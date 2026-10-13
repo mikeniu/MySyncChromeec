@@ -140,6 +140,38 @@ static int test_body_detect(void)
 	TEST_ASSERT(15 * window_size <= trigger_time &&
 		    trigger_time < 20 * window_size);
 
+	/* Single-sample impulse rejection test */
+	body_detect_reset();
+	body_detect_change_state(BODY_DETECTION_OFF_BODY, false);
+	for (int i = 0; i < window_size; ++i) {
+		sensor->xyz[X] = 0;
+		sensor->xyz[Y] = 0;
+		sensor->xyz[Z] = filler(sensor, 9.8f);
+		body_detect();
+	}
+	TEST_ASSERT(body_detect_get_state() == BODY_DETECTION_OFF_BODY);
+
+	sensor->xyz[X] = filler(sensor, 2.5f);
+	body_detect();
+	for (int i = 0; i < window_size; ++i) {
+		sensor->xyz[X] = 0;
+		body_detect();
+		TEST_ASSERT(body_detect_get_state() == BODY_DETECTION_OFF_BODY);
+	}
+
+	sensor->xyz[X] = filler(sensor, -2.5f);
+	body_detect();
+	for (int i = 0; i < window_size; ++i) {
+		sensor->xyz[X] = 0;
+		body_detect();
+		TEST_ASSERT(body_detect_get_state() == BODY_DETECTION_OFF_BODY);
+	}
+
+	sensor->xyz[X] = filler(sensor, 2.5f);
+	body_detect();
+	body_detect();
+	TEST_ASSERT(body_detect_get_state() == BODY_DETECTION_ON_BODY);
+
 	return EC_SUCCESS;
 }
 
