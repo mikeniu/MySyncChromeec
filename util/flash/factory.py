@@ -15,6 +15,9 @@ from flash.flasher_base import BaseEcFlasher
 from flash.flashrom_flasher import FlashromFlasher
 from flash.ite_flasher import IteI2cFlasher
 from flash.ite_flasher import IteUartFlasher
+from flash.npcx_flasher import NpcxJtagFlasher
+from flash.npcx_flasher import NpcxSpiFlasher
+from flash.npcx_flasher import NpcxUutFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 
@@ -119,15 +122,12 @@ class FlasherFactory:
 
         if interface == "uart" and chip.startswith("it8"):
             flasher_cls = IteUartFlasher
-        elif interface == "spi" and not chip.startswith("npcx"):
-            flasher_cls = FlashromFlasher
-        elif chip in (
-            "ite_spi",
-            "npcx_int_spi",
-            "npcx_spi",
-            "stm32_spi",
-            "mchp_int_spi",
-        ):
+        elif interface == "spi":
+            if chip.startswith("npcx"):
+                flasher_cls = NpcxSpiFlasher
+            else:
+                flasher_cls = FlashromFlasher
+        elif chip in ("ite_spi", "stm32_spi", "mchp_int_spi"):
             flasher_cls = FlashromFlasher
         elif chip in ("it8xxx2", "ite_spi_ccd_i2c", "ite_spi_ccd_uart"):
             servo_type = servo.get("servo_type", default="") if servo else ""
@@ -141,6 +141,12 @@ class FlasherFactory:
             flasher_cls = IteI2cFlasher
         elif chip in ("ite_uart", "ite_uart_3m", "it8320"):
             flasher_cls = IteUartFlasher
+        elif chip == "npcx_uut":
+            flasher_cls = NpcxUutFlasher
+        elif chip in ("npcx_jtag", "npcx_5m5g_jtag", "5m5g_jtag"):
+            flasher_cls = NpcxJtagFlasher
+        elif chip.startswith("npcx"):
+            flasher_cls = NpcxSpiFlasher
 
         if flasher_cls is not None:
             return flasher_cls(servo, args)
