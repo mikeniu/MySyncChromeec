@@ -122,6 +122,7 @@ struct iteflash_config {
 	int disable_watchdog; /* boolean */
 	int disable_protect_path; /* boolean */
 	int block_write_size;
+	int preserve_pin;
 	int usb_interface;
 	int usb_vid;
 	int usb_pid;
@@ -759,6 +760,14 @@ static int check_chipid(struct common_hnd *chnd)
 		if (ret < 0)
 			return ret;
 
+		/*
+		 * In deep rescue mode when the main EC core clock domain is
+		 * asleep, 0xF02085 reads back 0x00 (e.g. 0x01202 on IT81202 or
+		 * 0x01302 on IT81302). Restore the leading 0x8 nibble.
+		 */
+		if ((id & 0xff00f) == 0x01002 || (id & 0xff00f) == 0x02002)
+			id |= 0x80000;
+
 		if ((id & 0xf000f) == 0x80001 || (id & 0xf000f) == 0x80002) {
 			chnd->flash_cmd_v2 = 1;
 			chnd->dbgr_addr_3bytes = 1;
@@ -835,18 +844,40 @@ static int exit_dbgr_mode(struct common_hnd *chnd)
 static int dbgr_reset_gpio(struct common_hnd *chnd)
 {
 	int ret = 0;
+	int addr;
 
-	printf("Reset GPIOs to default.\n");
+	printf("Reset GPIOs to default safely.\n");
 	if (chnd->dbgr_addr_3bytes)
 		ret |= i2c_write_byte(chnd, 0x80, 0xf0);
-	ret |= i2c_write_byte(chnd, 0x2f, 0x20);
-	ret |= i2c_write_byte(chnd, 0x2e, 0x07);
-	ret |= i2c_write_byte(chnd, 0x30, BIT(1));
+	ret |= i2c_write_byte(chnd, 0x2f, 0x16);
+
+	/*
+	 * Iterate GPCR registers (0xF01610..0xF0166F) instead of issuing a
+	 * global GPIO reset (0xF02007 = BIT(1)) so alternate-function pins
+	 * (0x00) and any caller-specified preserve_pin (e.g. AP_RST_L) are
+	 * not floated to High-Z input mid-flash.
+	 */
+	for (addr = 0x1610; addr <= 0x166f; addr++) {
+		uint8_t val = 0;
+		int r;
+
+		if (chnd->conf.preserve_pin != -1 &&
+		    addr == chnd->conf.preserve_pin)
+			continue;
+
+		r = i2c_write_byte(chnd, 0x2e, addr & 0xff);
+		if (!r)
+			r = i2c_read_byte(chnd, 0x30, &val);
+		if (r < 0)
+			ret |= r;
+		else if (val != 0x00)
+			ret |= i2c_write_byte(chnd, 0x30, 0x80);
+	}
 
 	if (ret < 0)
 		fprintf(stderr, "DBGR RESET GPIO FAILED\n");
 
-	return 0;
+	return ret < 0 ? -EIO : 0;
 }
 
 /* disable watchdog */
@@ -1247,9 +1278,6 @@ static int send_special_waveform(struct common_hnd *chnd)
 		ret = chnd->conf.i2c_if->send_special_waveform(chnd);
 		if (ret)
 			break;
-
-		/* wait for PLL stable for 5ms (plus remaining USB transfers) */
-		usleep(10 * MSEC);
 
 		/* Stop EC ASAP after sending special waveform. */
 		if (dbgr_stop_ec(chnd) >= 0) {
@@ -2256,6 +2284,7 @@ static int strdup_with_errmsg(const char *source, char **dest, const char *name)
 }
 
 static const struct option longopts[] = { { "block-write-size", 1, 0, 'b' },
+					  { "dbgr-preserve-pin", 1, 0, 'P' },
 					  { "debug", 0, 0, 'd' },
 					  { "erase", 0, 0, 'e' },
 					  { "help", 0, 0, 'h' },
@@ -2301,6 +2330,9 @@ static void display_usage(const char *program)
 	fprintf(stderr, "-n, --noverify : Don't auto verify.\n");
 	fprintf(stderr, "-b, --block-write-size <size> : Perform writes in\n"
 			"\tblocks of this many bytes.\n");
+	fprintf(stderr,
+		"-P, --dbgr-preserve-pin <addr|port_pin> : Skip resetting\n"
+		"\tspecified GPCR offset (e.g. 0x1641 or G1) during DBGR.\n");
 	fprintf(stderr, "-p, --product <0x1234> : USB product ID\n");
 	fprintf(stderr,
 		"-R, --range base[:size] : Allow to read or write"
@@ -2360,13 +2392,50 @@ static int parse_range_options(char *str, struct iteflash_config *conf)
 	return 0;
 }
 
+/*
+ * Parses -P / --dbgr-preserve-pin parameter, accepting either a GPCR register
+ * offset (e.g. "0x1641") or a port+pin name (e.g. "G1" -> 0x1641).
+ */
+static int parse_preserve_pin_option(const char *str,
+				     struct iteflash_config *conf)
+{
+	char *endptr = NULL;
+	long val;
+
+	if (!str || !*str)
+		return -1;
+
+	if (((str[0] >= 'A' && str[0] <= 'L') ||
+	     (str[0] >= 'a' && str[0] <= 'l')) &&
+	    (str[1] >= '0' && str[1] <= '7') && str[2] == '\0') {
+		int port_idx = (str[0] >= 'a') ? (str[0] - 'a') :
+						 (str[0] - 'A');
+		int pin = str[1] - '0';
+
+		conf->preserve_pin = 0x1610 + (port_idx * 8) + pin;
+		return 0;
+	}
+
+	val = strtol(str, &endptr, 0);
+	if (!endptr || *endptr != '\0' || val < 0x1610 || val > 0x166f) {
+		fprintf(stderr,
+			"Invalid -P / --dbgr-preserve-pin value: %s "
+			"(expected 0x1610..0x166f or A0..L7)\n",
+			str);
+		return -1;
+	}
+
+	conf->preserve_pin = (int)val;
+	return 0;
+}
+
 static int parse_parameters(int argc, char **argv, struct iteflash_config *conf)
 {
 	int opt, idx, ret = 0;
 
-	while (!ret &&
-	       (opt = getopt_long(argc, argv, "?b:c:D:dehi:mp:R:r:s:uv:W:w:Zz",
-				  longopts, &idx)) != -1) {
+	while (!ret && (opt = getopt_long(argc, argv,
+					  "?b:c:D:dehi:mnP:p:R:r:s:uv:W:w:Zz",
+					  longopts, &idx)) != -1) {
 		switch (opt) {
 		case 'b':
 			conf->block_write_size = strtol(optarg, NULL, 10);
@@ -2410,6 +2479,9 @@ static int parse_parameters(int argc, char **argv, struct iteflash_config *conf)
 			break;
 		case 'n':
 			conf->verify = 0;
+			break;
+		case 'P':
+			ret = parse_preserve_pin_option(optarg, conf);
 			break;
 		case 'p':
 			conf->usb_pid = strtol(optarg, NULL, 16);
@@ -2494,6 +2566,7 @@ int main(int argc, char **argv)
 			.send_waveform = 1,
 			.disable_watchdog = 1,
 			.disable_protect_path = 1,
+			.preserve_pin = -1,
 			.usb_interface = SERVO_INTERFACE,
 			.verify = 1,
 			.wdt_enable = 0,
