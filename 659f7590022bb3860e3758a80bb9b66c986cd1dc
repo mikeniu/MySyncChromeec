@@ -40,6 +40,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b192069e_c3ea8a5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T21:33:52Z",
+      "side": 1,
+      "message": "Please fix",
+      "parentUuid": "6793930f_24b3e319",
+      "revId": "659f7590022bb3860e3758a80bb9b66c986cd1dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f36d5299_cf86e59e",
         "filename": "util/flash_fp_mcu",
         "patchSetId": 1
@@ -77,6 +95,30 @@
       "side": 1,
       "message": "this is how it done for `config_brya`. Can you confirm?",
       "parentUuid": "f36d5299_cf86e59e",
+      "range": {
+        "startLine": 1321,
+        "startChar": 0,
+        "endLine": 1326,
+        "endChar": 9999
+      },
+      "revId": "659f7590022bb3860e3758a80bb9b66c986cd1dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff772e83_ba7debc6",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1326,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T21:33:52Z",
+      "side": 1,
+      "message": "The AI review suggestion is good",
+      "parentUuid": "07398a09_43689c05",
       "range": {
         "startLine": 1321,
         "startChar": 0,
