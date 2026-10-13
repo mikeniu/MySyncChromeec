@@ -123,11 +123,6 @@ task_id_t task_get_current(void);
 bool in_deferred_context(void);
 
 /**
- * Return a pointer to the bitmap of events of the task.
- */
-atomic_t *task_get_event_bitmap(task_id_t tskid);
-
-/**
  * Wait for the next event.
  *
  * If one or more events are already pending, returns immediately.  Otherwise,
