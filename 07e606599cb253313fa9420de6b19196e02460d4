@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "010fb7ed_97a3bd76",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T03:07:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n* **Functionality**: ✅ Looks good.\n* **Architecture \u0026 Component Fit**: ✅ Tests follow standard Zephyr `ztest` and FFF mocking practices.\n* **Code Simplicity**: ✅ Mocking and assertions are clear.\n* **Idiomaticity \u0026 Readability**: ❌ Some test bodies contain control flow (`for` loops) which should be unrolled.\n* **Security**: ✅ No issues.\n* **Testing**: ✅ Thorough test coverage of the algorithm wrapper.\n* **CL Size \u0026 Scope**: ❌ Size: L (+406, -0). This CL exceeds the size limit for a single logical change. Please split this CL into smaller atomic parts to ease review. A suggested split plan:\n  1. CL 1: Base test scaffolding, `CMakeLists.txt`, `prj.conf`, and initialization tests (`test_init_*`, `test_exit_*`).\n  2. CL 2: Enrollment step test cases (`test_enroll_*`).\n  3. CL 3: Match test cases (`test_match_*`).\n* **Commit Message**: ✅ Clear and follows conventions.\n [🔗](http://go/tj/030d9148-97a7-4893-b919-087c94cc49d5)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "07e606599cb253313fa9420de6b19196e02460d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9fded5e_fae37431",
+        "filename": "zephyr/test/fingerprint/algorithm/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T03:07:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Per the **Minimal Test Setup \u0026 Zero Control Flow in Tests** guideline, avoid `for` loops inside test bodies. Unroll this loop into sequential assertions to ensure that a failure in one position doesn\u0027t prevent testing of subsequent ones.\n\n```c\n\trts_bio_enroll_step_fake.return_val \u003d RTS_FP_TOO_HIGH;\n\tzassert_equal(fingerprint_enroll_step(fixture-\u003ealg, fixture-\u003eimage, NULL),\n\t\t      FP_ENROLLMENT_RESULT_LOW_COVERAGE);\n\n\trts_bio_enroll_step_fake.return_val \u003d RTS_FP_TOO_LOW;\n\tzassert_equal(fingerprint_enroll_step(fixture-\u003ealg, fixture-\u003eimage, NULL),\n\t\t      FP_ENROLLMENT_RESULT_LOW_COVERAGE);\n\n\trts_bio_enroll_step_fake.return_val \u003d RTS_FP_TOO_LEFT;\n\tzassert_equal(fingerprint_enroll_step(fixture-\u003ealg, fixture-\u003eimage, NULL),\n\t\t      FP_ENROLLMENT_RESULT_LOW_COVERAGE);\n\n\trts_bio_enroll_step_fake.return_val \u003d RTS_FP_TOO_RIGHT;\n\tzassert_equal(fingerprint_enroll_step(fixture-\u003ealg, fixture-\u003eimage, NULL),\n\t\t      FP_ENROLLMENT_RESULT_LOW_COVERAGE);\n```\n [🔗](http://go/tj/030d9148-97a7-4893-b919-087c94cc49d5)",
+      "range": {
+        "startLine": 231,
+        "startChar": 0,
+        "endLine": 238,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "07e606599cb253313fa9420de6b19196e02460d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a902cad0_a5d64696",
+        "filename": "zephyr/test/fingerprint/algorithm/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T03:07:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similar to `test_enroll_step_low_coverage`, avoid `for` loops in test bodies. Unroll this loop to ensure all coverage cases are independently evaluated.\n\n```c\n\trts_bio_match_fake.return_val \u003d RTS_FP_TOO_HIGH;\n\tzassert_equal(fingerprint_match(fixture-\u003ealg, fixture-\u003etempl, 1, fixture-\u003eimage,\n\t\t\t\t\tfalse, \u0026match_index, \u0026update_bitmap),\n\t\t      FP_MATCH_RESULT_LOW_COVERAGE);\n\n\trts_bio_match_fake.return_val \u003d RTS_FP_TOO_LOW;\n\tzassert_equal(fingerprint_match(fixture-\u003ealg, fixture-\u003etempl, 1, fixture-\u003eimage,\n\t\t\t\t\tfalse, \u0026match_index, \u0026update_bitmap),\n\t\t      FP_MATCH_RESULT_LOW_COVERAGE);\n\n\trts_bio_match_fake.return_val \u003d RTS_FP_TOO_LEFT;\n\tzassert_equal(fingerprint_match(fixture-\u003ealg, fixture-\u003etempl, 1, fixture-\u003eimage,\n\t\t\t\t\tfalse, \u0026match_index, \u0026update_bitmap),\n\t\t      FP_MATCH_RESULT_LOW_COVERAGE);\n\n\trts_bio_match_fake.return_val \u003d RTS_FP_TOO_RIGHT;\n\tzassert_equal(fingerprint_match(fixture-\u003ealg, fixture-\u003etempl, 1, fixture-\u003eimage,\n\t\t\t\t\tfalse, \u0026match_index, \u0026update_bitmap),\n\t\t      FP_MATCH_RESULT_LOW_COVERAGE);\n```\n [🔗](http://go/tj/030d9148-97a7-4893-b919-087c94cc49d5)",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 349,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "07e606599cb253313fa9420de6b19196e02460d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
