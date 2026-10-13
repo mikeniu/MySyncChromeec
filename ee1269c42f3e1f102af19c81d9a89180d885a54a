@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "bacafa1b_41242f30",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T23:24:57Z",
+      "side": 1,
+      "message": "Please add a brief commit message body explaining the change (e.g., that RTS5817 maps flash at 0x01800000 with two 4 KiB rollback regions at offsets 0x40000 and 0x41000), and keep the `TEST\u003d` command on a single line rather than wrapping it across two lines:\n\n```text\nTEST\u003d./test/run_device_tests.py -b realtekfp --zephyr -t rollback_region0 rollback_region1\n```\n\nAlso note that building and running `rollback` on `realtekfp` depends on the `realtekfp` board definition (CL 6878651) and Cortex-M33 MPU support (CL 7851857); please either rebase this stack onto that series or add `Cq-Depend: chromium:6878651, chromium:7851857`.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9999
+      },
+      "revId": "ee1269c42f3e1f102af19c81d9a89180d885a54a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "1f4cab82_c29fdfb3",
@@ -16,6 +39,29 @@
       "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/9d0e10e4-0a57-46d5-bab4-7b42a0501429)]\n\n### Review Summary\n* **Functionality:** The newly added `DATA_ACCESS_VIOLATION_1840000_REGEX` and `DATA_ACCESS_VIOLATION_1841000_REGEX` variables properly match the specific `mfar` addresses, ensuring region violations are correctly identified.\n* **Architecture \u0026 Component Fit:** The changes follow the established pattern for device test configurations and rollback parameters.\n* **Code Simplicity:** The regex assignments and struct modifications are direct and minimal. No simpler implementation is needed.\n* **Idiomaticity \u0026 Readability:** Python `re.compile` declarations and C struct designated initializers are used idiomatically.\n* **Security:** No security vulnerabilities were introduced.\n* **Testing \u0026 Test Coverage:** The CL directly enables the on-device automated testing for `rollback_region` on the `realtekfp` target.\n* **CL Size \u0026 Scope:** `Size: S (+14, -3)` is small, atomic, and represents a single logical change.\n* **Commit Message:** The commit message clearly states the changes and includes appropriate `BUG` and `TEST` footers.",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "ee1269c42f3e1f102af19c81d9a89180d885a54a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89fbdf9b_913e7c29",
+        "filename": "zephyr/test/hwtest/src/rollback.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T23:24:57Z",
+      "side": 1,
+      "message": "`CONFIG_SOC_RTS5817` uses the exact same `rollback_info` values as `CONFIG_SOC_EGIS_ET171` right above it. Consider combining them into a single `#elif` branch:\n\n```c\n#elif defined(CONFIG_SOC_EGIS_ET171) || defined(CONFIG_SOC_RTS5817)\nstruct rollback_info rollback_info \u003d {\n\t.region_0_offset \u003d 0x40000,\n\t.region_1_offset \u003d 0x41000,\n\t.region_size_bytes \u003d 4 * 1024,\n};\n```",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 9999
+      },
       "revId": "ee1269c42f3e1f102af19c81d9a89180d885a54a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
