@@ -1613,7 +1613,12 @@ function ite_dfu_mode() {
 				": ${CCD_I2C_CAP}"
 		fi
 
-		info "Asking CR50 to send the dbgr special waveform to ${CHIP}"
+		if dut_has_control gsc_uart_cmd; then
+			servo_save_add "gsc_uart_cmd" "sysrst deassert"
+			dut_control "gsc_uart_cmd:sysrst assert"
+		fi
+
+		info "Asking GSC to send the dbgr special waveform to ${CHIP}"
 		sleep 2
 		dut_control_or_die cr50_i2c_ctrl:ite_debugger_mode
 		sleep 3
@@ -1752,6 +1757,18 @@ function flash_it83xx() {
 			"-s" "$(get_serial)" )
 		if get_serial_is_ccd; then
 			ITEFLASH_ARGS+=( "--block-write-size=256" )
+		fi
+
+		local ITE_AP_RST_PIN=""
+		if dut_has_control ite_ap_rst_pin; then
+			ITE_AP_RST_PIN="$(dut_control_get ite_ap_rst_pin)"
+		fi
+		if [[ -n "${ITE_AP_RST_PIN}" && \
+		      "${ITE_AP_RST_PIN}" != *"Problem with"* ]]; then
+			ITEFLASH_ARGS+=( "--dbgr-preserve-pin=${ITE_AP_RST_PIN}" )
+		elif [[ "${BOARD}" == "corsola" || "${BOARD}" == "veluza" ]]; then
+			info "Falling back to G1 for ITE AP_RST preservation on ${BOARD}"
+			ITEFLASH_ARGS+=( "--dbgr-preserve-pin=G1" )
 		fi
 	fi
 
