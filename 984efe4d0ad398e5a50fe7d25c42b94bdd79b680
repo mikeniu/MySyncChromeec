@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b687178_8217d891",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-10-13T18:24:15Z",
+      "side": 1,
+      "message": "is this really a special case for the ocelotrvp-ite or do we need to update\nthe default conditions in\n`zephyr/boards/google/it8xxx2/Kconfig.defconfig`?",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 41
+      },
+      "revId": "984efe4d0ad398e5a50fe7d25c42b94bdd79b680",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
