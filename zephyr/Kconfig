@@ -46,6 +46,7 @@ menuconfig PLATFORM_EC
 	imply EVENTS
 	imply PRINTK
 	imply SHELL
+	imply THREAD_CUSTOM_DATA
     imply POLL # k_poll used in shim/src/console.c
 	help
 	  The platform/ec Zephyr module allows some code from the

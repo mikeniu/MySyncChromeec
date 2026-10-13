@@ -53,17 +53,44 @@ const static k_tid_t task_to_k_tid[TASK_ID_COUNT] = {
 	CROS_EC_TASK_LIST
 };
 
-static struct k_event task_events[TASK_ID_COUNT + EXTRA_TASK_COUNT];
+#define MAX_THREAD_EVENTS 32
+
+static struct {
+	k_tid_t thread;
+	struct k_event event;
+} thread_events[MAX_THREAD_EVENTS];
+static struct k_spinlock thread_event_lock;
 static int tasks_started;
 #undef CROS_EC_TASK
 
-test_export_static struct k_event *task_get_event(task_id_t cros_task_id)
+test_export_static struct k_event *get_thread_event(k_tid_t thread)
 {
-	if (cros_task_id >= ARRAY_SIZE(task_events)) {
+	if (thread == NULL) {
 		return NULL;
 	}
 
-	return &task_events[cros_task_id];
+	if (unlikely(thread->custom_data == NULL)) {
+		k_spinlock_key_t key = k_spin_lock(&thread_event_lock);
+
+		if (thread->custom_data == NULL) {
+			for (size_t i = 0; i < ARRAY_SIZE(thread_events); ++i) {
+				k_tid_t t = thread_events[i].thread;
+
+				if (t == thread || t == NULL ||
+				    (t->base.thread_state & _THREAD_DEAD)) {
+					thread_events[i].thread = thread;
+					k_event_set(&thread_events[i].event, 0);
+					thread->custom_data =
+						&thread_events[i].event;
+					break;
+				}
+			}
+			__ASSERT_NO_MSG(thread->custom_data != NULL);
+		}
+		k_spin_unlock(&thread_event_lock, key);
+	}
+
+	return thread->custom_data;
 }
 
 test_export_static k_tid_t get_idle_thread(void)
@@ -171,13 +198,42 @@ task_id_t task_get_current(void)
 	return thread_id_to_task_id(k_current_get());
 }
 
-void task_set_event(task_id_t cros_task_id, uint32_t event)
+#define get_HOSTCMD_thread get_hostcmd_thread
+#define get_MAIN_thread get_main_thread
+#define get_SHELL_thread get_shell_thread
+#define get_AP_PWRSEQ_thread get_ap_pwrseq_thread
+#define get_SYSWORKQ_thread get_sysworkq_thread
+#define get_IDLE_thread get_idle_thread
+#define EXTRA_TASK_GETTER(name) get_##name##_thread,
+static k_tid_t (*const extra_task_to_k_tid[EXTRA_TASK_COUNT])(void) = {
+	CROS_EC_EXTRA_TASKS(EXTRA_TASK_GETTER)
+};
+
+static k_tid_t task_id_to_thread_id(task_id_t task_id)
 {
-	struct k_event *ev = task_get_event(cros_task_id);
+	if (task_id < TASK_ID_COUNT) {
+		return task_to_k_tid[task_id];
+	}
+
+	if (task_id - TASK_ID_COUNT < EXTRA_TASK_COUNT) {
+		return extra_task_to_k_tid[task_id - TASK_ID_COUNT]();
+	}
+
+	return NULL;
+}
+
+void thread_set_event(k_tid_t thread, uint32_t event)
+{
+	struct k_event *ev = get_thread_event(thread);
 
 	if (ev != NULL) {
 		k_event_post(ev, event);
 	}
+}
+
+void task_set_event(task_id_t cros_task_id, uint32_t event)
+{
+	thread_set_event(task_id_to_thread_id(cros_task_id), event);
 }
 
 uint32_t task_wait_event(int timeout_us)
@@ -189,15 +245,17 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
 	const k_timeout_t timeout = (timeout_us == -1) ? K_FOREVER :
 							 K_USEC(timeout_us);
-	struct k_event *ev = task_get_event(task_get_current());
+	struct k_event *ev = get_thread_event(k_current_get());
 	uint32_t events;
-
-	__ASSERT_NO_MSG(ev != NULL);
 
 	events = k_event_wait_safe(ev, event_mask, false, timeout);
 	return events ? events : TASK_EVENT_TIMER;
 }
 #ifdef TEST_BUILD
+struct k_event *task_get_event(task_id_t cros_task_id)
+{
+	return get_thread_event(task_id_to_thread_id(cros_task_id));
+}
 void set_test_runner_tid(void)
 {
 	task_to_k_tid[TASK_ID_TEST_RUNNER] = k_current_get();
@@ -239,8 +297,8 @@ void start_ec_tasks(void)
  */
 static int init_events(void)
 {
-	for (size_t i = 0; i < ARRAY_SIZE(task_events); ++i) {
-		k_event_init(&task_events[i]);
+	for (size_t i = 0; i < ARRAY_SIZE(thread_events); ++i) {
+		k_event_init(&thread_events[i].event);
 	}
 
 	return 0;
