@@ -44,6 +44,7 @@ zephyr_library_sources_ifdef(CONFIG_HW_TEST_QUEUE src/queue.c
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_RAM_LOCK src/ram_lock.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_REBOOT src/reboot.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_RESTRICTED_CONSOLE ${PLATFORM_EC}/zephyr/test/console/src/console_restricted.c)
+zephyr_library_sources_ifdef(CONFIG_HW_TEST_RISCV_FPU src/riscv_fpu.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_RNG_BENCHMARK src/rng_benchmark.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_ROLLBACK src/rollback.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_ROLLBACK_ENTROPY src/rollback_entropy.c)
