@@ -41,6 +41,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6bb1656_73d3255a",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T20:28:46Z",
+      "side": 1,
+      "message": "Done. Wrapped long lines and removed line-too-long from pylint disable.",
+      "parentUuid": "0ce0a9e7_ee50c9dd",
+      "range": {
+        "startLine": 14,
+        "startChar": 33,
+        "endLine": 14,
+        "endChar": 46
+      },
+      "isAi": true,
+      "revId": "a61e6b895da5b0b0ff958845366e203f0dd77e8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00022947_28f15d66",
@@ -64,6 +89,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5957aa5e_07fef8be",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T20:28:46Z",
+      "side": 1,
+      "message": "Added a comment clarifying this: the \u0027$\u0027 anchor matches only the top-level CONFIG_PLATFORM_EC module toggle (disabling it turns off the entire EC application build), while individual CONFIG_PLATFORM_EC_* sub-options are still evaluated.",
+      "parentUuid": "00022947_28f15d66",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 91,
+        "endChar": 21
+      },
+      "isAi": true,
+      "revId": "a61e6b895da5b0b0ff958845366e203f0dd77e8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6114b4f_1068133c",
@@ -77,6 +127,25 @@
       "writtenOn": "2026-09-17T23:41:57Z",
       "side": 1,
       "message": "I would suggest ec/build for that",
+      "revId": "a61e6b895da5b0b0ff958845366e203f0dd77e8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b615951c_7951ed4c",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 667,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T20:28:46Z",
+      "side": 1,
+      "message": "Done. Changed default build directory to build/zmake_opt_\u003ctarget\u003e.",
+      "parentUuid": "f6114b4f_1068133c",
+      "isAi": true,
       "revId": "a61e6b895da5b0b0ff958845366e203f0dd77e8e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -100,6 +169,31 @@
         "endLine": 1579,
         "endChar": 70
       },
+      "revId": "a61e6b895da5b0b0ff958845366e203f0dd77e8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a36a6400_c1aa82c7",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1579,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T20:28:46Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "66cc29dd_5472a305",
+      "range": {
+        "startLine": 1579,
+        "startChar": 66,
+        "endLine": 1579,
+        "endChar": 70
+      },
+      "isAi": true,
       "revId": "a61e6b895da5b0b0ff958845366e203f0dd77e8e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
