@@ -39,6 +39,16 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #if defined(CONFIG_ARM)
 #define PANIC_ARCH PANIC_ARCH_CORTEX_M
 #if defined(CONFIG_EXTRA_EXCEPTION_INFO)
+#if defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
+#define EXTRA_MAINLINE_PANIC_REG_LIST(M)   \
+	M(extra_info.cfsr, cm.cfsr, cfsr)  \
+	M(extra_info.bfar, cm.bfar, bfar)  \
+	M(extra_info.mmfar, cm.mfar, mfar) \
+	M(extra_info.hfsr, cm.hfsr, hfsr)  \
+	M(extra_info.dfsr, cm.dfsr, dfsr)
+#else
+#define EXTRA_MAINLINE_PANIC_REG_LIST(M)
+#endif
 #define EXTRA_PANIC_REG_LIST(M, M_GPR)                                       \
 	M_GPR(extra_info.callee->v1, cm.regs[CORTEX_PANIC_REGISTER_R4], v1)  \
 	M_GPR(extra_info.callee->v2, cm.regs[CORTEX_PANIC_REGISTER_R5], v2)  \
@@ -51,7 +61,8 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 	M(extra_info.callee->psp, cm.regs[CORTEX_PANIC_REGISTER_PSP], psp)   \
 	M(basic.xpsr, cm.regs[CORTEX_PANIC_REGISTER_IPSR], ipsr)             \
 	M(extra_info.exc_return, cm.regs[CORTEX_PANIC_REGISTER_LR], exc_rtn) \
-	M(extra_info.msp, cm.regs[CORTEX_PANIC_REGISTER_MSP], msp)
+	M(extra_info.msp, cm.regs[CORTEX_PANIC_REGISTER_MSP], msp)           \
+	EXTRA_MAINLINE_PANIC_REG_LIST(M)
 /*
  * IPSR is a subset of xPSR, which is already captured in PANIC_REG_LIST, but
  * print it anyway because it may contain panic exception.
@@ -59,7 +70,6 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #else
 #define EXTRA_PANIC_REG_LIST(M, M_GPR)
 #endif
-/* TODO(b/245423691): Copy other status registers (e.g. CFSR) when available. */
 #define PANIC_REG_LIST(M, M_GPR)          \
 	M_GPR(basic.r0, cm.frame[0], a1)  \
 	M_GPR(basic.r1, cm.frame[1], a2)  \
