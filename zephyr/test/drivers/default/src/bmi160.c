@@ -2161,9 +2161,9 @@ ZTEST_USER(bmi160, test_bmi_interrupt_handler)
 	 * interrupt, and ensure the flag is set.
 	 */
 
-	atomic_t *mask;
+	uint32_t *mask;
 
-	mask = &task_get_base_data(TASK_ID_MOTIONSENSE)->event_mask;
+	mask = &task_get_event(TASK_ID_MOTIONSENSE)->events;
 	zassert_true((*mask & CONFIG_ACCELGYRO_BMI160_INT_EVENT) == 0,
 		     "Event flag is set before firing interrupt");
 

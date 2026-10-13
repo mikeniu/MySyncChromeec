@@ -80,7 +80,7 @@ ZTEST_F(pi3usb9201, test_usb0_evt)
 	 * bitmap
 	 */
 	toggle_gpio(USBC0_GPIO_DEV, USBC0_GPIO_PORT);
-	zassert_true(task_get_base_data(TASK_ID_USB_CHG)->event_mask & BIT(0));
+	zassert_true(task_get_event(TASK_ID_USB_CHG)->events & BIT(0));
 
 	/* Give the task a bit of time to process the events */
 	task_wake(TASK_ID_USB_CHG);
@@ -104,7 +104,7 @@ ZTEST_F(pi3usb9201, test_usb1_evt)
 	 * bitmap
 	 */
 	toggle_gpio(USBC1_GPIO_DEV, USBC1_GPIO_PORT);
-	zassert_true(task_get_base_data(TASK_ID_USB_CHG)->event_mask & BIT(1));
+	zassert_true(task_get_event(TASK_ID_USB_CHG)->events & BIT(1));
 
 	/* Give the task a bit of time to process the events */
 	task_wake(TASK_ID_USB_CHG);

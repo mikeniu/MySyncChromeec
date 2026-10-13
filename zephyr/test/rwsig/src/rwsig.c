@@ -395,7 +395,7 @@ ZTEST(rwsig, test_hostcmd_rwsig_action)
 	struct ec_params_rwsig_action param = { .action = RWSIG_ACTION_ABORT };
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_RWSIG_ACTION, 0, param);
-	atomic_t *events = &task_get_base_data(TASK_ID_RWSIG)->event_mask;
+	uint32_t *events = &task_get_event(TASK_ID_RWSIG)->events;
 
 	*events = 0;
 	zassert_ok(host_command_process(&args));
