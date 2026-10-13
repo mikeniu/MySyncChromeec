@@ -391,6 +391,29 @@ def bundle_firmware(opts):
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
         )
+        # Export the config files as they are, next to the tarballs.
+        ro_config = artifacts_dir / "RO" / ".config"
+        rw_config = artifacts_dir / ".config"
+        if ro_config.is_file():
+            config_exports = [
+                (ro_config, "ec-ro"),
+                (rw_config, "ec-rw"),
+            ]
+        else:
+            config_exports = [(rw_config, "ec")]
+        for config_file, kind in config_exports:
+            if not config_file.is_file():
+                continue
+            config_name = f"configs/{build_target}/{kind}.config"
+            config_path = pathlib.Path(bundle_dir) / config_name
+            config_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(config_file, config_path)
+            meta = info.objects.add()
+            meta.file_name = config_name
+            if build_target in baseboards and baseboards[build_target]:
+                meta.config_info.board.append(baseboards[build_target])
+            meta.config_info.target = build_target
+            meta.config_info.kind = kind
         # TODO(kmshelton): Populate the rest of metadata contents as it gets
         # defined in infra/proto/src/chromite/api/firmware.proto.
 
