@@ -20,6 +20,7 @@ from flash.mchp_flasher import MchpFlasher
 from flash.npcx_flasher import NpcxJtagFlasher
 from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
+from flash.openocd_flasher import OpenOcdFlasher
 from flash.rtk_flasher import RtkFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
@@ -144,6 +145,16 @@ class TestFactory(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             FlasherFactory.create(self.servo, self.args)
         self.assertEqual(self.args.chip, "unsupported_chip")
+
+    def test_openocd_dispatch(self) -> None:
+        """Route openocd chips to OpenOcdFlasher."""
+        for chip in ("openocd", "openocd_stm32"):
+            with self.subTest(chip=chip):
+                self.args.chip = chip
+                self.assertIsInstance(
+                    FlasherFactory.create(self.servo, self.args),
+                    OpenOcdFlasher,
+                )
 
     def test_chip_from_servo_ite_uart(self) -> None:
         """Route it8320 from servo ec_chip to IteUartFlasher."""

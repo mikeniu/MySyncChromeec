@@ -19,6 +19,7 @@ from flash.mchp_flasher import MchpFlasher
 from flash.npcx_flasher import NpcxJtagFlasher
 from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
+from flash.openocd_flasher import OpenOcdFlasher
 from flash.rtk_flasher import RtkFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
@@ -159,6 +160,8 @@ class FlasherFactory:
             flasher_cls = MchpFlasher
         elif chip.startswith("rtk") or chip.startswith("realtek"):
             flasher_cls = RtkFlasher
+        elif chip.startswith("openocd"):
+            flasher_cls = OpenOcdFlasher
 
         if flasher_cls is not None:
             return flasher_cls(servo, args)
