@@ -845,7 +845,6 @@ class AllTests:
                 timeout_secs=150,
             ),
             TestConfig(test_name="boringssl_crypto"),
-            # TODO(b/468409589): Add RISC-V FPU test.
             TestConfig(
                 test_name="cortexm_fpu",
                 architectures=[Architecture.ARM],
@@ -1005,6 +1004,10 @@ class AllTests:
                 skip_for_ec_legacy=True,
             ),
             TestConfig(test_name="restricted_console"),
+            TestConfig(
+                test_name="riscv_fpu",
+                architectures=[Architecture.RISCV],
+            ),
             TestConfig(test_name="rng_benchmark"),
             TestConfig(
                 config_name="rollback_region0",
