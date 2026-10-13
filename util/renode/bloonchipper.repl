@@ -13,6 +13,15 @@ rtc:
 timer2:
     frequency: 96000000
 
+// Upstream stm32f4.repl does not instantiate the Cortex-M4 Data Watchpoint and
+// Trace (DWT) unit at 0xE0001000, causing DWT->CYCCNT reads in timing and
+// benchmark tests to return 0. Instantiate DWT at 48 MHz (half of timer2's
+// 96 MHz frequency to align DWT->CYCCNT with Renode's simulated instruction
+// execution rate relative to timer2).
+// TODO(b/567997308): Remove once DWT is added to upstream stm32f4.repl.
+dwt: Miscellaneous.DWT @ sysbus 0xE0001000
+    frequency: 48000000
+
 GPIO_WP: Miscellaneous.Button @ gpioPortB 7
     invert: true
     -> gpioPortB@7
