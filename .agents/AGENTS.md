@@ -205,17 +205,16 @@ platform/ec$ ./twister -T path/to/my/tests
 
 ### Run a specific test
 ```
-platform/ec$ ./twister -s <test dir>/<my.test.scenario>
+platform/ec$ ./twister -s <my.test.scenario>
 ```
 
 For example:
 ```
-platform/ec$ ./twister -s drivers/drivers.default
+platform/ec$ ./twister -s drivers.default
 ```
 
-`drivers/` is the directory under `zephyr/test/` that contains the requested
-test, and `drivers.default` is the specific test scenario specified in that
-directory's `testcase.yaml` file.
+`drivers.default` is the test scenario named in the `testcase.yaml` file of
+the test directory under `zephyr/test/`, here `zephyr/test/drivers/`.
 
 ### Run all tests with coverage
 
