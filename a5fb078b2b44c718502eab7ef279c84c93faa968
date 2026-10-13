@@ -18,6 +18,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dafbea45_f632a484",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-13T18:29:03Z",
+      "side": 1,
+      "message": "Checked firmware_metadata.jsonpb from CQ build 8668383396063296385: jacuzzi models now have [jacuzzi, kukui], strongbad models have [strongbad, trogdor], etc., but model.yaml files under src/private-overlays/overlay-*-private produced board names with a -private suffix (e.g. hatch-private, octopus-private, strongbad-private). Added .removesuffix(\u0027-private\u0027) in PS2 to strip that suffix.",
+      "parentUuid": "19e51e9c_626e99a7",
+      "isAi": true,
+      "revId": "a5fb078b2b44c718502eab7ef279c84c93faa968",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52a4bf70_cb7bf04d",
@@ -31,6 +50,25 @@
       "writtenOn": "2026-10-09T21:46:17Z",
       "side": 1,
       "message": "software_config comes from the previous loop, so this would be the last found config, is that right?",
+      "revId": "a5fb078b2b44c718502eab7ef279c84c93faa968",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c056c9f2_1c98d148",
+        "filename": "firmware_builder.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-13T18:29:03Z",
+      "side": 1,
+      "message": "Good catch! Fixed in PS2 to read from config instead of software_config (which also finds nocturne_fp in poppy/nocturne/generated/joined.jsonproto, so I removed nocturne_fp from EXPECTED_UNUSED_BOARDS).",
+      "parentUuid": "52a4bf70_cb7bf04d",
+      "isAi": true,
       "revId": "a5fb078b2b44c718502eab7ef279c84c93faa968",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
