@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08567fb0_8e8bc184",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3329707
+      },
+      "writtenOn": "2026-10-13T20:38:55Z",
+      "side": 1,
+      "message": "zephyr/firmware_builder.py is 998 lines. pylint\u0027s limit is 1000.",
+      "revId": "77de183c99bb64abbec98f271b09828b4c43207c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
