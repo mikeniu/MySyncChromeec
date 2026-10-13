@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b258b84b_eff139d3",
+        "filename": "zephyr/lib/vsensor/body_detection/body_detection.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T22:03:07Z",
+      "side": 1,
+      "message": "Setting `body_detect_initialized \u003d false` here causes the next `body_detect_step()` call (line 152) to invoke `body_detect_change_state(BODY_DETECTION_ON_BODY, false)` again, emitting a redundant `ON_BODY` event/hook on every reset/ODR change. Consider removing or guarding the duplicate call in `body_detect_step()`.",
+      "isAi": true,
+      "revId": "5be9c412492004bf4a419f9cd466441c14f1fb7b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
