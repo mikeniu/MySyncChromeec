@@ -16,6 +16,24 @@
       "message": "can you use `min` here? single evaluation version",
       "revId": "d9785d47f8a6a82a40b0b1d5817c22274e20ed45",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f79011c_e2d4a014",
+        "filename": "common/body_detection.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-13T20:39:28Z",
+      "side": 1,
+      "message": "Done — switched to `min(confidence_delta_scaled, var_threshold_scaled)`.",
+      "parentUuid": "c24b07cb_43f3c67e",
+      "revId": "d9785d47f8a6a82a40b0b1d5817c22274e20ed45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
