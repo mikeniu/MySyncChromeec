@@ -20,6 +20,8 @@ from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
+from flash.stm32_flasher import Stm32DfuFlasher
+from flash.stm32_flasher import Stm32UartFlasher
 
 
 logger = logging.getLogger(__name__)
@@ -120,7 +122,9 @@ class FlasherFactory:
         interface = args.interface
         flasher_cls: Optional[Type[BaseEcFlasher]] = None
 
-        if interface == "uart" and chip.startswith("it8"):
+        if interface == "dfu" or chip == "stm32_dfu":
+            flasher_cls = Stm32DfuFlasher
+        elif interface == "uart" and chip.startswith("it8"):
             flasher_cls = IteUartFlasher
         elif interface == "spi":
             if chip.startswith("npcx"):
@@ -147,6 +151,8 @@ class FlasherFactory:
             flasher_cls = NpcxJtagFlasher
         elif chip.startswith("npcx"):
             flasher_cls = NpcxSpiFlasher
+        elif chip.startswith("stm32") or chip.startswith("google_"):
+            flasher_cls = Stm32UartFlasher
 
         if flasher_cls is not None:
             return flasher_cls(servo, args)
