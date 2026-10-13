@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a89e9ad7_baf78e52",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-13T01:20:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d550542_f50541a2",
+      "range": {
+        "startLine": 7,
+        "startChar": 28,
+        "endLine": 7,
+        "endChar": 55
+      },
+      "revId": "a66c491dedd4050a8f1f60e423f51a2bc56c1c21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "304b8654_3fa4b836",
@@ -63,6 +87,24 @@
       "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/9462f4f9-6e04-40d2-8f26-4b477b71fb44)]\n\n### Review Summary\n*   **Functionality:** The patch adds the `__attribute__((noinline))` directive to the `crash_system` function in the panic data hardware test. Without this attribute, the compiler may inline the function (especially on targets like `realtekfp` without LTO), causing the Link Register (LR) captured in the hardware panic frame to point to `test_crash` instead of the expected `crash_system` frame bounds, leading to the test falsely asserting. Forcing `noinline` ensures the trap executes in its own frame and the captured `lr` satisfies `(crash_addr \u003c\u003d lr) \u0026\u0026 (crash_end \u003e\u003d lr)`.\n*   **Architecture \u0026 Component Fit:** The change accurately aligns with the test architecture. It prevents a compiler optimization from obfuscating the call stack, maintaining the test\u0027s capability to verify stack frame capture.\n*   **Code Simplicity:** Yes, this is as simple as possible. It is a clean, minimal one-line directive to enforce the boundary needed for the test to succeed. No simpler rewrite exists.\n*   **Idiomaticity \u0026 Readability:** `__attribute__((noinline))` is a standard GCC attribute used in C environments for explicitly preventing function inlining.\n*   **Security:** N/A.\n*   **Testing \u0026 Test Coverage:** The CL directly patches and fixes an existing automated test suite for hardware targets (specifically fixing the `panic_data` tests for `realtekfp`). No further test coverage is required for a test fix.\n*   **CL Size \u0026 Scope:** `Size: XS (+1, -1)`. The CL is exceptionally small, atomic, and adheres strictly to the single logical change rule. \n*   **Commit Message:** The commit message clearly states the rationale (fixing a test failure on `realtekfp`), adheres to Chromium\u0027s formatting conventions, and accurately provides the required `BUG\u003d` and `TEST\u003d` footers.",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a66c491dedd4050a8f1f60e423f51a2bc56c1c21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7369e2bf_966049c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-13T01:20:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "304b8654_3fa4b836",
       "revId": "a66c491dedd4050a8f1f60e423f51a2bc56c1c21",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
