@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "5be9c412492004bf4a419f9cd466441c14f1fb7b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d631ad0_6a151108",
+        "filename": "zephyr/lib/vsensor/body_detection/body_detection.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-13T22:20:13Z",
+      "side": 1,
+      "message": "Done. Removed the duplicate body_detect_change_state(BODY_DETECTION_ON_BODY, false) call in body_detect_step() and added a HOOK_BODY_DETECT_CHANGE check in test_on_body_hysteresis.",
+      "parentUuid": "b258b84b_eff139d3",
+      "revId": "5be9c412492004bf4a419f9cd466441c14f1fb7b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
