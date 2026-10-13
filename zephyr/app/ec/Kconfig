@@ -195,9 +195,6 @@ configdefault SHELL_HELP
 configdefault KERNEL_SHELL
   default y
 
-configdefault WDT_SHELL
-	default y if WATCHDOG
-
 # Realtek ULPM support requires POWEROFF
 configdefault POWEROFF
 	default y if SOC_RTS5912_ULPM
