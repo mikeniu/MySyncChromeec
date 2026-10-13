@@ -86,6 +86,23 @@
       "parentUuid": "a0e6adf8_29edb2cc",
       "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b53f35ef_6695ded5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-10-13T01:18:29Z",
+      "side": 1,
+      "message": "New fail:\n\n[meru:rw] Loaded configuration \u0027/mnt/host/source/src/platform/ec/zephyr/boards/google/npcx9/npcx9_npcx9m7fb_defconfig\u0027\n[meru:rw] /mnt/host/source/src/third_party/zephyr/google-private/include/meru/project.conf:5: warning: attempt to assign the value \u00271500\u0027 to the undefined symbol PLATFORM_EC_LIGHTBAR_ANIMATION_HOLD_MS",
+      "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
