@@ -50,6 +50,24 @@
       "message": "Upload CL - crrev.com/i/9953035 in google-private to address the CQ failure",
       "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0e6adf8_29edb2cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-10-13T00:11:33Z",
+      "side": 1,
+      "message": "cr/9953035 landed.",
+      "parentUuid": "01f4119c_be21bdcf",
+      "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
