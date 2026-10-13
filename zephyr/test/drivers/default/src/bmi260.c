@@ -2000,30 +2000,6 @@ ZTEST_USER(bmi260, test_unsupported_configs)
 		EC_RES_INVALID_PARAM, ret);
 }
 
-ZTEST_USER(bmi260, test_interrupt_handler)
-{
-	/* The accelerometer interrupt handler simply sets an event flag for the
-	 * motion sensing task. Make sure that flag starts cleared, fire the
-	 * interrupt, and ensure the flag is set.
-	 */
-
-	atomic_t *mask;
-
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true((*mask & CONFIG_ACCELGYRO_BMI260_INT_EVENT) == 0,
-		     "Event flag is set before firing interrupt");
-
-	bmi260_interrupt(0);
-
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true(*mask & CONFIG_ACCELGYRO_BMI260_INT_EVENT,
-		     "Event flag is not set after firing interrupt");
-}
-
 ZTEST_USER(bmi260, test_bmi_init_chip_id)
 {
 	const struct emul *emul = EMUL_DT_GET(BMI_NODE);
@@ -2322,3 +2298,33 @@ static void bmi260_test_before(void *arg)
 
 ZTEST_SUITE(bmi260, drivers_predicate_pre_main, NULL, bmi260_test_before, NULL,
 	    NULL);
+
+ZTEST_USER(bmi260_tasks, test_interrupt_handler)
+{
+	const struct emul *emul = EMUL_DT_GET(BMI_NODE);
+	struct i2c_common_emul_data *common_data =
+		emul_bmi_get_i2c_common_data(emul);
+	struct fifo_func_data func_data = {
+		.interrupts = BMI260_FWM_INT,
+	};
+	struct bmi_emul_frame f = {
+		.type = BMI_EMUL_FRAME_ACC,
+		.acc_x = BMI_EMUL_1G / 10,
+		.acc_y = BMI_EMUL_1G / 20,
+		.acc_z = -(int)BMI_EMUL_1G / 30,
+		.next = NULL,
+	};
+
+	bmi_init_emul();
+	i2c_common_emul_set_read_func(common_data, emul_fifo_func, &func_data);
+	bmi_emul_append_frame(emul, &f);
+
+	bmi260_interrupt(0);
+	k_sleep(K_SECONDS(10));
+
+	zassert_equal(bmi_emul_get_reg(emul, BMI260_INT_STATUS_0), 0, NULL);
+	zassert_equal(bmi_emul_get_reg(emul, BMI260_INT_STATUS_1), 0, NULL);
+}
+
+ZTEST_SUITE(bmi260_tasks, drivers_predicate_post_main, NULL, bmi260_test_before,
+	    NULL, NULL);

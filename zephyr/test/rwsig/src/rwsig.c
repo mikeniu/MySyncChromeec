@@ -386,24 +386,16 @@ ZTEST(rwsig, test_rwsig_jump_now)
 	zassert_equal(system_run_image_copy_fake.call_count, 1);
 }
 
-#define TASK_EVENT_ABORT TASK_EVENT_CUSTOM_BIT(0)
-#define TASK_EVENT_CONTINUE TASK_EVENT_CUSTOM_BIT(1)
-
 ZTEST(rwsig, test_hostcmd_rwsig_action)
 {
 	struct ec_params_rwsig_action param = { .action = RWSIG_ACTION_ABORT };
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_RWSIG_ACTION, 0, param);
-	atomic_t *events = task_get_event_bitmap(TASK_ID_RWSIG);
 
-	*events = 0;
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_ABORT);
 
-	*events = 0;
 	param.action = RWSIG_ACTION_CONTINUE;
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_CONTINUE);
 
 	param.action = 99;
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);

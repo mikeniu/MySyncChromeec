@@ -185,15 +185,6 @@ task_id_t task_get_current(void)
 	return thread_id_to_task_id(k_current_get());
 }
 
-atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
-{
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(cros_task_id);
-
-	return data == NULL ? NULL : &data->event_mask;
-}
-
 void task_set_event(task_id_t cros_task_id, uint32_t event)
 {
 	struct task_ctx_base_data *data;
@@ -259,7 +250,8 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 
 	data = task_get_base_data(task_get_current());
 
-	uint32_t events = 0;
+	k_poll_signal_reset(&data->new_event);
+	uint32_t events = atomic_set(&data->event_mask, 0);
 	const int64_t tick_deadline =
 		k_uptime_ticks() + k_us_to_ticks_near64(timeout_us);
 
