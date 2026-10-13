@@ -22,6 +22,30 @@
       },
       "revId": "984efe4d0ad398e5a50fe7d25c42b94bdd79b680",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41e79b09_ad24d72a",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-10-13T20:15:12Z",
+      "side": 1,
+      "message": "Intel stated in the meeting this morning that it is RVP-specific.",
+      "parentUuid": "0b687178_8217d891",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 41
+      },
+      "revId": "984efe4d0ad398e5a50fe7d25c42b94bdd79b680",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
