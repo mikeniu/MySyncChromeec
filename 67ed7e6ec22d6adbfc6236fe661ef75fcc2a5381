@@ -16,6 +16,24 @@
       "message": "min/max here as well (unless it fails to compile but I think it works)",
       "revId": "67ed7e6ec22d6adbfc6236fe661ef75fcc2a5381",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd454108_2b0ae48c",
+        "filename": "common/body_detection.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-13T20:39:41Z",
+      "side": 1,
+      "message": "Done — switched `median3()` to `max(min(a, b), min(max(a, b), c))`.",
+      "parentUuid": "a13cae90_af1ec59e",
+      "revId": "67ed7e6ec22d6adbfc6236fe661ef75fcc2a5381",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
