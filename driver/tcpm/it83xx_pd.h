@@ -234,7 +234,7 @@
 #define CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT 0
 #endif
 
-#define TASK_EVENT_PHY_TX_DONE TASK_EVENT_CUSTOM_BIT(PD_EVENT_FIRST_FREE_BIT)
+#define PD_EVENT_PHY_TX_DONE BIT(PD_EVENT_FIRST_FREE_BIT)
 
 #define SET_MASK(reg, bit_mask) ((reg) |= (bit_mask))
 #define CLEAR_MASK(reg, bit_mask) ((reg) &= (~(bit_mask)))

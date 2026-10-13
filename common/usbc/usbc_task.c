@@ -33,6 +33,9 @@
 #include "usbc_ppc.h"
 #include "util.h"
 
+#include <zephyr/init.h>
+#include <zephyr/kernel.h>
+
 #define USBC_EVENT_TIMEOUT (5 * MSEC)
 #define USBC_MIN_EVENT_TIMEOUT (1 * MSEC)
 
@@ -51,6 +54,41 @@ extern int _GPIO_CCD_MODE_ODL;
 
 static uint8_t paused[CONFIG_USB_PD_PORT_MAX_COUNT];
 
+#if defined(HAS_TASK_PD_C0) && defined(CONFIG_USB_PD_PORT_MAX_COUNT)
+static struct k_event pd_port_events[CONFIG_USB_PD_PORT_MAX_COUNT];
+
+static int init_pd_port_events(void)
+{
+	for (int port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++)
+		k_event_init(&pd_port_events[port]);
+
+	return 0;
+}
+SYS_INIT(init_pd_port_events, PRE_KERNEL_1, 0);
+
+void pd_set_event(int port, uint32_t events)
+{
+	if (port >= 0 && port < CONFIG_USB_PD_PORT_MAX_COUNT)
+		k_event_post(&pd_port_events[port], events);
+}
+
+void pd_clear_port_event(int port, uint32_t events)
+{
+	if (port >= 0 && port < CONFIG_USB_PD_PORT_MAX_COUNT)
+		k_event_clear(&pd_port_events[port], events);
+}
+
+uint32_t pd_wait_event_mask(int port, uint32_t event_mask, int timeout_us)
+{
+	if (port < 0 || port >= CONFIG_USB_PD_PORT_MAX_COUNT)
+		return 0;
+
+	return k_event_wait_safe(&pd_port_events[port], event_mask, false,
+				 timeout_us < 0 ? K_FOREVER :
+						  K_USEC(timeout_us));
+}
+#endif /* HAS_TASK_PD_C0 && CONFIG_USB_PD_PORT_MAX_COUNT */
+
 void tc_pause_event_loop(int port)
 {
 	paused[port] = 1;
@@ -64,12 +102,12 @@ bool tc_event_loop_is_paused(int port)
 void tc_start_event_loop(int port)
 {
 	/*
-	 * Only generate TASK_EVENT_WAKE event if state
+	 * Only generate PD_EVENT_WAKE event if state
 	 * machine is transitioning to un-paused
 	 */
 	if (paused[port]) {
 		paused[port] = 0;
-		task_set_event(PD_PORT_TO_TASK_ID(port), TASK_EVENT_WAKE);
+		pd_wake(port);
 	}
 }
 
@@ -116,17 +154,18 @@ static int pd_task_timeout(int port)
 static bool pd_task_loop(int port)
 {
 	/* wait for next event/packet or timeout expiration */
-	const uint32_t evt = task_wait_event(pd_task_timeout(port));
+	const uint32_t evt =
+		pd_wait_event_mask(port, UINT32_MAX, pd_task_timeout(port));
 
 	/* Manage expired PD Timers on timeouts */
-	if (evt & TASK_EVENT_TIMER)
+	if (evt == 0)
 		pd_timer_manage_expired(port);
 
 	/*
-	 * Re-use TASK_EVENT_RESET_DONE in tests to restart the USB task
+	 * Re-use PD_EVENT_RESET_DONE in tests to restart the USB task
 	 * if this code is running in a unit test.
 	 */
-	if (IS_ENABLED(TEST_BUILD) && (evt & TASK_EVENT_RESET_DONE))
+	if (IS_ENABLED(TEST_BUILD) && (evt & PD_EVENT_RESET_DONE))
 		return false;
 
 	/* handle events that affect the state machine as a whole */

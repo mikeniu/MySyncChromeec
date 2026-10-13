@@ -42,7 +42,7 @@ static void integration_usb_before(void *state)
 	const struct emul *charger_emul = EMUL_GET_USBC_BINDING(0, chg);
 
 	/* Restart the PD task and let it settle */
-	task_set_event(TASK_ID_PD_C0, TASK_EVENT_RESET_DONE);
+	pd_set_event(0, PD_EVENT_RESET_DONE);
 	k_sleep(K_SECONDS(1));
 
 	/* Reset vbus to 0mV */

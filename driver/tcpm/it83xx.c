@@ -630,10 +630,10 @@ static enum tcpc_transmit_complete it83xx_tx_data(enum usbpd_port port,
 	for (r = 0; r <= retry_count; r++) {
 		/* Start TX */
 		USBPD_KICK_TX_START(port);
-		evt = task_wait_event_mask(TASK_EVENT_PHY_TX_DONE,
-					   PD_T_TCPC_TX_TIMEOUT);
+		evt = pd_wait_event_mask(port, PD_EVENT_PHY_TX_DONE,
+					 PD_T_TCPC_TX_TIMEOUT);
 		/* check TX status */
-		if (USBPD_IS_TX_ERR(port) || (evt & TASK_EVENT_TIMER)) {
+		if (USBPD_IS_TX_ERR(port) || (evt == 0)) {
 			/*
 			 * If discard, means HW doesn't send the msg and resend.
 			 */

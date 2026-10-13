@@ -50,30 +50,59 @@ enum pd_rx_errors {
 /* Events for USB PD task */
 
 /* Outgoing packet event */
-#define PD_EVENT_TX TASK_EVENT_CUSTOM_BIT(3)
+#define PD_EVENT_TX BIT(3)
 /* CC line change event */
-#define PD_EVENT_CC TASK_EVENT_CUSTOM_BIT(4)
+#define PD_EVENT_CC BIT(4)
 /* TCPC has reset */
-#define PD_EVENT_TCPC_RESET TASK_EVENT_CUSTOM_BIT(5)
+#define PD_EVENT_TCPC_RESET BIT(5)
 /* DRP state has changed */
-#define PD_EVENT_UPDATE_DUAL_ROLE TASK_EVENT_CUSTOM_BIT(6)
+#define PD_EVENT_UPDATE_DUAL_ROLE BIT(6)
 /*
  * A task, other than the task owning the PD port, accessed the TCPC. The task
  * that owns the port does not send itself this event.
  */
-#define PD_EVENT_DEVICE_ACCESSED TASK_EVENT_CUSTOM_BIT(7)
+#define PD_EVENT_DEVICE_ACCESSED BIT(7)
 /* Chipset power state changed */
-#define PD_EVENT_POWER_STATE_CHANGE TASK_EVENT_CUSTOM_BIT(8)
+#define PD_EVENT_POWER_STATE_CHANGE BIT(8)
 /* Issue a Hard Reset. */
-#define PD_EVENT_SEND_HARD_RESET TASK_EVENT_CUSTOM_BIT(9)
+#define PD_EVENT_SEND_HARD_RESET BIT(9)
 /* Prepare for sysjump */
-#define PD_EVENT_SYSJUMP TASK_EVENT_CUSTOM_BIT(10)
+#define PD_EVENT_SYSJUMP BIT(10)
 /* Receive a Hard Reset. */
-#define PD_EVENT_RX_HARD_RESET TASK_EVENT_CUSTOM_BIT(11)
+#define PD_EVENT_RX_HARD_RESET BIT(11)
 /* MUX configured notification event */
 #define PD_EVENT_AP_MUX_DONE TASK_EVENT_CUSTOM_BIT(12)
 /* First free event on PD task */
 #define PD_EVENT_FIRST_FREE_BIT 13
+/* For test-only builds, used to restart the PD thread */
+#define PD_EVENT_RESET_DONE BIT(28)
+/* Generic wake event for PD thread */
+#define PD_EVENT_WAKE BIT(29)
+
+#if defined(HAS_TASK_PD_C0) && defined(CONFIG_USB_PD_PORT_MAX_COUNT)
+void pd_set_event(int port, uint32_t events);
+void pd_clear_port_event(int port, uint32_t events);
+uint32_t pd_wait_event_mask(int port, uint32_t event_mask, int timeout_us);
+static inline void pd_wake(int port)
+{
+	pd_set_event(port, PD_EVENT_WAKE);
+}
+#else
+static inline void pd_set_event(int port, uint32_t events)
+{
+}
+static inline void pd_clear_port_event(int port, uint32_t events)
+{
+}
+static inline uint32_t pd_wait_event_mask(int port, uint32_t event_mask,
+					  int timeout_us)
+{
+	return 0;
+}
+static inline void pd_wake(int port)
+{
+}
+#endif
 
 /* Ensure TCPC is out of low power mode before handling these events. */
 #define PD_EXIT_LOW_POWER_EVENT_MASK               \
