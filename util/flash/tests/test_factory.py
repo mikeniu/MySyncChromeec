@@ -16,6 +16,7 @@ from flash.factory import query_ec_source_tree
 from flash.flashrom_flasher import FlashromFlasher
 from flash.ite_flasher import IteI2cFlasher
 from flash.ite_flasher import IteUartFlasher
+from flash.mchp_flasher import MchpFlasher
 from flash.npcx_flasher import NpcxJtagFlasher
 from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
@@ -188,6 +189,17 @@ class TestFactory(unittest.TestCase):
         self.args.chip = "google_dragonclaw"
         self.assertIsInstance(
             FlasherFactory.create(self.servo, self.args), Stm32UartFlasher
+        )
+
+    def test_mchp_dispatch(self) -> None:
+        """Route mchp and mec chips to MchpFlasher."""
+        self.args.chip = "mchp"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), MchpFlasher
+        )
+        self.args.chip = "mec1727"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), MchpFlasher
         )
 
     def test_board_map_lookup(self) -> None:
