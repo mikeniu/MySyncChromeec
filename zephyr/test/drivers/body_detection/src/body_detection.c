@@ -329,11 +329,15 @@ static timestamp_t get_time_fake(void)
 
 static void body_detect_sample_before(void *state)
 {
-	struct body_detect_params params;
+	static struct body_detect_params params;
 
 	ARG_UNUSED(state);
 	get_time_ptr_old = get_time_ptr;
 	get_time_ptr = get_time_fake;
+	time_fake_value = 0;
+
+	/* Reset body detection to make sure body_sensor is valid */
+	body_detect_reset();
 
 	old_drv = body_sensor->drv;
 	body_sensor->drv = &mock_drv;
@@ -508,6 +512,45 @@ ZTEST_USER(bodydetectsample, test_reallife_data)
 	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state());
 #endif
 }
+
+/* Note: ALOGIRTHM spelling matches Kconfig.body_detection */
+#if !defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+/**
+ * @brief TestPurpose: verify calculate_motion_confidence does not underflow
+ * uint64_t when confidence_delta_scaled > var_threshold_scaled.
+ */
+ZTEST_USER(bodydetectsample, test_confidence_delta_underflow)
+{
+	static const struct body_detect_params params = {
+		.var_threshold = 1000,
+		.confidence_delta = 3000,
+	};
+	int i, cnt;
+	float fs = 50.0f;
+	int G_1 = 16384;
+
+	body_sensor->bd_params = &params;
+	body_detect_reset();
+	zassert_true(confidence_delta_scaled > var_threshold_scaled);
+
+	/* Transition to OFF_BODY first */
+	cnt = 2 * 60 * fs;
+	for (i = 0; i < cnt; i++) {
+		body_sensor->xyz[X] = 0;
+		body_sensor->xyz[Y] = 0;
+		body_sensor->xyz[Z] = G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state());
+
+	/* Large X-axis motion must transition back to ON_BODY */
+	for (i = 0; i < 50; i++) {
+		body_sensor->xyz[X] = (i % 2 == 0) ? G_1 : -G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state());
+}
+#endif
 
 ZTEST_SUITE(bodydetectsample, drivers_predicate_post_main, NULL,
 	    body_detect_sample_before, body_detect_sample_after, NULL);
