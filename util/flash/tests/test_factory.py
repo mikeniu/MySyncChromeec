@@ -20,6 +20,7 @@ from flash.mchp_flasher import MchpFlasher
 from flash.npcx_flasher import NpcxJtagFlasher
 from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
+from flash.rtk_flasher import RtkFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 from flash.stm32_flasher import Stm32DfuFlasher
@@ -200,6 +201,17 @@ class TestFactory(unittest.TestCase):
         self.args.chip = "mec1727"
         self.assertIsInstance(
             FlasherFactory.create(self.servo, self.args), MchpFlasher
+        )
+
+    def test_rtk_dispatch(self) -> None:
+        """Route rtk and realtek chips to RtkFlasher."""
+        self.args.chip = "rtk"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), RtkFlasher
+        )
+        self.args.chip = "realtek"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), RtkFlasher
         )
 
     def test_board_map_lookup(self) -> None:
