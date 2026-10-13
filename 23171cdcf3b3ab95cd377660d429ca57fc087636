@@ -24,6 +24,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c43854a3_6c10716b",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-13T20:12:36Z",
+      "side": 1,
+      "message": "Done in PS3: added --no-print-directory. I reproduced the problem: with MAKEFLAGS\u003d-w, make -s still prints \"make: Entering directory\" and \"make: Leaving directory\", and those lines were taken as patterns. With the flag, _get_make_patterns() returns only the 30 real patterns.",
+      "parentUuid": "ad158ef7_a0a7ddf5",
+      "range": {
+        "startLine": 549,
+        "startChar": 0,
+        "endLine": 549,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "23171cdcf3b3ab95cd377660d429ca57fc087636",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0cbf4ed1_54735694",
@@ -43,6 +68,31 @@
         "endLine": 584,
         "endChar": 0
       },
+      "revId": "23171cdcf3b3ab95cd377660d429ca57fc087636",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2b5af7d_8b57450d",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-13T20:12:36Z",
+      "side": 1,
+      "message": "total is never 0 here: summarize_merged_lcov() (firmware_builder_lib.py, in CL 8572708, now merged) raises ValueError for any metric with no lines (covered by test_board_without_lines_raises). Failing is intended: a silent 0.0% would hide a renamed board or a broken merge, and the monolithic test() also raises when lcov --summary finds no data. I added a comment at the division in PS3 to make this visible.",
+      "parentUuid": "0cbf4ed1_54735694",
+      "range": {
+        "startLine": 584,
+        "startChar": 0,
+        "endLine": 584,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "23171cdcf3b3ab95cd377660d429ca57fc087636",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
