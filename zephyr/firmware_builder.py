@@ -4,6 +4,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+# pylint: disable=too-many-lines
+
 """Build and test all of the Zephyr boards.
 
 This is the entry point for the custom firmware builder workflow recipe.
@@ -36,6 +38,7 @@ sys.path.append(str(ZEPHYR_DIR / "../util"))
 
 # pylint: disable=wrong-import-position, import-error
 from coreboot_sdk import init_toolchain
+from lcov_stencil import compile_exclude_patterns
 import zmake.modules
 import zmake.project
 from zmake.repository_prep import find_checkout
@@ -48,6 +51,7 @@ from scripts.firmware_builder_lib import create_arg_parser
 from scripts.firmware_builder_lib import merge_shard_coverage_reports
 from scripts.firmware_builder_lib import save_or_load_shard_info
 from scripts.firmware_builder_lib import shard_projects
+from scripts.firmware_builder_lib import summarize_merged_lcov
 
 
 # pylint: enable=wrong-import-position, import-error
@@ -540,11 +544,64 @@ def bundle_coverage(opts):
     return 0
 
 
+def _get_make_patterns(variable):
+    """Gets the glob patterns that a variable of Makefile.cq has."""
+    # --no-print-directory: make -s still prints "Entering directory" lines
+    # when MAKEFLAGS has -w, and they would be taken for patterns.
+    cmd = [
+        "make",
+        "-s",
+        "--no-print-directory",
+        "-f",
+        "Makefile.cq",
+        f"print-{variable}",
+    ]
+    log_cmd(cmd)
+    output = subprocess.run(
+        cmd,
+        cwd=ZEPHYR_DIR,
+        check=True,
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
+        stdin=subprocess.DEVNULL,
+    ).stdout
+    return output.splitlines()
+
+
 def merge_shards(opts):
-    """Merges coverage artifacts from multiple build shards into a single report."""
-    return merge_shard_coverage_reports(
+    """Merges coverage artifacts from multiple build shards into a single report.
+
+    Also prints the code coverage metrics of the merged report as JSON, in the
+    format of the response that the recipe logs for test().
+    """
+    retcode = merge_shard_coverage_reports(
         opts, ZEPHYR_DIR, log_cmd, get_bundle_dir, write_metadata, firmware_pb2
     )
+    if retcode:
+        return retcode
+
+    metrics = firmware_pb2.FwTestMetricList()  # pylint: disable=no-member
+    summary = summarize_merged_lcov(
+        ZEPHYR_DIR.parent / "build" / "zephyr" / "lcov.info",
+        SPECIAL_BOARDS,
+        compile_exclude_patterns(_get_make_patterns("TEST_PATTERNS")),
+        compile_exclude_patterns(_get_make_patterns("BOARD_EXCLUDE_PATTERNS")),
+    )
+    for name, (covered, total) in summary.items():
+        metric = metrics.value.add()
+        metric.name = name
+        # total > 0: summarize_merged_lcov() raises for a metric with no lines.
+        metric.coverage_percent = round(100 * covered / total, 1)
+        metric.covered_lines = covered
+        metric.total_lines = total
+    print(
+        json.dumps(
+            {"metrics": json_format.MessageToDict(metrics)},
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
 
 
 def _run_compress(cmd, cwd=None):
