@@ -16,6 +16,9 @@ from flash.factory import query_ec_source_tree
 from flash.flashrom_flasher import FlashromFlasher
 from flash.ite_flasher import IteI2cFlasher
 from flash.ite_flasher import IteUartFlasher
+from flash.npcx_flasher import NpcxJtagFlasher
+from flash.npcx_flasher import NpcxSpiFlasher
+from flash.npcx_flasher import NpcxUutFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 
@@ -150,6 +153,25 @@ class TestFactory(unittest.TestCase):
         self.servo.get.return_value = "ccd_cr50"
         flasher = FlasherFactory.create(self.servo, self.args)
         self.assertIsInstance(flasher, IteI2cFlasher)
+
+    def test_npcx_dispatch(self) -> None:
+        """Route npcx_uut, npcx_jtag, and npcx to their respective flashers."""
+        self.args.chip = "npcx_uut"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), NpcxUutFlasher
+        )
+        self.args.chip = "npcx_jtag"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), NpcxJtagFlasher
+        )
+        self.args.chip = "npcx_spi"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), NpcxSpiFlasher
+        )
+        self.args.chip = "npcx9"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), NpcxSpiFlasher
+        )
 
     def test_board_map_lookup(self) -> None:
         """Verify legacy board_map lookup returns expected chip types."""
