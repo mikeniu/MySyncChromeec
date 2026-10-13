@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad158ef7_a0a7ddf5",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-13T18:56:32Z",
+      "side": 1,
+      "message": "Consider adding `--no-print-directory` to the `make` command to prevent `make` from printing `make: Entering directory...` output (which would then be incorrectly parsed as a glob pattern) in case `MAKEFLAGS\u003d-w` is set in the environment.",
+      "range": {
+        "startLine": 549,
+        "startChar": 0,
+        "endLine": 549,
+        "endChar": 0
+      },
+      "revId": "23171cdcf3b3ab95cd377660d429ca57fc087636",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cbf4ed1_54735694",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-13T18:56:32Z",
+      "side": 1,
+      "message": "If a component has 0 instrumented lines, `total` will be 0 and this will raise a `ZeroDivisionError`. It might be safer to handle the `total \u003d\u003d 0` case here, for example:\n\n```python\nmetric.coverage_percent \u003d round(100 * covered / total, 1) if total \u003e 0 else 0.0\n```",
+      "range": {
+        "startLine": 584,
+        "startChar": 0,
+        "endLine": 584,
+        "endChar": 0
+      },
+      "revId": "23171cdcf3b3ab95cd377660d429ca57fc087636",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
