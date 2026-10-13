@@ -91,6 +91,19 @@ bool is_interrupt_enabled(void);
 bool in_interrupt_context(void);
 
 /**
+ * Set a thread event.
+ *
+ * If the thread is higher priority than the current thread, this will cause an
+ * immediate context switch to the new thread.
+ *
+ * Can be called both in interrupt context and thread context.
+ *
+ * @param thread	Thread to set event for
+ * @param event		Event bitmap to set (TASK_EVENT_*)
+ */
+void thread_set_event(k_tid_t thread, uint32_t event);
+
+/**
  * Set a task event.
  *
  * If the task is higher priority than the current task, this will cause an
@@ -102,6 +115,16 @@ bool in_interrupt_context(void);
  * @param event		Event bitmap to set (TASK_EVENT_*)
  */
 void task_set_event(task_id_t tskid, uint32_t event);
+
+/**
+ * Wake a thread.  This sends it the TASK_EVENT_WAKE event.
+ *
+ * @param thread	Thread to wake
+ */
+static inline void thread_wake(k_tid_t thread)
+{
+	thread_set_event(thread, TASK_EVENT_WAKE);
+}
 
 /**
  * Wake a task.  This sends it the TASK_EVENT_WAKE event.
