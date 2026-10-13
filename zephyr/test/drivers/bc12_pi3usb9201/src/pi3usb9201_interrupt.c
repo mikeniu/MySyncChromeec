@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ec_tasks.h"
 #include "gpio_signal.h"
 #include "task.h"
 #include "test/drivers/test_state.h"
@@ -12,6 +13,7 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
+#include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
 
 /* Get reference to externally linked handlers (defined in DTS) */
@@ -79,7 +81,7 @@ ZTEST_F(pi3usb9201, test_usb0_evt)
 	 * bitmap
 	 */
 	toggle_gpio(USBC0_GPIO_DEV, USBC0_GPIO_PORT);
-	zassert_true(*task_get_event_bitmap(TASK_ID_USB_CHG) & BIT(0));
+	zassert_true(k_event_test(task_get_event(TASK_ID_USB_CHG), BIT(0)));
 
 	/* Give the task a bit of time to process the events */
 	task_wake(TASK_ID_USB_CHG);
@@ -103,7 +105,7 @@ ZTEST_F(pi3usb9201, test_usb1_evt)
 	 * bitmap
 	 */
 	toggle_gpio(USBC1_GPIO_DEV, USBC1_GPIO_PORT);
-	zassert_true(*task_get_event_bitmap(TASK_ID_USB_CHG) & BIT(1));
+	zassert_true(k_event_test(task_get_event(TASK_ID_USB_CHG), BIT(1)));
 
 	/* Give the task a bit of time to process the events */
 	task_wake(TASK_ID_USB_CHG);
