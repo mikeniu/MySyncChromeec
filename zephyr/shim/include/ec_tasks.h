@@ -23,6 +23,8 @@ void start_ec_tasks(void);
  * require to run in any task context.
  */
 void set_test_runner_tid(void);
+
+struct k_event *task_get_event(task_id_t cros_task_id);
 #endif
 
 #ifdef __cplusplus

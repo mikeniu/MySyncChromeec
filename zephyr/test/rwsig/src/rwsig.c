@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 #include "common/rollback_private.h"
+#include "ec_tasks.h"
 #include "emul/emul_flash.h"
 #include "flash.h"
 #include "host_command.h"
@@ -17,6 +18,7 @@
 
 #include <zephyr/device.h>
 #include <zephyr/fff.h>
+#include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
 
 FAKE_VALUE_FUNC(int32_t, system_get_rollback_version, enum ec_image);
@@ -394,16 +396,16 @@ ZTEST(rwsig, test_hostcmd_rwsig_action)
 	struct ec_params_rwsig_action param = { .action = RWSIG_ACTION_ABORT };
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_RWSIG_ACTION, 0, param);
-	atomic_t *events = task_get_event_bitmap(TASK_ID_RWSIG);
+	struct k_event *ev = task_get_event(TASK_ID_RWSIG);
 
-	*events = 0;
+	k_event_set(ev, 0);
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_ABORT);
+	zassert_equal(k_event_test(ev, UINT32_MAX), TASK_EVENT_ABORT);
 
-	*events = 0;
+	k_event_set(ev, 0);
 	param.action = RWSIG_ACTION_CONTINUE;
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_CONTINUE);
+	zassert_equal(k_event_test(ev, UINT32_MAX), TASK_EVENT_CONTINUE);
 
 	param.action = 99;
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);

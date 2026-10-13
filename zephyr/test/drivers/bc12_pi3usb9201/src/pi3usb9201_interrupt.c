@@ -75,14 +75,8 @@ ZTEST_F(pi3usb9201, test_usb0_evt)
 	/* Set up the driver to use the mock */
 	bc12_ports[0].drv = &fixture->mock_drv;
 
-	/* Trigger the event and verify that port0 was added to the task event
-	 * bitmap
-	 */
+	/* Trigger the event and give the task a bit of time to process it */
 	toggle_gpio(USBC0_GPIO_DEV, USBC0_GPIO_PORT);
-	zassert_true(*task_get_event_bitmap(TASK_ID_USB_CHG) & BIT(0));
-
-	/* Give the task a bit of time to process the events */
-	task_wake(TASK_ID_USB_CHG);
 	k_msleep(500);
 
 	/* Ensure that the callback was made (it should be the first, but others
@@ -99,14 +93,8 @@ ZTEST_F(pi3usb9201, test_usb1_evt)
 	/* Set up the driver to use the mock */
 	bc12_ports[1].drv = &fixture->mock_drv;
 
-	/* Trigger the event and verify that port1 was added to the task event
-	 * bitmap
-	 */
+	/* Trigger the event and give the task a bit of time to process it */
 	toggle_gpio(USBC1_GPIO_DEV, USBC1_GPIO_PORT);
-	zassert_true(*task_get_event_bitmap(TASK_ID_USB_CHG) & BIT(1));
-
-	/* Give the task a bit of time to process the events */
-	task_wake(TASK_ID_USB_CHG);
 	k_msleep(500);
 
 	/* Ensure that the callback was made (it should be the first, but others

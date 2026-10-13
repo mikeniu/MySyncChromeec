@@ -18,7 +18,7 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include <zephyr/sys/atomic.h>
+#include <zephyr/kernel.h>
 
 /* Task event bitmasks */
 /* Tasks may use the bits in TASK_EVENT_CUSTOM_BIT for their own events */
@@ -66,11 +66,6 @@ static inline void task_wake(task_id_t tskid)
  * Return the identifier of the task currently running.
  */
 task_id_t task_get_current(void);
-
-/**
- * Return a pointer to the bitmap of events of the task.
- */
-atomic_t *task_get_event_bitmap(task_id_t tskid);
 
 /**
  * Wait for the next event.

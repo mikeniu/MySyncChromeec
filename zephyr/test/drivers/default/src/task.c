@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ec_tasks.h"
 #include "task.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -37,8 +38,7 @@ static void after(void *f)
 
 ZTEST_SUITE(tasks, drivers_predicate_post_main, setup, before, after, NULL);
 
-ZTEST(tasks, test_get_event_bitmap_invalid_tid)
+ZTEST(tasks, test_get_event_invalid_tid)
 {
-	zassert_is_null(
-		task_get_event_bitmap(TASK_ID_COUNT + EXTRA_TASK_COUNT));
+	zassert_is_null(task_get_event(TASK_ID_COUNT + EXTRA_TASK_COUNT));
 }
