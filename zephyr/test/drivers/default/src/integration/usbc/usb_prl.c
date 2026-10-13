@@ -290,18 +290,13 @@ ZTEST_F(usb_prl_test_sink, test_prl_hard_reset_and_recovery)
  * ========================================================================= */
 
 /**
- * @brief Send chunk 0 of a chunked extended message of @p data_size bytes.
+ * @brief Allocate a partner message of @p size bytes, headers included.
  *
- * The partner emulator only builds single-chunk extended messages, so build
- * this one by hand. Allocate it the way the emulator does, because the
- * emulator frees it after the TCPM consumes it.
+ * Allocate it the way the partner emulator does, because the emulator frees
+ * the message after the TCPM consumes it.
  */
-static void partner_send_first_chunk(struct tcpci_partner_data *partner,
-				     enum pd_ext_msg_type type,
-				     uint16_t data_size)
+static struct tcpci_partner_msg *alloc_partner_msg(size_t size)
 {
-	const size_t size =
-		MSG_HEADER_LEN + MSG_MAX_DATA_OBJECTS * sizeof(uint32_t);
 	struct tcpci_partner_msg *msg;
 
 	msg = calloc(1, sizeof(*msg));
@@ -311,13 +306,54 @@ static void partner_send_first_chunk(struct tcpci_partner_data *partner,
 
 	msg->msg.cnt = size;
 	msg->msg.sop_type = TCPCI_MSG_SOP;
+
+	return msg;
+}
+
+/**
+ * @brief Build chunk 0 of a chunked extended message of @p data_size bytes.
+ *
+ * The partner emulator only builds single-chunk extended messages, so build
+ * this one by hand.
+ */
+static struct tcpci_partner_msg *build_first_chunk(enum pd_ext_msg_type type,
+						   uint16_t data_size)
+{
+	struct tcpci_partner_msg *msg = alloc_partner_msg(
+		MSG_HEADER_LEN + MSG_MAX_DATA_OBJECTS * sizeof(uint32_t));
+
 	msg->type = type;
 	msg->extended = true;
 	msg->data_objects = MSG_MAX_DATA_OBJECTS;
 	sys_put_le16(PD_EXT_HEADER(0, 0, data_size),
 		     &msg->msg.buf[MSG_HEADER_LEN]);
 
-	zassert_ok(tcpci_partner_send_msg(partner, msg, 0));
+	return msg;
+}
+
+/** @brief Send chunk 0 of a chunked extended message of @p data_size bytes. */
+static void partner_send_first_chunk(struct tcpci_partner_data *partner,
+				     enum pd_ext_msg_type type,
+				     uint16_t data_size)
+{
+	zassert_ok(tcpci_partner_send_msg(
+		partner, build_first_chunk(type, data_size), 0));
+}
+
+/**
+ * @brief Queue chunk 0 in the TCPC without alerting the TCPM. The partner's
+ * next message then shares one alert with this one.
+ */
+static void partner_queue_first_chunk(struct tcpci_partner_data *partner,
+				      const struct emul *tcpci_emul,
+				      enum pd_ext_msg_type type,
+				      uint16_t data_size)
+{
+	struct tcpci_partner_msg *msg = build_first_chunk(type, data_size);
+
+	tcpci_partner_set_header(partner, msg);
+	zassert_equal(tcpci_emul_add_rx_msg(tcpci_emul, &msg->msg, false),
+		      TCPCI_EMUL_TX_SUCCESS);
 }
 
 /** @brief Whether the partner's log holds a chunk request from the TCPM. */
@@ -390,6 +426,41 @@ ZTEST_F(usb_prl_test_source, test_prl_non_ext_msg_while_waiting_for_chunk)
 	/* Chunk 0 of a two-chunk message: the TCPM must ask for chunk 1. */
 	partner_send_first_chunk(partner, PD_EXT_MANUFACTURER_INFO,
 				 2 * PD_MAX_EXTENDED_MSG_CHUNK_LEN);
+	k_sleep(K_MSEC(100));
+
+	zassert_true(tcpm_sent_chunk_request(partner));
+	zassert_false(prl_is_busy(port));
+	zassert_true(tcpm_sent_ctrl_msg(partner, PD_CTRL_SOFT_RESET));
+	zassert_true(prl_is_running(port));
+}
+
+/**
+ * @brief The first chunk of an extended message and a non-extended message
+ * that the TCPM dequeues from its TCPC on the same pass must be handled as two
+ * messages. The TCPM requests chunk 1, then treats the non-extended message as
+ * an interruption of the chunked message (Soft_Reset). The message queued
+ * behind the chunk must not overwrite it before the TCPM has appended it.
+ *
+ * Ordering this test depends on: both messages must be in the TCPM's receive
+ * queue before the PD task dequeues the first one. The test queues the chunk in
+ * the TCPC emulator without raising an alert, then sends the control message
+ * normally, so the TCPM sees a single alert. Its alert handler runs in the PD
+ * interrupt task, which outranks the PD task, and drains the whole TCPC FIFO
+ * into the receive queue before the PD task runs again.
+ */
+ZTEST_F(usb_prl_test_source, test_prl_chunk_and_non_ext_msg_on_one_alert)
+{
+	struct tcpci_partner_data *partner = &fixture->fixture.partner_emul;
+	int port = TEST_USB_PORT;
+
+	zassert_true(tc_is_attached_src(port));
+	tcpci_partner_common_enable_pd_logging(partner, true);
+
+	partner_queue_first_chunk(partner, fixture->fixture.tcpci_emul,
+				  PD_EXT_MANUFACTURER_INFO,
+				  2 * PD_MAX_EXTENDED_MSG_CHUNK_LEN);
+	zassert_ok(tcpci_partner_send_control_msg(partner,
+						  PD_CTRL_GET_SOURCE_CAP, 0));
 	k_sleep(K_MSEC(100));
 
 	zassert_true(tcpm_sent_chunk_request(partner));
