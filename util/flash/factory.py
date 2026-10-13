@@ -15,6 +15,7 @@ from flash.flasher_base import BaseEcFlasher
 from flash.flashrom_flasher import FlashromFlasher
 from flash.ite_flasher import IteI2cFlasher
 from flash.ite_flasher import IteUartFlasher
+from flash.mchp_flasher import MchpFlasher
 from flash.npcx_flasher import NpcxJtagFlasher
 from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
@@ -153,6 +154,8 @@ class FlasherFactory:
             flasher_cls = NpcxSpiFlasher
         elif chip.startswith("stm32") or chip.startswith("google_"):
             flasher_cls = Stm32UartFlasher
+        elif chip.startswith("mchp") or chip.startswith("mec"):
+            flasher_cls = MchpFlasher
 
         if flasher_cls is not None:
             return flasher_cls(servo, args)
