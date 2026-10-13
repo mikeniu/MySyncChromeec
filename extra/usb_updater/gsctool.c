@@ -6180,11 +6180,12 @@ int main(int argc, char *argv[])
 	    !get_flog && !get_endorsement_seed && !get_metrics && !get_time &&
 	    !factory_config && !factory_mode && !erase_ap_ro_hash &&
 	    !password && !reboot_gsc && !rma && !set_capability &&
-	    !show_fw_ver && !sn_bits && !sn_inc_rma && !start_apro_verify &&
-	    !openbox_desc_file && !tstamp && !tpm_mode && (wp == WP_NONE) &&
-	    !get_chassis_open && !get_dev_ids && !get_aprov_reset_counts &&
-	    !upload_owner_config && !parse_device_ids && !set_strongbox &&
-	    !download_owner_config && !upload_boot_svc_msg) {
+	    !show_fw_ver && !sn_bits && !sn_inc_rma && !spi_drive &&
+	    !start_apro_verify && !openbox_desc_file && !tstamp && !tpm_mode &&
+	    (wp == WP_NONE) && !get_chassis_open && !get_dev_ids &&
+	    !get_aprov_reset_counts && !upload_owner_config &&
+	    !parse_device_ids && !set_strongbox && !download_owner_config &&
+	    !upload_boot_svc_msg) {
 		num_images = argc - optind;
 		if (num_images <= 0) {
 			fprintf(stderr,
