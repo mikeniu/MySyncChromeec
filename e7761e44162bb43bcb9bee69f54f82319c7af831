@@ -22,6 +22,31 @@
       },
       "revId": "e7761e44162bb43bcb9bee69f54f82319c7af831",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa4c0a31_68c8cd8c",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T00:38:50Z",
+      "side": 1,
+      "message": "Updated the comment to explain that Focaltech boards do not have a sensor select control line, so 0 is used for the servod fp_sensor_sel control.",
+      "parentUuid": "0886c1e1_3a70f9e3",
+      "range": {
+        "startLine": 235,
+        "startChar": 35,
+        "endLine": 235,
+        "endChar": 61
+      },
+      "isAi": true,
+      "revId": "e7761e44162bb43bcb9bee69f54f82319c7af831",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
