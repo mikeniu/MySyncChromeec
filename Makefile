@@ -77,6 +77,7 @@ endif
 
 # File containing configuration information
 config=$(out)/.config
+config_ro=$(out)/RO/.config
 
 # If no key file is provided, use the default dev key
 PEM ?= $(BDIR)/dev_key.pem
@@ -529,9 +530,13 @@ $(config): $(out)/$(PROJECT).bin
 	@printf '%s=y\n' $(_tsk_cfg) $(_tsk_cfg_rw) \
 		$(_flag_cfg) $(_flag_cfg_rw) > $@
 
+$(config_ro): $(out)/RO/$(PROJECT).RO.flat
+	@printf '%s=y\n' $(_tsk_cfg) $(_tsk_cfg_ro) \
+		$(_flag_cfg) $(_flag_cfg_ro) > $@
+
 def_all_deps:=$(config) $(PROJECT_EXTRA) notice rw size utils
 ifeq ($(CONFIG_FW_INCLUDE_RO),y)
-def_all_deps+=ro
+def_all_deps+=ro $(config_ro)
 endif
 all_deps?=$(def_all_deps)
 all: $(all_deps)
