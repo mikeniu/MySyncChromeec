@@ -259,7 +259,8 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 
 	data = task_get_base_data(task_get_current());
 
-	uint32_t events = 0;
+	k_poll_signal_reset(&data->new_event);
+	uint32_t events = atomic_set(&data->event_mask, 0);
 	const int64_t tick_deadline =
 		k_uptime_ticks() + k_us_to_ticks_near64(timeout_us);
 
