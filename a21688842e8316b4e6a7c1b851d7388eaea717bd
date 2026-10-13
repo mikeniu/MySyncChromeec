@@ -34,6 +34,24 @@
       "parentUuid": "33dba8d6_450ef2b4",
       "revId": "a21688842e8316b4e6a7c1b851d7388eaea717bd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d99a8a9d_5e70d3be",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Ok, so my thinking was that a thread enabling fast CPU should be active/ready (so system doesn\u0027t enter low-power mode) till it disables the fast CPU. But I can see you point, it doesn\u0027t hurt to put it here.",
+      "parentUuid": "438d920a_8b4a786f",
+      "revId": "a21688842e8316b4e6a7c1b851d7388eaea717bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

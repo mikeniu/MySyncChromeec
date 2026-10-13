@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5325fde6_0e7256d4",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "I don\u0027t think the irq locking is really needed here. IMO A proper synchro method should be enough here.",
+      "parentUuid": "fece2388_16f8e0f9",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3700500b_33a80ce5",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -108,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "20f87bb7_6f8e0bb4",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Where is this label defined and added? I can not find it.",
+      "parentUuid": "fdecdc9e_f1186d1d",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f7d1805d_d5607b1b",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -137,6 +173,24 @@
       "side": 1,
       "message": "No. APB clock is derived from sys_ck, while LPTIM runs off of LSI. It\u0027s a separate clock tree.",
       "parentUuid": "f7d1805d_d5607b1b",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca0a016c_9728ce31",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Great, thanks.",
+      "parentUuid": "c4e1752b_3b9a7e83",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -178,6 +232,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "751aa9a9_4c0b7a1f",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Almost 😄 I mean there are two options:\n- adjust flash latency after changing the system clock so the old latency is used with the new system clock for a moment\n- adjust flash latency before changing the system clock so the new latency is used with the old system clock for a moment\n\nI would like to see a comment explaining why we are choosing the second option.",
+      "parentUuid": "c57691a6_219e5c1e",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "27bd79fe_e63e45f4",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -207,6 +279,24 @@
       "side": 1,
       "message": "It\u0027s a leftover, the Kconfig option checked here is disabled. I can remove those lines.",
       "parentUuid": "27bd79fe_e63e45f4",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85e2f56d_0ab8b803",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Good. I think it is tricky naming - the system clock that clock the SOC (PLL after the change) and the system clock used by Zephyr (LPTIM, ticked by LSI, always constant)",
+      "parentUuid": "3888c2fb_095b3e91",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -248,6 +338,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "02ba5583_f536dd3d",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Thanks.",
+      "parentUuid": "b129f770_c9a2ae0d",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bf6e4475_1df7ec99",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -277,6 +385,24 @@
       "side": 1,
       "message": "\u003e We are reducing the rescalers while the system clock is still PLL.\n\nTake a look at line 112:\n```c\n\t\tLL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);\n\t\twhile (LL_RCC_GetSysClkSource() !\u003d\n                       LL_RCC_SYS_CLKSOURCE_STATUS_HSI) {\n\t\t}\n```",
       "parentUuid": "bf6e4475_1df7ec99",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0585bb8_69c6be92",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Oh, sorry. Thanks for pointing that out. I was looking at `LL_SetSystemCoreClock`.",
+      "parentUuid": "7eb0e57b_abb862d7",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -365,6 +491,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3e5e34db_c1967b16",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Thanks, probably some common define should be good for all usage of the HSI freq.",
+      "parentUuid": "b1c0cb6e_2eb30ad3",
+      "range": {
+        "startLine": 124,
+        "startChar": 21,
+        "endLine": 124,
+        "endChar": 35
+      },
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d38d0010_f1d1e3db",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -400,6 +550,30 @@
       "side": 1,
       "message": "Same as above, I\u0027ll add explicit division (although it doesn\u0027t change anything functionally for Dartmonkey, where the divisor is set to 1).",
       "parentUuid": "d38d0010_f1d1e3db",
+      "range": {
+        "startLine": 136,
+        "startChar": 24,
+        "endLine": 136,
+        "endChar": 38
+      },
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93c40063_0f92bfb7",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:01:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54aef045_d566c1a7",
       "range": {
         "startLine": 136,
         "startChar": 24,
