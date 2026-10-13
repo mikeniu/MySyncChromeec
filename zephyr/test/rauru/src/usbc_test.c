@@ -266,7 +266,7 @@ ZTEST(usbc_test, test_tc_state_init_dedicated_charge_port)
 	 */
 	charge_manager_update_charge(CHARGE_SUPPLIER_DEDICATED,
 				     DEDICATED_CHARGE_PORT, &info);
-	task_set_event(TASK_ID_PD_C0, TASK_EVENT_RESET_DONE);
+	pd_set_event(0, PD_EVENT_RESET_DONE);
 	k_msleep(1);
 	zassert_mem_equal(tc_get_current_state(0), "Unattached.SNK",
 			  sizeof("Unattached.SNK"));
@@ -278,7 +278,7 @@ ZTEST(usbc_test, test_tc_state_init_dedicated_charge_port)
 	info.current = 3000;
 	charge_manager_update_charge(CHARGE_SUPPLIER_DEDICATED,
 				     DEDICATED_CHARGE_PORT, &info);
-	task_set_event(TASK_ID_PD_C0, TASK_EVENT_RESET_DONE);
+	pd_set_event(0, PD_EVENT_RESET_DONE);
 	k_msleep(1);
 	zassert_mem_equal(tc_get_current_state(0), "ErrorRecovery",
 			  sizeof("ErrorRecovery"));

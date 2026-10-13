@@ -578,8 +578,8 @@ static enum tcpc_transmit_complete it8xxx2_tx_data(enum usbpd_port port,
 
 		/* Start Tx */
 		USBPD_KICK_TX_START(port);
-		evt = task_wait_event_mask(TASK_EVENT_PHY_TX_DONE,
-					   PD_T_TCPC_TX_TIMEOUT);
+		evt = pd_wait_event_mask(port, PD_EVENT_PHY_TX_DONE,
+					 PD_T_TCPC_TX_TIMEOUT);
 
 		/*
 		 * Check Tx error status (TCPC won't set multi tx errors at one
@@ -589,7 +589,7 @@ static enum tcpc_transmit_complete it8xxx2_tx_data(enum usbpd_port port,
 		 * 3) If port partner doesn't respond GoodCRC.
 		 * 4) If Tx timeout.
 		 */
-		if (tx_error_status[port] || (evt & TASK_EVENT_TIMER)) {
+		if (tx_error_status[port] || (evt == 0)) {
 			if (tx_error_status[port] &
 			    USBPD_REG_MASK_TX_NOT_EN_STAT) {
 				CPRINTS("p%d TxErr: Tx EN and resend", port);
@@ -617,7 +617,7 @@ static enum tcpc_transmit_complete it8xxx2_tx_data(enum usbpd_port port,
 				 */
 				restore_sop_header_pwr_data_role(port, type);
 				return TCPC_TX_COMPLETE_FAILED;
-			} else if (evt & TASK_EVENT_TIMER) {
+			} else if (evt == 0) {
 				CPRINTS("p%d TxErr: Timeout", port);
 				restore_sop_header_pwr_data_role(port, type);
 				return TCPC_TX_UNSET;
@@ -752,7 +752,7 @@ static int it8xxx2_tcpm_enter_low_power_mode(int port)
 
 	it8xxx2_tcpm_get_cc(port, &cc1, &cc2);
 	if (!cc_is_open(cc1, cc2) && !cc_is_pwred_cbl_without_snk(cc1, cc2))
-		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
+		pd_set_event(port, PD_EVENT_CC);
 
 	/*
 	 * ITE embedded TCPC SLEEP_MASK_USB_PD flag is only controlled by

@@ -349,9 +349,8 @@ BUILD_ASSERT(ARRAY_SIZE(flag_bit_names) == TC_FLAGS_COUNT);
 
 static struct bit_name event_bit_names[] = {
 	{ TASK_EVENT_PD_AWAKE, "PD_AWAKE" },
-	{ TASK_EVENT_RESET_DONE, "RESET_DONE" },
-	{ TASK_EVENT_WAKE, "WAKE" },
-	{ TASK_EVENT_TIMER, "TIMER" },
+	{ PD_EVENT_RESET_DONE, "RESET_DONE" },
+	{ PD_EVENT_WAKE, "WAKE" },
 	{ PD_EVENT_TX, "TX" },
 	{ PD_EVENT_CC, "CC" },
 	{ PD_EVENT_TCPC_RESET, "TCPC_RESET" },
@@ -516,7 +515,7 @@ void pd_request_source_voltage(int port, int mv)
 	else
 		pd_dpm_request(port, DPM_REQUEST_PR_SWAP);
 
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	pd_wake(port);
 }
 
 void pd_set_external_voltage_limit(int port, int mv)
@@ -527,7 +526,7 @@ void pd_set_external_voltage_limit(int port, int mv)
 	if (get_state_tc(port) == TC_ATTACHED_SNK)
 		pd_dpm_request(port, DPM_REQUEST_NEW_POWER_LEVEL);
 
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	pd_wake(port);
 }
 
 void pd_set_new_power_request(int port)
@@ -682,7 +681,7 @@ static inline void pd_set_dual_role_and_event(int port,
 		pd_update_try_source();
 
 	if (event != 0)
-		task_set_event(PD_PORT_TO_TASK_ID(port), event);
+		pd_set_event(port, event);
 }
 
 void pd_set_dual_role(int port, enum pd_dual_role_states state)
@@ -710,7 +709,7 @@ void pd_request_data_swap(int port)
 	 */
 	if (IS_ATTACHED_SRC(port) || IS_ATTACHED_SNK(port)) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_DR_SWAP);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 	}
 }
 
@@ -856,7 +855,7 @@ void tc_prs_src_snk_assert_rd(int port)
 		 * DebugAccessory.SNK assert Rd
 		 */
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 	}
 }
 
@@ -872,7 +871,7 @@ void tc_prs_snk_src_assert_rp(int port)
 		 * UnorientedDebugAccessory.SRC to assert Rp
 		 */
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 	}
 }
 
@@ -893,7 +892,7 @@ void tc_prs_snk_src_assert_rp(int port)
 void tc_hard_reset_request(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_HARD_RESET_REQUESTED);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	pd_wake(port);
 }
 
 void tc_try_src_override(enum try_src_override_t ov)
@@ -1008,7 +1007,7 @@ void pd_set_suspend(int port, int suspend)
 		if (PD_PORT_TO_TASK_ID(port) == task_get_current())
 			return;
 
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 
 		/* Sleep this task if we are not suspended */
 		while (pd_is_port_enabled(port)) {
@@ -1021,7 +1020,7 @@ void pd_set_suspend(int port, int suspend)
 		}
 	} else {
 		TC_CLR_FLAG(port, TC_FLAGS_REQUEST_SUSPEND);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 	}
 }
 
@@ -1689,7 +1688,7 @@ static bool in_ct_state(int port)
 void tc_event_check(int port, int evt)
 {
 #ifdef DEBUG_PRINT_FLAG_AND_EVENT_NAMES
-	if (evt != TASK_EVENT_TIMER)
+	if (evt != 0)
 		print_bits(port, "Event", evt, event_bit_names,
 			   ARRAY_SIZE(event_bit_names));
 #endif
@@ -1881,7 +1880,7 @@ void pd_request_vconn_swap_off(int port)
 	if (get_state_tc(port) == TC_ATTACHED_SRC ||
 	    get_state_tc(port) == TC_ATTACHED_SNK) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_VC_SWAP_OFF);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 	}
 }
 
@@ -1890,7 +1889,7 @@ void pd_request_vconn_swap_on(int port)
 	if (get_state_tc(port) == TC_ATTACHED_SRC ||
 	    get_state_tc(port) == TC_ATTACHED_SNK) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_VC_SWAP_ON);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 	}
 }
 #endif
@@ -1930,7 +1929,7 @@ static __maybe_unused int reset_device_and_notify(int port)
 	 * waking the TCPC, but it has also set PD_EVENT_TCPC_RESET again, which
 	 * would result in a second, unnecessary init.
 	 */
-	task_wait_event_mask(PD_EVENT_TCPC_RESET, 0);
+	pd_clear_port_event(port, PD_EVENT_TCPC_RESET);
 
 	waiting_tasks = atomic_clear(&tc[port].tasks_waiting_on_reset);
 
@@ -1965,7 +1964,7 @@ void pd_wait_exit_low_power(int port)
 		 * happen much, but it if starts occurring, we can add a guard
 		 * to prevent/reduce it.
 		 */
-		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_TCPC_RESET);
+		pd_set_event(port, PD_EVENT_TCPC_RESET);
 		task_wait_event_mask(TASK_EVENT_PD_AWAKE, -1);
 	}
 }
@@ -1979,8 +1978,7 @@ void pd_device_accessed(int port)
 	if (port == TASK_ID_TO_PD_PORT(task_get_current()))
 		handle_device_access(port);
 	else
-		task_set_event(PD_PORT_TO_TASK_ID(port),
-			       PD_EVENT_DEVICE_ACCESSED);
+		pd_set_event(port, PD_EVENT_DEVICE_ACCESSED);
 }
 
 /*
@@ -3875,13 +3873,13 @@ void tc_set_debug_level(enum debug_level debug_level)
 void tc_usb_firmware_fw_update_limited_run(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_USB_RETIMER_FW_UPDATE_LTD_RUN);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	pd_wake(port);
 }
 
 void tc_usb_firmware_fw_update_run(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_USB_RETIMER_FW_UPDATE_RUN);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	pd_wake(port);
 }
 
 void tc_run(const int port)
@@ -4040,8 +4038,7 @@ static void pd_set_power_change(void)
 	int i;
 
 	for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		task_set_event(PD_PORT_TO_TASK_ID(i),
-			       PD_EVENT_POWER_STATE_CHANGE);
+		pd_set_event(i, PD_EVENT_POWER_STATE_CHANGE);
 	}
 }
 DECLARE_DEFERRED(pd_set_power_change);

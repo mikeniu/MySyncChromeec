@@ -107,7 +107,7 @@ void usb_charger_vbus_change(int port, int vbus_level)
 	if ((get_usb_pd_vbus_detect() == USB_PD_VBUS_DETECT_CHARGER) ||
 	    (get_usb_pd_vbus_detect() == USB_PD_VBUS_DETECT_PPC)) {
 		/* USB PD task */
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		pd_wake(port);
 	}
 }
 
