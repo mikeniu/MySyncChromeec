@@ -806,6 +806,60 @@ ZTEST_USER(fpsensor_match, test_match_no_templates_sets_invalid)
 		     "Invalid flag should be set if no templates are enrolled");
 }
 
+ZTEST_USER(fpsensor_match,
+	   test_match_success_negative_finger_index_fails_internal)
+{
+	uint32_t fp_events = 0;
+	struct ec_response_fp_stats stats = {};
+
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	match_result = FP_MATCH_RESULT_MATCH;
+	finger_index = -1;
+	finger_updated_bitmap = 0;
+	mock_alg_match_fake.custom_fake = custom_match;
+
+	trigger_match_attempt(FP_MODE_MATCH);
+
+	fp_get_next_event(reinterpret_cast<uint8_t *>(&fp_events));
+	zassert_true(fp_events & EC_MKBP_FP_MATCH);
+	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
+		      EC_MKBP_FP_ERR_MATCH_NO_INTERNAL);
+
+	zassert_ok(ec_cmd_fp_stats(NULL, &stats));
+	zassert_true(stats.timestamps_invalid & FPSTATS_MATCHING_INV);
+}
+
+ZTEST_USER(fpsensor_match,
+	   test_match_success_out_of_bounds_finger_index_fails_internal)
+{
+	uint32_t fp_events = 0;
+	struct ec_response_fp_stats stats = {};
+
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	match_result = FP_MATCH_RESULT_MATCH;
+	finger_index = FP_MAX_FINGER_COUNT;
+	finger_updated_bitmap = 0;
+	mock_alg_match_fake.custom_fake = custom_match;
+
+	trigger_match_attempt(FP_MODE_MATCH);
+
+	fp_get_next_event(reinterpret_cast<uint8_t *>(&fp_events));
+	zassert_true(fp_events & EC_MKBP_FP_MATCH);
+	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
+		      EC_MKBP_FP_ERR_MATCH_NO_INTERNAL);
+
+	zassert_ok(ec_cmd_fp_stats(NULL, &stats));
+	zassert_true(stats.timestamps_invalid & FPSTATS_MATCHING_INV);
+}
+
 static void *fpsensor_setup(void)
 {
 	struct ec_params_fp_seed fp_seed_params = {

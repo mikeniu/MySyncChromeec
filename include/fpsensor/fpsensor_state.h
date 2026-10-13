@@ -15,6 +15,7 @@
 #include "fpsensor_image_frame_params.h"
 #include "fpsensor_matcher.h"
 #include "fpsensor_state_driver.h"
+#include "fpsensor_types.h"
 #include "link_defs.h"
 #include "timer.h"
 
@@ -207,5 +208,63 @@ enum ec_status
 fp_read_match_secret(int8_t fgr,
 		     std::span<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES>
 			     positive_match_secret);
+
+struct FpSensorStats {
+	uint32_t capture_time_us{};
+	uint32_t matching_time_us{};
+	uint32_t overall_time_us{};
+	timestamp_t overall_t0{};
+	uint8_t timestamps_invalid{};
+	/*
+	 * Last matched template index, persisted for telemetry
+	 * (EC_CMD_FP_STATS). Unlike global_context, this is not cleared when
+	 * the secret is read.
+	 */
+	int8_t template_matched{};
+};
+
+class FpSensorStateMachine {
+    public:
+	void init();
+	void run();
+	void handle_event(uint32_t evt);
+	[[nodiscard]] const FpSensorStats &stats() const noexcept;
+
+    private:
+	static constexpr int kWaitForeverUs = -1;
+	static constexpr int kFingerPollingDelayUs = 100 * MSEC;
+
+	[[nodiscard]] static constexpr bool has_mode(uint32_t mode,
+						     uint32_t flags) noexcept;
+	[[nodiscard]] static bool has_active_mode(uint32_t flags) noexcept;
+	static void clear_active_mode(uint32_t flags) noexcept;
+
+#ifdef HAVE_FP_PRIVATE_DRIVER
+	bool handle_config_update();
+	void update_enroll_session(uint32_t mode);
+	void acquire_immediate_image(enum fp_capture_type capture_type);
+	void configure_sensor_for_mode();
+	void execute_mode_action(uint32_t mode);
+	void encrypt_requested_template();
+	void decrypt_loaded_template();
+
+	void handle_sensor_or_timer_event(uint32_t evt);
+	enum finger_state check_finger_presence();
+	void process_finger_capture();
+	uint32_t process_enroll();
+	uint32_t process_match();
+	void end_enroll_session();
+	static void update_peripherals();
+#endif /* HAVE_FP_PRIVATE_DRIVER */
+
+	FpSensorStats stats_{};
+	int timeout_us_ = kWaitForeverUs;
+	bool pm_locked_ = true;
+#ifdef HAVE_FP_PRIVATE_DRIVER
+	bool enroll_session_active_ = false;
+#endif
+};
+
+extern FpSensorStateMachine fp_state_machine;
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_ */
