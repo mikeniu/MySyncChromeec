@@ -16,6 +16,52 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "d34fd7135a3790d0ac61d31d2b6221051eb358d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfca04b9_96a44d85",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-13T16:17:41Z",
+      "side": 1,
+      "message": "This is a bit outside of scope of this change, but if we\u0027re already here, I wonder why other possible return values are just ignored, for example -EINTR",
+      "range": {
+        "startLine": 237,
+        "startChar": 6,
+        "endLine": 237,
+        "endChar": 8
+      },
+      "revId": "d34fd7135a3790d0ac61d31d2b6221051eb358d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d04a8c1_a84315c9",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-13T16:17:41Z",
+      "side": 1,
+      "message": "how is that possible?",
+      "range": {
+        "startLine": 245,
+        "startChar": 55,
+        "endLine": 247,
+        "endChar": 22
+      },
+      "revId": "d34fd7135a3790d0ac61d31d2b6221051eb358d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
