@@ -38,16 +38,6 @@ void device_set_events(uint32_t mask);
 void device_clear_events(uint32_t mask);
 
 /**
- * Set a single device event.
- *
- * @param event         Event to set (EC_DEVICE_EVENT_*).
- */
-static inline void device_set_single_event(int event)
-{
-	device_set_events(EC_DEVICE_EVENT_MASK(event));
-}
-
-/**
  * Enable device event.
  *
  * @param event         Event to enable (EC_DEVICE_EVENT_*)

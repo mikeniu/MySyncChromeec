@@ -160,14 +160,6 @@ static enum ec_error_list isl923x_set_input_current_limit(int chgnum,
 	return raw_write16(chgnum, ISL923X_REG_ADAPTER_CURRENT_LIMIT2, reg);
 }
 
-/* use for board special setting*/
-int isl923x_set_level_2_input_current_limit(int chgnum, int input_current_2)
-{
-	uint16_t reg = AC_CURRENT_TO_REG(input_current_2);
-
-	return raw_write16(chgnum, ISL923X_REG_ADAPTER_CURRENT_LIMIT2, reg);
-}
-
 #ifdef CONFIG_CMD_CHARGER_ADC_AMON_BMON
 static int get_amon_bmon(int chgnum, enum isl923x_amon_bmon amon,
 			 enum isl923x_mon_dir direction, int *adc)

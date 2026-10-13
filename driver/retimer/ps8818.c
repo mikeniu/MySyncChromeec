@@ -16,44 +16,6 @@
 
 #define PS8818_DEBUG 0
 
-int ps8818_i2c_read(const struct usb_mux *me, int page, int offset, int *data)
-{
-	int rv;
-
-	rv = i2c_read8(me->i2c_port, me->i2c_addr_flags + page, offset, data);
-
-	if (PS8818_DEBUG)
-		ccprintf("%s(%d:0x%02X, 0x%02X) =>0x%02X\n", __func__,
-			 me->usb_port, me->i2c_addr_flags + page, offset,
-			 *data);
-
-	return rv;
-}
-
-int ps8818_i2c_write(const struct usb_mux *me, int page, int offset, int data)
-{
-	int rv;
-	int pre_val, post_val;
-
-	if (PS8818_DEBUG)
-		i2c_read8(me->i2c_port, me->i2c_addr_flags + page, offset,
-			  &pre_val);
-
-	rv = i2c_write8(me->i2c_port, me->i2c_addr_flags + page, offset, data);
-
-	if (PS8818_DEBUG) {
-		i2c_read8(me->i2c_port, me->i2c_addr_flags + page, offset,
-			  &post_val);
-
-		ccprintf("%s(%d:0x%02X, 0x%02X, 0x%02X) "
-			 "0x%02X=>0x%02X\n",
-			 __func__, me->usb_port, me->i2c_addr_flags + page,
-			 offset, data, pre_val, post_val);
-	}
-
-	return rv;
-}
-
 int ps8818_i2c_field_update8(const struct usb_mux *me, int page, int offset,
 			     uint8_t field_mask, uint8_t set_value)
 {

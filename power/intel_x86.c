@@ -522,46 +522,6 @@ enum power_state common_intel_x86_power_handle_state(enum power_state state)
 	return state;
 }
 
-#ifdef GPIO_PCH_DSW_PWROK
-void intel_x86_pwrok_signal_interrupt(enum gpio_signal signal)
-{
-	int in = gpio_get_level(GPIO_PG_EC_DSW_PWROK);
-	int out = gpio_get_level(GPIO_PCH_DSW_PWROK);
-
-	/*
-	 * This function is called when pwrok changes state. If pwrok
-	 * has been asserted (high -> low) then pass this new state to PCH.
-	 */
-	if (!in && (in != out))
-		gpio_set_level(GPIO_PCH_DSW_PWROK, in);
-
-	/*
-	 * Call the main power signal interrupt handler to wake up the chipset
-	 * task which handles low->high pwrok pass through.
-	 */
-	power_signal_interrupt(signal);
-}
-#endif
-
-void intel_x86_rsmrst_signal_interrupt(enum gpio_signal signal)
-{
-	int rsmrst_in = gpio_get_level(GPIO_PG_EC_RSMRST_ODL);
-	int rsmrst_out = gpio_get_level(GPIO_PCH_RSMRST_L);
-
-	/*
-	 * This function is called when rsmrst changes state. If rsmrst
-	 * has been asserted (high -> low) then pass this new state to PCH.
-	 */
-	if (!rsmrst_in && (rsmrst_in != rsmrst_out))
-		gpio_set_level(GPIO_PCH_RSMRST_L, rsmrst_in);
-
-	/*
-	 * Call the main power signal interrupt handler to wake up the chipset
-	 * task which handles low->high rsmrst pass through.
-	 */
-	power_signal_interrupt(signal);
-}
-
 __overridable void board_before_rsmrst(int rsmrst)
 {
 }

@@ -9193,21 +9193,4 @@ const struct test_sm_data test_pe_sm_data[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(pe_states) == ARRAY_SIZE(pe_state_names));
 const int test_pe_sm_data_size = ARRAY_SIZE(test_pe_sm_data);
-
-void pe_set_fn(int port, int fn)
-{
-	PE_SET_FN(port, fn);
-}
-void pe_clr_fn(int port, int fn)
-{
-	PE_CLR_FN(port, fn);
-}
-int pe_chk_fn(int port, int fn)
-{
-	return PE_CHK_FN(port, fn);
-}
-void pe_clr_dpm_requests(int port)
-{
-	pe[port].dpm_request = 0;
-}
 #endif

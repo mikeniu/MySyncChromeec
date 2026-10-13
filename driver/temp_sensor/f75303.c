@@ -14,10 +14,6 @@
 #include "temp_sensor/temp_sensor.h"
 #include "util.h"
 
-#define F75303_RESOLUTION 11
-#define F75303_SHIFT1 (16 - F75303_RESOLUTION)
-#define F75303_SHIFT2 (F75303_RESOLUTION - 8)
-
 static int temps[F75303_IDX_COUNT];
 static int8_t fake_temp[F75303_IDX_COUNT];
 
@@ -55,15 +51,6 @@ int f75303_get_val(int idx, int *temp)
 
 	*temp = temps[idx];
 	return EC_SUCCESS;
-}
-
-static inline int f75303_reg_to_mk(int16_t reg)
-{
-	int temp_mc;
-
-	temp_mc = (((reg >> F75303_SHIFT1) * 1000) >> F75303_SHIFT2);
-
-	return MILLI_CELSIUS_TO_MILLI_KELVIN(temp_mc);
 }
 
 int f75303_get_val_k(int idx, int *temp_k_ptr)

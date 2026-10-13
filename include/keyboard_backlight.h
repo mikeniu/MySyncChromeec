@@ -51,11 +51,6 @@ struct kblight_drv {
 __override_proto void board_kblight_init(void);
 
 /**
- * Shutdown keyboard backlight
- */
-__override_proto void board_kblight_shutdown(void);
-
-/**
  * Set keyboard backlight brightness
  *
  * @param percent Brightness in percentage

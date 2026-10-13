@@ -25,10 +25,6 @@ __overridable void board_kblight_init(void)
 {
 }
 
-__overridable void board_kblight_shutdown(void)
-{
-}
-
 static int kblight_init(void)
 {
 	if (!kblight.drv || !kblight.drv->init)

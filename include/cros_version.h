@@ -56,13 +56,6 @@ extern const char build_info[];
 extern const char __image_data_offset[];
 extern const void *__image_size;
 
-/**
- * Get the number of commits of an image
- *
- * @return Number of commits in integer or 0 on error
- */
-int ver_get_num_commits(enum ec_image copy);
-
 #ifdef __cplusplus
 }
 #endif

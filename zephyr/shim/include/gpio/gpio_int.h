@@ -69,12 +69,6 @@ int gpio_enable_dt_interrupt(const struct gpio_int_config *const ic);
 int gpio_disable_dt_interrupt(const struct gpio_int_config *const ic);
 
 /*
- * Get the interrupt config for this interrupt.
- */
-const struct gpio_int_config *
-gpio_interrupt_get_config(enum gpio_interrupts intr);
-
-/*
  * Declare interrupt configuration data structures.
  */
 #define GPIO_INT_DECLARE(id) \

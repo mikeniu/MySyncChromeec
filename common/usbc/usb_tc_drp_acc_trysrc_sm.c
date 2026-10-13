@@ -2006,21 +2006,6 @@ void pd_device_accessed(int port)
 		task_set_event(PD_PORT_TO_TASK_ID(port),
 			       PD_EVENT_DEVICE_ACCESSED);
 }
-
-/*
- * TODO(b/137493121): Move this function to a separate file that's shared
- * between the this and the original stack.
- */
-void pd_prevent_low_power_mode(int port, int prevent)
-{
-	const int current_task_mask = (1 << task_get_current());
-
-	if (prevent)
-		atomic_or(&tc[port].tasks_preventing_lpm, current_task_mask);
-	else
-		atomic_clear_bits(&tc[port].tasks_preventing_lpm,
-				  current_task_mask);
-}
 #endif /* CONFIG_USB_PD_TCPC_LOW_POWER */
 
 static void sink_power_sub_states(int port)

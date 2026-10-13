@@ -38,14 +38,6 @@ uint32_t get_acpi_value(uint32_t data);
 bool is_8042_ibf(uint32_t data);
 
 /**
- * Check if the 8042 event data contains an output-buffer-empty (OBE) event.
- *
- * @param data The full 8042 event data.
- * @return True if the data contains an OBE event.
- */
-bool is_8042_obe(uint32_t data);
-
-/**
  * Get the type of 8042 message.
  *
  * @param data The full 8042 event data.

@@ -109,7 +109,6 @@ int it8801_pwm_get_enabled(enum pwm_channel ch);
 void it8801_pwm_set_raw_duty(enum pwm_channel ch, uint16_t duty);
 uint16_t it8801_pwm_get_raw_duty(enum pwm_channel ch);
 void it8801_pwm_set_duty(enum pwm_channel ch, int percent);
-int it8801_pwm_get_duty(enum pwm_channel ch);
 
 #define IT8801_REG_PWMODDSR 0x5F
 #define IT8801_REG_PWMMCR(n) (0x60 + ((n) - 1) * 8)

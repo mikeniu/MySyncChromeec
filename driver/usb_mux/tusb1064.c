@@ -59,35 +59,6 @@ void tusb1044_hpd_update(const struct usb_mux *me, mux_state_t mux_state,
 }
 #endif
 
-int tusb1064_set_dp_rx_eq(const struct usb_mux *me, int db)
-{
-	uint8_t reg;
-	int rv;
-
-	if (db < TUSB1064_DP_EQ_RX_NEG_0_3_DB || db > TUSB1064_DP_EQ_RX_12_1_DB)
-		return EC_ERROR_INVAL;
-
-	/* Set the requested gain values */
-	reg = TUSB1064_DP1EQ(db) | TUSB1064_DP3EQ(db);
-	rv = tusb1064_write(me, TUSB1064_REG_DP1DP3EQ_SEL, reg);
-	if (rv)
-		return rv;
-
-	reg = TUSB1064_DP0EQ(db) | TUSB1064_DP2EQ(db);
-	rv = tusb1064_write(me, TUSB1064_REG_DP0DP2EQ_SEL, reg);
-	if (rv)
-		return rv;
-
-	/* Enable EQ_OVERRIDE so the gain registers are used */
-	rv = tusb1064_read(me, TUSB1064_REG_GENERAL, &reg);
-	if (rv)
-		return rv;
-
-	reg |= REG_GENERAL_EQ_OVERRIDE;
-
-	return tusb1064_write(me, TUSB1064_REG_GENERAL, reg);
-}
-
 /* Writes control register to set switch mode */
 int tusb1064_set_mux(const struct usb_mux *me, mux_state_t mux_state,
 		     bool *ack_required)

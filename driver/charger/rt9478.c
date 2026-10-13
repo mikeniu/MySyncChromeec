@@ -779,14 +779,6 @@ static enum ec_error_list rt9478_set_option(int chgnum, int option)
 	return raw_write16(chgnum, RT9478_REG_CHARGE_OPTION_0, option);
 }
 
-int rt9478_set_min_system_voltage(int chgnum, int mv)
-{
-	int reg;
-
-	reg = min_system_voltage_to_reg(mv);
-	return raw_write16(chgnum, RT9478_REG_MIN_SYSTEM_VOLTAGE, reg);
-}
-
 #ifdef CONFIG_CHARGE_RAMP_HW
 
 static void rt9478_chg_ramp_handle(void)

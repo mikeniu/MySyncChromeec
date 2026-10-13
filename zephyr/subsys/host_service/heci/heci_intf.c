@@ -23,17 +23,6 @@ struct heci_bsp_t *heci_intf_get_entry(int core_id)
 	return NULL;
 }
 
-struct heci_bsp_t *get_host_intf(void)
-{
-	for (struct heci_bsp_t *bsp = &__heci_desc_start;
-	     bsp < &__heci_desc_end; bsp++) {
-		if (bsp->peer_is_host) {
-			return bsp;
-		}
-	}
-	return NULL;
-}
-
 uint32_t get_heci_core_bitmap(void)
 {
 	uint32_t map = 0;

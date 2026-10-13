@@ -173,12 +173,6 @@ int gpio_enable_dt_interrupt(const struct gpio_int_config *conf)
 	return gpio_pin_interrupt_configure(conf->port, conf->pin, flags);
 }
 
-const struct gpio_int_config *
-gpio_interrupt_get_config(enum gpio_interrupts intr)
-{
-	return &gpio_int_data[intr];
-}
-
 /*
  * Legacy API calls to enable/disable interrupts.
  */

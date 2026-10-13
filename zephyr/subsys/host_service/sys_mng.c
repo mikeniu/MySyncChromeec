@@ -191,20 +191,6 @@ static void handle_host_time_sync(uint8_t *data, uint8_t data_len)
 	}
 }
 
-void get_clock_sync_data(uint64_t *last_fw_clock, uint64_t *last_host_clock_utc,
-			 uint64_t *last_host_clock_system)
-{
-	if (last_fw_clock) {
-		*last_fw_clock = saved_time.last_sync_fw_clock;
-	}
-	if (last_host_clock_utc) {
-		*last_host_clock_utc = saved_time.last_sync_host_clock_utc;
-	}
-	if (last_host_clock_system) {
-		*last_host_clock_system = saved_time.last_sync_host_clock_sys;
-	}
-}
-
 #endif
 
 static int send_reset_to_peer(uint32_t command, uint16_t reset_id)

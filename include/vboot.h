@@ -53,18 +53,6 @@ const struct vb21_packed_key *vb21_get_packed_key(void);
 int vboot_is_padding_valid(const uint8_t *data, uint32_t start, uint32_t end);
 
 /**
- * Verify data by RSA signature
- *
- * @param data Data to be verified.
- * @param len  Number of bytes in <data>.
- * @param key  Key to be used for verification.
- * @param sig  Signature of <data>
- * @return EC_SUCCESS or EC_ERROR_*
- */
-int vboot_verify(const uint8_t *data, int len, const struct rsa_public_key *key,
-		 const uint8_t *sig);
-
-/**
  * Entry point of EC EFS
  */
 void vboot_main(void);

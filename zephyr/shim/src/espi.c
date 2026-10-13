@@ -762,13 +762,6 @@ bool is_8042_ibf(uint32_t data)
 	return kbc->evt & HOST_KBC_EVT_IBF;
 }
 
-bool is_8042_obe(uint32_t data)
-{
-	struct espi_evt_data_kbc *kbc = (struct espi_evt_data_kbc *)&data;
-
-	return kbc->evt & HOST_KBC_EVT_OBE;
-}
-
 uint32_t get_8042_type(uint32_t data)
 {
 	struct espi_evt_data_kbc *kbc = (struct espi_evt_data_kbc *)&data;

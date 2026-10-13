@@ -154,9 +154,6 @@ bool heci_send_flow_control(uint32_t conn_id);
  */
 int heci_complete_disconnect(uint32_t conn_id);
 
-void get_clock_sync_data(uint64_t *last_fw_clock, uint64_t *last_host_clock_utc,
-			 uint64_t *last_host_clock_system);
-
 /*
  * @brief
  * message handler callback to proceed the heci message
@@ -164,15 +161,6 @@ void get_clock_sync_data(uint64_t *last_fw_clock, uint64_t *last_host_clock_utc,
  * @param len message length for received heci buffer
  */
 typedef void (*heci_msg_proc_handler_f)(void *msg, uint32_t len);
-
-/*
- * @brief
- * add fix client message proceed handler for fixed function client
- * @param addr fixed client addr
- * @param hdl message proceed function
- * @retval 0 If successful.
- */
-int heci_add_fix_clients(uint32_t addr, heci_msg_proc_handler_f hdl);
 
 #ifdef __cplusplus
 }

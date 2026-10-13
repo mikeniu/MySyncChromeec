@@ -57,82 +57,6 @@ int ps8802_i2c_write(const struct usb_mux *me, int page, int offset, int data)
 	return rv;
 }
 
-int ps8802_i2c_write16(const struct usb_mux *me, int page, int offset, int data)
-{
-	int rv;
-	int pre_val, post_val;
-
-	if (PS8802_DEBUG)
-		i2c_read16(me->i2c_port, me->i2c_addr_flags + page, offset,
-			   &pre_val);
-
-	rv = i2c_write16(me->i2c_port, me->i2c_addr_flags + page, offset, data);
-
-	if (PS8802_DEBUG) {
-		i2c_read16(me->i2c_port, me->i2c_addr_flags + page, offset,
-			   &post_val);
-
-		ccprintf("%s(%d:0x%02X, 0x%02X, 0x%04X) "
-			 "0x%04X=>0x%04X\n",
-			 __func__, me->i2c_port, me->i2c_addr_flags + page,
-			 offset, data, pre_val, post_val);
-	}
-
-	return rv;
-}
-
-int ps8802_i2c_field_update8(const struct usb_mux *me, int page, int offset,
-			     uint8_t field_mask, uint8_t set_value)
-{
-	int rv;
-	int pre_val, post_val;
-
-	if (PS8802_DEBUG)
-		i2c_read8(me->i2c_port, me->i2c_addr_flags + page, offset,
-			  &pre_val);
-
-	rv = i2c_field_update8(me->i2c_port, me->i2c_addr_flags + page, offset,
-			       field_mask, set_value);
-
-	if (PS8802_DEBUG) {
-		i2c_read8(me->i2c_port, me->i2c_addr_flags + page, offset,
-			  &post_val);
-
-		ccprintf("%s(%d:0x%02X, 0x%02X, 0x%02X, 0x%02X) "
-			 "0x%02X=>0x%02X\n",
-			 __func__, me->i2c_port, me->i2c_addr_flags + page,
-			 offset, field_mask, set_value, pre_val, post_val);
-	}
-
-	return rv;
-}
-
-int ps8802_i2c_field_update16(const struct usb_mux *me, int page, int offset,
-			      uint16_t field_mask, uint16_t set_value)
-{
-	int rv;
-	int pre_val, post_val;
-
-	if (PS8802_DEBUG)
-		i2c_read16(me->i2c_port, me->i2c_addr_flags + page, offset,
-			   &pre_val);
-
-	rv = i2c_field_update16(me->i2c_port, me->i2c_addr_flags + page, offset,
-				field_mask, set_value);
-
-	if (PS8802_DEBUG) {
-		i2c_read16(me->i2c_port, me->i2c_addr_flags + page, offset,
-			   &post_val);
-
-		ccprintf("%s(%d:0x%02X, 0x%02X, 0x%02X, 0x%04X) "
-			 "0x%04X=>0x%04X\n",
-			 __func__, me->i2c_port, me->i2c_addr_flags + page,
-			 offset, field_mask, set_value, pre_val, post_val);
-	}
-
-	return rv;
-}
-
 /*
  * If PS8802 is in I2C standby mode, wake it up by reading PS8802_REG_MODE.
  * From Application Note: 1) Activate by reading any Page 2 register. 2) Wait
@@ -259,18 +183,3 @@ const struct usb_mux_driver ps8802_usb_mux_driver = {
 	.get = ps8802_get_mux,
 	.enter_low_power_mode = &ps8802_enter_low_power_mode,
 };
-
-/*
- * If PS8802 I2c address was conflicted, change
- * the I2c address in page 0x0A, offset 0xB0
- * switch to 0x50 8-bit address
- */
-int ps8802_chg_i2c_addr(int i2c_port)
-{
-	int rv;
-
-	rv = i2c_write8(i2c_port, PS8802_P1_ADDR, PS8802_ADDR_CFG,
-			PS8802_I2C_ADDR_FLAGS_ALT);
-
-	return rv;
-}

@@ -1675,18 +1675,6 @@ void pd_wait_exit_low_power(int port);
 void pd_device_accessed(int port);
 
 /**
- * Prevents the TCPC from going back into low power mode. Invocations must be
- * called in a pair from the same task, otherwise the TCPC will never re-enter
- * low power mode.
- *
- * Note: This will not wake the device up if it is in LPM.
- *
- * @param port USB-C port number
- * @param prevent 1 to prevent this port from entering LPM
- */
-void pd_prevent_low_power_mode(int port, int prevent);
-
-/**
  * Process source capabilities packet
  *
  * @param port USB-C port number
@@ -1834,13 +1822,6 @@ __override_proto void typec_set_input_current_limit(int port,
 						    uint32_t supply_voltage);
 
 /**
- * Verify board specific health status : current, voltages...
- *
- * @return EC_SUCCESS if the board is good, <0 else.
- */
-__override_proto int pd_board_checks(void);
-
-/**
  * Return if VBUS is detected on type-C port
  *
  * @param port USB-C port number
@@ -1911,15 +1892,6 @@ __override_proto void pd_check_pr_role(int port, enum pd_power_role pr_role,
  */
 __override_proto void pd_check_dr_role(int port, enum pd_data_role dr_role,
 				       int flags);
-
-/**
- * Check for a potential Vconn swap if the port isn't
- * supplying Vconn
- *
- * @param port USB-C port number
- * @param flags PD flags
- */
-__override_proto void pd_try_execute_vconn_swap(int port, int flags);
 
 /**
  * Execute data swap.

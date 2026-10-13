@@ -89,20 +89,6 @@ extern struct ioexpander_config_t ioex_config[];
 #define ioex_enable_interrupt gpio_enable_interrupt
 #define ioex_disable_interrupt gpio_disable_interrupt
 
-#ifdef CONFIG_GPIO_GET_EXTENDED
-static inline int ioex_get_flags(enum gpio_signal signal, int *flags)
-{
-	*flags = gpio_get_flags(signal);
-	return EC_SUCCESS;
-}
-#endif
-
-static inline int ioex_set_flags(enum gpio_signal signal, int flags)
-{
-	gpio_set_flags(signal, flags);
-	return EC_SUCCESS;
-}
-
 static inline int ioex_get_level(enum gpio_signal signal, int *val)
 {
 	*val = gpio_get_level(signal);
@@ -116,11 +102,6 @@ static inline int ioex_set_level(enum gpio_signal signal, int val)
 }
 
 int ioex_init(int ioex);
-
-static inline const char *ioex_get_name(enum ioex_signal signal)
-{
-	return gpio_get_name(signal);
-}
 
 #ifdef __cplusplus
 }

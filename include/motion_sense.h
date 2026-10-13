@@ -370,12 +370,6 @@ static inline int16_t ec_motion_sensor_clamp_i16(const int32_t value)
 {
 	return min(max(value, (int32_t)INT16_MIN), (int32_t)INT16_MAX);
 }
-static inline void ec_motion_sensor_clamp_i16s(int16_t *arr, const int32_t *v)
-{
-	arr[0] = ec_motion_sensor_clamp_i16(v[0]);
-	arr[1] = ec_motion_sensor_clamp_i16(v[1]);
-	arr[2] = ec_motion_sensor_clamp_i16(v[2]);
-}
 
 /* direct assignment */
 static inline void

@@ -108,12 +108,5 @@ extern const struct usb_mux_driver ps8802_usb_mux_driver;
 int ps8802_i2c_wake(const struct usb_mux *me);
 int ps8802_i2c_read(const struct usb_mux *me, int page, int offset, int *data);
 int ps8802_i2c_write(const struct usb_mux *me, int page, int offset, int data);
-int ps8802_i2c_write16(const struct usb_mux *me, int page, int offset,
-		       int data);
-int ps8802_i2c_field_update8(const struct usb_mux *me, int page, int offset,
-			     uint8_t field_mask, uint8_t set_value);
-int ps8802_i2c_field_update16(const struct usb_mux *me, int page, int offset,
-			      uint16_t field_mask, uint16_t set_value);
-int ps8802_chg_i2c_addr(int i2c_port);
 
 #endif /* PLATFORM_EC_DRIVER_RETIMER_PS8802_H_ */

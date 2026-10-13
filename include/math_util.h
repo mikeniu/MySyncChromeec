@@ -117,33 +117,6 @@ static inline fp_t fp_div_dbz(fp_t a, fp_t b)
 #endif
 
 /**
- * Square (a * a)
- */
-static inline fp_t fp_sq(fp_t a)
-{
-	return fp_mul(a, a);
-}
-
-/**
- * Absolute value
- */
-static inline fp_t fp_abs(fp_t a)
-{
-	return (a >= INT_TO_FP(0) ? a : -a);
-}
-
-/*
- * Return the smallest positive X where M * X >= N.
- *
- * For example, if n = 88 and m = 9, then it returns 10
- * (i.e. 9 * 10 >= 88).
- */
-static inline int ceil_for(int n, int m)
-{
-	return (((n - 1) / m) + 1);
-}
-
-/**
  * Integer square root
  */
 int int_sqrtf(fp_inter_t x);

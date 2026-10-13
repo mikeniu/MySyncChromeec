@@ -30,11 +30,6 @@ bool rauru_is_hpd_high(enum rauru_dp_port port)
 	return PD_VDO_DPSTS_HPD_LVL(dp_status[port]);
 }
 
-enum rauru_dp_port rauru_get_dp_path(void)
-{
-	return active_dp_port;
-}
-
 void rauru_detach_dp_path(enum rauru_dp_port port)
 {
 	if (port != active_dp_port) {

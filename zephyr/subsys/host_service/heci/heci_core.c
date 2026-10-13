@@ -1095,17 +1095,6 @@ int heci_register(struct heci_client_t *client)
 	return 0;
 }
 
-int heci_add_fix_clients(uint32_t addr, heci_msg_proc_handler_f hdl)
-{
-	if ((addr >= HECI_FIXED_CLIENT_NUM) || (addr == 0)) {
-		return -EINVAL;
-	}
-
-	LOG_INF("fixed client added: addr:0x%02x", addr);
-	proc_hdls[addr] = hdl;
-	return 0;
-}
-
 static void heci_process_message(struct heci_bus_msg_t *msg)
 {
 	heci_lock();

@@ -213,24 +213,6 @@ void usb_mux_set_safe_mode(int port);
 void usb_mux_set_safe_mode_exit(int port);
 
 /**
- * Get the PD flags stored in BB Ram
- *
- * @param port USB-C port number
- * @param flags pointer where flags are written to
- * @return EC_SUCCESS on success
- */
-int pd_get_saved_port_flags(int port, uint8_t *flags);
-
-/**
- * Update the flag in BB Ram with the give value
- *
- * @param port USB-C port number
- * @param flag BB Ram flag to update
- * @param do_set value written to the BB Ram flag
- */
-void pd_update_saved_port_flags(int port, uint8_t flag, uint8_t do_set);
-
-/**
  * Sets up and sends PD alert message with given ADO on all ports.
  *
  * @param ado - Alert Data Object defining alert sent to the PD partner
