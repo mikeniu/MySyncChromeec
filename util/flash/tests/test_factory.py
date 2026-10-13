@@ -13,6 +13,7 @@ from unittest.mock import patch
 from flash.board_map import get_chip_from_board
 from flash.factory import FlasherFactory
 from flash.factory import query_ec_source_tree
+from flash.flashrom_flasher import FlashromFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 
@@ -143,6 +144,20 @@ class TestFactory(unittest.TestCase):
         self.assertEqual(get_chip_from_board("buccaneer"), "npcx_spi")
         self.assertEqual(get_chip_from_board("servo_v4p1"), "stm32_dfu")
         self.assertIsNone(get_chip_from_board("nonexistent_board"))
+
+    def test_ite_spi_flashrom_with_servo_micro(self) -> None:
+        """Route it8xxx2 to FlashromFlasher when connected via servo_micro."""
+        self.args.chip = "it8xxx2"
+        self.servo.get.return_value = "servo_micro"
+        flasher = FlasherFactory.create(self.servo, self.args)
+        self.assertIsInstance(flasher, FlashromFlasher)
+
+    def test_spi_interface_override(self) -> None:
+        """Route non-NPCX chip with interface=spi to FlashromFlasher."""
+        self.args.chip = "somerandomspi"
+        self.args.interface = "spi"
+        flasher = FlasherFactory.create(self.servo, self.args)
+        self.assertIsInstance(flasher, FlashromFlasher)
 
 
 if __name__ == "__main__":
