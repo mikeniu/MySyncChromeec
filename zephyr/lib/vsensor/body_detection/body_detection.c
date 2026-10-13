@@ -48,6 +48,7 @@ static const struct body_detect_params default_body_detect_params = {
 static bool body_detect_enable = IS_ENABLED(CONFIG_BODY_DETECTION);
 static bool body_detect_initialized;
 static bool body_detect_rate_is_set;
+static int inactivity_cnt;
 STATIC_IF(CONFIG_ACCEL_SPOOF_MODE) bool spoof_enable;
 
 /* Depends on body_detect_common.c */
@@ -142,7 +143,6 @@ static void body_detect_init(float x0, float y0, float z0)
 test_export_static void body_detect_step(float x, float y, float z,
 					 uint64_t curtime)
 {
-	static int inactivity_cnt;
 	float x_avg = 0, y_avg = 0, z_avg = 0;
 	float var = 0;
 	float motion_confidence = 0;
@@ -242,11 +242,11 @@ test_export_static void body_detect_step(float x, float y, float z,
 	 * Body detection
 	 */
 	if (body_detect_get_state() == BODY_DETECTION_ON_BODY) {
-		if (motion_confidence > CONFIG_BODY_DETECTION_ON_BODY_CON) {
+		if (motion_confidence >= CONFIG_BODY_DETECTION_OFF_BODY_CON) {
 			LOG_DBG("Confidence(%d) is above threshold(%d), "
 				"updating timestamp to %llu",
 				(int)motion_confidence,
-				CONFIG_BODY_DETECTION_ON_BODY_CON, curtime);
+				CONFIG_BODY_DETECTION_OFF_BODY_CON, curtime);
 			onbody_lasttime = curtime;
 		}
 		if (curtime - onbody_lasttime >
@@ -304,10 +304,14 @@ void body_detect_reset(void)
 	LOG_DBG("Resetting body detection");
 	if (body_detect_get_state() == BODY_DETECTION_ON_BODY) {
 		onbody_lasttime = onbody_get_curtime();
-	} else if (IS_ENABLED(CONFIG_ACCEL_SPOOF_MODE)) {
-		body_detect_change_state(BODY_DETECTION_ON_BODY, spoof_enable);
+	} else {
+		body_detect_change_state(BODY_DETECTION_ON_BODY,
+					 IS_ENABLED(CONFIG_ACCEL_SPOOF_MODE) &&
+						 spoof_enable);
 	}
 
+	body_detect_initialized = false;
+	inactivity_cnt = 0;
 	body_detect_get_params();
 	body_detect_set_update_rate(odr);
 }
