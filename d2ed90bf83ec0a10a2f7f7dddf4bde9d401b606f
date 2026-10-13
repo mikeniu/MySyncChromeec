@@ -1,6 +1,48 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "373e5101_e1f859d1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T23:10:30Z",
+      "side": 1,
+      "message": "Nit: crash_system() now calls __builtin_trap() (since CL:8478813) rather than CODE_UNREACHABLE.",
+      "isAi": true,
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2227d59_491731b4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T23:10:30Z",
+      "side": 1,
+      "message": "This explanation isn\u0027t quite right: `bl log_printf` and `bl cflush` are calls made from `test_crash()` that overwrite `LR` (`test_crash()`\u0027s incoming `LR` was pushed to the stack in its prologue), so `LR` does not hold the return address into `test_crash()`\u0027s caller.\n\nInstead, `cflush()` (via `uart_flush_output()` -\u003e `uart_tx_flush()`) is a non-leaf function: it pushes `lr` to the stack, makes internal `bl`/`blx` calls (such as `uart_irq_tx_complete()`, setting `LR` to an address inside `uart_tx_flush()`), and returns via `pop {..., pc}`. Because popping into `PC` does not restore `LR`, `LR` still points inside `uart_tx_flush()`/`cflush()` when the inlined `__builtin_trap()` executes in `test_crash()`.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "c1f5d5bf_4a1c3a00",
@@ -15,6 +57,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/9f39c4e1-a6b9-4c9f-8fa1-50ea6ed7240e)]\n\n### Review Summary\n* **Functionality**: The patch accurately adds `__attribute__((noinline))` to `crash_system()`. Under LTO on `realtekfp`, inlining this function removes the function call boundary, causing the trapped Link Register to hold the return address of `test_crash`\u0027s caller. Forcing `noinline` restores the `bl` instruction inside `test_crash`, updating the `lr` to point inside `test_crash`, which satisfies the test\u0027s `(crash_addr \u003c\u003d lr) \u0026\u0026 (crash_end \u003e\u003d lr)` bounds check for LTO builds.\n* **Architecture \u0026 Component Fit**: The change correctly aligns with the testing framework\u0027s expectations of the stack and program counter state during a hardware panic.\n* **Code Simplicity**: The fix is as minimal and direct as possible.\n* **Idiomaticity \u0026 Readability**: `__attribute__((noinline))` is standard usage in C for selectively disabling compiler optimizations on specific functions.\n* **Security**: N/A.\n* **Testing**: This CL directly fixes the existing `panic_data` test for the `realtekfp` target.\n* **CL Size \u0026 Scope**: Size: XS (+1, -1). The CL is atomic and correctly scoped to a single logical change.\n* **Commit Message**: The commit message cleanly and accurately details the compiler inlining behavior and how it affects the link register during the trap, providing excellent rationale for the fix.",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b8d3b50_d1e9a7c0",
+        "filename": "zephyr/test/hwtest/src/panic_data.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T23:10:30Z",
+      "side": 1,
+      "message": "Nit: Prefer Zephyr\u0027s `__noinline` macro (from `\u003czephyr/toolchain.h\u003e`) instead of `__attribute__((noinline))`, matching `zephyr/test/hwtest/src/ftrapv.c`:\n\n```c\nstatic void __noinline crash_system(void)\n```",
       "isAi": true,
       "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
