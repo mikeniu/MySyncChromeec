@@ -116,6 +116,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "46e64f71_21e82fe5",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T22:52:10Z",
+      "side": 1,
+      "message": "Marked as unresolved.",
+      "parentUuid": "a18877f7_0f71b634",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 9999
+      },
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "42800bc4_96aafb4e",
@@ -136,6 +160,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9969e997_f878f3a1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_finger_presence.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T22:52:10Z",
+      "side": 1,
+      "message": "Marked as unresolved.",
+      "parentUuid": "42800bc4_96aafb4e",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9999
+      },
       "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
