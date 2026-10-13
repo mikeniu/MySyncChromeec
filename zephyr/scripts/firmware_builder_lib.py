@@ -5,10 +5,12 @@
 """Helper functions shared across firmware builder scripts."""
 
 import argparse
+import collections
 import json
 import multiprocessing
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -282,6 +284,77 @@ def merge_shard_coverage_reports(
         write_metadata_fn(opts, info)
 
     return 0
+
+
+def summarize_merged_lcov(lcov_info, boards, test_exclude, board_exclude):
+    """Computes the code coverage metrics of a merged lcov.info.
+
+    These are the ALL_FILTERED, ALL_MERGED and BOARD_* metrics that test() gets
+    by running lcov --summary on the outputs of Makefile.cq, but computed in a
+    single pass over the merged tracefile, instead of running lcov and
+    lcov_stencil.py on it for each metric. ALL_TESTS, EC_ZEPHYR_TESTS and
+    EC_ZEPHYR_MERGED are not computed, because they include the files that the
+    shards filter out of their lcov.info.
+
+    The hits of the unit tests are under the empty test name (TN:), and the
+    lines that each board compiles, without hits, are under TN:<board name>.
+
+    Args:
+        lcov_info: Path of the merged lcov.info.
+        boards: Names of the boards to compute the BOARD_* metrics of.
+        test_exclude: Compiled regex of the paths that ALL_FILTERED skips, or
+            None.
+        board_exclude: Compiled regex of the paths that BOARD_* skip, or None.
+
+    Returns:
+        A dict of metric name to (covered lines, total lines).
+
+    Raises:
+        ValueError: If a metric has no lines.
+    """
+    # geninfo replaces the characters that are not allowed in a test name.
+    board_names = {re.sub(r"\W", "_", board): board for board in boards}
+    all_lines = collections.defaultdict(set)
+    hit_lines = collections.defaultdict(set)
+    board_lines = {name: collections.defaultdict(set) for name in board_names}
+    test_name = source = None
+    with open(lcov_info, encoding="utf-8") as file:
+        for line in file:
+            if line.startswith("TN:"):
+                test_name = line[3:].rstrip("\n")
+            elif line.startswith("SF:"):
+                source = line[3:].rstrip("\n")
+            elif line.startswith("DA:"):
+                number, count = line[3:].split(",")[:2]
+                all_lines[source].add(number)
+                if int(count) > 0:
+                    hit_lines[source].add(number)
+                if test_name in board_lines:
+                    board_lines[test_name][source].add(number)
+            elif line.startswith("end_of_record"):
+                test_name = source = None
+
+    def summarize(lines_by_source, exclude):
+        covered = total = 0
+        for path, lines in lines_by_source.items():
+            if exclude and exclude.match(path):
+                continue
+            total += len(lines)
+            covered += len(lines & hit_lines[path])
+        return covered, total
+
+    metrics = {
+        "ALL_FILTERED": summarize(all_lines, test_exclude),
+        "ALL_MERGED": summarize(all_lines, None),
+    }
+    for name, board in board_names.items():
+        metrics[f"BOARD_{board}".upper()] = summarize(
+            board_lines[name], board_exclude
+        )
+    for name, (_, total) in metrics.items():
+        if not total:
+            raise ValueError(f"{lcov_info} has no lines for {name}")
+    return metrics
 
 
 def _parse_pos_int(val):
