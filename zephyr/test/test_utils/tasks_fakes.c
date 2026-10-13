@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "task_id.h"
+#include "task.h"
 
 #include <zephyr/fff.h>
 #include <zephyr/sys/atomic.h>
@@ -15,7 +15,9 @@
  */
 /* LCOV_EXCL_START */
 FAKE_VALUE_FUNC(task_id_t, task_get_current);
+FAKE_VALUE_FUNC(atomic_t *, thread_get_event_bitmap, k_tid_t);
 FAKE_VALUE_FUNC(atomic_t *, task_get_event_bitmap, task_id_t);
+FAKE_VOID_FUNC(thread_set_event, k_tid_t, uint32_t);
 FAKE_VOID_FUNC(task_set_event, task_id_t, uint32_t);
 FAKE_VALUE_FUNC(int, task_start_called);
 FAKE_VALUE_FUNC(uint32_t, task_wait_event, int);
