@@ -949,18 +949,6 @@ void power_signal_interrupt(enum gpio_signal signal)
 	task_wake(TASK_ID_CHIPSET);
 }
 
-#ifdef CONFIG_POWER_SHUTDOWN_PAUSE_IN_S5
-inline int power_get_pause_in_s5(void)
-{
-	return pause_in_s5;
-}
-
-inline void power_set_pause_in_s5(int pause)
-{
-	pause_in_s5 = pause;
-}
-#endif
-
 /*****************************************************************************/
 /* Console commands */
 

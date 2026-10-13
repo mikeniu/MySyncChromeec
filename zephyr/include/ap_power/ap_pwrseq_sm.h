@@ -398,17 +398,4 @@ bool ap_pwrseq_sm_is_event_set(void *const data, enum ap_pwrseq_event event);
  * @retval AP_POWER_STATE_UNDEF If state machine is not doing state transition.
  **/
 enum ap_pwrseq_state ap_pwrseq_sm_get_entry_state(void *const data);
-
-/**
- * @brief Get state machine is exiting.
- *
- * This function is meant to be executed only within AP power sequence driver
- * thread context. `tid` was given in `ap_pwrseq_sm_init`.
- *
- * @param data Pointer to AP power sequence state machine instance data.
- *
- * @retval Enum value Upon success.
- * @retval AP_POWER_STATE_UNDEF If state machine is not doing state transition.
- **/
-enum ap_pwrseq_state ap_pwrseq_sm_get_exit_state(void *const data);
 #endif /* PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_H_ */

@@ -234,13 +234,6 @@ void ap_power_reset_host_sleep_state(void)
 						 NULL);
 }
 
-/* TODO: hook to reset event */
-void ap_power_handle_chipset_reset(void)
-{
-	if (ap_power_in_state(AP_POWER_STATE_STANDBY))
-		ap_power_reset_host_sleep_state();
-}
-
 void ap_power_chipset_handle_host_sleep_event(
 	enum host_sleep_event state, struct host_sleep_event_context *ctx)
 {

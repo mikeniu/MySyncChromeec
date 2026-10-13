@@ -90,18 +90,6 @@ void throttle_ap_config_prochot(const struct prochot_cfg *cfg);
  */
 void throttle_ap_prochot_input_interrupt(enum gpio_signal signal);
 
-/**
- * Interrupt handler to monitor the C10 input to the EC. The C10 signal
- * can be asserted by the AP when entering an idle state. This interrupt
- * is configured for the edge indicating C10 is de-asserting (GPIO_INT_RISING
- * if the signal is active low, GPIO_INT_FALLING for an active high signal).
- *
- * The board initialization is responsible for enabling the interrupt.
- *
- * @param signal    GPIO signal connected to C10 input.
- */
-void throttle_ap_c10_input_interrupt(enum gpio_signal signal);
-
 #else
 static inline void throttle_ap(enum throttle_level level,
 			       enum throttle_type type,

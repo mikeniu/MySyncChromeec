@@ -241,19 +241,6 @@ enum ap_pwrseq_state ap_pwrseq_sm_get_entry_state(void *const data)
 	return sm_data->entry;
 }
 
-enum ap_pwrseq_state ap_pwrseq_sm_get_exit_state(void *const data)
-{
-	struct ap_pwrseq_sm_data *sm_data = data;
-
-	if (!IS_ENABLED(CONFIG_EMUL_AP_PWRSEQ_DRIVER) &&
-	    sm_data->tid != k_current_get()) {
-		/* Called by wrong thread */
-		return -EPERM;
-	}
-
-	return sm_data->exit;
-}
-
 void ap_pwrseq_sm_exec_entry_handler(void *const data,
 				     ap_pwr_state_action_handler handler)
 {

@@ -216,11 +216,6 @@ void ap_power_reset(enum ap_power_shutdown_reason reason);
 void ap_power_force_shutdown(enum ap_power_shutdown_reason reason);
 
 /**
- * @brief Initialise the AP reset log.
- */
-void ap_power_init_reset_log(void);
-
-/**
  * @brief Starts the AP power sequence thread.
  */
 void ap_pwrseq_task_start(void);

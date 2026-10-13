@@ -22,13 +22,6 @@
 #define CPUTS(outstr) cputs(CC_THERMAL, outstr)
 #define CPRINTS(format, args...) cprints(CC_THERMAL, format, ##args)
 
-/*
- * When C10 deasserts, PROCHOT may also change state when the corresponding
- * power rail is turned back on. Recheck PROCHOT directly from the C10 exit
- * using a shorter debounce than the PROCHOT interrupt.
- */
-#define C10_IN_DEBOUNCE_US (10 * MSEC)
-
 /*****************************************************************************/
 /* This enforces the virtual OR of all throttling sources. */
 static K_MUTEX_DEFINE(throttle_mutex);
@@ -171,18 +164,6 @@ void throttle_ap_prochot_input_interrupt(enum gpio_signal signal)
 	hook_call_deferred(&prochot_input_deferred_data,
 			   PROCHOT_IN_DEBOUNCE_US);
 }
-
-#ifdef CONFIG_CPU_PROCHOT_GATE_ON_C10
-void throttle_ap_c10_input_interrupt(enum gpio_signal signal)
-{
-	/*
-	 * This interrupt is configured to fire only when the AP exits C10
-	 * and de-asserts the C10 signal. Recheck the PROCHOT signal in case
-	 * another PROCHOT source is active when the AP exits C10.
-	 */
-	hook_call_deferred(&prochot_input_deferred_data, C10_IN_DEBOUNCE_US);
-}
-#endif
 
 /*****************************************************************************/
 /* Console commands */

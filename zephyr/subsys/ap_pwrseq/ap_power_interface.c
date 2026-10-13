@@ -187,7 +187,3 @@ void ap_pwrseq_task_start(void)
 	ap_pwrseq_start(dev, chipset_pwr_seq_get_state());
 }
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
-
-void ap_power_init_reset_log(void)
-{
-}
