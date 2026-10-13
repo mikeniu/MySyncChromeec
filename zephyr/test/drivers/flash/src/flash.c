@@ -536,6 +536,10 @@ ZTEST_USER(flash, test_console_cmd_flash_erase__bad_args)
 	/* Check for alpha arg instead of number*/
 	CHECK_CONSOLE_CMD("flasherase xyz 100", NULL, EC_ERROR_PARAM1);
 	CHECK_CONSOLE_CMD("flasherase 100 xyz", NULL, EC_ERROR_PARAM2);
+
+	/* Negative offset or size */
+	CHECK_CONSOLE_CMD("flasherase -1 100", NULL, EC_ERROR_INVAL);
+	CHECK_CONSOLE_CMD("flasherase 100 -1", NULL, EC_ERROR_INVAL);
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_erase__overflow)
@@ -974,6 +978,10 @@ ZTEST_USER(flash, test_console_cmd_flash_write__bad_args)
 	/* Check for alpha arg instead of number*/
 	CHECK_CONSOLE_CMD("flashwrite xyz 100", NULL, EC_ERROR_PARAM1);
 	CHECK_CONSOLE_CMD("flashwrite 100 xyz", NULL, EC_ERROR_PARAM2);
+
+	/* Negative offset or size */
+	CHECK_CONSOLE_CMD("flashwrite -1 100", NULL, EC_ERROR_INVAL);
+	CHECK_CONSOLE_CMD("flashwrite 100 -1", NULL, EC_ERROR_INVAL);
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_write__too_big)
@@ -1014,6 +1022,10 @@ ZTEST_USER(flash, test_console_cmd_flash_read__bad_args)
 	/* Check for alpha arg instead of number*/
 	CHECK_CONSOLE_CMD("flashread xyz 100", NULL, EC_ERROR_PARAM1);
 	CHECK_CONSOLE_CMD("flashread 100 xyz", NULL, EC_ERROR_PARAM2);
+
+	/* Negative offset or size */
+	CHECK_CONSOLE_CMD("flashread -1 100", NULL, EC_ERROR_INVAL);
+	CHECK_CONSOLE_CMD("flashread 100 -1", NULL, EC_ERROR_INVAL);
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_read__too_big)
