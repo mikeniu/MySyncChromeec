@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9202e8e8_6eac054c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T21:30:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n**Functionality:** Looks good in principle, but requires splitting.\n**Architecture \u0026 Component Fit:** ✅\n**Code Simplicity:** ❌ See inline comment regarding avoiding intermediate mutable state.\n**Idiomaticity \u0026 Readability:** ✅\n**Security:** ✅\n**Testing:** ℹ️ (No automated tests expected for this hardware-specific script).\n**CL Size \u0026 Scope:** Size: S (+13, -14). The commit message body joins two distinct actions with \"and\" (\"Adjust ocelot spidev to /dev/spidev1.0 on Android and remove the unused cros_config model query\"). These are independent logical changes. Please split this into two separate CLs to follow the Single Logical Change rule:\n1. **CL 1:** A pure cleanup CL that removes the unused `cros_config` query and `case` statement from `config_ocelot`.\n2. **CL 2:** A behavioral CL that adjusts the `DEVICE` path to `/dev/spidev1.0` on Android.\n**Commit Message:** The description accurately reflects the changes, but highlights that the CL bundles multiple logical changes. When splitting, please ensure the subject line for each new CL ends with a period (e.g., `util/flash_fp_mcu: Adjust ocelot config for Android.`).\n\n[🔗](http://go/tj/64f26c9b-8f33-4674-b330-c0babd5be977)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "659f7590022bb3860e3758a80bb9b66c986cd1dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f36d5299_cf86e59e",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1326,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T21:30:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nTo avoid intermediate mutable state before marking the variable as `readonly`, consider using a symmetric `if/else` block:\n\n```bash\n  if [[ \"$(os)\" \u003d\u003d \"android\" ]]; then\n    readonly DEVICE\u003d\"/dev/spidev1.0\"\n  else\n    readonly DEVICE\u003d\"/dev/spidev0.0\"\n  fi\n```\n[🔗](http://go/tj/64f26c9b-8f33-4674-b330-c0babd5be977)",
+      "range": {
+        "startLine": 1321,
+        "startChar": 0,
+        "endLine": 1326,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "659f7590022bb3860e3758a80bb9b66c986cd1dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
