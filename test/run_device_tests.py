@@ -619,7 +619,6 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "fp_transport",  # TODO(b/485668240)
             "null_pointer",  # TODO(b/485624833)
             "panic_data",  # TODO(b/485667679)
             "rollback_entropy",  # TODO(b/485670085)
