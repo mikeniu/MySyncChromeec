@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3ac75f3_3b257368",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T20:55:08Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If `k_poll` returns `-EAGAIN` (e.g. because of a timeout or `K_NO_WAIT`), but `events` actually picked up a matching event from `atomic_set()`, this logic will still unconditionally add `TASK_EVENT_TIMER` and break.\n\nTo prevent returning a timer event when a matching event was successfully retrieved, consider grouping the `rv \u003d\u003d -EAGAIN` check so it only applies when no matching events were found:\n```c\n\t\tif (!(event_mask \u0026 events) \u0026\u0026\n\t\t    (rv \u003d\u003d -EAGAIN || (timeout_us !\u003d -1 \u0026\u0026 ticks_left \u003c\u003d 0))) {\n```",
+      "range": {
+        "startLine": 285,
+        "startChar": 0,
+        "endLine": 285,
+        "endChar": 0
+      },
+      "revId": "7d3f171c786be7d1dc26c9f77163789485c1a4ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
