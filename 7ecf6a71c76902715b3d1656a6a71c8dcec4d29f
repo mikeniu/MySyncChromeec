@@ -18,6 +18,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75a2bd16_8694434d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T16:19:38Z",
+      "side": 1,
+      "message": "Yes — AllTests.get_public_tests() defines separate test configs for SPI (fp_transport_spi_ro, fp_transport_spi_rw with host_interfaces\u003d{HostInterface.SPI}) and UART (fp_transport_uart_ro, fp_transport_uart_rw with host_interfaces\u003d{HostInterface.UART}). For each config, Renode.flash() starts a fresh Renode instance with --transport spi or --transport uart, which sets GPIO_TRANSPORT_SEL before boot, and run_test_zephyr() runs the corresponding ztest suite (fp_transport_spi or fp_transport_uart).",
+      "parentUuid": "a75a7021_80314a72",
+      "isAi": true,
+      "revId": "7ecf6a71c76902715b3d1656a6a71c8dcec4d29f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06111ba0_9501e597",
@@ -31,6 +50,25 @@
       "writtenOn": "2026-10-06T08:46:02Z",
       "side": 1,
       "message": "Now the test looks a bit confusing. There is the following part that can be executed if the transport_type is not FP_TRANSPORT_TYPE_UART. However, there is no corresponding part for SPI. I think the test should be reconstructed a bit to have two parts - one for active interface and the second for not active. Or just remove the later part.",
+      "revId": "7ecf6a71c76902715b3d1656a6a71c8dcec4d29f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f06047b9_0938c6e4",
+        "filename": "zephyr/test/hwtest/src/fp_transport.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T16:19:38Z",
+      "side": 1,
+      "message": "Done — reconstructed both test_fp_transport_spi and test_fp_transport_uart so each has two symmetric parts: check_protocol_info() when that transport is the active interface at boot, and check_backend_init() when that transport is inactive.",
+      "parentUuid": "06111ba0_9501e597",
+      "isAi": true,
       "revId": "7ecf6a71c76902715b3d1656a6a71c8dcec4d29f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
