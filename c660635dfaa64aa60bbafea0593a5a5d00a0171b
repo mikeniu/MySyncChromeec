@@ -16,6 +16,24 @@
       "message": "Nit: Can you note in the body that this changes the devicetree to align with the schematic?",
       "revId": "c660635dfaa64aa60bbafea0593a5a5d00a0171b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09eb31c2_6f88d37b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-10-13T01:02:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eee0b9d7_b9b43f03",
+      "revId": "c660635dfaa64aa60bbafea0593a5a5d00a0171b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
