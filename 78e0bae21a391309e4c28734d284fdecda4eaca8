@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "534db8d3_814ff566",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T10:53:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f26eafc_0429d07d",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "992fadac_80cc105a",
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "\u003e I don\u0027t think the irq locking is really needed here\n\nWhat about the following scenario, similar to the one outlined above:\n```\nT1:\n-\u003e increment ref counter\n-\u003e start enabling fast CPU\n  -\u003e Interrupt\n  -\u003e re-schedule to T2:\n  -\u003e increment ref counter\n  -\u003e enable fast CPU\n  -\u003e calculations \n  -\u003e disable fast CPU\n  -\u003e decrement ref counter\n  -\u003e reschedule to T1 again\n-\u003e continue enabling fast CPU   // potentially bad hardware state\n```\n\nWe could try to use a mutex instead of a reference counter + `irq_lock()` but first I\u0027d need to check the call sites and their possible execution contexts, for example to ensure that this function is never called from an interrupt handler.",
       "parentUuid": "5325fde6_0e7256d4",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a7b961a_f0436162",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T10:53:35Z",
+      "side": 1,
+      "message": "I chose a mutex held for the entire length of a single fast cpu block. Reference counting paired poorly with the cpp implementation of `ScopedFastCpu` class and without reference counting correctness could not be guaranteed.\n\nI\u0027m not resolving the comment yet. PTAL at the current approach and resolve if you agree it\u0027s good enough.",
+      "parentUuid": "f4798d7b_9a660290",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -338,6 +374,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13208fd9_f20bb889",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T10:53:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d66c1644_332e805d",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27bd79fe_e63e45f4",
@@ -387,6 +441,24 @@
       "side": 1,
       "message": "Good. I think it is tricky naming - the system clock that clock the SOC (PLL after the change) and the system clock used by Zephyr (LPTIM, ticked by LSI, always constant)",
       "parentUuid": "3888c2fb_095b3e91",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca2de8e4_9326b4f6",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T10:53:35Z",
+      "side": 1,
+      "message": "The calls were actually removed by a later CL but I removed them here and resolved the conflict.",
+      "parentUuid": "85e2f56d_0ab8b803",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -641,6 +713,24 @@
         "endLine": 124,
         "endChar": 35
       },
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c0d16c0_ad50c8aa",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T10:53:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "050120af_c525830b",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
