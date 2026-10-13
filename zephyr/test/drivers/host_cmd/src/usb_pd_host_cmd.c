@@ -128,6 +128,75 @@ ZTEST_USER(usb_pd_host_cmd, test_typec_discovery_invalid_args)
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
 }
 
+/*
+ * Test that when discovery data contains more SVIDs than fit in the host
+ * command response buffer, hc_typec_discovery() copies only as many as fit,
+ * reports that count in the response, and does not write past it.
+ *
+ * The discovery results are populated directly rather than through a
+ * partner emulator, to keep the test focused on the host command.
+ */
+ZTEST_USER(usb_pd_host_cmd, test_typec_discovery_svid_count_capped)
+{
+	struct ec_params_typec_discovery params = {
+		.port = 0,
+		.partner_type = TYPEC_PARTNER_SOP,
+	};
+	uint8_t response_buf[sizeof(struct ec_response_typec_discovery) +
+			     2 * sizeof(struct svid_mode_info)];
+	struct ec_response_typec_discovery *response =
+		(struct ec_response_typec_discovery *)response_buf;
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_TYPEC_DISCOVERY, 0, params);
+	struct pd_discovery *disc =
+		pd_get_am_discovery_and_notify_access(0, TCPCI_MSG_SOP);
+	struct pd_discovery saved_disc = *disc;
+
+	/*
+	 * Fill the response buffer with a canary and a bogus svid_count, so
+	 * the handler's output cannot depend on prior buffer contents.
+	 */
+	memset(response_buf, 0xaa, sizeof(response_buf));
+	response->svid_count = 0xff;
+
+	/* Setup 2 discovered SVIDs in the port discovery state */
+	disc->identity_cnt = 1;
+	disc->identity.raw_value[0] = 0x12345678;
+	disc->identity_discovery = PD_DISC_COMPLETE;
+	disc->svids_discovery = PD_DISC_COMPLETE;
+	disc->svid_cnt = 2;
+	disc->svids[0].svid = USB_SID_DISPLAYPORT;
+	disc->svids[0].mode_cnt = 1;
+	disc->svids[0].mode_vdo[0] = 0x11111111;
+	disc->svids[0].discovery = PD_DISC_COMPLETE;
+	disc->svids[1].svid = USB_VID_GOOGLE;
+	disc->svids[1].mode_cnt = 1;
+	disc->svids[1].mode_vdo[0] = 0x22222222;
+	disc->svids[1].discovery = PD_DISC_COMPLETE;
+
+	/* Restrict response buffer to fit only 1 SVID */
+	args.response = response_buf;
+	args.response_max = sizeof(struct ec_response_typec_discovery) +
+			    sizeof(struct svid_mode_info);
+
+	/*
+	 * Verify that host_command_process() succeeds, caps the returned SVIDs
+	 * to exactly 1, sets response_size matching 1 SVID, and leaves the
+	 * unallocated portion of response_buf untouched (canary 0xaaaa).
+	 */
+	zassert_equal(host_command_process(&args), EC_RES_SUCCESS);
+	zassert_equal(args.response_size,
+		      sizeof(struct ec_response_typec_discovery) +
+			      sizeof(struct svid_mode_info));
+	zassert_equal(response->svid_count, 1);
+	zassert_equal(response->svids[0].svid, USB_SID_DISPLAYPORT);
+	zassert_equal(response->svids[0].mode_count, 1);
+	zassert_equal(response->svids[0].mode_vdo[0], 0x11111111);
+	zassert_equal(response->svids[1].svid, 0xaaaa);
+
+	*disc = saved_disc;
+}
+
 ZTEST_USER(usb_pd_host_cmd, test_typec_control_invalid_args)
 {
 	struct ec_params_typec_control params = {

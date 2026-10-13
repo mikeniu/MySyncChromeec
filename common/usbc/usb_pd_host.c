@@ -64,26 +64,31 @@ hc_typec_discovery(struct ec_host_cmd_handler_args *args)
 
 	if (pd_get_modes_discovery(p->port, type) == PD_DISC_COMPLETE) {
 		int svid_i;
+		int svid_count;
 		int max_resp_svids =
 			(args->output_buf_max - args->output_buf_size) /
 			sizeof(struct svid_mode_info);
 
 		if (disc->svid_cnt > max_resp_svids) {
 			CPRINTS("Warn: SVIDS exceeded HC response");
-			r->svid_count = max_resp_svids;
+			svid_count = max_resp_svids;
 		} else {
-			r->svid_count = disc->svid_cnt;
+			svid_count = disc->svid_cnt;
 		}
 
-		for (svid_i = 0; svid_i < r->svid_count; svid_i++) {
+		for (svid_i = 0; svid_i < svid_count; svid_i++) {
 			r->svids[svid_i].svid = disc->svids[svid_i].svid;
 			r->svids[svid_i].mode_count =
 				disc->svids[svid_i].mode_cnt;
 			memcpy(r->svids[svid_i].mode_vdo,
 			       disc->svids[svid_i].mode_vdo,
 			       sizeof(r->svids[svid_i].mode_vdo));
-			args->output_buf_size += sizeof(struct svid_mode_info);
 		}
+
+		/* Record the final SVID count and response size. */
+		r->svid_count = svid_count;
+		args->output_buf_size +=
+			svid_count * sizeof(struct svid_mode_info);
 	} else {
 		r->svid_count = 0;
 	}
