@@ -484,6 +484,51 @@ int test_command_crash(int argc, const char **argv)
 	return command_crash(argc, argv);
 }
 #endif /* TEST_BUILD*/
+
+static const char *const crash_type_names[] = {
+	[EC_CRASH_ASSERT] = "assert",	    [EC_CRASH_DIVZERO] = "divzero",
+	[EC_CRASH_UDIVZERO] = "udivzero",   [EC_CRASH_STACK] = "stack",
+	[EC_CRASH_UNALIGNED] = "unaligned", [EC_CRASH_WATCHDOG] = "watchdog",
+	[EC_CRASH_HANG] = "hang",	    [EC_CRASH_NULL] = "null",
+	[EC_CRASH_OOPS] = "oops",
+};
+BUILD_ASSERT(ARRAY_SIZE(crash_type_names) == EC_CRASH_COUNT);
+
+static uint8_t pending_crash_type;
+
+static void deferred_crash(void)
+{
+	if (pending_crash_type < ARRAY_SIZE(crash_type_names)) {
+		const char *argv[] = { "crash",
+				       crash_type_names[pending_crash_type] };
+
+		command_crash(2, argv);
+	}
+}
+DECLARE_DEFERRED(deferred_crash);
+
+static enum ec_host_cmd_status
+host_command_crash(struct ec_host_cmd_handler_args *args)
+{
+	const struct ec_params_crash *p = args->input_buf;
+
+	if (args->input_buf_size < sizeof(*p))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
+	if (p->type >= EC_CRASH_COUNT)
+		return EC_HOST_CMD_INVALID_PARAM;
+
+	if (p->type == EC_CRASH_ASSERT &&
+	    !IS_ENABLED(CONFIG_DEBUG_ASSERT_REBOOTS))
+		return EC_HOST_CMD_INVALID_PARAM;
+
+	pending_crash_type = p->type;
+	hook_call_deferred(&deferred_crash_data, 50 * MSEC);
+
+	return EC_HOST_CMD_SUCCESS;
+}
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_CRASH, host_command_crash, EC_VER_MASK(0),
+			     struct ec_params_crash);
 #endif /* CONFIG_CMD_CRASH */
 
 static int command_panicinfo(int argc, const char **argv)

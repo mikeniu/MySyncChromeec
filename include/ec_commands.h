@@ -8543,6 +8543,26 @@ struct ec_params_ap_reset_scheduled {
 	uint32_t delay_ms;
 } __ec_align4;
 
+/* Trigger an EC/ISH crash for testing */
+#define EC_CMD_CRASH 0x0147
+
+enum ec_crash_type {
+	EC_CRASH_ASSERT = 0,
+	EC_CRASH_DIVZERO = 1,
+	EC_CRASH_UDIVZERO = 2,
+	EC_CRASH_STACK = 3,
+	EC_CRASH_UNALIGNED = 4,
+	EC_CRASH_WATCHDOG = 5,
+	EC_CRASH_HANG = 6,
+	EC_CRASH_NULL = 7,
+	EC_CRASH_OOPS = 8,
+	EC_CRASH_COUNT,
+};
+
+struct ec_params_crash {
+	uint8_t type; /* enum ec_crash_type */
+} __ec_align1;
+
 /*****************************************************************************/
 /* The command range 0x200-0x2FF is reserved for Rotor. */
 
