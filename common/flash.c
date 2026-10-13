@@ -1658,7 +1658,7 @@ flash_command_read(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_OVERFLOW;
 
 	/* Make sure that offset + p->size does not overflow. */
-	if (check_add_overflow(offset, p->size, &end))
+	if (u32_add_overflow(offset, p->size, &end))
 		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_ROLLBACK
@@ -1709,7 +1709,7 @@ flash_command_write(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_INVALID_PARAM;
 
 	/* Make sure that offset + p->size does not overflow. */
-	if (check_add_overflow(offset, p->size, &end))
+	if (u32_add_overflow(offset, p->size, &end))
 		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_INTERNAL_STORAGE
@@ -1784,7 +1784,7 @@ flash_command_erase(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_ACCESS_DENIED;
 
 	/* Make sure that offset + p->size does not overflow. */
-	if (check_add_overflow(offset, p->size, &end))
+	if (u32_add_overflow(offset, p->size, &end))
 		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_INTERNAL_STORAGE
