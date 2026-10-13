@@ -6,9 +6,9 @@
 #define DT_DRV_COMPAT cros_ec_fingerprint_sensor_sim
 
 #include "fingerprint_sensor_sim.h"
-#include "overflow.h"
 
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/math_extras.h>
 #include <zephyr/sys/minmax.h>
 
 #include <drivers/fingerprint.h>
@@ -164,8 +164,8 @@ static int fp_simulator_acquire_image(const struct device *dev,
 		 * offset + frame_size calculation overflows or exceeds the
 		 * buffer.
 		 */
-		if (check_add_overflow(offset, frame_size,
-				       &total_required_size) ||
+		if (u32_add_overflow(offset, frame_size,
+				     &total_required_size) ||
 		    total_required_size > image_buf_size) {
 			return -EINVAL;
 		}
