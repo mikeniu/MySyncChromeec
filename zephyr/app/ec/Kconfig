@@ -195,9 +195,6 @@ configdefault SHELL_HELP
 configdefault KERNEL_SHELL
   default y
 
-configdefault PWM_SHELL
-	default y if PWM
-
 configdefault WDT_SHELL
 	default y if WATCHDOG
 
