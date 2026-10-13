@@ -8,11 +8,13 @@ import argparse
 import logging
 import os
 import re
-from typing import Optional
+from typing import Optional, Type
 
 from flash.board_map import get_chip_from_board
 from flash.flasher_base import BaseEcFlasher
 from flash.flashrom_flasher import FlashromFlasher
+from flash.ite_flasher import IteI2cFlasher
+from flash.ite_flasher import IteUartFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 
@@ -45,12 +47,10 @@ def query_ec_source_tree(board: str, ec_dir: str) -> Optional[str]:
                 match = proj_regex.search(content)
                 if match:
                     block = match.group(0)
-                    zb_match = zboard_regex.search(block)
-                    if zb_match:
-                        return zb_match.group(1).split("/")[0]
-                    c_match = chip_regex.search(block)
-                    if c_match:
-                        return c_match.group(1).split("/")[0]
+                    for regex in (zboard_regex, chip_regex):
+                        sub_match = regex.search(block)
+                        if sub_match:
+                            return sub_match.group(1).split("/")[0]
         except OSError:
             pass
     return None
@@ -60,12 +60,11 @@ class FlasherFactory:
     """Factory to instantiate the appropriate BaseEcFlasher."""
 
     @staticmethod
-    def create(
+    def _resolve_chip(
         servo: Optional[ServoDriver], args: argparse.Namespace
-    ) -> BaseEcFlasher:
-        """Create a BaseEcFlasher matching the target chip and interface."""
+    ) -> str:
+        """Resolve the lowercase EC chip name from args, servo, or board."""
         chip = args.chip
-        interface = args.interface
 
         if not chip and servo:
             try:
@@ -107,23 +106,44 @@ class FlasherFactory:
 
         chip = chip.lower()
         args.chip = chip
+        return chip
 
-        if interface == "spi" and not chip.startswith("npcx"):
-            return FlashromFlasher(servo, args)
+    @staticmethod
+    def create(
+        servo: Optional[ServoDriver], args: argparse.Namespace
+    ) -> BaseEcFlasher:
+        """Create a BaseEcFlasher matching the target chip and interface."""
+        chip = FlasherFactory._resolve_chip(servo, args)
+        interface = args.interface
+        flasher_cls: Optional[Type[BaseEcFlasher]] = None
 
-        if chip in (
+        if interface == "uart" and chip.startswith("it8"):
+            flasher_cls = IteUartFlasher
+        elif interface == "spi" and not chip.startswith("npcx"):
+            flasher_cls = FlashromFlasher
+        elif chip in (
             "ite_spi",
             "npcx_int_spi",
             "npcx_spi",
             "stm32_spi",
             "mchp_int_spi",
         ):
-            return FlashromFlasher(servo, args)
-
-        if chip in ("it8xxx2", "ite_spi_ccd_i2c", "ite_spi_ccd_uart"):
+            flasher_cls = FlashromFlasher
+        elif chip in ("it8xxx2", "ite_spi_ccd_i2c", "ite_spi_ccd_uart"):
             servo_type = servo.get("servo_type", default="") if servo else ""
             if "servo_micro" in servo_type or "c2d2" in servo_type:
-                return FlashromFlasher(servo, args)
+                flasher_cls = FlashromFlasher
+            elif chip == "ite_spi_ccd_uart":
+                flasher_cls = IteUartFlasher
+            else:
+                flasher_cls = IteI2cFlasher
+        elif chip in ("it83xx", "ite_i2c", "ite_i2c_usbc_charging"):
+            flasher_cls = IteI2cFlasher
+        elif chip in ("ite_uart", "ite_uart_3m", "it8320"):
+            flasher_cls = IteUartFlasher
+
+        if flasher_cls is not None:
+            return flasher_cls(servo, args)
 
         raise NotImplementedError(
             f"Flasher for chip '{chip}' (interface='{interface}') "

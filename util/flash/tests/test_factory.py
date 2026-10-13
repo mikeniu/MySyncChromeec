@@ -14,6 +14,8 @@ from flash.board_map import get_chip_from_board
 from flash.factory import FlasherFactory
 from flash.factory import query_ec_source_tree
 from flash.flashrom_flasher import FlashromFlasher
+from flash.ite_flasher import IteI2cFlasher
+from flash.ite_flasher import IteUartFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 
@@ -131,10 +133,23 @@ class TestFactory(unittest.TestCase):
 
     def test_stubbed_chip_raises_not_implemented(self) -> None:
         """Raise NotImplementedError for detected chip in base skeleton."""
-        self.servo.get.return_value = "it8320"
+        self.servo.get.return_value = "unsupported_chip"
         with self.assertRaises(NotImplementedError):
             FlasherFactory.create(self.servo, self.args)
-        self.assertEqual(self.args.chip, "it8320")
+        self.assertEqual(self.args.chip, "unsupported_chip")
+
+    def test_chip_from_servo_ite_uart(self) -> None:
+        """Route it8320 from servo ec_chip to IteUartFlasher."""
+        self.servo.get.return_value = "it8320"
+        flasher = FlasherFactory.create(self.servo, self.args)
+        self.assertIsInstance(flasher, IteUartFlasher)
+
+    def test_ite_i2c(self) -> None:
+        """Route ite_i2c and it8xxx2 over CCD to IteI2cFlasher."""
+        self.args.chip = "ite_i2c"
+        self.servo.get.return_value = "ccd_cr50"
+        flasher = FlasherFactory.create(self.servo, self.args)
+        self.assertIsInstance(flasher, IteI2cFlasher)
 
     def test_board_map_lookup(self) -> None:
         """Verify legacy board_map lookup returns expected chip types."""
