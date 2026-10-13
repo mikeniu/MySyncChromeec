@@ -115,7 +115,18 @@ __maybe_unused static void print_flag(const char *group, int set_or_clear,
  * when we send the message to the TCPC layer.
  */
 #define PRL_FLAGS_MSG_XMIT BIT(7)
-/* Flag to note a message was received */
+/*
+ * Flag to note a message was received.
+ *
+ * RCH: a buffer-ownership token. Set by prl_rx when it writes a message for
+ * RCH into rx_chk_buf, and by tch_message_received_entry when TCH hands one
+ * over. While set, prl_rx must not overwrite rx_chk_buf or rx_emsg.header.
+ * RCH clears it only in the function that consumes or discards rx_chk_buf,
+ * in the same pass, so that "flag clear" always means "buffer free".
+ *
+ * TCH: a notification only; prl_rx does not wait on it. TCH either handles
+ * the message as a chunk request or forwards it to RCH.
+ */
 #define PRL_FLAGS_MSG_RECEIVED BIT(8)
 /* Flag to note aborting current TX message, not currently set */
 #define PRL_FLAGS_ABORT BIT(9)
@@ -1501,7 +1512,6 @@ static void rch_wait_for_message_from_protocol_layer_run(const int port)
 
 	if (!RCH_CHK_FLAG(port, PRL_FLAGS_MSG_RECEIVED))
 		return;
-	RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
 
 	/* Extended messages are only valid from a PD3.0 partner. */
 	ext = pdmsg_xmit_type_is_rev30(port) &&
@@ -1512,6 +1522,10 @@ static void rch_wait_for_message_from_protocol_layer_run(const int port)
 	 *
 	 * Chunking is always 1 here: unchunked extended messages are not
 	 * supported. Refer to b/573313604.
+	 *
+	 * Leave PRL_FLAGS_MSG_RECEIVED set. rx_chk_buf is consumed by
+	 * RCH_PROCESSING_EXTENDED_MESSAGE on the next pass, and prl_rx must
+	 * not overwrite it until then.
 	 */
 	if (ext &&
 	    PD_EXT_HEADER_CHUNKED(GET_EXT_HEADER(pdmsg[port].rx_chk_buf[0]))) {
@@ -1527,6 +1541,9 @@ static void rch_wait_for_message_from_protocol_layer_run(const int port)
 		set_state_rch(port, RCH_PROCESSING_EXTENDED_MESSAGE);
 		return;
 	}
+
+	/* Every remaining path consumes or discards rx_chk_buf below. */
+	RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
 
 	/* Received Non-Extended Message */
 	if (!PD_HEADER_EXT(rx_emsg[port].header)) {
@@ -1569,6 +1586,16 @@ static void rch_processing_extended_message_run(const int port)
 	uint8_t chunk_num = PD_EXT_HEADER_CHUNK_NUM(exhdr);
 	uint32_t data_size = PD_EXT_HEADER_DATA_SIZE(exhdr);
 	uint32_t byte_num;
+
+	/*
+	 * rx_chk_buf is consumed (appended) or discarded (error, abort) in
+	 * this pass, so release it to prl_rx now.
+	 *
+	 * Clear before the error paths: with the flag set, RCH_REPORT_ERROR
+	 * would pass rx_chk_buf to the Policy Engine as a complete message,
+	 * and here it holds a chunk.
+	 */
+	RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
 
 	/*
 	 * Abort Flag Set
@@ -1721,21 +1748,18 @@ static void rch_waiting_chunk_run(const int port)
 			PDMSG_CLR_FLAG(port, PRL_FLAGS_TX_COMPLETE);
 
 		/*
+		 * PRL_FLAGS_MSG_RECEIVED stays set on both paths below: the
+		 * state entered next consumes rx_chk_buf and clears it.
+		 *
 		 * Chunk response Received from Protocol Layer
 		 */
 		if (rx_msg_is_chunk_response(port)) {
-			/*
-			 * No error was detected, so clear
-			 * PRL_FLAGS_MSG_RECEIVED flag.
-			 */
-			RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
 			set_state_rch(port, RCH_PROCESSING_EXTENDED_MESSAGE);
 		}
 		/*
 		 * Other Message Received from Protocol Layer, including a
-		 * non-extended message. PRL_FLAGS_MSG_RECEIVED stays set so
-		 * that RCH_REPORT_ERROR passes the message to the Policy
-		 * Engine.
+		 * non-extended message. RCH_REPORT_ERROR passes the message to
+		 * the Policy Engine.
 		 */
 		else {
 			rch[port].error = ERR_RCH_CHUNKED;
