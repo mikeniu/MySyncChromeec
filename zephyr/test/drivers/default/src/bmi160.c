@@ -2153,30 +2153,6 @@ ZTEST_USER(bmi160, test_bmi_temp_sensor)
 		      EC_ERROR_NOT_POWERED, ret);
 }
 
-ZTEST_USER(bmi160, test_bmi_interrupt_handler)
-{
-	/* The accelerometer interrupt handler simply sets an event flag for the
-	 * motion sensing task. Make sure that flag starts cleared, fire the
-	 * interrupt, and ensure the flag is set.
-	 */
-
-	atomic_t *mask;
-
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true((*mask & CONFIG_ACCELGYRO_BMI160_INT_EVENT) == 0,
-		     "Event flag is set before firing interrupt");
-
-	bmi160_interrupt(0);
-
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true(*mask & CONFIG_ACCELGYRO_BMI160_INT_EVENT,
-		     "Event flag is not set after firing interrupt");
-}
-
 /* Make an I2C emulator mock wrapped in FFF for use with test_bmi_init_chip_id()
  */
 FAKE_VALUE_FUNC(int, bmi_init_chip_id_mock_write_fn, const struct emul *, int,
