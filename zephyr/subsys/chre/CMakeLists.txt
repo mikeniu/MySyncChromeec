@@ -5,6 +5,10 @@
 if(CONFIG_ISH_CHRE)
   zephyr_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>)
 
+  target_sources(app PRIVATE
+    chre.cc
+  )
+
   if(NOT CONFIG_ZTEST)
     set(CHRE_PLATFORM_PIGWEED ON CACHE BOOL "" FORCE)
     zephyr_compile_options(-include zephyr/sys/util_macro.h)
@@ -23,6 +27,9 @@ if(CONFIG_ISH_CHRE)
     set(chre_third_party_flatbuffers_LIBRARY chre.third_party.flatbuffers
         CACHE STRING "" FORCE)
     add_subdirectory(${CHRE_ROOT} chre)
-    target_link_libraries(app PRIVATE chre)
+    target_link_libraries(app PRIVATE
+      chre
+      pw_allocator_zephyr.synchronized_heap_allocator
+    )
   endif()
 endif()
