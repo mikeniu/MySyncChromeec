@@ -233,6 +233,14 @@ ZTEST(test_task_shim, test_empty_set_mask)
 	run_test(&empty_set_mask1, &empty_set_mask2);
 }
 
+ZTEST(test_task_shim, test_event_mask_zero_timeout)
+{
+	task_set_event(task_get_current(), 0x0003);
+	zassert_equal(task_wait_event_mask(0x0001, 0), 0x0001);
+	zassert_equal(task_wait_event_mask(0x0001, 0), TASK_EVENT_TIMER);
+	zassert_equal(task_wait_event_mask(0x0002, 0), 0x0002);
+}
+
 static bool pre_kernel_ran = false;
 static int pre_kernel(void)
 {

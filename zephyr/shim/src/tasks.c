@@ -268,12 +268,6 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 
 	while (!(event_mask & events)) {
 		const int64_t ticks_left = tick_deadline - k_uptime_ticks();
-
-		if (timeout_us != -1 && ticks_left <= 0) {
-			events |= TASK_EVENT_TIMER;
-			break;
-		}
-
 		struct k_poll_event poll_events[1] = {
 			K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
 						 K_POLL_MODE_NOTIFY_ONLY,
@@ -281,10 +275,18 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 		};
 
 		/* Ensure to honor the -1 timeout as FOREVER */
-		k_poll(poll_events, ARRAY_SIZE(poll_events),
-		       timeout_us == -1 ? K_FOREVER : K_TICKS(ticks_left));
+		const int rv = k_poll(poll_events, ARRAY_SIZE(poll_events),
+				      timeout_us == -1 ? K_FOREVER :
+				      ticks_left > 0   ? K_TICKS(ticks_left) :
+							 K_NO_WAIT);
 		k_poll_signal_reset(&data->new_event);
 		events |= atomic_set(&data->event_mask, 0);
+
+		if (rv == -EAGAIN || (!(event_mask & events) &&
+				      timeout_us != -1 && ticks_left <= 0)) {
+			events |= TASK_EVENT_TIMER;
+			break;
+		}
 	}
 
 	/* Replace any events that weren't in the mask */
