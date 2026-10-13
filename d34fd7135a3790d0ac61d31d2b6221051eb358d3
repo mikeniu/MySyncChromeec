@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "da931628_1adaef19",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T17:43:23Z",
+      "side": 1,
+      "message": "In this context (kernel mode polling a single K_POLL_TYPE_SIGNAL), k_poll() can only ever return 0 or -EAGAIN.",
+      "parentUuid": "dfca04b9_96a44d85",
+      "range": {
+        "startLine": 237,
+        "startChar": 6,
+        "endLine": 237,
+        "endChar": 8
+      },
+      "revId": "d34fd7135a3790d0ac61d31d2b6221051eb358d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d04a8c1_a84315c9",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-10-13T16:17:41Z",
       "side": 1,
       "message": "how is that possible?",
+      "range": {
+        "startLine": 245,
+        "startChar": 55,
+        "endLine": 247,
+        "endChar": 22
+      },
+      "revId": "d34fd7135a3790d0ac61d31d2b6221051eb358d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d971158_4dfbbb2e",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T17:43:23Z",
+      "side": 1,
+      "message": "In `task_set_event()`, `atomic_or(\u0026data-\u003eevent_mask, event)` and `k_poll_signal_raise(\u0026data-\u003enew_event, 0)` are not atomic together:\n1. If a second caller runs `atomic_or()` and is preempted before `k_poll_signal_raise()`, the waking task can reset `new_event` and consume both events via `atomic_set(\u0026data-\u003eevent_mask, 0)`, after which the preempted caller raises `new_event` with `event_mask \u003d\u003d 0`.\n2. Callers can also clear bits directly via `task_get_event_bitmap()` (or call `task_set_event(id, 0)`), leaving `new_event` signaled with `event_mask \u003d\u003d 0`.\n\nMigrating `task_ctx_base_data` to `struct k_event` would avoid this, would be a worthwhile followup.",
+      "parentUuid": "6d04a8c1_a84315c9",
       "range": {
         "startLine": 245,
         "startChar": 55,
