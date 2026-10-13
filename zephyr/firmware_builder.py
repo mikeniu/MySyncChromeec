@@ -49,6 +49,7 @@ from scripts.firmware_builder_lib import (
     get_safe_lcov_workers as _get_safe_lcov_workers,
 )
 from scripts.firmware_builder_lib import create_arg_parser
+from scripts.firmware_builder_lib import export_configs
 from scripts.firmware_builder_lib import merge_shard_coverage_reports
 from scripts.firmware_builder_lib import save_or_load_shard_info
 from scripts.firmware_builder_lib import shard_projects
@@ -699,6 +700,18 @@ def bundle_firmware(opts):
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
         )
+        # Export the config files as they are, next to the tarballs.
+        for file_name, kind in export_configs(
+            project.config.project_name,
+            (variant for variant, _ in project.iter_builds()),
+            build_dir,
+            bundle_dir,
+        ):
+            meta = info.objects.add()
+            meta.file_name = file_name
+            meta.config_info.board.extend(sorted(boards))
+            meta.config_info.target = project.config.project_name
+            meta.config_info.kind = kind
         # TODO(kmshelton): Populate the rest of metadata contents as it
         # gets defined in infra/proto/src/chromite/api/firmware.proto.
     # For each board, create a big tar file that contains all the models.
