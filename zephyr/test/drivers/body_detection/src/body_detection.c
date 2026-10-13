@@ -550,6 +550,55 @@ ZTEST_USER(bodydetectsample, test_confidence_delta_underflow)
 	}
 	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state());
 }
+
+/**
+ * @brief TestPurpose: verify a single-sample impulse (desk bump) while
+ * OFF_BODY does not falsely trigger ON_BODY, while multi-sample motion does.
+ */
+ZTEST_USER(bodydetectsample, test_single_sample_impulse_rejection)
+{
+	int i, cnt;
+	float fs = 50.0f;
+	int G_1 = 16384;
+
+	/* Settle into OFF_BODY */
+	cnt = 2 * 60 * fs;
+	for (i = 0; i < cnt; i++) {
+		body_sensor->xyz[X] = 0;
+		body_sensor->xyz[Y] = 0;
+		body_sensor->xyz[Z] = G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state());
+
+	/* Inject a positive 1-sample desk bump spike (+0.25G) then rest */
+	body_sensor->xyz[X] = G_1 / 4;
+	body_detect();
+	for (i = 0; i < 50; i++) {
+		body_sensor->xyz[X] = 0;
+		body_detect();
+		zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state(),
+			      "positive 1-sample spike triggered ON_BODY at %d",
+			      i);
+	}
+
+	/* Inject a negative 1-sample desk bump spike (-0.25G) then rest */
+	body_sensor->xyz[X] = -G_1 / 4;
+	body_detect();
+	for (i = 0; i < 50; i++) {
+		body_sensor->xyz[X] = 0;
+		body_detect();
+		zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state(),
+			      "negative 1-sample spike triggered ON_BODY at %d",
+			      i);
+	}
+
+	/* Sustained multi-sample motion must still transition to ON_BODY */
+	body_sensor->xyz[X] = G_1 / 4;
+	body_detect();
+	body_detect();
+	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state());
+}
 #endif
 
 ZTEST_SUITE(bodydetectsample, drivers_predicate_post_main, NULL,
