@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f4798d7b_9a660290",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T07:26:00Z",
+      "side": 1,
+      "message": "\u003e I don\u0027t think the irq locking is really needed here\n\nWhat about the following scenario, similar to the one outlined above:\n```\nT1:\n-\u003e increment ref counter\n-\u003e start enabling fast CPU\n  -\u003e Interrupt\n  -\u003e re-schedule to T2:\n  -\u003e increment ref counter\n  -\u003e enable fast CPU\n  -\u003e calculations \n  -\u003e disable fast CPU\n  -\u003e decrement ref counter\n  -\u003e reschedule to T1 again\n-\u003e continue enabling fast CPU   // potentially bad hardware state\n```\n\nWe could try to use a mutex instead of a reference counter + `irq_lock()` but first I\u0027d need to check the call sites and their possible execution contexts, for example to ensure that this function is never called from an interrupt handler.",
+      "parentUuid": "5325fde6_0e7256d4",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3700500b_33a80ce5",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -138,6 +156,24 @@
       "side": 1,
       "message": "Where is this label defined and added? I can not find it.",
       "parentUuid": "fdecdc9e_f1186d1d",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcb6817d_c22d727e",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T07:26:00Z",
+      "side": 1,
+      "message": "Upstream PR that defines it: https://github.com/zephyrproject-rtos/zephyr/pull/120336\nDownstream CLs:\n* binding cherry-pick: crrev/c/8498898\n* added to dartmonkey devicetree: crrev/c/8499700",
+      "parentUuid": "20f87bb7_6f8e0bb4",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -244,6 +280,24 @@
       "side": 1,
       "message": "Almost 😄 I mean there are two options:\n- adjust flash latency after changing the system clock so the old latency is used with the new system clock for a moment\n- adjust flash latency before changing the system clock so the new latency is used with the old system clock for a moment\n\nI would like to see a comment explaining why we are choosing the second option.",
       "parentUuid": "c57691a6_219e5c1e",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b40a769a_18ef71b4",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T07:26:00Z",
+      "side": 1,
+      "message": "Ahh, I see.\n\nThe flash latency is set first because when enabling fast CPU, the clock frequency increases. Higher clock frequency requires more flash wait states. Therefore the following option:\n\n\u003e adjust flash latency after changing the system clock so the old latency is used with the new system clock for a moment\n\nwould create a time window when the flash latency would be too low for the new clock frequency. The other option:\n\n\u003e adjust flash latency before changing the system clock so the new latency is used with the old system clock for a moment\n\ncreates a time window when a longer latency is used even though it is not needed yet, but it is functionally correct.\n\nI\u0027ll add a comment with this explanation.",
+      "parentUuid": "751aa9a9_4c0b7a1f",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -503,6 +557,30 @@
       "side": 1,
       "message": "Thanks, probably some common define should be good for all usage of the HSI freq.",
       "parentUuid": "b1c0cb6e_2eb30ad3",
+      "range": {
+        "startLine": 124,
+        "startChar": 21,
+        "endLine": 124,
+        "endChar": 35
+      },
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a506e5a1_e6c3b844",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T07:26:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3e5e34db_c1967b16",
       "range": {
         "startLine": 124,
         "startChar": 21,
