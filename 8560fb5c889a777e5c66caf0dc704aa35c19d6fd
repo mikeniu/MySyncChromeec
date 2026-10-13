@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9b7b234_31802e57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-13T06:40:03Z",
+      "side": 1,
+      "message": "Actually the *keyboard layout* field in standard UFSC schema should be used instead of custom fields. Please see this CL crrev.com/c/7819876 and arsp/4558625 as a reference.",
+      "revId": "8560fb5c889a777e5c66caf0dc704aa35c19d6fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
