@@ -288,7 +288,7 @@ static int check_cc_rp_timeout(int port, int timeout)
 	tcpm_get_cc(port, &cc1, &cc2);
 
 	while (((cc_is_rp(cc1)) || (cc_is_rp(cc2))) != true) {
-		if (task_wait_event(timeout) == TASK_EVENT_TIMER) {
+		if (task_wait_event(timeout) == 0) {
 			return EC_ERROR_TIMEOUT;
 		}
 		tcpm_get_cc(port, &cc1, &cc2);
