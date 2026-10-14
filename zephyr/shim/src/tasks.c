@@ -62,7 +62,6 @@ const static k_tid_t task_to_k_tid[TASK_ID_COUNT] = {
 
 static struct task_ctx_base_data shimmed_tasks_data[TASK_ID_COUNT];
 static struct task_ctx_base_data extra_tasks_data[EXTRA_TASK_COUNT];
-static int tasks_started;
 #undef CROS_EC_TASK
 
 static struct task_ctx_base_data *task_get_base_data(task_id_t cros_task_id)
@@ -335,8 +334,6 @@ void start_ec_tasks(void)
 #endif
 		k_thread_start(task_to_k_tid[i]);
 	}
-
-	tasks_started = 1;
 }
 
 /*
@@ -355,8 +352,3 @@ int init_signals(void)
 	return 0;
 }
 SYS_INIT(init_signals, POST_KERNEL, 50);
-
-int task_start_called(void)
-{
-	return tasks_started;
-}

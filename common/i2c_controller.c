@@ -63,19 +63,10 @@ const struct i2c_port_t *get_i2c_port(const int port)
 {
 	int i;
 
-	/*
-	 * If the EC's I2C driver implementation is task event based and the
-	 * I2C is accessed before the task is initialized, it causes the system
-	 * panic hence these I2C will fall back to bitbang mode if enabled at
-	 * board level and will again switch back to event based I2C upon task
-	 * initialization.
-	 */
-	if (task_start_called()) {
-		/* Find the matching port in i2c_ports[] table. */
-		for (i = 0; i < i2c_ports_used; i++) {
-			if (i2c_ports[i].port == port)
-				return &i2c_ports[i];
-		}
+	/* Find the matching port in i2c_ports[] table. */
+	for (i = 0; i < i2c_ports_used; i++) {
+		if (i2c_ports[i].port == port)
+			return &i2c_ports[i];
 	}
 
 	return NULL;
