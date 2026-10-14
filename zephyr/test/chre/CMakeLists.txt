@@ -13,7 +13,9 @@ target_include_directories(app PRIVATE
 
 target_sources(app PRIVATE
   src/main.cc
+  src/sensor_pal_test.cc
   src/tagged_log_test.cc
   mock_chre/mock_chre.cc
   ${PLATFORM_EC}/zephyr/shim/src/chre.cc
+  ${PLATFORM_EC}/zephyr/shim/src/chre_sensor_pal.cc
 )

@@ -21,8 +21,17 @@ if(CONFIG_ISH_CHRE OR CONFIG_SCP_CHRE)
 
   target_sources(app PRIVATE shim/src/chre.cc)
   if(NOT CONFIG_ZTEST)
+    if(CONFIG_SCP_CHRE AND CONFIG_PLATFORM_EC_MOTIONSENSE)
+      include(${CHRE_ROOT}/pal/backend.cmake)
+      pw_add_library(chre.platform.ec.pal_sensor INTERFACE)
+      pw_set_backend(chre.pal.sensor chre.platform.ec.pal_sensor)
+      target_sources(app PRIVATE shim/src/chre_sensor_pal.cc)
+    endif()
     set(CHRE_PLATFORM_PIGWEED ON CACHE BOOL "" FORCE)
-    zephyr_compile_options(-include zephyr/sys/util_macro.h)
+    zephyr_compile_options(
+      -include zephyr/sys/util_macro.h
+      $<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>
+    )
     add_subdirectory(${CHRE_ROOT} chre EXCLUDE_FROM_ALL)
     target_link_libraries(app PRIVATE
       chre
@@ -33,6 +42,12 @@ if(CONFIG_ISH_CHRE OR CONFIG_SCP_CHRE)
     endif()
     if(CONFIG_CHRE_HELLO_WORLD)
       target_link_libraries(app PRIVATE chre.apps.hello_world)
+    endif()
+    if(CONFIG_CHRE_SENSOR_WORLD)
+      target_link_libraries(app PRIVATE chre.apps.sensor_world)
+    endif()
+    if(CONFIG_CHRE_MESSAGE_WORLD)
+      target_link_libraries(app PRIVATE chre.apps.message_world)
     endif()
   endif()
 endif()
