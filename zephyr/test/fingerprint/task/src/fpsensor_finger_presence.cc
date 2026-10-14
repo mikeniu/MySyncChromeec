@@ -52,6 +52,7 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_mode)
 	/* Confirm that detect mode was enabled. */
 	fingerprint_get_state(fp_sim, &state);
 	zassert_true(state.detect_mode);
+	zassert_false(state.low_power_mode);
 
 	/* Disable finger detection */
 	params.mode = 0;
@@ -64,6 +65,7 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_mode)
 	/* Confirm that detect mode was disabled. */
 	fingerprint_get_state(fp_sim, &state);
 	zassert_false(state.detect_mode);
+	zassert_true(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence, test_finger_down_present)
@@ -83,6 +85,7 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_present)
 	k_msleep(1);
 
 	/* Put finger on the sensor and ping fpsensor task. */
+	fingerprint_get_state(fp_sim, &state);
 	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
 	fingerprint_set_state(fp_sim, &state);
 	fingerprint_run_callback(fp_sim);
@@ -103,6 +106,10 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_present)
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_false(response.mode & FP_MODE_FINGER_DOWN);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_false(state.detect_mode);
+	zassert_true(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence, test_finger_down_partial)
@@ -121,6 +128,7 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_partial)
 	k_msleep(1);
 
 	/* Put finger partially on the sensor and ping fpsensor task. */
+	fingerprint_get_state(fp_sim, &state);
 	state.finger_state = FINGERPRINT_FINGER_STATE_PARTIAL;
 	fingerprint_set_state(fp_sim, &state);
 	fingerprint_run_callback(fp_sim);
@@ -135,6 +143,10 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_partial)
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_true(response.mode & FP_MODE_FINGER_DOWN);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_true(state.detect_mode);
+	zassert_false(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence, test_finger_down_no_finger)
@@ -143,6 +155,7 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_no_finger)
 		.mode = FP_MODE_FINGER_DOWN,
 	};
 	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
 
 	/* Detect finger on the sensor. */
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
@@ -164,6 +177,10 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_down_no_finger)
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_true(response.mode & FP_MODE_FINGER_DOWN);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_true(state.detect_mode);
+	zassert_false(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence, test_finger_up_mode)
@@ -191,9 +208,10 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_up_mode)
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_true(response.mode & FP_MODE_FINGER_UP);
 
-	/* Confirm that detect mode was enabled. */
+	/* Confirm that detect mode was enabled and low power mode disabled. */
 	fingerprint_get_state(fp_sim, &state);
 	zassert_true(state.detect_mode);
+	zassert_false(state.low_power_mode);
 
 	/* Disable finger up detection */
 	params.mode = 0;
@@ -203,9 +221,10 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_up_mode)
 	/* Give opportunity for fpsensor task to change mode. */
 	k_msleep(1);
 
-	/* Confirm that detect mode was disabled. */
+	/* Confirm that detect mode was disabled and low power mode enabled. */
 	fingerprint_get_state(fp_sim, &state);
 	zassert_false(state.detect_mode);
+	zassert_true(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence, test_finger_up_no_finger_no_interrupt)
@@ -214,6 +233,7 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_up_no_finger_no_interrupt)
 		.mode = FP_MODE_FINGER_UP,
 	};
 	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
 	uint32_t fp_events;
 
 	/* Detect finger up. */
@@ -244,6 +264,10 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_up_no_finger_no_interrupt)
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_false(response.mode & FP_MODE_FINGER_UP);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_false(state.detect_mode);
+	zassert_true(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence,
@@ -269,6 +293,7 @@ ZTEST_USER(fpsensor_finger_presence,
 	k_msleep(1);
 
 	/* Remove finger from the sensor and ping fpsensor task. */
+	fingerprint_get_state(fp_sim, &state);
 	state.finger_state = FINGERPRINT_FINGER_STATE_NONE;
 	fingerprint_set_state(fp_sim, &state);
 	fingerprint_run_callback(fp_sim);
@@ -286,6 +311,10 @@ ZTEST_USER(fpsensor_finger_presence,
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_false(response.mode & FP_MODE_FINGER_UP);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_false(state.detect_mode);
+	zassert_true(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence,
@@ -311,6 +340,7 @@ ZTEST_USER(fpsensor_finger_presence,
 	k_msleep(1);
 
 	/* Remove finger from the sensor. */
+	fingerprint_get_state(fp_sim, &state);
 	state.finger_state = FINGERPRINT_FINGER_STATE_NONE;
 	fingerprint_set_state(fp_sim, &state);
 
@@ -327,6 +357,10 @@ ZTEST_USER(fpsensor_finger_presence,
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_false(response.mode & FP_MODE_FINGER_UP);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_false(state.detect_mode);
+	zassert_true(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence,
@@ -351,6 +385,7 @@ ZTEST_USER(fpsensor_finger_presence,
 	k_msleep(1);
 
 	/* Put finger partially on the sensor. */
+	fingerprint_get_state(fp_sim, &state);
 	state.finger_state = FINGERPRINT_FINGER_STATE_PARTIAL;
 	fingerprint_set_state(fp_sim, &state);
 
@@ -364,6 +399,14 @@ ZTEST_USER(fpsensor_finger_presence,
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_true(response.mode & FP_MODE_FINGER_UP);
+
+	/*
+	 * Confirm that sensor stays in detect mode and does not enter
+	 * low power mode after polling while finger is still on sensor.
+	 */
+	fingerprint_get_state(fp_sim, &state);
+	zassert_true(state.detect_mode);
+	zassert_false(state.low_power_mode);
 }
 
 ZTEST_USER(fpsensor_finger_presence,
@@ -389,6 +432,7 @@ ZTEST_USER(fpsensor_finger_presence,
 	k_msleep(1);
 
 	/* Remove finger from the sensor. */
+	fingerprint_get_state(fp_sim, &state);
 	state.finger_state = FINGERPRINT_FINGER_STATE_NONE;
 	fingerprint_set_state(fp_sim, &state);
 
@@ -405,6 +449,10 @@ ZTEST_USER(fpsensor_finger_presence,
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_false(response.mode & FP_MODE_FINGER_UP);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_false(state.detect_mode);
+	zassert_true(state.low_power_mode);
 }
 
 static void *fpsensor_setup(void)
