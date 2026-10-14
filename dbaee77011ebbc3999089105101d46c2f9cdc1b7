@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36d6250f_c3c62f99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-10-14T10:42:35Z",
+      "side": 1,
+      "message": "[FAILED] chromiumos/platform/ec: cros format\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      02:18:49: WARNING: zephyr/program/bluey/pic/src/keyboard_customization.c: needs formatting\n      02:19:15: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/program/bluey/pic/src/keyboard_customization.c",
+      "revId": "dbaee77011ebbc3999089105101d46c2f9cdc1b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
