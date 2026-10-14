@@ -265,6 +265,7 @@ static int fpc1145_set_mode(const struct device *dev,
 		 * TODO(b/117620462): verify that sleep mode is WAI (no
 		 * increased latency, expected power consumption).
 		 */
+		rc = fpc1145_disable_irq(dev);
 		break;
 
 	case FINGERPRINT_SENSOR_MODE_IDLE:
