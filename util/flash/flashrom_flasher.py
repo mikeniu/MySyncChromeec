@@ -12,7 +12,9 @@ import tempfile
 import time
 
 from flash.flasher_base import BaseEcFlasher
+from flash.helpers import get_writable_ranges
 from flash.helpers import locate_tool
+from flash.helpers import parse_fmap_areas
 from flash.helpers import preserve_sections_with_cur_image
 from flash.servo_utils import ServoError
 
@@ -197,7 +199,37 @@ class FlashromFlasher(BaseEcFlasher):
                 if pad_size > 0:
                     out_f.write(b"\xff" * pad_size)
 
-            if not getattr(self.args, "no_preserve", False):
+            no_preserve = bool(getattr(self.args, "no_preserve", False))
+            areas = parse_fmap_areas(self.args.image)
+            target_regions = None
+            if getattr(self.args, "ro", False):
+                target_regions = ["EC_RO"]
+            elif getattr(self.args, "rw", False):
+                target_regions = ["EC_RW"]
+            elif self.on_raiden() and "servo_micro" not in servo_type:
+                # Like flash_ec, only write WP_RO and EC_RW over CCD.
+                target_regions = ["WP_RO", "EC_RW"]
+
+            writable_ranges = get_writable_ranges(
+                self.args.image,
+                chip_size,
+                target_regions=target_regions,
+                no_preserve=no_preserve,
+                areas=areas,
+            )
+
+            layout_args = []
+            if writable_ranges and writable_ranges != [(0, chip_size)]:
+                layout_path = os.path.join(temp_dir, "flashrom.layout")
+                with open(layout_path, "w", encoding="utf-8") as layout_f:
+                    for idx, (start, end) in enumerate(writable_ranges):
+                        region_name = f"WRITE_{idx}"
+                        layout_f.write(
+                            f"{start:08x}:{end - 1:08x} {region_name}\n"
+                        )
+                        layout_args.extend(["-i", region_name])
+                layout_args.extend(["-l", layout_path, "--noverify-all"])
+            elif not no_preserve and not areas:
                 cur_img = os.path.join(temp_dir, "ec.cur.bin")
                 read_cmd = cmd + ["-r", cur_img]
                 logger.info(
@@ -210,7 +242,7 @@ class FlashromFlasher(BaseEcFlasher):
                         cur_img, temp_img, temp_dir
                     )
 
-            write_cmd = cmd + ["-w", temp_img]
+            write_cmd = cmd + layout_args + ["-w", temp_img]
             if not getattr(self.args, "verify", True):
                 write_cmd.append("-n")
 
