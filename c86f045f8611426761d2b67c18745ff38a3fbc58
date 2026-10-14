@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "342e4286_1ae3af32",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "Consider using target_img here for consistency with the UART flasher (line 345) and to ensure you are using the string representation of the path if it happens to be a Path object.",
+      "range": {
+        "startLine": 193,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1123d9b_116f4131",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "The sleeps here are 0.5s, whereas IteI2cFlasher (lines 67-69) uses 2s and 3s for the same operation. If ITE debugger mode entry is slow, these shorter sleeps might lead to flakiness. Standardizing them or noting why they differ would be helpful.",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50c05d3e_56835a3f",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "This call lacks a default value, unlike the call above it. If the control is missing, it will raise a ServoError. Consider adding default\u003d\u0027\u0027 if you want to handle it gracefully.",
+      "range": {
+        "startLine": 302,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ad86e5e_0bb4ba07",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "Calling sudo internally can be problematic in automated environments or if it triggers a password prompt unexpectedly. Since iteflash doesn\u0027t require it, is there a specific reason itecomdbgr needs root (e.g., PTY ownership)? If so, a comment explaining it would be useful.",
+      "range": {
+        "startLine": 306,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

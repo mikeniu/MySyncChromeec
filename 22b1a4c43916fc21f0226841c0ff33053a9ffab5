@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9358847_0f5c2ea4",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "You should probably be using active_dut_controller here not servo_type. In either case, use the same logic as _get_serial.",
+      "range": {
+        "startLine": 30,
+        "startChar": 37,
+        "endLine": 30,
+        "endChar": 47
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15cb48f8_f46773f4",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "Use gsc_i2c_ctrl",
+      "range": {
+        "startLine": 68,
+        "startChar": 28,
+        "endLine": 68,
+        "endChar": 41
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "857f9f9b_5cd5d8df",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "I think we can stop supporting the servo_v2 interface.",
+      "range": {
+        "startLine": 70,
+        "startChar": 14,
+        "endLine": 70,
+        "endChar": 22
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae4ae0fd_6a2e8049",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "All of this logic is suspect. servo_type will contain multiple of these. I.e. servo_v4p1_with_ccd_and_servo_micro.\n\nYou should pick the interface you are going to use once, and then have everything else switch off that one choice.",
+      "range": {
+        "startLine": 56,
+        "startChar": 6,
+        "endLine": 79,
+        "endChar": 55
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9582cfa4_829d4886",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "gsc_uart_cmd always exists, you don\u0027t have to fallback to cr50_uart_cmd",
+      "range": {
+        "startLine": 127,
+        "startChar": 26,
+        "endLine": 127,
+        "endChar": 38
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e847f64e_cb9bb396",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "No need for this always use gsc_uart_cmd",
+      "range": {
+        "startLine": 237,
+        "startChar": 26,
+        "endLine": 237,
+        "endChar": 39
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a80f1793_cdf4ecbe",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T17:56:01Z",
+      "side": 1,
+      "message": "s/cr50/gsc/ everywhere",
+      "range": {
+        "startLine": 244,
+        "startChar": 32,
+        "endLine": 244,
+        "endChar": 45
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
