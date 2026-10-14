@@ -406,6 +406,8 @@ test_export_static int system_preinitialize(void)
 		return -1;
 	}
 
+	system_common_pre_init();
+
 	/*
 	 * For some boards on power-on, the EC is reset by the H1 after
 	 * power-on, so the EC sees 2 resets. This config enables the EC to save
@@ -426,7 +428,6 @@ test_export_static int system_preinitialize(void)
 			arch_nop();
 	}
 #endif
-	system_common_pre_init();
 	return 0;
 }
 
