@@ -66,8 +66,6 @@ enum pd_rx_errors {
 #define PD_EVENT_POWER_STATE_CHANGE TASK_EVENT_CUSTOM_BIT(8)
 /* Issue a Hard Reset. */
 #define PD_EVENT_SEND_HARD_RESET TASK_EVENT_CUSTOM_BIT(9)
-/* Prepare for sysjump */
-#define PD_EVENT_SYSJUMP TASK_EVENT_CUSTOM_BIT(10)
 /* Receive a Hard Reset. */
 #define PD_EVENT_RX_HARD_RESET TASK_EVENT_CUSTOM_BIT(11)
 /* MUX configured notification event */
@@ -3409,15 +3407,6 @@ static inline int pd_vdm_get_log_entry(uint32_t *payload)
 	return 0;
 }
 #endif /* CONFIG_USB_PD_LOGGING */
-
-/**
- * Prepare for a sysjump by exiting any alternate modes, if PD communication is
- * allowed.
- *
- * Note: this call will block until the PD task has finished its exit mode and
- * re-awoken the calling task.
- */
-void pd_prepare_sysjump(void);
 
 /**
  * Compose SVDM Request Header
