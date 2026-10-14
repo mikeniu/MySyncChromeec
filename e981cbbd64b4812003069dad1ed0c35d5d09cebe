@@ -39,6 +39,31 @@
       },
       "revId": "e981cbbd64b4812003069dad1ed0c35d5d09cebe",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c74bd4ee_0ab2b1b9",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-14T19:04:37Z",
+      "side": 1,
+      "message": "`struct cortex_panic_data` in `include/panic_defs.h` (and `platform2/libec/ec_panicinfo.cc`) defines this field as `mfar`, whereas Zephyr\u0027s `extra_info` uses `mmfar`, so `M(extra_info.mmfar, cm.mfar, mfar)` is intentional.",
+      "parentUuid": "08d64dfc_f787dbf8",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "e981cbbd64b4812003069dad1ed0c35d5d09cebe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
