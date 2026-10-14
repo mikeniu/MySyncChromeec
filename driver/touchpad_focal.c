@@ -10,7 +10,6 @@
 #include "i2c.h"
 #include "math_util.h"
 #include "sha256.h"
-#include "shared_mem.h"
 #include "tablet_mode.h"
 #include "task.h"
 #include "timer.h"

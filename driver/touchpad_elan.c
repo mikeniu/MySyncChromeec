@@ -674,9 +674,6 @@ test_mockable_static const uint8_t allowed_command_hashes
 		  0x89, 0x0c, 0x01, 0x21, 0x0e, 0x2b, 0xa5, 0x35 },
 	};
 
-/* Debugging commands need to allocate a <=1k buffer. */
-SHARED_MEM_CHECK_SIZE(1024);
-
 int touchpad_debug(const uint8_t *param, unsigned int param_size,
 		   uint8_t **data, unsigned int *data_size)
 {

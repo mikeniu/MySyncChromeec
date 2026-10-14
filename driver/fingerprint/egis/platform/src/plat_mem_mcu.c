@@ -5,16 +5,14 @@
 #include "common.h"
 #include "plat_log.h"
 #include "plat_mem.h"
-#include "shared_mem.h"
+
+#include <stdlib.h>
 
 void *sys_alloc(size_t count, size_t size)
 {
-	char *addr = NULL;
-	int rc;
+	void *addr = malloc(size);
 
-	rc = shared_mem_acquire(size, &addr);
-
-	if (rc != EC_SUCCESS) {
+	if (addr == NULL) {
 		CPRINTS("Error - %s of size %u failed.", __func__, size);
 		return NULL;
 	}
@@ -23,8 +21,5 @@ void *sys_alloc(size_t count, size_t size)
 
 void sys_free(void *ptr)
 {
-	if (ptr == NULL) {
-		return;
-	}
-	shared_mem_release(ptr);
+	free(ptr);
 }

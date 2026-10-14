@@ -9,11 +9,12 @@
 #include "fpc_sensor_pal.h"
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_console.h"
-#include "shared_mem.h"
 #include "spi.h"
 #include "timer.h"
 #include "uart.h"
 #include "util.h"
+
+#include <stdlib.h>
 
 __staticlib_hook void fpc_pal_log_entry(const char *tag, int log_level,
 					const char *format, ...)
@@ -51,15 +52,16 @@ __staticlib_hook int fpc_pal_wait_irq(fpc_device_t device,
 
 __staticlib_hook int32_t FpcMalloc(void **data, size_t size)
 {
-	int ret = shared_mem_acquire(size, (char **)data);
-
-	if (ret != EC_SUCCESS)
+	*data = malloc(size);
+	if (*data == NULL) {
 		CPRINTS("Error - %s of size %zu failed.", __func__, size);
-	return ret;
+		return EC_ERROR_BUSY;
+	}
+	return EC_SUCCESS;
 }
 
 __staticlib_hook void FpcFree(void **data)
 {
-	shared_mem_release(*data);
+	free(*data);
 	*data = NULL;
 }

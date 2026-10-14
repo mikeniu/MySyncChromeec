@@ -8,28 +8,25 @@
 #include "clock.h"
 #include "elan_misc.h"
 #include "fpsensor/fpsensor_console.h"
-#include "shared_mem.h"
 #include "timer.h"
 #include "uart.h"
 
+#include <stdlib.h>
+
 __staticlib_hook void *elan_malloc(uint32_t size)
 {
-	char *data;
-	int rc;
+	void *data = malloc(size);
 
-	rc = shared_mem_acquire(size, &data);
-
-	if (rc == EC_SUCCESS)
-		return data;
-	else {
+	if (data == NULL) {
 		CPRINTS("Error - %s of size %u failed.", __func__, size);
 		return NULL;
 	}
+	return data;
 }
 
 __staticlib_hook void elan_free(void *data)
 {
-	shared_mem_release(data);
+	free(data);
 }
 
 __staticlib_hook void elan_log_var(const char *format, ...)
