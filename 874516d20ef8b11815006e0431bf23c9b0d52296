@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53e889ad_2f62025b",
+        "filename": "util/flash/flash_ec.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:51:46Z",
+      "side": 1,
+      "message": "By using insert(0, ...), you are prioritizing system-built binaries (e.g. from emerge) over local builds in the repo\u0027s build/ directory. This is usually correct for production/test environments but can be confusing for local development. Consider if you want to allow the repo\u0027s build/ directory to take precedence if it exists.",
+      "range": {
+        "startLine": 201,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 0
+      },
+      "revId": "874516d20ef8b11815006e0431bf23c9b0d52296",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "741a3295_1ac4a802",
+        "filename": "util/flash/flash_ec.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:51:46Z",
+      "side": 1,
+      "message": "Personally I would just make args.image required and drop all of this dir searching.",
+      "range": {
+        "startLine": 222,
+        "startChar": 33,
+        "endLine": 222,
+        "endChar": 43
+      },
+      "revId": "874516d20ef8b11815006e0431bf23c9b0d52296",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64115564_229e1d4d",
+        "filename": "util/flash/flasher_base.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:51:46Z",
+      "side": 1,
+      "message": "In some workflows, we want to ensure \u0027cold_reset:off\u0027 at the end of flashing regardless of the initial state (to ensure the DUT boots). save_state() currently captures the current value. If the DUT was in reset before starting, it will be left in reset. This is a faithful \u0027restore\u0027, but worth confirming if it\u0027s the desired behavior for the flasher.\n\nMaybe set cold_reset:off always in all situations.",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 0
+      },
+      "revId": "874516d20ef8b11815006e0431bf23c9b0d52296",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
