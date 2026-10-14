@@ -71,4 +71,20 @@ parse_args -B 2>/dev/null || ret=$?
 assert_eq "${EXIT_ARGUMENT}" "${ret}" \
   "expected missing -B argument to fail with EXIT_ARGUMENT"
 
+# 5. Dynamic spidev resolution
+(
+  get_spiid() { echo "spi-PRP0001:00"; }
+  readlink() {
+    echo "/sys/devices/pci0000:00/0000:00:1e.2" \
+      "/pxa2xx-spi.6/spi_master/spi1/spi-PRP0001:00" | tr -d ' '
+  }
+  assert_eq "/dev/spidev1.0" "$(get_spidev)" \
+    "get_spidev for spi-PRP0001:00 on spi1"
+)
+(
+  get_spiid() { echo "spi0.1"; }
+  readlink() { echo "/sys/devices/platform/spi_master/spi0/spi0.1"; }
+  assert_eq "/dev/spidev0.1" "$(get_spidev)" "get_spidev for spi0.1 on spi0"
+)
+
 echo "PASS"
