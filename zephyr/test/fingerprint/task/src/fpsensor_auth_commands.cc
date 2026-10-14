@@ -1710,6 +1710,32 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_tag)
 	zassert_equal(global_context.templ_valid, 0u);
 }
 
+ZTEST(fpsensor_auth_commands, test_fp_info_and_frame_host_cmd_handlers)
+{
+	constexpr size_t info_buf_size =
+		sizeof(ec_response_fp_info_v3) +
+		sizeof(fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
+	std::array<uint8_t, info_buf_size> info_buf{};
+	auto *info_resp =
+		reinterpret_cast<ec_response_fp_info_v3 *>(info_buf.data());
+
+	zassert_ok(ec_cmd_fp_info_v3(nullptr, info_resp, info_buf.size()));
+
+	ec_params_fp_frame frame_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 0,
+	};
+	zassert_equal(ec_cmd_fp_frame(nullptr, &frame_v0, info_buf.data()),
+		      EC_HOST_CMD_UNAVAILABLE);
+
+	ec_params_fp_frame_v1 frame_v1 = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+	zassert_equal(ec_cmd_fp_frame_v1(nullptr, &frame_v1, nullptr),
+		      EC_HOST_CMD_UNAVAILABLE);
+}
+
 } // namespace
 
 static void *fpsensor_auth_commands_setup()

@@ -57,8 +57,28 @@ struct enc_buffer {
 	struct ec_fp_template_encryption_metadata metadata{};
 	std::array<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE> fp_template{};
 	std::array<uint8_t, FP_POSITIVE_MATCH_SALT_BYTES> positive_match_salt{};
+
+	[[nodiscard]] std::span<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE +
+						 FP_POSITIVE_MATCH_SALT_BYTES>
+	payload() noexcept
+	{
+		return std::span<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE +
+						  FP_POSITIVE_MATCH_SALT_BYTES>(
+			fp_template.data(),
+			fp_template.size() + positive_match_salt.size());
+	}
+
+	[[nodiscard]] std::span<uint8_t, FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE>
+	as_bytes() noexcept
+	{
+		return std::span<uint8_t, FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE>(
+			reinterpret_cast<uint8_t *>(this), sizeof(*this));
+	}
 };
 BUILD_ASSERT(sizeof(enc_buffer) == FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE);
+BUILD_ASSERT(offsetof(enc_buffer, fp_template) +
+		     sizeof(enc_buffer::fp_template) ==
+	     offsetof(enc_buffer, positive_match_salt));
 
 #define FP_NO_SUCH_TEMPLATE (UINT16_MAX)
 

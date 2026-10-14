@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <ec_commands.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <span>
 
 /* Define the missing FFF mocks for the linker */
@@ -405,6 +406,28 @@ ZTEST_USER(fpsensor_state,
 		FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
 		"Expected sensor_mode to be ENROLL_IMAGE | ENROLL_SESSION, got 0x%x",
 		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_encrypt_template_no_such_template)
+{
+	global_context.fp_encryption_status |= FP_ENCRYPTED_TEMPLATE_READY;
+	global_context.template_encrypted_id = FP_NO_SUCH_TEMPLATE;
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	fp_state_machine.handle_event(TASK_EVENT_UPDATE_CONFIG);
+
+	zassert_false(global_context.sensor_mode & FP_MODE_ENCRYPT_TEMPLATE);
+	zassert_false(global_context.fp_encryption_status &
+		      FP_ENCRYPTED_TEMPLATE_READY);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_unhandled_event)
+{
+	global_context.sensor_mode = FP_MODE_DEEPSLEEP;
+
+	fp_state_machine.handle_event(0);
+
+	zassert_equal(global_context.sensor_mode, FP_MODE_DEEPSLEEP);
 }
 
 static void *fpsensor_setup(void)

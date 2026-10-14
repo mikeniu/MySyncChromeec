@@ -29,6 +29,7 @@
 #include <ec_tasks.h>
 #include <flash.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <host_command.h>
 #include <mkbp_event.h>
 #include <rollback.h>
@@ -1469,6 +1470,146 @@ ZTEST_USER(fpsensor_template,
 
 	/* Rate-limit sleep required between encryption requests. */
 	k_sleep(K_SECONDS(1));
+}
+
+ZTEST_USER(fpsensor_template, test_encrypt_template_invalid_id)
+{
+	/* 1. template_encrypted_id >= FP_MAX_FINGER_COUNT */
+	global_context.template_encrypted_id = FP_MAX_FINGER_COUNT;
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+	fp_state_machine.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_false(global_context.fp_encryption_status &
+		      FP_ENCRYPTED_TEMPLATE_READY);
+
+	/* 2. template_encrypted_id >= templ_valid (when templ_valid == 0) */
+	global_context.templ_valid = 0;
+	global_context.template_encrypted_id = 0;
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+	fp_state_machine.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_false(global_context.fp_encryption_status &
+		      FP_ENCRYPTED_TEMPLATE_READY);
+}
+
+ZTEST_USER(fpsensor_template, test_fp_frame_v0_and_v1_edge_cases)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	struct ec_params_fp_frame frame_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 16,
+	};
+	struct ec_params_fp_frame_v1 frame_v1 = {
+		.cmd = FP_FRAME_GET_RAW_IMAGE,
+		.offset = 0,
+		.size = 16,
+	};
+
+	/* 1. size > args->output_buf_max for v0 and v1 */
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      CROS_EC_COMMAND(NULL, EC_CMD_FP_FRAME, 0, &frame_v0,
+				      sizeof(frame_v0), encrypted_template, 8));
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      CROS_EC_COMMAND(NULL, EC_CMD_FP_FRAME, 1, &frame_v1,
+				      sizeof(frame_v1), encrypted_template, 8));
+
+	/* 2. Unknown command in fp_command_frame_v1 */
+	frame_v1.cmd = 99;
+	frame_v1.size = 0;
+	zassert_ok(ec_cmd_fp_frame_v1(NULL, &frame_v1, encrypted_template));
+
+	/* 3. Enroll a template to test v0 template read edge cases. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	k_msleep(1);
+
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	enroll_percent = 100;
+	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
+	mock_alg_enroll_finish_fake.custom_fake = custom_enroll_finish;
+
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+
+	/* 4. v0 template read with invalid offset/size */
+	frame_v0.offset = (FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT) |
+			  sizeof(fp_enc_buffer);
+	frame_v0.size = 1;
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      ec_cmd_fp_frame(NULL, &frame_v0, encrypted_template));
+
+	/* 5. v0 template read encryption failure at offset == 0 */
+	mock_ctrl_fpsensor_crypto.output_type =
+		MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL;
+	frame_v0.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT;
+	frame_v0.size = 16;
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_frame(NULL, &frame_v0, encrypted_template));
+
+	/* 6. Immediate retry hits 1-second encryption_deadline (EC_RES_BUSY) */
+	mock_ctrl_fpsensor_crypto = MOCK_CTRL_DEFAULT_FPSENSOR_CRYPTO;
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_frame(NULL, &frame_v0, encrypted_template));
+
+	/* 7. Non-zero offset chunk read succeeds without re-encrypting */
+	frame_v0.offset = (FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT) |
+			  16;
+	frame_v0.size = 16;
+	zassert_ok(ec_cmd_fp_frame(NULL, &frame_v0, encrypted_template));
+
+	k_sleep(K_SECONDS(1));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_and_v1_edge_cases)
+{
+	uint8_t params_buffer[FP_TEMPLATE_PARAMS_BUFFER_SIZE] = {};
+	auto *params_v0 =
+		reinterpret_cast<struct ec_params_fp_template *>(params_buffer);
+	struct ec_params_fp_template_v1 params_v1 = {};
+
+	/* 1. v0 overflow when templ_valid >= FP_MAX_FINGER_COUNT */
+	global_context.templ_valid = FP_MAX_FINGER_COUNT;
+	zassert_equal(EC_RES_OVERFLOW,
+		      ec_cmd_fp_template(NULL, params_v0, sizeof(*params_v0)));
+	global_context.templ_valid = 0;
+
+	/* 2. v0 params_size mismatch */
+	params_v0->offset = 0;
+	params_v0->size = 4;
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      ec_cmd_fp_template(NULL, params_v0,
+					 offsetof(struct ec_params_fp_template,
+						  data) +
+						 params_v0->size + 1));
+
+	/* 3. v0 validate_fp_buffer_offset failure */
+	params_v0->offset = sizeof(fp_enc_buffer);
+	params_v0->size = 1;
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      ec_cmd_fp_template(NULL, params_v0,
+					 offsetof(struct ec_params_fp_template,
+						  data) +
+						 params_v0->size));
+
+	/* 4. v1 invalid command */
+	params_v1.cmd = 99;
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      ec_cmd_fp_template_v1(NULL, &params_v1,
+					    sizeof(params_v1)));
+
+	/* 5. fp_commit_template overflow when templ_valid reaches max */
+	global_context.templ_valid = FP_MAX_FINGER_COUNT;
+	global_context.sensor_mode = FP_MODE_DECRYPT_TEMPLATE;
+	fp_state_machine.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	params_v1.cmd = FP_TEMPLATE_GET_RESULT;
+	zassert_equal(EC_RES_OVERFLOW,
+		      ec_cmd_fp_template_v1(NULL, &params_v1,
+					    sizeof(params_v1)));
+	global_context.templ_valid = 0;
 }
 
 static void *fpsensor_setup(void)
