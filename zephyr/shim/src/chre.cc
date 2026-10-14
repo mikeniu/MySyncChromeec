@@ -3,6 +3,10 @@
  * found in the LICENSE file.
  */
 
+#ifdef CONFIG_PLATFORM_EC_HOOKS
+#include "hooks.h"
+#endif
+
 #include "chre/core/event_loop_manager.h"
 #include "chre/core/static_nanoapps.h"
 #include "chre/platform/shared/init.h"
@@ -15,9 +19,24 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/sys/util.h>
 
 LOG_MODULE_REGISTER(chre, LOG_LEVEL_INF);
+
+static atomic_t chre_runtime_ready;
+
+extern "C" bool chre_is_ready(void)
+{
+	return atomic_get(&chre_runtime_ready) != 0;
+}
+
+#ifdef CONFIG_ZTEST
+extern "C" void chre_set_ready_for_test(bool ready)
+{
+	atomic_set(&chre_runtime_ready, ready ? 1 : 0);
+}
+#endif
 
 extern "C" void chre_ec_log(uint8_t level, const char *fmt, ...)
 {
@@ -45,6 +64,12 @@ UniquePtr<Nanoapp> initializeStaticNanoappTimerWorld();
 #ifdef CONFIG_CHRE_HELLO_WORLD
 UniquePtr<Nanoapp> initializeStaticNanoappHelloWorld();
 #endif
+#ifdef CONFIG_CHRE_SENSOR_WORLD
+UniquePtr<Nanoapp> initializeStaticNanoappSensorWorld();
+#endif
+#ifdef CONFIG_CHRE_MESSAGE_WORLD
+UniquePtr<Nanoapp> initializeStaticNanoappMessageWorld();
+#endif
 
 const StaticNanoappInitFunction kStaticNanoappList[] = {
 #ifdef CONFIG_CHRE_TIMER_WORLD
@@ -52,6 +77,12 @@ const StaticNanoappInitFunction kStaticNanoappList[] = {
 #endif
 #ifdef CONFIG_CHRE_HELLO_WORLD
 	initializeStaticNanoappHelloWorld,
+#endif
+#ifdef CONFIG_CHRE_SENSOR_WORLD
+	initializeStaticNanoappSensorWorld,
+#endif
+#ifdef CONFIG_CHRE_MESSAGE_WORLD
+	initializeStaticNanoappMessageWorld,
 #endif
 };
 const size_t kStaticNanoappCount = ARRAY_SIZE(kStaticNanoappList);
@@ -86,12 +117,40 @@ static void chre_thread_entry(void *arg1, void *arg2, void *arg3)
 	chre::initCommon();
 	chre::EventLoopManagerSingleton::get()->lateInit();
 	chre::loadStaticNanoapps();
+	atomic_set(&chre_runtime_ready, 1);
 
 	chre::EventLoopManagerSingleton::get()->getEventLoop().run();
 
+	atomic_set(&chre_runtime_ready, 0);
 	chre::deinitCommon();
 	LOG_INF("CHRE runtime exited");
 }
+
+#ifdef CONFIG_PLATFORM_EC_HOOKS
+static void chre_host_suspend(void)
+{
+	if (!chre_is_ready()) {
+		return;
+	}
+	chre::EventLoopManagerSingleton::get()
+		->getEventLoop()
+		.getPowerControlManager()
+		.onHostWakeSuspendEvent(false);
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, chre_host_suspend, HOOK_PRIO_DEFAULT);
+
+static void chre_host_resume(void)
+{
+	if (!chre_is_ready()) {
+		return;
+	}
+	chre::EventLoopManagerSingleton::get()
+		->getEventLoop()
+		.getPowerControlManager()
+		.onHostWakeSuspendEvent(true);
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, chre_host_resume, HOOK_PRIO_DEFAULT);
+#endif /* CONFIG_PLATFORM_EC_HOOKS */
 
 static int chre_init(void)
 {
