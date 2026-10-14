@@ -138,7 +138,7 @@ class FlasherFactory:
             flasher_cls = FlashromFlasher
         elif chip in ("it8xxx2", "ite_spi_ccd_i2c", "ite_spi_ccd_uart"):
             servo_type = servo.get("servo_type", default="") if servo else ""
-            if "servo_micro" in servo_type or "c2d2" in servo_type:
+            if "servo_micro" in servo_type or "servo_v2" in servo_type:
                 flasher_cls = FlashromFlasher
             elif chip == "ite_spi_ccd_uart":
                 flasher_cls = IteUartFlasher

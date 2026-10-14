@@ -169,6 +169,20 @@ class TestFactory(unittest.TestCase):
         flasher = FlasherFactory.create(self.servo, self.args)
         self.assertIsInstance(flasher, IteI2cFlasher)
 
+    def test_ite_ccd_chips_use_flashrom_only_on_debug_header(self) -> None:
+        """Use flashrom only on servo_micro/servo_v2, like flash_ec."""
+        for chip, servo_type, expected in (
+            ("it8xxx2", "servo_v2", FlashromFlasher),
+            ("it8xxx2", "servo_v4p1_with_ccd_ti50", IteI2cFlasher),
+            ("it8xxx2", "c2d2", IteI2cFlasher),
+            ("ite_spi_ccd_uart", "c2d2", IteUartFlasher),
+        ):
+            with self.subTest(chip=chip, servo_type=servo_type):
+                self.args.chip = chip
+                self.servo.get.return_value = servo_type
+                flasher = FlasherFactory.create(self.servo, self.args)
+                self.assertIsInstance(flasher, expected)
+
     def test_npcx_dispatch(self) -> None:
         """Route npcx_uut, npcx_jtag, and npcx to their respective flashers."""
         self.args.chip = "npcx_uut"
