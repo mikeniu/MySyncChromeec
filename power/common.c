@@ -224,7 +224,7 @@ int power_wait_mask_signals_timeout(uint32_t want, uint32_t mask, int timeout)
 		return EC_SUCCESS;
 
 	while ((in_signals & mask) != in_want) {
-		if (task_wait_event(timeout) == TASK_EVENT_TIMER) {
+		if (task_wait_event(timeout) == 0) {
 			power_update_signals();
 			return EC_ERROR_TIMEOUT;
 		}
@@ -531,7 +531,7 @@ static enum power_state power_common_state(void)
 		} else if (s5_inactivity_timeout < 0) {
 			task_wait_event(-1);
 		} else if (task_wait_event(s5_inactivity_timeout * SECOND) ==
-			   TASK_EVENT_TIMER) {
+			   0) {
 			/* Prepare to drop to G3; wake not requested yet */
 			return POWER_S5G3;
 		}
