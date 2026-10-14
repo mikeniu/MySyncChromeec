@@ -526,7 +526,7 @@ void motion_interrupt(enum gpio_signal signal)
 
 static void board_detect_motionsensor(void)
 {
-	int val;
+	int val = 0;
 	/* Check base accelgyro chip */
 	if (base_accelgyro_config != BASE_GYRO_NONE)
 		return;
@@ -542,7 +542,11 @@ static void board_detect_motionsensor(void)
 	CPRINTS("Base Accelgyro: %s",
 		(val == ICM426XX_CHIP_ICM40608) ? "ICM40608" : "BMI160");
 }
-DECLARE_HOOK(HOOK_INIT, board_detect_motionsensor, HOOK_PRIO_DEFAULT);
+/*
+ * board_spi_enable() is called in board_init() (HOOK_PRIO_DEFAULT) on sysjump
+ * to RW, so board_detect_motionsensor() must run at HOOK_PRIO_DEFAULT + 1.
+ */
+DECLARE_HOOK(HOOK_INIT, board_detect_motionsensor, HOOK_PRIO_DEFAULT + 1);
 
 int board_sensor_at_360(void)
 {
