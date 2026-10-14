@@ -298,7 +298,7 @@ void rwsig_task(void *u)
 	evt = task_wait_event(CONFIG_RWSIG_JUMP_TIMEOUT);
 
 	/* Jump now if we timed out, or were told to continue. */
-	if (evt == TASK_EVENT_TIMER || evt == TASK_EVENT_CONTINUE)
+	if (evt == 0 || evt == TASK_EVENT_CONTINUE)
 		rwsig_jump_now();
 	else
 		rwsig_status = RWSIG_ABORTED;
