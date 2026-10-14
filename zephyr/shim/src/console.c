@@ -403,6 +403,50 @@ static void handle_sprintf_rv(int rv, size_t *len)
 	}
 }
 
+/*
+ * Write a pre-formatted string directly to the Zephyr shell output stream,
+ * expanding '\n' to "\r\n".
+ *
+ * Calling shell_fprintf(shell_zephyr, SHELL_NORMAL, "%s", buff) on an
+ * already-formatted buffer is expensive because it:
+ *   1. Runs a redundant cbvprintf() formatting pass and copies characters
+ *      byte-by-byte through the 30-byte shell_fprintf intermediate buffer.
+ *   2. Calls z_shell_cmd_line_erase() before the message and
+ *      z_shell_print_prompt_and_cmd() after the message when
+ *      CONFIG_SHELL_VT100_COMMANDS is enabled, turning one print into four
+ *      formatting and UART write operations.
+ */
+static void shell_write_str(const struct shell *sh, const char *buff,
+			    size_t size)
+{
+	const char *end = buff + size;
+
+	k_mutex_lock(&sh->ctx->wr_mtx, K_FOREVER);
+
+	while (buff < end && *buff != '\0') {
+		const char *p = buff;
+		const char *out = buff;
+		size_t len;
+
+		/* Scan up to the next newline so each non-newline span is
+		 * written in a single stream call.
+		 */
+		while (p < end && *p != '\0' && *p != '\n') {
+			p++;
+		}
+		len = p - buff;
+		if (len == 0) {
+			out = "\r\n";
+			len = 2;
+			p++;
+		}
+		z_shell_print_stream(sh, out, len);
+		buff = p;
+	}
+
+	k_mutex_unlock(&sh->ctx->wr_mtx);
+}
+
 static void zephyr_print(const char *buff, size_t size)
 {
 	/*
@@ -421,12 +465,23 @@ static void zephyr_print(const char *buff, size_t size)
 		    !in_isr) {
 			printk("!%s", buff);
 		}
-	} else {
-		shell_fprintf(shell_zephyr, SHELL_NORMAL, "%s", buff);
-		if (IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE))
-			console_buf_notify_chars(buff, size);
-		if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_DEBUG))
-			printk("%s", buff);
+		return;
+	}
+
+	/* Send all legacy output directly to the shell.  The shell UART
+	 * backend uses uart_fifo_fill(), while LOG_MODE_MINIMAL uses
+	 * printk() and calls uart_poll_out().
+	 */
+	shell_write_str(shell_zephyr, buff, size);
+
+	/* Capture legacy output into the console buffer read by the AP.
+	 */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE)) {
+		console_buf_notify_chars(buff, size);
+	}
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_DEBUG)) {
+		printk("%s", buff);
 	}
 }
 #endif /* CONFIG_PIGWEED_LOG_TOKENIZED_LIB */
