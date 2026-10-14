@@ -348,15 +348,7 @@ static struct bit_name flag_bit_names[] = {
 BUILD_ASSERT(ARRAY_SIZE(flag_bit_names) == TC_FLAGS_COUNT);
 
 static struct bit_name event_bit_names[] = {
-	{ TASK_EVENT_IPC_READY, "IPC_READY" },
 	{ TASK_EVENT_PD_AWAKE, "PD_AWAKE" },
-	{ TASK_EVENT_PECI_DONE, "PECI_DONE" },
-	{ TASK_EVENT_I2C_IDLE, "I2C_IDLE" },
-#ifdef TASK_EVENT_PS2_DONE
-	{ TASK_EVENT_PS2_DONE, "PS2_DONE" },
-#endif
-	{ TASK_EVENT_DMA_TC, "DMA_TC" },
-	{ TASK_EVENT_ADC_DONE, "ADC_DONE" },
 	{ TASK_EVENT_RESET_DONE, "RESET_DONE" },
 	{ TASK_EVENT_WAKE, "WAKE" },
 	{ TASK_EVENT_TIMER, "TIMER" },
