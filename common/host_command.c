@@ -14,7 +14,6 @@
 #include "lpc.h"
 #include "power.h"
 #include "printf.h"
-#include "shared_mem.h"
 #include "system.h"
 #include "task.h"
 #include "timer.h"

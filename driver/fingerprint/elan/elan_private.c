@@ -14,7 +14,6 @@
 #include "gpio.h"
 #include "link_defs.h"
 #include "math_util.h"
-#include "shared_mem.h"
 #include "spi.h"
 #include "system.h"
 #include "timer.h"
