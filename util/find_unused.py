@@ -18,9 +18,13 @@ Limitations:
 """
 
 import argparse
+import ast
 from concurrent.futures import as_completed
 from concurrent.futures import ProcessPoolExecutor
+import configparser
+import fnmatch
 import functools
+import json
 import os
 from pathlib import Path
 import re
@@ -33,6 +37,22 @@ from elftools.elf.sections import SymbolTableSection
 
 
 MAX_WORKERS = os.cpu_count() or 4
+
+DEFAULT_COPYBOT_PATTERNS = [
+    "common/fpsensor/*",
+    "common/mock/fpsensor*",
+    "common/mock/rollback*",
+    "common/rollback*",
+    "driver/fingerprint/*",
+    "include/ec_commands.h",
+    "include/ec_cmd_api.h",
+    "include/fpsensor/*",
+    "test/run_device_tests.py",
+    "util/flash_ec",
+    "util/flash_jlink.py",
+    "util/renode/*",
+    "util/renode_ec_launch.py",
+]
 
 C_KEYWORDS = {
     "ARRAY_SIZE",
@@ -735,6 +755,56 @@ def is_header_included(
     return has_plain_basename
 
 
+def load_copybot_patterns(
+    ec_root: Path, copybot_config: Path | None = None
+) -> list[str]:
+    """Load include-downstream globs from the ec-legacy copybot config."""
+    candidates = []
+    if copybot_config:
+        candidates.append(copybot_config.resolve())
+    else:
+        if len(ec_root.parents) >= 3:
+            candidates.append(
+                ec_root.parents[2]
+                / "infra"
+                / "copybot"
+                / "config"
+                / "fingerprint"
+                / "ec-legacy.ini"
+            )
+        candidates.append(
+            Path(
+                "/mnt/host/source/infra/copybot/config/fingerprint/ec-legacy.ini"
+            )
+        )
+
+    for cfg_path in candidates:
+        if cfg_path.exists():
+            try:
+                cp = configparser.ConfigParser()
+                cp.read(cfg_path, encoding="utf-8")
+                if cp.has_option("copybot", "include-downstream"):
+                    raw = cp.get("copybot", "include-downstream")
+                    parsed = ast.literal_eval(raw)
+                    if isinstance(parsed, list):
+                        return [str(x) for x in parsed]
+            except (
+                OSError,
+                configparser.Error,
+                ValueError,
+                SyntaxError,
+            ):
+                pass
+
+    return list(DEFAULT_COPYBOT_PATTERNS)
+
+
+def is_copybot_synced(rel_path: Path | str, patterns: list[str]) -> bool:
+    """Return True if rel_path matches any copybot include-downstream glob."""
+    rel_str = str(rel_path)
+    return any(fnmatch.fnmatch(rel_str, pat) for pat in patterns)
+
+
 def scan_elfs(all_elfs, ec_root, zephyr_root, need_functions: bool = True):
     """Scan all ELF files in parallel and extract sources, headers, and functions."""
     used_sources = set()
@@ -760,171 +830,44 @@ def scan_elfs(all_elfs, ec_root, zephyr_root, need_functions: bool = True):
     return used_sources, used_headers_dwarf, used_functions
 
 
-def _collect_elfs(build_paths, include_tests: bool = False):
-    """Find and filter ELF files in build_paths."""
-    raw_elfs = find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
-    raw_elf_set = set(raw_elfs)
-    all_elfs = [
-        e
-        for e in sorted(raw_elfs)
-        if e.name != "zephyr_pre0.elf"
-        and not (
-            e.name == "zephyr.exe" and (e.parent / "zephyr.elf") in raw_elf_set
-        )
-    ]
-    if not include_tests:
-        test_patterns = [
-            "build/host/",
-            "minimal-posix",
-            "native_sim",
-            "test",
-            "fake",
-            "emul",
-            "ztest",
-            "hwtest",
-        ]
-        all_elfs = [
-            e
-            for e in all_elfs
-            if not any(
-                tp in str(e).rsplit("/src/platform/ec/", maxsplit=1)[-1].lower()
-                for tp in test_patterns
-            )
-        ]
-    return all_elfs
-
-
-def find_unused_functions(
-    ec_root, zephyr_root, source_paths, build_paths, include_tests=False
-):
-    """Find functions that are defined but never appear in ELFs."""
-    print(f"Finding all defined functions in {len(source_paths)} paths...")
-    all_functions = find_all_defined_functions(paths=source_paths)
-    all_functions = {
-        (normalize_path(ec_root, zephyr_root, f[0]), f[1])
-        for f in all_functions
-    }
-    print(f"* Found {len(all_functions)} defined functions")
-
-    print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = _collect_elfs(build_paths, include_tests=include_tests)
-    print(f"* Found {len(all_elfs)} elf files")
-
-    print("Extracting functions from elf files...")
-    _, _, used_functions = scan_elfs(
-        all_elfs, ec_root, zephyr_root, need_functions=True
-    )
-    print(f"\n* Extracted {len(used_functions)} unique functions from elfs")
-
-    unused_functions = all_functions - used_functions
-    print(f"\nUNUSED FUNCTIONS({len(unused_functions)}):\n")
-    for path, function_name in sorted(list(unused_functions)):
-        print(f"{str(path)}: {function_name}")
-
-
-def find_unused_configs(ec_root, source_paths, build_paths):
-    """Find configs that are referenced in source but never set in builds."""
-    print("Finding all referenced configs...")
-    all_configs = find_configs(source_paths + [ec_root / "util"])
-    print(f"* Found {len(all_configs)} configs")
-
-    print("Finding all set configs...")
-    set_configs = find_set_configs(source_paths, build_paths)
-    print(f"* Found {len(set_configs)} set configs")
-
-    never_set_configs = all_configs - set_configs
-    print(f"\nNEVER SET CONFIGS({len(never_set_configs)}):\n")
-    for config in sorted(list(never_set_configs)):
-        print(config)
-
-
-def find_unused_sources(
-    ec_root, zephyr_root, source_paths, build_paths, include_tests=False
-):
-    """Find source files that are never compiled into any ELF."""
-    print(f"Finding all source files in {len(source_paths)} paths...")
-    all_sources = find_files(
-        paths=source_paths, patterns=["*.c", "*.cc", "*.S"]
-    )
-    all_sources = {normalize_path(ec_root, zephyr_root, s) for s in all_sources}
-    print(f"* Found {len(all_sources)} source files")
-
-    print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = _collect_elfs(build_paths, include_tests=include_tests)
-    print(f"* Found {len(all_elfs)} elf files")
-
-    print("Extracting sources from elf files...")
-    used_sources, _, _ = scan_elfs(
-        all_elfs, ec_root, zephyr_root, need_functions=False
-    )
-    print(f"\n* Extracted {len(used_sources)} unique source files from elfs")
-
-    unused_sources = [
-        source
-        for source in sorted(list(all_sources))
-        if source not in used_sources
-    ]
-
-    print(f"\nUNUSED SOURCES({len(unused_sources)}):\n")
-    for source in unused_sources:
-        print(source)
-
-
-def find_unused_headers(
-    ec_root, zephyr_root, source_paths, build_paths, include_tests=False
-):
-    """Find header files that are never included anywhere."""
-    print(f"Finding all header files in {len(source_paths)} paths...")
-    all_headers = find_files(paths=source_paths, patterns=["*.h", "*.inc"])
-    all_headers = {normalize_path(ec_root, zephyr_root, s) for s in all_headers}
-    print(f"* Found {len(all_headers)} header files")
-
-    print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = _collect_elfs(build_paths, include_tests=include_tests)
-    print(f"* Found {len(all_elfs)} elf files")
-
-    print("Extracting headers from elf files (DWARF heuristic)...")
-    _, used_headers_dwarf, _ = scan_elfs(
-        all_elfs, ec_root, zephyr_root, need_functions=False
-    )
-    print(f"\n* DWARF info reported {len(used_headers_dwarf)} headers as used")
-
-    print("Searching for #include directives (Grep heuristic)...")
-    inc_search_paths = list(source_paths) + [ec_root / "util"]
-    if zephyr_root:
-        inc_search_paths.extend(
-            [
-                zephyr_root / "include",
-                zephyr_root / "subsys" / "testsuite",
-            ]
-        )
-    full_inc, base_inc = find_includes(inc_search_paths)
-    print(f"* Found {len(base_inc)} unique filenames in includes")
-
-    unused_headers = []
-    for header in sorted(list(all_headers)):
-        if header in used_headers_dwarf:
-            continue
-        if is_header_included(header, full_inc, base_inc):
-            continue
-        unused_headers.append(header)
-
-    print(f"\nUNUSED HEADERS({len(unused_headers)}):\n")
-    for header in unused_headers:
-        print(header)
-
-
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "command", choices=["sources", "configs", "functions", "headers"]
+        "command", choices=["sources", "configs", "functions", "headers", "all"]
     )
     parser.add_argument("--ec-root", type=Path, help="Path to EC root")
     parser.add_argument("--zephyr-root", type=Path, help="Path to Zephyr root")
+    parser.add_argument(
+        "--build-dir",
+        type=Path,
+        action="append",
+        help="Path to build directory (can be specified multiple times)",
+    )
     parser.add_argument("--board", help="Filter by board name (e.g. 'taniks')")
     parser.add_argument(
         "--include-tests", action="store_true", help="Include test directories"
+    )
+    parser.add_argument(
+        "--ignore-copybot",
+        action="store_true",
+        help="Ignore files synced to platform/ec-legacy via copybot",
+    )
+    parser.add_argument(
+        "--copybot-config",
+        type=Path,
+        help="Path to copybot ec-legacy.ini config file",
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="Output results in JSON format"
+    )
+    parser.add_argument(
+        "--output", "-o", type=Path, help="Write output to specified file"
+    )
+    parser.add_argument(
+        "--summary",
+        action="store_true",
+        help="Print summary metrics and statistics",
     )
     args = parser.parse_args()
 
@@ -978,7 +921,9 @@ def main():
 
     source_paths = [p for p in source_paths if p.exists()]
 
-    if args.board:
+    if args.build_dir:
+        build_paths = [p.resolve() for p in args.build_dir]
+    elif args.board:
         build_paths = [
             ec_root / "build" / args.board,
             ec_root / "build" / "zephyr" / args.board,
@@ -999,32 +944,211 @@ def main():
         print(f"Error: No source paths found in {ec_root}", file=sys.stderr)
         sys.exit(1)
 
-    if args.command == "sources":
-        find_unused_sources(
-            ec_root,
-            zephyr_root,
-            source_paths,
-            build_paths,
-            include_tests=args.include_tests,
+    results = {}
+    summary = {}
+    copybot_patterns = load_copybot_patterns(ec_root, args.copybot_config)
+
+    need_elfs = args.command in ["sources", "functions", "headers", "all"]
+    need_functions = args.command in ["functions", "all"]
+    all_elfs = []
+    used_sources = set()
+    used_headers_dwarf = set()
+    used_functions = set()
+
+    if need_elfs:
+        raw_elfs = find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
+        raw_elf_set = set(raw_elfs)
+        all_elfs = [
+            e
+            for e in sorted(raw_elfs)
+            if e.name != "zephyr_pre0.elf"
+            and not (
+                e.name == "zephyr.exe"
+                and (e.parent / "zephyr.elf") in raw_elf_set
+            )
+        ]
+        if not args.include_tests:
+            test_patterns = [
+                "build/host/",
+                "minimal-posix",
+                "native_sim",
+                "test",
+                "fake",
+                "emul",
+                "ztest",
+                "hwtest",
+            ]
+            all_elfs = [
+                e
+                for e in all_elfs
+                if not any(
+                    tp
+                    in str(e)
+                    .rsplit("/src/platform/ec/", maxsplit=1)[-1]
+                    .lower()
+                    for tp in test_patterns
+                )
+            ]
+        if not args.json:
+            print(f"Finding elf files in {len(build_paths)} paths...")
+            print(f"* Found {len(all_elfs)} elf files")
+            print("Extracting info from elf files (sources, headers, DWARF)...")
+        used_sources, used_headers_dwarf, used_functions = scan_elfs(
+            all_elfs, ec_root, zephyr_root, need_functions=need_functions
         )
-    elif args.command == "configs":
-        find_unused_configs(ec_root, source_paths, build_paths)
-    elif args.command == "functions":
-        find_unused_functions(
-            ec_root,
-            zephyr_root,
-            source_paths,
-            build_paths,
-            include_tests=args.include_tests,
+
+    # 1. SOURCES
+    if args.command in ["sources", "all"]:
+        all_sources = find_files(
+            paths=source_paths, patterns=["*.c", "*.cc", "*.S"]
         )
-    elif args.command == "headers":
-        find_unused_headers(
-            ec_root,
-            zephyr_root,
-            source_paths,
-            build_paths,
-            include_tests=args.include_tests,
-        )
+        all_sources = {
+            normalize_path(ec_root, zephyr_root, s) for s in all_sources
+        }
+        if args.ignore_copybot:
+            all_sources = {
+                s
+                for s in all_sources
+                if not is_copybot_synced(s, copybot_patterns)
+            }
+        unused_sources = [
+            str(s) for s in sorted(list(all_sources)) if s not in used_sources
+        ]
+        results["unused_sources"] = unused_sources
+        summary["total_sources"] = len(all_sources)
+        summary["unused_sources"] = len(unused_sources)
+
+    # 2. HEADERS
+    if args.command in ["headers", "all"]:
+        all_headers = find_files(paths=source_paths, patterns=["*.h", "*.inc"])
+        all_headers = {
+            normalize_path(ec_root, zephyr_root, s) for s in all_headers
+        }
+        if args.ignore_copybot:
+            all_headers = {
+                h
+                for h in all_headers
+                if not is_copybot_synced(h, copybot_patterns)
+            }
+        inc_search_paths = list(source_paths) + [ec_root / "util"]
+        if zephyr_root:
+            inc_search_paths.extend(
+                [
+                    zephyr_root / "include",
+                    zephyr_root / "subsys" / "testsuite",
+                ]
+            )
+        full_inc, base_inc = find_includes(inc_search_paths)
+        unused_headers = []
+        for h in sorted(list(all_headers)):
+            if h in used_headers_dwarf:
+                continue
+            if is_header_included(h, full_inc, base_inc):
+                continue
+            unused_headers.append(str(h))
+        results["unused_headers"] = unused_headers
+        summary["total_headers"] = len(all_headers)
+        summary["unused_headers"] = len(unused_headers)
+
+    # 3. FUNCTIONS
+    if args.command in ["functions", "all"]:
+        all_functions = find_all_defined_functions(paths=source_paths)
+        all_functions = {
+            (normalize_path(ec_root, zephyr_root, f[0]), f[1])
+            for f in all_functions
+        }
+        if args.ignore_copybot:
+            all_functions = {
+                (p, name)
+                for p, name in all_functions
+                if not is_copybot_synced(p, copybot_patterns)
+            }
+        unused_functions = []
+        for p, name in sorted(list(all_functions - used_functions)):
+            entry = {"path": str(p), "name": name}
+            if is_copybot_synced(p, copybot_patterns):
+                entry["copybot_synced"] = True
+            unused_functions.append(entry)
+        results["unused_functions"] = unused_functions
+        summary["total_functions"] = len(all_functions)
+        summary["unused_functions"] = len(unused_functions)
+
+    # 4. CONFIGS
+    if args.command in ["configs", "all"]:
+        all_configs = find_configs(source_paths + [ec_root / "util"])
+        set_configs = find_set_configs(source_paths, build_paths)
+        never_set = sorted(list(all_configs - set_configs))
+        results["never_set_configs"] = never_set
+        summary["total_configs"] = len(all_configs)
+        summary["never_set_configs"] = len(never_set)
+
+    copybot_synced_set = set()
+    if not args.ignore_copybot:
+        copybot_synced_set = {
+            p
+            for p in (
+                results.get("unused_sources", [])
+                + results.get("unused_headers", [])
+                + [f["path"] for f in results.get("unused_functions", [])]
+            )
+            if is_copybot_synced(p, copybot_patterns)
+        }
+        if copybot_synced_set:
+            copybot_synced_files = sorted(copybot_synced_set)
+            results["copybot_synced_files"] = copybot_synced_files
+            summary["copybot_synced_files"] = len(copybot_synced_files)
+
+    # OUTPUT FORMATTING
+    output_str = ""
+    if args.json:
+        out_obj = {"command": args.command, "summary": summary, **results}
+        output_str = json.dumps(out_obj, indent=2)
+    else:
+        out_lines = []
+        if args.summary or args.command == "all":
+            out_lines.append("=== SUMMARY METRICS ===")
+            for k, v in summary.items():
+                out_lines.append(f"  {k}: {v}")
+            out_lines.append("")
+
+        if "unused_sources" in results:
+            out_lines.append(f"UNUSED SOURCES({summary['unused_sources']}):\n")
+            for s in results["unused_sources"]:
+                tag = " [copybot: ec-legacy]" if s in copybot_synced_set else ""
+                out_lines.append(f"{s}{tag}")
+            out_lines.append("")
+
+        if "unused_headers" in results:
+            out_lines.append(f"UNUSED HEADERS({summary['unused_headers']}):\n")
+            for h in results["unused_headers"]:
+                tag = " [copybot: ec-legacy]" if h in copybot_synced_set else ""
+                out_lines.append(f"{h}{tag}")
+            out_lines.append("")
+
+        if "unused_functions" in results:
+            out_lines.append(
+                f"UNUSED FUNCTIONS({summary['unused_functions']}):\n"
+            )
+            for f in results["unused_functions"]:
+                tag = " [copybot: ec-legacy]" if f.get("copybot_synced") else ""
+                out_lines.append(f"{f['path']}: {f['name']}{tag}")
+            out_lines.append("")
+
+        if "never_set_configs" in results:
+            out_lines.append(
+                f"NEVER SET CONFIGS({summary['never_set_configs']}):\n"
+            )
+            for c in results["never_set_configs"]:
+                out_lines.append(c)
+            out_lines.append("")
+
+        output_str = "\n".join(out_lines).strip()
+
+    if args.output:
+        args.output.write_text(output_str + "\n", encoding="utf-8")
+        print(f"Results written to {args.output}")
+    else:
+        print(output_str)
 
 
 if __name__ == "__main__":
