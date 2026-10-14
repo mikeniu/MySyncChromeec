@@ -29,6 +29,11 @@ int charge_manager_get_active_charge_port(void)
 	return active_charge_port;
 }
 
+int charge_manager_get_active_charge_port_no_lock(void)
+{
+	return active_charge_port;
+}
+
 enum led_pwr_state led_pwr_get_state(void)
 {
 	/*
