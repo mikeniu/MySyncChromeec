@@ -23,33 +23,8 @@ extern "C" {
 /* Tasks may use the bits in TASK_EVENT_CUSTOM_BIT for their own events */
 #define TASK_EVENT_CUSTOM_BIT(x) BUILD_CHECK_INLINE(BIT(x), BIT(x) & 0x0ffff)
 
-/* Used to signal that IPC layer is available for sending new data */
-#define TASK_EVENT_IPC_READY BIT(17)
-
 #define TASK_EVENT_PD_AWAKE BIT(18)
 
-/* npcx peci event */
-#define TASK_EVENT_PECI_DONE BIT(19)
-
-/* I2C tx/rx interrupt handler completion event. */
-#ifdef CHIP_STM32
-#define TASK_EVENT_I2C_COMPLETION(port) (1 << ((port) + 20))
-#define TASK_EVENT_I2C_IDLE (TASK_EVENT_I2C_COMPLETION(0))
-#define TASK_EVENT_MAX_I2C 6
-#ifdef I2C_PORT_COUNT
-#if (I2C_PORT_COUNT > TASK_EVENT_MAX_I2C)
-#error "Too many i2c ports for i2c events"
-#endif
-#endif
-#else
-#define TASK_EVENT_I2C_IDLE BIT(20)
-#define TASK_EVENT_PS2_DONE BIT(21)
-#endif
-
-/* DMA transmit complete event */
-#define TASK_EVENT_DMA_TC BIT(26)
-/* ADC interrupt handler event */
-#define TASK_EVENT_ADC_DONE BIT(27)
 /* For test-only builds, may be used by some tasks to restart themselves. */
 #define TASK_EVENT_RESET_DONE BIT(28)
 /* task_wake() called on task */
