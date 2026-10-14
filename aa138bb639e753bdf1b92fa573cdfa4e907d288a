@@ -16,6 +16,63 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d426c72b_ca06405e",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T08:46:29Z",
+      "side": 1,
+      "message": "Isn\u0027t ifdef needed here? Not all devices have the `gpio_lid_open` alias.",
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fc16957_bf175de5",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T08:46:29Z",
+      "side": 1,
+      "message": "Is `MATCH_EXPIRED` mode really needed?",
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52bb5032_4234736e",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T08:46:29Z",
+      "side": 1,
+      "message": "I don\u0027t actually understand that print.",
+      "range": {
+        "startLine": 243,
+        "startChar": 10,
+        "endLine": 243,
+        "endChar": 35
+      },
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
