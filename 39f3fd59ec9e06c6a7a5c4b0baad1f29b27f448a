@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "39f3fd59ec9e06c6a7a5c4b0baad1f29b27f448a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02a162bc_700eb29c",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T11:25:48Z",
+      "side": 1,
+      "message": "IMO the commit message is good.",
+      "parentUuid": "5fa083d8_5d4d6de7",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "revId": "39f3fd59ec9e06c6a7a5c4b0baad1f29b27f448a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
