@@ -289,12 +289,7 @@ ZTEST_F(isl9241_driver, test_acokref)
 
 static bool mock_charge_full_active;
 
-int charge_manager_get_active_charge_port(void)
-{
-	if (mock_charge_full_active)
-		return 0;
-	return charge_manager_get_active_charge_port_no_lock();
-}
+extern int charge_port;
 
 const struct batt_params *charger_current_battery_params(void)
 {
@@ -312,6 +307,7 @@ ZTEST_F(isl9241_driver, test_restart_charge_voltage_when_full)
 	struct charge_state_data *curr = charge_get_status();
 	struct charge_state_data saved_charge_state = *curr;
 	enum power_state orig_power = power_get_state();
+	int orig_charge_port = charge_port;
 	uint16_t reg;
 
 	/* Let any pending boot-time deferred hooks drain on k_sys_work_q */
@@ -332,6 +328,7 @@ ZTEST_F(isl9241_driver, test_restart_charge_voltage_when_full)
 	 */
 	power_set_state(POWER_S3);
 	curr->state = ST_CHARGE;
+	charge_port = 0;
 	mock_charge_full_active = true;
 	zassert_equal(led_pwr_get_state(), LED_PWRS_CHARGE_NEAR_FULL);
 	zassert_equal(battery_get_disconnect_state(), BATTERY_NOT_DISCONNECTED);
@@ -347,6 +344,7 @@ ZTEST_F(isl9241_driver, test_restart_charge_voltage_when_full)
 	zassert_true(reg & ISL9241_CONTROL1_LEARN_MODE);
 
 	/* Clear mock so background tasks don't re-trigger */
+	charge_port = orig_charge_port;
 	mock_charge_full_active = false;
 
 	/* Learn mode remains active before the 50 ms deferred callback expires

@@ -24,9 +24,14 @@ static int active_charge_port = CHARGE_PORT_NONE;
 static enum led_pwr_state active_charge_state = LED_PWRS_IDLE;
 static int active_battery_status;
 
-int charge_manager_get_active_charge_port(void)
+int charge_manager_get_active_charge_port_no_lock(void)
 {
 	return active_charge_port;
+}
+
+int charge_manager_get_active_charge_port(void)
+{
+	return charge_manager_get_active_charge_port_no_lock();
 }
 
 enum led_pwr_state led_pwr_get_state(void)

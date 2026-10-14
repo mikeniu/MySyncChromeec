@@ -523,7 +523,8 @@ static int match_node(const struct policy_group *grp, int node_idx)
 
 		/* Check if this node depends on charge port */
 		if (node->charge_port != -1) {
-			int port = charge_manager_get_active_charge_port();
+			int port =
+				charge_manager_get_active_charge_port_no_lock();
 
 			if (node->charge_port != port) {
 				*active = false;
@@ -557,10 +558,10 @@ static int match_node(const struct policy_group *grp, int node_idx)
 #if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY))
 	/* check if this node depends on battery status */
 	if (node->batt_state_mask != -1) {
-		int batt_state;
+		const struct batt_params *batt =
+			charger_current_battery_params();
 
-		battery_status(&batt_state);
-		if ((node->batt_state_mask & batt_state) !=
+		if ((node->batt_state_mask & batt->status) !=
 		    (node->batt_state_mask & node->batt_state)) {
 			*active = false;
 			return -1;
