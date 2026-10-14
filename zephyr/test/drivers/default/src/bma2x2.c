@@ -21,7 +21,7 @@
 #define BMA_NODE DT_NODELABEL(bma_emul)
 
 /** Mutex for test motion sensor  */
-static mutex_t sensor_mutex;
+static struct k_mutex sensor_mutex;
 
 /** Rotation used in some tests */
 static const mat33_fp_t test_rotation = { { 0, FLOAT_TO_FP(1), 0 },

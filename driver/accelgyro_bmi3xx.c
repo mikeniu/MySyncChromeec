@@ -147,7 +147,7 @@ static int config_interrupt(const struct motion_sensor_t *s)
 	if (s->type != MOTIONSENSE_TYPE_ACCEL)
 		return EC_SUCCESS;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* Clear the FIFO using Flush command */
 	reg_data[0] = BMI3_ENABLE;
@@ -220,7 +220,7 @@ static int config_interrupt(const struct motion_sensor_t *s)
 	}
 
 err_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -455,7 +455,7 @@ static int bmi3xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 		return EC_SUCCESS;
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* disable INT1_OUTPUT_EN */
 	ret = bmi3_read_n(s, BMI3_REG_IO_INT_CTRL, reg_data, 4);
@@ -463,7 +463,7 @@ static int bmi3xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 				    BMI3_INT_OUTPUT_DISABLE);
 	ret = bmi3_write_n(s, BMI3_REG_IO_INT_CTRL, &reg_data[2], 2);
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 #endif /* ACCELGYRO_BMI3XX_INT_ENABLE */
@@ -789,7 +789,7 @@ static int set_offset(const struct motion_sensor_t *s, const int16_t *offset,
 	/*
 	 * Lock accel resource to prevent I2C racing condition.
 	 */
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	switch (s->type) {
 	case MOTIONSENSE_TYPE_ACCEL:
@@ -804,7 +804,7 @@ static int set_offset(const struct motion_sensor_t *s, const int16_t *offset,
 		ret = EC_RES_INVALID_PARAM;
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -865,14 +865,14 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	 * Lock accel resource to prevent another task from attempting
 	 * to write accel parameters until we are done.
 	 */
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/*
 	 * Get default configurations for the type of feature selected.
 	 */
 	ret = bmi3_read_n(s, BMI3_REG_ACC_CONF + s->type, reg_data, 4);
 	if (ret) {
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		return ret;
 	}
 
@@ -933,7 +933,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	/* Set the accel/gyro configurations. */
 	ret = bmi3_write_n(s, BMI3_REG_ACC_CONF + s->type, &reg_data[2], 2);
 	if (ret) {
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		return ret;
 	}
 
@@ -948,7 +948,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 		ret = enable_fifo(s, 1);
 #endif
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -999,7 +999,7 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 		}
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/*
 	 * Read the range register from sensor for accelerometer/gyroscope
@@ -1023,7 +1023,7 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 			s->current_range = sensor_range[index][0];
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -1034,7 +1034,7 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 	uint8_t reg_data[8] = { 0 };
 	uint16_t status_val = 0;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* Read the status register */
 	ret = bmi3_read_n(s, BMI3_REG_STATUS, reg_data, 4);
@@ -1050,7 +1050,7 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 			if (v != s->raw_xyz)
 				memcpy(v, s->raw_xyz, sizeof(s->raw_xyz));
 
-			mutex_unlock(s->mutex);
+			k_mutex_unlock(s->mutex);
 
 			return EC_SUCCESS;
 		}
@@ -1072,7 +1072,7 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 		}
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }

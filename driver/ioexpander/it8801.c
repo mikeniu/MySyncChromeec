@@ -325,7 +325,7 @@ static int it8801_ioex_set_level(int ioex, int port, int mask, int value)
 	if (ioex_check_is_not_valid(port, mask))
 		return EC_ERROR_INVAL;
 
-	mutex_lock(&ioex_mutex);
+	k_mutex_lock(&ioex_mutex, K_FOREVER);
 	/*
 	 * The bit of output value in SOV is different than
 	 * the one we were about to set it to.
@@ -339,7 +339,7 @@ static int it8801_ioex_set_level(int ioex, int port, int mask, int value)
 		rv = it8801_ioex_write(ioex, IT8801_REG_GPIO_SOVR(port),
 				       it8801_gpio_sov[port]);
 	}
-	mutex_unlock(&ioex_mutex);
+	k_mutex_unlock(&ioex_mutex);
 
 	return rv;
 }
@@ -395,7 +395,7 @@ static int it8801_ioex_set_flags_by_mask(int ioex, int port, int mask,
 	if (rv)
 		return rv;
 
-	mutex_lock(&ioex_mutex);
+	k_mutex_lock(&ioex_mutex, K_FOREVER);
 	rv = it8801_ioex_read(ioex, IT8801_REG_GPIO_CR(port, mask), &val);
 	if (rv)
 		goto unlock_mutex;
@@ -438,7 +438,7 @@ static int it8801_ioex_set_flags_by_mask(int ioex, int port, int mask,
 	rv = it8801_ioex_write(ioex, IT8801_REG_GPIO_CR(port, mask), val);
 
 unlock_mutex:
-	mutex_unlock(&ioex_mutex);
+	k_mutex_unlock(&ioex_mutex);
 
 	return rv;
 }

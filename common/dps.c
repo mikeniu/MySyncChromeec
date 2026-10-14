@@ -106,10 +106,10 @@ static void update_timeout(int us)
 
 	new_timeout.val = get_time().val + us;
 
-	mutex_lock(&dps_lock);
+	k_mutex_lock(&dps_lock, K_FOREVER);
 	if (new_timeout.val > timeout.val)
 		timeout = new_timeout;
-	mutex_unlock(&dps_lock);
+	k_mutex_unlock(&dps_lock);
 }
 
 /*

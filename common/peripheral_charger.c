@@ -146,12 +146,12 @@ SYS_INIT(init_pchg_mutex, POST_KERNEL, 50);
 
 static void pchg_queue_event(struct pchg *ctx, enum pchg_event event)
 {
-	mutex_lock(&ctx->mtx);
+	k_mutex_lock(&ctx->mtx, K_FOREVER);
 	if (queue_add_unit(&ctx->events, &event) == 0) {
 		ctx->dropped_event_count++;
 		CPRINTS("WARN: Queue is full.");
 	}
-	mutex_unlock(&ctx->mtx);
+	k_mutex_unlock(&ctx->mtx);
 }
 
 static void pchg_queue_host_event(struct pchg *ctx, uint32_t event)
@@ -162,7 +162,7 @@ static void pchg_queue_host_event(struct pchg *ctx, uint32_t event)
 
 	event |= EC_MKBP_PCHG_PORT_TO_EVENT(PCHG_CTX_TO_PORT(ctx));
 
-	mutex_lock(&host_event_mtx);
+	k_mutex_lock(&host_event_mtx, K_FOREVER);
 	i = queue_count(&host_events);
 	if (i > 0) {
 		queue_peek_units(&host_events, &last_event, i - 1, 1);
@@ -175,7 +175,7 @@ static void pchg_queue_host_event(struct pchg *ctx, uint32_t event)
 	} else {
 		len = queue_add_unit(&host_events, &event);
 	}
-	mutex_unlock(&host_event_mtx);
+	k_mutex_unlock(&host_event_mtx);
 
 	if (len < 0) {
 		CPRINTS("INFO: Skipped back-to-back host event");
@@ -223,9 +223,9 @@ int pchg_get_battery_percent(int port)
 
 static void _clear_port(struct pchg *ctx)
 {
-	mutex_lock(&ctx->mtx);
+	k_mutex_lock(&ctx->mtx, K_FOREVER);
 	queue_init(&ctx->events);
-	mutex_unlock(&ctx->mtx);
+	k_mutex_unlock(&ctx->mtx);
 	atomic_clear(&ctx->irq);
 	ctx->battery_percent = 0;
 	ctx->error = 0;
@@ -702,13 +702,13 @@ static int pchg_run(struct pchg *ctx)
 	int port = PCHG_CTX_TO_PORT(ctx);
 	int rv;
 
-	mutex_lock(&ctx->mtx);
+	k_mutex_lock(&ctx->mtx, K_FOREVER);
 	if (!queue_remove_unit(&ctx->events, &ctx->event)) {
-		mutex_unlock(&ctx->mtx);
+		k_mutex_unlock(&ctx->mtx);
 		CPRINTS("P%d No event in queue", port);
 		return 0;
 	}
-	mutex_unlock(&ctx->mtx);
+	k_mutex_unlock(&ctx->mtx);
 
 	CPRINTS("P%d(MODE_%s) Run in STATE_%s for EVENT_%s", port,
 		_text_mode(ctx->mode), _text_state(ctx->state),
@@ -1006,7 +1006,7 @@ static enum ec_host_cmd_status hc_pchg(struct ec_host_cmd_handler_args *args)
 	}
 
 	ctx = &pchgs[port];
-	mutex_lock(&ctx->mtx);
+	k_mutex_lock(&ctx->mtx, K_FOREVER);
 
 	if (ctx->state == PCHG_STATE_CONNECTED &&
 	    ctx->battery_percent >= ctx->cfg->full_percent)
@@ -1024,7 +1024,7 @@ static enum ec_host_cmd_status hc_pchg(struct ec_host_cmd_handler_args *args)
 	if (args->version > 2)
 		ctx->error &= ~p->error;
 
-	mutex_unlock(&ctx->mtx);
+	k_mutex_unlock(&ctx->mtx);
 
 	return EC_HOST_CMD_SUCCESS;
 }
@@ -1037,9 +1037,9 @@ int pchg_get_next_event(uint8_t *out)
 	uint32_t event;
 	size_t len;
 
-	mutex_lock(&host_event_mtx);
+	k_mutex_lock(&host_event_mtx, K_FOREVER);
 	len = queue_remove_unit(&host_events, &event);
-	mutex_unlock(&host_event_mtx);
+	k_mutex_unlock(&host_event_mtx);
 	if (len == 0)
 		return 0;
 
@@ -1140,9 +1140,9 @@ hc_pchg_update(struct ec_host_cmd_handler_args *args)
 
 	case EC_PCHG_UPDATE_CMD_ENABLE_PASSTHRU:
 		HCPRINTS("Enabling passthru mode");
-		mutex_lock(&ctx->mtx);
+		k_mutex_lock(&ctx->mtx, K_FOREVER);
 		ctx->mode = PCHG_MODE_PASSTHRU;
-		mutex_unlock(&ctx->mtx);
+		k_mutex_unlock(&ctx->mtx);
 		break;
 
 	default:

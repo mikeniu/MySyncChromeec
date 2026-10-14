@@ -577,7 +577,7 @@ static void gpio_discharge_vbus(int port, int enable)
 
 test_mockable void pd_set_vbus_discharge(int port, int enable)
 {
-	static mutex_t discharge_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
+	static struct k_mutex discharge_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
 	static bool inited[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 	if (port >= board_get_usb_pd_port_count())
@@ -587,7 +587,7 @@ test_mockable void pd_set_vbus_discharge(int port, int enable)
 		(void)k_mutex_init(&discharge_lock[port]);
 		inited[port] = true;
 	}
-	mutex_lock(&discharge_lock[port]);
+	k_mutex_lock(&discharge_lock[port], K_FOREVER);
 	enable &= !board_vbus_source_enabled(port);
 
 	if (get_usb_pd_discharge() == USB_PD_DISCHARGE_GPIO) {
@@ -602,7 +602,7 @@ test_mockable void pd_set_vbus_discharge(int port, int enable)
 #endif
 	}
 
-	mutex_unlock(&discharge_lock[port]);
+	k_mutex_unlock(&discharge_lock[port]);
 }
 #endif /* CONFIG_USB_PD_DISCHARGE */
 

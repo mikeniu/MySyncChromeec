@@ -130,7 +130,7 @@ static enum ec_error_list isl95522_set_frequency(int chgnum, int freq_khz)
 	int reg;
 	int freq;
 
-	mutex_lock(&control2_mutex_isl95522);
+	k_mutex_lock(&control2_mutex_isl95522, K_FOREVER);
 	rv = isl95522_read(chgnum, ISL95522_REG_CONTROL2, &reg);
 	if (rv) {
 		CPRINTS("Could not read CONTROL2. (rv=%d)", rv);
@@ -177,7 +177,7 @@ static enum ec_error_list isl95522_set_frequency(int chgnum, int freq_khz)
 	}
 
 error:
-	mutex_unlock(&control2_mutex_isl95522);
+	k_mutex_unlock(&control2_mutex_isl95522);
 
 	return rv;
 }
@@ -323,12 +323,12 @@ static enum ec_error_list isl95522_discharge_on_ac_weak_disable(int chgnum)
 {
 	int rv = 0;
 
-	mutex_lock(&control1_mutex_isl95522);
+	k_mutex_lock(&control1_mutex_isl95522, K_FOREVER);
 	if (!learn_mode) {
 		rv = isl95522_discharge_on_ac_unsafe(chgnum, 0);
 	}
 
-	mutex_unlock(&control1_mutex_isl95522);
+	k_mutex_unlock(&control1_mutex_isl95522);
 	return rv;
 }
 
@@ -336,9 +336,9 @@ static enum ec_error_list isl95522_discharge_on_ac(int chgnum, int enable)
 {
 	int rv = 0;
 
-	mutex_lock(&control1_mutex_isl95522);
+	k_mutex_lock(&control1_mutex_isl95522, K_FOREVER);
 	rv = isl95522_discharge_on_ac_unsafe(chgnum, enable);
-	mutex_unlock(&control1_mutex_isl95522);
+	k_mutex_unlock(&control1_mutex_isl95522);
 	return rv;
 }
 
@@ -415,7 +415,7 @@ static void isl95522_init(int chgnum)
 			   bi->voltage_min))
 		goto init_fail;
 
-	mutex_lock(&control1_mutex_isl95522);
+	k_mutex_lock(&control1_mutex_isl95522, K_FOREVER);
 	/*
 	 * Set control1 registers
 	 */
@@ -423,11 +423,11 @@ static void isl95522_init(int chgnum)
 	ctl_val |= ISL95522_REG_CONTROL1_WOCP;
 	if (isl95522_write(chgnum, ISL95522_REG_CONTROL1, ctl_val))
 		rv = 1;
-	mutex_unlock(&control1_mutex_isl95522);
+	k_mutex_unlock(&control1_mutex_isl95522);
 	if (rv)
 		goto init_fail;
 
-	mutex_lock(&control2_mutex_isl95522);
+	k_mutex_lock(&control2_mutex_isl95522, K_FOREVER);
 	/*
 	 * Set control2 register
 	 */
@@ -435,7 +435,7 @@ static void isl95522_init(int chgnum)
 	ctl_val |= ISL95522_REG_CONTROL2_TRICKLE_CHARGE;
 	if (isl95522_write(chgnum, ISL95522_REG_CONTROL2, ctl_val))
 		rv = 1;
-	mutex_unlock(&control2_mutex_isl95522);
+	k_mutex_unlock(&control2_mutex_isl95522);
 	if (rv)
 		goto init_fail;
 

@@ -280,7 +280,7 @@ static void i8042_send_to_host(int len, const uint8_t *bytes, uint8_t chan,
 	struct data_byte data;
 
 	/* Enqueue output data if there's space */
-	mutex_lock(&to_host_mutex);
+	k_mutex_lock(&to_host_mutex, K_FOREVER);
 
 	if (is_typematic && !typematic_len) {
 		for (i = 0; i < len; i++)
@@ -310,7 +310,7 @@ static void i8042_send_to_host(int len, const uint8_t *bytes, uint8_t chan,
 			}
 		}
 	}
-	mutex_unlock(&to_host_mutex);
+	k_mutex_unlock(&to_host_mutex);
 
 	/* Wake up the task to move from queue to host */
 	task_wake(TASK_ID_KEYPROTO);
@@ -427,11 +427,11 @@ test_export_static void reset_rate_and_delay(void)
 void keyboard_clear_buffer(void)
 {
 	CPRINTS("KB Clear Buffer");
-	mutex_lock(&to_host_mutex);
+	k_mutex_lock(&to_host_mutex, K_FOREVER);
 	kblog_put('x', queue_count(&to_host));
 	queue_init(&to_host);
 	queue_init(&to_host_cmd);
-	mutex_unlock(&to_host_mutex);
+	k_mutex_unlock(&to_host_mutex);
 	lpc_keyboard_clear_buffer();
 }
 
