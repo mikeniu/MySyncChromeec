@@ -33,6 +33,12 @@ struct deferred_data {
  */
 int hook_call_deferred(const struct deferred_data *data, int us);
 
+#if defined(CONFIG_PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK)
+void sysworkq_audit_check_non_blocking(const char *func, const void *caller);
+uint32_t sysworkq_audit_get_violation_count(void);
+void sysworkq_audit_reset_violation_count(void);
+#endif
+
 #define DECLARE_DEFERRED(routine)                                    \
 	K_WORK_DELAYABLE_DEFINE(routine##_work_data,                 \
 				(void (*)(struct k_work *))routine); \

@@ -224,4 +224,99 @@ ZTEST(hooks_tests, test_hook_ap_power_events)
 	zassert_equal(3, ev_count, "Startup callback not called");
 }
 
+static K_MUTEX_DEFINE(audit_test_mutex);
+static K_SEM_DEFINE(audit_test_sem, 0, 1);
+static K_CONDVAR_DEFINE(audit_test_condvar);
+static K_EVENT_DEFINE(audit_test_event);
+K_MSGQ_DEFINE(audit_test_msgq, sizeof(uint32_t), 2, 4);
+
+static void audit_idle_work_fn(struct k_work *work)
+{
+	ARG_UNUSED(work);
+}
+static K_WORK_DEFINE(audit_idle_work, audit_idle_work_fn);
+
+static bool non_blocking_deferred_done;
+
+static void deferred_non_blocking_ops(void)
+{
+	uint32_t msg = 0x5a;
+
+	zassert_ok(k_mutex_lock(&audit_test_mutex, K_NO_WAIT));
+	(void)k_condvar_wait(&audit_test_condvar, &audit_test_mutex, K_NO_WAIT);
+	zassert_ok(k_mutex_unlock(&audit_test_mutex));
+
+	(void)k_sem_take(&audit_test_sem, K_NO_WAIT);
+	(void)k_event_wait(&audit_test_event, 0x1, false, K_NO_WAIT);
+	zassert_ok(k_msgq_put(&audit_test_msgq, &msg, K_NO_WAIT));
+	zassert_ok(k_msgq_get(&audit_test_msgq, &msg, K_NO_WAIT));
+	(void)k_thread_join(k_current_get(), K_NO_WAIT);
+
+	non_blocking_deferred_done = true;
+}
+DECLARE_DEFERRED(deferred_non_blocking_ops);
+
+static bool blocking_deferred_done;
+
+static void deferred_blocking_ops(void)
+{
+	struct k_work_sync work_sync;
+	uint32_t msg = 0xa5;
+
+	sysworkq_audit_check_non_blocking("custom_check", NULL);
+	k_usleep(1);
+
+	zassert_ok(k_mutex_lock(&audit_test_mutex, K_TICKS(1)));
+	(void)k_condvar_wait(&audit_test_condvar, &audit_test_mutex,
+			     K_TICKS(1));
+	zassert_ok(k_mutex_unlock(&audit_test_mutex));
+
+	k_sem_give(&audit_test_sem);
+	zassert_ok(k_sem_take(&audit_test_sem, K_TICKS(1)));
+
+	k_event_post(&audit_test_event, 0x1);
+	(void)k_event_wait(&audit_test_event, 0x1, false, K_TICKS(1));
+
+	zassert_ok(k_msgq_put(&audit_test_msgq, &msg, K_TICKS(1)));
+	zassert_ok(k_msgq_get(&audit_test_msgq, &msg, K_TICKS(1)));
+
+	(void)k_thread_join(k_current_get(), K_TICKS(1));
+	(void)k_work_cancel_sync(&audit_idle_work, &work_sync);
+	(void)k_work_flush(&audit_idle_work, &work_sync);
+
+	blocking_deferred_done = true;
+}
+DECLARE_DEFERRED(deferred_blocking_ops);
+
+ZTEST(hooks_tests, test_sysworkq_runtime_check)
+{
+	/* Off sysworkq: blocking operations must not record violations */
+	sysworkq_audit_reset_violation_count();
+	sysworkq_audit_check_non_blocking("off_sysworkq", NULL);
+	k_usleep(1);
+	zassert_ok(k_mutex_lock(&audit_test_mutex, K_TICKS(1)));
+	zassert_ok(k_mutex_unlock(&audit_test_mutex));
+	zassert_equal(sysworkq_audit_get_violation_count(), 0);
+
+	/* On sysworkq with K_NO_WAIT: must not record violations */
+	non_blocking_deferred_done = false;
+	zassert_ok(hook_call_deferred(&deferred_non_blocking_ops_data, 0));
+	k_usleep(DEFERRED_DELAY_US);
+	zassert_true(non_blocking_deferred_done);
+	zassert_equal(sysworkq_audit_get_violation_count(), 0);
+
+	/* On sysworkq with blocking timeouts: each operation must flag */
+	blocking_deferred_done = false;
+	zassert_ok(hook_call_deferred(&deferred_blocking_ops_data, 0));
+	k_usleep(DEFERRED_DELAY_US);
+	zassert_true(blocking_deferred_done);
+	/*
+	 * 11 explicit blocking calls + 1 internal k_mutex_lock(K_FOREVER)
+	 * inside k_condvar_wait() when re-acquiring the mutex = 12 violations.
+	 */
+	zassert_equal(sysworkq_audit_get_violation_count(), 12);
+	sysworkq_audit_reset_violation_count();
+	zassert_equal(sysworkq_audit_get_violation_count(), 0);
+}
+
 ZTEST_SUITE(hooks_tests, NULL, NULL, NULL, NULL, NULL);
