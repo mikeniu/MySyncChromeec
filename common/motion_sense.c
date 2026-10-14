@@ -56,7 +56,7 @@ STATIC_IF(CONFIG_CMD_ACCEL_INFO) int accel_disp;
 
 #define SENSOR_ACTIVE(_sensor) (sensor_active & (_sensor)->active_mask)
 
-mutex_t g_sensor_mutex;
+K_MUTEX_DEFINE(g_sensor_mutex);
 
 /*
  * Current power level (S0, S3, S5, ...)
@@ -98,14 +98,6 @@ static atomic_t odr_event_required;
 
 /* Whether or not the FIFO interrupt should be enabled (set from the AP). */
 __maybe_unused static int fifo_int_enabled;
-
-static int init_sensor_mutex(void)
-{
-	k_mutex_init(&g_sensor_mutex);
-
-	return 0;
-}
-SYS_INIT(init_sensor_mutex, POST_KERNEL, 50);
 
 #ifdef CONFIG_LID_ANGLE
 __attribute__((weak)) int sensor_board_is_lid_angle_available(void)
