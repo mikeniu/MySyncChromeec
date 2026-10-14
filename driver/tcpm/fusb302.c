@@ -604,7 +604,7 @@ static int fusb302_tcpm_set_polarity(int port, enum tcpc_cc_polarity polarity)
 	tcpc_write(port, TCPC_REG_SWITCHES1, reg);
 
 	/* Save the polarity for later */
-	state[port].cc_polarity = polarity;
+	state[port].cc_polarity = polarity_rm_dts(polarity);
 
 	return 0;
 }
