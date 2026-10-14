@@ -71,26 +71,30 @@ int ppc_get_alert_status(int port)
 
 static int tune_mux(const struct usb_mux *me);
 
-const struct usb_mux ampton_usb_muxes[CONFIG_USB_PD_PORT_MAX_COUNT] = {
+const struct usb_mux_chain ampton_usb_muxes[CONFIG_USB_PD_PORT_MAX_COUNT] = {
 	[USB_PD_PORT_ITE_0] = {
-		/* Use PS8751 as mux only */
-		.usb_port = USB_PD_PORT_ITE_0,
-		.i2c_port = I2C_PORT_USBC0,
-		.i2c_addr_flags = PS8XXX_I2C_ADDR1_FLAGS,
-		.flags = USB_MUX_FLAG_NOT_TCPC,
-		.driver = &ps8xxx_usb_mux_driver,
-		.hpd_update = &ps8xxx_tcpc_update_hpd_status,
-		.board_init = &tune_mux,
+		.mux = &(const struct usb_mux) {
+			/* Use PS8751 as mux only */
+			.usb_port = USB_PD_PORT_ITE_0,
+			.i2c_port = I2C_PORT_USBC0,
+			.i2c_addr_flags = PS8XXX_I2C_ADDR1_FLAGS,
+			.flags = USB_MUX_FLAG_NOT_TCPC,
+			.driver = &ps8xxx_usb_mux_driver,
+			.hpd_update = &ps8xxx_tcpc_update_hpd_status,
+			.board_init = &tune_mux,
+		},
 	},
 	[USB_PD_PORT_ITE_1] = {
-		/* Use PS8751 as mux only */
-		.usb_port = USB_PD_PORT_ITE_1,
-		.i2c_port = I2C_PORT_USBC1,
-		.i2c_addr_flags = PS8XXX_I2C_ADDR1_FLAGS,
-		.flags = USB_MUX_FLAG_NOT_TCPC,
-		.driver = &ps8xxx_usb_mux_driver,
-		.hpd_update = &ps8xxx_tcpc_update_hpd_status,
-		.board_init = &tune_mux,
+		.mux = &(const struct usb_mux) {
+			/* Use PS8751 as mux only */
+			.usb_port = USB_PD_PORT_ITE_1,
+			.i2c_port = I2C_PORT_USBC1,
+			.i2c_addr_flags = PS8XXX_I2C_ADDR1_FLAGS,
+			.flags = USB_MUX_FLAG_NOT_TCPC,
+			.driver = &ps8xxx_usb_mux_driver,
+			.hpd_update = &ps8xxx_tcpc_update_hpd_status,
+			.board_init = &tune_mux,
+		},
 	}
 };
 
