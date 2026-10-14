@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0c54076_30c664e3",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1122,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T02:50:19Z",
+      "side": 1,
+      "message": "Similar to the auto-repair logic, `_find_missing_dep_symbols` is called concurrently by worker threads. Reading `sym.type` or interacting with `self.resolver.kconf` here without the lock is not thread-safe.\n\nIt would be safer to encapsulate this type checking and symbol lookup within a synchronized method inside `KconfigDependencyResolver`.",
+      "range": {
+        "startLine": 1122,
+        "startChar": 0,
+        "endLine": 1122,
+        "endChar": 0
+      },
+      "revId": "4c40c67bc4d9d1b9be8fa328351b063eb65c4e70",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0212c9d2_9a74392f",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1435,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T02:50:19Z",
+      "side": 1,
+      "message": "Since `_eval_task` executes in a thread pool, accessing `self.resolver.kconf.syms` (and specifically reading `.str_value`) without acquiring `self.resolver._lock` can cause data races. `kconfiglib` lazily evaluates and caches expression values internally, meaning a read operation can mutate internal state.\n\nConsider adding a thread-safe getter method (e.g. `get_symbol_value`) in `KconfigDependencyResolver` that holds the `_lock` when interacting with `kconf`.",
+      "range": {
+        "startLine": 1435,
+        "startChar": 0,
+        "endLine": 1435,
+        "endChar": 0
+      },
+      "revId": "4c40c67bc4d9d1b9be8fa328351b063eb65c4e70",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
