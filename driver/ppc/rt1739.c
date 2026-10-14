@@ -4,7 +4,6 @@
  */
 
 /* Richtek RT1739 USB-C Power Path Controller */
-#include "atomic.h"
 #include "battery.h"
 #include "common.h"
 #include "config.h"
@@ -15,6 +14,8 @@
 #include "hooks.h"
 #include "usbc_ppc.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #if defined(CONFIG_USBC_PPC_VCONN) && !defined(CONFIG_USBC_PPC_POLARITY)
 #error "Can't use set_vconn without set_polarity"
@@ -66,8 +67,8 @@ static int rt1739_vbus_source_enable(int port, int enable)
 		prev_flag =
 			atomic_or(&flags[port], RT1739_FLAGS_SOURCE_ENABLED);
 	else
-		prev_flag = atomic_clear_bits(&flags[port],
-					      RT1739_FLAGS_SOURCE_ENABLED);
+		prev_flag =
+			atomic_and(&flags[port], ~RT1739_FLAGS_SOURCE_ENABLED);
 
 	/* Return if status doesn't change */
 	if (!!(prev_flag & RT1739_FLAGS_SOURCE_ENABLED) == !!enable)
@@ -274,10 +275,10 @@ static int rt1739_set_frs_enable(int port, int enable)
 	if (enable)
 		atomic_or(&flags[port], RT1739_FLAGS_FRS_ENABLED);
 	else
-		atomic_clear_bits(&flags[port], RT1739_FLAGS_FRS_ENABLED);
+		atomic_and(&flags[port], ~RT1739_FLAGS_FRS_ENABLED);
 
 	/* Clear Rx receive events. */
-	atomic_clear_bits(&flags[port], RT1739_FLAGS_FRS_RX_RECV);
+	atomic_and(&flags[port], ~RT1739_FLAGS_FRS_RX_RECV);
 
 	return EC_SUCCESS;
 }

@@ -4,7 +4,6 @@
  */
 
 #include "adc.h"
-#include "atomic.h"
 #include "battery.h"
 #include "builtin/assert.h"
 #include "charge_manager.h"
@@ -30,6 +29,8 @@
 #include "util.h"
 #include "zephyr/include/usbc/pdc_dpm.h"
 #include "zephyr/include/usbc/pdc_power_mgmt.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef HAS_MOCK_CHARGE_MANAGER
 #error Mock defined HAS_MOCK_CHARGE_MANAGER

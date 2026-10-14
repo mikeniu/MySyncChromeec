@@ -8,7 +8,6 @@
  * and the new (i.e. usb_sm_*) USB-C PD stacks.
  */
 
-#include "atomic.h"
 #include "charge_manager.h"
 #include "charge_state.h"
 #include "chipset.h"
@@ -35,6 +34,8 @@
 #include "usbc_ocp.h"
 #include "usbc_ppc.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef CONFIG_COMMON_RUNTIME
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)

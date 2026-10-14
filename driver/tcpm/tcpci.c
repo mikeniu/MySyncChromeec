@@ -6,7 +6,6 @@
 /* Type-C port manager */
 
 #include "anx74xx.h"
-#include "atomic.h"
 #include "compile_time_macros.h"
 #include "console.h"
 #include "ec_commands.h"
@@ -26,6 +25,8 @@
 #include "usb_pd_tcpm.h"
 #include "usb_pe_sm.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)

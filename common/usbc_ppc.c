@@ -5,7 +5,6 @@
 
 /* USB-C Power Path Controller Common Code */
 
-#include "atomic.h"
 #include "common.h"
 #include "console.h"
 #include "hooks.h"
@@ -13,6 +12,8 @@
 #include "usb_pd.h"
 #include "usbc_ppc.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifndef TEST_LEGACY_BUILD
 /*

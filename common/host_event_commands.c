@@ -277,8 +277,8 @@ static void host_events_atomic_clear(host_event_t *e, host_event_t m)
 {
 	atomic_t *ptr = (atomic_t *)e;
 
-	atomic_clear_bits(ptr, (uint32_t)m);
-	atomic_clear_bits(ptr + 1, (uint32_t)(m >> 32));
+	atomic_and(ptr, ~((uint32_t)m));
+	atomic_and(ptr + 1, ~(uint32_t)(m >> 32));
 }
 
 #if !defined(CONFIG_HOSTCMD_X86) && defined(CONFIG_MKBP_EVENT)

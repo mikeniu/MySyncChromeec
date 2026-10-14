@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "chipset.h"
 #include "common.h"
 #include "extpower.h"
@@ -18,6 +17,8 @@
 #include "task.h"
 #include "timer.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 /* Peripheral Charge Manager */
 
