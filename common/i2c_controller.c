@@ -54,6 +54,7 @@ int i2c_port_is_locked(int port)
 
 const struct i2c_port_t *get_i2c_port(const int port)
 {
+	const struct i2c_port_t *bb_port = NULL;
 	int i;
 
 	/*
@@ -63,23 +64,26 @@ const struct i2c_port_t *get_i2c_port(const int port)
 	 * board level and will again switch back to event based I2C upon task
 	 * initialization.
 	 */
-	if (task_start_called()) {
-		/* Find the matching port in i2c_ports[] table. */
-		for (i = 0; i < i2c_ports_used; i++) {
-			if (i2c_ports[i].port == port)
-				return &i2c_ports[i];
-		}
-	}
-
 	if (IS_ENABLED(CONFIG_I2C_BITBANG_CROS_EC)) {
 		/* Find the matching port in i2c_bitbang_ports[] table. */
 		for (i = 0; i < i2c_bitbang_ports_used; i++) {
-			if (i2c_bitbang_ports[i].port == port)
-				return &i2c_bitbang_ports[i];
+			if (i2c_bitbang_ports[i].port == port) {
+				bb_port = &i2c_bitbang_ports[i];
+				break;
+			}
 		}
+
+		if (bb_port && !task_start_called())
+			return bb_port;
 	}
 
-	return NULL;
+	/* Find the matching port in i2c_ports[] table. */
+	for (i = 0; i < i2c_ports_used; i++) {
+		if (i2c_ports[i].port == port)
+			return &i2c_ports[i];
+	}
+
+	return bb_port;
 }
 
 __maybe_unused static int chip_i2c_xfer_with_notify(const int port,
