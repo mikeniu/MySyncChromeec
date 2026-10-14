@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9486092_ba494818",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T11:26:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ The state transition logic correctly keeps the sensor active when waiting for a finger-up event, resolving the early low-power state issue. The call to `fp_idle()` has been completely removed.\n* **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated within the existing task event loop and properly leverages the sensor modes.\n* **Code Simplicity:** ✅ The changes are minimal, straightforward, and no longer include unnecessary calls to `fp_idle()`.\n* **Idiomaticity \u0026 Readability:** ✅ Standard C/C++ idioms are followed and consistent with the existing codebase.\n* **Security:** ✅ No security vulnerabilities introduced.\n* **Testing:** ✅ The test suite comprehensively asserts both `detect_mode` and `low_power_mode` transitions correctly on all boundary paths, fully verifying the fix.\n* **CL Size \u0026 Scope:** ✅ Size: M (+62, -11). The CL is focused strictly on fixing the finger-up sensor mode issue and passes the Single Logical Change rule.\n* **Commit Message:** ✅ The description clearly explains the prior flawed behavior, why it occurred, and the conceptual solution.\n\n[🔗](http://go/tj/0be6d9cd-7c6e-47db-98c8-a35c39c575e1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f9cdcce71e1db6aee24aaf194d179cf22e71e4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
