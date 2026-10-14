@@ -86,6 +86,44 @@ class TestRtkFlasher(unittest.TestCase):
             ]
         )
 
+    @patch(
+        "flash.rtk_flasher.resolve_image_writable_ranges",
+        return_value=(
+            {"CBI": MagicMock(offset=0x50000, size=0x1000)},
+            0x100000,
+            [(0, 0x50000), (0x51000, 0x100000)],
+        ),
+    )
+    @patch("flash.rtk_flasher.preserve_sections_with_cur_image")
+    @patch("os.path.isfile", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    @patch("flash.rtk_flasher.locate_tool", return_value="/mock/rtkupdate")
+    @patch("subprocess.run")
+    def test_execute_flash_write_skips_cbi_via_slices(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_isfile: MagicMock,
+        mock_preserve: MagicMock,
+        _mock_resolve: MagicMock,
+    ) -> None:
+        """Verify RtkFlasher writes slices around CBI without reading it."""
+        self.args.no_preserve = False
+        self.servo.get.return_value = "/dev/pts/6"
+        with patch("builtins.open", unittest.mock.mock_open(read_data=b"\xff")):
+            self.flasher.execute_flash()
+
+        mock_preserve.assert_not_called()
+        flash_calls = [
+            c.args[0]
+            for c in mock_run.call_args_list
+            if "--method=flash" in c.args[0]
+        ]
+        self.assertEqual(len(flash_calls), 2)
+        self.assertIn("--spi_start=0x00000000", flash_calls[0])
+        self.assertIn("--spi_start=0x00051000", flash_calls[1])
+
 
 if __name__ == "__main__":
     unittest.main()

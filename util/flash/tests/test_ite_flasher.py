@@ -154,6 +154,54 @@ class TestIteI2cFlasher(unittest.TestCase):
         self.assertEqual(mock_run.call_count, 2)
         self.servo.set.assert_any_call("cr50_i2c_ctrl", "ite_debugger_mode")
 
+    @patch(
+        "flash.ite_flasher.get_preserve_ranges",
+        return_value=[(0x5E000, 0x5F000)],
+    )
+    @patch("flash.ite_flasher.preserve_sections_with_cur_image")
+    @patch("os.path.exists", return_value=True)
+    @patch("flash.ite_flasher.locate_tool", return_value="/mock/iteflash")
+    @patch("subprocess.run")
+    def test_execute_flash_skips_cbi_range_without_read(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        mock_preserve: MagicMock,
+        _mock_ranges: MagicMock,
+    ) -> None:
+        """Verify IteI2cFlasher passes --skip-range and skips reading CBI."""
+        self.args.no_preserve = False
+
+        def mock_get(key: str, default: str = "") -> str:
+            if key == "servo_type":
+                return "servo_v4_with_ccd_cr50"
+            if key == "ccd_serialname":
+                return "CCD123"
+            return default
+
+        self.servo.get.side_effect = mock_get
+        self.servo.has_control.return_value = False
+
+        self.flasher.execute_flash()
+
+        mock_preserve.assert_not_called()
+        mock_run.assert_called_once_with(
+            [
+                "/mock/iteflash",
+                "--send-waveform=0",
+                "--i2c-interface=usb",
+                "-s",
+                "CCD123",
+                "--block-write-size=256",
+                "--dbgr-preserve-pin=G1",
+                "--skip-range=0x5e000:0x1000",
+                "--erase",
+                "--write=/tmp/image.bin",
+            ],
+            check=True,
+        )
+
 
 class TestIteUartFlasher(unittest.TestCase):
     """Tests for IteUartFlasher."""
@@ -239,6 +287,46 @@ class TestIteUartFlasher(unittest.TestCase):
                 "/dev/pts/1",
                 "-b",
                 "115200",
+                "-f",
+                "/tmp/image.bin",
+            ],
+            check=True,
+        )
+
+    @patch(
+        "flash.ite_flasher.get_preserve_ranges",
+        return_value=[(0x5E000, 0x5F000)],
+    )
+    @patch("flash.ite_flasher.preserve_sections_with_cur_image")
+    @patch("os.path.exists", return_value=True)
+    @patch("flash.ite_flasher.locate_tool", return_value="/mock/itecomdbgr")
+    @patch("subprocess.run")
+    def test_execute_flash_skips_cbi_range_without_read(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        mock_preserve: MagicMock,
+        _mock_ranges: MagicMock,
+    ) -> None:
+        """Verify IteUartFlasher passes -S start size and skips reading CBI."""
+        self.args.no_preserve = False
+        self.servo.get.return_value = "/dev/pts/1"
+        self.flasher.execute_flash()
+
+        mock_preserve.assert_not_called()
+        mock_run.assert_called_once_with(
+            [
+                "sudo",
+                "--",
+                "/mock/itecomdbgr",
+                "-d",
+                "/dev/pts/1",
+                "-b",
+                "115200",
+                "-S",
+                "0x5e000",
+                "0x1000",
                 "-f",
                 "/tmp/image.bin",
             ],
