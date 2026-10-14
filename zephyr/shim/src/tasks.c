@@ -6,6 +6,7 @@
 #include "ap_power/ap_power_interface.h"
 #include "common.h"
 #include "ec_tasks.h"
+#include "hooks.h"
 #include "host_command.h"
 #include "task.h"
 #include "timer.h"
@@ -208,6 +209,11 @@ uint32_t task_wait_event(int timeout_us)
 {
 	struct task_ctx_base_data *data;
 
+#if defined(CONFIG_PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK)
+	sysworkq_audit_check_non_blocking(__func__,
+					  __builtin_return_address(0));
+#endif
+
 	data = task_get_base_data(task_get_current());
 
 	__ASSERT_NO_MSG(data != NULL);
@@ -254,6 +260,11 @@ uint32_t task_wait_event(int timeout_us)
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
 	struct task_ctx_base_data *data;
+
+#if defined(CONFIG_PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK)
+	sysworkq_audit_check_non_blocking(__func__,
+					  __builtin_return_address(0));
+#endif
 
 	data = task_get_base_data(task_get_current());
 

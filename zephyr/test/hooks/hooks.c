@@ -5,6 +5,7 @@
 
 #include "ap_power/ap_power.h"
 #include "hooks.h"
+#include "timer.h"
 
 #include <stdbool.h>
 
@@ -264,7 +265,7 @@ static void deferred_blocking_ops(void)
 	uint32_t msg = 0xa5;
 
 	sysworkq_audit_check_non_blocking("custom_check", NULL);
-	k_usleep(1);
+	crec_usleep(1); /* NOLINT_EC_SYMBOL */
 
 	zassert_ok(k_mutex_lock(&audit_test_mutex, K_TICKS(1)));
 	(void)k_condvar_wait(&audit_test_condvar, &audit_test_mutex,
@@ -293,7 +294,7 @@ ZTEST(hooks_tests, test_sysworkq_runtime_check)
 	/* Off sysworkq: blocking operations must not record violations */
 	sysworkq_audit_reset_violation_count();
 	sysworkq_audit_check_non_blocking("off_sysworkq", NULL);
-	k_usleep(1);
+	crec_usleep(1); /* NOLINT_EC_SYMBOL */
 	zassert_ok(k_mutex_lock(&audit_test_mutex, K_TICKS(1)));
 	zassert_ok(k_mutex_unlock(&audit_test_mutex));
 	zassert_equal(sysworkq_audit_get_violation_count(), 0);
@@ -311,10 +312,10 @@ ZTEST(hooks_tests, test_sysworkq_runtime_check)
 	k_usleep(DEFERRED_DELAY_US);
 	zassert_true(blocking_deferred_done);
 	/*
-	 * 11 explicit blocking calls + 1 internal k_mutex_lock(K_FOREVER)
-	 * inside k_condvar_wait() when re-acquiring the mutex = 12 violations.
+	 * 11 explicit blocking calls + 1 k_usleep inside crec_usleep +
+	 * 1 internal k_mutex_lock(K_FOREVER) inside k_condvar_wait() = 13.
 	 */
-	zassert_equal(sysworkq_audit_get_violation_count(), 12);
+	zassert_equal(sysworkq_audit_get_violation_count(), 13);
 	sysworkq_audit_reset_violation_count();
 	zassert_equal(sysworkq_audit_get_violation_count(), 0);
 }

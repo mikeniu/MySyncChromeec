@@ -4,6 +4,7 @@
  */
 
 #include "ec_tasks.h"
+#include "hooks.h"
 #include "task.h"
 #include "timer.h"
 
@@ -272,6 +273,31 @@ SYS_INIT(post_kernel, POST_KERNEL, 0);
 ZTEST(test_task_shim, test_task_get_current_post_kernel)
 {
 	zassert_true(post_kernel_ran);
+}
+
+static K_SEM_DEFINE(sysworkq_wait_test_done, 0, 1);
+
+static void sysworkq_wait_test_work_fn(struct k_work *work)
+{
+	ARG_UNUSED(work);
+
+	(void)task_wait_event(0);
+	(void)task_wait_event_mask(TASK_EVENT_CUSTOM_BIT(0), 0);
+	k_sem_give(&sysworkq_wait_test_done);
+}
+static K_WORK_DEFINE(sysworkq_wait_test_work, sysworkq_wait_test_work_fn);
+
+ZTEST(test_task_shim, test_sysworkq_task_wait_violation)
+{
+	sysworkq_audit_reset_violation_count();
+	zassert_equal(task_wait_event_mask(TASK_EVENT_CUSTOM_BIT(0), 0),
+		      TASK_EVENT_TIMER);
+	zassert_equal(sysworkq_audit_get_violation_count(), 0);
+
+	k_work_submit(&sysworkq_wait_test_work);
+	zassert_ok(k_sem_take(&sysworkq_wait_test_done, K_SECONDS(1)));
+	zassert_equal(sysworkq_audit_get_violation_count(), 2);
+	sysworkq_audit_reset_violation_count();
 }
 
 ZTEST_SUITE(test_task_shim, NULL, tasks_setup, NULL, NULL, NULL);

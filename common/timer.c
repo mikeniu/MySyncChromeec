@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "console.h"
+#include "hooks.h"
 #include "hwtimer.h"
 #include "timer.h"
 #include "util.h"
@@ -41,6 +42,11 @@ int crec_usleep(unsigned int us)
 	if (!us) {
 		return 0;
 	}
+
+#if defined(CONFIG_PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK)
+	sysworkq_audit_check_non_blocking(__func__,
+					  __builtin_return_address(0));
+#endif
 
 	while (us) {
 		us = k_usleep(us);

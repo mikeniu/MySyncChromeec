@@ -9,6 +9,7 @@ tests:
   tasks.default:
     extra_configs:
       - CONFIG_HAS_TEST_TASKS=y
+      - CONFIG_PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK=y
   tasks.extra_tasks:
     extra_configs:
       - CONFIG_SHIMMED_TASKS=y
