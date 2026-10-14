@@ -1,0 +1,105 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f3e66be_d9916f43",
+        "filename": "firmware_builder.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T13:37:46Z",
+      "side": 1,
+      "message": "The original shebang included the `-u` flag for unbuffered output. Removing it might cause delayed or mixed output in logs. Consider using `#!/usr/bin/env -S vpython3 -u` to restore the original behavior.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 0
+      },
+      "revId": "b46a40061dd8433bd5325976617ee1625b92d13f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cbfd4ab_26e6ded7",
+        "filename": "firmware_builder.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T13:37:46Z",
+      "side": 1,
+      "message": "Redundant call: `firmware_builder_util.py` already calls `setup_path()` at module import time (line 23). Also note that `crrev.com/c/8527849` just landed on `ec-legacy`, adding `util/repository_prep.py` (`find_checkout()`, `prepared_workspace()`), so this CL will need a rebase onto `ec-legacy` HEAD.",
+      "isAi": true,
+      "revId": "b46a40061dd8433bd5325976617ee1625b92d13f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "153587db_e81ae690",
+        "filename": "firmware_builder.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T13:37:46Z",
+      "side": 1,
+      "message": "A few architectural and reproducibility points on `INSTALL_PACKAGES_LIST`:\n\n1. **Pinning versions instead of `\"latest\"`**: Using `package_version\u003d\"latest\"` means any future upload to CIPD can silently change or break builds across `ec-legacy` and release branches without a commit. Please pin explicit version tags/hashes (or read pinned versions from config).\n2. **Using existing CrOS SDK standalone toolchains (`b/522844685`) instead of custom `clang`/`gcc` subtools**:\n   - The CrOS SDK builder (`cros_setup_toolchains.py --create-packages`) already builds and publishes standalone, `lddtree`-wrapped toolchain tarballs containing Clang/LLVM, the real `sysroot_wrapper`, `compiler-rt` baremetal builtins (`libclang_rt.builtins-{armv7m,armv6m,riscv32}.a`), `newlib`/`glibc`, `libcxx`, `libunwind`, and `binutils` to `gs://chromiumos-sdk/\u003cTC_PATH\u003e` (`armv7m-cros-eabi`, `arm-none-eabi`, `riscv32-cros-elf`, and `x86_64-cros-linux-gnu`), with the verified version pinned in `chromiumos-overlay/chromeos/binhost/host/sdk_version.conf`.\n   - Following the same pattern as `util/coreboot_sdk.py` (which reads `coreboot-sdk-ec-dependencies.eclass` and downloads into `~/.cache/`), we can read `sdk_version.conf` and pull those official standalone toolchain tarballs rather than maintaining hand-written compiler wrappers in `chromiumos-overlay`.\n3. **`openssl` package**: `experimental/pbusse_at_google.com/chromiumos/infra/tools/openssl` is not defined in `crrev.com/c/8566017`. Also note that EC host utilities query `pkg-config --cflags --libs libcrypto` (in addition to `openssl`), so if we use `infra/3pp/static_libs/openssl/linux-amd64` (or a subtool), make sure `libcrypto.pc` is present.",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 197,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b46a40061dd8433bd5325976617ee1625b92d13f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2d851b2_051b0dc5",
+        "filename": "firmware_builder.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T13:37:46Z",
+      "side": 1,
+      "message": "Verify that `./firmware_builder.py test` (both with and without `--code-coverage`) passes outside the chroot:\n- Line 536 runs `make HOST_CROSS_COMPILE\u003dx86_64-cros-linux-gnu- TEST_ASAN\u003dy BOARD\u003dhost runtests`, which invokes `x86_64-cros-linux-gnu-clang` / `x86_64-cros-linux-gnu-clang++` (present in `gs://chromiumos-sdk/.../x86_64-cros-linux-gnu-*.tar.xz`, but currently missing from `clang-subtool` in `crrev.com/c/8566017`).\n- Line 519 (`tests-bloonchipper`, `tests-dartmonkey`, `tests-helipilot`) builds `third_party/googletest` using `cmake/toolchain-armv7m.cmake`, which hardcodes `set(CMAKE_SYSROOT /usr/armv7m-cros-eabi/)` on line 9 and will fail if `/usr/armv7m-cros-eabi/` does not exist on the host machine.\n- In `Makefile.toolchain` line 105, `BUILDCC` checks `which /usr/bin/x86_64-pc-linux-gnu-$(CROSS_COMPILE_CC_NAME)` using an absolute `/usr/bin/` path; on gLinux hosts where `/usr/bin/x86_64-pc-linux-gnu-gcc` is installed via `apt`, `BUILDCC` will bypass `PATH` unless `Makefile.toolchain` checks `PATH` instead of `/usr/bin/`.",
+      "isAi": true,
+      "revId": "b46a40061dd8433bd5325976617ee1625b92d13f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d416cd48_fe6b24cd",
+        "filename": "firmware_builder_util.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T13:37:46Z",
+      "side": 1,
+      "message": "Nit: typo `enviroment` -\u003e `environment` (here and below).",
+      "isAi": true,
+      "revId": "b46a40061dd8433bd5325976617ee1625b92d13f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
