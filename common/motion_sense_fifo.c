@@ -264,7 +264,7 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 	if (valid_data > 0 && !sensor)
 		return;
 
-	mutex_lock(&g_sensor_mutex);
+	k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 
 	for (i = 0; i < valid_data; i++)
 		sensor->xyz[i] = data->data[i];
@@ -280,7 +280,7 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 			sensor->oversampling %= sensor->oversampling_ratio;
 		}
 		if (removed) {
-			mutex_unlock(&g_sensor_mutex);
+			k_mutex_unlock(&g_sensor_mutex);
 			return;
 		}
 	}
@@ -307,7 +307,7 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 		 * address 0. Just don't add any data to the queue instead.
 		 */
 		CPRINTS("Failed to get write chunk for new fifo data!");
-		mutex_unlock(&g_sensor_mutex);
+		k_mutex_unlock(&g_sensor_mutex);
 		return;
 	}
 
@@ -335,7 +335,7 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 			fifo_staged.requires_spreading = 1;
 	}
 
-	mutex_unlock(&g_sensor_mutex);
+	k_mutex_unlock(&g_sensor_mutex);
 }
 
 /**
@@ -537,7 +537,7 @@ void motion_sense_fifo_commit_data(void)
 	if (!fifo_staged.count)
 		return;
 
-	mutex_lock(&g_sensor_mutex);
+	k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 	/*
 	 * If per-sensor event counts are never more than 1, no spreading is
 	 * needed. This will also catch cases where tight timestamps aren't
@@ -609,7 +609,7 @@ commit_data_end:
 	/* Reset metadata for next staging cycle. */
 	memset(&fifo_staged, 0, sizeof(fifo_staged));
 
-	mutex_unlock(&g_sensor_mutex);
+	k_mutex_unlock(&g_sensor_mutex);
 }
 
 void motion_sense_fifo_get_info(
@@ -617,14 +617,14 @@ void motion_sense_fifo_get_info(
 {
 	int i;
 
-	mutex_lock(&g_sensor_mutex);
+	k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 	fifo_info->size = fifo.buffer_units;
 	fifo_info->count = queue_count(&fifo);
 	fifo_info->total_lost = fifo_lost;
 	for (i = 0; i < MAX_MOTION_SENSORS; i++) {
 		fifo_info->lost[i] = fifo_sensor_lost[i];
 	}
-	mutex_unlock(&g_sensor_mutex);
+	k_mutex_unlock(&g_sensor_mutex);
 #ifdef CONFIG_MKBP_EVENT
 	fifo_info->timestamp = mkbp_last_event_time;
 #endif
@@ -651,9 +651,9 @@ inline int motion_sense_fifo_over_thres(void)
 {
 	int result;
 
-	mutex_lock(&g_sensor_mutex);
+	k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 	result = queue_space(&fifo) < CONFIG_ACCEL_FIFO_THRES;
-	mutex_unlock(&g_sensor_mutex);
+	k_mutex_unlock(&g_sensor_mutex);
 
 	return result;
 }
@@ -663,11 +663,11 @@ int motion_sense_fifo_read(int capacity_bytes, int max_count, void *out,
 {
 	int count;
 
-	mutex_lock(&g_sensor_mutex);
+	k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 	count = min(capacity_bytes / fifo.unit_bytes,
 		    min(queue_count(&fifo), max_count));
 	count = queue_remove_units(&fifo, out, count);
-	mutex_unlock(&g_sensor_mutex);
+	k_mutex_unlock(&g_sensor_mutex);
 	*out_size = count * fifo.unit_bytes;
 
 	return count;

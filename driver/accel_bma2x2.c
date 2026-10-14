@@ -58,13 +58,13 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	if ((BMA2x2_REG_TO_RANGE(range_val) < range) && rnd)
 		range_val = BMA2x2_RANGE_TO_REG(range * 2);
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* Determine the new value of control reg and attempt to write it. */
 	ret = raw_read8(s->port, s->i2c_spi_addr_flags,
 			BMA2x2_RANGE_SELECT_ADDR, &range_reg_val);
 	if (ret != EC_SUCCESS) {
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		return ret;
 	}
 	reg_val = (range_reg_val & ~BMA2x2_RANGE_SELECT_MSK) | range_val;
@@ -75,7 +75,7 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	if (ret == EC_SUCCESS)
 		s->current_range = BMA2x2_REG_TO_RANGE(range_val);
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -103,13 +103,13 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 			odr_val = BMA2x2_BW_TO_REG(rate * 2);
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* Determine the new value of control reg and attempt to write it. */
 	ret = raw_read8(s->port, s->i2c_spi_addr_flags, BMA2x2_BW_SELECT_ADDR,
 			&odr_reg_val);
 	if (ret != EC_SUCCESS) {
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		return ret;
 	}
 	reg_val = (odr_reg_val & ~BMA2x2_BW_MSK) | odr_val;
@@ -121,7 +121,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	if (ret == EC_SUCCESS)
 		data->odr = BMA2x2_REG_TO_BW(odr_val);
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -179,10 +179,10 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 	int ret, i;
 
 	/* Read 6 bytes starting at X_AXIS_LSB. */
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	ret = i2c_read_block(s->port, s->i2c_spi_addr_flags,
 			     BMA2x2_X_AXIS_LSB_ADDR, acc, 6);
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	if (ret != EC_SUCCESS)
 		return ret;
@@ -288,17 +288,17 @@ static int init(struct motion_sensor_t *s)
 	reg = BMA2x2_RST_ADDR;
 	reset_field = BMA2x2_CMD_SOFT_RESET;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = raw_read8(s->port, s->i2c_spi_addr_flags, reg, &val);
 	if (ret != EC_SUCCESS) {
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		return ret;
 	}
 	val |= reset_field;
 	ret = raw_write8(s->port, s->i2c_spi_addr_flags, reg, val);
 	if (ret != EC_SUCCESS) {
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		return ret;
 	}
 
@@ -313,12 +313,12 @@ static int init(struct motion_sensor_t *s)
 		/* Check for tires. */
 		if (tries++ > SENSOR_ENABLE_ATTEMPTS) {
 			ret = EC_ERROR_TIMEOUT;
-			mutex_unlock(s->mutex);
+			k_mutex_unlock(s->mutex);
 			return ret;
 		}
 		crec_msleep(1);
 	} while (1);
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return sensor_init_done(s);
 }

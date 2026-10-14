@@ -291,10 +291,10 @@ static int set_value(const struct motion_sensor_t *s, int reg, int val,
 	int ret, reg_val_new, reg_val;
 
 	/* Disable the sensor to allow for changing of critical parameters. */
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	ret = disable_sensor(s, &reg_val);
 	if (ret != EC_SUCCESS) {
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		return ret;
 	}
 
@@ -307,7 +307,7 @@ static int set_value(const struct motion_sensor_t *s, int reg, int val,
 		/* Re-enable the sensor. */
 		ret = enable_sensor(s, reg_val_new);
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -476,13 +476,13 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 
 	/* Read 6 bytes starting at XOUT_L. */
 	reg = KIONIX_XOUT_L(V(s));
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	ret = raw_read_multi(s->port, s->i2c_spi_addr_flags, reg, acc, 6);
 	if (IS_ENABLED(CONFIG_KX022_ORIENTATION_SENSOR) &&
 	    (s->location == MOTIONSENSE_LOC_LID) && (V(s) == 0) &&
 	    (ret == EC_SUCCESS))
 		ret = check_orientation_locked(s);
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	if (ret != EC_SUCCESS)
 		return ret;
@@ -526,7 +526,7 @@ static int init(struct motion_sensor_t *s)
 	int ret, val, reg, reset_field;
 	uint8_t timeout;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	if (V(s)) {
 		/* The chip can take up to 10ms to boot */
 		reg = KIONIX_WHO_AM_I(V(s));
@@ -632,7 +632,7 @@ static int init(struct motion_sensor_t *s)
 		goto reset_failed;
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	/* Initialize with the desired parameters. */
 	if (V(s))
@@ -645,7 +645,7 @@ static int init(struct motion_sensor_t *s)
 	return sensor_init_done(s);
 
 reset_failed:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 

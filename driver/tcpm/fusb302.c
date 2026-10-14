@@ -119,7 +119,7 @@ static int measure_cc_pin_source(int port, int cc_measure)
 	int reg;
 	int cc_lvl;
 
-	mutex_lock(&measure_lock);
+	k_mutex_lock(&measure_lock, K_FOREVER);
 
 	/* Read status register */
 	tcpc_read(port, TCPC_REG_SWITCHES0, &reg);
@@ -168,7 +168,7 @@ static int measure_cc_pin_source(int port, int cc_measure)
 	/* Restore SWITCHES0 register to its value prior */
 	tcpc_write(port, TCPC_REG_SWITCHES0, switches0_reg);
 
-	mutex_unlock(&measure_lock);
+	k_mutex_unlock(&measure_lock);
 
 	return cc_lvl;
 }
@@ -204,7 +204,7 @@ static void detect_cc_pin_sink(int port, enum tcpc_cc_voltage_status *cc1,
 	int bc_lvl_cc1;
 	int bc_lvl_cc2;
 
-	mutex_lock(&measure_lock);
+	k_mutex_lock(&measure_lock, K_FOREVER);
 
 	/*
 	 * Measure CC1 first.
@@ -276,7 +276,7 @@ static void detect_cc_pin_sink(int port, enum tcpc_cc_voltage_status *cc1,
 
 	tcpc_write(port, TCPC_REG_SWITCHES0, reg);
 
-	mutex_unlock(&measure_lock);
+	k_mutex_unlock(&measure_lock);
 }
 
 /* Parse header bytes for the size of packet */
@@ -1134,7 +1134,7 @@ static int fusb302_compare_mdac(int port, int mdac)
 {
 	int orig_reg, status0;
 
-	mutex_lock(&measure_lock);
+	k_mutex_lock(&measure_lock, K_FOREVER);
 
 	/* backup REG_MEASURE */
 	tcpc_read(port, TCPC_REG_MEASURE, &orig_reg);
@@ -1153,7 +1153,7 @@ static int fusb302_compare_mdac(int port, int mdac)
 	/* write back original value */
 	tcpc_write(port, TCPC_REG_MEASURE, orig_reg);
 
-	mutex_unlock(&measure_lock);
+	k_mutex_unlock(&measure_lock);
 
 	return status0 & TCPC_REG_STATUS0_COMP;
 }
