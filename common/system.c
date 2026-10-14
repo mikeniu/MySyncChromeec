@@ -892,6 +892,15 @@ static void init_jump_data(void)
 	jdata = get_jump_data();
 
 	/*
+	 * Discard stale jump data if a hardware watchdog reset in RO
+	 * interrupted the jumped-to image before it could clear jdata->magic.
+	 */
+	if (IS_ENABLED(CONFIG_CROS_EC_RO) &&
+	    (reset_flags & EC_RESET_FLAG_WATCHDOG)) {
+		goto clear_jump_data;
+	}
+
+	/*
 	 * Check jump data if this is a jump between images.
 	 */
 	if (jdata->magic == JUMP_DATA_MAGIC && jdata->version >= 1) {
