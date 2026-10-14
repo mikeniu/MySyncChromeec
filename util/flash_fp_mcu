@@ -256,6 +256,21 @@ get_sysfs_gpiochip_base() {
   return 1
 }
 
+# Get the gpiochip device name (e.g. gpiochip0) from /sys/bus/gpio/devices
+# that matches a controller device path (e.g. INTC10EC:00).
+get_gpiochip_by_dev() {
+  local match="$1"
+
+  for chip in /sys/bus/gpio/devices/gpiochip*; do
+    if readlink "${chip}" | grep -q "${match}"; then
+      basename "${chip}"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 # Get the spiid for the fingerprint sensor based on the modalias
 # string: https://crbug.com/955117
 get_spiid() {
@@ -379,23 +394,32 @@ _gpio_new() {
   local cmd="$1"
   shift
 
-  if [[ -z "${GPIO_CHIP}" ]]; then
+  for signal in "$@"; do
+    local gpio_chip="${GPIO_CHIP}"
+    local gpio_line="${signal}"
+    case "${signal}" in
+      *:*)
+        gpio_chip="${signal%%:*}"
+        gpio_line="${signal#*:}"
+        ;;
+    esac
+
+    if [[ -z "${gpio_chip}" ]]; then
       echo "Error: GPIO_CHIP variable is not set." >&2
       exit "${EXIT_CONFIG}"
-  fi
+    fi
 
-  for signal in "$@"; do
     case "${cmd}" in
       0|1)
         if [[ "${GPIOSET_SUPPORTS_HOLD}" -eq 1 ]]; then
-          _gpioset_hold "${GPIO_CHIP}" "${signal}" "${cmd}"
+          _gpioset_hold "${gpio_chip}" "${gpio_line}" "${cmd}"
         else
-          _gpioset "${GPIO_CHIP}" "${signal}" "${cmd}"
+          _gpioset "${gpio_chip}" "${gpio_line}" "${cmd}"
         fi
         ;;
       get)
-        klog "Get GPIO ${GPIO_CHIP}/${signal}"
-        gpioget "${GPIO_CHIP}" "${signal}"
+        klog "Get GPIO ${gpio_chip}/${gpio_line}"
+        gpioget "${gpio_chip}" "${gpio_line}"
         ;;
       unexport|export|in|out)
         # no-op
@@ -542,7 +566,7 @@ get_board_version() {
 power_cycle_fpmcu() {
   local gpio_pwren="${1}"
 
-  if [[ "${gpio_pwren}" -gt 0 ]]; then
+  if [[ -n "${gpio_pwren}" && "${gpio_pwren#*:}" -gt 0 ]]; then
     echo "Power cycling the FPMCU."
     gpio export "${gpio_pwren}"
     gpio out    "${gpio_pwren}"
@@ -1010,7 +1034,7 @@ flash_fp_mcu_board() {
   # when SW-WP is enabled and HW-WP is disabled. It is avoided if a POR is
   # detected on boot. We force a POR here to ensure we avoid this reboot loop.
   # See to b/146428434.
-  if [[ "${gpio_pwren}" -gt 0 ]]; then
+  if [[ -n "${gpio_pwren}" && "${gpio_pwren#*:}" -gt 0 ]]; then
     power_cycle_fpmcu "${gpio_pwren}"
   else
     echo "Reset the FPMCU."
@@ -1437,14 +1461,21 @@ config_ocelot() {
   fi
   readonly DEVICE="${spidev}"
 
-  readonly GPIO_CHIP="gpiochip0"
+  local chip_c
+  local chip_e
+  if ! chip_c="$(get_gpiochip_by_dev "INTC10EC:00")" || \
+     ! chip_e="$(get_gpiochip_by_dev "INTC10EC:01")"; then
+    return 1
+  fi
+  readonly GPIO_CHIP="${chip_c}"
 
-  # FPMCU FPS_RST_N(RST_ODL) is on GPP_C15 = Base 24 + Pin 15 = 39
-  readonly GPIO_NRST=39
-  # FPMCU FPMCU_FW_UPDATE(BOOT0) is on GPP_E20 = Base 26 + Pin 20 = 46
-  readonly GPIO_BOOT0=46
-  # FPMCU_PWREN(FP_PWR_EN) is on GPP_E5 = Base 26 + Pin 5 = 31
-  readonly GPIO_PWREN=31
+  # FPMCU FPS_RST_N(RST_ODL) is on GPP_C15 (INTC10EC:00) = Base 24 + Pin 15 = 39
+  readonly GPIO_NRST="${chip_c}:39"
+  # FPMCU FPMCU_FW_UPDATE(BOOT0) is on GPP_E20 (INTC10EC:01) =
+  # Base 26 + Pin 20 = 46
+  readonly GPIO_BOOT0="${chip_e}:46"
+  # FPMCU_PWREN(FP_PWR_EN) is on GPP_E5 (INTC10EC:01) = Base 26 + Pin 5 = 31
+  readonly GPIO_PWREN="${chip_e}:31"
 }
 
 config_nissa() {

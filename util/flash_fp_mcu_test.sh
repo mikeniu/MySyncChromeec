@@ -87,4 +87,15 @@ assert_eq "${EXIT_ARGUMENT}" "${ret}" \
   assert_eq "/dev/spidev0.1" "$(get_spidev)" "get_spidev for spi0.1 on spi0"
 )
 
+# 6. <chip>:<line> GPIO tuple routing in _gpio_new
+(
+  GPIO_CHIP="gpiochip0"
+  GPIOSET_SUPPORTS_HOLD=0
+  calls=""
+  _gpioset() { calls="${calls}$1:$2=$3;"; }
+  _gpio_new 1 "gpiochip1:46" "39"
+  assert_eq "gpiochip1:46=1;gpiochip0:39=1;" "${calls}" \
+    "_gpio_new <chip>:<line> routing"
+)
+
 echo "PASS"
