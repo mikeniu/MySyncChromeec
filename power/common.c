@@ -1145,7 +1145,7 @@ static K_MUTEX_DEFINE(pwr_5v_ctl_mtx);
 
 void power_5v_enable(task_id_t tid, int enable)
 {
-	mutex_lock(&pwr_5v_ctl_mtx);
+	k_mutex_lock(&pwr_5v_ctl_mtx, K_FOREVER);
 
 	if (enable) /* Set the bit indicating the request. */
 		pwr_5v_en_req |= 1 << tid;
@@ -1157,7 +1157,7 @@ void power_5v_enable(task_id_t tid, int enable)
 	 * turn on the rail.  Otherwise, turn it off.
 	 */
 	board_power_5v_enable(pwr_5v_en_req);
-	mutex_unlock(&pwr_5v_ctl_mtx);
+	k_mutex_unlock(&pwr_5v_ctl_mtx);
 }
 
 #define P5_SYSJUMP_TAG 0x5005 /* "P5" */
@@ -1168,9 +1168,9 @@ static void restore_enable_5v_state(void)
 
 	state = (const uint32_t *)system_get_jump_tag(P5_SYSJUMP_TAG, 0, &size);
 	if (state && size == sizeof(pwr_5v_en_req)) {
-		mutex_lock(&pwr_5v_ctl_mtx);
+		k_mutex_lock(&pwr_5v_ctl_mtx, K_FOREVER);
 		pwr_5v_en_req |= *state;
-		mutex_unlock(&pwr_5v_ctl_mtx);
+		k_mutex_unlock(&pwr_5v_ctl_mtx);
 	}
 }
 DECLARE_HOOK(HOOK_INIT, restore_enable_5v_state, HOOK_PRIO_FIRST);

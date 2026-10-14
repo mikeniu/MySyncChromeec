@@ -41,7 +41,7 @@ void throttle_ap(enum throttle_level level, enum throttle_type type,
 {
 	uint32_t tmpval, bitmask;
 
-	mutex_lock(&throttle_mutex);
+	k_mutex_lock(&throttle_mutex, K_FOREVER);
 
 	bitmask = BIT(source);
 
@@ -75,7 +75,7 @@ void throttle_ap(enum throttle_level level, enum throttle_type type,
 		break;
 	}
 
-	mutex_unlock(&throttle_mutex);
+	k_mutex_unlock(&throttle_mutex);
 
 	/* print outside the mutex */
 	CPRINTS("set AP throttling type %d to %s (0x%08x)", type,
@@ -193,9 +193,9 @@ static int command_apthrottle(int argc, const char **argv)
 	uint32_t tmpval;
 
 	for (i = 0; i < NUM_THROTTLE_TYPES; i++) {
-		mutex_lock(&throttle_mutex);
+		k_mutex_lock(&throttle_mutex, K_FOREVER);
 		tmpval = throttle_request[i];
-		mutex_unlock(&throttle_mutex);
+		k_mutex_unlock(&throttle_mutex);
 
 		ccprintf("AP throttling type %d is %s (0x%08x)\n", i,
 			 tmpval ? "on" : "off", tmpval);

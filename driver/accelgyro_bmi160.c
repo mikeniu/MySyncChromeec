@@ -132,7 +132,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	 * Lock accel resource to prevent another task from attempting
 	 * to write accel parameters until we are done.
 	 */
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = bmi_set_reg8(s, BMI_CONF_REG(s->type), reg_val, BMI_ODR_MASK);
 	if (ret != EC_SUCCESS)
@@ -166,7 +166,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 		bmi_enable_fifo(s, 1);
 
 accel_cleanup:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -378,7 +378,7 @@ config_accel_interrupt(const struct motion_sensor_t *s)
 {
 	int ret, tmp;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	bmi_write8(s->port, s->i2c_spi_addr_flags, BMI160_CMD_REG,
 		   BMI160_CMD_FIFO_FLUSH);
 	bmi_write8(s->port, s->i2c_spi_addr_flags, BMI160_CMD_REG,
@@ -457,7 +457,7 @@ config_accel_interrupt(const struct motion_sensor_t *s)
 		bmi_enable_reg8(s, BMI160_INT_EN_1,
 				BMI160_INT_FWM_EN | BMI160_INT_FFUL_EN, 1);
 	}
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 

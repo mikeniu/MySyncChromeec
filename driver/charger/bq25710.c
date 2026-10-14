@@ -132,7 +132,7 @@
  * power is connected or when the EN_LWPWR bit in ChargeOption0 is clear.
  */
 static uint32_t bq25710_perf_mode_req;
-static mutex_t bq25710_perf_mode_mutex;
+static struct k_mutex bq25710_perf_mode_mutex;
 #endif
 
 /*
@@ -239,7 +239,7 @@ static int bq25710_set_low_power_mode(int chgnum, int enable)
 		return rv;
 
 #ifdef CONFIG_CHARGER_BQ25710_IDCHG_LIMIT_MA
-	mutex_lock(&bq25710_perf_mode_mutex);
+	k_mutex_lock(&bq25710_perf_mode_mutex, K_FOREVER);
 	/*
 	 * Performance mode means not in low power mode. The bit that controls
 	 * this is EN_LWPWR in ChargeOption0. The 'enable' param in this
@@ -262,7 +262,7 @@ static int bq25710_set_low_power_mode(int chgnum, int enable)
 
 	rv = raw_write16(chgnum, BQ25710_REG_CHARGE_OPTION_0, reg);
 #ifdef CONFIG_CHARGER_BQ25710_IDCHG_LIMIT_MA
-	mutex_unlock(&bq25710_perf_mode_mutex);
+	k_mutex_unlock(&bq25710_perf_mode_mutex);
 #endif
 	if (rv)
 		return rv;

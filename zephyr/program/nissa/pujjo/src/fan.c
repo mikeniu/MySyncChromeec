@@ -79,10 +79,10 @@ void check_fan_status(void)
 K_MUTEX_DEFINE(check_fan_lock);
 int cbi_board_override(enum cbi_data_tag tag, uint8_t *buf, uint8_t *size)
 {
-	mutex_lock(&check_fan_lock);
+	k_mutex_lock(&check_fan_lock, K_FOREVER);
 	if (override_flag == OVERRIDE_CHECK)
 		check_fan_status();
-	mutex_unlock(&check_fan_lock);
+	k_mutex_unlock(&check_fan_lock);
 	if (override_flag == OVERRIDE_15W) {
 		switch (tag) {
 		case CBI_TAG_SKU_ID:

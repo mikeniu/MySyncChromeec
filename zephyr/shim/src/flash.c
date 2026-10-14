@@ -35,9 +35,9 @@ K_MUTEX_DEFINE(flash_lock);
 void crec_flash_lock_mapped_storage(int lock)
 {
 	if (lock)
-		mutex_lock(&flash_lock);
+		k_mutex_lock(&flash_lock, K_FOREVER);
 	else
-		mutex_unlock(&flash_lock);
+		k_mutex_unlock(&flash_lock);
 }
 #endif
 
