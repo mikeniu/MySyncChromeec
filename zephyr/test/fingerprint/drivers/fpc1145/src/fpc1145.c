@@ -167,8 +167,20 @@ ZTEST_F(fpc1145, test_get_info)
 	}
 }
 
+FAKE_VOID_FUNC(test_interrupt_handler, const struct device *);
+
 ZTEST_F(fpc1145, test_enter_low_power_mode)
 {
+	const struct gpio_dt_spec spec =
+		GPIO_DT_SPEC_GET(DT_NODELABEL(fpc1145), irq_gpios);
+
+	RESET_FAKE(test_interrupt_handler);
+	zassert_ok(fingerprint_config(fixture->dev, test_interrupt_handler));
+
+	/* Enable interrupt (they are disabled by default). */
+	zassert_ok(gpio_pin_interrupt_configure_dt(&spec,
+						   GPIO_INT_EDGE_TO_ACTIVE));
+
 	zassert_ok(fingerprint_set_mode(fixture->dev,
 					FINGERPRINT_SENSOR_MODE_LOW_POWER));
 	/*
@@ -176,6 +188,17 @@ ZTEST_F(fpc1145, test_enter_low_power_mode)
 	 * latency, expected power consumption).
 	 */
 	zassert_equal(fpc1145_get_low_power_mode(fixture->target), 0);
+
+	/*
+	 * Toggle the GPIO. We expect that entering low power mode disabled
+	 * the interrupt, so the handler should not be called.
+	 */
+	gpio_emul_input_set(spec.port, spec.pin, 1);
+	k_msleep(5);
+	gpio_emul_input_set(spec.port, spec.pin, 0);
+	k_msleep(5);
+
+	zassert_equal(test_interrupt_handler_fake.call_count, 0);
 }
 
 ZTEST_F(fpc1145, test_enter_idle)
@@ -188,8 +211,6 @@ ZTEST_F(fpc1145, test_invalid_mode_not_supported)
 {
 	zassert_equal(fingerprint_set_mode(fixture->dev, UINT16_MAX), -ENOTSUP);
 }
-
-FAKE_VOID_FUNC(test_interrupt_handler, const struct device *);
 
 ZTEST_F(fpc1145, test_interrupt)
 {
