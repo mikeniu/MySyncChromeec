@@ -14,7 +14,7 @@ if ISH_CHRE
 
 config CHRE_DYNAMIC_MEMORY_SIZE
 	int "CHRE memory pool size"
-	default 16384
+	default 65536
 	help
 	  Size of the CHRE dynamic memory pool in bytes.
 
@@ -32,7 +32,7 @@ config ISH_CHRE_PRIORITY
 
 config CHRE_TIMER_WORLD
 	bool "Load TimerWorld static nanoapp"
-	default y
+	default n
 	help
 	  Statically link and run the CHRE TimerWorld example nanoapp
 	  at boot to verify the CHRE event loop, timers, and nanoapp runtime.
@@ -43,5 +43,13 @@ config CHRE_HELLO_WORLD
 	help
 	  Statically link and run the CHRE HelloWorld example nanoapp
 	  at boot to verify the CHRE event loop and nanoapp runtime.
+
+config CHRE_DYNAMIC_NANOAPPS
+	bool "Build dynamic nanoapps alongside ISH image"
+	default y
+	help
+	  Build dynamic nanoapps (.so) targeting ISH alongside the ISH image.
+	  The resulting nanoapps are output under nanoapps/ in the build
+	  directory, ready for loading via ectool chreload.
 
 endif # ISH_CHRE
