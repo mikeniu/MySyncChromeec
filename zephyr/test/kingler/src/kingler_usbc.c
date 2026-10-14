@@ -33,7 +33,6 @@ void ppc_interrupt(enum gpio_signal);
 void ccd_interrupt(enum gpio_signal);
 void bc12_interrupt(enum gpio_signal);
 
-FAKE_VALUE_FUNC(bool, in_interrupt_context);
 FAKE_VALUE_FUNC(bool, ps8743_field_update, const struct usb_mux *, uint8_t,
 		uint8_t, uint8_t);
 FAKE_VALUE_FUNC(enum corsola_db_type, corsola_get_db_type);
@@ -53,7 +52,6 @@ FAKE_VOID_FUNC(usb_mux_hpd_update, int, mux_state_t);
 	FAKE(board_get_adjusted_usb_pd_port_count) \
 	FAKE(corsola_get_db_type)                  \
 	FAKE(hdmi_hpd_interrupt)                   \
-	FAKE(in_interrupt_context)                 \
 	FAKE(nx20p348x_interrupt)                  \
 	FAKE(ppc_vbus_sink_enable)                 \
 	FAKE(ps185_hdmi_hpd_mux_set)               \

@@ -350,20 +350,3 @@ int task_start_called(void)
 {
 	return tasks_started;
 }
-
-inline bool in_interrupt_context(void)
-{
-	return k_is_in_isr();
-}
-
-inline bool in_deferred_context(void)
-{
-	/* k_current_get() is not valid pre kernel */
-	if (k_is_pre_kernel()) {
-		return false;
-	}
-	/*
-	 * Deferred calls run in the sysworkq.
-	 */
-	return (k_current_get() == get_sysworkq_thread());
-}

@@ -7,9 +7,10 @@
 #include "console.h"
 #include "event_log.h"
 #include "hooks.h"
-#include "task.h"
 #include "timer.h"
 #include "util.h"
+
+#include <zephyr/irq.h>
 
 /* Event log FIFO */
 #define UNIT_SIZE sizeof(struct event_log_entry)
@@ -142,9 +143,10 @@ static int command_dlog(int argc, const char **argv)
 
 	if (argc > 1) {
 		if (!strcasecmp(argv[1], "clear")) {
-			interrupt_disable();
+			uint32_t lock_key = irq_lock();
+
 			log_head = log_tail = log_tail_next = 0;
-			interrupt_enable();
+			irq_unlock(lock_key);
 
 			return EC_SUCCESS;
 		}
