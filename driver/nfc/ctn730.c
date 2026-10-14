@@ -149,7 +149,7 @@ static int _i2c_read(int i2c_port, uint8_t *in, int in_len)
 
 	rv = i2c_xfer(i2c_port, CTN730_I2C_ADDR, NULL, 0, in, in_len);
 	if (rv) {
-		crec_msleep(_wake_up_delay_ms);
+		k_msleep(_wake_up_delay_ms);
 		rv = i2c_xfer(i2c_port, CTN730_I2C_ADDR, NULL, 0, in, in_len);
 	}
 	if (rv)
@@ -175,7 +175,7 @@ static int _send_command(struct pchg *ctx, const struct ctn730_msg *cmd)
 		      sizeof(*cmd) + cmd->length, NULL, 0);
 
 	if (rv) {
-		crec_msleep(_wake_up_delay_ms);
+		k_msleep(_wake_up_delay_ms);
 		rv = i2c_xfer(i2c_port, CTN730_I2C_ADDR, (void *)cmd,
 			      sizeof(*cmd) + cmd->length, NULL, 0);
 	}
@@ -193,7 +193,7 @@ static int ctn730_reset(struct pchg *ctx)
 	 * especially if it's long (e.g. ~1 ms) since the PCHG state machine
 	 * may try to access the I2C bus, which is held low by ctn730.
 	 */
-	udelay(15);
+	k_busy_wait(15);
 	gpio_set_level(GPIO_WLC_NRST_CONN, 1);
 	return EC_SUCCESS_IN_PROGRESS;
 }
@@ -409,7 +409,7 @@ static int _process_payload_event(struct pchg *ctx, struct ctn730_msg *res)
 			 * ctn730 isn't immediately ready for i2c write after
 			 * normal mode initialization (b:178096436).
 			 */
-			crec_msleep(5);
+			k_msleep(5);
 		} else if (buf[0] == WLC_HOST_CTRL_RESET_EVT_DOWNLOAD_MODE) {
 			if (len != WLC_HOST_CTRL_RESET_EVT_DOWNLOAD_MODE_SIZE)
 				return EC_ERROR_INVAL;
@@ -679,7 +679,7 @@ static int _send_command_blocking(struct pchg *ctx, uint8_t *buf, int buf_len)
 
 	/* Busy loop */
 	while (gpio_get_level(irq_pin) == 0 && !rv) {
-		udelay(1 * MSEC);
+		k_busy_wait(1 * MSEC);
 		rv = timestamp_expired(deadline, NULL);
 		watchdog_reload();
 	}

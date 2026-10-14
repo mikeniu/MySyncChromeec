@@ -329,7 +329,7 @@ static int bq25710_adc_start(int chgnum, int adc_en_mask)
 	 */
 	do {
 		/* sleep 2 ms so we time out after 2x the expected time */
-		crec_msleep(2);
+		k_msleep(2);
 		raw_read16(chgnum, BQ25710_REG_ADC_OPTION, &reg);
 	} while (--tries_left &&
 		 (reg & BQ_FIELD_MASK(BQ257X0, ADC_OPTION, ADC_START)));
@@ -627,7 +627,7 @@ static void bq25710_init(int chgnum)
 	if (!system_jumped_late()) {
 		rv = bq25710_set_low_power_mode(chgnum, 0);
 		/* Allow enough time for VDDA to be powered */
-		crec_msleep(BQ25710_VDDA_STARTUP_DELAY_MSEC);
+		k_msleep(BQ25710_VDDA_STARTUP_DELAY_MSEC);
 
 		if (IS_ENABLED(
 			    CONFIG_CHARGER_BQ25710_VSYS_MIN_VOLTAGE_CUSTOM)) {

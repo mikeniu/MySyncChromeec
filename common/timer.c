@@ -100,13 +100,9 @@ __overridable uint32_t __hw_clock_source_read(void)
 void timer_print_info(void)
 {
 	timestamp_t t = get_time();
-	uint64_t deadline = (uint64_t)t.le.hi << 32 | __hw_clock_event_get();
-	uint64_t delta = deadline - t.val;
 
-	ccprintf("Time:     0x%016llx us, %4lld.%06lld s\n"
-		 "Deadline: 0x%016llx -> %4lld.%06lld s from now\n",
-		 t.val, t.val / USEC_PER_SEC, t.val % USEC_PER_SEC, deadline,
-		 delta / USEC_PER_SEC, delta % USEC_PER_SEC);
+	ccprintf("Time:     0x%016llx us, %4lld.%06lld s\n", t.val,
+		 t.val / USEC_PER_SEC, t.val % USEC_PER_SEC);
 	cflush();
 }
 
@@ -139,7 +135,7 @@ static int command_wait(int argc, const char **argv)
 	 * watchdog timeout. This is intended behaviour and is in fact used by
 	 * a FAFT test to check that the watchdog timer is working.
 	 */
-	udelay(i * 1000);
+	k_busy_wait(i * 1000);
 
 	return EC_SUCCESS;
 }

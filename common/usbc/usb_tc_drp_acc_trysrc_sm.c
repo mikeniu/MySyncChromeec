@@ -1017,7 +1017,7 @@ void pd_set_suspend(int port, int suspend)
 					wait * SUSPEND_SLEEP_DELAY);
 				return;
 			}
-			crec_msleep(SUSPEND_SLEEP_DELAY);
+			k_msleep(SUSPEND_SLEEP_DELAY);
 		}
 	} else {
 		TC_CLR_FLAG(port, TC_FLAGS_REQUEST_SUSPEND);

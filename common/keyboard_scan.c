@@ -220,7 +220,7 @@ static void ensure_keyboard_scanned(int old_polls)
 	 */
 	while ((kbd_polls == old_polls) &&
 	       (get_time().val - start_time < SCAN_TASK_TIMEOUT_US))
-		crec_usleep(keyscan_config.stable_scan_period_us);
+		k_usleep(keyscan_config.stable_scan_period_us);
 }
 
 #ifdef CONFIG_KEYBOARD_SCAN_ADC
@@ -300,8 +300,8 @@ static void simulate_key(int row, int col, int pressed)
 	 * That means it needs to have run and for enough time.
 	 */
 	ensure_keyboard_scanned(old_polls);
-	crec_usleep(pressed ? keyscan_config.debounce_down_us :
-			      keyscan_config.debounce_up_us);
+	k_usleep(pressed ? keyscan_config.debounce_down_us :
+			   keyscan_config.debounce_up_us);
 	ensure_keyboard_scanned(kbd_polls);
 }
 
@@ -316,8 +316,8 @@ static bool power_button_raw_pressed(void)
 /**
  * Read the raw keyboard matrix state.
  *
- * Used in pre-init, so must not make task-switching-dependent calls; udelay()
- * is ok because it's a spin-loop.
+ * Used in pre-init, so must not make task-switching-dependent calls;
+ * k_busy_wait() is ok because it's a spin-loop.
  *
  * @param state		Destination for new state (must be KEYBOARD_COLS_MAX
  *			long).
@@ -349,12 +349,12 @@ static int read_matrix(uint8_t *state, bool at_boot)
 
 		/* Select column, then wait a bit for it to settle */
 		keyboard_raw_drive_column(c);
-		udelay(keyscan_config.output_settle_us);
+		k_busy_wait(keyscan_config.output_settle_us);
 
 		/* Only add the extre delay when selecting or deselecting COL2
 		 */
 		if (c == COL2 || c == (COL2 + 1)) {
-			udelay(COL2_DELAY_US);
+			k_busy_wait(COL2_DELAY_US);
 		}
 
 		/* Read the row state */
@@ -804,7 +804,7 @@ static uint8_t keyboard_scan_column(int column)
 	uint8_t state;
 
 	keyboard_raw_drive_column(column);
-	udelay(keyscan_config.output_settle_us + COL2_DELAY_US);
+	k_busy_wait(keyscan_config.output_settle_us + COL2_DELAY_US);
 #ifdef CONFIG_KEYBOARD_SCAN_ADC
 	state = keyboard_read_adc_rows();
 #else
@@ -921,7 +921,7 @@ static void read_adc_boot_keys(uint8_t *state)
 
 		/* Select column, then wait a bit for it to settle */
 		keyboard_raw_drive_column(c);
-		udelay(keyscan_config.output_settle_us + COL2_DELAY_US);
+		k_busy_wait(keyscan_config.output_settle_us + COL2_DELAY_US);
 
 		if (adc_read_channel(ADC_KSI_00 + r) >
 		    keyscan_config.ksi_threshold_mv)
@@ -1120,8 +1120,8 @@ void keyboard_scan_task(void *u)
 				 * results.
 				 */
 				keyboard_raw_drive_column(KEYBOARD_COLUMN_ALL);
-				udelay(keyscan_config.output_settle_us +
-				       COL2_DELAY_US);
+				k_busy_wait(keyscan_config.output_settle_us +
+					    COL2_DELAY_US);
 				force_poll |= local_disable_scanning;
 			} else if (!local_disable_scanning) {
 				/*
@@ -1212,7 +1212,7 @@ void keyboard_scan_task(void *u)
 			if (wait_time < post_scan_clock_us)
 				wait_time = post_scan_clock_us;
 
-			crec_usleep(wait_time);
+			k_usleep(wait_time);
 		}
 
 		/*
