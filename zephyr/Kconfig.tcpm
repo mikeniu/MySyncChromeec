@@ -345,7 +345,6 @@ config PLATFORM_EC_USB_PD_TCPM_SBU
 config PLATFORM_EC_CONSOLE_CMD_TCPC_DUMP
 	bool "Console command: tcpc_dump"
 	# anx7447 also supports this command, but is not yet enabled
-	default y
 	help
 	  Allows dumping of the Type-C Port Controller (TCPC) state, which is
 	  basically a list of registers and their values. By reference to the
