@@ -18,6 +18,48 @@
       "isAi": true,
       "revId": "486b749423252c669c7df2583babd70d0dac191a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7960e454_c8f3b5a0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_fpc1145.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T23:43:18Z",
+      "side": 1,
+      "message": "Since `case FINGERPRINT_SENSOR_MODE_LOW_POWER:` has no executable statements before `case FINGERPRINT_SENSOR_MODE_IDLE:`, it is just two `case` labels sharing the same block rather than a statement fallthrough, so `-Wimplicit-fallthrough` does not require `/* fallthrough */` here (or if you prefer keeping `LOW_POWER` and `IDLE` as separate `case` blocks like the other Zephyr fingerprint drivers, that works too).",
+      "isAi": true,
+      "revId": "486b749423252c669c7df2583babd70d0dac191a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b46e12a_e0835792",
+        "filename": "zephyr/test/fingerprint/drivers/fpc1145/src/fpc1145.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T23:43:18Z",
+      "side": 1,
+      "message": "Rather than configuring `test_interrupt_handler`, toggling the GPIO input, and sleeping, we can check the emulated GPIO interrupt flags directly via `gpio_emul_flags_get_dt`:\n\n```c\nZTEST_F(fpc1145, test_enter_low_power_mode)\n{\n\tconst struct gpio_dt_spec spec \u003d\n\t\tGPIO_DT_SPEC_GET(DT_NODELABEL(fpc1145), irq_gpios);\n\tgpio_flags_t flags;\n\n\t/* Enable interrupt (they are disabled by default). */\n\tzassert_ok(gpio_pin_interrupt_configure_dt(\u0026spec,\n\t\t\t\t\t\t   GPIO_INT_EDGE_TO_ACTIVE));\n\n\tzassert_ok(fingerprint_set_mode(fixture-\u003edev,\n\t\t\t\t\tFINGERPRINT_SENSOR_MODE_LOW_POWER));\n\t/*\n\t * TODO(b/117620462): verify that sleep mode is WAI (no increased\n\t * latency, expected power consumption).\n\t */\n\tzassert_equal(fpc1145_get_low_power_mode(fixture-\u003etarget), 0);\n\n\tzassert_ok(gpio_emul_flags_get_dt(\u0026spec, \u0026flags));\n\tzassert_equal(flags \u0026 GPIO_INT_ENABLE, 0);\n}\n```",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 55
+      },
+      "isAi": true,
+      "revId": "486b749423252c669c7df2583babd70d0dac191a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
