@@ -76,9 +76,6 @@ __overridable const struct svdm_response svdm_rsp = {
 	.modes = NULL,
 };
 
-/* Tracker for which task is waiting on sysjump prep to finish */
-static volatile task_id_t sysjump_task_waiting = TASK_ID_INVALID;
-
 #define DPM_SET_FLAG(port, flag) atomic_or(&dpm[(port)].flags, (flag))
 #define DPM_CLR_FLAG(port, flag) atomic_clear_bits(&dpm[(port)].flags, (flag))
 #define DPM_CHK_FLAG(port, flag) (dpm[(port)].flags & (flag))
@@ -157,20 +154,6 @@ static int init_dpm_mutexes(void)
 	return 0;
 }
 SYS_INIT(init_dpm_mutexes, POST_KERNEL, 50);
-
-void pd_prepare_sysjump(void)
-{
-}
-
-void notify_sysjump_ready(void)
-{
-	/*
-	 * If event was set from pd_prepare_sysjump, wake the
-	 * task waiting on us to complete.
-	 */
-	if (sysjump_task_waiting != TASK_ID_INVALID)
-		task_set_event(sysjump_task_waiting, TASK_EVENT_SYSJUMP_READY);
-}
 
 /*
  * TODO(b/270409939): Refactor this function

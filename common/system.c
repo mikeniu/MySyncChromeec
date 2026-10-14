@@ -552,10 +552,6 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	 */
 	board_pulse_entering_rw();
 
-	if (IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP))
-		/* Note: must be before i2c module is locked down */
-		pd_prepare_sysjump();
-
 #ifdef CONFIG_I2C_CONTROLLER
 	/* Prepare I2C module for sysjump */
 	i2c_prepare_sysjump();
