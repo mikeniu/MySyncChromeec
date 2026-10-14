@@ -37,11 +37,6 @@ static void after(void *f)
 
 ZTEST_SUITE(tasks, drivers_predicate_post_main, setup, before, after, NULL);
 
-ZTEST(tasks, test_interrupt_context)
-{
-	zassert_false(in_interrupt_context());
-}
-
 ZTEST(tasks, test_get_event_bitmap_invalid_tid)
 {
 	zassert_is_null(

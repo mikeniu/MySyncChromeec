@@ -67,29 +67,6 @@ extern "C" {
 #define TASK_MAX_WAIT_US 0x7fffffff
 
 /**
- * Disable CPU interrupt bit.
- *
- * This might break the system so think really hard before using these. There
- * are usually better ways of accomplishing this.
- */
-void interrupt_disable(void);
-
-/**
- * Enable CPU interrupt bit.
- */
-void interrupt_enable(void);
-
-/**
- * Check if interrupts are enabled
- */
-bool is_interrupt_enabled(void);
-
-/**
- * Return true if we are in interrupt context.
- */
-bool in_interrupt_context(void);
-
-/**
  * Set a task event.
  *
  * If the task is higher priority than the current task, this will cause an
@@ -116,11 +93,6 @@ static inline void task_wake(task_id_t tskid)
  * Return the identifier of the task currently running.
  */
 task_id_t task_get_current(void);
-
-/**
- * Check if this current task is running in deferred context
- */
-bool in_deferred_context(void);
 
 /**
  * Return a pointer to the bitmap of events of the task.

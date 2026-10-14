@@ -20,6 +20,8 @@
 #include "timer.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_HOSTCMD, outstr)
 #define CPRINTF(format, args...) cprintf(CC_HOSTCMD, format, ##args)
@@ -95,7 +97,7 @@ test_mockable void host_send_response(struct host_cmd_handler_args *args)
 	 * When a EC_CMD_RESEND_RESPONSE arrives we will supply this response
 	 * to that command.
 	 */
-	if (!in_interrupt_context()) {
+	if (!k_is_in_isr()) {
 		if (command_pending) {
 			/*
 			 * We previously got EC_RES_IN_PROGRESS.  This must be

@@ -33,7 +33,6 @@ LOG_MODULE_REGISTER(corsola_usbc);
 
 FAKE_VOID_FUNC(ppc_interrupt, enum gpio_signal);
 FAKE_VALUE_FUNC(enum corsola_db_type, corsola_get_db_type);
-FAKE_VALUE_FUNC(bool, in_interrupt_context);
 DECLARE_FAKE_VOID_FUNC(bmi3xx_interrupt);
 FAKE_VOID_FUNC(hdmi_hpd_interrupt);
 FAKE_VOID_FUNC(ps185_hdmi_hpd_mux_set);
@@ -50,7 +49,6 @@ FAKE_VOID_FUNC(bc12_interrupt, enum gpio_signal);
 
 #define FFF_FAKES_LIST(FAKE)               \
 	FAKE(corsola_get_db_type)          \
-	FAKE(in_interrupt_context)         \
 	FAKE(bmi3xx_interrupt)             \
 	FAKE(hdmi_hpd_interrupt)           \
 	FAKE(ps185_hdmi_hpd_mux_set)       \

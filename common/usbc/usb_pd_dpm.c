@@ -659,16 +659,19 @@ static int count_port_bits(uint32_t bitmask)
 /*
  * Centralized, mutex-controlled updates to the claimed 3.0 A ports
  */
+static bool deferred_waiting;
 static void balance_source_ports(void);
-DECLARE_DEFERRED(balance_source_ports);
+
+static void balance_source_ports_deferred(void)
+{
+	deferred_waiting = false;
+	balance_source_ports();
+}
+DECLARE_DEFERRED(balance_source_ports_deferred);
 
 static void balance_source_ports(void)
 {
 	uint32_t removed_ports, new_ports;
-	static bool deferred_waiting;
-
-	if (in_deferred_context())
-		deferred_waiting = false;
 
 	/*
 	 * Ignore balance attempts while we're waiting for a downgraded port to
@@ -713,7 +716,7 @@ static void balance_source_ports(void)
 
 			/* Wait tSinkAdj before using current */
 			deferred_waiting = true;
-			hook_call_deferred(&balance_source_ports_data,
+			hook_call_deferred(&balance_source_ports_deferred_data,
 					   PD_T_SINK_ADJ);
 			goto unlock;
 		} else if (source_frs_max_requested & max_current_claimed) {
@@ -725,7 +728,7 @@ static void balance_source_ports(void)
 
 			/* Give 20 ms for the PD task to process DPM flag */
 			deferred_waiting = true;
-			hook_call_deferred(&balance_source_ports_data,
+			hook_call_deferred(&balance_source_ports_deferred_data,
 					   20 * MSEC);
 			goto unlock;
 		} else {
@@ -755,7 +758,7 @@ static void balance_source_ports(void)
 
 			/* Wait tSinkAdj before using current */
 			deferred_waiting = true;
-			hook_call_deferred(&balance_source_ports_data,
+			hook_call_deferred(&balance_source_ports_deferred_data,
 					   PD_T_SINK_ADJ);
 			goto unlock;
 		} else {
