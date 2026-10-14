@@ -892,6 +892,21 @@ static void init_jump_data(void)
 	jdata = get_jump_data();
 
 	/*
+	 * On a sysjump, the previous image jumps directly to the new image's
+	 * reset vector without resetting the chip or saving flags to BBRAM. If
+	 * RO jumped to RW (setting jdata->magic = JUMP_DATA_MAGIC) and RW was
+	 * reset by the watchdog before init_jump_data() could clear
+	 * jdata->magic, stale jump data will still be in SRAM when RO boots.
+	 * Since a sysjump into RO never triggers a reset, discard jdata if RO
+	 * booted from a watchdog, soft, hard, or hibernate reset.
+	 */
+	if (IS_ENABLED(CONFIG_CROS_EC_RO) &&
+	    (reset_flags & (EC_RESET_FLAG_WATCHDOG | EC_RESET_FLAG_SOFT |
+			    EC_RESET_FLAG_HARD | EC_RESET_FLAG_HIBERNATE))) {
+		goto clear_jump_data;
+	}
+
+	/*
 	 * Check jump data if this is a jump between images.
 	 */
 	if (jdata->magic == JUMP_DATA_MAGIC && jdata->version >= 1) {
