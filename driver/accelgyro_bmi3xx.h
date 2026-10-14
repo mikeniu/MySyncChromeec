@@ -179,7 +179,16 @@
 /* 1LSB = 61 milli-dps*/
 #define BMI3_OFFSET_GYR_MDPS (61 * 1000)
 
-#define BMI3_FIFO_BUFFER 32
+/*
+ * Size the FIFO read buffer to a multiple of BMI3_FIFO_ENTRY (3 words / 6 bytes
+ * per frame) to avoid reading truncated partial frames that must be discarded
+ * and re-read on the next transaction.
+ *
+ * 10 frames * 3 words/frame = 30 uint16_t words (60 bytes) of FIFO data, or
+ * 31 words (62 bytes) total including the 1-word (2-byte) I2C sync word in
+ * struct bmi3_fifo_frame, fitting within a 64-byte I2C transfer.
+ */
+#define BMI3_FIFO_BUFFER (10 * BMI3_FIFO_ENTRY)
 
 /* General Macro Definitions */
 /* LSB and MSB mask definitions */
