@@ -348,16 +348,7 @@ static struct bit_name flag_bit_names[] = {
 BUILD_ASSERT(ARRAY_SIZE(flag_bit_names) == TC_FLAGS_COUNT);
 
 static struct bit_name event_bit_names[] = {
-	{ TASK_EVENT_SYSJUMP_READY, "SYSJUMP_READY" },
-	{ TASK_EVENT_IPC_READY, "IPC_READY" },
 	{ TASK_EVENT_PD_AWAKE, "PD_AWAKE" },
-	{ TASK_EVENT_PECI_DONE, "PECI_DONE" },
-	{ TASK_EVENT_I2C_IDLE, "I2C_IDLE" },
-#ifdef TASK_EVENT_PS2_DONE
-	{ TASK_EVENT_PS2_DONE, "PS2_DONE" },
-#endif
-	{ TASK_EVENT_DMA_TC, "DMA_TC" },
-	{ TASK_EVENT_ADC_DONE, "ADC_DONE" },
 	{ TASK_EVENT_RESET_DONE, "RESET_DONE" },
 	{ TASK_EVENT_WAKE, "WAKE" },
 	{ TASK_EVENT_TIMER, "TIMER" },
@@ -368,7 +359,6 @@ static struct bit_name event_bit_names[] = {
 	{ PD_EVENT_DEVICE_ACCESSED, "DEVICE_ACCESSED" },
 	{ PD_EVENT_POWER_STATE_CHANGE, "POWER_STATE_CHANGE" },
 	{ PD_EVENT_SEND_HARD_RESET, "SEND_HARD_RESET" },
-	{ PD_EVENT_SYSJUMP, "SYSJUMP" },
 };
 
 static void print_bits(int port, const char *desc, int value,
@@ -1725,19 +1715,6 @@ void tc_event_check(int port, int evt)
 	if (IS_ENABLED(CONFIG_AP_POWER_CONTROL)) {
 		if (evt & PD_EVENT_POWER_STATE_CHANGE)
 			handle_new_power_state(port);
-	}
-
-	if (IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP)) {
-		int i;
-
-		/*
-		 * Notify all ports of sysjump
-		 */
-		if (evt & PD_EVENT_SYSJUMP) {
-			for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++)
-				dpm_set_mode_exit_request(i);
-			notify_sysjump_ready();
-		}
 	}
 
 	if (evt & PD_EVENT_UPDATE_DUAL_ROLE) {
