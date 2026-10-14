@@ -25,7 +25,8 @@
 #define SCP_IPI_VDEC_LAT 14
 #define SCP_IPI_VDEC_CORE 15
 #define SCP_IPI_ISP_IMG_CMD 16
-#define SCP_IPI_COUNT 17
+#define SCP_IPI_CHRE 17
+#define SCP_IPI_COUNT 18
 
 #define IPI_COUNT SCP_IPI_COUNT
 

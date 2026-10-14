@@ -133,6 +133,31 @@ enum sensor_config motion_sense_get_ec_config(void)
 	}
 }
 
+#ifdef CONFIG_SCP_CHRE
+int motion_sense_set_chre_config(int sensor_num, unsigned int odr_mhz,
+				 unsigned int ec_rate_us)
+{
+	struct motion_sensor_t *sensor;
+
+	if (sensor_num < 0 || sensor_num >= motion_sensor_count)
+		return EC_ERROR_INVAL;
+
+	sensor = &motion_sensors[sensor_num];
+	sensor->config[SENSOR_CONFIG_EC_S0].odr =
+		odr_mhz ? (odr_mhz | ROUND_UP_FLAG) : 0;
+	sensor->config[SENSOR_CONFIG_EC_S0].ec_rate = ec_rate_us;
+	if (sensor->active_mask & SENSOR_ACTIVE_S3) {
+		sensor->config[SENSOR_CONFIG_EC_S3].odr =
+			odr_mhz ? (odr_mhz | ROUND_UP_FLAG) : 0;
+		sensor->config[SENSOR_CONFIG_EC_S3].ec_rate = ec_rate_us;
+	}
+
+	atomic_or(&odr_event_required, BIT(sensor_num));
+	task_set_event(TASK_ID_MOTIONSENSE, TASK_EVENT_MOTION_ODR_CHANGE);
+	return EC_SUCCESS;
+}
+#endif /* CONFIG_SCP_CHRE */
+
 #ifndef CONFIG_ACCEL_FORCE_MODE_MASK
 #define CONFIG_ACCEL_FORCE_MODE_MASK 0
 #endif
@@ -1223,10 +1248,16 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		if (args->version < 3)
 			args->response_size = sizeof(out->info);
 		if (args->version >= 3) {
-			out->info_3.min_frequency =
-				max(sensor->min_frequency,
-				    BASE_ODR(sensor->config[SENSOR_CONFIG_EC_S0]
-						     .odr));
+			if (IS_ENABLED(CONFIG_SCP_CHRE)) {
+				out->info_3.min_frequency =
+					sensor->min_frequency;
+			} else {
+				out->info_3.min_frequency = max(
+					sensor->min_frequency,
+					BASE_ODR(sensor->config
+							 [SENSOR_CONFIG_EC_S0]
+								 .odr));
+			}
 			out->info_3.max_frequency = sensor->max_frequency;
 			out->info_3.fifo_max_event_count =
 				CONFIG_ACCEL_FIFO_SIZE;

@@ -391,6 +391,14 @@ ec_motion_sensor_fill_values(struct ec_response_motion_sensor_data *dst,
 enum sensor_config motion_sense_get_ec_config(void);
 #endif
 
+#ifdef CONFIG_SCP_CHRE
+int motion_sense_set_chre_config(int sensor_num, unsigned int odr_mhz,
+				 unsigned int ec_rate_us);
+void chre_sensor_pal_on_sample(const struct ec_response_motion_sensor_data *d,
+			       const struct motion_sensor_t *sensor,
+			       int valid_data, uint32_t time);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
