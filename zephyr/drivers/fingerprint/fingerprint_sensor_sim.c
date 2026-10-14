@@ -106,15 +106,18 @@ static int fp_simulator_set_mode(const struct device *dev,
 	switch (mode) {
 	case FINGERPRINT_SENSOR_MODE_DETECT:
 		data->state.detect_mode = true;
+		data->state.low_power_mode = false;
 		break;
 
 	case FINGERPRINT_SENSOR_MODE_LOW_POWER:
 		data->state.low_power_mode = true;
+		data->state.detect_mode = false;
 		break;
 
 	case FINGERPRINT_SENSOR_MODE_IDLE:
 		data->state.maintenance_ran = false;
 		data->state.detect_mode = false;
+		data->state.low_power_mode = false;
 		break;
 
 	default:
