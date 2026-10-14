@@ -251,9 +251,9 @@ static void cps8100_print_irq_type_names(const char *preamble, uint32_t reg)
 
 static void cps8100_status_update(struct pchg *ctx, uint32_t reg)
 {
-	mutex_lock(&cps8100_mtx);
+	k_mutex_lock(&cps8100_mtx, K_FOREVER);
 	cps8100_state.reg = reg;
-	mutex_unlock(&cps8100_mtx);
+	k_mutex_unlock(&cps8100_mtx);
 }
 
 static int cps8100_i2c_write(int port, int addr, const uint8_t *buf, size_t len)

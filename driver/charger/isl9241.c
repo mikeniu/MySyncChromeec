@@ -136,7 +136,7 @@ static enum ec_error_list isl9241_set_frequency(int chgnum, int freq_khz)
 	int reg;
 	int freq;
 
-	mutex_lock(&control1_mutex_isl9241);
+	k_mutex_lock(&control1_mutex_isl9241, K_FOREVER);
 	rv = isl9241_read(chgnum, ISL9241_REG_CONTROL1, &reg);
 	if (rv) {
 		CPRINTS("Could not read CONTROL1. (rv=%d)", rv);
@@ -176,7 +176,7 @@ static enum ec_error_list isl9241_set_frequency(int chgnum, int freq_khz)
 	}
 
 error:
-	mutex_unlock(&control1_mutex_isl9241);
+	k_mutex_unlock(&control1_mutex_isl9241);
 
 	return rv;
 }
@@ -290,10 +290,10 @@ static enum ec_error_list isl9241_set_mode(int chgnum, int mode)
 
 	/* POR reset */
 	if (mode & CHARGE_FLAG_POR_RESET) {
-		mutex_lock(&control3_mutex_isl9241);
+		k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 		rv = isl9241_write(chgnum, ISL9241_REG_CONTROL3,
 				   ISL9241_CONTROL3_DIGITAL_RESET);
-		mutex_unlock(&control3_mutex_isl9241);
+		k_mutex_unlock(&control3_mutex_isl9241);
 	}
 
 	return rv;
@@ -335,7 +335,7 @@ static enum ec_error_list isl9241_get_vbus_voltage(int chgnum, int port,
 	int rv;
 
 	/* Get current Control3 value */
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 	rv = isl9241_read(chgnum, ISL9241_REG_CONTROL3, &ctl3_val);
 	if (rv)
 		goto error;
@@ -370,7 +370,7 @@ error_restore_ctl3:
 		(void)isl9241_write(chgnum, ISL9241_REG_CONTROL3, ctl3_val);
 
 error:
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 	if (rv)
 		CPRINTS("Could not read VBUS ADC! Error: %d", rv);
 
@@ -417,9 +417,9 @@ static enum ec_error_list isl9241_get_vsys_voltage(int chgnum, int port,
 {
 	int rv;
 
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 	rv = _get_vsys_voltage(chgnum, port, voltage);
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 
 	return rv;
 }
@@ -449,12 +449,12 @@ static enum ec_error_list isl9241_discharge_on_ac_weak_disable(int chgnum)
 {
 	int rv = 0;
 
-	mutex_lock(&control1_mutex_isl9241);
+	k_mutex_lock(&control1_mutex_isl9241, K_FOREVER);
 	if (!learn_mode) {
 		rv = isl9241_discharge_on_ac_unsafe(chgnum, 0);
 	}
 
-	mutex_unlock(&control1_mutex_isl9241);
+	k_mutex_unlock(&control1_mutex_isl9241);
 	return rv;
 }
 
@@ -462,9 +462,9 @@ static enum ec_error_list isl9241_discharge_on_ac(int chgnum, int enable)
 {
 	int rv = 0;
 
-	mutex_lock(&control1_mutex_isl9241);
+	k_mutex_lock(&control1_mutex_isl9241, K_FOREVER);
 	rv = isl9241_discharge_on_ac_unsafe(chgnum, enable);
-	mutex_unlock(&control1_mutex_isl9241);
+	k_mutex_unlock(&control1_mutex_isl9241);
 	return rv;
 }
 
@@ -547,7 +547,7 @@ static int isl9241_get_prochot_status(int chgnum, bool *out_low_vsys,
 	*out_acprochot = val & ISL9241_REG_INFORMATION1_AC_PROCHOT;
 
 	/* Get current Control3 value */
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 	rv = isl9241_read(chgnum, ISL9241_REG_CONTROL3, &val);
 	if (rv) {
 		CPRINTS("%s: failed to read control3 (%d)", __func__, rv);
@@ -636,7 +636,7 @@ restore_control3:
 		if (rv)
 			CPRINTS("%s: failed to disable ADC (%d)", __func__, rv);
 	}
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 
 	return rv;
 }
@@ -747,7 +747,7 @@ static enum ec_error_list isl9241_bypass_to_bat(int chgnum)
 
 	CPRINTS("bypass -> bat");
 
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 	/* 1: Disable force forward buck/reverse boost. */
 	isl9241_update_force_buck_mode(chgnum, MASK_CLR);
 
@@ -773,7 +773,7 @@ static enum ec_error_list isl9241_bypass_to_bat(int chgnum)
 		      ISL9241_MV_TO_ACOK_REFERENCE(
 			      ISL9241_ACOK_REF_LOW_VOLTAGE_ADAPTER_MV));
 
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 	return EC_SUCCESS;
 }
 
@@ -784,7 +784,7 @@ static enum ec_error_list isl9241_bypass_chrg_to_bat(int chgnum)
 {
 	CPRINTS("bypass_chrg -> bat");
 
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 	/* 1: Disable force forward buck/reverse boost. */
 	isl9241_update_force_buck_mode(chgnum, MASK_CLR);
 	/* 2: Disable fast charge. */
@@ -806,7 +806,7 @@ static enum ec_error_list isl9241_bypass_chrg_to_bat(int chgnum)
 	isl9241_write(chgnum, ISL9241_REG_ACOK_REFERENCE,
 		      ISL9241_MV_TO_ACOK_REFERENCE(3600));
 
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 	return EC_SUCCESS;
 }
 
@@ -849,7 +849,7 @@ static enum ec_error_list isl9241_nvdc_to_bypass(int chgnum)
 
 	CPRINTS("nvdc -> bypass");
 
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 	/* 1: Set adapter current limit. */
 	isl9241_set_input_current_limit(chgnum, charge_current);
 
@@ -937,7 +937,7 @@ static enum ec_error_list isl9241_nvdc_to_bypass(int chgnum)
 	}
 
 unlock_control3:
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 
 	return rv;
 }
@@ -1094,7 +1094,7 @@ enum ec_error_list isl9241_set_acokref(int chgnum, int mv)
 	enum ec_error_list rv;
 	int acokref_mv = pdo_mv_to_acokref_mv(mv);
 
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 
 	/* 1: Enable ADC for all modes.
 	 *    This prevents ACOK from a 1ms glitch.
@@ -1112,7 +1112,7 @@ enum ec_error_list isl9241_set_acokref(int chgnum, int mv)
 	isl9241_update(chgnum, ISL9241_REG_CONTROL3,
 		       ISL9241_CONTROL3_ENABLE_ADC, MASK_CLR);
 
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 
 	return rv;
 }
@@ -1128,7 +1128,7 @@ static void isl9241_init(int chgnum)
 
 	const struct battery_info *bi = battery_get_info();
 
-	mutex_lock(&control3_mutex_isl9241);
+	k_mutex_lock(&control3_mutex_isl9241, K_FOREVER);
 	/*
 	 * Set the MaxSystemVoltage to battery maximum,
 	 * 0x00=disables switching charger states
@@ -1197,7 +1197,7 @@ static void isl9241_init(int chgnum)
 		goto init_fail;
 #endif
 
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 
 	/*
 	 * No need to proceed with the rest of init if we sysjump'd to this
@@ -1214,7 +1214,7 @@ static void isl9241_init(int chgnum)
 	return;
 
 init_fail:
-	mutex_unlock(&control3_mutex_isl9241);
+	k_mutex_unlock(&control3_mutex_isl9241);
 	CPRINTS("Init failed!");
 }
 

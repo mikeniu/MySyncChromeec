@@ -136,17 +136,17 @@ void charge_manager_dump_mutex_history()
 #define CM_MUTEX_LOCK(m)                                        \
 	{                                                       \
 		MUTEX_HISTORY_LOG(&mutex_event_rb, m, LOCKING); \
-		mutex_lock(m);                                  \
+		k_mutex_lock(m, K_FOREVER);                     \
 		MUTEX_HISTORY_LOG(&mutex_event_rb, m, LOCKED);  \
 	}
 #define CM_MUTEX_UNLOCK(m)                                       \
 	{                                                        \
-		mutex_unlock(m);                                 \
+		k_mutex_unlock(m);                               \
 		MUTEX_HISTORY_LOG(&mutex_event_rb, m, UNLOCKED); \
 	}
 #else
-#define CM_MUTEX_LOCK(m) mutex_lock(m)
-#define CM_MUTEX_UNLOCK(m) mutex_unlock(m)
+#define CM_MUTEX_LOCK(m) k_mutex_lock(m, K_FOREVER)
+#define CM_MUTEX_UNLOCK(m) k_mutex_unlock(m)
 #endif /* CM_MUTEX_DEBUG */
 
 /* Store current state of port enable / charge current. */

@@ -39,7 +39,7 @@
  * Mutex for BB_RETIMER_REG_CONNECTION_STATE register, which can be
  * accessed from multiple tasks.
  */
-static mutex_t bb_retimer_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
+static struct k_mutex bb_retimer_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
 /*
  * Requested BB mux state.
  */
@@ -537,7 +537,7 @@ static int retimer_set_state(const struct usb_mux *me, mux_state_t mux_state,
 	/* This driver does not use host command ACKs */
 	*ack_required = false;
 
-	mutex_lock(&bb_retimer_lock[port]);
+	k_mutex_lock(&bb_retimer_lock[port], K_FOREVER);
 	bb_mux_state[port] = mux_state;
 
 	/*
@@ -635,7 +635,7 @@ static int retimer_set_state(const struct usb_mux *me, mux_state_t mux_state,
 	/* Writing the register4 */
 	rv = bb_retimer_write(me, BB_RETIMER_REG_CONNECTION_STATE,
 			      set_retimer_con);
-	mutex_unlock(&bb_retimer_lock[port]);
+	k_mutex_unlock(&bb_retimer_lock[port]);
 	return rv;
 }
 
@@ -646,16 +646,16 @@ static int bb_set_idle_mode(const struct usb_mux *me, bool idle)
 	uint32_t reg_val;
 	int port = me->usb_port;
 
-	mutex_lock(&bb_retimer_lock[port]);
+	k_mutex_lock(&bb_retimer_lock[port], K_FOREVER);
 
 	if (!(bb_mux_state[port] & USB_PD_MUX_USB_ENABLED)) {
-		mutex_unlock(&bb_retimer_lock[port]);
+		k_mutex_unlock(&bb_retimer_lock[port]);
 		return EC_SUCCESS;
 	}
 
 	rv = bb_retimer_read(me, BB_RETIMER_REG_CONNECTION_STATE, &reg_val);
 	if (rv != EC_SUCCESS) {
-		mutex_unlock(&bb_retimer_lock[port]);
+		k_mutex_unlock(&bb_retimer_lock[port]);
 		return rv;
 	}
 
@@ -665,7 +665,7 @@ static int bb_set_idle_mode(const struct usb_mux *me, bool idle)
 	WRITE_BIT(reg_val, 5, usb3_enable);
 	rv = bb_retimer_write(me, BB_RETIMER_REG_CONNECTION_STATE, reg_val);
 
-	mutex_unlock(&bb_retimer_lock[port]);
+	k_mutex_unlock(&bb_retimer_lock[port]);
 
 	return rv;
 }
@@ -676,18 +676,18 @@ int bb_retimer_set_dp_connection(const struct usb_mux *me, bool enable)
 	uint32_t reg_val;
 	int port = me->usb_port;
 
-	mutex_lock(&bb_retimer_lock[port]);
+	k_mutex_lock(&bb_retimer_lock[port], K_FOREVER);
 
 	rv = bb_retimer_read(me, BB_RETIMER_REG_CONNECTION_STATE, &reg_val);
 	if (rv != EC_SUCCESS) {
-		mutex_unlock(&bb_retimer_lock[port]);
+		k_mutex_unlock(&bb_retimer_lock[port]);
 		return rv;
 	}
 	/* Bit 8: BB_RETIMER_DP_CONNECTION */
 	WRITE_BIT(reg_val, 8, enable);
 	rv = bb_retimer_write(me, BB_RETIMER_REG_CONNECTION_STATE, reg_val);
 
-	mutex_unlock(&bb_retimer_lock[port]);
+	k_mutex_unlock(&bb_retimer_lock[port]);
 
 	return rv;
 }
@@ -701,13 +701,13 @@ void bb_retimer_hpd_update(const struct usb_mux *me, mux_state_t hpd_state,
 	/* This driver does not use host command ACKs */
 	*ack_required = false;
 
-	mutex_lock(&bb_retimer_lock[port]);
+	k_mutex_lock(&bb_retimer_lock[port], K_FOREVER);
 	bb_mux_state[port] = (bb_mux_state[port] & ~MUX_STATE_HPD_UPDATE_MASK) |
 			     (hpd_state & MUX_STATE_HPD_UPDATE_MASK);
 
 	if (bb_retimer_read(me, BB_RETIMER_REG_CONNECTION_STATE,
 			    &retimer_con_reg) != EC_SUCCESS) {
-		mutex_unlock(&bb_retimer_lock[port]);
+		k_mutex_unlock(&bb_retimer_lock[port]);
 		return;
 	}
 	/*
@@ -734,7 +734,7 @@ void bb_retimer_hpd_update(const struct usb_mux *me, mux_state_t hpd_state,
 	/* Writing the register4 */
 	bb_retimer_write(me, BB_RETIMER_REG_CONNECTION_STATE, retimer_con_reg);
 
-	mutex_unlock(&bb_retimer_lock[port]);
+	k_mutex_unlock(&bb_retimer_lock[port]);
 }
 
 static void init_retimer_mutexes(void)

@@ -194,13 +194,13 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 
 	reg_val = LIS2DS_FS_REG(newrange);
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	err = st_write_data_with_mask(s, LIS2DS_FS_ADDR, LIS2DS_FS_MASK,
 				      reg_val);
 	if (err == EC_SUCCESS)
 		/* Save internally gain for speed optimization. */
 		s->current_range = newrange;
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return EC_SUCCESS;
 }
@@ -211,7 +211,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	struct stprivate_data *data = s->drv_data;
 	uint8_t reg_val = 0;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	if (IS_ENABLED(ACCEL_LIS2DS_INT_ENABLE)) {
 		/* FIFO stop collecting events. Restart FIFO in Bypass mode */
 		ret = lis2ds_enable_fifo(s, LIS2DS_FIFO_BYPASS_MODE);
@@ -248,7 +248,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	}
 
 unlock_rate:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -322,7 +322,7 @@ static int init(struct motion_sensor_t *s)
 	 * the sensor is unknown here. Initiate software reset to restore
 	 * sensor to default.
 	 */
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = st_raw_write8(s->port, s->i2c_spi_addr_flags,
 			    LIS2DS_SOFT_RESET_ADDR, LIS2DS_SOFT_RESET_MASK);
@@ -352,7 +352,7 @@ static int init(struct motion_sensor_t *s)
 	if (ret != EC_SUCCESS)
 		goto err_unlock;
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	/* Set default resolution */
 	data->resol = LIS2DS_RESOLUTION;
@@ -360,7 +360,7 @@ static int init(struct motion_sensor_t *s)
 	return sensor_init_done(s);
 
 err_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	CPRINTS("%s: MS Init type:0x%X Error", s->name, s->type);
 
 	return ret;

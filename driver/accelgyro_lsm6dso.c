@@ -308,12 +308,12 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 		newrange = LSM6DSO_GYRO_NORMALIZE_FS(reg_val);
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	err = st_write_data_with_mask(s, ctrl_reg, LSM6DSO_RANGE_MASK, reg_val);
 	if (err == EC_SUCCESS)
 		s->current_range = newrange;
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return EC_SUCCESS;
 }
@@ -345,7 +345,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 			return EC_RES_INVALID_PARAM;
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	ret = st_write_data_with_mask(s, ctrl_reg, LSM6DSO_ODR_MASK, reg_val);
 	if (ret == EC_SUCCESS) {
 		data->base.odr = normalized_rate;
@@ -353,7 +353,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 			accelgyro_config_fifo(s);
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -436,7 +436,7 @@ static int init(struct motion_sensor_t *s)
 	 * Requirement: Acc need be init before Gyro
 	 */
 	if (s->type == MOTIONSENSE_TYPE_ACCEL) {
-		mutex_lock(s->mutex);
+		k_mutex_lock(s->mutex, K_FOREVER);
 
 		/* Software reset. */
 		ret = st_raw_write8(s->port, s->i2c_spi_addr_flags,
@@ -465,7 +465,7 @@ static int init(struct motion_sensor_t *s)
 		if (ret != EC_SUCCESS)
 			goto err_unlock;
 
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 	}
 
 	/* Set default resolution common to Acc and Gyro. */
@@ -473,7 +473,7 @@ static int init(struct motion_sensor_t *s)
 	return sensor_init_done(s);
 
 err_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	CPRINTS("%s: MS Init type:0x%X Error", s->name, s->type);
 
 	return ret;

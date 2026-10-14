@@ -189,7 +189,7 @@ static int get_amon_bmon(int chgnum, enum isl923x_amon_bmon amon,
 			return ret;
 	}
 
-	mutex_lock(&control1_mutex_isl923x);
+	k_mutex_lock(&control1_mutex_isl923x, K_FOREVER);
 
 	ret = raw_read16(chgnum, ISL923X_REG_CONTROL1, &reg);
 	if (!ret) {
@@ -221,7 +221,7 @@ static int get_amon_bmon(int chgnum, enum isl923x_amon_bmon amon,
 		goto err;
 
 err:
-	mutex_unlock(&control1_mutex_isl923x);
+	k_mutex_unlock(&control1_mutex_isl923x);
 	return ret;
 }
 #endif
@@ -282,7 +282,7 @@ static enum ec_error_list isl923x_enable_otg_power(int chgnum, int enabled)
 {
 	int rv, control1;
 
-	mutex_lock(&control1_mutex_isl923x);
+	k_mutex_lock(&control1_mutex_isl923x, K_FOREVER);
 
 	rv = raw_read16(chgnum, ISL923X_REG_CONTROL1, &control1);
 	if (rv)
@@ -296,7 +296,7 @@ static enum ec_error_list isl923x_enable_otg_power(int chgnum, int enabled)
 	rv = raw_write16(chgnum, ISL923X_REG_CONTROL1, control1);
 
 out:
-	mutex_unlock(&control1_mutex_isl923x);
+	k_mutex_unlock(&control1_mutex_isl923x);
 
 	return rv;
 }
@@ -363,7 +363,7 @@ static enum ec_error_list isl923x_set_frequency(int chgnum, int freq_khz)
 	int reg;
 	int dev_id;
 
-	mutex_lock(&control1_mutex_isl923x);
+	k_mutex_lock(&control1_mutex_isl923x, K_FOREVER);
 
 	rv = isl923x_device_id(chgnum, &dev_id);
 	if (rv) {
@@ -374,7 +374,7 @@ static enum ec_error_list isl923x_set_frequency(int chgnum, int freq_khz)
 	rv = raw_read16(chgnum, ISL923X_REG_CONTROL1, &reg);
 	if (rv) {
 		CPRINTS("Could not read CONTROL1. (rv=%d)", rv);
-		mutex_unlock(&control1_mutex_isl923x);
+		k_mutex_unlock(&control1_mutex_isl923x);
 		return rv;
 	}
 
@@ -423,7 +423,7 @@ static enum ec_error_list isl923x_set_frequency(int chgnum, int freq_khz)
 #endif
 	rv = raw_write16(chgnum, ISL923X_REG_CONTROL1, reg);
 
-	mutex_unlock(&control1_mutex_isl923x);
+	k_mutex_unlock(&control1_mutex_isl923x);
 	return rv;
 }
 #endif
@@ -997,9 +997,9 @@ static enum ec_error_list isl923x_discharge_on_ac(int chgnum, int enable)
 {
 	int rv;
 
-	mutex_lock(&control1_mutex_isl923x);
+	k_mutex_lock(&control1_mutex_isl923x, K_FOREVER);
 	rv = isl923x_discharge_on_ac_unsafe(chgnum, enable);
-	mutex_unlock(&control1_mutex_isl923x);
+	k_mutex_unlock(&control1_mutex_isl923x);
 	return rv;
 }
 
@@ -1008,11 +1008,11 @@ static enum ec_error_list isl923x_discharge_on_ac_weak_disable(int chgnum)
 {
 	int rv = 0;
 
-	mutex_lock(&control1_mutex_isl923x);
+	k_mutex_lock(&control1_mutex_isl923x, K_FOREVER);
 	if (!learn_mode)
 		rv = isl923x_discharge_on_ac_unsafe(chgnum, 0);
 
-	mutex_unlock(&control1_mutex_isl923x);
+	k_mutex_unlock(&control1_mutex_isl923x);
 	return rv;
 }
 
@@ -1236,7 +1236,7 @@ static void charger_enable_psys(void)
 {
 	int val;
 
-	mutex_lock(&control1_mutex_isl923x);
+	k_mutex_lock(&control1_mutex_isl923x, K_FOREVER);
 
 	/*
 	 * enable system power monitor PSYS function
@@ -1252,7 +1252,7 @@ static void charger_enable_psys(void)
 	psys_enabled = 1;
 
 out:
-	mutex_unlock(&control1_mutex_isl923x);
+	k_mutex_unlock(&control1_mutex_isl923x);
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, charger_enable_psys, HOOK_PRIO_DEFAULT);
 
@@ -1260,7 +1260,7 @@ static void charger_disable_psys(void)
 {
 	int val;
 
-	mutex_lock(&control1_mutex_isl923x);
+	k_mutex_lock(&control1_mutex_isl923x, K_FOREVER);
 
 	/*
 	 * disable system power monitor PSYS function
@@ -1276,7 +1276,7 @@ static void charger_disable_psys(void)
 	psys_enabled = 0;
 
 out:
-	mutex_unlock(&control1_mutex_isl923x);
+	k_mutex_unlock(&control1_mutex_isl923x);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, charger_disable_psys, HOOK_PRIO_DEFAULT);
 

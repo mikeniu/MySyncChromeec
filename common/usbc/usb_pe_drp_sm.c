@@ -614,7 +614,7 @@ static struct policy_engine {
 
 	/* ADO - Used to store information about alert messages */
 	uint32_t ado;
-	mutex_t ado_lock;
+	struct k_mutex ado_lock;
 
 	/*
 	 * Flag to indicate that the timeout of the current VDM request should
@@ -1558,21 +1558,21 @@ int pe_set_ado(int port, uint32_t data)
 	/* return busy error if unable to set ado */
 	int ret = EC_ERROR_BUSY;
 
-	mutex_lock(&pe[port].ado_lock);
+	k_mutex_lock(&pe[port].ado_lock, K_FOREVER);
 	if (pe[port].ado == 0x0) {
 		pe[port].ado = data;
 		ret = EC_SUCCESS;
 	}
 
-	mutex_unlock(&pe[port].ado_lock);
+	k_mutex_unlock(&pe[port].ado_lock);
 	return ret;
 }
 
 void pe_clear_ado(int port)
 {
-	mutex_lock(&pe[port].ado_lock);
+	k_mutex_lock(&pe[port].ado_lock, K_FOREVER);
 	pe[port].ado = 0x0;
-	mutex_unlock(&pe[port].ado_lock);
+	k_mutex_unlock(&pe[port].ado_lock);
 }
 
 struct rmdo pd_get_partner_rmdo(int port)
@@ -4920,10 +4920,10 @@ static void pe_send_alert_entry(int port)
 		pe_set_ready_state(port);
 	} else {
 		/* Get ADO from PE state, the ADO is a uint32_t */
-		mutex_lock(&pe[port].ado_lock);
+		k_mutex_lock(&pe[port].ado_lock, K_FOREVER);
 		*msg = pe[port].ado;
 		*len = sizeof(pe[port].ado);
-		mutex_unlock(&pe[port].ado_lock);
+		k_mutex_unlock(&pe[port].ado_lock);
 	}
 
 	/* Request the Protocol Layer to send Alert Message. */

@@ -60,7 +60,7 @@ static struct {
 	uint32_t vdm_req[VDO_MAX_SIZE];
 	int vdm_req_cnt;
 	enum tcpci_msg_type req_type;
-	mutex_t vdm_req_mutex;
+	struct k_mutex vdm_req_mutex;
 	enum dpm_pd_button_state pd_button_state;
 	/* The desired VCONN role for an upcoming VCONN Swap. Only meaningful if
 	 * DPM_FLAG_VCONN_SWAP is set.
@@ -239,24 +239,24 @@ void pd_request_vconn_swap(int port)
 enum ec_status pd_request_vdm(int port, const uint32_t *data, int vdo_count,
 			      enum tcpci_msg_type tx_type)
 {
-	mutex_lock(&dpm[port].vdm_req_mutex);
+	k_mutex_lock(&dpm[port].vdm_req_mutex, K_FOREVER);
 
 	/* Only one VDM REQ message may be pending */
 	if (DPM_CHK_FLAG(port, DPM_FLAG_SEND_VDM_REQ)) {
-		mutex_unlock(&dpm[port].vdm_req_mutex);
+		k_mutex_unlock(&dpm[port].vdm_req_mutex);
 		return EC_RES_BUSY;
 	}
 
 	/* VDM header is required and we cannot exceed standard message size*/
 	if (!vdo_count || vdo_count > VDO_MAX_SIZE) {
-		mutex_unlock(&dpm[port].vdm_req_mutex);
+		k_mutex_unlock(&dpm[port].vdm_req_mutex);
 		return EC_RES_INVALID_PARAM;
 	}
 
 	/* SVDM Attention message must be 1 or 2 VDOs in length */
 	if (PD_VDO_SVDM(data[0]) && (PD_VDO_CMD(data[0]) == CMD_ATTENTION) &&
 	    vdo_count > PD_ATTENTION_MAX_VDO) {
-		mutex_unlock(&dpm[port].vdm_req_mutex);
+		k_mutex_unlock(&dpm[port].vdm_req_mutex);
 		return EC_RES_INVALID_PARAM;
 	}
 
@@ -272,7 +272,7 @@ enum ec_status pd_request_vdm(int port, const uint32_t *data, int vdo_count,
 	 */
 	DPM_SET_FLAG(port, DPM_FLAG_SEND_VDM_REQ);
 
-	mutex_unlock(&dpm[port].vdm_req_mutex);
+	k_mutex_unlock(&dpm[port].vdm_req_mutex);
 
 	return EC_RES_SUCCESS;
 }
@@ -684,7 +684,7 @@ static void balance_source_ports(void)
 	if (bist_shared_mode_enabled)
 		return;
 
-	mutex_lock(&max_current_claimed_lock);
+	k_mutex_lock(&max_current_claimed_lock, K_FOREVER);
 
 	/* Remove any ports which no longer require 3.0 A */
 	removed_ports = max_current_claimed &
@@ -782,7 +782,7 @@ static void balance_source_ports(void)
 		new_ports &= ~BIT(new_max_port);
 	}
 unlock:
-	mutex_unlock(&max_current_claimed_lock);
+	k_mutex_unlock(&max_current_claimed_lock);
 }
 
 /* Process port's first Sink_Capabilities PDO for port current consideration */
