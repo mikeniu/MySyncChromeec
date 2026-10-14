@@ -21,7 +21,7 @@
 #define BMA_NODE DT_NODELABEL(bma_emul)
 
 /** Mutex for test motion sensor  */
-static mutex_t sensor_mutex;
+static K_MUTEX_DEFINE(sensor_mutex);
 
 /** Rotation used in some tests */
 static const mat33_fp_t test_rotation = { { 0, FLOAT_TO_FP(1), 0 },
@@ -925,17 +925,10 @@ ZTEST_USER(bma2x2, test_bma_get_resolution)
 	zassert_equal(12, ms.drv->get_resolution(&ms));
 }
 
-static void *bma2x2_setup(void)
-{
-	k_mutex_init(&sensor_mutex);
-
-	return NULL;
-}
-
 static void bma2x2_after(void *data)
 {
 	ms.rot_standard_ref = NULL;
 }
 
-ZTEST_SUITE(bma2x2, drivers_predicate_post_main, bma2x2_setup, NULL,
-	    bma2x2_after, NULL);
+ZTEST_SUITE(bma2x2, drivers_predicate_post_main, NULL, NULL, bma2x2_after,
+	    NULL);
