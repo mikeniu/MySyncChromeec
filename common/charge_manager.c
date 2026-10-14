@@ -144,9 +144,18 @@ void charge_manager_dump_mutex_history()
 		mutex_unlock(m);                                 \
 		MUTEX_HISTORY_LOG(&mutex_event_rb, m, UNLOCKED); \
 	}
+#define CM_MUTEX_TRY_LOCK(m)                                           \
+	({                                                             \
+		MUTEX_HISTORY_LOG(&mutex_event_rb, m, LOCKING);        \
+		int _cm_ret = k_mutex_lock(m, K_NO_WAIT);              \
+		if (_cm_ret == 0)                                      \
+			MUTEX_HISTORY_LOG(&mutex_event_rb, m, LOCKED); \
+		_cm_ret;                                               \
+	})
 #else
 #define CM_MUTEX_LOCK(m) mutex_lock(m)
 #define CM_MUTEX_UNLOCK(m) mutex_unlock(m)
+#define CM_MUTEX_TRY_LOCK(m) k_mutex_lock(m, K_NO_WAIT)
 #endif /* CM_MUTEX_DEBUG */
 
 /* Store current state of port enable / charge current. */
@@ -950,6 +959,9 @@ static void charge_manager_get_best_port(int *new_port, int *new_supplier)
 	*new_supplier = best_supplier;
 }
 
+static void charge_manager_refresh(void);
+DECLARE_DEFERRED(charge_manager_refresh);
+
 /**
  * Charge manager refresh -- responsible for selecting the active charge port
  * and charge power. Called as a deferred task.
@@ -966,7 +978,16 @@ static void charge_manager_refresh(void)
 	int ceil;
 	int power_changed = 0;
 
-	CM_MUTEX_LOCK(&cm_refresh);
+	if (CM_MUTEX_TRY_LOCK(&cm_refresh) != 0) {
+		/*
+		 * cm_refresh is held by another thread (e.g. PDC or host
+		 * command). Since charge_manager_refresh executes on
+		 * k_sys_work_q, we must not block. Reschedule to try again
+		 * shortly.
+		 */
+		hook_call_deferred(&charge_manager_refresh_data, 1 * MSEC);
+		return;
+	}
 
 	/* Hunt for an acceptable charge port */
 	while (1) {
@@ -1201,15 +1222,14 @@ static void charge_manager_refresh(void)
 	if (is_pd_port(updated_old_port))
 		pd_set_new_power_request(updated_old_port);
 
+	CM_MUTEX_UNLOCK(&cm_refresh);
+
 	if (power_changed) {
 		hook_notify(HOOK_POWER_SUPPLY_CHANGE);
 		/* notify host of power info change */
 		pd_send_host_event(PD_EVENT_POWER_CHANGE);
 	}
-
-	CM_MUTEX_UNLOCK(&cm_refresh);
 }
-DECLARE_DEFERRED(charge_manager_refresh);
 
 /**
  * Called when charge override times out waiting for power swap.

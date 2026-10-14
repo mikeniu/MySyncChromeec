@@ -80,6 +80,7 @@ ZTEST_USER(charge_manager, test_has_no_active_charge_port)
 	zassert_false(charge_manager_has_active_charge_port());
 }
 
+<<<<<<< HEAD
 ZTEST_USER(charge_manager, test_available_current)
 {
 	struct charge_port_info charge = {
@@ -112,4 +113,43 @@ ZTEST_USER(charge_manager, test_available_current)
 	zassert_equal(charge_manager_get_available_current(
 			      CHARGE_SUPPLIER_TYPEC, CHARGE_PORT_COUNT),
 		      0);
+}
+
+extern struct k_mutex cm_refresh;
+
+ZTEST_USER(charge_manager, test_charge_manager_refresh_mutex_retry)
+{
+	union connector_status_t connector_status = {};
+
+	charge_manager_leave_safe_mode();
+	zassert_false(charge_manager_has_active_charge_port());
+
+	/* Acquire cm_refresh mutex to simulate lock contention from another
+	 * task */
+	k_mutex_lock(&cm_refresh, K_FOREVER);
+
+	/* Connect partner which requests charge manager refresh */
+	emul_pdc_configure_snk(emul, &connector_status);
+	emul_pdc_connect_partner(emul, &connector_status);
+
+	/* Give sysworkq time to run charge_manager_refresh and reschedule */
+	k_msleep(10);
+
+	/*
+	 * While mutex is held, charge_manager_refresh should reschedule
+	 * without setting active port or blocking sysworkq.
+	 */
+	zassert_false(charge_manager_has_active_charge_port());
+
+	/* Release mutex: rescheduled deferred refresh should now proceed */
+	k_mutex_unlock(&cm_refresh);
+
+	/* Wait for sync and verify active charge port is set */
+	pdc_power_mgmt_wait_for_sync(0, -1);
+	zassert_true(charge_manager_has_active_charge_port());
+
+	/* Disconnect */
+	emul_pdc_disconnect(emul);
+	pdc_power_mgmt_wait_for_sync(0, -1);
+	zassert_false(charge_manager_has_active_charge_port());
 }
