@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba303789_729e7710",
+        "filename": "core/nds32/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-14T18:37:04Z",
+      "side": 1,
+      "message": "Consider marking `end_irq_handler` with `__ram_code`, and adding this barrier to `core/riscv-rv32i/task.c` as well.",
+      "isAi": true,
+      "revId": "60f9f2f02312d5356299fd4ce4a279f850b97e95",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abe51c1a_25dd11de",
+        "filename": "core/nds32/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-14T18:37:04Z",
+      "side": 1,
+      "message": "Since `CONFIG_TASK_PROFILING` is enabled on `boten`, `get_time()` already reads `IT83XX_ETWD_ETXCNTOR` on the 8 MHz bus here. Does `IT83XX_INTC_AIVCT` flush a separate write buffer from ETWD?",
+      "isAi": true,
+      "revId": "60f9f2f02312d5356299fd4ce4a279f850b97e95",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
