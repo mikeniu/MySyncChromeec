@@ -6,37 +6,9 @@
 # Disable check that incorrectly detects the "config_*" functions as unreachable.
 # shellcheck disable=SC2317
 
-shflags_path=""
-for path in \
-  "/usr/share/misc/shflags" \
-  "/system/usr/share/misc/shflags"
-do
-  if [ -f "${path}" ]; then
-    shflags_path="${path}"
-    break
-  fi
-done
-
-# shellcheck source=../../../scripts/lib/shflags/shflags
-. "${SHFLAGS:-${shflags_path}}" || exit 1
-
 readonly DEFAULT_RETRIES=${DEFAULT_RETRIES:-4}
 readonly STM32MON_CONNECT_RETRIES=${STM32MON_CONNECT_RETRIES:-6}
 readonly STM32MON_SERIAL_BAUDRATE=${STM32MON_SERIAL_BAUDRATE:-115200}
-
-DEFINE_boolean 'read' "${FLAGS_FALSE}" 'Read instead of write' 'r'
-# Both flash read and write protection are removed by default, but you
-# can optionally enable them (for testing purposes).
-DEFINE_boolean 'remove_flash_read_protect' "${FLAGS_TRUE}" \
-  'Remove flash read protection while performing command' 'U'
-DEFINE_boolean 'remove_flash_write_protect' "${FLAGS_TRUE}" \
-  'Remove flash write protection while performing command' 'u'
-DEFINE_integer 'retries' "${DEFAULT_RETRIES}" 'Specify number of retries' 'R'
-DEFINE_integer 'baudrate' "${STM32MON_SERIAL_BAUDRATE}" 'Specify UART baudrate' 'B'
-DEFINE_boolean 'hello' "${FLAGS_FALSE}" 'Only ping the bootloader' 'H'
-DEFINE_boolean 'services' "${FLAGS_TRUE}" \
-  'Stop the biod service before flashing and then resume it afterwards' 's'
-FLAGS_HELP="Usage: ${0} [flags] [ec.bin]"
 
 #        EXIT_SUCCESS=0
 #        EXIT_FAILURE=1
@@ -46,17 +18,132 @@ readonly EXIT_CONFIG=4
 readonly EXIT_PRECONDITION=5
 readonly EXIT_RUNTIME=6
 
-# Process commandline flags
-FLAGS "${@}" || exit "${EXIT_ARGUMENT}"
-eval set -- "${FLAGS_ARGV}"
+readonly FLAGS_TRUE=0
+readonly FLAGS_FALSE=1
+
+usage() {
+  cat <<EOF
+Usage: ${0} [flags] [ec.bin]
+flags:
+  -r,--[no]read:  Read instead of write (default: false)
+  -U,--[no]remove_flash_read_protect:
+    Remove flash read protection while performing command (default: true)
+  -u,--[no]remove_flash_write_protect:
+    Remove flash write protection while performing command (default: true)
+  -R,--retries:  Specify number of retries (default: ${DEFAULT_RETRIES})
+  -B,--baudrate:  Specify UART baudrate (default: ${STM32MON_SERIAL_BAUDRATE})
+  -H,--[no]hello:  Only ping the bootloader (default: false)
+  -s,--[no]services:
+    Stop the biod service before flashing and resume it afterwards
+    (default: true)
+  -h,--help:  Show this help
+EOF
+}
+
+parse_args() {
+  FLAGS_read="${FLAGS_FALSE}"
+  # Both flash read and write protection are removed by default, but you
+  # can optionally enable them (for testing purposes).
+  FLAGS_remove_flash_read_protect="${FLAGS_TRUE}"
+  FLAGS_remove_flash_write_protect="${FLAGS_TRUE}"
+  FLAGS_retries="${DEFAULT_RETRIES}"
+  FLAGS_baudrate="${STM32MON_SERIAL_BAUDRATE}"
+  FLAGS_hello="${FLAGS_FALSE}"
+  FLAGS_services="${FLAGS_TRUE}"
+  POSITIONAL_ARGS=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -r|--read)
+        FLAGS_read="${FLAGS_TRUE}"
+        shift
+        ;;
+      --noread)
+        FLAGS_read="${FLAGS_FALSE}"
+        shift
+        ;;
+      -U|--remove_flash_read_protect)
+        FLAGS_remove_flash_read_protect="${FLAGS_TRUE}"
+        shift
+        ;;
+      --noremove_flash_read_protect)
+        FLAGS_remove_flash_read_protect="${FLAGS_FALSE}"
+        shift
+        ;;
+      -u|--remove_flash_write_protect)
+        FLAGS_remove_flash_write_protect="${FLAGS_TRUE}"
+        shift
+        ;;
+      --noremove_flash_write_protect)
+        FLAGS_remove_flash_write_protect="${FLAGS_FALSE}"
+        shift
+        ;;
+      -R|--retries)
+        if [[ $# -lt 2 ]]; then
+          usage >&2
+          return "${EXIT_ARGUMENT}"
+        fi
+        FLAGS_retries="$2"
+        shift 2
+        ;;
+      --retries=*)
+        FLAGS_retries="${1#*=}"
+        shift
+        ;;
+      -B|--baudrate)
+        if [[ $# -lt 2 ]]; then
+          usage >&2
+          return "${EXIT_ARGUMENT}"
+        fi
+        FLAGS_baudrate="$2"
+        shift 2
+        ;;
+      --baudrate=*)
+        FLAGS_baudrate="${1#*=}"
+        shift
+        ;;
+      -H|--hello)
+        FLAGS_hello="${FLAGS_TRUE}"
+        shift
+        ;;
+      --nohello)
+        FLAGS_hello="${FLAGS_FALSE}"
+        shift
+        ;;
+      -s|--services)
+        FLAGS_services="${FLAGS_TRUE}"
+        shift
+        ;;
+      --noservices)
+        FLAGS_services="${FLAGS_FALSE}"
+        shift
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        POSITIONAL_ARGS+=("$@")
+        break
+        ;;
+      -*)
+        echo "Unknown flag: $1" >&2
+        usage >&2
+        return "${EXIT_ARGUMENT}"
+        ;;
+      *)
+        POSITIONAL_ARGS+=("$@")
+        break
+        ;;
+    esac
+  done
+}
 
 readonly CROS_EC_SPI_MODALIAS_STR="of:NcrfpTCgoogle,cros-ec-spi"
 readonly CROS_EC_FP_SPI_MODALIAS_STR="spi:cros-ec-fp"
 
 readonly CROS_EC_UART_MODALIAS_STR="of:NcrfpTCgoogle,cros-ec-uart"
-
-# Clean up any remaining gpioset processes on exit.
-trap 'kill "${GPIO_ACTIVE_PIDS[@]}" 2>/dev/null' EXIT
 
 klog() {
   echo "flash_fp_mcu: $*" > /dev/kmsg
@@ -1519,4 +1606,10 @@ main() {
   exit "${ret}"
 }
 
-main "$@"
+if [[ "${FLASH_FP_MCU_SOURCE_ONLY:-0}" != "1" ]]; then
+  # Clean up any remaining gpioset processes on exit.
+  trap 'kill "${GPIO_ACTIVE_PIDS[@]}" 2>/dev/null' EXIT
+  parse_args "$@" || exit "$?"
+  set -- "${POSITIONAL_ARGS[@]}"
+  main "$@"
+fi
