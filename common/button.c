@@ -107,7 +107,7 @@ static void button_blink_hw_reinit_led(void)
 		led_control(EC_LED_ID_RECOVERY_HW_REINIT_LED, led_state);
 		led_state = !led_state;
 		watchdog_reload();
-		crec_msleep(100);
+		k_msleep(100);
 		now = get_time();
 	}
 

@@ -80,13 +80,13 @@ static int icm_read_mclk_reg(const struct motion_sensor_t *s, const int reg,
 	if (ret)
 		return ret;
 
-	udelay(10);
+	k_busy_wait(10);
 
 	ret = icm_read8(s, ICM42607_REG_M_R, buf);
 	if (ret)
 		return ret;
 
-	udelay(10);
+	k_busy_wait(10);
 
 	if (blk_sel) {
 		ret = icm_write8(s, ICM42607_REG_BLK_SEL_R, 0);
@@ -119,7 +119,7 @@ static int icm_write_mclk_reg(const struct motion_sensor_t *s, const int reg,
 	if (ret)
 		return ret;
 
-	udelay(10);
+	k_busy_wait(10);
 
 	if (blk_sel) {
 		ret = icm_write8(s, ICM42607_REG_BLK_SEL_W, 0);
@@ -195,7 +195,7 @@ static int __maybe_unused icm42607_flush_fifo(const struct motion_sensor_t *s)
 	if (ret)
 		return ret;
 
-	udelay(10);
+	k_busy_wait(10);
 
 	for (i = 0; i < 10; ++i) {
 		ret = icm_read8(s, ICM42607_REG_SIGNAL_PATH_RESET, &val);
@@ -205,7 +205,7 @@ static int __maybe_unused icm42607_flush_fifo(const struct motion_sensor_t *s)
 		if (!(val & ICM42607_FIFO_FLUSH))
 			return EC_SUCCESS;
 
-		udelay(1);
+		k_busy_wait(1);
 	}
 
 	return EC_ERROR_HW_INTERNAL;
@@ -510,7 +510,7 @@ static int icm42607_enable_sensor(const struct motion_sensor_t *s, int enable)
 		rem = icm_get_sensor_stabilized(s, __hw_clock_source_read());
 		/* rem > stop_delay means counter rollover */
 		if (rem > 0 && rem <= stop_delay)
-			crec_usleep(rem);
+			k_usleep(rem);
 	}
 
 	k_mutex_lock(s->mutex, K_FOREVER);
@@ -520,7 +520,7 @@ static int icm42607_enable_sensor(const struct motion_sensor_t *s, int enable)
 		icm_set_stabilize_ts(s, delay);
 		/* when turning sensor on block any register write for 200 us */
 		if (enable)
-			crec_usleep(200);
+			k_usleep(200);
 	}
 
 	k_mutex_unlock(s->mutex);
@@ -1002,7 +1002,7 @@ static int icm42607_reset_revA(const struct motion_sensor_t *s)
 		return ret;
 
 	/* Wait for 300us for the OTP to fully power up */
-	crec_usleep(300);
+	k_usleep(300);
 
 	/* Set otp_reload register field */
 	ret = icm_field_update_mclk_reg(s, ICM42607_MREG_OTP_CTRL7,
@@ -1012,7 +1012,7 @@ static int icm42607_reset_revA(const struct motion_sensor_t *s)
 		return ret;
 
 	/* Wait for 280 us for the OTP to load */
-	crec_usleep(280);
+	k_usleep(280);
 
 	/* Write POR value for all registers not loaded with OTP */
 	ret = icm_write8(s, ICM42607_REG_GYRO_CONFIG0, 0x06);
@@ -1155,7 +1155,7 @@ static int icm42607_reset_revB(const struct motion_sensor_t *s)
 
 	/* Check reset is done, 1ms max */
 	for (i = 0; i < 5; i++) {
-		crec_usleep(200);
+		k_usleep(200);
 		ret = icm_read8(s, ICM42607_REG_INT_STATUS, &val);
 		if (ret)
 			return ret;

@@ -188,7 +188,7 @@ static int sn5s330_init(int port)
 		if (status) {
 			ppc_prints("Failed to set FUNC_SET1! Retrying..", port);
 			retries++;
-			crec_msleep(1);
+			k_msleep(1);
 		} else {
 			break;
 		}

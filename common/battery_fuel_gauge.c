@@ -205,7 +205,7 @@ void init_battery_type(void)
 		}
 		CPRINTS("Manuf name not found, wait 100ms then retry (attempt %d)",
 			i);
-		crec_msleep(100);
+		k_msleep(100);
 		ret = battery_manufacturer_name(batt_manuf_name,
 						sizeof(batt_manuf_name));
 	}
@@ -239,7 +239,7 @@ void init_battery_type(void)
 		}
 		CPRINTS("Device name not found, wait 100ms then retry (attempt %d)",
 			i);
-		crec_msleep(100);
+		k_msleep(100);
 		ret = battery_device_name(batt_device_name,
 					  sizeof(batt_device_name));
 	}

@@ -518,7 +518,7 @@ host_command_vboot_hash(struct ec_host_cmd_handler_args *args)
 		/* Wait for hash to finish if command is RECALC */
 		if (p->cmd == EC_VBOOT_HASH_RECALC)
 			while (in_progress)
-				crec_usleep(1000);
+				k_usleep(1000);
 
 		fill_response(r, p->offset);
 		args->output_buf_size = sizeof(*r);

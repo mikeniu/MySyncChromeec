@@ -1580,7 +1580,7 @@ int tcpci_tcpm_init(int port)
 			break;
 		if (--tries <= 0)
 			return error ? error : EC_ERROR_TIMEOUT;
-		crec_msleep(10);
+		k_msleep(10);
 	}
 
 	/*
@@ -1690,7 +1690,7 @@ int tcpci_tcpm_mux_init(const struct usb_mux *me)
 			break;
 		if (--tries <= 0)
 			return error ? error : EC_ERROR_TIMEOUT;
-		crec_msleep(10);
+		k_msleep(10);
 	}
 
 	/* Turn off all alerts and acknowledge any pending IRQ */

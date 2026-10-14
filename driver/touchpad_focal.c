@@ -165,7 +165,7 @@ static int fts_hid2std(int mode)
 			return ret;
 		}
 
-		crec_msleep(10);
+		k_msleep(10);
 		ret = fts_read(NULL, 0, val, 3);
 		if (ret < 0) {
 			CPRINTS("hid2std cmd read fail");
@@ -275,7 +275,7 @@ static int fts_read_chip_id(void)
 
 	CPRINTS("%s", __func__);
 
-	crec_msleep(100);
+	k_msleep(100);
 	for (i = 0; i < 5; i++) {
 		ret = fts_read_reg(FTS_REG_CHIP_ID_H, &val[0]);
 		if (ret < 0) {
@@ -287,7 +287,7 @@ static int fts_read_chip_id(void)
 		}
 
 		CPRINTS("read id %x", val[0]);
-		crec_msleep(50);
+		k_msleep(50);
 	}
 
 	CPRINTS("read chip ID fail, read boot id");
@@ -323,7 +323,7 @@ static bool fts_fw_is_valid(void)
 			break;
 
 		CPRINTS("read id %x", val);
-		crec_msleep(50);
+		k_msleep(50);
 	}
 
 	if (i >= 5) {
@@ -397,7 +397,7 @@ static int fts_enter_upgrade_mode(void)
 		CPRINTS("write FC=0xAA fail");
 		return ret;
 	}
-	crec_msleep(FTS_DELAY_UPGRADE_AA);
+	k_msleep(FTS_DELAY_UPGRADE_AA);
 
 	ret = fts_write_reg(reg, FTS_UPGRADE_55);
 	if (ret < 0) {
@@ -405,7 +405,7 @@ static int fts_enter_upgrade_mode(void)
 		return ret;
 	}
 
-	crec_msleep(FTS_DELAY_UPGRADE_RESET);
+	k_msleep(FTS_DELAY_UPGRADE_RESET);
 	return 0;
 }
 
@@ -434,7 +434,7 @@ static bool fts_fwupg_check_flash_status(uint16_t flash_status, int retries,
 			return true;
 		}
 		watchdog_reload();
-		crec_msleep(retries_delay);
+		k_msleep(retries_delay);
 	}
 
 	CPRINTS("flash status fail,ok:%04x,read:%04x,retries:%d", flash_status,
@@ -465,7 +465,7 @@ static int fts_fwupg_erase(uint32_t delay)
 		return ret;
 	}
 	watchdog_reload();
-	crec_msleep(delay);
+	k_msleep(delay);
 	/* read status 0xF0AA: success */
 	flag = fts_fwupg_check_flash_status(FTS_CMD_FLASH_STATUS_ERASE_OK,
 					    FTS_RETRIES_REASE,
@@ -548,7 +548,7 @@ static int fts_flash_write_buf(uint32_t saddr, const uint8_t *buf, uint32_t len,
 			CPRINTS("app write fail");
 			return ret;
 		}
-		crec_msleep(delay);
+		k_msleep(delay);
 
 		/* read status */
 		wr_ok = 0x1000 + addr / packet_len;
@@ -560,7 +560,7 @@ static int fts_flash_write_buf(uint32_t saddr, const uint8_t *buf, uint32_t len,
 			if (wr_ok == read_status) {
 				break;
 			}
-			crec_msleep(1);
+			k_msleep(1);
 		}
 		watchdog_reload();
 	}
@@ -623,7 +623,7 @@ static int fts_fwupg_ecc_cal(uint32_t saddr, uint32_t len)
 		CPRINTS("ecc calc cmd write fail");
 		return ret;
 	}
-	crec_msleep(packet_len / 256);
+	k_msleep(packet_len / 256);
 
 	/* read status if check sum is finished */
 	bflag = fts_fwupg_check_flash_status(FTS_CMD_FLASH_STATUS_ECC_OK,
@@ -659,7 +659,7 @@ static int fts_fwupg_reset_in_boot(void)
 	}
 	board_touchpad_reset();
 
-	crec_msleep(FTS_DELAY_UPGRADE_RESET);
+	k_msleep(FTS_DELAY_UPGRADE_RESET);
 	return 0;
 }
 
@@ -755,7 +755,7 @@ int touchpad_update_write(int offset, int size, const uint8_t *data)
 			CPRINTS("reset to normal boot fail");
 		}
 		ecc_in_host = 0;
-		crec_msleep(200);
+		k_msleep(200);
 		gpio_enable_interrupt(GPIO_TOUCHPAD_INT);
 	}
 	return EC_SUCCESS;
@@ -794,13 +794,13 @@ void fts_tp_read_report_retry(void)
 			return;
 
 		/* Try again */
-		crec_msleep(1);
+		k_msleep(1);
 	}
 
 	/* Failed to read data, reset the touchpad. */
 	CPRINTF("Resetting TP.");
 	board_touchpad_reset();
-	crec_msleep(200);
+	k_msleep(200);
 	fts_tp_init();
 }
 

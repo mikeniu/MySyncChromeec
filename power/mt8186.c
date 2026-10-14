@@ -111,7 +111,7 @@ static bool power_is_enough(void)
 
 	while (!system_can_boot_ap() &&
 	       !timestamp_expired(poll_deadline, NULL)) {
-		crec_usleep(CAN_BOOT_AP_CHECK_WAIT);
+		k_usleep(CAN_BOOT_AP_CHECK_WAIT);
 	}
 
 	return system_can_boot_ap();
@@ -122,9 +122,9 @@ static bool power_is_enough(void)
 static void set_pmic_pwron(void)
 {
 	GPIO_SET_LEVEL(GPIO_EC_PMIC_EN_ODL, 1);
-	crec_msleep(PMIC_EN_PULSE_MS);
+	k_msleep(PMIC_EN_PULSE_MS);
 	GPIO_SET_LEVEL(GPIO_EC_PMIC_EN_ODL, 0);
-	crec_msleep(PMIC_EN_PULSE_MS);
+	k_msleep(PMIC_EN_PULSE_MS);
 	GPIO_SET_LEVEL(GPIO_EC_PMIC_EN_ODL, 1);
 }
 
@@ -144,7 +144,7 @@ static void set_pmic_pwroff(void)
 	pmic_off_timeout.val += PMIC_HARD_OFF_DELAY;
 
 	while (!timestamp_expired(pmic_off_timeout, NULL)) {
-		crec_msleep(100);
+		k_msleep(100);
 	};
 
 	GPIO_SET_LEVEL(GPIO_EC_PMIC_EN_ODL, 1);
@@ -268,7 +268,7 @@ void chipset_reset(enum chipset_shutdown_reason reason)
 	hook_call_deferred(&reset_flag_deferred_data, RESET_FLAG_TIMEOUT);
 	/* Hold GPIO_SYS_RST_ODL to S5 and it will be released during S5->S3. */
 	GPIO_SET_LEVEL(GPIO_SYS_RST_ODL, 0);
-	crec_usleep(SYS_RST_PULSE_LENGTH);
+	k_usleep(SYS_RST_PULSE_LENGTH);
 }
 
 #ifdef CONFIG_POWER_TRACK_HOST_SLEEP_STATE
@@ -594,7 +594,7 @@ enum power_state power_handle_state(enum power_state state)
 			CPRINTS("PMIC reset AP timeout. Forcing PMIC off");
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5), 0);
 #ifdef CONFIG_PLATFORM_EC_PP3700_DISCHARGE_TIME_MS
-		crec_msleep(CONFIG_PLATFORM_EC_PP3700_DISCHARGE_TIME_MS);
+		k_msleep(CONFIG_PLATFORM_EC_PP3700_DISCHARGE_TIME_MS);
 #endif /* CONFIG_PLATFORM_EC_PP3700_DISCHARGE_TIME_MS */
 		power_signal_disable_interrupt(GPIO_PMIC_EC_RESETB);
 #endif /* DT_NODE_EXISTS(DT_NODELABEL(en_pp4200_s5)) */

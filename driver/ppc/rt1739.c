@@ -207,12 +207,12 @@ static int rt1739_workaround(int port)
 		RETURN_ERROR(write_reg(port, RT1739_VBUS_FAULT_DIS, 0));
 		RETURN_ERROR(write_reg(port, RT1739_REG_VBUS_CTRL1, 0));
 		RETURN_ERROR(write_reg(port, RT1739_REG_VBUS_SWITCH_CTRL, 0));
-		crec_msleep(5);
+		k_msleep(5);
 		RETURN_ERROR(write_reg(port, RT1739_REG_VBUS_SWITCH_CTRL,
 				       RT1739_LV_SRC_EN));
-		crec_msleep(5);
+		k_msleep(5);
 		RETURN_ERROR(write_reg(port, RT1739_REG_VBUS_SWITCH_CTRL, 0));
-		crec_msleep(5);
+		k_msleep(5);
 		RETURN_ERROR(write_reg(
 			port, RT1739_VBUS_FAULT_DIS,
 			RT1739_OVP_DISVBUS_EN | RT1739_UVLO_DISVBUS_EN |

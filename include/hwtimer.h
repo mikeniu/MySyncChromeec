@@ -14,13 +14,10 @@
 extern "C" {
 #endif
 
-/* Returns the timestamp of the next programed event */
-uint32_t __hw_clock_event_get(void);
-
 /**
  * Get the lower 32-bits of the free-running counter used as clock
  *
- * The counter resolution must be 1us, since udelay() relies on this.
+ * The counter resolution must be 1us, since k_busy_wait() relies on this.
  *
  * @return current counter value
  */

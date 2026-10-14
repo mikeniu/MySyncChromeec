@@ -66,11 +66,11 @@ void svdm_set_hpd_gpio_irq(int port)
 		while (get_time().val <
 		       debounce_start_time + HPD_DSTREAM_DEBOUNCE_IRQ) {
 			/* Small delay to reduce CPU usage in the loop */
-			crec_usleep(50);
+			k_usleep(50);
 		}
 
 	} else {
-		crec_usleep(HPD_DSTREAM_DEBOUNCE_IRQ);
+		k_usleep(HPD_DSTREAM_DEBOUNCE_IRQ);
 	}
 
 	svdm_set_hpd_gpio(port, 1);
@@ -93,7 +93,7 @@ enum ec_error_list dp_hpd_gpio_set(int port, bool level, bool irq)
 		uint64_t now = get_time().val;
 		/* wait for the minimum spacing between IRQ_HPD if needed */
 		if (now < svdm_hpd_deadline[port])
-			crec_usleep(svdm_hpd_deadline[port] - now);
+			k_usleep(svdm_hpd_deadline[port] - now);
 
 		svdm_set_hpd_gpio_irq(port);
 	} else {

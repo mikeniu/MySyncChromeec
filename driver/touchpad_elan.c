@@ -357,7 +357,7 @@ test_export_static void elan_tp_init(void)
 	CPRINTS("%s", __func__);
 
 	elan_tp_write_cmd(ETP_I2C_STAND_CMD, ETP_I2C_RESET);
-	crec_msleep(100);
+	k_msleep(100);
 	rv = i2c_xfer(CONFIG_TOUCHPAD_I2C_PORT, CONFIG_TOUCHPAD_I2C_ADDR_FLAGS,
 		      NULL, 0, val, sizeof(val));
 
@@ -516,11 +516,11 @@ static int elan_prepare_for_update(void)
 	if (!initial_mode) {
 		CPRINTS("%s: In IAP mode, reset IC.", __func__);
 		elan_tp_write_cmd(ETP_I2C_IAP_RESET_CMD, ETP_I2C_IAP_RESET);
-		crec_msleep(30);
+		k_msleep(30);
 	}
 	/* Send the passphrase */
 	elan_tp_write_cmd(ETP_I2C_IAP_CMD, ETP_I2C_IAP_PASSWORD);
-	crec_msleep(initial_mode ? 100 : 30);
+	k_msleep(initial_mode ? 100 : 30);
 
 	/* We should be in the IAP mode now */
 	if (elan_in_main_mode()) {
@@ -535,7 +535,7 @@ static int elan_prepare_for_update(void)
 
 	/* Send the passphrase again */
 	elan_tp_write_cmd(ETP_I2C_IAP_CMD, ETP_I2C_IAP_PASSWORD);
-	crec_msleep(30);
+	k_msleep(30);
 
 	/* Verify the password */
 	if (elan_tp_read_cmd(ETP_I2C_IAP_CMD, &rx_buf)) {
@@ -585,7 +585,7 @@ fail:
 	i2c_lock(CONFIG_TOUCHPAD_I2C_PORT, 0);
 	if (rv)
 		return rv;
-	crec_msleep(elan_tp_params.page_size >= 512 ? 50 : 35);
+	k_msleep(elan_tp_params.page_size >= 512 ? 50 : 35);
 
 	rv = elan_tp_read_cmd(ETP_I2C_IAP_CTRL_CMD, &rx_buf);
 
@@ -795,7 +795,7 @@ void elan_tp_read_report_retry(void)
 			return;
 
 		/* Try again */
-		crec_msleep(1);
+		k_msleep(1);
 	}
 
 	/* Failed to read data, reset the touchpad. */

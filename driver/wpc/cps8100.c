@@ -264,7 +264,7 @@ static int cps8100_i2c_write(int port, int addr, const uint8_t *buf, size_t len)
 	rv = i2c_xfer(port, addr, buf, len, NULL, 0);
 
 	if (rv) {
-		crec_msleep(cps8100_wake_up_delay_ms);
+		k_msleep(cps8100_wake_up_delay_ms);
 		rv = i2c_xfer(port, addr, buf, len, NULL, 0);
 	}
 	if (rv)
@@ -523,7 +523,7 @@ static int cps8601_write_mem(int port, uint32_t addr, uint8_t *data, size_t len)
 
 		offset += block_size;
 		addr += block_size;
-		crec_msleep(short_sleep_ms);
+		k_msleep(short_sleep_ms);
 	}
 
 	if (remaining) {
@@ -553,7 +553,7 @@ static int cps8601_write_mem(int port, uint32_t addr, uint8_t *data, size_t len)
 				addr);
 			return rv;
 		}
-		crec_msleep(short_sleep_ms);
+		k_msleep(short_sleep_ms);
 	}
 
 	return EC_SUCCESS;
@@ -615,7 +615,7 @@ static int cps8200_wait_cmd_done(int port, uint8_t id)
 
 	deadline.val = get_time().val + CPS8200_CMD_TIMEOUT;
 	while (1) {
-		crec_msleep(10);
+		k_msleep(10);
 		rv = cps8200_read32(port, CPS8200_ADDR_CMD_STATUS, &u32);
 		if (rv)
 			return EC_ERROR_UNKNOWN;
@@ -646,7 +646,7 @@ static int cps8601_wait_cmd_done(int port)
 
 	deadline.val = get_time().val + CPS8200_CMD_TIMEOUT;
 	while (1) {
-		crec_msleep(10);
+		k_msleep(10);
 		rv = cps8601_read32(port, CPS8601_ADDR_CMD_STATUS, &u32);
 		if (rv)
 			return EC_ERROR_UNKNOWN;
@@ -694,7 +694,7 @@ static int cps8x00_reset(struct pchg *ctx)
 {
 	gpio_set_level(GPIO_QI_RESET_L, 0);
 	cps8100_status_update(ctx, 0);
-	udelay(15);
+	k_busy_wait(15);
 	gpio_set_level(GPIO_QI_RESET_L, 1);
 
 	return EC_SUCCESS;
@@ -750,18 +750,18 @@ static int cps8x00_get_chip_info(struct pchg *ctx)
 		 * already probed but unlock again in case it's turned
 		 * off.
 		 */
-		crec_msleep(CPS8100_POWER_ON_DELAY_MS);
+		k_msleep(CPS8100_POWER_ON_DELAY_MS);
 		return cps8100_unlock(port);
 	} else if (chip_id == CPS8200_CHIPID) {
-		crec_msleep(CPS8200_POWER_ON_DELAY_MS);
+		k_msleep(CPS8200_POWER_ON_DELAY_MS);
 		return cps8200_unlock(port);
 	} else if (chip_id == CPS8601_CHIPID) {
-		crec_msleep(CPS8601_POWER_ON_DELAY_MS);
+		k_msleep(CPS8601_POWER_ON_DELAY_MS);
 		return cps8601_unlock(port);
 	}
 
 	/* not probed yet, need to unlock blindly first. */
-	crec_msleep(max(CPS8100_POWER_ON_DELAY_MS, CPS8200_POWER_ON_DELAY_MS));
+	k_msleep(max(CPS8100_POWER_ON_DELAY_MS, CPS8200_POWER_ON_DELAY_MS));
 	if (!cps8100_unlock(port))
 		rv = cps8100_read32(port, CPS8100_REG_IC_INFO, &u32);
 	else if (!cps8200_unlock(port))
@@ -894,37 +894,37 @@ static int cps8200_update_open(struct pchg *ctx)
 	rv = cps8200_write32(port, 0x40014028, 0x00010000);
 	if (rv)
 		return rv;
-	crec_msleep(50);
+	k_msleep(50);
 
 	/* Reset watchdog */
 	rv = cps8200_write32(port, 0x40008400, 0x1ACCE551);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 	rv = cps8200_write32(port, 0x40008008, 0x0);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* Disable DCDC module */
 	rv = cps8200_write32(port, 0x4000F0A4, 0x0);
 	if (rv)
 		return rv;
-	crec_msleep(50);
+	k_msleep(50);
 
 	/* Reset MCU clock */
 	rv = cps8200_write32(port, 0x40014020, 0x0);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 	rv = cps8200_write32(port, 0x40014024, 0x0);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 	rv = cps8200_write32(port, 0x400140A8, 0x0);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* Program bootloader to SRAM */
 	CPRINTS("Loading bootloader hex!");
@@ -933,49 +933,49 @@ static int cps8200_update_open(struct pchg *ctx)
 		CPRINTS("Failed to write bootloader!");
 		return EC_ERROR_UNKNOWN;
 	}
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* disable trim */
 	rv = cps8200_write32(port, 0x4001F01C, 0x0);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* enable address remap */
 	rv = cps8200_write32(port, 0x4001F030, 0xFFFFFF00);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 	rv = cps8200_write32(port, 0x4001F034, 0xFFFFFFFF);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 	rv = cps8200_write32(port, 0x4001F038, 0xFFFFFFFF);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 	rv = cps8200_write32(port, 0x4001F03C, 0xFFFFFFFF);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* disable mcu halt, run bootloader */
 	rv = cps8200_write32(port, 0x40014028, 0x101);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* enable i2c and unlock */
 	rv = cps8200_i2c_enable(port);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* write bootloader length */
 	rv = cps8200_write32(port, CPS8200_ADDR_BUFFER0, boot_hex_len * 4);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* calculate CRC of bootloader */
 	rv = cps8200_send_cmd(ctx, CMD_CACL_CRC_BOOT, &id);
@@ -986,7 +986,7 @@ static int cps8200_update_open(struct pchg *ctx)
 	rv = cps8200_wait_cmd_done(port, id);
 	if (rv)
 		return rv;
-	crec_msleep(100);
+	k_msleep(100);
 
 	/* check CRC */
 	rv = cps8200_read32(port, CPS8200_ADDR_BUFFER0, &u32);
@@ -1032,7 +1032,7 @@ static int cps8200_update_write(struct pchg *ctx)
 	if (cps8200_write_mem(port, CPS8200_ADDR_BUFFER0, buf,
 			      ctx->update.size))
 		return EC_ERROR_UNKNOWN;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* Write buffer to flash */
 	rv = cps8200_send_cmd(ctx, CMD_PGM_BUFFER0, &id);
@@ -1073,7 +1073,7 @@ static int cps8200_update_close(struct pchg *ctx)
 	rv = cps8200_write32(port, CPS8200_ADDR_BUFFER0, len);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* Check firmware CRC */
 	CPRINTS("Checking Firmware CRC...");
@@ -1086,7 +1086,7 @@ static int cps8200_update_close(struct pchg *ctx)
 		CPRINTS("Command to calculate CRC timeout or failed: %d", rv);
 		return EC_ERROR_UNKNOWN;
 	}
-	crec_msleep(100);
+	k_msleep(100);
 
 	cps8200_read32(port, CPS8200_ADDR_BUFFER0, &u32);
 	if (upd->crc != (u32 & 0x0000ffff)) {
@@ -1118,10 +1118,10 @@ static int cps8200_update_close(struct pchg *ctx)
 
 	/* power off MCU */
 	board_pchg_power_on(PCHG_CTX_TO_PORT(ctx), 0);
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 	/* power on MCU */
 	board_pchg_power_on(PCHG_CTX_TO_PORT(ctx), 1);
-	crec_msleep(CPS8200_POWER_ON_DELAY_MS);
+	k_msleep(CPS8200_POWER_ON_DELAY_MS);
 	/* Update the information of firmware version */
 	cps8200_unlock(port);
 	rv = cps8x00_read_firmware_ver(ctx);
@@ -1160,7 +1160,7 @@ static int cps8601_update_open(struct pchg *ctx)
 	rv = cps8601_i2c_enable(port);
 	if (rv)
 		return rv;
-	crec_msleep(100);
+	k_msleep(100);
 
 	rv = cps8601_read32(port, 0xFFFFFF00, &u32);
 	if (rv)
@@ -1169,7 +1169,7 @@ static int cps8601_update_open(struct pchg *ctx)
 	rv = cps8601_write32(port, 0x40040030, 0xFFFFFFFF);
 	if (rv)
 		return rv;
-	crec_msleep(50);
+	k_msleep(50);
 
 	rv = cps8601_write32(port, 0x40040070, 0x0000A061);
 	if (rv)
@@ -1209,11 +1209,11 @@ static int cps8601_update_open(struct pchg *ctx)
 		return rv;
 
 	/* bootloader verification*/
-	crec_msleep(10);
+	k_msleep(10);
 	rv = cps8601_write32(port, 0xFFFFFF00, 0x0000000E);
 	if (rv)
 		return rv;
-	crec_msleep(100);
+	k_msleep(100);
 
 	rv = cps8601_write32(port, 0x40040030, 0xFFFFFFFF);
 	if (rv)
@@ -1228,7 +1228,7 @@ static int cps8601_update_open(struct pchg *ctx)
 			     cps8601_boot_hex_len * 4);
 	if (rv)
 		return rv;
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* calculate CRC of bootloader */
 	rv = cps8601_write32(port, 0x200009FC, 0x000000B0);
@@ -1239,7 +1239,7 @@ static int cps8601_update_open(struct pchg *ctx)
 	rv = cps8601_wait_cmd_done(port);
 	if (rv)
 		return rv;
-	crec_msleep(100);
+	k_msleep(100);
 
 	/* check CRC */
 	rv = cps8601_read32(port, CPS8601_ADDR_BUFFER0, &u32);
@@ -1259,7 +1259,7 @@ static int cps8601_update_open(struct pchg *ctx)
 	rv = cps8601_i2c_enable(port);
 	if (rv)
 		return rv;
-	crec_msleep(100);
+	k_msleep(100);
 
 	rv = cps8601_write32(port, 0x40040030, 0xFFFFFFFF);
 	if (rv)
@@ -1299,7 +1299,7 @@ static int cps8601_update_write(struct pchg *ctx)
 
 	CPRINTS("WGX SIZE : %d ", ctx->update.size);
 
-	crec_msleep(short_sleep_ms);
+	k_msleep(short_sleep_ms);
 
 	/* Write buffer to flash */
 	rv = cps8601_write32(port, 0x200009FC, 0x00000010);
@@ -1354,7 +1354,7 @@ static int cps8601_update_close(struct pchg *ctx)
 		return EC_ERROR_UNKNOWN;
 	}
 
-	crec_msleep(100);
+	k_msleep(100);
 
 	cps8601_read32(port, CPS8601_ADDR_BUFFER0, &u32);
 	CPRINTS("crc = %04x, expect %04x", u32, upd->crc);
@@ -1376,7 +1376,7 @@ static int cps8601_update_close(struct pchg *ctx)
 	rv = cps8601_i2c_enable(port);
 	if (rv)
 		return rv;
-	crec_msleep(100);
+	k_msleep(100);
 
 	rv = cps8601_write32(port, 0x40040030, 0xFFFFFFFF);
 	if (rv)

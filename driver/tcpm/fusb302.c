@@ -142,7 +142,7 @@ static int measure_cc_pin_source(int port, int cc_measure)
 	tcpc_write(port, TCPC_REG_MEASURE, state[port].mdac_vnc);
 
 	/* Wait on measurement */
-	crec_usleep(250);
+	k_usleep(250);
 
 	/* Read status register */
 	tcpc_read(port, TCPC_REG_STATUS0, &reg);
@@ -156,7 +156,7 @@ static int measure_cc_pin_source(int port, int cc_measure)
 		tcpc_write(port, TCPC_REG_MEASURE, state[port].mdac_rd);
 
 		/* Wait on measurement */
-		crec_usleep(250);
+		k_usleep(250);
 
 		/* Read status register */
 		tcpc_read(port, TCPC_REG_STATUS0, &reg);
@@ -231,7 +231,7 @@ static void detect_cc_pin_sink(int port, enum tcpc_cc_voltage_status *cc1,
 	/* CC1 is now being measured by FUSB302. */
 
 	/* Wait on measurement */
-	crec_usleep(250);
+	k_usleep(250);
 
 	tcpc_read(port, TCPC_REG_STATUS0, &bc_lvl_cc1);
 
@@ -253,7 +253,7 @@ static void detect_cc_pin_sink(int port, enum tcpc_cc_voltage_status *cc1,
 	/* CC2 is now being measured by FUSB302. */
 
 	/* Wait on measurement */
-	crec_usleep(250);
+	k_usleep(250);
 
 	tcpc_read(port, TCPC_REG_STATUS0, &bc_lvl_cc2);
 
@@ -454,7 +454,7 @@ static int fusb302_tcpm_init(int port)
 
 #if defined(CONFIG_USB_PD_VBUS_DETECT_TCPC) && defined(CONFIG_USB_CHARGER)
 	/* Wait for the reference voltage to stablize */
-	crec_usleep(250);
+	k_usleep(250);
 	/*
 	 * Initialize VBUS supplier when VBUS is already present before
 	 * init (e.g. Cold reboot with charger plugged).
@@ -1112,7 +1112,7 @@ static int fusb302_tcpm_enter_low_power_mode(int port)
 	if (rv)
 		return rv;
 
-	crec_usleep(250);
+	k_usleep(250);
 
 	rv = i2c_read8(tcpc_config[port].i2c_info.port,
 		       tcpc_config[port].i2c_info.addr_flags, TCPC_REG_CONTROL2,
@@ -1143,7 +1143,7 @@ static int fusb302_compare_mdac(int port, int mdac)
 		   (mdac & TCPC_REG_MEASURE_MDAC_MASK) | TCPC_REG_MEASURE_VBUS);
 
 	/* Wait on measurement */
-	crec_usleep(350);
+	k_usleep(350);
 
 	/*
 	 * Read status register, if STATUS0_COMP=1 then vbus is higher than

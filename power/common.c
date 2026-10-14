@@ -463,7 +463,7 @@ static enum power_state power_common_state(void)
 			 * user specified delay times out.
 			 */
 			for (i = 0; i < reboot_ap_at_g3_delay; i += 100)
-				crec_msleep(100);
+				k_msleep(100);
 			reboot_ap_at_g3_delay = 0;
 
 			return POWER_G3S5;

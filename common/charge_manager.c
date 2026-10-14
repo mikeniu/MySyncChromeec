@@ -1465,7 +1465,7 @@ void charge_manager_leave_safe_mode(void)
 	 * CHARGE_PORT_NONE around init time and not cut off the
 	 * input FETs.
 	 */
-	crec_msleep(board_get_leave_safe_mode_delay_ms());
+	k_msleep(board_get_leave_safe_mode_delay_ms());
 	CPRINTS("%s()", __func__);
 	left_safe_mode = 1;
 	if (charge_manager_is_seeded())
