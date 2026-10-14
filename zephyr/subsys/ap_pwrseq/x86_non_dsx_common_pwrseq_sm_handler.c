@@ -9,8 +9,7 @@
 #include "zephyr_console_shim.h"
 
 #include <zephyr/init.h>
-
-#include <atomic.h>
+#include <zephyr/sys/atomic.h>
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
 #include <x86_non_dsx_common_pwrseq_sm_handler.h>
 #else

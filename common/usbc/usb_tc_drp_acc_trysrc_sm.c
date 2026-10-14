@@ -71,14 +71,14 @@ void print_flag(int port, int set_or_clear, int flag);
 		print_flag(port, 1, flag);          \
 		atomic_or(&tc[port].flags, (flag)); \
 	} while (0)
-#define TC_CLR_FLAG(port, flag)                             \
-	do {                                                \
-		print_flag(port, 0, flag);                  \
-		atomic_clear_bits(&tc[port].flags, (flag)); \
+#define TC_CLR_FLAG(port, flag)                       \
+	do {                                          \
+		print_flag(port, 0, flag);            \
+		atomic_and(&tc[port].flags, ~(flag)); \
 	} while (0)
 #else
 #define TC_SET_FLAG(port, flag) atomic_or(&tc[port].flags, (flag))
-#define TC_CLR_FLAG(port, flag) atomic_clear_bits(&tc[port].flags, (flag))
+#define TC_CLR_FLAG(port, flag) atomic_and(&tc[port].flags, ~(flag))
 #endif
 #define TC_CHK_FLAG(port, flag) (tc[port].flags & (flag))
 
@@ -610,8 +610,7 @@ static bool pd_comm_allowed_by_policy(void)
 static void tc_policy_pd_enable(int port, int en)
 {
 	if (en)
-		atomic_clear_bits(&tc[port].pd_disabled_mask,
-				  PD_DISABLED_BY_POLICY);
+		atomic_and(&tc[port].pd_disabled_mask, ~PD_DISABLED_BY_POLICY);
 	else
 		atomic_or(&tc[port].pd_disabled_mask, PD_DISABLED_BY_POLICY);
 
@@ -621,8 +620,8 @@ static void tc_policy_pd_enable(int port, int en)
 static void tc_enable_pd(int port, int en)
 {
 	if (en)
-		atomic_clear_bits(&tc[port].pd_disabled_mask,
-				  PD_DISABLED_NO_CONNECTION);
+		atomic_and(&tc[port].pd_disabled_mask,
+			   ~PD_DISABLED_NO_CONNECTION);
 	else
 		atomic_or(&tc[port].pd_disabled_mask,
 			  PD_DISABLED_NO_CONNECTION);
@@ -636,7 +635,7 @@ __maybe_unused static void tc_enable_try_src(int en)
 	if (en)
 		atomic_or(&pd_try_src, 1);
 	else
-		atomic_clear_bits(&pd_try_src, 1);
+		atomic_and(&pd_try_src, ~1);
 }
 
 /*
@@ -1930,8 +1929,8 @@ static __maybe_unused int reset_device_and_notify(int port)
 	 * waking the TCPC, but it has also set PD_EVENT_TCPC_RESET again, which
 	 * would result in a second, unnecessary init.
 	 */
-	atomic_clear_bits(task_get_event_bitmap(task_get_current()),
-			  PD_EVENT_TCPC_RESET);
+	atomic_and(task_get_event_bitmap(task_get_current()),
+		   ~PD_EVENT_TCPC_RESET);
 
 	waiting_tasks = atomic_clear(&tc[port].tasks_waiting_on_reset);
 
@@ -1995,8 +1994,7 @@ void pd_prevent_low_power_mode(int port, int prevent)
 	if (prevent)
 		atomic_or(&tc[port].tasks_preventing_lpm, current_task_mask);
 	else
-		atomic_clear_bits(&tc[port].tasks_preventing_lpm,
-				  current_task_mask);
+		atomic_and(&tc[port].tasks_preventing_lpm, ~current_task_mask);
 }
 #endif /* CONFIG_USB_PD_TCPC_LOW_POWER */
 

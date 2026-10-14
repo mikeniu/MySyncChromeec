@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "console.h"
 #include "driver/accel_bma2x2.h"
 #include "lid_angle.h"
@@ -15,6 +14,7 @@
 
 #include <zephyr/fff.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/ztest.h>
 
 static int16_t mock_offset[3];

@@ -6,7 +6,6 @@
 /* Motion sense module to read from various motion sensors. */
 
 #include "accelgyro.h"
-#include "atomic.h"
 #include "body_detection.h"
 #include "builtin/assert.h"
 #include "chipset.h"
@@ -34,6 +33,7 @@
 #include "util.h"
 
 #include <zephyr/kernel.h>
+#include <zephyr/sys/atomic.h>
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_MOTION_SENSE, outstr)

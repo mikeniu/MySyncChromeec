@@ -265,9 +265,8 @@ static void frs_gpio_disable_deferred(void)
 
 	for (i = 0; i < board_get_usb_pd_port_count(); ++i) {
 		if (frs_flag[i] & FLAG_FRS_VBUS_VALID_FALL) {
-			atomic_clear_bits(&frs_flag[i],
-					  FLAG_FRS_RX_SIGNALLED |
-						  FLAG_FRS_VBUS_VALID_FALL);
+			atomic_and(&frs_flag[i], ~(FLAG_FRS_RX_SIGNALLED |
+						   FLAG_FRS_VBUS_VALID_FALL));
 			/* If the FRS gets enabled again, do not disable it. */
 			if (!(frs_flag[i] & FLAG_FRS_ENABLED))
 				board_rt1718s_set_frs_enable(i, 0);
@@ -537,7 +536,7 @@ int rt1718s_set_frs_enable(int port, int enable)
 		vbus_ctrl_en |= RT1718S_VBUS_CTRL_EN_GPIO2_VBUS_PATH_EN;
 		vbus_ctrl_en |= RT1718S_VBUS_CTRL_EN_GPIO1_VBUS_PATH_EN;
 	} else {
-		atomic_clear_bits(&frs_flag[port], FLAG_FRS_ENABLED);
+		atomic_and(&frs_flag[port], ~FLAG_FRS_ENABLED);
 		if (FLAG_FRS_RX_SIGNALLED ==
 		    (frs_flag[port] &
 		     (FLAG_FRS_RX_SIGNALLED | FLAG_FRS_VBUS_VALID_FALL))) {

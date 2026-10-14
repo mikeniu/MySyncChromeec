@@ -25,11 +25,11 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 
 #include <ap_power/ap_power.h>
 #include <ap_power/ap_power_espi.h>
 #include <ap_power/ap_power_events.h>
-#include <atomic.h>
 
 #define VWIRE_PULSE_TRIGGER_TIME \
 	CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_DEFAULT_VW_WIDTH_US

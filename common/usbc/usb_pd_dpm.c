@@ -77,7 +77,7 @@ __overridable const struct svdm_response svdm_rsp = {
 };
 
 #define DPM_SET_FLAG(port, flag) atomic_or(&dpm[(port)].flags, (flag))
-#define DPM_CLR_FLAG(port, flag) atomic_clear_bits(&dpm[(port)].flags, (flag))
+#define DPM_CLR_FLAG(port, flag) atomic_and(&dpm[(port)].flags, ~(flag))
 #define DPM_CHK_FLAG(port, flag) (dpm[(port)].flags & (flag))
 
 /* Flags for internal DPM state */
@@ -839,8 +839,8 @@ void dpm_remove_sink(int port)
 	    !(BIT(port) & (uint32_t)non_pd_sink_max_requested))
 		return;
 
-	atomic_clear_bits(&sink_max_pdo_requested, BIT(port));
-	atomic_clear_bits(&non_pd_sink_max_requested, BIT(port));
+	atomic_and(&sink_max_pdo_requested, ~BIT(port));
+	atomic_and(&non_pd_sink_max_requested, ~BIT(port));
 
 	/* Restore selected default Rp on the port */
 	typec_select_src_current_limit_rp(
@@ -860,7 +860,7 @@ void dpm_remove_source(int port)
 	if (!(BIT(port) & (uint32_t)source_frs_max_requested))
 		return;
 
-	atomic_clear_bits(&source_frs_max_requested, BIT(port));
+	atomic_and(&source_frs_max_requested, ~BIT(port));
 
 	balance_source_ports();
 }

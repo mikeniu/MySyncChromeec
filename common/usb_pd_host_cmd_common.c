@@ -5,7 +5,6 @@
  * Host commands shared across multiple USB-PD implementations
  */
 
-#include "atomic.h"
 #include "battery.h"
 #include "console.h"
 #include "ec_commands.h"
@@ -17,6 +16,8 @@
 
 #include <stdbool.h>
 #include <string.h>
+
+#include <zephyr/sys/atomic.h>
 
 __overridable enum ec_pd_port_location board_get_pd_port_location(int port)
 {

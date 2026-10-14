@@ -5,7 +5,6 @@
  * Event handling in MKBP keyboard protocol
  */
 
-#include "atomic.h"
 #include "chipset.h"
 #include "gpio.h"
 #include "host_command.h"
@@ -20,6 +19,7 @@
 #include "util.h"
 
 #include <zephyr/mgmt/ec_host_cmd/backend.h>
+#include <zephyr/sys/atomic.h>
 
 #define CPUTS(outstr) cputs(CC_SYSTEM, outstr)
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)

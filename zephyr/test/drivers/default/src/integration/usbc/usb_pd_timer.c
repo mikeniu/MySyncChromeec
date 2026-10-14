@@ -3,10 +3,10 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "timer.h"
 #include "usb_pd_timer.h"
 
+#include <zephyr/sys/atomic.h>
 #include <zephyr/ztest.h>
 
 ZTEST_SUITE(usb_pd_timer, NULL, NULL, NULL, NULL, NULL);

@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "battery.h"
 #include "battery_smart.h"
 #include "builtin/assert.h"
@@ -41,6 +40,8 @@
 #include "usbc_ppc.h"
 #include "util.h"
 
+#include <zephyr/sys/atomic.h>
+
 /*
  * USB Policy Engine Sink / Source module
  *
@@ -76,9 +77,8 @@
 
 #define PE_SET_FN(port, _fn) \
 	atomic_or(ATOMIC_ELEM(pe[port].flags_a, (_fn)), ATOMIC_MASK(_fn))
-#define PE_CLR_FN(port, _fn)                                    \
-	atomic_clear_bits(ATOMIC_ELEM(pe[port].flags_a, (_fn)), \
-			  ATOMIC_MASK(_fn))
+#define PE_CLR_FN(port, _fn) \
+	atomic_and(ATOMIC_ELEM(pe[port].flags_a, (_fn)), ~ATOMIC_MASK(_fn))
 #define PE_CHK_FN(port, _fn) \
 	(pe[port].flags_a[ATOMIC_ELEM(0, (_fn))] & ATOMIC_MASK(_fn))
 
@@ -90,15 +90,14 @@
  * TODO(b/229655319): support more than 32 bits
  */
 #define PE_SET_MASK(port, mask) atomic_or(&pe[port].flags_a[0], (mask))
-#define PE_CLR_MASK(port, mask) atomic_clear_bits(&pe[port].flags_a[0], (mask))
+#define PE_CLR_MASK(port, mask) atomic_and(&pe[port].flags_a[0], ~(mask))
 
 /*
  * These macros SET, CLEAR, and CHECK, a DPM (Device Policy Manager)
  * Request. The Requests are listed in usb_pe_sm.h.
  */
 #define PE_SET_DPM_REQUEST(port, req) atomic_or(&pe[port].dpm_request, (req))
-#define PE_CLR_DPM_REQUEST(port, req) \
-	atomic_clear_bits(&pe[port].dpm_request, (req))
+#define PE_CLR_DPM_REQUEST(port, req) atomic_and(&pe[port].dpm_request, ~(req))
 #define PE_CHK_DPM_REQUEST(port, req) (pe[port].dpm_request & (req))
 
 /* Message flags which should not persist on returning to ready state */
@@ -1072,7 +1071,7 @@ void pd_notify_event(int port, uint32_t event_mask)
 
 void pd_clear_events(int port, uint32_t clear_mask)
 {
-	atomic_clear_bits(&pe[port].events, clear_mask);
+	atomic_and(&pe[port].events, ~clear_mask);
 }
 
 uint32_t pd_get_events(int port)
@@ -8687,7 +8686,7 @@ __maybe_unused void pd_discovery_access_clear(int port,
 	if (!IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP))
 		assert(0);
 
-	atomic_clear_bits(&task_access[port][type], 0xFFFFFFFF);
+	atomic_clear(&task_access[port][type]);
 }
 
 __maybe_unused bool pd_discovery_access_validate(int port,
