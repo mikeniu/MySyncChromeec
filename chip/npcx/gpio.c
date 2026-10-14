@@ -535,10 +535,21 @@ void gpio_pre_init(void)
 	 * Make sure to set up the timer before using udelay().
 	 */
 	if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
-	    system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
-		__hw_early_init_hwtimer(0);
-		udelay(2 * SECOND);
-		/* Shouldn't get here, but proceeding anyway... */
+	    (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR)) {
+		if (IS_ENABLED(SECTION_IS_RO)) {
+			__hw_early_init_hwtimer(0);
+			udelay(2 * SECOND);
+		}
+		/*
+		 * H1 is expected to reset the EC during the wait above. If the
+		 * wait in RO timed out without a reset, or we landed here in
+		 * the RW image with EC_RESET_FLAG_INITIAL_PWR still set by RO,
+		 * clear the flag from BBRAM so it does not persist across
+		 * subsequent reboots.
+		 */
+		system_clear_reset_flags(EC_RESET_FLAG_INITIAL_PWR);
+		chip_save_reset_flags(chip_read_reset_flags() &
+				      ~EC_RESET_FLAG_INITIAL_PWR);
 	}
 
 #ifdef CHIP_FAMILY_NPCX7
