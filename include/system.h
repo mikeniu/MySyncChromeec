@@ -519,10 +519,16 @@ int system_set_bbram(enum system_bbram_idx idx, uint8_t value);
 void system_hibernate(uint32_t seconds, uint32_t microseconds);
 
 /**
- * Optional board-level callback functions called before and after initiating
- * chip-level hibernate sequence. These function may or may not return,
- * depending if the board implements an alternate hibernate method.  The _late
- * version is called after interrupts are disabled.
+ * Optional board-level callback functions called before and during the
+ * chip-level hibernate sequence.
+ *
+ * board_hibernate() is called while interrupts, tasks, and the watchdog are
+ * still active (e.g. for I2C transactions to put external ICs into low-power
+ * mode) and before EC_RESET_FLAG_HIBERNATE is saved. It must return.
+ *
+ * board_hibernate_late() is called after EC_RESET_FLAG_HIBERNATE is saved and
+ * interrupts and the watchdog are disabled. It may not return if the board
+ * implements an alternate hibernate method that cuts EC power directly.
  */
 void board_hibernate(void) __attribute__((weak));
 void board_hibernate_late(void) __attribute__((weak));
