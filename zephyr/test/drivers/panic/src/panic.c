@@ -345,6 +345,9 @@ ZTEST(panic, test_panic_data_write_esf)
 					 PANIC_DATA_FLAG_RW_IMAGE :
 					 PANIC_DATA_FLAG_RO_IMAGE;
 
+#if defined(CONFIG_ARCH_POSIX)
+	esf.dummy = 0xdeadbeef;
+#endif
 	if (IS_ENABLED(CONFIG_ARM)) {
 		expected_flags |= PANIC_DATA_FLAG_FRAME_VALID;
 	}
@@ -358,6 +361,9 @@ ZTEST(panic, test_panic_data_write_esf)
 	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 	zassert_equal(pdata->flags, expected_flags);
+#if defined(CONFIG_ARCH_POSIX)
+	zassert_equal(pdata->posix.esf_placeholder, 0xdeadbeef);
+#endif
 }
 
 ZTEST(panic, test_panic_data_write_esf_null)

@@ -253,7 +253,6 @@ Saved panic data: 0x48 (NEW)  # Panic Flags (RW_IMAGE | OLD_HOSTEVENT)
   v7       = 0x00000000
   v8       = 0x00000000
   psp      = 0x00000000
-  ipsr     = 0x00000004   # Exception: Truncated Thread Id
   exc_rtn  = 0x00000000
   msp      = 0x00000000
   cfsr     = 0x00000000
@@ -261,6 +260,8 @@ Saved panic data: 0x48 (NEW)  # Panic Flags (RW_IMAGE | OLD_HOSTEVENT)
   mfar     = 0x00000000
   hfsr     = 0x00000000
   dfsr     = 0x00000000
+  ipsr     = 0x00000004   # Exception: Truncated Thread Id
+  shcsr    = 0x00000000
 ```
 
 #### Host `ectool panicinfo` Output (ARM Watchdog Example)
