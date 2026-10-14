@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e269e25b_9e9d01cd",
+        "filename": "util/itecomdbgr.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T19:16:21Z",
+      "side": 1,
+      "message": "It\u0027s not actually erasing, why not print Skipping... or not print instead?",
+      "range": {
+        "startLine": 621,
+        "startChar": 3,
+        "endLine": 622,
+        "endChar": 26
+      },
+      "revId": "4825105cd0b13edc056feb7e69fe897d80e8b69b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8977abbf_c86c011a",
+        "filename": "util/itecomdbgr.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 1195,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T19:16:21Z",
+      "side": 1,
+      "message": "For consistency with the iteflash implementation and the examples below, consider adding a colon-separated example here, or update the help text to mention both formats.",
+      "range": {
+        "startLine": 1195,
+        "startChar": 0,
+        "endLine": 1195,
+        "endChar": 0
+      },
+      "revId": "4825105cd0b13edc056feb7e69fe897d80e8b69b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b06c75d_a312df2f",
+        "filename": "util/iteflash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 2507,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T19:16:21Z",
+      "side": 1,
+      "message": "Consider using base 0 here (strtoull(str, \u0026size, 0)) to allow users to provide addresses in either decimal or hex (with 0x prefix), matching the behavior in itecomdbgr.cc.",
+      "range": {
+        "startLine": 2507,
+        "startChar": 0,
+        "endLine": 2507,
+        "endChar": 0
+      },
+      "revId": "4825105cd0b13edc056feb7e69fe897d80e8b69b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6339ac8_5e161a8d",
+        "filename": "util/iteflash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 2508,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T19:16:21Z",
+      "side": 1,
+      "message": "To be consistent with itecomdbgr.cc, consider allowing a space-separated format (e.g., `-S 0x1000 0x100`) in addition to the colon-separated format.",
+      "range": {
+        "startLine": 2508,
+        "startChar": 0,
+        "endLine": 2508,
+        "endChar": 0
+      },
+      "revId": "4825105cd0b13edc056feb7e69fe897d80e8b69b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
