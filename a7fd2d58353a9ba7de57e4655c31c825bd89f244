@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80a221b9_64ed2493",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:56:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "087843c7_a3543a05",
+      "revId": "a7fd2d58353a9ba7de57e4655c31c825bd89f244",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5de8fe1e_f87b282b",
@@ -35,6 +53,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for details. [🔗](http://go/tj/f44f3d87-d1a3-499f-bb26-d8662cc71de1)\n\n### Review Summary\n*   **Functionality:** The patch correctly configures and introduces RTS5817 testing logic, with `JLinkExe` receiving the expected arguments.\n*   **Architecture \u0026 Component Fit:** The board-specific power cycle and flash behaviors are placed directly into the main `run_device_tests.py` flow, which aligns with existing board-specific workarounds in the script.\n*   **Code Simplicity:** Good use of the `with` statement for resource cleanup.\n*   **Idiomaticity \u0026 Readability:** Inline feedback provided for adding type annotations and fixing the docstring for the new helper function.\n*   **Testing \u0026 Test Coverage:** The patch adds configuration and support for a new board to the test runner infrastructure. No additional automated unit tests are required for this configuration change.\n*   **CL Size \u0026 Scope:** `Size: M (+96, -0)`. The CL is small, atomic, and focused on a single logical change.\n*   **Commit Message:** The commit message lacks a prose description of *Why* the change is necessary and *What* is changing. Inline feedback provided to add a descriptive body.",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a7fd2d58353a9ba7de57e4655c31c825bd89f244",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c967332_ef7a27b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:56:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5de8fe1e_f87b282b",
       "revId": "a7fd2d58353a9ba7de57e4655c31c825bd89f244",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -60,6 +96,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a7fd2d58353a9ba7de57e4655c31c825bd89f244",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a25de3d1_976e4d04",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:56:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e3cbef5_0e9ea4cc",
+      "range": {
+        "startLine": 200,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 9999
+      },
       "revId": "a7fd2d58353a9ba7de57e4655c31c825bd89f244",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
