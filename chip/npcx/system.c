@@ -622,8 +622,15 @@ void __enter_hibernate(uint32_t seconds, uint32_t microseconds)
 	 * it's possible that this may not return at all.  On those boards,
 	 * power to the EC is likely being turn off entirely.
 	 */
-	if (board_hibernate_late)
+	if (board_hibernate_late) {
+		/*
+		 * Set reset flag in case board_hibernate_late() doesn't
+		 * return.
+		 */
+		chip_save_reset_flags(EC_RESET_FLAG_HIBERNATE);
 		board_hibernate_late();
+		chip_save_reset_flags(0);
+	}
 
 	/* Clear all pending IRQ otherwise wfi will have no affect */
 	for (i = NPCX_IRQ_0; i < NPCX_IRQ_COUNT; i++)
