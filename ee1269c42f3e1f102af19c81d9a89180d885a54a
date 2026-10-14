@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "c87abfe2_39d3aa7f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:58:29Z",
+      "side": 1,
+      "message": "OK, please check it.",
+      "parentUuid": "bacafa1b_41242f30",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9999
+      },
+      "revId": "ee1269c42f3e1f102af19c81d9a89180d885a54a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "1f4cab82_c29fdfb3",
@@ -56,6 +80,30 @@
       "writtenOn": "2026-10-13T23:24:57Z",
       "side": 1,
       "message": "`CONFIG_SOC_RTS5817` uses the exact same `rollback_info` values as `CONFIG_SOC_EGIS_ET171` right above it. Consider combining them into a single `#elif` branch:\n\n```c\n#elif defined(CONFIG_SOC_EGIS_ET171) || defined(CONFIG_SOC_RTS5817)\nstruct rollback_info rollback_info \u003d {\n\t.region_0_offset \u003d 0x40000,\n\t.region_1_offset \u003d 0x41000,\n\t.region_size_bytes \u003d 4 * 1024,\n};\n```",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 9999
+      },
+      "revId": "ee1269c42f3e1f102af19c81d9a89180d885a54a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb4e5b84_07f57124",
+        "filename": "zephyr/test/hwtest/src/rollback.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:58:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89fbdf9b_913e7c29",
       "range": {
         "startLine": 44,
         "startChar": 0,
