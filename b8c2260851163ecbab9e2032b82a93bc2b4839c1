@@ -24,6 +24,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25787b31_741b9917",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T00:14:36Z",
+      "side": 1,
+      "message": "Good catch, done. cleanup_dut() now mirrors flash_ec\u0027s cleanup(): it restores the saved servo controls (LIFO, so the SPI vref/buffers are restored before cold_reset) and then pulses cold_reset so the EC boots the new image. That also fixes the ITE/NPCX strap branches, which previously were never reset after flashing. test_run_releases_cold_reset checks the resulting dut-control sequence with a real ServoDriver.",
+      "parentUuid": "4e8da813_78bc572f",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "b8c2260851163ecbab9e2032b82a93bc2b4839c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5dbe2b91_f3d4b8f8",
@@ -43,6 +68,31 @@
         "endLine": 161,
         "endChar": 0
       },
+      "revId": "b8c2260851163ecbab9e2032b82a93bc2b4839c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05fcc52d_a2a183fe",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-14T00:14:36Z",
+      "side": 1,
+      "message": "Done. It now takes the last line made up only of digits (flashrom prints the size as a bare `%zu\\n` line), so leading banners and trailing warnings are ignored, and it logs a warning if no such line is found. Added test cases for both.",
+      "parentUuid": "5dbe2b91_f3d4b8f8",
+      "range": {
+        "startLine": 161,
+        "startChar": 0,
+        "endLine": 161,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "b8c2260851163ecbab9e2032b82a93bc2b4839c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
