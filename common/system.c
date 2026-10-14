@@ -892,9 +892,13 @@ static void init_jump_data(void)
 	jdata = get_jump_data();
 
 	/*
-	 * Check jump data if this is a jump between images.
+	 * Check jump data if this is a jump between images and not a hardware
+	 * watchdog reset in RO that interrupted the jumped-to image before it
+	 * could clear jdata->magic.
 	 */
-	if (jdata->magic == JUMP_DATA_MAGIC && jdata->version >= 1) {
+	if (jdata->magic == JUMP_DATA_MAGIC && jdata->version >= 1 &&
+	    !(IS_ENABLED(CONFIG_CROS_EC_RO) &&
+	      (reset_flags & EC_RESET_FLAG_WATCHDOG))) {
 		/* Change in jump data struct size between the previous image
 		 * and this one. */
 		int delta;
