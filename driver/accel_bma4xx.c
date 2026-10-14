@@ -274,7 +274,7 @@ static int set_range(struct motion_sensor_t *s, int range, int round)
 	if ((BMA4_REG_TO_RANGE(range_reg_val) < range) && round)
 		range_reg_val = BMA4_RANGE_TO_REG(range * 2);
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* Determine the new value of control reg and attempt to write it. */
 	ret = bma4_set_reg8(s, BMA4_ACCEL_RANGE_ADDR,
@@ -285,7 +285,7 @@ static int set_range(struct motion_sensor_t *s, int range, int round)
 	if (ret == EC_SUCCESS)
 		s->current_range = BMA4_REG_TO_RANGE(range_reg_val);
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -370,7 +370,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int round)
 	int ret = 0;
 	struct accelgyro_saved_data_t *data = s->drv_data;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	if (rate == 0) {
 		/* Disable accel */
@@ -413,7 +413,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int round)
 	}
 
 out:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -431,7 +431,7 @@ static int set_offset(const struct motion_sensor_t *s, const int16_t *offset,
 	int ret;
 	intv3_t v = { offset[X], offset[Y], offset[Z] };
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = write_accel_offset(s, v);
 
@@ -442,7 +442,7 @@ static int set_offset(const struct motion_sensor_t *s, const int16_t *offset,
 				    BMA4_NV_ACCEL_OFFSET_MSK);
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -453,12 +453,12 @@ static int get_offset(const struct motion_sensor_t *s, int16_t *offset,
 	int i, val, ret;
 	intv3_t v;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	for (i = X; i <= Z; i++) {
 		ret = bma4_read8(s, BMA4_OFFSET_0_ADDR + i, &val);
 		if (ret) {
-			mutex_unlock(s->mutex);
+			k_mutex_unlock(s->mutex);
 			return ret;
 		}
 
@@ -469,7 +469,7 @@ static int get_offset(const struct motion_sensor_t *s, int16_t *offset,
 				    BMA4_OFFSET_ACC_DIV_MG);
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	/* Offset is in milli-g */
 	rotate(v, *s->rot_standard_ref, v);
@@ -511,13 +511,13 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 	uint8_t acc[6];
 	int ret;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* Read 6 bytes starting at X_AXIS_LSB. */
 	ret = i2c_read_block(s->port, s->i2c_spi_addr_flags, BMA4_DATA_8_ADDR,
 			     acc, 6);
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	if (ret)
 		return ret;
@@ -541,7 +541,7 @@ static int init(struct motion_sensor_t *s)
 	if (s->chip != MOTIONSENSE_CHIP_BMA422 || reg_val != BMA422_CHIP_ID)
 		return EC_ERROR_HW_INTERNAL;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/*
 	 * Disable accelerometer by default, set ODR to match. This avoids
@@ -568,7 +568,7 @@ static int init(struct motion_sensor_t *s)
 	}
 
 out:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	if (ret)
 		return ret;
@@ -584,7 +584,7 @@ static int bma4xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 	int ret;
 	int interrupt_status_reg;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* Flush the FIFO */
 	GOTO_ON_ERROR(out, bma4_write8(s, BMA4_CMD_ADDR, BMA4_FIFO_FLUSH));
@@ -600,7 +600,7 @@ static int bma4xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 	GOTO_ON_ERROR(out,
 		      bma4_read8(s, BMA4_INT_STATUS_1, &interrupt_status_reg));
 out:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -720,12 +720,12 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			int fifo_read = min(ARRAY_SIZE(fifo_data), fifo_depth);
 			int ret;
 
-			mutex_lock(s->mutex);
+			k_mutex_lock(s->mutex, K_FOREVER);
 			ret = i2c_read_block(s->port, s->i2c_spi_addr_flags,
 					     BMA4_FIFO_DATA_ADDR, fifo_data,
 					     fifo_read);
 			fifo_depth -= fifo_read;
-			mutex_unlock(s->mutex);
+			k_mutex_unlock(s->mutex);
 			if (ret)
 				return ret;
 

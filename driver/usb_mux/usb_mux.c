@@ -43,7 +43,7 @@ static atomic_t flags[CONFIG_USB_PD_PORT_MAX_COUNT];
 #define USB_MUX_FLAG_INIT BIT(1)
 
 /* Coordinate mux accesses by-port among the tasks */
-static mutex_t mux_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
+static struct k_mutex mux_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 /* Coordinate which task requires an ACK event */
 static task_id_t ack_task[CONFIG_USB_PD_PORT_MAX_COUNT] = {
@@ -117,10 +117,10 @@ __maybe_unused static struct queue_state
 	queue_states[CONFIG_USB_PD_PORT_MAX_COUNT];
 __maybe_unused static struct mux_queue_entry
 	queue_buffers[CONFIG_USB_PD_PORT_MAX_COUNT][MUX_QUEUE_DEPTH];
-static mutex_t queue_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
+static struct k_mutex queue_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
 #else
 extern struct queue const mux_queue[];
-extern mutex_t queue_lock[];
+extern struct k_mutex queue_lock[];
 #endif
 
 static int init_mux_mutex(void)
@@ -158,14 +158,14 @@ mux_task_enqueue(int port, int index, enum mux_config_type type,
 	new_entry.enqueued_time = get_time();
 #endif
 
-	mutex_lock(&queue_lock[port]);
+	k_mutex_lock(&queue_lock[port], K_FOREVER);
 
 	if (queue_add_unit(&mux_queue[port], &new_entry) == 0)
 		CPRINTS("Error: Dropping port %d mux %d", port, type);
 	else
 		task_wake(TASK_ID_USB_MUX);
 
-	mutex_unlock(&queue_lock[port]);
+	k_mutex_unlock(&queue_lock[port]);
 }
 
 #ifdef HAS_TASK_USB_MUX
@@ -257,9 +257,9 @@ __maybe_unused void usb_mux_task(void *u)
 				 * Lock since the tail is changing, which would
 				 * disrupt any calls iterating the queue.
 				 */
-				mutex_lock(&queue_lock[port]);
+				k_mutex_lock(&queue_lock[port], K_FOREVER);
 				queue_advance_head(&mux_queue[port], 1);
-				mutex_unlock(&queue_lock[port]);
+				k_mutex_unlock(&queue_lock[port]);
 
 				/*
 				 * Force the task to run again if this queue has
@@ -305,7 +305,7 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 			continue;
 
 		/* Action time!  Lock this mux */
-		mutex_lock(&mux_lock[port]);
+		k_mutex_lock(&mux_lock[port], K_FOREVER);
 
 		switch (config) {
 		case USB_MUX_INIT:
@@ -404,7 +404,7 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 		}
 
 		/* Unlock before any host command waits */
-		mutex_unlock(&mux_lock[port]);
+		k_mutex_unlock(&mux_lock[port]);
 
 		if (ack_required) {
 			ack_task[port] = task_get_current();
@@ -520,13 +520,13 @@ void usb_mux_init(int port)
 		new_entry.enqueued_time = get_time();
 #endif
 
-		mutex_lock(&queue_lock[port]);
+		k_mutex_lock(&queue_lock[port], K_FOREVER);
 		if (queue_add_unit(&mux_queue[port], &new_entry) == 0)
 			CPRINTS("Error: Dropping port %d mux init", port);
 		else
 			task_wake(TASK_ID_USB_MUX);
 
-		mutex_unlock(&queue_lock[port]);
+		k_mutex_unlock(&queue_lock[port]);
 	} else {
 		perform_mux_init(port);
 	}
@@ -619,7 +619,7 @@ bool usb_mux_set_completed(int port)
 		return true;
 
 	/* Lock the queue so we can scroll through the items left to do */
-	mutex_lock(&queue_lock[port]);
+	k_mutex_lock(&queue_lock[port], K_FOREVER);
 
 	for (queue_begin(&mux_queue[port], &it); it.ptr != NULL;
 	     queue_next(&mux_queue[port], &it)) {
@@ -632,7 +632,7 @@ bool usb_mux_set_completed(int port)
 		}
 	}
 
-	mutex_unlock(&queue_lock[port]);
+	k_mutex_unlock(&queue_lock[port]);
 
 	return !sets_pending;
 }

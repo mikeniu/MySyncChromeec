@@ -160,7 +160,7 @@ struct motion_sensor_t {
 	enum motionsensor_location location;
 	const struct accelgyro_drv *drv;
 	/* One mutex per physical chip. */
-	mutex_t *mutex;
+	struct k_mutex *mutex;
 	void *drv_data;
 
 	/* Minimum number of samples in batch to trigger spreading */
@@ -253,7 +253,7 @@ struct motion_sensor_t {
  * When we process CMD_DUMP, we want to be sure the motion sense
  * task is not updating the sensor values at the same time.
  */
-extern mutex_t g_sensor_mutex;
+extern struct k_mutex g_sensor_mutex;
 
 /* Defined at board level. */
 extern struct motion_sensor_t motion_sensors[];

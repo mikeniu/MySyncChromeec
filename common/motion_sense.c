@@ -269,7 +269,7 @@ int motion_sense_set_data_rate(struct motion_sensor_t *sensor)
 	if (ret)
 		return ret;
 
-	mutex_lock(&g_sensor_mutex);
+	k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 	odr = sensor->drv->get_data_rate(sensor);
 	if (ap_odr_mhz)
 		/*
@@ -291,7 +291,7 @@ int motion_sense_set_data_rate(struct motion_sensor_t *sensor)
 		motion_sense_set_data_period(sensor - motion_sensors,
 					     sensor->collection_rate);
 	}
-	mutex_unlock(&g_sensor_mutex);
+	k_mutex_unlock(&g_sensor_mutex);
 	if (IS_ENABLED(CONFIG_BODY_DETECTION) &&
 	    (sensor - motion_sensors == CONFIG_BODY_DETECTION_SENSOR))
 		body_detect_reset();
@@ -400,9 +400,9 @@ static void motion_sense_switch_sensor_rate(void)
 			 * Use mutex to be sure we are not changing the
 			 * ODR in MOTIONSENSE, in case it is running.
 			 */
-			mutex_lock(&g_sensor_mutex);
+			k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 			sensor->collection_rate = 0;
-			mutex_unlock(&g_sensor_mutex);
+			k_mutex_unlock(&g_sensor_mutex);
 			sensor->state = SENSOR_NOT_INITIALIZED;
 		}
 	}
@@ -711,19 +711,19 @@ void motion_sense_push_raw_xyz(struct motion_sensor_t *s)
 		    s->flags & MOTIONSENSE_FLAG_IN_SPOOF_MODE)
 			v = s->spoof_xyz;
 
-		mutex_lock(&g_sensor_mutex);
+		k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 
 		ec_motion_sensor_fill_values(&vector, v);
 
-		mutex_unlock(&g_sensor_mutex);
+		k_mutex_unlock(&g_sensor_mutex);
 
 		motion_sense_fifo_stage_data(&vector, s, 3,
 					     __hw_clock_source_read());
 		motion_sense_fifo_commit_data();
 	} else {
-		mutex_lock(&g_sensor_mutex);
+		k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 		memcpy(s->xyz, s->raw_xyz, sizeof(s->xyz));
-		mutex_unlock(&g_sensor_mutex);
+		k_mutex_unlock(&g_sensor_mutex);
 	}
 }
 
@@ -887,7 +887,7 @@ static void check_and_queue_gestures(uint32_t *event)
 				.sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID,
 			};
 
-			mutex_lock(sensor->mutex);
+			k_mutex_lock(sensor->mutex, K_FOREVER);
 			if (motion_orientation_changed(sensor) &&
 			    (*motion_orientation_ptr(sensor) !=
 			     MOTIONSENSE_ORIENTATION_UNKNOWN)) {
@@ -908,7 +908,7 @@ static void check_and_queue_gestures(uint32_t *event)
 						mode[vector.activity_data.state]);
 				}
 			}
-			mutex_unlock(sensor->mutex);
+			k_mutex_unlock(sensor->mutex);
 		}
 	}
 }
@@ -1326,7 +1326,7 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 		out->dump.sensor_count = ALL_MOTION_SENSORS;
 		args->output_buf_size = sizeof(out->dump);
 		reported = min(ALL_MOTION_SENSORS, in->dump.max_sensor_count);
-		mutex_lock(&g_sensor_mutex);
+		k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 		for (i = 0; i < reported; i++) {
 			out->dump.sensor[i].flags =
 				MOTIONSENSE_SENSOR_FLAG_PRESENT;
@@ -1339,7 +1339,7 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 				       3 * sizeof(int16_t));
 			}
 		}
-		mutex_unlock(&g_sensor_mutex);
+		k_mutex_unlock(&g_sensor_mutex);
 		args->output_buf_size +=
 			reported *
 			sizeof(struct ec_response_motion_sensor_data);
@@ -1357,9 +1357,9 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 
 		out->data.flags = 0;
 
-		mutex_lock(&g_sensor_mutex);
+		k_mutex_lock(&g_sensor_mutex, K_FOREVER);
 		ec_motion_sensor_fill_values(&out->data, sensor->xyz);
-		mutex_unlock(&g_sensor_mutex);
+		k_mutex_unlock(&g_sensor_mutex);
 
 		args->output_buf_size = sizeof(out->data);
 		break;

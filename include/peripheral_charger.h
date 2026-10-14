@@ -305,7 +305,7 @@ struct pchg {
 	/* Event queue */
 	struct queue const events;
 	/* Event queue mutex */
-	mutex_t mtx;
+	struct k_mutex mtx;
 	/* 1:Pending IRQ 0:No pending IRQ */
 	atomic_t irq;
 	/* Event currently being handled */

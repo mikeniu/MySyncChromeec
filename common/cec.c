@@ -90,9 +90,9 @@ __soc_ram_code int cec_transfer_is_eom(const struct cec_msg_transfer *transfer,
 
 void cec_rx_queue_flush(struct cec_rx_queue *queue)
 {
-	mutex_lock(&rx_queue_readoffset_mutex);
+	k_mutex_lock(&rx_queue_readoffset_mutex, K_FOREVER);
 	queue->read_offset = 0;
-	mutex_unlock(&rx_queue_readoffset_mutex);
+	k_mutex_unlock(&rx_queue_readoffset_mutex);
 	queue->write_offset = 0;
 }
 
@@ -198,10 +198,10 @@ int cec_rx_queue_pop(struct cec_rx_queue *queue, uint8_t *msg, uint8_t *msg_len)
 {
 	int i;
 
-	mutex_lock(&rx_queue_readoffset_mutex);
+	k_mutex_lock(&rx_queue_readoffset_mutex, K_FOREVER);
 	if (queue->read_offset == queue->write_offset) {
 		/* Queue empty */
-		mutex_unlock(&rx_queue_readoffset_mutex);
+		k_mutex_unlock(&rx_queue_readoffset_mutex);
 		*msg_len = 0;
 		return -1;
 	}
@@ -209,7 +209,7 @@ int cec_rx_queue_pop(struct cec_rx_queue *queue, uint8_t *msg, uint8_t *msg_len)
 	/* The first byte in the buffer is the message length */
 	*msg_len = queue->buf[queue->read_offset];
 	if (*msg_len == 0 || *msg_len > MAX_CEC_MSG_LEN) {
-		mutex_unlock(&rx_queue_readoffset_mutex);
+		k_mutex_unlock(&rx_queue_readoffset_mutex);
 		*msg_len = 0;
 		CPRINTS("CEC: Invalid msg size in queue: %u", *msg_len);
 		return -1;
@@ -222,7 +222,7 @@ int cec_rx_queue_pop(struct cec_rx_queue *queue, uint8_t *msg, uint8_t *msg_len)
 			(queue->read_offset + 1) % CEC_RX_BUFFER_SIZE;
 	}
 
-	mutex_unlock(&rx_queue_readoffset_mutex);
+	k_mutex_unlock(&rx_queue_readoffset_mutex);
 
 	return 0;
 }
