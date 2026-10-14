@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "beeda6e3_72eea129",
+        "filename": "util/flash_ec",
+        "patchSetId": 4
+      },
+      "lineNbr": 798,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T23:07:06Z",
+      "side": 1,
+      "message": "This baseboard detection only works for legacy boards, and they are not in platform/ec, and the only use of BASEBOARD in this file is for a zephyr board.",
+      "range": {
+        "startLine": 784,
+        "startChar": 0,
+        "endLine": 798,
+        "endChar": 2
+      },
+      "revId": "13d18ca05574e0f1682c5becc48b3a086990018d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2866b012_086b31c3",
+        "filename": "util/flash_ec",
+        "patchSetId": 4
+      },
+      "lineNbr": 1619,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T23:07:06Z",
+      "side": 1,
+      "message": "cr50_uart_cmd is an alias for gsc_uart_cmd, so this fallback is unnecessary.",
+      "range": {
+        "startLine": 1619,
+        "startChar": 23,
+        "endLine": 1619,
+        "endChar": 36
+      },
+      "revId": "13d18ca05574e0f1682c5becc48b3a086990018d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff061731_548058b5",
+        "filename": "util/flash_ec",
+        "patchSetId": 4
+      },
+      "lineNbr": 1773,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T23:07:06Z",
+      "side": 1,
+      "message": "Baseboard will never be \u003d\u003d corsola, see above.",
+      "range": {
+        "startLine": 1773,
+        "startChar": 10,
+        "endLine": 1773,
+        "endChar": 37
+      },
+      "revId": "13d18ca05574e0f1682c5becc48b3a086990018d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
