@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9a30554_5e858302",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T07:55:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/d38fa469-52e3-4a09-80b7-977f036852ad)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly adds Zephyr\u0027s `__noinline` directive to `crash_system()` to prevent it from being inlined into `test_crash()`. When LTO is enabled on the `realtekfp` board, inlining removes the call boundary, causing the trapped Link Register to hold the return address of `test_crash`\u0027s caller instead of the expected range inside `test_crash`. Forcing `__noinline` preserves the `bl` instruction and call boundary, ensuring the saved `lr` correctly falls within `[crash_addr, crash_end]`.\n*   **Architecture \u0026 Component Fit:** The change is appropriate for a hardware panic test that relies on specific stack frame structures.\n*   **Code Simplicity:** The fix is as minimal and direct as possible.\n*   **Idiomaticity \u0026 Readability:** Excellent. The change properly uses Zephyr\u0027s idiomatic `__noinline` macro (via `\u003czephyr/toolchain.h\u003e`) instead of a raw compiler attribute, addressing prior review feedback.\n*   **Security:** N/A.\n*   **Testing \u0026 Test Coverage:** This CL directly patches and fixes an existing automated test suite for hardware targets (specifically fixing the `panic_data` tests for `realtekfp`). No further test coverage is required for a test fix.\n*   **CL Size \u0026 Scope:** `Size: XS (+2, -1)`. The CL is exceptionally small, atomic, and adheres strictly to the Single Logical Change rule.\n*   **Commit Message:** The commit message clearly states the rationale, adheres to Chromium\u0027s formatting conventions, and accurately provides the required `BUG\u003d` and `TEST\u003d` footers. It excellently explains the problem and the mechanism of the fix.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "087e09fd4d187112a9a12818822f95ae0d193bce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
