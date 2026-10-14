@@ -4,7 +4,6 @@
  */
 
 /* Silergy SYV682x USB-C Power Path Controller */
-#include "atomic.h"
 #include "common.h"
 #include "config.h"
 #include "console.h"
@@ -20,6 +19,8 @@
 #include "usb_pd_tcpm.h"
 #include "usbc_ppc.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #define SYV682X_FLAGS_SOURCE_ENABLED BIT(0)
 #define SYV682X_FLAGS_SINK_ENABLED BIT(1)
@@ -238,9 +239,9 @@ static int syv682x_vbus_source_enable(int port, int enable)
 
 	if (enable) {
 		atomic_or(&flags[port], SYV682X_FLAGS_SOURCE_ENABLED);
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_SINK_ENABLED);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_SINK_ENABLED);
 	} else {
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_SOURCE_ENABLED);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_SOURCE_ENABLED);
 	}
 
 #if defined(CONFIG_USB_CHARGER) && defined(CONFIG_USB_PD_VBUS_DETECT_PPC)
@@ -264,7 +265,7 @@ static bool syv682x_interrupt_filter(int port, int regval, int regmask,
 			return true;
 		}
 	} else {
-		atomic_clear_bits(&flags[port], flagmask);
+		atomic_and(&flags[port], ~flagmask);
 	}
 	return false;
 }
@@ -326,7 +327,7 @@ static void syv682x_handle_status_interrupt(int port, int regval)
 		}
 
 		atomic_or(&flags[port], SYV682X_FLAGS_SOURCE_ENABLED);
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_SINK_ENABLED);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_SINK_ENABLED);
 		if (!tcpm_tcpc_has_frs_control(port))
 			pd_got_frs_signal(port);
 	}
@@ -348,7 +349,7 @@ static void syv682x_handle_status_interrupt(int port, int regval)
 	} else if ((regval & SYV682X_STATUS_OC_5V) &&
 		   (get_time().val > vbus_oc_timer[port].val)) {
 		vbus_oc_timer[port].val = UINT64_MAX;
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_5V_OC);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_5V_OC);
 		syv682x_vbus_source_enable(port, 0);
 		pd_handle_overcurrent(port);
 	}
@@ -366,14 +367,13 @@ static void syv682x_handle_status_interrupt(int port, int regval)
 	if (syv682x_interrupt_filter(port, regval, SYV682X_STATUS_TSD,
 				     SYV682X_FLAGS_TSD)) {
 		ppc_prints("TSD!", port);
-		atomic_clear_bits(&flags[port],
-				  SYV682X_FLAGS_SOURCE_ENABLED |
-					  SYV682X_FLAGS_SINK_ENABLED);
+		atomic_and(&flags[port], ~(SYV682X_FLAGS_SOURCE_ENABLED |
+					   SYV682X_FLAGS_SINK_ENABLED));
 	}
 	if (syv682x_interrupt_filter(port, regval, SYV682X_STATUS_OVP,
 				     SYV682X_FLAGS_OVP)) {
 		ppc_prints("VBUS OVP!", port);
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_SOURCE_ENABLED);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_SOURCE_ENABLED);
 	}
 
 	/*
@@ -390,8 +390,7 @@ static void syv682x_handle_status_interrupt(int port, int regval)
 			syv682x_vbus_sink_enable(port, 1);
 		} else {
 			ppc_prints("Disable sink", port);
-			atomic_clear_bits(&flags[port],
-					  SYV682X_FLAGS_SINK_ENABLED);
+			atomic_and(&flags[port], ~SYV682X_FLAGS_SINK_ENABLED);
 		}
 	}
 }
@@ -414,7 +413,7 @@ static int syv682x_handle_control_4_interrupt(int port, int regval)
 	} else if ((regval & SYV682X_CONTROL_4_VCONN_OCP) &&
 		   (get_time().val > vconn_oc_timer[port].val)) {
 		vconn_oc_timer[port].val = UINT64_MAX;
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_VCONN_OCP);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_VCONN_OCP);
 
 		/* Disable VCONN */
 		regval &=
@@ -447,7 +446,7 @@ static int syv682x_vbus_sink_enable(int port, int enable)
 
 	if (!enable) {
 		atomic_clear(&sink_ocp_count[port]);
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_SINK_ENABLED);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_SINK_ENABLED);
 		/*
 		 * We're currently a source, so nothing more to do
 		 */
@@ -477,7 +476,7 @@ static int syv682x_vbus_sink_enable(int port, int enable)
 			~(SYV682X_CONTROL_1_HV_DR | SYV682X_CONTROL_1_PWR_ENB);
 		/* Set sink current limit to the configured value */
 		regval |= CONFIG_SYV682X_HV_ILIM << SYV682X_HV_ILIM_BIT_SHIFT;
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_SOURCE_ENABLED);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_SOURCE_ENABLED);
 		atomic_or(&flags[port], SYV682X_FLAGS_SINK_ENABLED);
 	} else {
 		/*
@@ -519,7 +518,7 @@ static int syv682x_is_vbus_present(int port)
 	if (vbus)
 		atomic_or(&flags[port], SYV682X_FLAGS_VBUS_PRESENT);
 	else
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_VBUS_PRESENT);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_VBUS_PRESENT);
 #endif
 
 	return vbus;
@@ -573,7 +572,7 @@ static int syv682x_set_polarity(int port, int polarity)
 	if (polarity)
 		atomic_or(&flags[port], SYV682X_FLAGS_CC_POLARITY);
 	else
-		atomic_clear_bits(&flags[port], SYV682X_FLAGS_CC_POLARITY);
+		atomic_and(&flags[port], ~SYV682X_FLAGS_CC_POLARITY);
 
 	return EC_SUCCESS;
 }

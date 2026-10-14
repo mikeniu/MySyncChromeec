@@ -9,7 +9,6 @@
 #define PLATFORM_EC_INCLUDE_MOTION_SENSE_H_
 
 #include "accelgyro.h"
-#include "atomic.h"
 #include "body_detection.h"
 #include "chipset.h"
 #include "common.h"
@@ -20,6 +19,8 @@
 #include "task.h"
 #include "timer.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef __cplusplus
 extern "C" {

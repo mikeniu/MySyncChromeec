@@ -7,7 +7,6 @@
  * USB PDC message tracing.
  */
 
-#include "atomic.h"
 #include "builtin/assert.h"
 #include "console.h"
 #include "hooks.h"
@@ -22,6 +21,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/sys/ring_buffer.h>
 
 #include <drivers/pdc.h>

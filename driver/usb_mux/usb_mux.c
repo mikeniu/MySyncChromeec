@@ -5,7 +5,6 @@
 
 /* USB mux high-level driver. */
 
-#include "atomic.h"
 #include "builtin/assert.h"
 #include "chipset.h"
 #include "common.h"
@@ -19,6 +18,8 @@
 #include "usb_mux.h"
 #include "usbc_ppc.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef CONFIG_COMMON_RUNTIME
 #define CPRINTS(format, args...) cprints(CC_USBCHARGE, format, ##args)
@@ -503,7 +504,7 @@ static void perform_mux_init(int port)
 	if (rv == EC_ERROR_NOT_POWERED)
 		atomic_or(&flags[port], USB_MUX_FLAG_IN_LPM);
 	else
-		atomic_clear_bits(&flags[port], USB_MUX_FLAG_IN_LPM);
+		atomic_and(&flags[port], ~USB_MUX_FLAG_IN_LPM);
 }
 
 void usb_mux_init(int port)
@@ -821,9 +822,9 @@ static void usb_mux_reset_in_g3(void)
 		while (mux_chain && mux_chain->mux) {
 			mux_ptr = mux_chain->mux;
 			if (mux_ptr->flags & USB_MUX_FLAG_RESETS_IN_G3) {
-				atomic_clear_bits(&flags[port],
-						  USB_MUX_FLAG_INIT |
-							  USB_MUX_FLAG_IN_LPM);
+				atomic_and(&flags[port],
+					   ~(USB_MUX_FLAG_INIT |
+					     USB_MUX_FLAG_IN_LPM));
 			}
 			mux_chain = mux_chain->next;
 		}

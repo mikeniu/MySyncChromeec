@@ -5,7 +5,6 @@
 
 /* USB-C Overcurrent Protection Common Code */
 
-#include "atomic.h"
 #include "common.h"
 #include "console.h"
 #include "hooks.h"
@@ -14,6 +13,8 @@
 #include "usb_pd.h"
 #include "usbc_ocp.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
@@ -89,7 +90,7 @@ int usbc_ocp_add_event(int port)
 	oc_event_cnt_tbl[port]++;
 
 	/* The port overcurrented, so don't clear it's OC events. */
-	atomic_clear_bits(&snk_connected_ports, 1 << port);
+	atomic_and(&snk_connected_ports, ~(1 << port));
 
 	if (oc_event_cnt_tbl[port] >= OCP_MAX_CNT) {
 		CPRINTS("C%d: OC event limit reached! "
@@ -162,7 +163,7 @@ void usbc_ocp_snk_is_connected(int port, bool connected)
 	if (connected)
 		atomic_or(&snk_connected_ports, 1 << port);
 	else
-		atomic_clear_bits(&snk_connected_ports, 1 << port);
+		atomic_and(&snk_connected_ports, ~(1 << port));
 }
 
 __overridable void board_overcurrent_event(int port, int is_overcurrented)

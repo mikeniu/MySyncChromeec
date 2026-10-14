@@ -57,13 +57,13 @@ __maybe_unused static void print_flag(const char *group, int set_or_clear,
 #define CLR_FLAG(group, flags, flag)                \
 	do {                                        \
 		int before = *flags;                \
-		atomic_clear_bits(flags, (flag));   \
+		atomic_and(flags, ~(flag));         \
 		if (*flags != before)               \
 			print_flag(group, 0, flag); \
 	} while (0)
 #else
 #define SET_FLAG(group, flags, flag) atomic_or(flags, (flag))
-#define CLR_FLAG(group, flags, flag) atomic_clear_bits(flags, (flag))
+#define CLR_FLAG(group, flags, flag) atomic_and(flags, ~(flag))
 #endif
 
 #define RCH_SET_FLAG(port, flag) SET_FLAG("RCH", &rch[port].flags, (flag))

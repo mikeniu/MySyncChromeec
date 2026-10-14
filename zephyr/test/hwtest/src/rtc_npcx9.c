@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "atomic.h"
 #include "system.h"
 #include "timer.h"
 
+#include <zephyr/sys/atomic.h>
 #include <zephyr/ztest.h>
 
 static const int rtc_delay_seconds = 1;

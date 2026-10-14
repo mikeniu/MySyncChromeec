@@ -4,7 +4,6 @@
  */
 
 #include "ap_power/ap_power.h"
-#include "atomic.h"
 #include "cros_board_info.h"
 #include "hooks.h"
 #include "power.h"

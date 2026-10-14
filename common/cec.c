@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "cec.h"
 #include "chipset.h"
 #include "console.h"
@@ -14,6 +13,8 @@
 #include "printf.h"
 #include "task.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef CONFIG_SOC_IT8XXX2
 #include <ilm.h>
@@ -244,7 +245,7 @@ test_export_static void send_mkbp_event(int port, uint32_t event)
 	if ((event & CEC_SEND_RESULTS) &&
 	    (cec_mkbp_events[port] & CEC_SEND_RESULTS)) {
 		CPRINTS("CEC%d warning: host did not clear send result", port);
-		atomic_clear_bits(&cec_mkbp_events[port], CEC_SEND_RESULTS);
+		atomic_and(&cec_mkbp_events[port], ~CEC_SEND_RESULTS);
 	}
 
 	atomic_or(&cec_mkbp_events[port], event);

@@ -6,12 +6,13 @@
  * in TCPMv2 and not under a PDC.
  */
 
-#include "atomic.h"
 #include "ec_commands.h"
 #include "host_command.h"
 #include "usb_mux.h"
 #include "usb_pd.h"
 #include "usb_pd_dpm_sm.h"
+
+#include <zephyr/sys/atomic.h>
 
 enum ec_status board_set_tbt_ufp_reply(int port, enum typec_tbt_ufp_reply reply)
 {
