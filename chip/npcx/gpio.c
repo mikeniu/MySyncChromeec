@@ -463,7 +463,7 @@ void gpio_set_flags_by_mask(uint32_t port, uint32_t mask, uint32_t flags)
 	if (flags & GPIO_OUTPUT)
 		NPCX_PDIR(port) |= mask;
 
-		/* Lock GPIO output and configuration if need */
+	/* Lock GPIO output and configuration if need */
 #if NPCX_FAMILY_VERSION >= NPCX_FAMILY_NPCX7
 	if (flags & GPIO_LOCKED)
 		NPCX_PLOCK_CTL(port) |= mask;
@@ -535,10 +535,15 @@ void gpio_pre_init(void)
 	 * Make sure to set up the timer before using udelay().
 	 */
 	if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
-	    system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
-		__hw_early_init_hwtimer(0);
-		udelay(2 * SECOND);
+	    (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR)) {
+		if (IS_ENABLED(SECTION_IS_RO)) {
+			__hw_early_init_hwtimer(0);
+			udelay(2 * SECOND);
+		}
 		/* Shouldn't get here, but proceeding anyway... */
+		system_clear_reset_flags(EC_RESET_FLAG_INITIAL_PWR);
+		chip_save_reset_flags(chip_read_reset_flags() &
+				      ~EC_RESET_FLAG_INITIAL_PWR);
 	}
 
 #ifdef CHIP_FAMILY_NPCX7
