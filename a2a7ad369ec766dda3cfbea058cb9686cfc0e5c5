@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "366bf9ce_30ac634f",
+        "filename": "common/usbc/usb_prl_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1712,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-14T22:27:49Z",
+      "side": 1,
+      "message": "One possible cleanup, but I don\u0027t think it\u0027s a must fix. --\u003e Please fix this WARNING reported by autoreview issue finding: For consistency with the rest of this refactor and to further reduce nesting as mentioned in the commit message, you could use a guard clause here as well:\n\nif (!RCH_CHK_FLAG(port, PRL_FLAGS_MSG_RECEIVED))\n    return;",
+      "range": {
+        "startLine": 1712,
+        "startChar": 0,
+        "endLine": 1712,
+        "endChar": 0
+      },
+      "revId": "a2a7ad369ec766dda3cfbea058cb9686cfc0e5c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
