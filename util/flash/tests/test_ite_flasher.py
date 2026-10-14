@@ -51,6 +51,37 @@ class TestIteI2cFlasher(unittest.TestCase):
         self.flasher.cleanup_dut()
         self.servo.set.assert_any_call("gsc_uart_cmd", "sysrst deassert")
 
+    @patch("time.sleep")
+    def test_prepare_dut_reads_enable_ite_dfu(
+        self, _mock_sleep: MagicMock
+    ) -> None:
+        """Trigger the DFU waveform by reading enable_ite_dfu, like flash_ec."""
+        self.servo.has_control.return_value = True
+        for servo_type in ("servo_micro", "c2d2"):
+            with self.subTest(servo_type=servo_type):
+                self.servo.reset_mock()
+                self.servo.get.return_value = servo_type
+                self.flasher.prepare_dut()
+                self.servo.get.assert_any_call("enable_ite_dfu")
+                self.assertNotIn(
+                    "enable_ite_dfu",
+                    [c.args[0] for c in self.servo.set.call_args_list],
+                )
+
+    @patch("time.sleep")
+    def test_prepare_dut_dry_run_skips_enable_ite_dfu(
+        self, mock_sleep: MagicMock
+    ) -> None:
+        """Do not send the DFU waveform or wait for it in dry-run mode."""
+        self.args.dry_run = True
+        self.servo.get.return_value = "servo_micro"
+        self.flasher.prepare_dut()
+        self.assertNotIn(
+            "enable_ite_dfu",
+            [c.args[0] for c in self.servo.get.call_args_list],
+        )
+        mock_sleep.assert_not_called()
+
     @patch("os.path.exists", return_value=True)
     @patch("flash.ite_flasher.locate_tool", return_value="/mock/iteflash")
     @patch("subprocess.run")
@@ -77,7 +108,7 @@ class TestIteI2cFlasher(unittest.TestCase):
         self.servo.has_control.return_value = False
 
         self.flasher.prepare_dut()
-        self.servo.set.assert_any_call("enable_ite_dfu", "on")
+        self.servo.get.assert_any_call("enable_ite_dfu")
 
         self.flasher.execute_flash()
         mock_run.assert_called_once_with(
