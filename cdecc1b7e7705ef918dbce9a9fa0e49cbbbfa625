@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf114d59_0d3f37fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T10:24:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n*   **CL Size \u0026 Scope:** Size: XS (+1, -0). The CL makes a single atomic logic change. ✅\n*   **Architecture \u0026 Component Fit:** Fits appropriately within the fingerprint driver state machine. ✅\n*   **Code Simplicity:** ❌ The new logic duplicates the branch setup and state finalization of the adjacent `IDLE` mode. Please see the inline comment to combine the cases using a fallthrough.\n*   **Idiomaticity \u0026 Readability:** Clean. ✅\n*   **Testing:** ❌ The CL modifies the state transition logic but does not update the corresponding test (`test_enter_low_power_mode`) to verify the new behavior (that IRQs are disabled).\n[🔗](http://go/tj/747dbbc1-b26c-43a6-bca3-a838a167b65e)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cdecc1b7e7705ef918dbce9a9fa0e49cbbbfa625",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25b42191_2df29a2c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_fpc1145.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T10:24:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe `FINGERPRINT_SENSOR_MODE_LOW_POWER` and `FINGERPRINT_SENSOR_MODE_IDLE` cases now execute identical logic (`rc \u003d fpc1145_disable_irq(dev);`).\n\n**Code Simplicity:** Please combine these duplicate cases using a fallthrough to avoid duplicated branches and state finalization.\n\n```c\n\tcase FINGERPRINT_SENSOR_MODE_LOW_POWER:\n\t\t/*\n\t\t * TODO(b/117620462): verify that sleep mode is WAI (no\n\t\t * increased latency, expected power consumption).\n\t\t */\n\t\t/* fallthrough */\n\tcase FINGERPRINT_SENSOR_MODE_IDLE:\n\t\trc \u003d fpc1145_disable_irq(dev);\n\t\tbreak;\n```\n\n**Testing:** The CL introduces new behavior (disabling IRQs) to the `LOW_POWER` state transition, but the existing `test_enter_low_power_mode` test in `zephyr/test/fingerprint/drivers/fpc1145/src/fpc1145.c` was not updated to verify that the IRQ is actually disabled. Please update the test to verify this new behavior.\n[🔗](http://go/tj/747dbbc1-b26c-43a6-bca3-a838a167b65e)",
+      "range": {
+        "startLine": 263,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cdecc1b7e7705ef918dbce9a9fa0e49cbbbfa625",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
