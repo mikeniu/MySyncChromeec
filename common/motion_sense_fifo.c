@@ -433,7 +433,15 @@ void motion_sense_fifo_stage_data(struct ec_response_motion_sensor_data *data,
 {
 	int id = data->sensor_num;
 
-	if (IS_ENABLED(CONFIG_SENSOR_TIGHT_TIMESTAMPS)) {
+#ifdef CONFIG_SCP_CHRE
+	if (valid_data > 0 && sensor != NULL) {
+		chre_sensor_pal_on_sample(data, sensor, valid_data, time);
+	}
+#endif
+
+	if (IS_ENABLED(CONFIG_SENSOR_TIGHT_TIMESTAMPS) &&
+	    (!IS_ENABLED(CONFIG_SCP_CHRE) || !valid_data || !sensor ||
+	     sensor->oversampling_ratio > 0)) {
 		fifo_stage_timestamp(time, data->sensor_num);
 	}
 	/*

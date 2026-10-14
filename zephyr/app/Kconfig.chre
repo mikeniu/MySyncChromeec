@@ -64,4 +64,18 @@ config CHRE_HELLO_WORLD
 	  Statically link and run the CHRE HelloWorld example nanoapp
 	  at boot to verify the CHRE event loop and nanoapp runtime.
 
+config CHRE_SENSOR_WORLD
+	bool "Load SensorWorld static nanoapp"
+	default n
+	help
+	  Statically link and run the CHRE SensorWorld example nanoapp
+	  at boot to verify the CHRE sensor PAL and sensor event pipeline.
+
+config CHRE_MESSAGE_WORLD
+	bool "Load MessageWorld static nanoapp"
+	default n
+	help
+	  Statically link and run the CHRE MessageWorld example nanoapp
+	  at boot to verify host-nanoapp messaging over HostLink.
+
 endif # ISH_CHRE || SCP_CHRE
