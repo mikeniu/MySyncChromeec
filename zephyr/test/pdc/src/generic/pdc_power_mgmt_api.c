@@ -23,7 +23,7 @@ LOG_MODULE_REGISTER(pdc_power_mgmt_api, LOG_LEVEL_INF);
 
 #define ZEPHYR_USER_NODE DT_PATH(zephyr_user)
 
-#define TYPEC_ONLY_SINK_DEBOUNCE_TIME_MS 1000
+#define TYPEC_ONLY_DEBOUNCE_TIME_MS 1000
 
 #if DT_NODE_EXISTS(ZEPHYR_USER_NODE)
 #define PDC_TEST_TIMEOUT DT_PROP_OR(ZEPHYR_USER_NODE, test_timeout, 2500)
@@ -1629,7 +1629,7 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_task_state_name_typec_snk_attached)
 				     "TypeCSnkAttached"));
 
 	/* Allow for debouncing time. */
-	TEST_WORKING_DELAY(PD_T_SINK_WAIT_CAP / USEC_PER_MSEC);
+	TEST_WORKING_DELAY(TYPEC_ONLY_DEBOUNCE_TIME_MS);
 	zassert_true(test_pdc_power_mgmt_is_snk_typec_attached_run(TEST_PORT));
 }
 
@@ -1648,7 +1648,7 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_task_state_name_typec_src_attached)
 				     "TypeCSrcAttached"));
 
 	/* Allow for debouncing time. */
-	TEST_WORKING_DELAY(TYPEC_ONLY_SINK_DEBOUNCE_TIME_MS);
+	TEST_WORKING_DELAY(TYPEC_ONLY_DEBOUNCE_TIME_MS);
 	zassert_true(test_pdc_power_mgmt_is_src_typec_attached_run(TEST_PORT));
 }
 

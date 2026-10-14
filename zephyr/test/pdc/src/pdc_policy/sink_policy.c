@@ -51,6 +51,7 @@ BUILD_ASSERT(CONFIG_USB_PD_PORT_MAX_COUNT == 2,
 #define IS_ONE_BIT_SET IS_POWER_OF_TWO
 
 static uint8_t sink_path_en_mask;
+static int fail_sink_path_count;
 
 static void clear_partner_pdos(const struct emul *e, enum pdo_type_t type)
 {
@@ -121,7 +122,13 @@ static int custom_fake_pdc_set_sink_path(const struct device *dev, bool en)
 {
 	int port = pdc_dev_to_port(dev);
 
+	if (fail_sink_path_count > 0) {
+		fail_sink_path_count--;
+		return 0;
+	}
+
 	WRITE_BIT(sink_path_en_mask, port, en);
+
 	LOG_INF("FAKE C%d: pdc_set_sink_path en_mask=0x%X", port,
 		sink_path_en_mask);
 
@@ -160,6 +167,7 @@ static void sink_policy_before(void *f)
 	RESET_FAKE(sniff_pdc_set_sink_path);
 
 	sink_path_en_mask = 0;
+	fail_sink_path_count = 0;
 
 	chipset_in_state_fake.custom_fake = custom_fake_chipset_in_state;
 	sniff_pdc_set_sink_path_fake.custom_fake =
@@ -424,4 +432,33 @@ ZTEST_USER_F(sink_policy, test_sink_policy_detach_worse_charger)
 	/* Verify correct RDO is selected */
 	zassert_ok(emul_pdc_get_rdo(charger->emul_pdc, &rdo));
 	zassert_equal(RDO_POS(rdo), 3);
+}
+
+ZTEST_USER_F(sink_policy, test_typec_only_sink_set_sink_path_retry)
+{
+	union connector_status_t cs = { 0 };
+	const struct pdc_fixture *pdc = &fixture->pdc[TEST_USBC_PORT0];
+	bool sink_path_en = false;
+
+	/* Drop the first SET_SINK_PATH command so it times out with an error */
+	fail_sink_path_count = 1;
+
+	emul_pdc_configure_snk(pdc->emul_pdc, &cs);
+	cs.power_operation_mode = USB_TC_CURRENT_3A;
+	zassert_ok(emul_pdc_connect_partner(pdc->emul_pdc, &cs));
+
+	/* Wait for the initial attempt to be sent */
+	zassert_true(TEST_WAIT_FOR(sniff_pdc_set_sink_path_fake.call_count >= 1,
+				   PDC_TEST_TIMEOUT));
+	zassert_ok(emul_pdc_get_sink_path(pdc->emul_pdc, &sink_path_en));
+	zassert_false(sink_path_en);
+
+	/* Verify that SET_SINK_PATH is retried after SINK_PATH_RETRY_DELAY_MS
+	 * and enables the sink path.
+	 */
+	zassert_true(TEST_WAIT_FOR(sniff_pdc_set_sink_path_fake.call_count >= 2,
+				   PDC_TEST_TIMEOUT * 2));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(pdc->port, -1));
+	zassert_ok(emul_pdc_get_sink_path(pdc->emul_pdc, &sink_path_en));
+	zassert_true(sink_path_en);
 }

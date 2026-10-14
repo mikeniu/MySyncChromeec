@@ -124,7 +124,12 @@ test_mockable_static_inline int sniff_pdc_set_rdo(const struct device *dev,
 /**
  * @brief Time to wait for typec only devices (Non PD) to settle
  */
-#define TYPEC_ONLY_SINK_DEBOUNCE_TIME_US (1000 * USEC_PER_MSEC)
+#define TYPEC_ONLY_DEBOUNCE_TIME_US (1000 * USEC_PER_MSEC)
+
+/**
+ * @brief Time delay before retrying a failed CMD_PDC_SET_SINK_PATH command
+ */
+#define SINK_PATH_RETRY_DELAY_MS 500
 
 /**
  * @brief maximum number of times to try and send a command, or wait for a
@@ -2050,7 +2055,8 @@ static void run_typec_snk_policies(struct pdc_port_t *port)
 		return;
 	}
 
-	if (atomic_test_and_clear_bit(port->snk_policy.flags,
+	if (k_timer_remaining_get(&port->typec_only_timer) == 0 &&
+	    atomic_test_and_clear_bit(port->snk_policy.flags,
 				      SNK_POLICY_SET_ACTIVE_CHARGE_PORT)) {
 		/* Check if we are the active charge port */
 		port->sink_path_to_send =
@@ -3575,10 +3581,19 @@ static void pdc_send_cmd_wait_exit(void *obj)
 			}
 		}
 		break;
+	case CMD_PDC_SET_SINK_PATH:
+		if (port->cmd->error &&
+		    port->send_cmd_return_state == PDC_SNK_TYPEC_ONLY) {
+			k_timer_start(&port->typec_only_timer,
+				      K_MSEC(SINK_PATH_RETRY_DELAY_MS),
+				      K_NO_WAIT);
+			atomic_set_bit(port->snk_policy.flags,
+				       SNK_POLICY_SET_ACTIVE_CHARGE_PORT);
+		}
+		__fallthrough;
 	case CMD_PDC_SET_PDR:
 	case CMD_PDC_SET_UOR:
 	case CMD_PDC_SET_PDOS:
-	case CMD_PDC_SET_SINK_PATH:
 	case CMD_PDC_READ_POWER_LEVEL:
 		trigger_ppm_status_change(port);
 		break;
@@ -3612,8 +3627,7 @@ static void pdc_src_typec_only_entry(void *obj)
 		 * k_timer_start call always resets the timer status.
 		 */
 		k_timer_start(&port->typec_only_timer,
-			      K_USEC(TYPEC_ONLY_SINK_DEBOUNCE_TIME_US),
-			      K_NO_WAIT);
+			      K_USEC(TYPEC_ONLY_DEBOUNCE_TIME_US), K_NO_WAIT);
 
 		if (IS_ENABLED(CONFIG_PDC_POWER_MGMT_USB_MUX)) {
 			usb_mux_set(
@@ -3703,7 +3717,7 @@ static void pdc_snk_typec_only_entry(void *obj)
 		 * k_timer_start call always resets the timer status.
 		 */
 		k_timer_start(&port->typec_only_timer,
-			      K_USEC(PD_T_SINK_WAIT_CAP), K_NO_WAIT);
+			      K_USEC(TYPEC_ONLY_DEBOUNCE_TIME_US), K_NO_WAIT);
 
 		if (IS_ENABLED(CONFIG_PDC_POWER_MGMT_USB_MUX)) {
 			usb_mux_set(
