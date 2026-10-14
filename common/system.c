@@ -603,7 +603,7 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	 *   - Perform interrupt-driven driver I/O (e.g., blocking I2C/SPI
 	 *     transactions expecting IRQ completion).
 	 *   - Acquire mutexes or block on synchronization primitives
-	 *     (e.g., mutex_lock, k_mutex_lock, k_sem_take).
+	 *     (e.g., k_mutex_lock, k_sem_take).
 	 *   - Rely on deferred functions or timer interrupts.
 	 */
 	hook_notify(HOOK_SYSJUMP);

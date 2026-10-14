@@ -185,7 +185,7 @@ static int rt9478_set_low_power_mode(int chgnum, bool enable)
 	int rv;
 	int reg;
 
-	mutex_lock(&rt9478_perf_mode_mutex);
+	k_mutex_lock(&rt9478_perf_mode_mutex, K_FOREVER);
 	rv = raw_read16(chgnum, RT9478_REG_CHARGE_OPTION_0, &reg);
 	if (rv)
 		goto unlock_and_return;
@@ -206,7 +206,7 @@ static int rt9478_set_low_power_mode(int chgnum, bool enable)
 
 	rv = raw_write16(chgnum, RT9478_REG_CHARGE_OPTION_0, reg);
 unlock_and_return:
-	mutex_unlock(&rt9478_perf_mode_mutex);
+	k_mutex_unlock(&rt9478_perf_mode_mutex);
 	return rv;
 }
 

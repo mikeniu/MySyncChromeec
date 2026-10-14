@@ -455,12 +455,12 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	}
 
 	ctrl_reg = LSM6DSM_RANGE_REG(s->type);
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	err = st_write_data_with_mask(s, ctrl_reg, LSM6DSM_RANGE_MASK, reg_val);
 	if (err == EC_SUCCESS)
 		/* Save internally gain for speed optimization. */
 		s->current_range = newrange;
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return err;
 }
 
@@ -521,9 +521,9 @@ int lsm6dsm_set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 		else
 			cal->batch_size = 0;
 		CPRINTS("Batch size: %d", cal->batch_size);
-		mutex_lock(s->mutex);
+		k_mutex_lock(s->mutex, K_FOREVER);
 	} else {
-		mutex_lock(s->mutex);
+		k_mutex_lock(s->mutex, K_FOREVER);
 		ctrl_reg = LSM6DSM_ODR_REG(s->type);
 		ret = st_write_data_with_mask(s, ctrl_reg, LSM6DSM_ODR_MASK,
 					      reg_val);
@@ -540,7 +540,7 @@ int lsm6dsm_set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 			CPRINTS("Failed to enable FIFO. Error: %d", ret);
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -645,7 +645,7 @@ static int init(struct motion_sensor_t *s)
 	 * Requirement: Accel need be init before gyro and mag
 	 */
 	if (s->type == MOTIONSENSE_TYPE_ACCEL) {
-		mutex_lock(s->mutex);
+		k_mutex_lock(s->mutex, K_FOREVER);
 
 		/* Software reset procedure. */
 		reg_val = LSM6DSM_ODR_TO_REG(LSM6DSM_ODR_MIN_VAL);
@@ -720,7 +720,7 @@ static int init(struct motion_sensor_t *s)
 		if (ret != EC_SUCCESS)
 			goto err_unlock;
 
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 	}
 
 	/* Set default resolution common to acc and gyro. */
@@ -728,7 +728,7 @@ static int init(struct motion_sensor_t *s)
 	return sensor_init_done(s);
 
 err_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	CPRINTS("%s: MS Init type:0x%X Error", s->name, s->type);
 	return ret;
 }

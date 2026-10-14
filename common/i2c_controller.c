@@ -28,7 +28,7 @@
 #define I2C_CONTROLLER_COUNT I2C_PORT_COUNT
 #endif
 
-static mutex_t port_mutex[I2C_CONTROLLER_COUNT];
+static struct k_mutex port_mutex[I2C_CONTROLLER_COUNT];
 
 /* A bitmap of the controllers which are currently servicing a request. */
 static volatile uint32_t i2c_port_active_list;
@@ -181,7 +181,7 @@ void i2c_lock(int port, int lock)
 	if (lock) {
 		uint32_t irq_lock_key;
 
-		mutex_lock(port_mutex + port);
+		k_mutex_lock(port_mutex + port, K_FOREVER);
 
 		/* Disable interrupt during changing counter for preemption. */
 		irq_lock_key = irq_lock();
@@ -201,7 +201,7 @@ void i2c_lock(int port, int lock)
 
 		irq_unlock(irq_lock_key);
 
-		mutex_unlock(port_mutex + port);
+		k_mutex_unlock(port_mutex + port);
 	}
 }
 
@@ -211,7 +211,7 @@ void i2c_prepare_sysjump(void)
 
 	/* Lock all i2c controllers */
 	for (i = 0; i < ARRAY_SIZE(port_mutex); ++i)
-		mutex_lock(port_mutex + i);
+		k_mutex_lock(port_mutex + i, K_FOREVER);
 }
 
 static uint8_t i2c_header_crc8(const uint16_t addr_flags, uint8_t reg)

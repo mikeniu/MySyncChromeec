@@ -79,7 +79,7 @@ static int fifo_remove(uint8_t *buffp)
 {
 	int size;
 
-	mutex_lock(&fifo_remove_mutex);
+	k_mutex_lock(&fifo_remove_mutex, K_FOREVER);
 	if (!fifo_entries) {
 		/* no entry remaining in FIFO : return last known state */
 		int last = (fifo_start + FIFO_DEPTH - 1) % FIFO_DEPTH;
@@ -87,7 +87,7 @@ static int fifo_remove(uint8_t *buffp)
 		size = get_data_size(fifo[last].event_type);
 
 		memcpy(buffp, &fifo[last].data, size);
-		mutex_unlock(&fifo_remove_mutex);
+		k_mutex_unlock(&fifo_remove_mutex);
 
 		/*
 		 * Bail out without changing any FIFO indices and let the
@@ -106,7 +106,7 @@ static int fifo_remove(uint8_t *buffp)
 
 	fifo_start = (fifo_start + 1) % FIFO_DEPTH;
 	atomic_sub(&fifo_entries, 1);
-	mutex_unlock(&fifo_remove_mutex);
+	k_mutex_unlock(&fifo_remove_mutex);
 
 	return EC_SUCCESS;
 }
@@ -129,8 +129,8 @@ void mkbp_fifo_clear_keyboard(void)
 	 * Order of these locks is important to prevent deadlock since
 	 * mkbp_fifo_add() may call fifo_remove().
 	 */
-	mutex_lock(&fifo_add_mutex);
-	mutex_lock(&fifo_remove_mutex);
+	k_mutex_lock(&fifo_add_mutex, K_FOREVER);
+	k_mutex_lock(&fifo_remove_mutex, K_FOREVER);
 
 	/* Reset the end position */
 	fifo_end = fifo_start;
@@ -149,8 +149,8 @@ void mkbp_fifo_clear_keyboard(void)
 	}
 	fifo_entries = new_fifo_entries;
 
-	mutex_unlock(&fifo_remove_mutex);
-	mutex_unlock(&fifo_add_mutex);
+	k_mutex_unlock(&fifo_remove_mutex);
+	k_mutex_unlock(&fifo_add_mutex);
 }
 
 void mkbp_clear_fifo(void)
@@ -163,8 +163,8 @@ void mkbp_clear_fifo(void)
 	 * Order of these locks is important to prevent deadlock since
 	 * mkbp_fifo_add() may call fifo_remove().
 	 */
-	mutex_lock(&fifo_add_mutex);
-	mutex_lock(&fifo_remove_mutex);
+	k_mutex_lock(&fifo_add_mutex, K_FOREVER);
+	k_mutex_lock(&fifo_remove_mutex, K_FOREVER);
 
 	fifo_start = 0;
 	fifo_end = 0;
@@ -173,17 +173,17 @@ void mkbp_clear_fifo(void)
 	for (i = 0; i < FIFO_DEPTH; i++)
 		memset(&fifo[i], 0, sizeof(struct ec_response_get_next_event));
 
-	mutex_unlock(&fifo_remove_mutex);
-	mutex_unlock(&fifo_add_mutex);
+	k_mutex_unlock(&fifo_remove_mutex);
+	k_mutex_unlock(&fifo_add_mutex);
 }
 
 test_mockable int mkbp_fifo_add(uint8_t event_type, const uint8_t *buffp)
 {
 	uint8_t size;
 
-	mutex_lock(&fifo_add_mutex);
+	k_mutex_lock(&fifo_add_mutex, K_FOREVER);
 	if (fifo_entries >= fifo_max_depth) {
-		mutex_unlock(&fifo_add_mutex);
+		k_mutex_unlock(&fifo_add_mutex);
 		CPRINTS("MKBP common FIFO depth %d reached", fifo_max_depth);
 
 		return EC_ERROR_OVERFLOW;
@@ -203,7 +203,7 @@ test_mockable int mkbp_fifo_add(uint8_t event_type, const uint8_t *buffp)
 	if (!mkbp_send_event(event_type) && fifo_entries == 1)
 		fifo_remove(NULL);
 
-	mutex_unlock(&fifo_add_mutex);
+	k_mutex_unlock(&fifo_add_mutex);
 	return EC_SUCCESS;
 }
 

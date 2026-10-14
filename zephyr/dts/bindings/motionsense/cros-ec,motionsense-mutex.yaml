@@ -6,7 +6,7 @@ description: Motion sense mutex parent node
 compatible: "cros-ec,motionsense-mutex"
 
 child-binding:
-  description: A mutex node is used to create an instance of mutex_t.
+  description: A mutex node is used to create an instance of struct k_mutex.
                A mutex node is referenced by one or more sensor nodes in
                "/motionsense-sensors" node.
 

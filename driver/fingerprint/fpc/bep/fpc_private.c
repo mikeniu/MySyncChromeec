@@ -171,7 +171,7 @@ static uint8_t spi_buf[MAX_CMD_SPI_TRANSFER_SIZE];
 void fp_sensor_lock(void)
 {
 	if (sensor_owner != task_get_current()) {
-		mutex_lock(&sensor_lock);
+		k_mutex_lock(&sensor_lock, K_FOREVER);
 		sensor_owner = task_get_current();
 	}
 }
@@ -179,7 +179,7 @@ void fp_sensor_lock(void)
 void fp_sensor_unlock(void)
 {
 	sensor_owner = 0xFF;
-	mutex_unlock(&sensor_lock);
+	k_mutex_unlock(&sensor_lock);
 }
 
 static int fpc_send_cmd(const uint8_t cmd)

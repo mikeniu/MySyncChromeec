@@ -153,7 +153,7 @@ static int __maybe_unused icm426xx_config_fifo(const struct motion_sensor_t *s,
 
 	val = enable ? mask : 0;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = icm_field_update8(s, ICM426XX_REG_FIFO_CONFIG1, mask, val);
 	if (ret != EC_SUCCESS)
@@ -178,7 +178,7 @@ static int __maybe_unused icm426xx_config_fifo(const struct motion_sensor_t *s,
 	}
 
 out_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -285,7 +285,7 @@ static int icm426xx_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	    (!(*event & CONFIG_ACCELGYRO_ICM426XX_INT_EVENT)))
 		return EC_ERROR_NOT_HANDLED;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* read and clear interrupt status */
 	ret = icm_read8(s, ICM426XX_REG_INT_STATUS, &status);
@@ -299,7 +299,7 @@ static int icm426xx_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	}
 
 out_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -384,7 +384,7 @@ static int icm426xx_enable_sensor(const struct motion_sensor_t *s, int enable)
 			crec_usleep(rem);
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = icm_field_update8(s, ICM426XX_REG_PWR_MGMT0, mask, val);
 	if (ret == EC_SUCCESS) {
@@ -394,7 +394,7 @@ static int icm426xx_enable_sensor(const struct motion_sensor_t *s, int enable)
 			crec_usleep(200);
 	}
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -447,14 +447,14 @@ static int icm426xx_set_data_rate(const struct motion_sensor_t *s, int rate,
 		return ret;
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = icm_field_update8(s, reg, ICM426XX_ODR_MASK,
 				ICM426XX_ODR(reg_val));
 	if (ret != EC_SUCCESS)
 		goto out_unlock;
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	if (data->odr == 0) {
 		/* enable sensor */
@@ -469,7 +469,7 @@ static int icm426xx_set_data_rate(const struct motion_sensor_t *s, int rate,
 	return EC_SUCCESS;
 
 out_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -517,14 +517,14 @@ static int icm426xx_set_range(struct motion_sensor_t *s, int range, int rnd)
 		return EC_RES_INVALID_PARAM;
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = icm_field_update8(s, reg, ICM426XX_FS_MASK,
 				ICM426XX_FS_SEL(reg_val));
 	if (ret == EC_SUCCESS)
 		s->current_range = newrange;
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return ret;
 }
@@ -537,10 +537,10 @@ static int icm426xx_get_hw_offset(const struct motion_sensor_t *s,
 
 	switch (s->type) {
 	case MOTIONSENSE_TYPE_ACCEL:
-		mutex_lock(s->mutex);
+		k_mutex_lock(s->mutex, K_FOREVER);
 		ret = icm_read_n(s, ICM426XX_REG_OFFSET_USER4, raw,
 				 sizeof(raw));
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		if (ret != EC_SUCCESS)
 			return ret;
 		/*
@@ -555,10 +555,10 @@ static int icm426xx_get_hw_offset(const struct motion_sensor_t *s,
 		offset[Z] = (((int)raw[3] << 4) & ~GENMASK(7, 0)) | raw[4];
 		break;
 	case MOTIONSENSE_TYPE_GYRO:
-		mutex_lock(s->mutex);
+		k_mutex_lock(s->mutex, K_FOREVER);
 		ret = icm_read_n(s, ICM426XX_REG_OFFSET_USER0, raw,
 				 sizeof(raw));
-		mutex_unlock(s->mutex);
+		k_mutex_unlock(s->mutex);
 		if (ret != EC_SUCCESS)
 			return ret;
 		/*
@@ -596,7 +596,7 @@ static int icm426xx_set_hw_offset(const struct motion_sensor_t *s,
 			offset[i] = -2048;
 	}
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	switch (s->type) {
 	case MOTIONSENSE_TYPE_ACCEL:
@@ -673,7 +673,7 @@ static int icm426xx_set_hw_offset(const struct motion_sensor_t *s,
 	}
 
 out_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 
@@ -762,13 +762,13 @@ static int icm426xx_read(const struct motion_sensor_t *s, intv3_t v)
 	}
 
 	/* read data registers if sensor is stabilized */
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	ret = icm426xx_check_sensor_stabilized(s, __hw_clock_source_read());
 	if (ret == EC_SUCCESS)
 		ret = icm_read_n(s, reg, raw, sizeof(raw));
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	if (ret != EC_SUCCESS)
 		return ret;
 
@@ -786,9 +786,9 @@ static int icm426xx_read_temp(const struct motion_sensor_t *s, int *temp_ptr)
 {
 	int val, ret;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 	ret = icm_read16(s, ICM426XX_REG_TEMP_DATA, &val);
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	if (ret != EC_SUCCESS)
 		return ret;
 
@@ -872,7 +872,7 @@ static int icm426xx_init(struct motion_sensor_t *s)
 	int mask, val;
 	int ret, i;
 
-	mutex_lock(s->mutex);
+	k_mutex_lock(s->mutex, K_FOREVER);
 
 	/* manually force register bank to 0 */
 	st->bank = 0;
@@ -944,12 +944,12 @@ static int icm426xx_init(struct motion_sensor_t *s)
 	if (ret != EC_SUCCESS)
 		goto out_unlock;
 
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 
 	return sensor_init_done(s);
 
 out_unlock:
-	mutex_unlock(s->mutex);
+	k_mutex_unlock(s->mutex);
 	return ret;
 }
 

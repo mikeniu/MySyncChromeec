@@ -38,12 +38,12 @@ void report_ap_reset(enum chipset_shutdown_reason reason)
 	timestamp_t now = get_time();
 	uint32_t now_ms = (uint32_t)(now.val / MSEC);
 
-	mutex_lock(&reset_log_mutex);
+	k_mutex_lock(&reset_log_mutex, K_FOREVER);
 	reset_logs[next_reset_log].reset_cause = reason;
 	reset_logs[next_reset_log++].reset_time_ms = now_ms;
 	next_reset_log &= ARRAY_SIZE(reset_logs) - 1;
 	ap_resets_since_ec_boot++;
-	mutex_unlock(&reset_log_mutex);
+	k_mutex_unlock(&reset_log_mutex);
 
 	/* Update checksum */
 	reset_log_checksum = calc_reset_log_checksum();
@@ -59,7 +59,7 @@ get_ap_reset_stats(struct ap_reset_log_entry *reset_log_entries,
 	if (reset_log_entries == NULL || resets_since_ec_boot == NULL)
 		return EC_ERROR_INVAL;
 
-	mutex_lock(&reset_log_mutex);
+	k_mutex_lock(&reset_log_mutex, K_FOREVER);
 	*resets_since_ec_boot = ap_resets_since_ec_boot;
 	for (i = 0; i != ARRAY_SIZE(reset_logs) && i != num_reset_log_entries;
 	     ++i) {
@@ -67,7 +67,7 @@ get_ap_reset_stats(struct ap_reset_log_entry *reset_log_entries,
 			      (ARRAY_SIZE(reset_logs) - 1);
 		reset_log_entries[i] = reset_logs[log_address];
 	}
-	mutex_unlock(&reset_log_mutex);
+	k_mutex_unlock(&reset_log_mutex);
 
 	return EC_SUCCESS;
 }
@@ -76,13 +76,13 @@ enum chipset_shutdown_reason chipset_get_shutdown_reason(void)
 {
 	enum chipset_shutdown_reason reason = CHIPSET_RESET_UNKNOWN;
 
-	mutex_lock(&reset_log_mutex);
+	k_mutex_lock(&reset_log_mutex, K_FOREVER);
 	if (ap_resets_since_ec_boot != 0) {
 		int i = (next_reset_log == 0) ? ARRAY_SIZE(reset_logs) - 1 :
 						next_reset_log - 1;
 		reason = reset_logs[i].reset_cause;
 	}
-	mutex_unlock(&reset_log_mutex);
+	k_mutex_unlock(&reset_log_mutex);
 
 	return reason;
 }
@@ -92,9 +92,9 @@ uint32_t test_chipset_get_ap_resets_since_ec_boot(void)
 {
 	uint32_t count;
 
-	mutex_lock(&reset_log_mutex);
+	k_mutex_lock(&reset_log_mutex, K_FOREVER);
 	count = ap_resets_since_ec_boot;
-	mutex_unlock(&reset_log_mutex);
+	k_mutex_unlock(&reset_log_mutex);
 
 	return count;
 }
