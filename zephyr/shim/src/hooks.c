@@ -104,6 +104,25 @@ BUILD_ASSERT(
 	CONFIG_SYSTEM_WORKQUEUE_PRIORITY == EC_TASK_PRIORITY(EC_SYSWORKQ_PRIO),
 	"EC_SYSWORKQ_PRIO does not match CONFIG_SYSTEM_WORKQUEUE_PRIORITY.");
 
+#if defined(CONFIG_PLATFORM_EC_WORKQ_LATENCY_AUDIT)
+static uint32_t workq_latency_warn_count;
+
+static bool is_sysworkq_thread(void)
+{
+	return k_current_get() == k_work_queue_thread_get(&k_sys_work_q);
+}
+
+uint32_t zephyr_shim_get_workq_latency_warn_count(void)
+{
+	return workq_latency_warn_count;
+}
+
+void zephyr_shim_reset_workq_latency_warn_count(void)
+{
+	workq_latency_warn_count = 0;
+}
+#endif
+
 static int zephyr_shim_setup_hooks(void)
 {
 	int rv = 0;
@@ -168,11 +187,58 @@ void hook_notify(enum hook_type type)
 		/* Call each handler with the located priority */
 		for (const struct zephyr_shim_hook_info *p = start; p != end;
 		     p++) {
-			if (p->priority == prio)
+			if (p->priority == prio) {
+#if defined(CONFIG_PLATFORM_EC_WORKQ_LATENCY_AUDIT)
+				bool on_sysworkq = is_sysworkq_thread();
+				uint64_t t0 = on_sysworkq ? get_time().val : 0;
+
 				p->routine();
+
+				if (on_sysworkq) {
+					uint64_t dt_us = get_time().val - t0;
+
+					if (dt_us >
+					    CONFIG_PLATFORM_EC_WORKQ_MAX_EXEC_US) {
+						workq_latency_warn_count++;
+						cprints(CC_COMMAND,
+							"WARN: Hook %d (func %p) took %llu us on sysworkq",
+							type, p->routine,
+							dt_us);
+					}
+				}
+#else
+				p->routine();
+#endif
+			}
 		}
 	};
 }
+
+#if defined(CONFIG_PLATFORM_EC_WORKQ_LATENCY_AUDIT)
+void zephyr_shim_run_deferred(void (*routine)(void), uint64_t *target_time_us)
+{
+	uint64_t t0 = get_time().val;
+	uint64_t target_us = *target_time_us;
+	uint64_t dt_us;
+
+	if (t0 > target_us + CONFIG_PLATFORM_EC_WORKQ_MAX_QUEUE_DELAY_US) {
+		workq_latency_warn_count++;
+		cprints(CC_COMMAND,
+			"WARN: Deferred call %p delayed %llu us in sysworkq",
+			routine, t0 - target_us);
+	}
+
+	routine();
+
+	dt_us = get_time().val - t0;
+	if (dt_us > CONFIG_PLATFORM_EC_WORKQ_MAX_EXEC_US) {
+		workq_latency_warn_count++;
+		cprints(CC_COMMAND,
+			"WARN: Deferred call %p took %llu us on sysworkq",
+			routine, dt_us);
+	}
+}
+#endif
 
 int hook_call_deferred(const struct deferred_data *data, int us)
 {
@@ -183,6 +249,10 @@ int hook_call_deferred(const struct deferred_data *data, int us)
 		k_work_cancel_delayable(work);
 	} else if (us >= 0) {
 		k_timeout_t delay = K_USEC(us);
+
+#if defined(CONFIG_PLATFORM_EC_WORKQ_LATENCY_AUDIT)
+		*data->target_time_us = get_time().val + (uint64_t)us;
+#endif
 
 		rv = k_work_reschedule(work, delay);
 		/*

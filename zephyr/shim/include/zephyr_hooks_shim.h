@@ -26,6 +26,9 @@ extern "C" {
  */
 struct deferred_data {
 	struct k_work_delayable *work;
+#if defined(CONFIG_PLATFORM_EC_WORKQ_LATENCY_AUDIT)
+	uint64_t *target_time_us;
+#endif
 };
 
 /**
@@ -39,12 +42,31 @@ uint32_t sysworkq_audit_get_violation_count(void);
 void sysworkq_audit_reset_violation_count(void);
 #endif
 
+#if defined(CONFIG_PLATFORM_EC_WORKQ_LATENCY_AUDIT)
+void zephyr_shim_run_deferred(void (*routine)(void), uint64_t *target_time_us);
+uint32_t zephyr_shim_get_workq_latency_warn_count(void);
+void zephyr_shim_reset_workq_latency_warn_count(void);
+
+#define DECLARE_DEFERRED(routine)                                              \
+	static uint64_t routine##_target_time_us;                              \
+	static void routine##_workq_wrapper(struct k_work *work)               \
+	{                                                                      \
+		ARG_UNUSED(work);                                              \
+		zephyr_shim_run_deferred(routine, &routine##_target_time_us);  \
+	}                                                                      \
+	K_WORK_DELAYABLE_DEFINE(routine##_work_data, routine##_workq_wrapper); \
+	__maybe_unused const struct deferred_data routine##_data = {           \
+		.work = &routine##_work_data,                                  \
+		.target_time_us = &routine##_target_time_us,                   \
+	}
+#else
 #define DECLARE_DEFERRED(routine)                                    \
 	K_WORK_DELAYABLE_DEFINE(routine##_work_data,                 \
 				(void (*)(struct k_work *))routine); \
 	__maybe_unused const struct deferred_data routine##_data = { \
 		.work = &routine##_work_data,                        \
 	}
+#endif
 
 /**
  * Record describing a single hook routine.

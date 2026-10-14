@@ -258,6 +258,7 @@ static void deferred_non_blocking_ops(void)
 DECLARE_DEFERRED(deferred_non_blocking_ops);
 
 static bool blocking_deferred_done;
+static uint32_t blocking_deferred_violations;
 
 static void deferred_blocking_ops(void)
 {
@@ -285,6 +286,7 @@ static void deferred_blocking_ops(void)
 	(void)k_work_cancel_sync(&audit_idle_work, &work_sync);
 	(void)k_work_flush(&audit_idle_work, &work_sync);
 
+	blocking_deferred_violations = sysworkq_audit_get_violation_count();
 	blocking_deferred_done = true;
 }
 DECLARE_DEFERRED(deferred_blocking_ops);
@@ -308,6 +310,7 @@ ZTEST(hooks_tests, test_sysworkq_runtime_check)
 
 	/* On sysworkq with blocking timeouts: each operation must flag */
 	blocking_deferred_done = false;
+	blocking_deferred_violations = 0;
 	zassert_ok(hook_call_deferred(&deferred_blocking_ops_data, 0));
 	k_usleep(DEFERRED_DELAY_US);
 	zassert_true(blocking_deferred_done);
@@ -315,9 +318,120 @@ ZTEST(hooks_tests, test_sysworkq_runtime_check)
 	 * 11 explicit blocking calls + 1 k_usleep inside crec_usleep +
 	 * 1 internal k_mutex_lock(K_FOREVER) inside k_condvar_wait() = 13.
 	 */
-	zassert_equal(sysworkq_audit_get_violation_count(), 13);
+	zassert_equal(blocking_deferred_violations, 13);
 	sysworkq_audit_reset_violation_count();
 	zassert_equal(sysworkq_audit_get_violation_count(), 0);
+}
+
+static timestamp_t latency_fake_time;
+static bool slow_hook_enabled;
+static bool delayed_deferred_done;
+
+static void slow_hook_fn(void)
+{
+	if (slow_hook_enabled) {
+		latency_fake_time.val +=
+			CONFIG_PLATFORM_EC_WORKQ_MAX_QUEUE_DELAY_US + 5000;
+	}
+}
+DECLARE_HOOK(HOOK_TEST_3, slow_hook_fn, HOOK_PRIO_DEFAULT);
+
+static void deferred_delayed_fn(void)
+{
+	delayed_deferred_done = true;
+}
+DECLARE_DEFERRED(deferred_delayed_fn);
+
+static void deferred_staller_fn(void)
+{
+	zassert_ok(hook_call_deferred(&deferred_delayed_fn_data, 0));
+	hook_notify(HOOK_TEST_3);
+}
+DECLARE_DEFERRED(deferred_staller_fn);
+
+ZTEST(hooks_tests, test_workq_latency_audit)
+{
+	latency_fake_time.val = 1000;
+	get_time_mock = &latency_fake_time;
+	zephyr_shim_reset_workq_latency_warn_count();
+	zassert_equal(zephyr_shim_get_workq_latency_warn_count(), 0);
+
+	/* Fast hook and deferred calls on sysworkq must not warn */
+	slow_hook_enabled = false;
+	delayed_deferred_done = false;
+	zassert_ok(hook_call_deferred(&deferred_staller_fn_data, 0));
+	k_usleep(DEFERRED_DELAY_US);
+	zassert_true(delayed_deferred_done);
+	zassert_equal(zephyr_shim_get_workq_latency_warn_count(), 0);
+
+	/*
+	 * Trigger:
+	 * 1. slow_hook_fn on sysworkq exceeds WORKQ_MAX_EXEC_US
+	 * 2. deferred_staller_fn exceeds WORKQ_MAX_EXEC_US
+	 * 3. deferred_delayed_fn exceeds WORKQ_MAX_QUEUE_DELAY_US
+	 */
+	slow_hook_enabled = true;
+	delayed_deferred_done = false;
+	zassert_ok(hook_call_deferred(&deferred_staller_fn_data, 0));
+	k_usleep(DEFERRED_DELAY_US);
+	zassert_true(delayed_deferred_done);
+	zassert_equal(zephyr_shim_get_workq_latency_warn_count(), 3);
+
+	slow_hook_enabled = false;
+	get_time_mock = NULL;
+	zephyr_shim_reset_workq_latency_warn_count();
+	sysworkq_audit_reset_violation_count();
+	zassert_equal(zephyr_shim_get_workq_latency_warn_count(), 0);
+}
+
+static bool sweep_done;
+
+static void deferred_hook_sweep(void)
+{
+	static const enum hook_type sysworkq_hooks[] = {
+		HOOK_INIT,
+		HOOK_PRE_FREQ_CHANGE,
+		HOOK_FREQ_CHANGE,
+		HOOK_CHIPSET_PRE_INIT,
+		HOOK_CHIPSET_STARTUP,
+		HOOK_CHIPSET_RESUME,
+		HOOK_CHIPSET_SUSPEND,
+		HOOK_CHIPSET_SHUTDOWN,
+		HOOK_CHIPSET_SHUTDOWN_COMPLETE,
+		HOOK_CHIPSET_HARD_OFF,
+		HOOK_CHIPSET_RESET,
+		HOOK_AC_CHANGE,
+		HOOK_LID_CHANGE,
+		HOOK_TABLET_MODE_CHANGE,
+		HOOK_BASE_ATTACHED_CHANGE,
+		HOOK_POWER_BUTTON_CHANGE,
+		HOOK_BATTERY_SOC_CHANGE,
+		HOOK_TICK,
+		HOOK_SECOND,
+		HOOK_USB_PD_DISCONNECT,
+		HOOK_USB_PD_CONNECT,
+		HOOK_POWER_SUPPLY_CHANGE,
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(sysworkq_hooks); i++) {
+		hook_notify(sysworkq_hooks[i]);
+	}
+	sweep_done = true;
+}
+DECLARE_DEFERRED(deferred_hook_sweep);
+
+ZTEST(hooks_tests, test_sysworkq_hook_sweep)
+{
+	sysworkq_audit_reset_violation_count();
+	zephyr_shim_reset_workq_latency_warn_count();
+	sweep_done = false;
+
+	zassert_ok(hook_call_deferred(&deferred_hook_sweep_data, 0));
+	k_usleep(DEFERRED_DELAY_US);
+
+	zassert_true(sweep_done);
+	zassert_equal(sysworkq_audit_get_violation_count(), 0);
+	zassert_equal(zephyr_shim_get_workq_latency_warn_count(), 0);
 }
 
 ZTEST_SUITE(hooks_tests, NULL, NULL, NULL, NULL, NULL);

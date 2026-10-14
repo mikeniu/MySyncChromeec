@@ -493,6 +493,31 @@ choice TRACING_FORMAT_CHOICE
 	default TRACING_USER if PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK
 endchoice
 
+config PLATFORM_EC_WORKQ_LATENCY_AUDIT
+	bool "Audit execution duration and queue delay of hooks and deferred work"
+	depends on PLATFORM_EC_HOOKS && PLATFORM_EC_TIMER
+	default y
+	help
+	  Measures execution duration and queue delay for hooks and deferred
+	  calls dispatched on sysworkq, logging warnings if either threshold
+	  is exceeded.
+
+config PLATFORM_EC_WORKQ_MAX_EXEC_US
+	int "Maximum permitted execution duration (microseconds) on sysworkq"
+	depends on PLATFORM_EC_WORKQ_LATENCY_AUDIT
+	default 10000
+	help
+	  Warn threshold in microseconds for hook and deferred routine
+	  execution on sysworkq.
+
+config PLATFORM_EC_WORKQ_MAX_QUEUE_DELAY_US
+	int "Maximum permitted queue delay (microseconds) on sysworkq"
+	depends on PLATFORM_EC_WORKQ_LATENCY_AUDIT
+	default 50000
+	help
+	  Warn threshold in microseconds between the scheduled target execution
+	  time of a deferred routine and when it begins executing on sysworkq.
+
 config HAS_HOSTCMD
 	bool
 	default y if EC_HOST_CMD || PLATFORM_EC_HOSTCMD
