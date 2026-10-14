@@ -132,12 +132,6 @@ uint32_t task_wait_event(int timeout_us);
  */
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
 
-/**
- * Return non-zero if task_start() has been called and task scheduling has
- * started.
- */
-int task_start_called(void);
-
 typedef struct k_mutex mutex_t;
 
 #define mutex_lock(mtx) (k_mutex_lock(mtx, K_FOREVER))

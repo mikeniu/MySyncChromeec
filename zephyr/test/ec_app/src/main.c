@@ -5,7 +5,6 @@
 
 #include "ec_app_main.h"
 #include "hooks.h"
-#include "task.h"
 #include "timer.h"
 
 #include <zephyr/pm/policy.h>
@@ -102,13 +101,6 @@ ZTEST(ec_app_tests, test_hook_notify_init)
 }
 #endif
 
-#ifdef CONFIG_SHIMMED_TASKS
-ZTEST(ec_app_tests, test_start_ec_tasks)
-{
-	zassert_equal(task_start_called(), 1, "Tasks did not start.");
-}
-#endif
-
 ZTEST(ec_app_tests, test_ec_boot_sleep_disable)
 {
 #ifdef CONFIG_PLATFORM_EC_BOOT_NO_SLEEP_MS
@@ -123,9 +115,6 @@ ZTEST(ec_app_tests, test_ec_boot_sleep_disable)
 /* Does setup for all of the test cases. */
 void *ec_app_setup(void)
 {
-#ifdef CONFIG_SHIMMED_TASKS
-	zassert_equal(task_start_called(), 0, "Tasks have already started.");
-#endif
 	ec_app_main();
 	return NULL;
 }
