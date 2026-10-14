@@ -247,7 +247,6 @@ static int pre_kernel(void)
 	zassert_false(pre_kernel_ran);
 	zassert_true(k_is_pre_kernel());
 	zassert_equal(TASK_ID_INVALID, task_get_current());
-	zassert_false(in_deferred_context());
 	pre_kernel_ran = true;
 	return 0;
 }

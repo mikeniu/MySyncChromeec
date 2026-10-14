@@ -455,7 +455,7 @@ test_mockable int rt1718s_get_adc(int port, enum rt1718s_adc_channel channel,
 	int rv;
 	const int max_wait_times = 30;
 
-	if (in_interrupt_context()) {
+	if (k_is_in_isr()) {
 		CPRINTS("Err: use ADC in IRQ");
 		return EC_ERROR_INVAL;
 	}

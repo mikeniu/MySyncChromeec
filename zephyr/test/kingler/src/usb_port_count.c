@@ -20,7 +20,6 @@
 LOG_MODULE_REGISTER(usb_port_count);
 
 FAKE_VALUE_FUNC(enum corsola_db_type, corsola_get_db_type);
-FAKE_VALUE_FUNC(bool, in_interrupt_context);
 FAKE_VOID_FUNC(bmi3xx_interrupt);
 FAKE_VOID_FUNC(hdmi_hpd_interrupt);
 FAKE_VOID_FUNC(ps185_hdmi_hpd_mux_set);
@@ -31,7 +30,6 @@ FAKE_VALUE_FUNC(int, tc_is_attached_src, int);
 
 #define FFF_FAKES_LIST(FAKE)         \
 	FAKE(corsola_get_db_type)    \
-	FAKE(in_interrupt_context)   \
 	FAKE(bmi3xx_interrupt)       \
 	FAKE(hdmi_hpd_interrupt)     \
 	FAKE(ps185_hdmi_hpd_mux_set) \
