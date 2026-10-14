@@ -16,6 +16,24 @@
       "message": "Please split into two patches:\n1. lock screen key implementation\n2. multilingual keyboard support",
       "revId": "0f3a743e6a572f188cbb4bae7cc5406c711892bc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0056bf03_b82eb862",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-14T07:47:28Z",
+      "side": 1,
+      "message": "We already remove lock screen key implementation from latest patch, please check it.",
+      "parentUuid": "2d0053b4_43e3ce53",
+      "revId": "0f3a743e6a572f188cbb4bae7cc5406c711892bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
