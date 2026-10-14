@@ -4,7 +4,6 @@
  */
 
 #include "assert.h"
-#include "atomic.h"
 #include "common.h"
 #include "console.h"
 #include "limits.h"
@@ -12,6 +11,8 @@
 #include "system.h"
 #include "usb_pd_timer.h"
 #include "usb_tc_sm.h"
+
+#include <zephyr/sys/atomic.h>
 
 #define MAX_PD_PORTS CONFIG_USB_PD_PORT_MAX_COUNT
 #define MAX_PD_TIMERS PD_TIMER_COUNT

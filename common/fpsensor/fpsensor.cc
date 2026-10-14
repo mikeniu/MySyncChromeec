@@ -4,7 +4,6 @@
  */
 
 #include "assert.h"
-#include "atomic.h"
 #include "clock.h"
 #include "common.h"
 #include "compile_time_macros.h"
@@ -35,6 +34,8 @@
 #include "trng.h"
 #include "util.h"
 #include "watchdog.h"
+
+#include <zephyr/sys/atomic.h>
 
 #include <algorithm>
 #include <array>

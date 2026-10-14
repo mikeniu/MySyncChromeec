@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "common.h"
 #include "ec_commands.h"
 #include "fpsensor/fpsensor.h"
@@ -15,6 +14,8 @@
 #include "system.h"
 #include "util.h"
 #include "watchdog.h"
+
+#include <zephyr/sys/atomic.h>
 
 #include <vector>
 

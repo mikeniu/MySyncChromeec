@@ -5,7 +5,6 @@
  * Matrix KeyBoard Protocol FIFO buffer implementation
  */
 
-#include "atomic.h"
 #include "common.h"
 #include "keyboard_config.h"
 #include "keyboard_scan.h"
@@ -14,6 +13,8 @@
 #include "system.h"
 #include "task.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 /* Console output macros */
 #define CPRINTS(format, args...) cprints(CC_KEYBOARD, format, ##args)

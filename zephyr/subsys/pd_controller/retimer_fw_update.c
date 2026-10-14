@@ -15,9 +15,9 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/sys/util.h>
 
-#include <atomic.h>
 #include <drivers/pdc.h>
 #include <usbc/pd_task_intel_altmode.h>
 #include <usbc/pdc_power_mgmt.h>

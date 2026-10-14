@@ -11,7 +11,6 @@
  * controlled PPC chips that are similar to the AOZ1380
  */
 
-#include "atomic.h"
 #include "common.h"
 #include "console.h"
 #include "hooks.h"
@@ -21,6 +20,8 @@
 #include "usb_pd.h"
 #include "usb_pd_tcpc.h"
 #include "usbc_ppc.h"
+
+#include <zephyr/sys/atomic.h>
 
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
@@ -33,7 +34,7 @@ static atomic_t irq_pending; /* Bitmask of ports signaling an interrupt. */
 static atomic_t flags[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 #define AOZ1380_SET_FLAG(port, flag) atomic_or(&flags[port], (flag))
-#define AOZ1380_CLR_FLAG(port, flag) atomic_clear_bits(&flags[port], (flag))
+#define AOZ1380_CLR_FLAG(port, flag) atomic_and(&flags[port], ~(flag))
 
 static int aoz1380_init(int port)
 {

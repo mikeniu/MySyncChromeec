@@ -4,7 +4,6 @@
  */
 
 /* Richtek RT1718S USB-C Power Path Controller */
-#include "atomic.h"
 #include "common.h"
 #include "config.h"
 #include "console.h"
@@ -13,6 +12,8 @@
 #include "usb_pe_sm.h"
 #include "usbc_ppc.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #define RT1718S_FLAGS_SOURCE_ENABLED BIT(0)
 static atomic_t flags[CONFIG_USB_PD_PORT_MAX_COUNT];
@@ -68,7 +69,7 @@ static int rt1718s_vbus_source_enable(int port, int enable)
 	if (enable)
 		atomic_or(&flags[port], RT1718S_FLAGS_SOURCE_ENABLED);
 	else
-		atomic_clear_bits(&flags[port], RT1718S_FLAGS_SOURCE_ENABLED);
+		atomic_and(&flags[port], ~RT1718S_FLAGS_SOURCE_ENABLED);
 
 	RETURN_ERROR(tcpm_set_src_ctrl(port, enable));
 

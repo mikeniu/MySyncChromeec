@@ -8,7 +8,6 @@
  * Refer to USB Type-C Cable and Connector Specification Release 2.0 Section F
  */
 
-#include "atomic.h"
 #include "compile_time_macros.h"
 #include "console.h"
 #include "tcpm/tcpm.h"
@@ -23,6 +22,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <zephyr/sys/atomic.h>
 
 /*
  * Enter/Exit TBT mode with active cable

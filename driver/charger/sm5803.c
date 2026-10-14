@@ -4,7 +4,6 @@
  *
  * Silicon Mitus SM5803 Buck-Boost Charger
  */
-#include "atomic.h"
 #include "battery.h"
 #include "battery_smart.h"
 #include "charge_state.h"
@@ -23,6 +22,8 @@
 #include "usbc_ocp.h"
 #include "util.h"
 #include "watchdog.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifndef CONFIG_CHARGER_NARROW_VDC
 #error "SM5803 is a NVDC charger, please enable CONFIG_CHARGER_NARROW_VDC."

@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "chipset.h"
 #include "common.h"
 #include "console.h"
@@ -13,6 +12,8 @@
 #include "temp_sensor.h"
 #include "temp_sensor/temp_sensor.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_DPTF, outstr)
@@ -55,7 +56,7 @@ int dptf_query_next_sensor_event(void)
 
 	for (id = 0; id < TEMP_SENSOR_COUNT; id++)
 		if ((uint32_t)dptf_seen & BIT(id)) {
-			atomic_clear_bits(&dptf_seen, BIT(id));
+			atomic_and(&dptf_seen, ~BIT(id));
 			return id;
 		}
 
@@ -118,7 +119,7 @@ void dptf_set_temp_threshold(int sensor_id, int temp, int idx, int enable)
 		if (dptf_threshold[sensor_id][idx].temp == -1)
 			cond_init(&dptf_threshold[sensor_id][idx].over, 0);
 		dptf_threshold[sensor_id][idx].temp = temp;
-		atomic_clear_bits(&dptf_seen, BIT(sensor_id));
+		atomic_and(&dptf_seen, ~BIT(sensor_id));
 	} else {
 		dptf_threshold[sensor_id][idx].temp = -1;
 	}

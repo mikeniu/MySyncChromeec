@@ -6,8 +6,8 @@
 #include "signal_vw.h"
 
 #include <zephyr/drivers/espi.h>
+#include <zephyr/sys/atomic.h>
 
-#include <atomic.h>
 #include <x86_non_dsx_common_pwrseq_sm_handler.h>
 
 #define DT_DRV_COMPAT intel_ap_pwrseq_vw

@@ -8,9 +8,9 @@
 #ifndef PLATFORM_EC_INCLUDE_USB_PD_TIMER_H_
 #define PLATFORM_EC_INCLUDE_USB_PD_TIMER_H_
 
-#include "atomic.h"
-
 #include <stdbool.h>
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "common.h"
 #include "compile_time_macros.h"
 #include "ec_commands.h"
@@ -20,6 +19,8 @@
 #include "system.h"
 #include "task.h"
 #include "util.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef CONFIG_ZEPHYR
 #include <zephyr/shell/shell.h>

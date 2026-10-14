@@ -8,7 +8,6 @@
 #ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_
 
-#include "atomic.h"
 #include "common.h"
 #include "ec_commands.h"
 #include "fpsensor_driver.h"
@@ -20,6 +19,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <zephyr/sys/atomic.h>
 
 #include <array>
 #include <optional>

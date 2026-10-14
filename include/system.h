@@ -8,12 +8,13 @@
 #ifndef PLATFORM_EC_INCLUDE_SYSTEM_H_
 #define PLATFORM_EC_INCLUDE_SYSTEM_H_
 
-#include "atomic.h"
 #include "common.h"
 #include "compile_time_macros.h"
 #include "console.h"
 #include "ec_commands.h"
 #include "timer.h"
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -645,7 +646,7 @@ extern atomic_t sleep_mask;
  */
 static inline void enable_sleep(uint32_t mask)
 {
-	atomic_clear_bits(&sleep_mask, mask);
+	atomic_and(&sleep_mask, ~mask);
 }
 
 /**
@@ -693,7 +694,7 @@ static inline void disable_idle(void)
 
 static inline void enable_idle(void)
 {
-	atomic_clear_bits(&idle_disabled, 1);
+	atomic_and(&idle_disabled, ~1);
 }
 #endif
 

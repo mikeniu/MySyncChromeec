@@ -5,7 +5,6 @@
  * Dynamic PDO Selection.
  */
 
-#include "atomic.h"
 #include "battery.h"
 #include "charge_manager.h"
 #include "charge_state.h"
@@ -23,6 +22,8 @@
 #include "util.h"
 
 #include <stdint.h>
+
+#include <zephyr/sys/atomic.h>
 
 #define K_MORE_PWR 96
 #define K_LESS_PWR 93
@@ -376,7 +377,7 @@ test_mockable_static bool has_new_power_request(struct pdo_candidate *cand)
 		if (!fake_enabled)
 			input_pwr_avg = req_pwr + 1;
 	} else {
-		atomic_clear_bits(&flag, DPS_FLAG_NEED_MORE_PWR);
+		atomic_and(&flag, ~DPS_FLAG_NEED_MORE_PWR);
 	}
 
 	if (debug_level)
@@ -506,7 +507,7 @@ void dps_task(void *u)
 		} else if (now.val < timeout.val) {
 			atomic_or(&flag, DPS_FLAG_WAITING);
 			task_wait_event(timeout.val - now.val);
-			atomic_clear_bits(&flag, DPS_FLAG_WAITING);
+			atomic_and(&flag, ~DPS_FLAG_WAITING);
 			continue;
 		}
 
@@ -527,7 +528,7 @@ void dps_task(void *u)
 
 		if (!has_new_power_request(&curr_cand)) {
 			sample_count = 0;
-			atomic_clear_bits(&flag, DPS_FLAG_SAMPLED);
+			atomic_and(&flag, ~DPS_FLAG_SAMPLED);
 		} else {
 			if (last_cand.port == curr_cand.port &&
 			    last_cand.mv == curr_cand.mv &&
@@ -543,8 +544,8 @@ void dps_task(void *u)
 			dps_port = curr_cand.port;
 			pd_dpm_request(dps_port, DPM_REQUEST_NEW_POWER_LEVEL);
 			sample_count = 0;
-			atomic_clear_bits(&flag, (DPS_FLAG_SAMPLED |
-						  DPS_FLAG_NEED_MORE_PWR));
+			atomic_and(&flag, ~(DPS_FLAG_SAMPLED |
+					    DPS_FLAG_NEED_MORE_PWR));
 		}
 
 		last_cand.port = curr_cand.port;
@@ -559,7 +560,7 @@ void check_battery_present(void)
 	const struct batt_params *batt = charger_current_battery_params();
 
 	if (batt->is_present == BP_YES && (flag & DPS_FLAG_NO_BATTERY)) {
-		atomic_clear_bits(&flag, DPS_FLAG_NO_BATTERY);
+		atomic_and(&flag, ~DPS_FLAG_NO_BATTERY);
 		task_wake(TASK_ID_DPS);
 	}
 }

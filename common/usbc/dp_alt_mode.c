@@ -9,7 +9,6 @@
  * section 5.2
  */
 
-#include "atomic.h"
 #include "builtin/assert.h"
 #include "chipset.h"
 #include "console.h"
@@ -26,6 +25,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <zephyr/sys/atomic.h>
 
 #ifdef CONFIG_COMMON_RUNTIME
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
@@ -94,7 +95,7 @@ static const uint8_t state_vdm_cmd[DP_STATE_COUNT] = {
 static atomic_t dpm_dp_flags[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 #define DP_SET_FLAG(port, flag) atomic_or(&dpm_dp_flags[port], (flag))
-#define DP_CLR_FLAG(port, flag) atomic_clear_bits(&dpm_dp_flags[port], (flag))
+#define DP_CLR_FLAG(port, flag) atomic_and(&dpm_dp_flags[port], ~(flag))
 #define DP_CHK_FLAG(port, flag) (dpm_dp_flags[port] & (flag))
 
 /* Note: There is only one DP mode currently specified */

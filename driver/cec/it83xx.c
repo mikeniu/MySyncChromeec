@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "atomic.h"
 #include "cec.h"
 #include "clock.h"
 #include "console.h"
@@ -18,6 +17,7 @@
 
 #include <zephyr/device.h>
 #include <zephyr/irq.h>
+#include <zephyr/sys/atomic.h>
 #ifndef CONFIG_TEST
 #include <zephyr/drivers/pinctrl.h>
 
