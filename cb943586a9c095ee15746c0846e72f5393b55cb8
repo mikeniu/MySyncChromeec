@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a8b25b7_d6a155e8",
+        "filename": "util/flash/stm32_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:55:22Z",
+      "side": 1,
+      "message": "On c2d2 this will cause an unnecessary gsc reboot, and lock ccd. Maybe use the gsc command ecrst instead.",
+      "range": {
+        "startLine": 99,
+        "startChar": 12,
+        "endLine": 101,
+        "endChar": 47
+      },
+      "revId": "cb943586a9c095ee15746c0846e72f5393b55cb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27dd1aed_c27999ec",
+        "filename": "util/flash/stm32_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:55:22Z",
+      "side": 1,
+      "message": "Including -U (unprotect) during a read operation can be destructive on STM32 if read protection is active, as it triggers a mass erase. If the chip is not protected, -U is unnecessary. Consider removing it for read-only operations, especially the one used for FMAP preservation on line 179.",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 164,
+        "endChar": 0
+      },
+      "revId": "cb943586a9c095ee15746c0846e72f5393b55cb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
