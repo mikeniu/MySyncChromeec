@@ -120,7 +120,7 @@ static void timeout1(void)
 	const uint32_t events = task_wait_event(TASK_SEC(2));
 	const uint32_t end_ms = k_uptime_get();
 
-	zassert_equal(events, TASK_EVENT_TIMER, "Should have timeout event");
+	zassert_equal(events, 0, "Should have timed out");
 	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
 }
 
@@ -167,7 +167,7 @@ static void event_mask_not_delivered2(void)
 	const uint32_t events = task_wait_event_mask(0x0080, TASK_SEC(7));
 	const uint32_t end_ms = k_uptime_get();
 
-	zassert_equal(events, TASK_EVENT_TIMER, "Should have timeout event");
+	zassert_equal(events, 0, "Should have timed out");
 	zassert_within(end_ms - start_ms, 7000, 100, "Timeout for 7 seconds");
 
 	const uint32_t leftover_events = task_wait_event(0);
@@ -239,7 +239,7 @@ ZTEST(test_task_shim, test_event_mask_zero_timeout)
 {
 	task_set_event(task_get_current(), 0x0003);
 	zassert_equal(task_wait_event_mask(0x0001, 0), 0x0001);
-	zassert_equal(task_wait_event_mask(0x0001, 0), TASK_EVENT_TIMER);
+	zassert_equal(task_wait_event_mask(0x0001, 0), 0);
 	zassert_equal(task_wait_event_mask(0x0002, 0), 0x0002);
 }
 

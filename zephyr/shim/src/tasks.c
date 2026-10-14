@@ -188,12 +188,10 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 	const k_timeout_t timeout = (timeout_us == -1) ? K_FOREVER :
 							 K_USEC(timeout_us);
 	struct k_event *ev = task_get_event(task_get_current());
-	uint32_t events;
 
 	__ASSERT_NO_MSG(ev != NULL);
 
-	events = k_event_wait_safe(ev, event_mask, false, timeout);
-	return events ? events : TASK_EVENT_TIMER;
+	return k_event_wait_safe(ev, event_mask, false, timeout);
 }
 #ifdef TEST_BUILD
 void set_test_runner_tid(void)
