@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "325e9caa_e0ae8d43",
+        "filename": "util/flash/factory.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:52:59Z",
+      "side": 1,
+      "message": "Most other flashers here use `.startswith()` (e.g., mchp, rtk, stm32). Consider using `chip.startswith(\"openocd\")` for consistency and to allow users to pass more specific chip strings that might still route to the OpenOCD flasher.",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 0
+      },
+      "revId": "b24e4eb613da73717b625b19c1ef83d6c4b3ad0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d885902_979e8e0d",
+        "filename": "util/flash/openocd_flasher.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:52:59Z",
+      "side": 1,
+      "message": "Defaulting to `stm32f1x.cfg` makes this flasher STM32-specific by default. If this flasher is intended to be the generic OpenOCD implementation, consider if there\u0027s a way to derive the config from the `chip` name if it\u0027s not provided, or perhaps just leave it as a required argument for non-STM32 targets.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 0
+      },
+      "revId": "b24e4eb613da73717b625b19c1ef83d6c4b3ad0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ade7c351_38ddc52c",
+        "filename": "util/flash/openocd_flasher.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:52:59Z",
+      "side": 1,
+      "message": "While manual quoting for spaces works, `shlex.quote` is generally safer for handling special characters in paths. However, since this string is being embedded into a Jim Tcl command for OpenOCD, double quotes are usually correct. Just be aware that this logic doesn\u0027t handle paths that might contain literal double quotes.\n\nSo maybe just raise an error if image_arg contains quotes.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 0
+      },
+      "revId": "b24e4eb613da73717b625b19c1ef83d6c4b3ad0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
