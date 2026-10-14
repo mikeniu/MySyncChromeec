@@ -3,6 +3,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+# pylint: disable=too-many-lines
+
 """Find unused sources, functions and configs by comparing sources to build artifacts.
 
 This script relies on heuristics and DWARF info extraction using pyelftools.
@@ -16,18 +18,59 @@ Limitations:
 """
 
 import argparse
+from concurrent.futures import as_completed
 from concurrent.futures import ProcessPoolExecutor
+import functools
 import os
 from pathlib import Path
 import re
 import subprocess
 import sys
 
-from elftools.elf.elffile import ELFFile  # pylint: disable=import-error
+# pylint: disable=import-error
+from elftools.elf.elffile import ELFFile
+from elftools.elf.sections import SymbolTableSection
 
 
 MAX_WORKERS = os.cpu_count() or 4
-print(f"Using {MAX_WORKERS} workers")
+
+
+@functools.lru_cache(maxsize=16384)
+def normalize_path(
+    ec_root: Path | None, zephyr_root: Path | None, path: Path
+) -> Path:
+    """Normalize path to be relative to ec_root and handle cros_sdk mounts."""
+    path_str = os.path.normpath(str(path))
+
+    if "/src/platform/ec/" in path_str:
+        path_str = path_str.split("/src/platform/ec/", 1)[1]
+    elif "/src/platform/ec-legacy/" in path_str:
+        path_str = path_str.split("/src/platform/ec-legacy/", 1)[1]
+    elif "/src/third_party/zephyr/main/" in path_str:
+        path_str = (
+            "zephyr-main/"
+            + path_str.split("/src/third_party/zephyr/main/", 1)[1]
+        )
+    elif "/src/third_party/zephyrproject/zephyr/" in path_str:
+        path_str = (
+            "zephyr-base/"
+            + path_str.split("/src/third_party/zephyrproject/zephyr/", 1)[1]
+        )
+
+    res_path = Path(path_str)
+
+    if res_path.is_absolute():
+        if ec_root and res_path.is_relative_to(ec_root):
+            res_path = res_path.relative_to(ec_root)
+        elif zephyr_root and res_path.is_relative_to(zephyr_root):
+            res_path = Path("zephyr-base") / res_path.relative_to(zephyr_root)
+
+    path_str = os.path.normpath(str(res_path))
+    path_str = re.sub(r"^build/zephyr/[\w-]+/modules/ec/", "", path_str)
+    path_str = re.sub(r"^build/zephyr/[\w-]+/build-r[ow]/", "", path_str)
+    path_str = re.sub(r"^twister-out[^/]*/.*/modules/ec/", "", path_str)
+
+    return Path(path_str)
 
 
 def find_files(paths, patterns):
@@ -41,7 +84,30 @@ def find_files(paths, patterns):
     for path in paths:
         if not path.exists():
             continue
-        cmd = ["find", str(path), "-type", "f"] + filter_pattern
+        cmd = [
+            "find",
+            str(path),
+            "(",
+            "-name",
+            "CMakeFiles",
+            "-o",
+            "-name",
+            "modules",
+            "-o",
+            "-name",
+            "output",
+            "-o",
+            "-name",
+            "packer",
+            ")",
+            "-prune",
+            "-o",
+            "-type",
+            "f",
+        ]
+        if filter_pattern:
+            cmd.extend(["("] + filter_pattern + [")"])
+        cmd.append("-print")
         result = subprocess.run(
             cmd,
             capture_output=True,
@@ -53,64 +119,198 @@ def find_files(paths, patterns):
     return sources
 
 
-def sources_from_elf(elf_path) -> list:
-    """Find sources used in elf using pyelftools."""
+def _resolve_line_program_files(
+    line_program, comp_dir: str, ec_root: Path | None, zephyr_root: Path | None
+) -> tuple[list[Path | None], set[Path], set[Path]]:
+    """Resolve file_entry table in a CU's line_program to normalized Paths."""
+    cu_files: list[Path | None] = []
+    sources: set[Path] = set()
+    headers: set[Path] = set()
+
+    if not line_program:
+        return cu_files, sources, headers
+
+    inc_dirs = line_program["include_directory"]
+    is_dwarf5 = line_program.header.version >= 5
+    for file_entry in line_program["file_entry"]:
+        name = file_entry.name.decode("utf-8", errors="ignore")
+        dir_index = file_entry.dir_index
+
+        if is_dwarf5:
+            if 0 <= dir_index < len(inc_dirs):
+                dir_path = inc_dirs[dir_index].decode("utf-8", errors="ignore")
+                if comp_dir and not Path(dir_path).is_absolute():
+                    full_path = Path(comp_dir) / dir_path / name
+                else:
+                    full_path = Path(dir_path) / name
+            elif comp_dir and not Path(name).is_absolute():
+                full_path = Path(comp_dir) / name
+            else:
+                full_path = Path(name)
+        elif 0 < dir_index <= len(inc_dirs):
+            dir_path = inc_dirs[dir_index - 1].decode("utf-8", errors="ignore")
+            if comp_dir and not Path(dir_path).is_absolute():
+                full_path = Path(comp_dir) / dir_path / name
+            else:
+                full_path = Path(dir_path) / name
+        else:
+            if comp_dir and not Path(name).is_absolute():
+                full_path = Path(comp_dir) / name
+            else:
+                full_path = Path(name)
+
+        if full_path.name.startswith("<") and full_path.name.endswith(">"):
+            cu_files.append(None)
+        else:
+            norm = normalize_path(ec_root, zephyr_root, full_path)
+            cu_files.append(norm)
+            if norm.suffix in [".h", ".inc", ".hpp"]:
+                headers.add(norm)
+            else:
+                sources.add(norm)
+
+    return cu_files, sources, headers
+
+
+def extract_elf_info(args_tuple) -> tuple[set, set, list]:
+    """Extract sources, headers, and active functions from an ELF file in a single pass."""
+    elf_path, ec_root, zephyr_root, need_functions = args_tuple
     sources = set()
-    try:
-        with open(elf_path, "rb") as f:
-            elffile = ELFFile(f)
-            if not elffile.has_dwarf_info():
-                return []
-
-            dwarfinfo = elffile.get_dwarf_info()
-            for cu in dwarfinfo.iter_CUs():
-                line_program = dwarfinfo.line_program_for_CU(cu)
-                if not line_program:
-                    continue
-
-                for file_entry in line_program["file_entry"]:
-                    name = file_entry.name.decode("utf-8")
-                    dir_index = file_entry.dir_index
-
-                    if dir_index > 0:
-                        # dir_index is 1-based, include_directory is 0-based
-                        dir_path = line_program["include_directory"][
-                            dir_index - 1
-                        ].decode("utf-8")
-                        full_path = Path(dir_path) / name
-                    else:
-                        # dir_index 0 typically implies the comp_dir of the CU
-                        top_die = cu.get_top_DIE()
-                        comp_dir_attr = top_die.attributes.get("DW_AT_comp_dir")
-                        if comp_dir_attr and not Path(name).is_absolute():
-                            comp_dir = comp_dir_attr.value.decode("utf-8")
-                            full_path = Path(comp_dir) / name
-                        else:
-                            full_path = Path(name)
-
-                    # Filter out artificial sources like <built-in>
-                    if not (
-                        full_path.name.startswith("<")
-                        and full_path.name.endswith(">")
-                    ):
-                        sources.add(full_path)
-    except Exception:  # pylint: disable=broad-exception-caught
-        # Silently fail if ELF parsing fails
-        pass
-
-    return list(sources)
-
-
-def find_functions_in_elf(elf_path) -> list:
-    """Find functions used in elf using pyelftools."""
+    headers = set()
     functions = []
+
     try:
         with open(elf_path, "rb") as f:
             elffile = ELFFile(f)
             if not elffile.has_dwarf_info():
-                return []
+                return sources, headers, functions
+
+            sym_funcs = set()
+            if need_functions:
+                for sec in elffile.iter_sections():
+                    if isinstance(sec, SymbolTableSection):
+                        for sym in sec.iter_symbols():
+                            if (
+                                sym["st_info"]["type"] == "STT_FUNC"
+                                and sym["st_shndx"] != "SHN_UNDEF"
+                                and sym["st_value"] > 0
+                                and sym["st_size"] > 0
+                            ):
+                                sym_funcs.add(sym.name.split(".")[0])
 
             dwarfinfo = elffile.get_dwarf_info()
+            subprogs = {}
+            active_offsets = set()
+
+            def walk_cu_dies(
+                die,
+                cu_offset,
+                cu_norm,
+                cu_files,
+                is_dwarf5,
+                is_cpp,
+                scope: tuple[str, ...] = (),
+            ):
+                for child in die.iter_children():
+                    if child.tag == "DW_TAG_subprogram":
+                        name_attr = child.attributes.get("DW_AT_name")
+                        func_name = (
+                            name_attr.value.decode("utf-8", errors="ignore")
+                            if name_attr
+                            else None
+                        )
+                        is_decl = "DW_AT_declaration" in child.attributes
+
+                        decl_norm = None
+                        decl_attr = child.attributes.get("DW_AT_decl_file")
+                        if decl_attr is not None and cu_files:
+                            f_idx = (
+                                decl_attr.value
+                                if is_dwarf5
+                                else decl_attr.value - 1
+                            )
+                            if 0 <= f_idx < len(cu_files):
+                                decl_norm = cu_files[f_idx]
+
+                        orig = child.attributes.get(
+                            "DW_AT_abstract_origin"
+                        ) or child.attributes.get("DW_AT_specification")
+                        orig_off = None
+                        if orig is not None:
+                            orig_off = orig.value + (
+                                cu_offset
+                                if orig.form != "DW_FORM_ref_addr"
+                                else 0
+                            )
+
+                        subprogs[child.offset] = (
+                            func_name,
+                            scope,
+                            decl_norm,
+                            cu_norm,
+                            orig_off,
+                        )
+
+                        lpc = child.attributes.get("DW_AT_low_pc")
+                        rng = child.attributes.get("DW_AT_ranges")
+                        has_code = (lpc is not None and lpc.value > 0) or (
+                            rng is not None and lpc is None
+                        )
+
+                        if has_code or (not is_decl and func_name in sym_funcs):
+                            active_offsets.add(child.offset)
+                            if orig_off is not None:
+                                active_offsets.add(orig_off)
+
+                        if has_code and child.has_children:
+                            stack = [child]
+                            while stack:
+                                curr = stack.pop()
+                                for c in curr.iter_children():
+                                    if c.tag in (
+                                        "DW_TAG_inlined_subroutine",
+                                        "DW_TAG_subprogram",
+                                    ):
+                                        io = c.attributes.get(
+                                            "DW_AT_abstract_origin"
+                                        ) or c.attributes.get(
+                                            "DW_AT_specification"
+                                        )
+                                        if io is not None:
+                                            active_offsets.add(
+                                                io.value
+                                                + (
+                                                    cu_offset
+                                                    if io.form
+                                                    != "DW_FORM_ref_addr"
+                                                    else 0
+                                                )
+                                            )
+                                    if c.has_children:
+                                        stack.append(c)
+                    elif is_cpp and child.tag in (
+                        "DW_TAG_namespace",
+                        "DW_TAG_class_type",
+                        "DW_TAG_structure_type",
+                        "DW_TAG_union_type",
+                    ):
+                        s_attr = child.attributes.get("DW_AT_name")
+                        s_name = (
+                            s_attr.value.decode("utf-8", errors="ignore")
+                            if s_attr
+                            else None
+                        )
+                        next_scope = scope + (s_name,) if s_name else scope
+                        walk_cu_dies(
+                            child,
+                            cu_offset,
+                            cu_norm,
+                            cu_files,
+                            is_dwarf5,
+                            is_cpp,
+                            next_scope,
+                        )
+
             for cu in dwarfinfo.iter_CUs():
                 top_die = cu.get_top_DIE()
                 comp_dir = ""
@@ -120,26 +320,125 @@ def find_functions_in_elf(elf_path) -> list:
                     name_attr = top_die.attributes.get("DW_AT_name")
                     comp_dir_attr = top_die.attributes.get("DW_AT_comp_dir")
                     if name_attr:
-                        cu_name = name_attr.value.decode("utf-8")
+                        cu_name = name_attr.value.decode(
+                            "utf-8", errors="ignore"
+                        )
                     if comp_dir_attr:
-                        comp_dir = comp_dir_attr.value.decode("utf-8")
+                        comp_dir = comp_dir_attr.value.decode(
+                            "utf-8", errors="ignore"
+                        )
 
-                for die in cu.iter_DIEs():
-                    if die.tag == "DW_TAG_subprogram":
-                        name_attr = die.attributes.get("DW_AT_name")
-                        if name_attr:
-                            func_name = name_attr.value.decode("utf-8")
+                line_program = dwarfinfo.line_program_for_CU(cu)
+                cu_files, cu_srcs, cu_hdrs = _resolve_line_program_files(
+                    line_program, comp_dir, ec_root, zephyr_root
+                )
+                sources.update(cu_srcs)
+                headers.update(cu_hdrs)
 
-                            if cu_name:
-                                if not Path(cu_name).is_absolute() and comp_dir:
-                                    full_path = Path(comp_dir) / cu_name
-                                else:
-                                    full_path = Path(cu_name)
-                                functions.append((full_path, func_name))
+                if need_functions:
+                    cu_norm = None
+                    if cu_name and not (
+                        cu_name.startswith("<") and cu_name.endswith(">")
+                    ):
+                        if not Path(cu_name).is_absolute() and comp_dir:
+                            full_cu = Path(comp_dir) / cu_name
+                        else:
+                            full_cu = Path(cu_name)
+                        cu_norm = normalize_path(ec_root, zephyr_root, full_cu)
+
+                    is_dwarf5 = (
+                        line_program.header.version >= 5
+                        if line_program
+                        else False
+                    )
+                    lang_attr = top_die.attributes.get("DW_AT_language")
+                    is_cpp = cu_name.endswith((".cc", ".cpp", ".cxx")) or (
+                        lang_attr is not None
+                        and lang_attr.value in (4, 25, 26, 33, 42, 43)
+                    )
+                    walk_cu_dies(
+                        top_die,
+                        cu.cu_offset,
+                        cu_norm,
+                        cu_files,
+                        is_dwarf5,
+                        is_cpp,
+                    )
+
+            if need_functions:
+                changed = True
+                while changed:
+                    changed = False
+                    for off in list(active_offsets):
+                        info = subprogs.get(off)
+                        if info is not None:
+                            _, _, _, _, orig_off = info
+                            if (
+                                orig_off is not None
+                                and orig_off not in active_offsets
+                            ):
+                                active_offsets.add(orig_off)
+                                changed = True
+
+                for off in active_offsets:
+                    info = subprogs.get(off)
+                    if info is None:
+                        continue
+                    func_name, scope, decl_norm, cu_norm, orig_off = info
+                    visited = {off}
+                    curr_orig = orig_off
+                    while curr_orig is not None and curr_orig not in visited:
+                        visited.add(curr_orig)
+                        orig_info = subprogs.get(curr_orig)
+                        if orig_info is None:
+                            break
+                        o_name, o_scope, o_decl, o_cu, next_orig = orig_info
+                        if not func_name and o_name:
+                            func_name = o_name
+                        if not scope and o_scope:
+                            scope = o_scope
+                        if decl_norm is None and o_decl is not None:
+                            decl_norm = o_decl
+                        if cu_norm is None and o_cu is not None:
+                            cu_norm = o_cu
+                        curr_orig = next_orig
+
+                    if func_name:
+                        for i in range(len(scope) + 1):
+                            cand = "::".join(scope[i:] + (func_name,))
+                            if decl_norm is not None:
+                                functions.append((decl_norm, cand))
+                            if cu_norm is not None and cu_norm != decl_norm:
+                                functions.append((cu_norm, cand))
     except Exception:  # pylint: disable=broad-exception-caught
         pass
 
-    return functions
+    return sources, headers, functions
+
+
+def scan_elfs(all_elfs, ec_root, zephyr_root, need_functions: bool = True):
+    """Scan all ELF files in parallel and extract sources, headers, and functions."""
+    used_sources = set()
+    used_headers_dwarf = set()
+    used_functions = set()
+
+    count = 0
+    tasks = [(elf, ec_root, zephyr_root, need_functions) for elf in all_elfs]
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = [executor.submit(extract_elf_info, t) for t in tasks]
+        for future in as_completed(futures):
+            count += 1
+            elf_srcs, elf_hdrs, elf_funcs = future.result()
+            used_sources.update(elf_srcs)
+            used_headers_dwarf.update(elf_hdrs)
+            used_functions.update(elf_funcs)
+            if sys.stdout.isatty():
+                print(f"{count}/{len(all_elfs)}", end="\r", flush=True)
+
+    if sys.stdout.isatty():
+        print()
+
+    return used_sources, used_headers_dwarf, used_functions
 
 
 def find_configs(paths) -> set:
@@ -220,42 +519,43 @@ def find_all_defined_functions(paths) -> set:
     return functions
 
 
-def normalize_path(ec_root, zephyr_root, path):
-    """Normalize path to be relative to ec_root and handle cros_sdk mounts."""
-    path = Path(path)
-
-    try:
-        path = path.resolve()
-    except Exception:  # pylint: disable=broad-exception-caught
-        pass
-
-    path_str = str(path)
-
-    if "/mnt/host/source/src/platform/ec/" in path_str:
-        path = Path(path_str.split("/mnt/host/source/src/platform/ec/")[1])
-    elif "/mnt/host/source/src/platform/ec-legacy/" in path_str:
-        path = Path(
-            path_str.split("/mnt/host/source/src/platform/ec-legacy/")[1]
+def _collect_elfs(build_paths, include_tests: bool = False):
+    """Find and filter ELF files in build_paths."""
+    raw_elfs = find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
+    raw_elf_set = set(raw_elfs)
+    all_elfs = [
+        e
+        for e in sorted(raw_elfs)
+        if e.name != "zephyr_pre0.elf"
+        and not (
+            e.name == "zephyr.exe" and (e.parent / "zephyr.elf") in raw_elf_set
         )
-    elif "/mnt/host/source/src/third_party/zephyr/main/" in path_str:
-        path = (
-            Path("zephyr-main")
-            / path_str.split("/mnt/host/source/src/third_party/zephyr/main/")[1]
-        )
-    elif path.is_absolute():
-        if ec_root and path.is_relative_to(ec_root):
-            path = path.relative_to(ec_root)
-        elif zephyr_root and path.is_relative_to(zephyr_root):
-            path = Path("zephyr-base") / path.relative_to(zephyr_root)
+    ]
+    if not include_tests:
+        test_patterns = [
+            "build/host/",
+            "minimal-posix",
+            "native_sim",
+            "test",
+            "fake",
+            "emul",
+            "ztest",
+            "hwtest",
+        ]
+        all_elfs = [
+            e
+            for e in all_elfs
+            if not any(
+                tp in str(e).rsplit("/src/platform/ec/", maxsplit=1)[-1].lower()
+                for tp in test_patterns
+            )
+        ]
+    return all_elfs
 
-    path_str = str(path)
-    path_str = re.sub(r"build/zephyr/[\w-]+/modules/ec/", "", path_str)
-    path_str = re.sub(r"build/zephyr/[\w-]+/build-r[ow]/", "", path_str)
 
-    return Path(path_str)
-
-
-def find_unused_functions(ec_root, zephyr_root, source_paths, build_paths):
+def find_unused_functions(
+    ec_root, zephyr_root, source_paths, build_paths, include_tests=False
+):
     """Find functions that are defined but never appear in ELFs."""
     print(f"Finding all defined functions in {len(source_paths)} paths...")
     all_functions = find_all_defined_functions(paths=source_paths)
@@ -266,26 +566,13 @@ def find_unused_functions(ec_root, zephyr_root, source_paths, build_paths):
     print(f"* Found {len(all_functions)} defined functions")
 
     print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = list(find_files(paths=build_paths, patterns=["*.elf", "*.exe"]))
+    all_elfs = _collect_elfs(build_paths, include_tests=include_tests)
     print(f"* Found {len(all_elfs)} elf files")
 
     print("Extracting functions from elf files...")
-    used_functions = set()
-    count = 0
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = [
-            executor.submit(find_functions_in_elf, elf) for elf in all_elfs
-        ]
-        for future in futures:
-            count += 1
-            elf_functions = future.result()
-            used_functions.update(
-                {
-                    (normalize_path(ec_root, zephyr_root, f[0]), f[1])
-                    for f in elf_functions
-                }
-            )
-            print(f"{count}/{len(all_elfs)}", end="\r")
+    _, _, used_functions = scan_elfs(
+        all_elfs, ec_root, zephyr_root, need_functions=True
+    )
     print(f"\n* Extracted {len(used_functions)} unique functions from elfs")
 
     unused_functions = all_functions - used_functions
@@ -310,7 +597,9 @@ def find_unused_configs(source_paths, build_paths):
         print(config)
 
 
-def find_unused_sources(ec_root, zephyr_root, source_paths, build_paths):
+def find_unused_sources(
+    ec_root, zephyr_root, source_paths, build_paths, include_tests=False
+):
     """Find source files that are never compiled into any ELF."""
     print(f"Finding all source files in {len(source_paths)} paths...")
     all_sources = find_files(
@@ -320,22 +609,14 @@ def find_unused_sources(ec_root, zephyr_root, source_paths, build_paths):
     print(f"* Found {len(all_sources)} source files")
 
     print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
+    all_elfs = _collect_elfs(build_paths, include_tests=include_tests)
     print(f"* Found {len(all_elfs)} elf files")
 
     print("Extracting sources from elf files...")
-    used_sources = set()
-    count = 0
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = [executor.submit(sources_from_elf, elf) for elf in all_elfs]
-        for future in futures:
-            count += 1
-            elf_sources = future.result()
-            used_sources.update(
-                {normalize_path(ec_root, zephyr_root, s) for s in elf_sources}
-            )
-            print(f"{count}/{len(all_elfs)}", end="\r")
-
+    used_sources, used_headers_dwarf, _ = scan_elfs(
+        all_elfs, ec_root, zephyr_root, need_functions=False
+    )
+    used_sources.update(used_headers_dwarf)
     print(f"\n* Extracted {len(used_sources)} unique source files from elfs")
 
     unused_sources = []
@@ -351,7 +632,9 @@ def find_unused_sources(ec_root, zephyr_root, source_paths, build_paths):
         print(source)
 
 
-def find_unused_headers(ec_root, zephyr_root, source_paths, build_paths):
+def find_unused_headers(
+    ec_root, zephyr_root, source_paths, build_paths, include_tests=False
+):
     """Find header files that are never included anywhere."""
     print(f"Finding all header files in {len(source_paths)} paths...")
     all_headers = find_files(paths=source_paths, patterns=["*.h", "*.inc"])
@@ -359,26 +642,13 @@ def find_unused_headers(ec_root, zephyr_root, source_paths, build_paths):
     print(f"* Found {len(all_headers)} header files")
 
     print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
+    all_elfs = _collect_elfs(build_paths, include_tests=include_tests)
     print(f"* Found {len(all_elfs)} elf files")
 
     print("Extracting headers from elf files (DWARF heuristic)...")
-    used_headers_dwarf = set()
-    count = 0
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = [executor.submit(sources_from_elf, elf) for elf in all_elfs]
-        for future in futures:
-            count += 1
-            elf_sources = future.result()
-            used_headers_dwarf.update(
-                {
-                    normalize_path(ec_root, zephyr_root, s)
-                    for s in elf_sources
-                    if s.suffix in [".h", ".inc"]
-                }
-            )
-            print(f"{count}/{len(all_elfs)}", end="\r")
-
+    _, used_headers_dwarf, _ = scan_elfs(
+        all_elfs, ec_root, zephyr_root, need_functions=False
+    )
     print(f"\n* DWARF info reported {len(used_headers_dwarf)} headers as used")
 
     print("Searching for #include directives (Grep heuristic)...")
@@ -498,20 +768,35 @@ def main():
     build_paths = [p for p in build_paths if p.exists()]
 
     if not source_paths:
-        print(f"Error: No source paths found in {ec_root}")
+        print(f"Error: No source paths found in {ec_root}", file=sys.stderr)
         sys.exit(1)
 
-    match args.command:
-        case "sources":
-            find_unused_sources(ec_root, zephyr_root, source_paths, build_paths)
-        case "configs":
-            find_unused_configs(source_paths, build_paths)
-        case "functions":
-            find_unused_functions(
-                ec_root, zephyr_root, source_paths, build_paths
-            )
-        case "headers":
-            find_unused_headers(ec_root, zephyr_root, source_paths, build_paths)
+    if args.command == "sources":
+        find_unused_sources(
+            ec_root,
+            zephyr_root,
+            source_paths,
+            build_paths,
+            include_tests=args.include_tests,
+        )
+    elif args.command == "configs":
+        find_unused_configs(source_paths, build_paths)
+    elif args.command == "functions":
+        find_unused_functions(
+            ec_root,
+            zephyr_root,
+            source_paths,
+            build_paths,
+            include_tests=args.include_tests,
+        )
+    elif args.command == "headers":
+        find_unused_headers(
+            ec_root,
+            zephyr_root,
+            source_paths,
+            build_paths,
+            include_tests=args.include_tests,
+        )
 
 
 if __name__ == "__main__":
