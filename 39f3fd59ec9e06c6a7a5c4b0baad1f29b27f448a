@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c94efac9_76dddc31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T10:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n* **Functionality:** ✅ The bug causing the sensor to prematurely enter low power mode or idle while waiting for finger removal is fixed effectively.\n* **Architecture \u0026 Component Fit:** ✅ The logic integrates seamlessly into the existing `fp_task` state machine.\n* **Code Simplicity:** ✅ Control flow changes are minimal and directly address the edge cases without unnecessary duplication.\n* **Idiomaticity \u0026 Readability:** ✅ Standard C++ idioms for Zephyr and non-Zephyr builds are preserved.\n* **Security:** ✅ No security boundaries are affected.\n* **Testing:** ✅ Excellent additions to `fpsensor_finger_presence.cc` simulating `detect_mode` and `low_power_mode` state transitions.\n* **CL Size \u0026 Scope:** ✅ Size: M (+62, -11). The changes represent a single, atomic logical change.\n* **Commit Message:** ℹ️ The commit message has a clear high-level summary of What and Why, but contains unnecessary diff narration in its bulleted list (flagged as a non-blocking suggestion).\n\n[🔗](http://go/tj/8e86d8b2-982d-4675-90ab-d1066157c705)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "39f3fd59ec9e06c6a7a5c4b0baad1f29b27f448a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fa083d8_5d4d6de7",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T10:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Suggestion — Non-Blocking]** (Anchored to first diff file for CL description visibility) While the high-level summary clearly explains the motivation, the bulleted list below repeats file-by-file implementation minutiae evident from the diff. Per go/cl-descriptions#minutiae, consider condensing the low-level file breakdown.\n\n[🔗](http://go/tj/8e86d8b2-982d-4675-90ab-d1066157c705)",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "39f3fd59ec9e06c6a7a5c4b0baad1f29b27f448a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
