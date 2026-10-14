@@ -13,7 +13,9 @@ import unittest
 from util.find_unused import find_configs
 from util.find_unused import find_functions_in_file
 from util.find_unused import find_set_configs
+from util.find_unused import is_copybot_synced
 from util.find_unused import is_header_included
+from util.find_unused import load_copybot_patterns
 from util.find_unused import normalize_path
 
 
@@ -209,6 +211,26 @@ class FindUnusedTest(unittest.TestCase):
             self.assertNotIn("CONFIG_CONT_GUARDED", set_cfgs)
             self.assertNotIn("CONFIG_TYPO_GUARDED", set_cfgs)
             self.assertNotIn("CONFIG_UNUSED_OPT", set_cfgs)
+
+    def test_copybot_patterns(self):
+        """Test loading and matching copybot include-downstream patterns."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ini_path = Path(tmpdir) / "ec-legacy.ini"
+            ini_path.write_text(
+                "[copybot]\n"
+                'include-downstream = ["driver/fingerprint/*", "include/ec_cmd_api.h"]\n'
+            )
+            patterns = load_copybot_patterns(Path(tmpdir), ini_path)
+            self.assertEqual(
+                patterns, ["driver/fingerprint/*", "include/ec_cmd_api.h"]
+            )
+            self.assertTrue(
+                is_copybot_synced(
+                    Path("driver/fingerprint/egis/egis_private.c"), patterns
+                )
+            )
+            self.assertTrue(is_copybot_synced("include/ec_cmd_api.h", patterns))
+            self.assertFalse(is_copybot_synced("common/crc8.c", patterns))
 
 
 if __name__ == "__main__":
