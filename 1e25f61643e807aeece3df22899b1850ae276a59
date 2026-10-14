@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b716940_6c6277ec",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:47:47Z",
+      "side": 1,
+      "message": "The state is saved here, but the values are never set. You likely need to set the baudrate and parity to what rtkupdate expects (usually 115200 and none) so that the Servo hardware is configured correctly:\nself.servo.set(\"ec_uart_baudrate\", \"115200\")\nself.servo.set(\"ec_uart_parity\", \"none\")",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f57d1c35_900443bf",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:47:47Z",
+      "side": 1,
+      "message": "The saved UART states (baudrate, parity, interp_connect) should be restored here to ensure the servo is returned to a usable state for the console. Call `self.servo.restore_state(\"ec_uart_baudrate\")`, etc.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47123614_56c56261",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:47:47Z",
+      "side": 1,
+      "message": "Consider defining this as a constant (e.g., `RTK_FLASH_SIZE \u003d 0x100000`) at the top of the file to avoid magic numbers and make it easier to update if future chips have different sizes.",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f41a1fd9_49e1616e",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:47:47Z",
+      "side": 1,
+      "message": "The 1MB size (0x100000) is hardcoded here and in several other places. Consider defining a constant or deriving it from the image size (e.g., os.path.getsize(self.args.image)) to avoid reading too much or too little if other RTK chips have different flash sizes.",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a774d439_4b1e860d",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:47:47Z",
+      "side": 1,
+      "message": "If `target_img` is smaller than 1MB, this will read the entire 1MB from the chip but only compare the first `ver_size` bytes. While correct, you could optimize this by passing `--bin_length\u003d{ver_size}` to the `read_bin` command instead of the hardcoded 1MB.",
+      "range": {
+        "startLine": 173,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
