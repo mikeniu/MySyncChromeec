@@ -94,7 +94,7 @@ static void intel_x86_rtc_reset(void)
 {
 	CPRINTS("Asserting RTCRST# to PCH");
 	gpio_set_level(GPIO_PCH_RTCRST, 1);
-	udelay(100);
+	k_busy_wait(100);
 	gpio_set_level(GPIO_PCH_RTCRST, 0);
 }
 
@@ -119,7 +119,7 @@ static enum power_state power_wait_s5_rtc_reset(void)
 				return POWER_G3; /* Stay off */
 			}
 
-			udelay(10 * MSEC);
+			k_busy_wait(10 * MSEC);
 			return POWER_G3S5; /* Power up again */
 		}
 	}
@@ -594,7 +594,7 @@ void common_intel_x86_handle_rsmrst(enum power_state state)
 	 * and deasserting RSMRST to PCH.
 	 */
 	if (IS_ENABLED(CONFIG_CHIPSET_X86_RSMRST_DELAY) && rsmrst_in)
-		crec_msleep(10);
+		k_msleep(10);
 
 	gpio_set_level(GPIO_PCH_RSMRST_L, rsmrst_in);
 
@@ -661,7 +661,7 @@ __overridable void intel_x86_sys_reset_delay(void)
 	 * Debounce time for SYS_RESET_L is 16 ms. Wait twice that period
 	 * to be safe.
 	 */
-	udelay(32 * MSEC);
+	k_busy_wait(32 * MSEC);
 }
 
 void chipset_reset(enum chipset_shutdown_reason reason)
@@ -703,7 +703,7 @@ enum ec_error_list intel_x86_wait_power_up_ok(void)
 	 * in case we're trying to boot the AP with no battery.
 	 */
 	while ((tries < CHARGER_INITIALIZED_TRIES) && is_power_up_inhibited()) {
-		crec_msleep(CHARGER_INITIALIZED_DELAY_MS);
+		k_msleep(CHARGER_INITIALIZED_DELAY_MS);
 		tries++;
 	}
 
@@ -728,7 +728,7 @@ enum ec_error_list intel_x86_wait_power_up_ok(void)
 	 * which causes (short-powered) system to brown out.
 	 */
 	while (!system_can_boot_ap())
-		crec_msleep(200);
+		k_msleep(200);
 #endif
 
 	return EC_SUCCESS;

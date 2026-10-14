@@ -256,7 +256,7 @@ static int rt9478_adc_start(int chgnum, int adc_en_mask)
 	 */
 	do {
 		/* sleep 2 ms so we time out after 2x the expected time */
-		crec_msleep(2);
+		k_msleep(2);
 		rv = raw_read16(chgnum, RT9478_REG_ADC_OPTION, &reg);
 	} while (--tries_left && !rv &&
 		 (reg & RT_FIELD_MASK(RT9478, ADC_OPTION, ADC_START)));
@@ -514,7 +514,7 @@ static void rt9478_init(int chgnum)
 	    (battery_get_disconnect_state() == BATTERY_NOT_DISCONNECTED)) {
 		rv = rt9478_set_low_power_mode(chgnum, false);
 		/* Allow enough time for VDDA to be powered */
-		crec_msleep(RT9478_VDDA_STARTUP_DELAY_MSEC);
+		k_msleep(RT9478_VDDA_STARTUP_DELAY_MSEC);
 
 		if (IS_ENABLED(CONFIG_CHARGER_RT9478_VSYS_MIN_VOLTAGE_CUSTOM)) {
 			vsys = min_system_voltage_to_reg(

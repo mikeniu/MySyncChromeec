@@ -19,12 +19,12 @@ unsigned long plat_get_diff_time(unsigned long long begin)
 
 void plat_wait_time(unsigned long msecs)
 {
-	udelay(msecs * MSEC);
+	k_busy_wait(msecs * MSEC);
 	return;
 }
 
 void plat_sleep_time(unsigned long timeInMs)
 {
-	crec_usleep(timeInMs * MSEC);
+	k_usleep(timeInMs * MSEC);
 	return;
 }

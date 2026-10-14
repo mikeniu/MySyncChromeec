@@ -22,5 +22,5 @@ __staticlib_hook uint32_t fpc_timebase_get_tick(void)
 
 __staticlib_hook void fpc_timebase_busy_wait(uint32_t ms)
 {
-	udelay(ms * 1000);
+	k_busy_wait(ms * 1000);
 }

@@ -77,7 +77,7 @@ upload_pgm_image(uint8_t *frame,
 
 	/* fake Z-modem ZRQINIT signature */
 	CPRINTF("#IGNORE for ZModem\r**\030B00");
-	crec_msleep(2000); /* let the download program start */
+	k_msleep(2000); /* let the download program start */
 
 	/* Print 8-bpp or 16-bpp PGM ASCII header */
 	CPRINTF("P2\n%d %d\n%d\n", image_frame_params.width,
@@ -123,7 +123,7 @@ static enum ec_error_list fp_console_action(uint32_t mode)
 				static_cast<int>(global_context.fp_events));
 			return EC_SUCCESS;
 		}
-		crec_usleep(100 * MSEC);
+		k_usleep(100 * MSEC);
 	}
 	return EC_ERROR_TIMEOUT;
 }
@@ -286,7 +286,7 @@ static int command_fpenroll(int argc, const char **argv)
 		task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
 		while (tries-- &&
 		       global_context.sensor_mode & FP_MODE_FINGER_UP)
-			crec_usleep(20 * MSEC);
+			k_usleep(20 * MSEC);
 	}
 	global_context.sensor_mode = 0; /* reset FP_MODE_ENROLL_SESSION */
 	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
@@ -408,7 +408,7 @@ static int command_fpmaintenance(int argc, const char **argv)
 
 	/* Block console until maintenance is finished. */
 	while (global_context.sensor_mode & FP_MODE_SENSOR_MAINTENANCE) {
-		crec_usleep(100 * MSEC);
+		k_usleep(100 * MSEC);
 	}
 #endif /* #ifdef HAVE_FP_PRIVATE_DRIVER */
 

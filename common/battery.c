@@ -362,7 +362,7 @@ static int command_battery(int argc, const char **argv)
 		watchdog_reload();
 
 		if (sleep_ms)
-			crec_msleep(sleep_ms);
+			k_msleep(sleep_ms);
 	}
 
 	return EC_SUCCESS;

@@ -13,6 +13,7 @@
 
 #include <sys/types.h>
 #else
+#include <zephyr/kernel.h>
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
 /* Data type for POSIX style clock() implementation */
@@ -50,59 +51,6 @@ typedef union {
  * @return 0 if deadline has not yet passed, 1 if it has passed
  */
 int timestamp_expired(timestamp_t deadline, const timestamp_t *now);
-
-/**
- * Busy-wait.
- *
- * This may be called with interrupts disabled.
- *
- * Note that calling this with us>1000 may impact system performance; use
- * crec_usleep() for longer delays.
- *
- * @param us		Number of microseconds to delay.
- */
-void udelay(unsigned int us);
-
-/**
- * Sleep.
- *
- * The current task will be de-scheduled for at least the specified delay (and
- * perhaps longer, if a higher-priority task is running when the delay
- * expires).
- *
- * This may only be called from a task function, with interrupts enabled.
- *
- * @param us		Number of microseconds to sleep.
- * @return 0 on success, negative on error
- */
-int crec_usleep(unsigned int us);
-
-/**
- * Sleep for milliseconds.
- *
- * Otherwise the same as crec_usleep().
- *
- * @param ms		Number of milliseconds to sleep.
- */
-static inline void crec_msleep(unsigned int ms)
-{
-	crec_usleep(ms * MSEC);
-}
-
-/**
- * Sleep for seconds
- *
- * Otherwise the same as crec_usleep().
- *
- * @param sec		Number of seconds to sleep.
- * @return 0 if the requested time has elapsed, or the number of seconds left
- *   to sleep, if the call was interrupted by a signal handler.
- */
-static inline unsigned int crec_sleep(unsigned int sec)
-{
-	crec_usleep(sec * SECOND);
-	return 0;
-}
 
 /**
  * Get the current timestamp from the system timer.

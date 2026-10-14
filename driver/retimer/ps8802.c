@@ -150,7 +150,7 @@ int ps8802_i2c_wake(const struct usb_mux *me)
 		if (rv == EC_SUCCESS)
 			return rv;
 
-		crec_usleep(PS8802_I2C_WAKE_DELAY);
+		k_usleep(PS8802_I2C_WAKE_DELAY);
 	}
 
 	return rv;

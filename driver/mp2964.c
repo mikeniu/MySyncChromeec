@@ -100,14 +100,14 @@ static int mp2964_store_user_all(void)
 	if (status != EC_SUCCESS)
 		return status;
 
-	crec_usleep(MP2964_STORE_WAIT_US);
+	k_usleep(MP2964_STORE_WAIT_US);
 
 	status = i2c_xfer_unlocked(I2C_PORT_MP2964, I2C_ADDR_MP2964_FLAGS, &rd,
 				   sizeof(rd), NULL, 0, I2C_XFER_SINGLE);
 	if (status != EC_SUCCESS)
 		return status;
 
-	crec_usleep(MP2964_RESTORE_WAIT_US);
+	k_usleep(MP2964_RESTORE_WAIT_US);
 
 	return EC_SUCCESS;
 }
@@ -127,7 +127,7 @@ int mp2964_tune(const struct mp2964_reg_val *rail_a, int count_a,
 	int tries = 2;
 	int delta;
 
-	udelay(MP2964_STARTUP_WAIT_US);
+	k_busy_wait(MP2964_STARTUP_WAIT_US);
 
 	i2c_lock(I2C_PORT_MP2964, 1);
 

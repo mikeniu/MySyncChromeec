@@ -182,7 +182,7 @@ it83xx_send_hw_reset(enum usbpd_port port, enum tcpci_msg_type reset_type)
 
 	/* send hard reset */
 	USBPD_SEND_HARD_RESET(port);
-	crec_usleep(MSEC);
+	k_usleep(MSEC);
 
 	if (USBPD_IS_HARD_CABLE_RESET_TX_DONE(port)) {
 		IT83XX_USBPD_ISR(port) =
@@ -196,7 +196,7 @@ it83xx_send_hw_reset(enum usbpd_port port, enum tcpci_msg_type reset_type)
 static void it83xx_send_bist_mode2_pattern(enum usbpd_port port)
 {
 	USBPD_ENABLE_SEND_BIST_MODE_2(port);
-	crec_usleep(PD_T_BIST_TRANSMIT);
+	k_usleep(PD_T_BIST_TRANSMIT);
 	USBPD_DISABLE_SEND_BIST_MODE_2(port);
 }
 
@@ -544,7 +544,7 @@ static int it83xx_tcpm_set_vconn(int port, int enable)
 			 * dropped below 3.3v (>500us) to avoid the potential
 			 * risk of voltage fed back into Vcore.
 			 */
-			crec_usleep(IT83XX_USBPD_T_VCONN_BELOW_3_3V);
+			k_usleep(IT83XX_USBPD_T_VCONN_BELOW_3_3V);
 			/*
 			 * Since our cc are not Vconn SRC, enable cc analog
 			 * module (ex.UP/RD/DET/Tx/Rx) and disable 5v tolerant.
