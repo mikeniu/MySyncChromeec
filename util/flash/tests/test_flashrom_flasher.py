@@ -411,6 +411,124 @@ class TestFlashromFlasher(unittest.TestCase):
             self.flasher.execute_flash()
         self.assertIn("Image is larger than SPI size!", str(ctx.exception))
 
+    @patch("flash.flashrom_flasher.parse_fmap_areas")
+    @patch("flash.flashrom_flasher.get_writable_ranges")
+    @patch("flash.flashrom_flasher.preserve_sections_with_cur_image")
+    @patch("flash.flashrom_flasher.locate_tool", return_value="flashrom")
+    @patch("subprocess.run")
+    @patch("subprocess.check_output", return_value="1048576\n")
+    @patch("os.path.getsize", return_value=0x100000)
+    @patch("os.path.exists", return_value=True)
+    @patch("tempfile.TemporaryDirectory")
+    @patch("builtins.open", new_callable=mock_open, read_data=b"testdata")
+    def test_execute_flash_write_skips_cbi_via_layout(
+        self,
+        mock_file: MagicMock,
+        mock_tmp: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_getsize: MagicMock,
+        _mock_check_output: MagicMock,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        mock_preserve: MagicMock,
+        mock_writable: MagicMock,
+        mock_parse_areas: MagicMock,
+    ) -> None:
+        """Skip reading/writing CBI by generating a flashrom layout file."""
+        self.args.read = None
+        self.args.image = "image.bin"
+        self.args.chip = "npcx_int_spi"
+        self.args.no_preserve = False
+        self.args.ro = False
+        self.args.rw = False
+        self.servo.get.side_effect = lambda ctrl, default="": (
+            "ccd" if ctrl == "servo_type" else ""
+        )
+        mock_parse_areas.return_value = {
+            "WP_RO": MagicMock(),
+            "CBI": MagicMock(),
+            "EC_RW": MagicMock(),
+        }
+        mock_writable.return_value = [
+            (0x0, 0x5E000),
+            (0x5F000, 0x60000),
+            (0x80000, 0x100000),
+        ]
+        mock_tmp.return_value.__enter__.return_value = "/tmp/dir"
+
+        self.flasher.execute_flash()
+
+        mock_preserve.assert_not_called()
+        mock_writable.assert_called_once_with(
+            "image.bin",
+            0x100000,
+            target_regions=["WP_RO", "EC_RW"],
+            no_preserve=False,
+            areas=mock_parse_areas.return_value,
+        )
+        mock_file.return_value.write.assert_any_call(
+            "00000000:0005dfff WRITE_0\n"
+        )
+        mock_file.return_value.write.assert_any_call(
+            "0005f000:0005ffff WRITE_1\n"
+        )
+        mock_file.return_value.write.assert_any_call(
+            "00080000:000fffff WRITE_2\n"
+        )
+        mock_run.assert_called_once_with(
+            [
+                "sudo",
+                "flashrom",
+                "--programmer=raiden_debug_spi:target=EC",
+                "-i",
+                "WRITE_0",
+                "-i",
+                "WRITE_1",
+                "-i",
+                "WRITE_2",
+                "-l",
+                "/tmp/dir/flashrom.layout",
+                "--noverify-all",
+                "-w",
+                "/tmp/dir/flash_temp.bin",
+            ],
+            check=True,
+        )
+
+        # Also verify --ro passes target_regions=['EC_RO'].
+        mock_writable.reset_mock()
+        mock_run.reset_mock()
+        self.args.ro = True
+        self.servo.get.side_effect = None
+        self.servo.get.return_value = "servo_v3"
+        mock_parse_areas.return_value = {}
+        mock_writable.return_value = [(0x0, 0x5E000)]
+
+        self.flasher.execute_flash()
+
+        mock_writable.assert_called_once_with(
+            "image.bin",
+            0x100000,
+            target_regions=["EC_RO"],
+            no_preserve=False,
+            areas={},
+        )
+        mock_run.assert_called_once_with(
+            [
+                "sudo",
+                "flashrom",
+                "--programmer=linux_spi",
+                "-i",
+                "WRITE_0",
+                "-l",
+                "/tmp/dir/flashrom.layout",
+                "--noverify-all",
+                "-w",
+                "/tmp/dir/flash_temp.bin",
+            ],
+            check=True,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
