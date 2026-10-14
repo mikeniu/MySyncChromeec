@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ef01d87_59c254f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:49:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "373e5101_e1f859d1",
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2227d59_491731b4",
@@ -39,6 +57,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62ec6d76_530469c4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:49:22Z",
+      "side": 1,
+      "message": "I have modified the explanation, please check it.",
+      "parentUuid": "a2227d59_491731b4",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 9999
+      },
       "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -81,6 +123,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8e32dba0_69315d9c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:49:22Z",
+      "side": 1,
+      "message": "OK, It is rebased.",
+      "parentUuid": "f6dcfa3e_745c0304",
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1b8d3b50_d1e9a7c0",
         "filename": "zephyr/test/hwtest/src/panic_data.c",
         "patchSetId": 5
@@ -93,6 +153,24 @@
       "side": 1,
       "message": "Nit: Prefer Zephyr\u0027s `__noinline` macro (from `\u003czephyr/toolchain.h\u003e`) instead of `__attribute__((noinline))`, matching `zephyr/test/hwtest/src/ftrapv.c`:\n\n```c\nstatic void __noinline crash_system(void)\n```",
       "isAi": true,
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "333b7da8_c1b4f80e",
+        "filename": "zephyr/test/hwtest/src/panic_data.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-14T07:49:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b8d3b50_d1e9a7c0",
       "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
