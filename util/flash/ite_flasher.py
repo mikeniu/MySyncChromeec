@@ -61,7 +61,9 @@ class IteI2cFlasher(_IteBaseFlasher):
         if "servo_micro" in servo_type or "c2d2" in servo_type:
             logger.info("Asking servo to send the dbgr special waveform...")
             time.sleep(3)
-            self.servo.set("enable_ite_dfu", "on")
+            # Get-only control: reading it sends the waveform.
+            if not self.args.dry_run:
+                self.servo.get("enable_ite_dfu")
         elif self._is_ccd():
             logger.info("Asking CR50 to send the dbgr special waveform...")
             time.sleep(2)
