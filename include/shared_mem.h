@@ -33,9 +33,6 @@ extern char fake_shmem_buf[BIT(20)];
  */
 int shared_mem_size(void);
 
-#define SHARED_MEM_CHECK_SIZE(size) \
-	BUILD_ASSERT((size) <= CONFIG_SHAREDMEM_MINIMUM_SIZE)
-
 /**
  * Acquires a shared memory area of the requested size in bytes.
  *
@@ -53,12 +50,6 @@ int shared_mem_size(void);
  */
 int shared_mem_acquire(int size, char **dest_ptr);
 
-#define SHARED_MEM_ACQUIRE_CHECK(size, dest_ptr)        \
-	({                                              \
-		SHARED_MEM_CHECK_SIZE(size);            \
-		shared_mem_acquire((size), (dest_ptr)); \
-	})
-
 /**
  * Releases a shared memory area previously allocated via shared_mem_acquire().
  *
@@ -67,34 +58,6 @@ int shared_mem_acquire(int size, char **dest_ptr);
  * @note If ptr is NULL, this is a no-op.
  */
 void shared_mem_release(void *ptr);
-
-/*
- * This structure is allocated at the base of the free memory chunk and every
- * allocated buffer.
- */
-struct shm_buffer {
-	struct shm_buffer *next_buffer;
-	struct shm_buffer *prev_buffer;
-	size_t buffer_size;
-};
-
-#ifdef TEST_SHMALLOC
-
-/*
- * When in test mode, all possible paths in the allocation/free functions set
- * unique bits in an integer bitmap.
- *
- * The test function generates random allocation and free requests and
- * monitors the bitmap until all bits have been set, which indicates that all
- * possible paths have been executed.
- */
-
-#define MAX_MASK_BIT 24
-#define ALL_PATHS_MASK ((1 << (MAX_MASK_BIT + 1)) - 1)
-void set_map_bit(uint32_t mask);
-extern struct shm_buffer *free_buf_chain;
-extern struct shm_buffer *allocced_buf_chain;
-#endif
 
 #ifdef __cplusplus
 }

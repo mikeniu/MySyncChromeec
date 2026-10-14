@@ -1152,9 +1152,9 @@ static int command_keyboard_log(int argc, const char **argv)
 
 	if (i) {
 		if (!kblog_buf) {
-			int rv = SHARED_MEM_ACQUIRE_CHECK(sizeof(*kblog_buf) *
-								  MAX_KBLOG,
-							  (char **)&kblog_buf);
+			int rv = shared_mem_acquire(sizeof(*kblog_buf) *
+							    MAX_KBLOG,
+						    (char **)&kblog_buf);
 			if (rv != EC_SUCCESS)
 				kblog_buf = NULL;
 			kblog_len = 0;
