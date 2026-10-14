@@ -6,14 +6,26 @@
 """Unit tests for FMAP and host tool helper utilities."""
 
 import os
+import struct
 import subprocess
+import tempfile
 import unittest
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 from flash.helpers import dump_fmap
+from flash.helpers import FMAP_AREA_FORMAT
+from flash.helpers import FMAP_AREA_PRESERVE
+from flash.helpers import FMAP_HEADER_FORMAT
+from flash.helpers import FMAP_SIGNATURE
+from flash.helpers import get_preserve_ranges
+from flash.helpers import get_writable_ranges
 from flash.helpers import locate_tool
+from flash.helpers import parse_fmap_areas
+from flash.helpers import parse_fmap_bytes
 from flash.helpers import preserve_sections_with_cur_image
+from flash.helpers import resolve_image_writable_ranges
+from flash.helpers import subtract_ranges
 
 
 class TestHelpers(unittest.TestCase):
@@ -137,6 +149,150 @@ class TestHelpers(unittest.TestCase):
             locate_tool("flashrom", ec_dir="/ec")
         path = mock_which.call_args.kwargs["path"]
         self.assertEqual(path, "/ec/build/host/util")
+
+    def _build_synthetic_fmap_image(self) -> bytes:
+        """Build a 1 MB synthetic EC image containing WP_RO, CBI, and EC_RW."""
+        total_size = 0x100000
+        areas = [
+            (0x00000, 0x60000, b"WP_RO", 0),
+            (0x00000, 0x5E000, b"EC_RO", 0),
+            (0x5E000, 0x01000, b"CBI", FMAP_AREA_PRESERVE),
+            (0x80000, 0x80000, b"EC_RW", 0),
+        ]
+        header = struct.pack(
+            FMAP_HEADER_FORMAT,
+            FMAP_SIGNATURE,
+            1,
+            1,
+            0,
+            total_size,
+            b"EC_FMAP",
+            len(areas),
+        )
+        entries = b"".join(
+            struct.pack(FMAP_AREA_FORMAT, off, sz, name, flags)
+            for off, sz, name, flags in areas
+        )
+        fmap_blob = header + entries
+        image = bytearray(b"\xff" * total_size)
+        image[0x1000 : 0x1000 + len(fmap_blob)] = fmap_blob
+        return bytes(image)
+
+    def test_parse_fmap_bytes_and_writable_ranges(self) -> None:
+        """Parse binary __FMAP__ and exclude CBI from writable ranges."""
+        img_bytes = self._build_synthetic_fmap_image()
+        areas = parse_fmap_bytes(img_bytes)
+        self.assertIn("CBI", areas)
+        self.assertTrue(areas["CBI"].is_preserve)
+        self.assertEqual(areas["CBI"].offset, 0x5E000)
+        self.assertEqual(areas["CBI"].size, 0x1000)
+
+        ro_slice = img_bytes[:0x60000]
+        ro_areas = parse_fmap_bytes(ro_slice)
+        self.assertIn("EC_RW", ro_areas)
+        self.assertIn("CBI", ro_areas)
+
+        with tempfile.NamedTemporaryFile(suffix=".bin") as tmp:
+            tmp.write(img_bytes)
+            tmp.flush()
+
+            self.assertEqual(
+                get_preserve_ranges(tmp.name),
+                [(0x5E000, 0x5F000)],
+            )
+            _areas, resolved_size, resolved_ranges = (
+                resolve_image_writable_ranges(tmp.name, no_preserve=False)
+            )
+            self.assertEqual(resolved_size, 0x100000)
+            self.assertEqual(
+                resolved_ranges,
+                [(0x0, 0x5E000), (0x5F000, 0x100000)],
+            )
+            self.assertEqual(
+                get_writable_ranges(tmp.name, 0x100000, no_preserve=False),
+                [(0x0, 0x5E000), (0x5F000, 0x100000)],
+            )
+            self.assertEqual(
+                get_writable_ranges(
+                    tmp.name,
+                    0x100000,
+                    target_regions=["WP_RO", "EC_RW"],
+                    no_preserve=False,
+                ),
+                [(0x0, 0x5E000), (0x5F000, 0x60000), (0x80000, 0x100000)],
+            )
+            self.assertEqual(
+                get_writable_ranges(
+                    tmp.name,
+                    0x100000,
+                    target_regions=["EC_RO"],
+                    no_preserve=False,
+                ),
+                [(0x0, 0x5E000)],
+            )
+            self.assertEqual(
+                get_writable_ranges(
+                    tmp.name,
+                    0x100000,
+                    target_regions=["EC_RW"],
+                    no_preserve=False,
+                ),
+                [(0x80000, 0x100000)],
+            )
+            self.assertEqual(
+                get_writable_ranges(tmp.name, 0x100000, no_preserve=True),
+                [(0x0, 0x100000)],
+            )
+
+    def test_writable_ranges_reject_missing_regions(self) -> None:
+        """Raise when a requested region is not in the image FMAP."""
+        with self.assertRaisesRegex(ValueError, "no EC_RW area"):
+            get_writable_ranges("unused.bin", 0x100000, ["EC_RW"], areas={})
+        with tempfile.NamedTemporaryFile(suffix=".bin") as tmp:
+            tmp.write(b"\xff" * 0x1000)
+            tmp.flush()
+            with patch("flash.helpers.dump_fmap", return_value=""):
+                with self.assertRaisesRegex(ValueError, "no EC_RO area"):
+                    resolve_image_writable_ranges(tmp.name, ro_only=True)
+                with self.assertRaisesRegex(
+                    ValueError, "Cannot specify both ro_only and rw_only"
+                ):
+                    resolve_image_writable_ranges(
+                        tmp.name, ro_only=True, rw_only=True
+                    )
+                self.assertEqual(
+                    resolve_image_writable_ranges(tmp.name), ({}, 0, [])
+                )
+
+    @patch("flash.helpers.dump_fmap")
+    def test_parse_fmap_areas_dump_fmap_fallback(
+        self, mock_dump_fmap: MagicMock
+    ) -> None:
+        """Fall back to dump_fmap output when binary __FMAP__ is absent."""
+        mock_dump_fmap.return_value = (
+            "WP_RO 0x0 0x40000 static\n"
+            "CBI 0x3e000 0x1000 static\n"
+            "EC_RW 0x40000 0x40000 static\n"
+        )
+        areas = parse_fmap_areas("nonexistent_image.bin")
+        self.assertTrue(areas["CBI"].is_preserve)
+        self.assertEqual(
+            subtract_ranges([(0, 0x80000)], [(0x3E000, 0x3F000)]),
+            [(0, 0x3E000), (0x3F000, 0x80000)],
+        )
+
+    @patch("flash.helpers.dump_fmap")
+    def test_parse_fmap_areas_falls_back_when_no_valid_areas(
+        self, mock_dump_fmap: MagicMock
+    ) -> None:
+        """Fall back to dump_fmap when file exists but has no valid areas."""
+        mock_dump_fmap.return_value = "WP_RO 0x0 0x40000 static\n"
+        with tempfile.NamedTemporaryFile() as tmp:
+            tmp.write(b"no fmap header in this file")
+            tmp.flush()
+            areas = parse_fmap_areas(tmp.name)
+            self.assertIn("WP_RO", areas)
+            mock_dump_fmap.assert_called_once_with(tmp.name)
 
 
 if __name__ == "__main__":

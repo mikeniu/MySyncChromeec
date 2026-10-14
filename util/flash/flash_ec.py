@@ -103,6 +103,19 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         default=False,
         help="Do not preserve FMAP sections across flashes",
     )
+    region = parser.add_mutually_exclusive_group()
+    region.add_argument(
+        "--ro",
+        action="store_true",
+        default=False,
+        help="Flash only the RO firmware region",
+    )
+    region.add_argument(
+        "--rw",
+        action="store_true",
+        default=False,
+        help="Flash only the RW firmware region",
+    )
     parser.add_argument(
         "--dry_run",
         "-n",

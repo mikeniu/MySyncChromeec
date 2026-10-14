@@ -80,13 +80,26 @@ class TestFlashEcCli(unittest.TestCase):
     """Tests for flash_ec CLI argument parsing and main entrypoint."""
 
     def test_parse_args_defaults(self) -> None:
-        """Verify default timeout (600s), port, and OpenOCD flags."""
+        """Verify default timeout (600s), port, region, and OpenOCD flags."""
         args = parse_args(["--board=veluza", "--ocd_chip_cfg=custom.cfg"])
         self.assertEqual(args.board, "veluza")
         self.assertEqual(args.timeout, 600)
         self.assertEqual(args.port, 9999)
         self.assertEqual(args.ocd_chip_cfg, "custom.cfg")
         self.assertTrue(args.verify)
+        self.assertFalse(args.ro)
+        self.assertFalse(args.rw)
+
+    def test_parse_args_region_flags(self) -> None:
+        """Verify --ro and --rw select the region to flash."""
+        args = parse_args(["--board=veluza", "--ro"])
+        self.assertTrue(args.ro)
+        self.assertFalse(args.rw)
+        args = parse_args(["--board=veluza", "--rw"])
+        self.assertFalse(args.ro)
+        self.assertTrue(args.rw)
+        with patch("sys.stderr"), self.assertRaises(SystemExit):
+            parse_args(["--board=veluza", "--ro", "--rw"])
 
     @patch("flash.flash_ec.FlasherFactory.create")
     @patch("flash.flash_ec.ServoDriver")

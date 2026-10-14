@@ -282,9 +282,17 @@ class NpcxJtagFlasher(BaseEcFlasher):
                 f"Chip '{self.args.chip}' is not supported over NPCX JTAG"
             )
 
-        # flash_npcx_all (util/openocd/npcx_cmds.tcl) reads RO/ec.RO.flat,
-        # RW/ec.RW.bin, and the monitor from the build dir.
+        if getattr(self.args, "rw", False):
+            raise ValueError("--rw is not supported over NPCX JTAG")
+
+        # flash_npcx_all/flash_npcx_ro (util/openocd/npcx_cmds.tcl) read
+        # RO/ec.RO.flat, RW/ec.RW.bin, and the monitor from the build dir.
         img_dir = os.path.dirname(os.path.abspath(self.args.image))
+        proc = (
+            "flash_npcx_ro"
+            if getattr(self.args, "ro", False)
+            else "flash_npcx_all"
+        )
         cmd = [
             "sudo",
             "timeout",
@@ -301,8 +309,8 @@ class NpcxJtagFlasher(BaseEcFlasher):
             "-f",
             "npcx_chip.cfg",
             "-c",
-            f"init; flash_npcx_all {self.args.chip} {img_dir} "
-            f"{self.args.offset}; shutdown;",
+            f"init; {proc} {self.args.chip} {img_dir} {self.args.offset}; "
+            "shutdown;",
         ]
 
         logger.info("Executing NPCX JTAG flash: %s", " ".join(cmd))
