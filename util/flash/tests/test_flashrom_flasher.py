@@ -13,6 +13,7 @@ from unittest.mock import mock_open
 from unittest.mock import patch
 
 from flash.flashrom_flasher import FlashromFlasher
+from flash.helpers import FmapArea
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 
@@ -26,6 +27,9 @@ class TestFlashromFlasher(unittest.TestCase):
         self.args = MagicMock()
         self.args.dry_run = False
         self.args.raiden = False
+        self.args.no_preserve = False
+        self.args.ro = False
+        self.args.rw = False
         self.flasher = FlashromFlasher(self.servo, self.args)
 
     def test_on_servov3(self) -> None:
@@ -275,6 +279,11 @@ class TestFlashromFlasher(unittest.TestCase):
             check=True,
         )
 
+    @patch(
+        "flash.flashrom_flasher.parse_fmap_areas",
+        return_value={"WP_RO": MagicMock(), "EC_RW": MagicMock()},
+    )
+    @patch("flash.flashrom_flasher.get_writable_ranges", return_value=[(0, 8)])
     @patch("flash.flashrom_flasher.locate_tool")
     @patch("subprocess.run")
     @patch("subprocess.check_output")
@@ -291,6 +300,8 @@ class TestFlashromFlasher(unittest.TestCase):
         mock_check_output: MagicMock,
         mock_run: MagicMock,
         mock_locate: MagicMock,
+        _mock_writable: MagicMock,
+        _mock_parse_areas: MagicMock,
     ) -> None:
         """Verify raiden_debug_spi:target=EC programmer selection on CCD."""
         mock_locate.return_value = "flashrom"
@@ -410,6 +421,246 @@ class TestFlashromFlasher(unittest.TestCase):
         with self.assertRaises(ValueError) as ctx:
             self.flasher.execute_flash()
         self.assertIn("Image is larger than SPI size!", str(ctx.exception))
+
+    @patch("flash.flashrom_flasher.parse_fmap_areas")
+    @patch("flash.flashrom_flasher.get_writable_ranges")
+    @patch("flash.flashrom_flasher.preserve_sections_with_cur_image")
+    @patch("flash.flashrom_flasher.locate_tool", return_value="flashrom")
+    @patch("subprocess.run")
+    @patch("subprocess.check_output", return_value="1048576\n")
+    @patch("os.path.getsize", return_value=0x100000)
+    @patch("os.path.exists", return_value=True)
+    @patch("tempfile.TemporaryDirectory")
+    @patch("builtins.open", new_callable=mock_open, read_data=b"testdata")
+    def test_execute_flash_write_skips_cbi_via_layout(
+        self,
+        mock_file: MagicMock,
+        mock_tmp: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_getsize: MagicMock,
+        _mock_check_output: MagicMock,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        mock_preserve: MagicMock,
+        mock_writable: MagicMock,
+        mock_parse_areas: MagicMock,
+    ) -> None:
+        """Skip reading/writing CBI by generating a flashrom layout file."""
+        self.args.read = None
+        self.args.image = "image.bin"
+        self.args.chip = "npcx_int_spi"
+        self.args.no_preserve = False
+        self.args.ro = False
+        self.args.rw = False
+        self.servo.get.side_effect = lambda ctrl, default="": (
+            "ccd" if ctrl == "servo_type" else ""
+        )
+        mock_parse_areas.return_value = {
+            "WP_RO": MagicMock(),
+            "CBI": MagicMock(),
+            "EC_RW": MagicMock(),
+        }
+        mock_writable.return_value = [
+            (0x0, 0x5E000),
+            (0x5F000, 0x60000),
+            (0x80000, 0x100000),
+        ]
+        mock_tmp.return_value.__enter__.return_value = "/tmp/dir"
+
+        self.flasher.execute_flash()
+
+        mock_preserve.assert_not_called()
+        mock_writable.assert_called_once_with(
+            "image.bin",
+            0x100000,
+            target_regions=["WP_RO", "EC_RW"],
+            no_preserve=False,
+            areas=mock_parse_areas.return_value,
+        )
+        mock_file.return_value.write.assert_any_call(
+            "00000000:0005dfff WRITE_0\n"
+        )
+        mock_file.return_value.write.assert_any_call(
+            "0005f000:0005ffff WRITE_1\n"
+        )
+        mock_file.return_value.write.assert_any_call(
+            "00080000:000fffff WRITE_2\n"
+        )
+        mock_run.assert_called_once_with(
+            [
+                "sudo",
+                "flashrom",
+                "--programmer=raiden_debug_spi:target=EC",
+                "-i",
+                "WRITE_0",
+                "-i",
+                "WRITE_1",
+                "-i",
+                "WRITE_2",
+                "-l",
+                "/tmp/dir/flashrom.layout",
+                "--noverify-all",
+                "-w",
+                "/tmp/dir/flash_temp.bin",
+            ],
+            check=True,
+        )
+
+        # Also verify --ro passes target_regions=['EC_RO'].
+        mock_writable.reset_mock()
+        mock_run.reset_mock()
+        self.args.ro = True
+        self.servo.get.side_effect = None
+        self.servo.get.return_value = "servo_v3"
+        mock_parse_areas.return_value = {}
+        mock_writable.return_value = [(0x0, 0x5E000)]
+
+        self.flasher.execute_flash()
+
+        mock_writable.assert_called_once_with(
+            "image.bin",
+            0x100000,
+            target_regions=["EC_RO"],
+            no_preserve=False,
+            areas={},
+        )
+        mock_run.assert_called_once_with(
+            [
+                "sudo",
+                "flashrom",
+                "--programmer=linux_spi",
+                "-i",
+                "WRITE_0",
+                "-l",
+                "/tmp/dir/flashrom.layout",
+                "--noverify-all",
+                "-w",
+                "/tmp/dir/flash_temp.bin",
+            ],
+            check=True,
+        )
+
+
+class TestFlashromRegionSelection(unittest.TestCase):
+    """Tests for FlashromFlasher --ro/--rw and CCD region selection."""
+
+    def setUp(self) -> None:
+        self.servo = MagicMock()
+        self.servo.get.return_value = "servo_v3"
+        self.args = MagicMock()
+        self.args.dry_run = False
+        self.args.raiden = False
+        self.args.no_preserve = False
+        self.args.ro = False
+        self.args.rw = False
+        self.args.read = None
+        self.args.image = "image.bin"
+        self.flasher = FlashromFlasher(self.servo, self.args)
+
+    @patch("flash.flashrom_flasher.locate_tool", return_value="flashrom")
+    @patch("subprocess.check_output", return_value="1048576\n")
+    @patch("os.path.getsize", return_value=0x100000)
+    @patch("os.path.exists", return_value=True)
+    @patch("tempfile.TemporaryDirectory")
+    @patch("builtins.open", new_callable=mock_open, read_data=b"testdata")
+    def test_rejects_both_ro_and_rw(
+        self,
+        _mock_file: MagicMock,
+        mock_tmp: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_getsize: MagicMock,
+        _mock_check_output: MagicMock,
+        _mock_locate: MagicMock,
+    ) -> None:
+        """Raise when both --ro and --rw are set."""
+        mock_tmp.return_value.__enter__.return_value = "/tmp/dir"
+        self.args.ro = True
+        self.args.rw = True
+        with self.assertRaisesRegex(
+            ValueError, "Cannot specify both --ro and --rw"
+        ):
+            self.flasher.execute_flash()
+
+    @patch(
+        "flash.flashrom_flasher.parse_fmap_areas",
+        return_value={"EC_RO": FmapArea("EC_RO", 0, 0x80000)},
+    )
+    @patch("flash.flashrom_flasher.locate_tool", return_value="flashrom")
+    @patch("subprocess.run")
+    @patch("subprocess.check_output", return_value="1048576\n")
+    @patch("os.path.getsize", return_value=0x100000)
+    @patch("os.path.exists", return_value=True)
+    @patch("tempfile.TemporaryDirectory")
+    @patch("builtins.open", new_callable=mock_open, read_data=b"testdata")
+    def test_rejects_missing_regions(
+        self,
+        _mock_file: MagicMock,
+        mock_tmp: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_getsize: MagicMock,
+        _mock_check_output: MagicMock,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_parse_areas: MagicMock,
+    ) -> None:
+        """Raise instead of writing the whole chip when a region is missing."""
+        mock_tmp.return_value.__enter__.return_value = "/tmp/dir"
+
+        self.args.rw = True
+        with self.assertRaisesRegex(ValueError, "no EC_RW area"):
+            self.flasher.execute_flash()
+
+        self.args.rw = False
+        self.servo.get.return_value = "ccd_cr50"
+        with self.assertRaisesRegex(ValueError, "no WP_RO area"):
+            self.flasher.execute_flash()
+
+        mock_run.assert_not_called()
+
+    @patch(
+        "flash.flashrom_flasher.parse_fmap_areas",
+        return_value={"EC_RW": FmapArea("EC_RW", 0x80000, 0x80000)},
+    )
+    @patch("flash.flashrom_flasher.locate_tool", return_value="flashrom")
+    @patch("subprocess.run")
+    @patch("subprocess.check_output", return_value="1048576\n")
+    @patch("os.path.getsize", return_value=0x100000)
+    @patch("os.path.exists", return_value=True)
+    @patch("tempfile.TemporaryDirectory")
+    @patch("builtins.open", new_callable=mock_open, read_data=b"testdata")
+    def test_rw_region(
+        self,
+        mock_file: MagicMock,
+        mock_tmp: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_getsize: MagicMock,
+        _mock_check_output: MagicMock,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_parse_areas: MagicMock,
+    ) -> None:
+        """Write only EC_RW for --rw."""
+        self.args.rw = True
+        mock_tmp.return_value.__enter__.return_value = "/tmp/dir"
+
+        self.flasher.execute_flash()
+
+        mock_file.return_value.write.assert_any_call(
+            "00080000:000fffff WRITE_0\n"
+        )
+        cmd = mock_run.call_args.args[0]
+        self.assertEqual(
+            cmd[-7:],
+            [
+                "-i",
+                "WRITE_0",
+                "-l",
+                "/tmp/dir/flashrom.layout",
+                "--noverify-all",
+                "-w",
+                "/tmp/dir/flash_temp.bin",
+            ],
+        )
 
 
 if __name__ == "__main__":

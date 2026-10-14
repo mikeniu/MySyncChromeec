@@ -138,6 +138,8 @@ class TestNpcxJtagFlasher(unittest.TestCase):
         self.args.chip = "npcx_5m5g_jtag"
         self.args.image = "/build/testboard/ec.bin"
         self.args.read = None
+        self.args.ro = False
+        self.args.rw = False
         self.args.offset = 0
         self.args.timeout = 60
         self.args.dry_run = False
@@ -170,6 +172,25 @@ class TestNpcxJtagFlasher(unittest.TestCase):
             "init; flash_npcx_all npcx_5m5g_jtag /build/testboard 0; "
             "shutdown;",
         )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("subprocess.run")
+    def test_execute_flash_ro(
+        self, mock_run: MagicMock, _mock_exists: MagicMock
+    ) -> None:
+        """Use flash_npcx_ro for --ro, like flash_ec."""
+        self.args.ro = True
+        self.flasher.execute_flash()
+        self.assertIn("flash_npcx_ro", mock_run.call_args.args[0][-1])
+
+    @patch("os.path.exists", return_value=True)
+    def test_execute_flash_rw_rejected(self, _mock_exists: MagicMock) -> None:
+        """Reject --rw on NPCX JTAG."""
+        self.args.rw = True
+        with self.assertRaisesRegex(
+            ValueError, "--rw is not supported over NPCX JTAG"
+        ):
+            self.flasher.execute_flash()
 
     @patch("os.path.exists", return_value=True)
     @patch("subprocess.run")
