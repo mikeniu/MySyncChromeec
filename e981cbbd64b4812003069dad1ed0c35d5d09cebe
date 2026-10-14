@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "e981cbbd64b4812003069dad1ed0c35d5d09cebe",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08d64dfc_f787dbf8",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-14T16:55:17Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Double-check if the field in `cortex_panic_data` is named `mfar` or `mmfar`. Standard ARM terminology for MemManage Fault Address Register is `MMFAR`. If the struct member is `mmfar`, this will fail to compile. Zephyr\u0027s `extra_info` also uses `mmfar` here.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 0
+      },
+      "revId": "e981cbbd64b4812003069dad1ed0c35d5d09cebe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
