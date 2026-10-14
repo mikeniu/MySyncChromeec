@@ -169,11 +169,6 @@ void pd_build_request(int32_t vpd_vdo, uint32_t *rdo, uint32_t *ma,
 		      uint32_t *mv, int port);
 
 /**
- * Notifies a task that is waiting on a system jump, that it's complete.
- */
-void notify_sysjump_ready(void);
-
-/**
  * Set USB MUX with current data role
  *
  * @param port USB-C port number
