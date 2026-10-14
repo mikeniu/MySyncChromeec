@@ -37,6 +37,8 @@
 #include "usb_tbt_alt_mode.h"
 #include "usb_tc_sm.h"
 
+#include <zephyr/kernel.h>
+
 #ifdef CONFIG_USB_PD_DEBUG_LEVEL
 static const enum debug_level dpm_debug_level = CONFIG_USB_PD_DEBUG_LEVEL;
 #elif defined(CONFIG_USB_PD_INITIAL_DEBUG_LEVEL)
@@ -667,7 +669,7 @@ static void balance_source_ports(void)
 	uint32_t removed_ports, new_ports;
 	static bool deferred_waiting;
 
-	if (in_deferred_context())
+	if (k_current_get() == k_sys_work_q.thread_id)
 		deferred_waiting = false;
 
 	/*

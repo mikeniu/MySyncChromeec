@@ -12,9 +12,10 @@
 #include "link_defs.h"
 #include "shared_mem.h"
 #include "system.h"
-#include "task.h"
 
 #include <stdlib.h>
+
+#include <zephyr/kernel.h>
 
 #include <malloc.h>
 
@@ -27,7 +28,7 @@ int shared_mem_acquire(int size, char **dest_ptr)
 {
 	*dest_ptr = NULL;
 
-	if (in_interrupt_context())
+	if (k_is_in_isr())
 		return EC_ERROR_INVAL;
 
 	*dest_ptr = malloc(size);
@@ -39,7 +40,7 @@ int shared_mem_acquire(int size, char **dest_ptr)
 
 void shared_mem_release(void *ptr)
 {
-	if (in_interrupt_context())
+	if (k_is_in_isr())
 		return;
 
 	free(ptr);
