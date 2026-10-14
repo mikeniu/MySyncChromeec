@@ -89,6 +89,13 @@
 #define STEPS_NORMAL 0x01
 #define STEPS_TEST 0xEE
 
+#define MAX_SKIP_RANGES 16
+
+struct skip_range {
+	unsigned long start_addr;
+	unsigned long range;
+};
+
 const static uint8_t enable_follow_mode[16] = {
 	W_CMD_PORT, DBUS_ADDR_3, W_DATA_PORT, 0x7F,
 	W_CMD_PORT, DBUS_ADDR_2, W_DATA_PORT, 0xFF,
@@ -128,6 +135,8 @@ struct itecomdbgr_config {
 	unsigned long update_end_addr;
 	unsigned long read_start_addr;
 	unsigned long read_range;
+	struct skip_range skip_ranges[MAX_SKIP_RANGES];
+	int num_skip_ranges;
 	bool noverify;
 	char *device_name;
 	char *file_name;
@@ -569,6 +578,19 @@ static void print_delta(const char *msg, int *prev_percent, int new_percent)
 	}
 }
 
+static bool is_in_skip_range(const struct itecomdbgr_config *conf,
+			     unsigned long addr, unsigned long len)
+{
+	for (int i = 0; i < conf->num_skip_ranges; i++) {
+		unsigned long start = conf->skip_ranges[i].start_addr;
+		unsigned long range = conf->skip_ranges[i].range;
+
+		if (range && addr < start + range && addr + len > start)
+			return true;
+	}
+	return false;
+}
+
 static int erase_flash(struct itecomdbgr_config *conf)
 {
 	int i = 0;
@@ -593,6 +615,11 @@ static int erase_flash(struct itecomdbgr_config *conf)
 
 	write_com(conf, enable_follow_mode, sizeof(enable_follow_mode));
 	while (start_addr < end_addr) {
+		if (is_in_skip_range(conf, start_addr, conf->sector_size)) {
+			start_addr += conf->sector_size;
+			++i;
+			continue;
+		}
 		if (spi_sr1_wel(conf) != SUCCESS) {
 			printf("erase_4k:check_status error 1\n");
 			result = FAIL;
@@ -673,6 +700,16 @@ static int fast_read_burst_cdata(struct itecomdbgr_config *conf,
 			read_count = conf->page_size;
 		else
 			read_count = end_addr - start_addr;
+
+		if (conf->read_start_addr == NO_READ &&
+		    is_in_skip_range(conf, start_addr, read_count)) {
+			progress_percent = (++j * 100) / total_size;
+			print_delta(check_erased ? "Checking..." :
+						   "Verifying...",
+				    &prev_percent, progress_percent);
+			start_addr += read_count;
+			continue;
+		}
 
 		if (check_status(conf, SPI_SR1_BUSY, 0) < 0) {
 			printf("fast_read_burst_cdata:check_status error 1\n");
@@ -812,10 +849,12 @@ static int page_program_burst_v2(struct itecomdbgr_config *conf,
 		else
 			write_count = end_addr - start_addr;
 
-		if (program_page(conf, start_addr, &wr_data[start_addr],
-				 write_count) != SUCCESS) {
-			result = FAIL;
-			goto out;
+		if (!is_in_skip_range(conf, start_addr, write_count)) {
+			if (program_page(conf, start_addr, &wr_data[start_addr],
+					 write_count) != SUCCESS) {
+				result = FAIL;
+				goto out;
+			}
 		}
 
 		start_addr += conf->page_size;
@@ -1060,7 +1099,7 @@ int main(int argc, char **argv)
 	int r = 0;
 	int option_index = 0;
 	int c;
-	const char *optstring = "f:d:b:hnr:R:";
+	const char *optstring = "f:d:b:hnr:R:S:";
 	struct option long_options[] = {
 		{ "filename", required_argument, NULL, 'f' },
 		{ "device", required_argument, NULL, 'd' },
@@ -1068,6 +1107,7 @@ int main(int argc, char **argv)
 		{ "no-verify", no_argument, NULL, 'n' },
 		{ "readfile", required_argument, NULL, 'r' },
 		{ "Range", required_argument, NULL, 'R' },
+		{ "skip-range", required_argument, NULL, 'S' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -1105,7 +1145,39 @@ int main(int argc, char **argv)
 				strtol(argv[optind - 1], (char **)0, 0);
 			conf.read_range = strtol(argv[optind], (char **)0, 0);
 			break;
+		case 'S': {
+			unsigned long start_addr, range;
+			const char *len_str;
+			char *end;
 
+			if (conf.num_skip_ranges >= MAX_SKIP_RANGES) {
+				fprintf(stderr,
+					"Too many -S / --skip-range options\n");
+				exit(1);
+			}
+			start_addr = strtoul(optarg, &end, 0);
+			if (end != optarg && *end == ':') {
+				len_str = end + 1;
+			} else if (end != optarg && *end == '\0' &&
+				   optind < argc && argv[optind][0] != '-') {
+				len_str = argv[optind++];
+			} else {
+				fprintf(stderr, "-S requires <start> <len> or "
+						"<start>:<len>\n");
+				exit(1);
+			}
+			range = strtoul(len_str, &end, 0);
+			if (end == len_str || *end != '\0' || range == 0) {
+				fprintf(stderr, "Invalid -S length: %s\n",
+					len_str);
+				exit(1);
+			}
+			conf.skip_ranges[conf.num_skip_ranges].start_addr =
+				start_addr;
+			conf.skip_ranges[conf.num_skip_ranges].range = range;
+			conf.num_skip_ranges++;
+			break;
+		}
 		case 'd':
 			conf.device_name = optarg;
 			break;
@@ -1125,6 +1197,8 @@ int main(int argc, char **argv)
 			printf("	-n : no verify\n");
 			printf("	-r : [read filename]\n");
 			printf("	-R : [read start addr] [length]\n");
+			printf("	-S : [skip start addr]:[length] or "
+			       "[skip start addr] [length]\n");
 			printf("Example :\n");
 			printf("    %s -f ec.bin -d /dev/ttyUSB3\n", argv[0]);
 			printf("    %s -f ec.bin -d /dev/ttyUSB3 -n\n",

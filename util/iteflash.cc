@@ -111,6 +111,13 @@ static volatile sig_atomic_t exit_requested;
 
 struct i2c_interface;
 
+#define MAX_SKIP_RANGES 16
+
+struct skip_range {
+	size_t base;
+	size_t size;
+};
+
 /* Config mostly comes from the command line.  Defaults are set in main(). */
 struct iteflash_config {
 	char *input_filename;
@@ -133,6 +140,8 @@ struct iteflash_config {
 	const struct i2c_interface *i2c_if;
 	size_t range_base;
 	size_t range_size;
+	struct skip_range skip_ranges[MAX_SKIP_RANGES];
+	int num_skip_ranges;
 };
 
 struct common_hnd {
@@ -1406,6 +1415,19 @@ static bool is_empty_page(uint8_t *buffer, int size)
 	return true;
 }
 
+static bool is_in_skip_range(const struct common_hnd *chnd, size_t addr,
+			     size_t len)
+{
+	for (int i = 0; i < chnd->conf.num_skip_ranges; i++) {
+		size_t base = chnd->conf.skip_ranges[i].base;
+		size_t size = chnd->conf.skip_ranges[i].size;
+
+		if (size && addr < base + size && addr + len > base)
+			return true;
+	}
+	return false;
+}
+
 static int command_write_pages(struct common_hnd *chnd, uint32_t address,
 			       uint32_t size, uint8_t *buffer)
 {
@@ -1422,6 +1444,12 @@ static int command_write_pages(struct common_hnd *chnd, uint32_t address,
 	while (remaining) {
 		cnt = (remaining > block_write_size) ? block_write_size :
 						       remaining;
+		if (is_in_skip_range(chnd, address, cnt)) {
+			buffer += cnt;
+			address += cnt;
+			remaining -= cnt;
+			continue;
+		}
 		addr_H = (address >> 16) & 0xFF;
 		addr_M = (address >> 8) & 0xFF;
 		addr_L = address & 0xFF;
@@ -1562,7 +1590,16 @@ static int command_erase(struct common_hnd *chnd, uint32_t len, uint32_t off)
 		goto failed_erase;
 
 	while (remaining) {
+		uint32_t sector_bytes = sector_erase_pages * PAGE_SIZE;
+		uint32_t addr = page * PAGE_SIZE;
+
 		draw_spinner(remaining, len);
+
+		if (is_in_skip_range(chnd, addr, sector_bytes)) {
+			page += sector_erase_pages;
+			remaining -= sector_bytes;
+			continue;
+		}
 
 		if (spi_flash_command_short(chnd, SPI_CMD_WRITE_ENABLE,
 					    "write enable for erase") < 0)
@@ -1572,7 +1609,8 @@ static int command_erase(struct common_hnd *chnd, uint32_t len, uint32_t off)
 			goto failed_erase;
 
 		/* do chip erase */
-		if (remaining == chnd->flash_size) {
+		if (remaining == chnd->flash_size &&
+		    !chnd->conf.num_skip_ranges) {
 			if (spi_flash_command_short(chnd, SPI_CMD_CHIP_ERASE,
 						    "chip erase") < 0)
 				goto failed_erase;
@@ -1597,12 +1635,13 @@ static int command_erase(struct common_hnd *chnd, uint32_t len, uint32_t off)
 					    "write disable for erase") < 0)
 			goto failed_erase;
 
-		if (remaining == chnd->flash_size) {
+		if (remaining == chnd->flash_size &&
+		    !chnd->conf.num_skip_ranges) {
 			remaining = 0;
 			draw_spinner(remaining, len);
 		} else {
 			page += sector_erase_pages;
-			remaining -= sector_erase_pages * PAGE_SIZE;
+			remaining -= sector_bytes;
 		}
 	}
 
@@ -1652,7 +1691,17 @@ static int command_erase2(struct common_hnd *chnd, uint32_t len, uint32_t off,
 		goto failed_erase;
 
 	while (remaining) {
+		uint32_t sector_bytes = sector_erase_pages * PAGE_SIZE;
+		uint32_t addr = page * PAGE_SIZE;
+
 		draw_spinner(remaining, len);
+
+		if (is_in_skip_range(chnd, addr, sector_bytes)) {
+			page += sector_erase_pages;
+			remaining -= sector_bytes;
+			draw_spinner(remaining, len);
+			continue;
+		}
 
 		if (spi_flash_command_short(chnd, SPI_CMD_WRITE_ENABLE,
 					    "write enable for erase") < 0)
@@ -1825,7 +1874,7 @@ static int write_flash2(struct common_hnd *chnd, const char *filename,
 	int block_write_size = chnd->conf.block_write_size;
 	FILE *hnd;
 	int size = chnd->flash_size;
-	int cnt, two_bytes_sent, ret;
+	int cnt, two_bytes_sent, ret = 0;
 	uint8_t addr_h, addr_m, addr_l, data_ff = 0xff;
 	uint8_t *buffer = (uint8_t *)malloc(size);
 
@@ -1869,6 +1918,14 @@ static int write_flash2(struct common_hnd *chnd, const char *filename,
 	printf("Writing %d bytes at 0x%08x.......\n", res, offset);
 
 __send_aai_cmd:
+	while (res >= 2 && is_in_skip_range(chnd, offset, 2)) {
+		offset += 2;
+		res -= 2;
+		draw_spinner(res, res + offset);
+	}
+	if (res < 2)
+		goto failed_write;
+
 	addr_h = (offset >> 16) & 0xff;
 	addr_m = (offset >> 8) & 0xff;
 	addr_l = offset & 0xff;
@@ -1908,6 +1965,24 @@ __send_aai_cmd:
 		if (two_bytes_sent) {
 			two_bytes_sent = 0;
 			cnt -= 2;
+		}
+		if (is_in_skip_range(chnd, offset, cnt)) {
+			for (int i = 0; i < chnd->conf.num_skip_ranges; i++) {
+				size_t base = chnd->conf.skip_ranges[i].base;
+
+				if (base > offset &&
+				    base < offset + (size_t)cnt)
+					cnt = base - offset;
+			}
+			if (is_in_skip_range(chnd, offset, cnt)) {
+				i2c_byte_transfer(chnd, I2C_DATA_ADDR, &data_ff,
+						  1, 1);
+				i2c_write_byte(chnd, 0x10, 0x00);
+				spi_flash_command_short(chnd,
+							SPI_CMD_WRITE_DISABLE,
+							"SPI write disable");
+				goto __send_aai_cmd;
+			}
 		}
 		if (i2c_byte_transfer(chnd, I2C_BLOCK_ADDR, &buffer[offset], 1,
 				      cnt) < 0) {
@@ -2007,7 +2082,8 @@ static int write_flash3(struct common_hnd *chnd, const char *filename,
 
 	while (res) {
 		cnt = (res > block_write_size) ? block_write_size : res;
-		if (chnd->conf.erase && is_empty_page(&buf[offset], cnt)) {
+		if (is_in_skip_range(chnd, offset, cnt) ||
+		    (chnd->conf.erase && is_empty_page(&buf[offset], cnt))) {
 			/* do nothing */
 		} else if (command_write_pages3(chnd, offset, cnt,
 						&buf[offset]) < 0) {
@@ -2076,8 +2152,25 @@ static int verify_flash(struct common_hnd *chnd, const char *filename,
 
 	printf("Verify %d bytes at 0x%08x\n", file_size, offset);
 	res = command_read_pages(chnd, offset, chnd->flash_size, buffer2);
-	if (res > 0)
+	if (res > 0) {
+		for (int i = 0; i < chnd->conf.num_skip_ranges; i++) {
+			size_t skip_start = chnd->conf.skip_ranges[i].base;
+			size_t skip_end =
+				skip_start + chnd->conf.skip_ranges[i].size;
+			size_t end_off = offset + (size_t)file_size;
+
+			if (skip_start < offset)
+				skip_start = offset;
+			if (skip_end > end_off)
+				skip_end = end_off;
+			if (skip_start < skip_end) {
+				memcpy(buffer2 + (skip_start - offset),
+				       buffer + (skip_start - offset),
+				       skip_end - skip_start);
+			}
+		}
 		res = memcmp(buffer, buffer2, file_size);
+	}
 
 	printf("\n\rVerify %s\n", res ? "Failed!" : "Done.");
 
@@ -2301,6 +2394,7 @@ static const struct option longopts[] = { { "block-write-size", 1, 0, 'b' },
 					  { "read", 1, 0, 'r' },
 					  { "send-waveform", 1, 0, 'W' },
 					  { "serial", 1, 0, 's' },
+					  { "skip-range", 1, 0, 'S' },
 					  { "vendor", 1, 0, 'v' },
 					  { "write", 1, 0, 'w' },
 					  { NULL, 0, 0, 0 } };
@@ -2343,6 +2437,9 @@ static void display_usage(const char *program)
 	fprintf(stderr, "-r, --read <file> : Read the flash content and"
 			" write it into <file>.\n");
 	fprintf(stderr, "-s, --serial <serialname> : USB serial string\n");
+	fprintf(stderr,
+		"-S, --skip-range base:size : Skip erasing, writing, and\n"
+		"\tverifying the specified range (base:size or base size).\n");
 	fprintf(stderr, "-v, --vendor <0x1234> : USB vendor ID\n");
 	fprintf(stderr,
 		"-W, --send-waveform <0|1|false|true> : Send the"
@@ -2392,6 +2489,49 @@ static int parse_range_options(char *str, struct iteflash_config *conf)
 	return 0;
 }
 
+static int parse_skip_range_options(const char *str, const char *size_arg,
+				    struct iteflash_config *conf)
+{
+	char *endptr = NULL;
+	size_t skip_base, skip_size;
+
+	if (!str || !*str) {
+		fprintf(stderr,
+			"missing skip-range base address specification\n");
+		return -1;
+	}
+	if (conf->num_skip_ranges >= MAX_SKIP_RANGES) {
+		fprintf(stderr, "too many skip-range specifications\n");
+		return -1;
+	}
+
+	skip_base = strtoull(str, &endptr, 0);
+	if (size_arg) {
+		if (!endptr || *endptr) {
+			fprintf(stderr, "wrong skip-range specification\n");
+			return -1;
+		}
+	} else {
+		if (!endptr || *endptr != ':' || !endptr[1]) {
+			fprintf(stderr, "wrong skip-range specification\n");
+			return -1;
+		}
+		size_arg = endptr + 1;
+	}
+
+	skip_size = strtoull(size_arg, &endptr, 0);
+	if (!endptr || *endptr || !skip_size) {
+		fprintf(stderr, "wrong skip-range size specification\n");
+		return -1;
+	}
+
+	conf->skip_ranges[conf->num_skip_ranges].base = skip_base;
+	conf->skip_ranges[conf->num_skip_ranges].size = skip_size;
+	conf->num_skip_ranges++;
+
+	return 0;
+}
+
 /*
  * Parses -P / --dbgr-preserve-pin parameter, accepting either a GPCR register
  * offset (e.g. "0x1641") or a port+pin name (e.g. "G1" -> 0x1641).
@@ -2434,7 +2574,7 @@ static int parse_parameters(int argc, char **argv, struct iteflash_config *conf)
 	int opt, idx, ret = 0;
 
 	while (!ret && (opt = getopt_long(argc, argv,
-					  "?b:c:D:dehi:mnP:p:R:r:s:uv:W:w:Zz",
+					  "?b:c:D:dehi:mnP:p:R:r:S:s:uv:W:w:Zz",
 					  longopts, &idx)) != -1) {
 		switch (opt) {
 		case 'b':
@@ -2493,6 +2633,15 @@ static int parse_parameters(int argc, char **argv, struct iteflash_config *conf)
 			ret = strdup_with_errmsg(optarg, &conf->input_filename,
 						 "-r / --read");
 			break;
+		case 'S': {
+			const char *size_arg = NULL;
+
+			if (!strchr(optarg, ':') && optind < argc &&
+			    argv[optind][0] != '-')
+				size_arg = argv[optind++];
+			ret = parse_skip_range_options(optarg, size_arg, conf);
+			break;
+		}
 		case 's':
 			ret = strdup_with_errmsg(optarg, &conf->usb_serial,
 						 "-s / --serial");
