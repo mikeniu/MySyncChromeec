@@ -41,6 +41,60 @@
       "isAi": true,
       "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "300e8293_08f27b78",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T21:47:32Z",
+      "side": 1,
+      "message": "In [`flash_andes_qspi_xip_init()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/drivers/flash/flash_andes_qspi_xip.c;l\u003d583-598;drc\u003d362839e0981d546b6520172a03bedc9072ee4dc8), the XIP flash `SCLK` divider is computed from `\u0026spi0`\u0027s `clock-frequency` (`bus_freq`) and [`p25q16`\u0027s `spi-frequency \u003d \u003c50000000\u003e`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/fpmcu/et171/common.dtsi;l\u003d34-42;drc\u003db87a766e8569618e7c61a16800b857ea8d127142):\n\n`sclk_div \u003d (bus_freq / (spi_freq \u003c\u003c 1)) - 1` -\u003e `(200 MHz / 100 MHz) - 1 \u003d 1` (`SCLK \u003d 50 MHz`).\n\nHowever, examine the boot initialization order when jumping (`sysjump`) from a 100 MHz RO image to this 200 MHz RW image:\n1. The 100 MHz RO image\u0027s `flash_andes_qspi_xip_init()` sets `SPI0-\u003eIFTIM.SCLK_DIV` (`0xF0B00040`) to `0` (`100 MHz / (2 * (0 + 1)) \u003d 50 MHz`), which persists across the software jump to RW.\n2. In the 200 MHz RW image, [`soc_pre_init()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/soc/egis/et171/soc.c;l\u003d118-216;drc\u003d228e22a804096391c93a37e6dcfb14bb41bbb27d) runs at `PRE_KERNEL_1` priority `0` and switches `AOSMU-\u003eCLK_SRC` (`SMU_CLK_AHB`) to 200 MHz (`AHB_CLK_DIV_1`) while `SPI0-\u003eIFTIM.SCLK_DIV` is still `0`.\n3. [`flash_andes_qspi_xip_init()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/drivers/flash/flash_andes_qspi_xip.c;l\u003d604-606;drc\u003d362839e0981d546b6520172a03bedc9072ee4dc8) does not run until `POST_KERNEL` priority `50` (`CONFIG_FLASH_INIT_PRIORITY`).\n\nBetween `PRE_KERNEL_1` priority `0` and `POST_KERNEL` priority `50`, XIP instruction fetches from `spi0` will clock the flash at `200 MHz / (2 * (0 + 1)) \u003d 100 MHz` (2x the configured 50 MHz limit).\n\nShould `SPI0-\u003eIFTIM.SCLK_DIV` be updated to `1` before `soc_pre_init()` switches `AOSMU-\u003eCLK_SRC` to 200 MHz (so flash `SCLK` steps from 50 MHz -\u003e 25 MHz -\u003e 50 MHz without exceeding 50 MHz)?",
+      "isAi": true,
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5ef320f_25247478",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T21:47:32Z",
+      "side": 1,
+      "message": "Nit: Unlike `spi0` ([`flash_andes_qspi_xip.c`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/drivers/flash/flash_andes_qspi_xip.c;l\u003d819;drc\u003d362839e0981d546b6520172a03bedc9072ee4dc8), which only reads `clock-frequency`), `spi1` uses [`spi_egis_et171.c`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/drivers/spi/spi_egis_et171.c;l\u003d1069-1083;drc\u003d5749eb1da43602feff2379164104a0304341fa70), which supports querying `clock_control_get_rate()` when `clock-frequency` is omitted.\n\nConsider configuring `\u0026spi1` similarly to [`\u0026uart0` below](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/fpmcu/et171/soc.dtsi;l\u003d83-87;drc\u003d8bb4652603c4cc4a06890100ce98226146060089):\n```dts\n\u0026spi1 {\n\tstatus \u003d \"okay\";\n\t/delete-property/ clock-frequency;\n\tclocks \u003d \u003c\u0026clock ET171_CLOCK_SPIM2\u003e;\n};\n```\nThat way `\u0026spi1` automatically gets the OTP-trimmed `SMU_CLK_AHB` rate from [`et171_clock_control_get_rate()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/drivers/clock_control/clock_control_et171.c;l\u003d111-126;drc\u003d73822255050d10a27ef43a8250da97bcba26f9f3) instead of needing a hardcoded frequency kept in sync with `ahb-divide`.",
+      "isAi": true,
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92549eb1_25dab50b",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T21:47:32Z",
+      "side": 1,
+      "message": "Since the ET171 APB clock is derived from the AHB clock (`APB_CLOCK \u003d (AHB_CLOCK / 2) / apb_divide` in [`soc_pre_init()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/soc/egis/et171/soc.c;l\u003d124-144;drc\u003d228e22a804096391c93a37e6dcfb14bb41bbb27d)), keeping `apb-divide \u003d \u003c1\u003e` while changing `ahb-divide` from `\u003c2\u003e` to `\u003c1\u003e` also doubles `SMU_CLK_APB` from **50 MHz to 100 MHz**.\n\nWhile [`mtimer`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/soc/egis/et171/soc.c;l\u003d175-178;drc\u003d228e22a804096391c93a37e6dcfb14bb41bbb27d) (and [`power.c`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/soc/egis/et171/power.c;l\u003d58;drc\u003da9fdf60e64bd0045d5a1c5198dfbe8cc2ce045d6)) and [`uart0`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/dts/riscv/egis/clock.dtsi;l\u003d13-15;drc\u003d73822255050d10a27ef43a8250da97bcba26f9f3) query `HAL_SMU_GetClock(SMU_CLK_APB)` at runtime, is 100 MHz within the ET171 hardware specification for the APB bus and all APB peripherals (`uart0`, `gpio0`, `wdt`, `otpc`, `pit0`, `i2c`), or should `apb-divide` be set to `\u003c2\u003e` to keep APB at 50 MHz?",
+      "isAi": true,
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
