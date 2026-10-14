@@ -33,6 +33,25 @@
       "message": "This is a pretty big change, can we split it up?",
       "revId": "07b0915733b1d369a42cd72e111c13dd27ce0675",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b089312_4068fe11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-14T19:50:57Z",
+      "side": 1,
+      "message": "Done — split into a 3-CL stack.",
+      "parentUuid": "da6df4e6_6e9e5fd5",
+      "isAi": true,
+      "revId": "07b0915733b1d369a42cd72e111c13dd27ce0675",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
