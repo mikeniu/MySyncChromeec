@@ -87,6 +87,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2b9b3c26_86967eed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T23:34:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ec6d76_530469c4",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 9999
+      },
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "c1f5d5bf_4a1c3a00",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
@@ -135,6 +159,24 @@
       "side": 1,
       "message": "OK, It is rebased.",
       "parentUuid": "f6dcfa3e_745c0304",
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e39d07d7_0f4840f7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T23:34:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e32dba0_69315d9c",
       "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
