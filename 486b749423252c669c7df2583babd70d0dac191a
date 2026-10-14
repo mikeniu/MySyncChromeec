@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7196646d_4e6cf6e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-14T11:40:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** The `LOW_POWER` state transition now correctly falls through to `IDLE` to disable the IRQ. ✅\n*   **Architecture \u0026 Component Fit:** Fits cleanly in the driver\u0027s state machine, aligning with the pattern used by other Zephyr fingerprint drivers. ✅\n*   **Code Simplicity:** The logic is clean and minimal, leveraging a fallthrough to avoid duplicated code. ✅\n*   **Idiomaticity \u0026 Readability:** Excellent. The fallthrough is explicitly documented with `/* fallthrough */`. ✅\n*   **Security:** N/A. ✅\n*   **Testing:** The `test_enter_low_power_mode` unit test was successfully updated to simulate an interrupt and verify that the handler is not called in low power mode. ✅\n*   **CL Size \u0026 Scope:** Size: S (+24, -4). The CL is small, atomic, and represents a single logical change. ✅\n*   **Commit Message:** The description accurately captures the motivation and behavior changes in concise prose. ✅\n\n[🔗](http://go/tj/29cc63bf-3859-4805-a9bf-380dfbce40c7)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "486b749423252c669c7df2583babd70d0dac191a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
