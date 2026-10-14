@@ -82,12 +82,20 @@ class TestFlashEcCli(unittest.TestCase):
 
     def test_parse_args_defaults(self) -> None:
         """Verify default timeout (600s), port, and OpenOCD flags."""
-        args = parse_args(["--board=veluza", "--ocd_chip_cfg=custom.cfg"])
+        args = parse_args(
+            [
+                "--board=veluza",
+                "--ocd_chip_cfg=custom.cfg",
+                "--ro",
+            ]
+        )
         self.assertEqual(args.board, "veluza")
         self.assertEqual(args.timeout, 600)
         self.assertEqual(args.port, 9999)
         self.assertEqual(args.ocd_chip_cfg, "custom.cfg")
         self.assertTrue(args.verify)
+        self.assertTrue(args.ro)
+        self.assertFalse(args.rw)
 
     @patch("flash.flash_ec.os.path.exists")
     def test_resolve_default_image(self, mock_exists: MagicMock) -> None:
