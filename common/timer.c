@@ -29,6 +29,7 @@ int timestamp_expired(timestamp_t deadline, const timestamp_t *now)
 	return ((int64_t)(now->val - deadline.val) >= 0);
 }
 
+#ifdef CONFIG_PLATFORM_EC_FINGERPRINT
 /*
  * For us < (2^31 - task scheduling latency)(~ 2147 sec), this function will
  * sleep for at least us, and no more than 2*us. As us approaches 2^32-1, the
@@ -47,6 +48,7 @@ int crec_usleep(unsigned int us)
 	}
 	return 0;
 }
+#endif /* CONFIG_PLATFORM_EC_FINGERPRINT */
 
 #ifdef CONFIG_ZTEST
 timestamp_t *get_time_mock;
@@ -100,13 +102,9 @@ __overridable uint32_t __hw_clock_source_read(void)
 void timer_print_info(void)
 {
 	timestamp_t t = get_time();
-	uint64_t deadline = (uint64_t)t.le.hi << 32 | __hw_clock_event_get();
-	uint64_t delta = deadline - t.val;
 
-	ccprintf("Time:     0x%016llx us, %4lld.%06lld s\n"
-		 "Deadline: 0x%016llx -> %4lld.%06lld s from now\n",
-		 t.val, t.val / USEC_PER_SEC, t.val % USEC_PER_SEC, deadline,
-		 delta / USEC_PER_SEC, delta % USEC_PER_SEC);
+	ccprintf("Time:     0x%016llx us, %4lld.%06lld s\n", t.val,
+		 t.val / USEC_PER_SEC, t.val % USEC_PER_SEC);
 	cflush();
 }
 
@@ -139,7 +137,7 @@ static int command_wait(int argc, const char **argv)
 	 * watchdog timeout. This is intended behaviour and is in fact used by
 	 * a FAFT test to check that the watchdog timer is working.
 	 */
-	udelay(i * 1000);
+	k_busy_wait(i * 1000);
 
 	return EC_SUCCESS;
 }

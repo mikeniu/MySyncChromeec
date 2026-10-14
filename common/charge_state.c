@@ -710,7 +710,7 @@ test_export_static int shutdown_on_critical_battery(void)
 				 * get there.
 				 */
 				if (!chipset_in_state(CHIPSET_STATE_ANY_OFF))
-					crec_sleep(1);
+					k_sleep(K_SECONDS(1));
 				CPRINTS("Hibernate due to critical battery");
 				cflush();
 				system_enter_hibernate(0, 0);
@@ -722,7 +722,7 @@ test_export_static int shutdown_on_critical_battery(void)
 			 * it's trying.
 			 */
 			if (!chipset_in_state(CHIPSET_STATE_ANY_OFF))
-				crec_sleep(1);
+				k_sleep(K_SECONDS(1));
 			CPRINTS("Cutoff due to critical battery");
 			cflush();
 			board_cut_off_battery();

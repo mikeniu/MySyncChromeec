@@ -166,7 +166,7 @@ void chipset_reset(enum chipset_shutdown_reason reason)
 	report_ap_reset(reason);
 
 	GPIO_SET_LEVEL(GPIO_SYS_RST_ODL, 0);
-	crec_usleep(SYS_RST_PULSE_LENGTH);
+	k_usleep(SYS_RST_PULSE_LENGTH);
 	GPIO_SET_LEVEL(GPIO_SYS_RST_ODL, 1);
 }
 
@@ -327,9 +327,9 @@ enum power_state power_handle_state(enum power_state state)
 
 		/* If PMIC is off, switch it on by pulsing PMIC enable. */
 		if (!(power_get_signals() & IN_PGOOD_PMIC)) {
-			crec_msleep(PMIC_EN_PULSE_MS);
+			k_msleep(PMIC_EN_PULSE_MS);
 			GPIO_SET_LEVEL(GPIO_EC_PMIC_EN_ODL, 0);
-			crec_msleep(PMIC_EN_PULSE_MS);
+			k_msleep(PMIC_EN_PULSE_MS);
 			GPIO_SET_LEVEL(GPIO_EC_PMIC_EN_ODL, 1);
 		}
 

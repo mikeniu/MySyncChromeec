@@ -415,7 +415,7 @@ static int init(struct motion_sensor_t *s)
 		ret = st_raw_read8(s->port, s->i2c_spi_addr_flags,
 				   LIS2DH_WHO_AM_I_REG, &tmp);
 		if (ret != EC_SUCCESS) {
-			udelay(10);
+			k_busy_wait(10);
 			count--;
 		} else {
 			break;

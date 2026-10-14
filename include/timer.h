@@ -13,6 +13,7 @@
 
 #include <sys/types.h>
 #else
+#include <zephyr/kernel.h>
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
 /* Data type for POSIX style clock() implementation */
@@ -51,18 +52,7 @@ typedef union {
  */
 int timestamp_expired(timestamp_t deadline, const timestamp_t *now);
 
-/**
- * Busy-wait.
- *
- * This may be called with interrupts disabled.
- *
- * Note that calling this with us>1000 may impact system performance; use
- * crec_usleep() for longer delays.
- *
- * @param us		Number of microseconds to delay.
- */
-void udelay(unsigned int us);
-
+#ifdef CONFIG_PLATFORM_EC_FINGERPRINT
 /**
  * Sleep.
  *
@@ -88,21 +78,7 @@ static inline void crec_msleep(unsigned int ms)
 {
 	crec_usleep(ms * MSEC);
 }
-
-/**
- * Sleep for seconds
- *
- * Otherwise the same as crec_usleep().
- *
- * @param sec		Number of seconds to sleep.
- * @return 0 if the requested time has elapsed, or the number of seconds left
- *   to sleep, if the call was interrupted by a signal handler.
- */
-static inline unsigned int crec_sleep(unsigned int sec)
-{
-	crec_usleep(sec * SECOND);
-	return 0;
-}
+#endif /* CONFIG_PLATFORM_EC_FINGERPRINT */
 
 /**
  * Get the current timestamp from the system timer.

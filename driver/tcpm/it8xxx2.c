@@ -201,7 +201,7 @@ static enum tcpc_transmit_complete it8xxx2_send_hw_reset(enum usbpd_port port)
 {
 	/* Send hard reset */
 	USBPD_SEND_HARD_RESET(port);
-	crec_usleep(MSEC);
+	k_usleep(MSEC);
 
 	if (!(IT83XX_USBPD_ISR(port) & USBPD_REG_MASK_HARD_RESET_TX_DONE))
 		return TCPC_TX_COMPLETE_FAILED;
@@ -215,7 +215,7 @@ it8xxx2_send_cable_reset(enum usbpd_port port)
 {
 	/* Send cable reset */
 	USBPD_SEND_CABLE_RESET(port);
-	crec_usleep(MSEC);
+	k_usleep(MSEC);
 
 	if (!(IT83XX_USBPD_ISR(port) & USBPD_REG_MASK_CABLE_RESET_TX_DONE))
 		return TCPC_TX_COMPLETE_FAILED;
@@ -227,7 +227,7 @@ it8xxx2_send_cable_reset(enum usbpd_port port)
 static void it8xxx2_send_bist_mode2_pattern(enum usbpd_port port)
 {
 	USBPD_ENABLE_SEND_BIST_MODE_2(port);
-	crec_usleep(PD_T_BIST_TRANSMIT);
+	k_usleep(PD_T_BIST_TRANSMIT);
 	USBPD_DISABLE_SEND_BIST_MODE_2(port);
 }
 
@@ -493,7 +493,7 @@ static int it8xxx2_tcpm_set_vconn(int port, int enable)
 			 * dropped below 3.3v (>500us) to avoid the potential
 			 * risk of voltage fed back into Vcore.
 			 */
-			udelay(IT83XX_USBPD_T_VCONN_BELOW_3_3V);
+			k_busy_wait(IT83XX_USBPD_T_VCONN_BELOW_3_3V);
 			/*
 			 * Since our cc are not Vconn SRC, enable cc analog
 			 * module (ex.UP/RD/DET/Tx/Rx) and disable 5v tolerant.

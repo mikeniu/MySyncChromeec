@@ -88,7 +88,7 @@ static int amd_fp6_mux_port0_write(const struct usb_mux *me, uint8_t write_val)
 		else if (port_status == AMD_FP6_MUX_PORT_CMD_TIMEOUT)
 			return EC_ERROR_TIMEOUT;
 		else if (port_status == AMD_FP6_MUX_PORT_CMD_BUSY)
-			crec_msleep(5);
+			k_msleep(5);
 		else
 			return EC_ERROR_UNKNOWN;
 	}

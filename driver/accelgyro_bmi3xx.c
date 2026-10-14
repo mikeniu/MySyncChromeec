@@ -674,7 +674,7 @@ static int get_calib_result(struct motion_sensor_t *s)
 
 	for (i = 0; i < 25; i++) {
 		/* A delay of 120ms is required to read this status register */
-		crec_msleep(OFFSET_UPDATE_DELAY);
+		k_msleep(OFFSET_UPDATE_DELAY);
 
 		/* Read the configuration from the feature engine register */
 		RETURN_ERROR(bmi3_read_n(s, BMI3_FEATURE_IO_1, reg_data, 4));
@@ -714,7 +714,7 @@ static int perform_calib(struct motion_sensor_t *s, int enable)
 	if (ret)
 		goto end_calib;
 
-	crec_msleep(FOC_DELAY);
+	k_msleep(FOC_DELAY);
 
 	switch (s->type) {
 	case MOTIONSENSE_TYPE_ACCEL:
@@ -1115,7 +1115,7 @@ static int init(struct motion_sensor_t *s)
 		RETURN_ERROR(bmi3_write_n(s, BMI3_REG_CMD, reg_data, 2));
 
 		/* Delay of 2ms after soft reset*/
-		crec_msleep(2);
+		k_msleep(2);
 
 		/* Enable feature engine bit */
 		reg_data[0] = BMI3_ENABLE;
