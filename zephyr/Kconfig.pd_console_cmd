@@ -14,7 +14,6 @@ if PLATFORM_EC_USB_PD_CONSOLE_CMD
 
 config PLATFORM_EC_CONSOLE_CMD_USB_PD_PE
 	bool "Console command: pe"
-	default y
 	help
 	  This command dumps information about the USB PD alternate mode options
 	  discovered from the partner device. It can be useful for debugging.
