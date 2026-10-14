@@ -453,6 +453,14 @@ static void check_reset_cause(void)
 			flags |= reset ? EC_RESET_FLAG_RESET_PIN :
 					 EC_RESET_FLAG_POWER_ON;
 #endif
+	} else {
+		/*
+		 * Scratch bit is set, so this is a warm reboot or sysjump
+		 * rather than a power-on or reset-pin restart. Clear any
+		 * stale INITIAL_PWR flag from BBRAM so RW does not stall in
+		 * gpio_pre_init() while the hardware watchdog is running.
+		 */
+		flags &= ~EC_RESET_FLAG_INITIAL_PWR;
 	}
 	chip_save_reset_flags(chip_flags);
 
