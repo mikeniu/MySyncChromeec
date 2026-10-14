@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c91fe934_efb0d930",
+        "filename": "util/flash/helpers.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T23:09:16Z",
+      "side": 1,
+      "message": "This construction can result in leading, trailing, or double separators if search_dirs contains empty strings or if PATH is unset. Consider: path_env \u003d os.pathsep.join(filter(None, search_dirs + [os.environ.get(\u0027PATH\u0027, \u0027\u0027)]))",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 0
+      },
+      "revId": "1e793eaf6980b5a692910082f7c3a64a3800f3eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75a2d092_d581224b",
+        "filename": "util/flash/helpers.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T23:09:16Z",
+      "side": 1,
+      "message": "The output of dump_fmap -e usually includes a header line (e.g., \u0027name offset size flags\u0027). While line 83 will filter it out based on the \u0027preserve\u0027 flag, it is cleaner to explicitly skip the header here (e.g., if line.startswith(\u0027name \u0027) or not line[0].isalnum()).",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 0
+      },
+      "revId": "1e793eaf6980b5a692910082f7c3a64a3800f3eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08456aa6_40e5a5af",
+        "filename": "util/flash/helpers.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T23:09:16Z",
+      "side": 1,
+      "message": "If futility fails for a single section, the check\u003dTrue will cause the entire flasher to crash. If FMAP preservation is \u0027best effort\u0027, you should wrap this in a try/except block. If it is mandatory, the error message should be more descriptive about how to skip it.",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 0
+      },
+      "revId": "1e793eaf6980b5a692910082f7c3a64a3800f3eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
