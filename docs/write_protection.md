@@ -11,30 +11,38 @@ so please edit or open a bug if something is not clear.
 ## RO and RW
 
 MCUs running the EC code have read-only (RO) and read-write (RW) firmware.
-Coming out of reset, the MCU boots into its RO firmware.
+Coming out of reset, the MCU always boots into its RO firmware.
 
-In the case of the EC, the RO firmware boots the host and asks it to verify a
-hash of the RW firmware (software sync). If the RW firmware is invalid, it is
-updated from a copy in the host's RW firmware.
+*   **Main Chromebook EC (EFS2 and Software Sync)**:
+    *   On modern boards with **Early Firmware Selection v2 (EFS2)**, the EC RO
+        firmware computes the SHA-256 hash of its RW firmware and asks the
+        Google Security Chip (GSC / Cr50 / Ti50) over UART to verify it against
+        a mirrored hash before powering on the host (AP). If valid, the EC
+        immediately jumps (`sysjump`) from RO to RW and powers on the AP.
+    *   During AP boot, Depthcharge performs **EC Software Sync**: if the EC's
+        RW hash does not match the expected hash bundled in the AP's RW
+        firmware, Depthcharge updates the mirrored hash (if using EFS2),
+        cold-resets the EC back into RO, flashes the updated EC RW image from
+        the AP's RW firmware, and boots into the new RW image.
+    *   See [EC Verified Boot, Software Sync, and Sysjump Flow] for the full
+        boot, OTA update, and recovery mode sequences.
+*   **Standalone MCUs (FPMCU / Detachable Bases)**:
+    *   The RO firmware uses an embedded public key (`RWSIG`) to validate the
+        RSA signature of the RW firmware. If the RW firmware is invalid, it does
+        not jump to the RW firmware.
 
-In the case of the FPMCU, the RO firmware uses the public key embedded in it to
-validate the signature of the RW firmware. If the RW firmware is invalid it does
-not jump to the RW firmware.
-
-Once the RW firmware is validated, the MCU jumps to it (without rebooting). The
-RO firmware is locked in the factory and is never changed. The RW firmware can
-be updated later by pushing a new system firmware containing an updated RW
-region.
+Once the RW firmware is validated, the MCU jumps to it without resetting
+hardware (`sysjump`). The RO firmware is locked in the factory and is never
+changed in the field.
 
 Note that both the RO and RW firmware regions are normally protected once write
-protect has been turned on.
+protect has been turned on:
 
-In the case of the EC, the RW region is unprotected at MCU boot until it has
-been verified by the host. The RW region is protected before the Linux kernel is
-loaded.
-
-In the case of the FPMCU, the RW region is protected before jumping the RO
-firmware jumps to it.
+*   In the case of the main EC, the RW region is protected and further sysjumps
+    are disabled (`EC_REBOOT_DISABLE_JUMP`) by Depthcharge before the OS kernel
+    is loaded.
+*   In the case of the FPMCU, the RW region is protected by RO before jumping
+    to RW.
 
 ## Hardware Write Protect {#hw_wp}
 
@@ -190,8 +198,27 @@ but leave `ro_at_boot` flag set.
 
 ## system_is_locked()
 
-The [`system_is_locked()`] function in the EC code returns false if the HW write
-protect GPIO is disabled, or the read-only firmware is not protected.
+The [`system_is_locked()`] function in the EC code returns false (`0`) if the HW
+write protect GPIO is deasserted or the read-only firmware is not protected
+(`EC_FLASH_PROTECT_RO_NOW` is unset), and true (`1`) on locked production
+devices.
+
+When `system_is_locked()` is true, the EC enforces strict runtime security
+invariants:
+
+*   **One-Way `RO -> RW` Sysjump**: [`system_run_image_copy_with_flags()`] and
+    [`validate_reboot_command()`] only permit jumping from `EC_IMAGE_RO` to an
+    `RW` image while `disable_jump == 0`. Jumping from `RW` back to `RO`
+    (`EC_REBOOT_JUMP_RO`) or jumping to arbitrary addresses is rejected with
+    `EC_ERROR_ACCESS_DENIED`; returning to `RO` from `RW` always requires a cold
+    hardware reset (`EC_REBOOT_COLD`).
+*   **MPU Lockdown**: When Depthcharge sends `EC_REBOOT_DISABLE_JUMP`
+    ([`system_disable_jump()`]), a locked EC enables the Memory Protection Unit
+    (`mpu_enable()`) to prevent code execution from data RAM or writes to code
+    RAM.
+*   **Console & Host Command Restrictions**: Sensitive debug console commands
+    (such as `rw`, `ww`, and arbitrary `sysjump`) and bootloader entry commands
+    are disabled or restricted when locked.
 
 One way this is used in the FPMCU source is to compile test or debug
 functionality into the firmware. Guarding the test functionality with
@@ -228,7 +255,11 @@ etc.) return an error if `EC_FLASH_PROTECT_ALL_NOW` is set.
 [Cr50 console]: https://chromium.googlesource.com/chromiumos/platform/ec/+/cr50_stab/docs/case_closed_debugging_gsc.md#consoles
 [Servo]: https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/HEAD/README.md
 [`OverrideWP`]: https://chromium.googlesource.com/chromiumos/platform/ec/+/cr50_stab/docs/case_closed_debugging_gsc.md
-[`system_is_locked()`]: https://chromium.googlesource.com/chromiumos/platform/ec/+/aaba1d5efd51082d143ce2ac64e6caf9cb14d5e5/common/system.c#195
+[`system_is_locked()`]: ../common/system.c
+[`system_run_image_copy_with_flags()`]: ../common/system.c
+[`validate_reboot_command()`]: ../common/system.c
+[`system_disable_jump()`]: ../common/system.c
+[EC Verified Boot, Software Sync, and Sysjump Flow]: ./verified_boot.md
 [wp_screw]: https://www.chromium.org/chromium-os/firmware-porting-guide/firmware-ec-write-protection
 [write_protect_gpio]: https://chromium.googlesource.com/chromiumos/platform/ec/+/aaba1d5efd51082d143ce2ac64e6caf9cb14d5e5/include/ec_commands.h#1599
 [SuzyQ]: https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/HEAD/docs/ccd.md#SuzyQ-SuzyQable

@@ -286,8 +286,18 @@ impossibility to create one but to avoid the negative side effects of having
 one: ie poor/unpredictable real-time behavior and possible leaks leading to a
 long-tail of failures.
 
--   TODO: talk about shared memory
--   TODO: where/how we store *panic* *memory* and *sysjump* *parameters*.
+### Preserved End-of-RAM (Panic Data and Jump Data)
+
+A reserved region at the end of RAM (`CONFIG_PRESERVED_END_OF_RAM_SIZE`) is left
+uninitialized across resets and sysjumps to store:
+
+-   `struct panic_data`: Captures exception registers and fault state across
+    reboots.
+-   `struct jump_data` and jump tags: Preserves reset flags and module state tags
+    across a `sysjump` between `RO` and `RW` images.
+
+See [Panic Handling in EC](./panic_data.md#memory-layout) for the exact memory
+layout and compatibility rules.
 
 ### Stacks
 
@@ -304,7 +314,30 @@ topic.)
 
 ## Firmware Code Organization and Multiple Copies
 
--   TODO: Details the classical RO / RW partitions and how we sysjump.
+EC flash is divided into a factory-locked Read-Only (`RO`) partition and an
+updatable Read-Write (`RW`) partition:
+
+-   **Cold Boot into `RO`**: On power-on or hardware reset, the MCU always boots
+    into `EC_RO`.
+-   **Transition to `RW` (`sysjump`)**: Once `EC_RW` is verified (either by
+    `EC_RO` communicating with the GSC via Early Firmware Selection v2, by AP
+    Software Sync in Depthcharge, or via `RWSIG` signature verification), `EC_RO`
+    jumps directly to the `EC_RW` reset vector via `system_run_image_copy()` ->
+    `jump_to_image()` in [`common/system.c`](../common/system.c) without
+    resetting hardware peripherals.
+-   **State Preservation (`HOOK_SYSJUMP`)**: Before jumping, the EC disables
+    interrupts, populates `struct jump_data`, and invokes `HOOK_SYSJUMP`
+    handlers so subsystems can save state tags via `system_add_jump_tag()` and
+    restore them in the new image via `system_get_jump_tag()`.
+-   **One-Way Transition in Production**: When write protection is enabled
+    (`system_is_locked()`), `sysjump` is strictly a one-way `RO -> RW`
+    transition, and further jumps are disabled (`system_disable_jump()`) before
+    the OS boots. Returning from `RW` to `RO` (for example, to update `EC_RW`
+    during Software Sync or enter manual recovery) always requires a cold
+    hardware reset (`EC_REBOOT_COLD`).
+
+For full details on EFS2, Software Sync, Recovery Mode, and sysjump security
+invariants, see [EC Verified Boot, Software Sync, and Sysjump Flow](./verified_boot.md).
 
 ## Power Management
 

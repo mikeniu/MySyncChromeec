@@ -75,6 +75,14 @@
     A replacement of the current UART-based console which moves much of the code
     off the EC into a host tool, reducing the amount of flash space required.
 
+*   **EFS2 - Early Firmware Selection v2** {#efs2}
+
+    Verified boot mechanism where the [EC](#ec) `RO` firmware computes a
+    SHA-256 digest of its `EC_RW` image on power-on, sends it to the [GSC](#gsc)
+    over UART prior to [AP](#ap) power-on, and [sysjumps](#sysjump) to `RW`
+    early if verified. See [Verified Boot](./verified_boot.md#efs2) for more
+    details.
+
 *   **E-Mark - Electronically Marked Cable** {#emark}
 
     See the [USB-C documentation](./usb-c.md#emark) for more details.
@@ -107,6 +115,13 @@
     used to enable/disable power rails, drive reset signals, and receive
     interrupts from devices connected to the EC. GPIOs may also be connected to
     [I/O expanders](#ioexpander).
+
+*   **GSC - Google Security Chip** {#gsc}
+
+    Hardware root-of-trust security microcontroller (such as Cr50 or Ti50) that
+    manages hardware write protection, Case-Closed Debugging (CCD), and stores
+    the verified `EC_RW` hash (`Hmir`) in non-volatile `secdata` for
+    [EFS2](#efs2) verification.
 
 *   **GYRO - Gyroscope** {#gyro}
 
@@ -198,6 +213,14 @@
     [chromium.org documentation](https://www.chromium.org/for-testers/saft) for
     more details.
 
+*   **Software Sync** {#software-sync}
+
+    Boot-time verified boot mechanism (`vb2api_ec_sync`) where the [AP](#ap)
+    firmware (`depthcharge`) verifies that the [EC](#ec) is running the expected
+    `EC_RW` image bundled inside the active AP `FW_MAIN_A` or `FW_MAIN_B` slot,
+    and updates `EC_RW` over the host command bus if a mismatch is detected. See
+    [Verified Boot](./verified_boot.md) for more details.
+
 *   **SHI - SPI Host Interface** {#shi}
 
     [SPI](#spi) host interface used for communication between the AP and the EC.
@@ -233,6 +256,14 @@
 *   **SVDM - Structured Vendor Defined Messages** {#svdm}
 
     See the [USB-C documentation](./usb-c.md#svdm) for more details.
+
+*   **Sysjump** {#sysjump}
+
+    Warm transition (`jump_to_image`) from one [EC](#ec) firmware copy to
+    another (in production, strictly `RO -> RW`) without resetting the EC
+    hardware or dropping board power rails. State across the jump is preserved
+    in upper RAM via `struct jump_data` and `HOOK_SYSJUMP`. See
+    [Verified Boot](./verified_boot.md#sysjump-mechanics) for more details.
 
 *   **TCPC - USB Type-C Port Controller** {#tcpc}
 

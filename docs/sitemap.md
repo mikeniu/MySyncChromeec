@@ -63,6 +63,7 @@
 
 ## Verified Boot
 
+*   [EC Verified Boot, Software Sync, and Sysjump](./verified_boot.md)
 *   [Detachable Base Verified Boot](./detachable_base_verified_boot.md)
 
 ## Zephyr
