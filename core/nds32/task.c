@@ -416,6 +416,17 @@ void end_irq_handler(void)
 	/* restore r0 and fp */
 	asm volatile("lmw.bim $r0, [$sp], $r0, 8");
 #endif
+
+#ifdef CHIP_FAMILY_IT83XX
+	volatile uint8_t __read_reg_unused __unused;
+
+	/*
+	 * Since the CPU and EC bus clocks are not synchronized
+	 * (48 MHz vs. 8 MHz), this barrier ensures that all EC register writes
+	 * are completed before returning from the ISR.
+	 */
+	__read_reg_unused = IT83XX_INTC_AIVCT;
+#endif
 }
 
 static uint32_t __ram_code __wait_evt(int timeout_us, task_id_t resched)
