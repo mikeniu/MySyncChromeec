@@ -360,7 +360,6 @@ static struct bit_name event_bit_names[] = {
 	{ TASK_EVENT_ADC_DONE, "ADC_DONE" },
 	{ TASK_EVENT_RESET_DONE, "RESET_DONE" },
 	{ TASK_EVENT_WAKE, "WAKE" },
-	{ TASK_EVENT_TIMER, "TIMER" },
 	{ PD_EVENT_TX, "TX" },
 	{ PD_EVENT_CC, "CC" },
 	{ PD_EVENT_TCPC_RESET, "TCPC_RESET" },
@@ -1680,7 +1679,7 @@ static bool in_ct_state(int port)
 void tc_event_check(int port, int evt)
 {
 #ifdef DEBUG_PRINT_FLAG_AND_EVENT_NAMES
-	if (evt != TASK_EVENT_TIMER)
+	if (evt != 0)
 		print_bits(port, "Event", evt, event_bit_names,
 			   ARRAY_SIZE(event_bit_names));
 #endif

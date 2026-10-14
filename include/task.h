@@ -58,11 +58,6 @@ extern "C" {
 #define TASK_EVENT_RESET_DONE BIT(28)
 /* task_wake() called on task */
 #define TASK_EVENT_WAKE BIT(29)
-/*
- * Timer expired.  For example, task_wait_event() timed out before receiving
- * another event.
- */
-#define TASK_EVENT_TIMER (1U << 31)
 
 /* Maximum time for task_wait_event() */
 #define TASK_MAX_WAIT_US 0x7fffffff
@@ -154,10 +149,10 @@ bool in_deferred_context(void);
  * order.  Automatically clears the bitmap of received events before returning
  * the events which are set.
  *
- * @param timeout_us	If > 0, sets a timer to produce the TASK_EVENT_TIMER
- *			event after the specified micro-second duration.
+ * @param timeout_us	If > 0, sets a timer to wake the task after the
+ *			specified micro-second duration.
  *
- * @return The bitmap of received events.
+ * @return The bitmap of received events, or 0 on timeout.
  */
 uint32_t task_wait_event(int timeout_us);
 
@@ -171,11 +166,10 @@ uint32_t task_wait_event(int timeout_us);
  *
  * @param event_mask	Bitmap of task events to wait for.
  *
- * @param timeout_us	If > 0, sets a timer to produce the TASK_EVENT_TIMER
- *			event after the specified micro-second duration.
+ * @param timeout_us	If > 0, sets a timer to wake the task after the
+ *			specified micro-second duration.
  *
- * @return		The bitmap of received events. Includes
- *			TASK_EVENT_TIMER if the timeout is reached.
+ * @return		The bitmap of received events, or 0 on timeout.
  */
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
 

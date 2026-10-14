@@ -422,7 +422,7 @@ extern "C" void fp_task(void)
 			} else {
 				fp_sensor_low_power();
 			}
-		} else if (evt & (TASK_EVENT_SENSOR_IRQ | TASK_EVENT_TIMER)) {
+		} else if ((evt & TASK_EVENT_SENSOR_IRQ) || evt == 0) {
 			overall_t0 = get_time();
 			/*
 			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
@@ -430,7 +430,7 @@ extern "C" void fp_task(void)
 			 */
 #ifdef CONFIG_ZEPHYR
 			/* On timeout, put sensor into idle state. */
-			if (evt & TASK_EVENT_TIMER)
+			if (evt == 0)
 				fp_idle();
 #else
 			gpio_disable_interrupt(GPIO_FPS_INT);
