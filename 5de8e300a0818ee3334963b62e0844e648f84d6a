@@ -46,6 +46,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "28a243c1_0a8e328d",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T10:52:47Z",
+      "side": 1,
+      "message": "That\u0027s true. Is a consequence of differences in driver in Zephyr vs legacy.\n\n\u003e (after which the ISR disables the IRQ and subsequent checks fall back to the 100ms timer).\n\nIs that true? I don\u0027t see how the IRQs are disabled.",
+      "parentUuid": "6da06cd5_a5ecb784",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 388,
+        "endChar": 9999
+      },
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5960447c_b8272e22",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 1
@@ -64,6 +88,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c951a60a_2ae26275",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T10:52:47Z",
+      "side": 1,
+      "message": "\u003e Does fp_configure_detect() need to be called again when FP_MODE_FINGER_UP is still active after a poll (or if FP_MODE_ANY_CAPTURE | FP_MODE_FINGER_UP were set together and fp_process_finger() just captured an image and cleared FP_MODE_ANY_CAPTURE)?\n\nThis was never a case and it\u0027s not a subject of this change.\n\n\u003e report FINGER_NONE prematurely unless the Egis driver/library is also updated?\n\nThis is not a subject of this change. It addresses incorrect state of sensor while checking finger presence.",
+      "parentUuid": "5960447c_b8272e22",
+      "range": {
+        "startLine": 471,
+        "startChar": 0,
+        "endLine": 483,
+        "endChar": 9999
+      },
       "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -88,6 +136,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5819b55b_50fb5327",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T10:52:47Z",
+      "side": 1,
+      "message": "Fixed the fpc1145 driver and updated the code.",
+      "parentUuid": "08ffbd7b_86184ce2",
+      "range": {
+        "startLine": 488,
+        "startChar": 0,
+        "endLine": 496,
+        "endChar": 9999
+      },
       "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -142,6 +214,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7304cac3_2e45c939",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T10:52:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46e64f71_21e82fe5",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 9999
+      },
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "42800bc4_96aafb4e",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_finger_presence.cc",
         "patchSetId": 1
@@ -178,6 +274,30 @@
       "side": 1,
       "message": "Marked as unresolved.",
       "parentUuid": "42800bc4_96aafb4e",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9999
+      },
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cda9e8ce_9a28283d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_finger_presence.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-14T10:52:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9969e997_f878f3a1",
       "range": {
         "startLine": 175,
         "startChar": 0,
