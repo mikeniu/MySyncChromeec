@@ -24,6 +24,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67d82760_48288ad5",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1122,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-14T17:46:32Z",
+      "side": 1,
+      "message": "Done. Added synchronized helper methods (`has_symbol()`, `is_bool_or_tristate()`, `get_symbol_value()`, `is_mandatory_symbol()`) on `KconfigDependencyResolver` so all `self.kconf` access is serialized under `self._lock`.",
+      "parentUuid": "b0c54076_30c664e3",
+      "range": {
+        "startLine": 1122,
+        "startChar": 0,
+        "endLine": 1122,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "4c40c67bc4d9d1b9be8fa328351b063eb65c4e70",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0212c9d2_9a74392f",
@@ -43,6 +68,31 @@
         "endLine": 1435,
         "endChar": 0
       },
+      "revId": "4c40c67bc4d9d1b9be8fa328351b063eb65c4e70",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ae3f1ef_8e1a389d",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1435,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-14T17:46:32Z",
+      "side": 1,
+      "message": "Done. Replaced direct `self.resolver.kconf.syms[repair_sym].str_value` access with `self.resolver.get_symbol_value(repair_sym, default\u003d\"y\")`, which acquires `self._lock`.",
+      "parentUuid": "0212c9d2_9a74392f",
+      "range": {
+        "startLine": 1435,
+        "startChar": 0,
+        "endLine": 1435,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "4c40c67bc4d9d1b9be8fa328351b063eb65c4e70",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
