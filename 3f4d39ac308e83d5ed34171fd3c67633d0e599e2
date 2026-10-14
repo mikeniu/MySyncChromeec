@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "830c9b7b_96fbcc01",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:37:09Z",
+      "side": 1,
+      "message": "Consider moving the logger message and the sleep inside the dry-run check. Since reading this control is what triggers the waveform, these actions are misleading or unnecessary when in dry-run mode. This also makes the dry-run faster.",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 0
+      },
+      "revId": "3f4d39ac308e83d5ed34171fd3c67633d0e599e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18153657_1f242674",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:37:09Z",
+      "side": 1,
+      "message": "gsc_",
+      "range": {
+        "startLine": 70,
+        "startChar": 28,
+        "endLine": 70,
+        "endChar": 41
+      },
+      "revId": "3f4d39ac308e83d5ed34171fd3c67633d0e599e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
