@@ -15,6 +15,7 @@ from flash.flasher_base import BaseEcFlasher
 from flash.helpers import EC_DIR
 from flash.helpers import locate_tool
 from flash.helpers import preserve_sections_with_cur_image
+from flash.helpers import resolve_image_writable_ranges
 from flash.servo_utils import ServoError
 
 
@@ -133,7 +134,64 @@ class RtkFlasher(BaseEcFlasher):
         with tempfile.TemporaryDirectory(prefix="flash_ec.rtk.") as temp_dir:
             target_img = self.args.image
             img_size = os.path.getsize(target_img)
-            if not getattr(self.args, "no_preserve", False):
+            no_preserve = bool(getattr(self.args, "no_preserve", False))
+            areas, _, writable_ranges = resolve_image_writable_ranges(
+                target_img,
+                ro_only=bool(getattr(self.args, "ro", False)),
+                rw_only=bool(getattr(self.args, "rw", False)),
+                no_preserve=no_preserve,
+            )
+            if writable_ranges and writable_ranges != [(0, img_size)]:
+                img_bytes = b""
+                if not self.args.dry_run:
+                    with open(target_img, "rb") as img_f:
+                        img_bytes = img_f.read()
+                for start, end in writable_ranges:
+                    slice_path = os.path.join(
+                        temp_dir, f"ec.slice.{start:x}.bin"
+                    )
+                    if not self.args.dry_run:
+                        with open(slice_path, "wb") as slice_f:
+                            slice_f.write(img_bytes[start:end])
+                    slice_cmd = [
+                        rtkupdate_bin,
+                        "--method=flash",
+                        f"--spi_start=0x{start:08x}",
+                        f"--file={slice_path}",
+                        f"--uart_device={pty}",
+                    ]
+                    logger.info(
+                        "Programming RTK EC slice [0x%x:0x%x]: %s",
+                        start,
+                        end,
+                        " ".join(slice_cmd),
+                    )
+                    if not self.args.dry_run:
+                        subprocess.run(slice_cmd, check=True)
+                if getattr(self.args, "verify", True):
+                    logger.info("Verifying RTK EC firmware...")
+                    read_verify = os.path.join(temp_dir, "ec.read.bin")
+                    ver_cmd = [
+                        rtkupdate_bin,
+                        "--method=read_bin",
+                        "--spi_start=0x00000000",
+                        f"--file={read_verify}",
+                        f"--uart_device={pty}",
+                        f"--bin_length=0x{img_size:x}",
+                    ]
+                    if not self.args.dry_run:
+                        subprocess.run(ver_cmd, check=True)
+                        with open(read_verify, "rb") as f_actual:
+                            actual_bytes = f_actual.read()
+                        for start, end in writable_ranges:
+                            if img_bytes[start:end] != actual_bytes[start:end]:
+                                raise RuntimeError(
+                                    "RTK firmware verification failed! "
+                                    "Files do not match."
+                                )
+                return
+
+            if not no_preserve and not areas:
                 cur_img = os.path.join(temp_dir, "ec.cur.bin")
                 read_cmd = [
                     rtkupdate_bin,

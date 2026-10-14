@@ -66,6 +66,8 @@ class TestNpcxUutFlasher(unittest.TestCase):
         self.args.read = None
         self.args.verify = False
         self.args.no_preserve = True
+        self.args.ro = False
+        self.args.rw = False
         self.args.verbose = False
         self.args.dry_run = False
         self.args.offset = 0
@@ -126,6 +128,82 @@ class TestNpcxUutFlasher(unittest.TestCase):
                 ),
             ]
         )
+
+    @patch(
+        "flash.npcx_flasher.resolve_image_writable_ranges",
+        return_value=(
+            {"CBI": MagicMock(offset=0x3E000, size=0x1000)},
+            0x80000,
+            [(0, 0x3E000), (0x3F000, 0x80000)],
+        ),
+    )
+    @patch("flash.npcx_flasher.preserve_sections_with_cur_image")
+    @patch("os.path.isfile", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    @patch(
+        "flash.npcx_flasher.locate_tool",
+        return_value="/mock/uartupdatetool",
+    )
+    @patch("subprocess.run")
+    def test_execute_flash_write_skips_cbi_via_slices(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_isfile: MagicMock,
+        mock_preserve: MagicMock,
+        _mock_resolve: MagicMock,
+    ) -> None:
+        """Verify NpcxUutFlasher writes slices around CBI without reading it."""
+        self.args.no_preserve = False
+        self.servo.get.return_value = "/dev/pts/3"
+        with patch("builtins.open", unittest.mock.mock_open(read_data=b"\xff")):
+            self.flasher.execute_flash()
+
+        mock_preserve.assert_not_called()
+        write_calls = [
+            c.args[0]
+            for c in mock_run.call_args_list
+            if "--auto" in c.args[0] and "--opr=rd" not in c.args[0]
+        ]
+        self.assertEqual(len(write_calls), 2)
+        self.assertIn("--offset=0", write_calls[0])
+        self.assertIn(f"--offset={0x3F000}", write_calls[1])
+
+    @patch(
+        "flash.npcx_flasher.resolve_image_writable_ranges",
+        return_value=(
+            {"EC_RO": MagicMock(offset=0, size=0x40000)},
+            0x80000,
+            [(0, 0x80000)],
+        ),
+    )
+    @patch("os.path.isfile", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    @patch(
+        "flash.npcx_flasher.locate_tool",
+        return_value="/mock/uartupdatetool",
+    )
+    @patch("subprocess.run")
+    def test_execute_flash_writes_whole_image_when_nothing_to_skip(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_isfile: MagicMock,
+        _mock_resolve: MagicMock,
+    ) -> None:
+        """Write the whole image if it has an FMAP but nothing to skip."""
+        self.args.no_preserve = False
+        self.servo.get.return_value = "/dev/pts/3"
+        self.flasher.execute_flash()
+
+        write_calls = [
+            c.args[0] for c in mock_run.call_args_list if "--auto" in c.args[0]
+        ]
+        self.assertEqual(len(write_calls), 1)
+        self.assertIn("--offset=0", write_calls[0])
+        self.assertIn("--file=/tmp/ec.bin", write_calls[0])
 
 
 class TestNpcxJtagFlasher(unittest.TestCase):

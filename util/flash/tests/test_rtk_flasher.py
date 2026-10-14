@@ -31,6 +31,8 @@ class TestRtkFlasher(unittest.TestCase):
         self.args.read = None
         self.args.verify = False
         self.args.no_preserve = True
+        self.args.ro = False
+        self.args.rw = False
         self.args.dry_run = False
         self.flasher = RtkFlasher(self.servo, self.args)
 
@@ -76,6 +78,10 @@ class TestRtkFlasher(unittest.TestCase):
         )
 
     @patch(
+        "flash.rtk_flasher.resolve_image_writable_ranges",
+        return_value=({}, 0, []),
+    )
+    @patch(
         "flash.rtk_flasher.preserve_sections_with_cur_image",
         return_value=False,
     )
@@ -100,6 +106,7 @@ class TestRtkFlasher(unittest.TestCase):
         _mock_file: MagicMock,
         _mock_copy: MagicMock,
         _mock_preserve: MagicMock,
+        _mock_resolve: MagicMock,
     ) -> None:
         """Read back only the image size when preserving and verifying."""
         self.args.no_preserve = False
@@ -162,6 +169,91 @@ class TestRtkFlasher(unittest.TestCase):
                     check=True,
                 ),
             ]
+        )
+
+    @patch(
+        "flash.rtk_flasher.resolve_image_writable_ranges",
+        return_value=(
+            {"CBI": MagicMock(offset=0x50000, size=0x1000)},
+            0x100000,
+            [(0, 0x50000), (0x51000, 0x100000)],
+        ),
+    )
+    @patch("flash.rtk_flasher.preserve_sections_with_cur_image")
+    @patch("os.path.getsize", return_value=0x100000)
+    @patch("os.path.isfile", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    @patch("flash.rtk_flasher.locate_tool", return_value="/mock/rtkupdate")
+    @patch("subprocess.run")
+    def test_execute_flash_write_skips_cbi_via_slices(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_isfile: MagicMock,
+        _mock_getsize: MagicMock,
+        mock_preserve: MagicMock,
+        _mock_resolve: MagicMock,
+    ) -> None:
+        """Verify RtkFlasher writes slices around CBI without reading it."""
+        self.args.no_preserve = False
+        self.servo.get.return_value = "/dev/pts/6"
+        with patch("builtins.open", mock_open(read_data=b"\xff")):
+            self.flasher.execute_flash()
+
+        mock_preserve.assert_not_called()
+        flash_calls = [
+            c.args[0]
+            for c in mock_run.call_args_list
+            if "--method=flash" in c.args[0]
+        ]
+        self.assertEqual(len(flash_calls), 2)
+        self.assertIn("--spi_start=0x00000000", flash_calls[0])
+        self.assertIn("--spi_start=0x00051000", flash_calls[1])
+
+    @patch(
+        "flash.rtk_flasher.resolve_image_writable_ranges",
+        return_value=(
+            {"EC_RO": MagicMock(offset=0, size=0x80000)},
+            0x100000,
+            [(0, 0x100000)],
+        ),
+    )
+    @patch("os.path.getsize", return_value=0x100000)
+    @patch("os.path.isfile", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    @patch("flash.rtk_flasher.locate_tool", return_value="/mock/rtkupdate")
+    @patch("subprocess.run")
+    def test_execute_flash_writes_whole_image_when_nothing_to_skip(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_isfile: MagicMock,
+        _mock_getsize: MagicMock,
+        _mock_resolve: MagicMock,
+    ) -> None:
+        """Write the whole image if it has an FMAP but nothing to skip."""
+        self.args.no_preserve = False
+        self.servo.get.return_value = "/dev/pts/6"
+        self.flasher.execute_flash()
+
+        flash_calls = [
+            c.args[0]
+            for c in mock_run.call_args_list
+            if "--method=flash" in c.args[0]
+        ]
+        self.assertEqual(
+            flash_calls,
+            [
+                [
+                    "/mock/rtkupdate",
+                    "--method=flash",
+                    "--spi_start=0x00000000",
+                    "--file=/tmp/ec.bin",
+                    "--uart_device=/dev/pts/6",
+                ]
+            ],
         )
 
 
