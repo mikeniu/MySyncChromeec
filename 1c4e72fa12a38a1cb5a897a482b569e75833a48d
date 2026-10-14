@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dde5b251_f014b1fc",
+        "filename": "util/iteflash.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 880,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:47:14Z",
+      "side": 1,
+      "message": "The function always returns 0 even if a write/read fails (though it does print a message). Since you\u0027re accumulating errors in `ret`, consider returning `ret \u003c 0 ? -EIO : 0` at the end for consistency with other functions in this file.",
+      "range": {
+        "startLine": 880,
+        "startChar": 0,
+        "endLine": 880,
+        "endChar": 0
+      },
+      "revId": "1c4e72fa12a38a1cb5a897a482b569e75833a48d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea79b2a8_3c859809",
+        "filename": "util/iteflash.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 2437,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T22:47:14Z",
+      "side": 1,
+      "message": "It seems \u0027n\u0027 is missing from the short options string here (and in the previous version), so \u0027-n\u0027 won\u0027t work as expected. You might want to add it since you\u0027re already updating this line.",
+      "range": {
+        "startLine": 2437,
+        "startChar": 0,
+        "endLine": 2437,
+        "endChar": 0
+      },
+      "revId": "1c4e72fa12a38a1cb5a897a482b569e75833a48d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
