@@ -244,10 +244,8 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 	const k_timeout_t timeout = (timeout_us == -1) ? K_FOREVER :
 							 K_USEC(timeout_us);
 	struct k_event *ev = get_thread_event(k_current_get());
-	uint32_t events;
 
-	events = k_event_wait_safe(ev, event_mask, false, timeout);
-	return events ? events : TASK_EVENT_TIMER;
+	return k_event_wait_safe(ev, event_mask, false, timeout);
 }
 #ifdef TEST_BUILD
 struct k_event *task_get_event(task_id_t cros_task_id)

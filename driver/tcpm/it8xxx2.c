@@ -589,7 +589,7 @@ static enum tcpc_transmit_complete it8xxx2_tx_data(enum usbpd_port port,
 		 * 3) If port partner doesn't respond GoodCRC.
 		 * 4) If Tx timeout.
 		 */
-		if (tx_error_status[port] || (evt & TASK_EVENT_TIMER)) {
+		if (tx_error_status[port] || evt == 0) {
 			if (tx_error_status[port] &
 			    USBPD_REG_MASK_TX_NOT_EN_STAT) {
 				CPRINTS("p%d TxErr: Tx EN and resend", port);
@@ -617,7 +617,7 @@ static enum tcpc_transmit_complete it8xxx2_tx_data(enum usbpd_port port,
 				 */
 				restore_sop_header_pwr_data_role(port, type);
 				return TCPC_TX_COMPLETE_FAILED;
-			} else if (evt & TASK_EVENT_TIMER) {
+			} else if (evt == 0) {
 				CPRINTS("p%d TxErr: Timeout", port);
 				restore_sop_header_pwr_data_role(port, type);
 				return TCPC_TX_UNSET;

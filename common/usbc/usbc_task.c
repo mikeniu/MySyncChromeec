@@ -119,7 +119,7 @@ static bool pd_task_loop(int port)
 	const uint32_t evt = task_wait_event(pd_task_timeout(port));
 
 	/* Manage expired PD Timers on timeouts */
-	if (evt & TASK_EVENT_TIMER)
+	if (evt == 0)
 		pd_timer_manage_expired(port);
 
 	/*
