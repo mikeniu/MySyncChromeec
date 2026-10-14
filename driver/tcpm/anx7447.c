@@ -885,7 +885,7 @@ static void anx7447_dump_registers(int port)
 static int anx7447_get_chip_info(int port, int live,
 				 struct ec_response_pd_chip_info_v1 *chip_info)
 {
-	int main_version = 0x0, build_version = 0x0;
+	int main_version = 0x0;
 
 	RETURN_ERROR(tcpci_get_chip_info(port, live, chip_info));
 
@@ -902,15 +902,12 @@ static int anx7447_get_chip_info(int port, int live,
 
 		RETURN_ERROR(anx7447_reg_read(
 			port, ANX7447_REG_OCM_MAIN_VERSION, &main_version));
-		RETURN_ERROR(anx7447_reg_read(
-			port, ANX7447_REG_OCM_BUILD_VERSION, &build_version));
+		chip_info->fw_version_number = main_version;
 	}
-
-	chip_info->fw_version_number = (main_version << 8) | build_version;
 
 	/* The minimum OCM firmware version to support FRS. */
 	if (IS_ENABLED(CONFIG_USB_PD_FRS))
-		chip_info->min_req_fw_version_number = 0x0115;
+		chip_info->min_req_fw_version_number = 0x01;
 
 	return EC_SUCCESS;
 }
