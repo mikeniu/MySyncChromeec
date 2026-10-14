@@ -12,7 +12,9 @@ import tempfile
 import time
 
 from flash.flasher_base import BaseEcFlasher
+from flash.helpers import get_preserve_ranges
 from flash.helpers import locate_tool
+from flash.helpers import parse_fmap_areas
 from flash.helpers import preserve_sections_with_cur_image
 from flash.servo_utils import ServoError
 
@@ -184,26 +186,35 @@ class IteI2cFlasher(_IteBaseFlasher):
             prefix="flash_ec.ite_i2c."
         ) as temp_dir:
             target_img = str(self.args.image)
+            skip_args = []
             if not getattr(self.args, "no_preserve", False):
-                cur_img = os.path.join(temp_dir, "ec.cur.bin")
-                read_cmd = cmd + [f"--read={cur_img}"]
-                logger.info(
-                    "Reading current image via iteflash to preserve "
-                    "FMAP sections..."
-                )
-                if not self.args.dry_run:
-                    subprocess.run(read_cmd, check=True)
-                    temp_new = os.path.join(temp_dir, "ec.new.cpy.bin")
-                    shutil.copyfile(target_img, temp_new)
-                    if preserve_sections_with_cur_image(
-                        cur_img, temp_new, temp_dir
-                    ):
-                        target_img = temp_new
-                    if self.servo and controller == "c2d2":
-                        self.servo.set("gsc_ec_reset", "on")
-                    self._enter_dfu_mode()
+                areas = parse_fmap_areas(target_img)
+                preserve_ranges = get_preserve_ranges(target_img, areas=areas)
+                if preserve_ranges:
+                    for start, end in preserve_ranges:
+                        skip_args.append(
+                            f"--skip-range=0x{start:x}:0x{end - start:x}"
+                        )
+                elif not areas:
+                    cur_img = os.path.join(temp_dir, "ec.cur.bin")
+                    read_cmd = cmd + [f"--read={cur_img}"]
+                    logger.info(
+                        "Reading current image via iteflash to preserve "
+                        "FMAP sections..."
+                    )
+                    if not self.args.dry_run:
+                        subprocess.run(read_cmd, check=True)
+                        temp_new = os.path.join(temp_dir, "ec.new.cpy.bin")
+                        shutil.copyfile(target_img, temp_new)
+                        if preserve_sections_with_cur_image(
+                            cur_img, temp_new, temp_dir
+                        ):
+                            target_img = temp_new
+                        if self.servo and controller == "c2d2":
+                            self.servo.set("gsc_ec_reset", "on")
+                        self._enter_dfu_mode()
 
-            write_cmd = cmd + ["--erase", f"--write={target_img}"]
+            write_cmd = cmd + skip_args + ["--erase", f"--write={target_img}"]
             if not getattr(self.args, "verify", True):
                 write_cmd.append("--noverify")
 
@@ -339,23 +350,32 @@ class IteUartFlasher(_IteBaseFlasher):
             prefix="flash_ec.ite_uart."
         ) as temp_dir:
             target_img = str(self.args.image)
+            skip_args = []
             if not getattr(self.args, "no_preserve", False):
-                cur_img = os.path.join(temp_dir, "ec.cur.bin")
-                read_cmd = base_cmd + ["-r", cur_img]
-                logger.info(
-                    "Reading current image via itecomdbgr to preserve "
-                    "FMAP sections..."
-                )
-                if not self.args.dry_run:
-                    subprocess.run(read_cmd, check=True)
-                    temp_new = os.path.join(temp_dir, "ec.new.cpy.bin")
-                    shutil.copyfile(target_img, temp_new)
-                    if preserve_sections_with_cur_image(
-                        cur_img, temp_new, temp_dir
-                    ):
-                        target_img = temp_new
+                areas = parse_fmap_areas(target_img)
+                preserve_ranges = get_preserve_ranges(target_img, areas=areas)
+                if preserve_ranges:
+                    for start, end in preserve_ranges:
+                        skip_args.extend(
+                            ["-S", f"0x{start:x}", f"0x{end - start:x}"]
+                        )
+                elif not areas:
+                    cur_img = os.path.join(temp_dir, "ec.cur.bin")
+                    read_cmd = base_cmd + ["-r", cur_img]
+                    logger.info(
+                        "Reading current image via itecomdbgr to preserve "
+                        "FMAP sections..."
+                    )
+                    if not self.args.dry_run:
+                        subprocess.run(read_cmd, check=True)
+                        temp_new = os.path.join(temp_dir, "ec.new.cpy.bin")
+                        shutil.copyfile(target_img, temp_new)
+                        if preserve_sections_with_cur_image(
+                            cur_img, temp_new, temp_dir
+                        ):
+                            target_img = temp_new
 
-            write_cmd = base_cmd + ["-f", target_img]
+            write_cmd = base_cmd + skip_args + ["-f", target_img]
             if not getattr(self.args, "verify", True):
                 write_cmd.append("-n")
 

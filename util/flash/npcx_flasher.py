@@ -17,6 +17,7 @@ from flash.flashrom_flasher import FlashromFlasher
 from flash.helpers import EC_DIR
 from flash.helpers import locate_tool
 from flash.helpers import preserve_sections_with_cur_image
+from flash.helpers import resolve_image_writable_ranges
 from flash.servo_utils import ServoError
 
 
@@ -183,8 +184,65 @@ class NpcxUutFlasher(BaseEcFlasher):
             prefix="flash_ec.npcx_uut."
         ) as temp_dir:
             target_img = self.args.image
+            no_preserve = bool(getattr(self.args, "no_preserve", False))
+            ro_only = bool(getattr(self.args, "ro", False))
+            rw_only = bool(getattr(self.args, "rw", False))
 
-            if not getattr(self.args, "no_preserve", False):
+            areas, img_size, writable_ranges = resolve_image_writable_ranges(
+                target_img,
+                ro_only=ro_only,
+                rw_only=rw_only,
+                no_preserve=no_preserve,
+            )
+            if writable_ranges and writable_ranges != [(0, img_size)]:
+                img_bytes = b""
+                if not self.args.dry_run:
+                    with open(target_img, "rb") as img_f:
+                        img_bytes = img_f.read()
+                for start, end in writable_ranges:
+                    slice_path = os.path.join(
+                        temp_dir, f"ec.slice.{start:x}.bin"
+                    )
+                    if not self.args.dry_run:
+                        with open(slice_path, "wb") as slice_f:
+                            slice_f.write(img_bytes[start:end])
+                    slice_cmd = base_args + [
+                        "--auto",
+                        f"--offset={self.args.offset + start}",
+                        f"--file={slice_path}",
+                    ]
+                    logger.info(
+                        "Programming EC slice [0x%x:0x%x] using UUT: %s",
+                        start,
+                        end,
+                        " ".join(slice_cmd),
+                    )
+                    if not self.args.dry_run:
+                        subprocess.run(slice_cmd, check=True)
+                if getattr(self.args, "verify", True):
+                    logger.info("Verifying EC firmware using UUT...")
+                    read_verify = os.path.join(temp_dir, "ec.verify.bin")
+                    ver_cmd = base_args + [
+                        "--read-flash",
+                        f"--file={read_verify}",
+                    ]
+                    if not self.args.dry_run:
+                        subprocess.run(ver_cmd, check=True)
+                        with open(read_verify, "rb") as f_actual:
+                            actual_bytes = f_actual.read()
+                        for start, end in writable_ranges:
+                            off = self.args.offset + start
+                            if (
+                                img_bytes[start:end]
+                                != actual_bytes[off : off + (end - start)]
+                            ):
+                                raise RuntimeError(
+                                    "UUT firmware verification failed! "
+                                    "Files do not match."
+                                )
+                return
+
+            if not no_preserve and not areas:
                 cur_img = os.path.join(temp_dir, "ec.cur.bin")
                 read_cmd = base_args + [
                     "--read-flash",
