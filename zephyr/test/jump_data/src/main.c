@@ -458,4 +458,47 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	}
 }
 
+ZTEST(jump_data, test_init_aborted_sysjump_watchdog_reset)
+{
+	struct jump_data *jdata = GET_JUMP_DATA_PTR(struct jump_data, 0);
+	const uint32_t ro_discard_flags[] = {
+		EC_RESET_FLAG_WATCHDOG,
+		EC_RESET_FLAG_SOFT,
+		EC_RESET_FLAG_HARD,
+		EC_RESET_FLAG_HIBERNATE,
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(ro_discard_flags); i++) {
+		uint32_t flag = ro_discard_flags[i];
+
+		/*
+		 * Simulate an aborted sysjump where the target image was reset
+		 * before init_jump_data() could clear jdata->magic, booting RO
+		 * with a reset flag set.
+		 */
+		system_common_reset_state();
+		jdata->magic = JUMP_DATA_MAGIC;
+		jdata->version = 3;
+		jdata->reset_flags = EC_RESET_FLAG_POWER_ON;
+		jdata->struct_size = sizeof(struct jump_data);
+		jdata->jump_tag_total = 0;
+		system_set_reset_flags(flag);
+
+		system_common_pre_init();
+
+		if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
+			zassert_equal(jdata->magic, 0);
+			zassert_equal(jdata->version, 0);
+			zassert_equal(system_jumped_to_this_image(), 0);
+			zassert_equal(system_get_reset_flags(), flag);
+		} else {
+			zassert_equal(jdata->magic, 0);
+			zassert_equal(system_jumped_to_this_image(), 1);
+			zassert_equal(system_get_reset_flags(),
+				      EC_RESET_FLAG_POWER_ON |
+					      EC_RESET_FLAG_SYSJUMP);
+		}
+	}
+}
+
 ZTEST_SUITE(jump_data, NULL, NULL, jump_data_before, NULL, NULL);
