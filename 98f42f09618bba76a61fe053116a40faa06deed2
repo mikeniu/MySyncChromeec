@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4444cdf_12993466",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:18:09Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Using `is True` is unidiomatic here. `bool(...)` or simply relying on truthiness is preferred.",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 0
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbb651d1_1cc756c8",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:18:09Z",
+      "side": 1,
+      "message": "elif rw_only and ro_only: raise?",
+      "range": {
+        "startLine": 210,
+        "startChar": 12,
+        "endLine": 210,
+        "endChar": 40
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3dc33b3_29e7114c",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:18:09Z",
+      "side": 1,
+      "message": "else: raise?",
+      "range": {
+        "startLine": 212,
+        "startChar": 12,
+        "endLine": 213,
+        "endChar": 51
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d6700cf_1ca998b7",
+        "filename": "util/flash/tests/test_servo_and_cli.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-14T20:18:09Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This test is named `test_parse_args_defaults`, but it now explicitly passes `--ro`. It would be better to keep this test for actual defaults and add a separate test for the new flags.",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 0
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
