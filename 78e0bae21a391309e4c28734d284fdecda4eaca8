@@ -163,6 +163,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5ac103e7_e02021f0",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-15T08:59:00Z",
+      "side": 1,
+      "message": "\u003e checking lock_count suggests there is something designed incorrectly.\n\nI also considered calling `k_mutex_lock(\u0026fast_cpu_mutex, K_NO_WAIT);` in the `else` branch. Then, the thread that locked the mutex when enabling fast CPU would take the second mutex too. However, it required two subsequent `unlock` calls at the end of the block, which felt less elegant to me than checking `lock_count` or the mutex\u0027s owner ID explicitly.\n\n\u003e I just realized, the case I described is handled by the `ScopedFastCpu` class.\n\nNot all calls to `clock_enable_module` are executed from `ScopedFastCpu` ctor/dtor: take a look at `vboot_hash.c`. I need to double check if these other call sites can preempt (or be preempted by) `ScopedFastCpu`. If they can then my suggestion would be:\n1. add a dedicated `ScopedFastCpu` implementation for STM32H7 only, a wrapper for `clock_enable_module`\n2. implement complete synchronization in `clock_enable_module` in this file.\n\n\u003e I would just suggest to add synchronization for checking the mode, not fast calculations itself.\n\nI\u0027m not sure what you had in mind, could you please clarify? Do you mean a mutex held only inside a single `if`/`else` block in `clock_enable_module` that guarantees sequential execution of those blocks, resulting in consistent state of the hardware and nothing else?",
+      "parentUuid": "960dd1b8_671706ad",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3700500b_33a80ce5",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
