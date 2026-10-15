@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bd50ac9_12445025",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-15T23:16:48Z",
+      "side": 1,
+      "message": "This is speculative, but you could get a CC connected event between the CC read and re-arming the interrupt, and that event might be lost. Re-arming first and then reading would avoid that race.\n\n```suggestion\n        it8xxx2_tcpm_enable_plug_in_detect(port);\n\n        it8xxx2_tcpm_get_cc(port, \u0026cc1, \u0026cc2);\n        if (!cc_is_open(cc1, cc2) \u0026\u0026 !cc_is_pwred_cbl_without_snk(cc1, cc2))\n            task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);\n```",
+      "range": {
+        "startLine": 749,
+        "startChar": 0,
+        "endLine": 753,
+        "endChar": 56
+      },
+      "revId": "8581df50fb336f81c2d44f5c99fc68958ae641f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

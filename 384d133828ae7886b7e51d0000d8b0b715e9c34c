@@ -123,6 +123,24 @@
       "parentUuid": "2755f746_0ea36ade",
       "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01e2f642_9d388706",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-15T23:16:48Z",
+      "side": 1,
+      "message": "As discussed OOB, this seems like it will work well enough, and the code looks fine to me.",
+      "parentUuid": "4849f5e0_fd2223d5",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
