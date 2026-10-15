@@ -16,6 +16,24 @@
       "message": "what\u0027s the sleep for? some hardware quirk? worth naming the constant or add a comment about it",
       "revId": "c7db732804ef3893aa793782ed94260ab0989ec3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0c2ee2e_a04a3b3a",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 3692199
+      },
+      "writtenOn": "2026-10-15T12:20:24Z",
+      "side": 1,
+      "message": "Yes, hw quirk. Added comment and defined constant. \n\nDetails: PAC1954 requires 1 ms `t_REFRESH` after a REFRESH per the Microchip PAC194x/195x datasheet. During enabling/disabling consecutive channels on the same PAC, sleeping for 2 ms ensures each PAC finishes its REFRESH cycle before the next channel on the same PAC is configured.",
+      "parentUuid": "17c3356f_68d758aa",
+      "revId": "c7db732804ef3893aa793782ed94260ab0989ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
