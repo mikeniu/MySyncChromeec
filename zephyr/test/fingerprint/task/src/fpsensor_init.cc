@@ -278,6 +278,53 @@ ZTEST_USER(fpsensor_init, test_maintenance_mode_dead_pixel_max_minus_1)
 	zassert_false(response.mode & FP_MODE_SENSOR_MAINTENANCE);
 }
 
+ZTEST_USER(fpsensor_init, test_fp_info_v3_overflow)
+{
+	zassert_equal(
+		EC_RES_OVERFLOW,
+		ec_cmd_fp_info_v3(NULL, test_info_buffer,
+				  sizeof(struct ec_response_fp_info_v3) - 1));
+}
+
+ZTEST_USER(fpsensor_init, test_fp_info_v3_get_info_error)
+{
+	struct fingerprint_sensor_state state;
+
+	fingerprint_get_state(fp_sim, &state);
+	state.get_info_result = -EINVAL;
+	fingerprint_set_state(fp_sim, &state);
+
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_info_v3(NULL, test_info_buffer,
+					test_info_buffer_size));
+}
+
+extern "C" void fps_event(enum gpio_signal signal);
+
+ZTEST_USER(fpsensor_init, test_fps_event_interrupt)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_FINGER_DOWN,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	uint32_t fp_events = 0;
+
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	k_msleep(1);
+
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	fps_event(static_cast<enum gpio_signal>(0));
+	k_msleep(1);
+
+	zassert_equal(mkbp_send_event_fake.call_count, 1);
+	fp_get_next_event(reinterpret_cast<uint8_t *>(&fp_events));
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
