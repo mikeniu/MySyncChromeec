@@ -473,6 +473,7 @@ int FLASH_DMA_CODE crec_flash_physical_write(int offset, int size,
 					     const char *data)
 {
 	int ret = EC_ERROR_UNKNOWN;
+	uint32_t key;
 
 	if (flash_dma_code_enabled == 0)
 		return EC_ERROR_ACCESS_DENIED;
@@ -487,7 +488,7 @@ int FLASH_DMA_CODE crec_flash_physical_write(int offset, int size,
 	 * EC-indirect follow mode to access flash, interrupts need to be
 	 * disabled.
 	 */
-	interrupt_disable();
+	key = irq_lock();
 
 	dma_flash_write(offset, size, data);
 #ifdef IMMU_CACHE_TAG_INVALID
@@ -504,7 +505,7 @@ int FLASH_DMA_CODE crec_flash_physical_write(int offset, int size,
 	offset |= CONFIG_MAPPED_STORAGE_BASE;
 	ret = dma_flash_verify(offset, size, data);
 
-	interrupt_enable();
+	irq_unlock(key);
 
 	return ret;
 }
@@ -520,6 +521,7 @@ int FLASH_DMA_CODE crec_flash_physical_write(int offset, int size,
 int FLASH_DMA_CODE crec_flash_physical_erase(int offset, int size)
 {
 	int v_size = size, v_addr = offset, ret = EC_ERROR_UNKNOWN;
+	uint32_t key;
 
 	if (flash_dma_code_enabled == 0)
 		return EC_ERROR_ACCESS_DENIED;
@@ -532,21 +534,18 @@ int FLASH_DMA_CODE crec_flash_physical_erase(int offset, int size)
 	 * EC-indirect follow mode to access flash, interrupts need to be
 	 * disabled.
 	 */
-	interrupt_disable();
+	key = irq_lock();
 
 	/* Always use sector erase command (1K or 4K bytes) */
 	for (; size > 0; size -= FLASH_SECTOR_ERASE_SIZE) {
 		dma_flash_erase(offset, FLASH_CMD_SECTOR_ERASE);
 		offset += FLASH_SECTOR_ERASE_SIZE;
-		/*
-		 * If requested erase size is too large at one time on KGD
-		 * flash, we need to reload watchdog to prevent the reset.
-		 */
-		if (IS_ENABLED(IT83XX_CHIP_FLASH_IS_KGD) && (size > 0x10000))
-			watchdog_reload();
+		watchdog_reload();
 		/*
 		 * EC still need to handle AP's EC_CMD_GET_COMMS_STATUS
-		 * command during erasing.
+		 * command during erasing. On N8/RISC-V, task_trigger_irq()
+		 * invokes the __ram_code SPI ISR synchronously via a
+		 * software syscall trap while hardware IRQs stay masked.
 		 */
 #ifdef IT83XX_IRQ_SPI_PERIPHERAL
 		if (IS_ENABLED(CONFIG_SPI) && IS_ENABLED(HAS_TASK_HOSTCMD) &&
@@ -565,7 +564,7 @@ int FLASH_DMA_CODE crec_flash_physical_erase(int offset, int size)
 	v_addr |= CONFIG_MAPPED_STORAGE_BASE;
 	ret = dma_flash_verify(v_addr, v_size, NULL);
 
-	interrupt_enable();
+	irq_unlock(key);
 
 	return ret;
 }
