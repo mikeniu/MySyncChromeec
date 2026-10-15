@@ -5,10 +5,12 @@
 """Unit tests for firmware_builder_lib."""
 
 import argparse
+import pathlib
 import re
 import tempfile
 import types
 import unittest
+from unittest import mock
 
 from scripts import firmware_builder_lib
 
@@ -167,6 +169,45 @@ class TestSummarizeMergedLcov(unittest.TestCase):
         """Test that a board that is not in the tracefile raises ValueError."""
         with self.assertRaisesRegex(ValueError, "BOARD_BOARD-Z"):
             self._summarize(["board-z"])
+
+
+class TestMergeShardCoverageReports(unittest.TestCase):
+    """Tests for merge_shard_coverage_reports function."""
+
+    @mock.patch("subprocess.run")
+    def test_merges_infos_and_creates_tarball(
+        self, mock_run: mock.MagicMock
+    ) -> None:
+        """Test that merge_shard_coverage_reports runs lcov and tars lcov.info."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = pathlib.Path(tmpdir)
+            zephyr_dir = root / "zephyr"
+            zephyr_dir.mkdir()
+            merge_dir = root / "shards"
+            merge_dir.mkdir()
+            (merge_dir / "shard1.info").write_text(
+                "TN:\nSF:/a.c\nDA:1,1\nend_of_record\n", encoding="utf-8"
+            )
+
+            opts = argparse.Namespace(merge_dir=str(merge_dir), cpus=2)
+            cmds: list[list[str]] = []
+            ret = firmware_builder_lib.merge_shard_coverage_reports(
+                opts, zephyr_dir, lambda cmd, cwd=None: cmds.append(cmd)
+            )
+
+            self.assertEqual(ret, 0)
+            self.assertEqual(mock_run.call_count, 2)
+            self.assertEqual(cmds[0][0], "/usr/bin/lcov")
+            self.assertIn(str(merge_dir / "shard1.info"), cmds[0])
+            self.assertEqual(
+                cmds[1],
+                [
+                    "tar",
+                    "cvjf",
+                    str(root / "build" / "zephyr" / "coverage.tbz2"),
+                    "lcov.info",
+                ],
+            )
 
 
 if __name__ == "__main__":

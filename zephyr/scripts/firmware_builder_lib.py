@@ -11,10 +11,10 @@ import multiprocessing
 import os
 import pathlib
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
+from typing import Any, Callable
 
 
 _ZMAKE_DIR = str(pathlib.Path(__file__).resolve().parents[1] / "zmake")
@@ -133,14 +133,11 @@ def shard_projects(projects, opts=None):
 
 
 def merge_shard_coverage_reports(
-    opts,
-    zephyr_dir,
-    log_cmd_fn,
-    get_bundle_dir_fn,
-    write_metadata_fn,
-    firmware_pb2_mod,
-):
-    """Extract shard coverage archives, merge lcov.info, and generate HTML/tbz2."""
+    opts: argparse.Namespace,
+    zephyr_dir: pathlib.Path,
+    log_cmd_fn: Callable[..., Any],
+) -> int:
+    """Extract shard coverage archives and merge lcov.info into coverage.tbz2."""
     merge_dir = pathlib.Path(opts.merge_dir)
     if not merge_dir.is_dir() and (zephyr_dir / opts.merge_dir).is_dir():
         merge_dir = zephyr_dir / opts.merge_dir
@@ -214,74 +211,11 @@ def merge_shard_coverage_reports(
             lcov_cmd, cwd=zephyr_dir, check=True, stdin=subprocess.DEVNULL
         )
 
-        # Only generate HTML reports if explicitly requested (--html) or during
-        # postsubmit release builds (--bcs-version), matching bundle_coverage().
-        # Presubmit CQ runs without --bcs-version and only needs lcov.info
-        # inside coverage.tbz2 for Gerrit/Zoss coverage display.
-        generate_html = bool(opts.html or opts.bcs_version)
-        html_dir = out_dir / "html"
-        if html_dir.exists():
-            shutil.rmtree(html_dir)
-        if generate_html:
-            html_dir.mkdir(parents=True, exist_ok=True)
-            # Match zephyr/Makefile.cq: run genhtml without --parallel to avoid OOM
-            # when rendering thousands of source files in Perl child processes.
-            genhtml_cmd = [
-                "/usr/bin/genhtml",
-                "--branch-coverage",
-                "-q",
-                "-o",
-                str(html_dir),
-                "--ignore-errors",
-                "inconsistent,inconsistent",
-                "--ignore-errors",
-                "unused,unused",
-                "-t",
-                "All boards and tests merged",
-                "-s",
-                str(merged_info),
-            ]
-            log_cmd_fn(genhtml_cmd)
-            subprocess.run(
-                genhtml_cmd,
-                cwd=zephyr_dir,
-                check=True,
-                stdin=subprocess.DEVNULL,
-            )
-
-        # The parent recipe orchestrator (recipes/build_firmware.py) uploads
-        # build/zephyr/coverage.tbz2 directly to GCS after merge-shards.
         tar_cmd = ["tar", "cvjf", str(tarball_path), "lcov.info"]
-        if generate_html:
-            tar_cmd.append("html/")
         log_cmd_fn(tar_cmd, cwd=out_dir)
         subprocess.run(
             tar_cmd, cwd=out_dir, check=True, stdin=subprocess.DEVNULL
         )
-
-        bundle_dir = get_bundle_dir_fn(opts)
-        if bundle_dir.resolve() != out_dir.resolve():
-            shutil.copyfile(tarball_path, bundle_dir / tarball_name)
-            bundle_html_dir = bundle_dir / "html"
-            if bundle_html_dir.exists():
-                shutil.rmtree(bundle_html_dir)
-            if generate_html:
-                shutil.copytree(html_dir, bundle_html_dir)
-
-        info = (
-            firmware_pb2_mod.FirmwareArtifactInfo()  # pylint: disable=no-member
-        )
-        info.bcs_version_info.version_string = opts.bcs_version
-        meta = info.objects.add()
-        meta.file_name = tarball_name
-        meta.lcov_info.type = (
-            firmware_pb2_mod.FirmwareArtifactInfo.LcovTarballInfo.LcovType.LCOV  # pylint: disable=no-member
-        )
-        if generate_html:
-            meta = info.objects.add()
-            meta.file_name = "html"
-            meta.coverage_html.SetInParent()
-        write_metadata_fn(opts, info)
 
     return 0
 
