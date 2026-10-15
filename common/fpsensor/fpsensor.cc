@@ -20,6 +20,7 @@
 #include "fpsensor/fpsensor_led.h"
 #include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
+#include "fpsensor/fpsensor_state_machine.h"
 #include "fpsensor/fpsensor_utils.h"
 #include "gpio.h"
 #include "host_command.h"
@@ -56,22 +57,9 @@
 /* Ready to encrypt a template. */
 static timestamp_t encryption_deadline;
 
-/* Delay between 2 s of the sensor to detect finger removal */
-#define FINGER_POLLING_DELAY (100 * MSEC)
-
-/* Timing statistics. */
-static uint32_t capture_time_us;
-static uint32_t matching_time_us;
-static uint32_t overall_time_us;
-static timestamp_t overall_t0;
-static uint8_t timestamps_invalid;
-/*
- * Last matched template index, persisted for telemetry (EC_CMD_FP_STATS).
- * Unlike global_context, this is not cleared when the secret is read.
- */
-static int8_t stats_template_matched;
-
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
+
+static FpSensorStateMachine state_machine;
 
 #ifndef CONFIG_ZEPHYR
 /* Define the PM functions for compatibility with EC-legacy. */
@@ -90,59 +78,311 @@ extern "C" void fps_event(enum gpio_signal signal)
 	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_SENSOR_IRQ);
 }
 
-static void send_mkbp_event(uint32_t event)
+static enum ec_error_list encrypt_template(uint16_t fgr);
+static enum ec_status fp_commit_template(std::span<const uint8_t> context);
+
+namespace
 {
-	atomic_or(&global_context.fp_events, event);
+
+template <class... Ts> struct Overloaded : Ts... {
+	using Ts::operator()...;
+};
+
+} /* namespace */
+
+void FpSensorStateMachine::send_mkbp_event(uint32_t event)
+{
+	atomic_or(&ctx_.fp_events, event);
 	mkbp_send_event(EC_MKBP_EVENT_FINGERPRINT);
+}
+
+FpSensorStateMachine::Command
+FpSensorStateMachine::parse_command(FpSensorMode mode) noexcept
+{
+	const fp_capture_type capture_type = mode.capture_type();
+
+	if (!is_finger_needed(mode.raw)) {
+		return ImmediateCaptureCommand{ capture_type };
+	}
+
+	if (mode.has_any(FP_MODE_ANY_DETECT_FINGER)) {
+		std::optional<CaptureRequest> capture = std::nullopt;
+		if (mode.has_any(FP_MODE_ENROLL_IMAGE)) {
+			capture = CaptureRequest{
+				.capture_type = capture_type,
+				.kind = EnrollImage{},
+			};
+		} else if (mode.has_any(FP_MODE_MATCH)) {
+			capture = CaptureRequest{
+				.capture_type = capture_type,
+				.kind =
+					MatchFinger{
+						.allow_template_update = !mode.has_any(
+							FP_MODE_MATCH_NO_TEMPLATE_UPDATE),
+					},
+			};
+		} else if (mode.has_any(FP_MODE_CAPTURE)) {
+			capture = CaptureRequest{
+				.capture_type = capture_type,
+				.kind = CaptureOnly{},
+			};
+		}
+
+		return DetectFingerCommand{
+			.state =
+				DetectFingerState{
+					.notify_finger_down = mode.has_any(
+						FP_MODE_FINGER_DOWN),
+					.notify_finger_up =
+						mode.has_any(FP_MODE_FINGER_UP),
+					.deepsleep =
+						mode.has_any(FP_MODE_DEEPSLEEP),
+					.capture = capture,
+				},
+		};
+	}
+
+	if (mode.has_any(FP_MODE_RESET_SENSOR)) {
+		return ResetSensorCommand{};
+	}
+	if (mode.has_any(FP_MODE_SENSOR_MAINTENANCE)) {
+		return MaintenanceCommand{};
+	}
+	if (mode.has_any(FP_MODE_ENCRYPT_TEMPLATE)) {
+		return EncryptTemplateCommand{};
+	}
+	if (mode.has_any(FP_MODE_DECRYPT_TEMPLATE)) {
+		return DecryptTemplateCommand{};
+	}
+
+	return IdleCommand{
+		.deepsleep = mode.has_any(FP_MODE_DEEPSLEEP),
+	};
+}
+
+const FpSensorStateMachine::State &FpSensorStateMachine::state() const noexcept
+{
+	return state_;
+}
+
+const FpSensorStats &FpSensorStateMachine::stats() const noexcept
+{
+	return stats_;
+}
+
+int FpSensorStateMachine::timeout_us() const noexcept
+{
+	const auto *detect = std::get_if<DetectFingerState>(&state_);
+	if (detect != nullptr && detect->notify_finger_up) {
+		return kFingerPollingDelayUs;
+	}
+	return kWaitForeverUs;
+}
+
+FpSensorMode FpSensorStateMachine::to_sensor_mode() const noexcept
+{
+	uint32_t raw = std::visit(
+		Overloaded{
+			[](const IdleState &s) -> uint32_t {
+				return s.deepsleep ? FP_MODE_DEEPSLEEP : 0;
+			},
+			[](const DetectFingerState &s) -> uint32_t {
+				uint32_t mode = 0;
+				if (s.deepsleep) {
+					mode |= FP_MODE_DEEPSLEEP;
+				}
+				if (s.notify_finger_down) {
+					mode |= FP_MODE_FINGER_DOWN;
+				}
+				if (s.notify_finger_up) {
+					mode |= FP_MODE_FINGER_UP;
+				}
+				if (s.capture.has_value()) {
+					mode |= FpSensorMode::encode_capture_type(
+						s.capture->capture_type);
+					mode |= std::visit(
+						Overloaded{
+							[](const CaptureOnly &)
+								-> uint32_t {
+								return FP_MODE_CAPTURE;
+							},
+							[](const EnrollImage &)
+								-> uint32_t {
+								return FP_MODE_ENROLL_IMAGE;
+							},
+							[](const MatchFinger &m)
+								-> uint32_t {
+								return FP_MODE_MATCH |
+								       (m.allow_template_update ?
+										0 :
+										FP_MODE_MATCH_NO_TEMPLATE_UPDATE);
+							},
+						},
+						s.capture->kind);
+				}
+				return mode;
+			},
+		},
+		state_);
+
+#ifdef HAVE_FP_PRIVATE_DRIVER
+	if (enroll_session_active_) {
+		raw |= FP_MODE_ENROLL_SESSION;
+	}
+#endif
+	return FpSensorMode(raw);
+}
+
+void FpSensorStateMachine::init()
+{
+	state_ = IdleState{};
+#ifdef HAVE_FP_PRIVATE_DRIVER
+	enroll_session_active_ = false;
+#endif
+
+	/* Lock PM for initialization. */
+	pm_policy_state_all_lock_get();
+	CPRINTS("FP_SENSOR_SEL: %s",
+		fp_sensor_type_to_str(fpsensor_detect_get_type()));
+
+#ifdef HAVE_FP_PRIVATE_DRIVER
+	/* Reset and initialize the sensor IC */
+	fp_sensor_init();
+
+	ctx_.fp_image_frame_params_cache.populate_cache(image_buffer_.size());
+#endif
+}
+
+void FpSensorStateMachine::run()
+{
+	init();
+
+	while (true) {
+#ifdef HAVE_FP_PRIVATE_DRIVER
+		const bool unlock_pm = !enroll_session_active_;
+		/*
+		 * Unlock PM while waiting for an event except for an
+		 * enrollment process.
+		 */
+		if (unlock_pm) {
+			pm_policy_state_all_lock_put();
+		}
+
+		/* Wait for a sensor IRQ or a new mode configuration */
+		const uint32_t evt = task_wait_event(timeout_us());
+
+		/*
+		 * Lock PM for any FP related actions, especially communication
+		 * with a FP sensor.
+		 */
+		if (unlock_pm) {
+			pm_policy_state_all_lock_get();
+		}
+#else
+		const uint32_t evt = task_wait_event(timeout_us());
+#endif
+
+		handle_event(evt);
+	}
 }
 
 #ifdef HAVE_FP_PRIVATE_DRIVER
 
-/*
- * contains the bit FP_MODE_ENROLL_SESSION if a finger enrollment is on-going.
- * It is used to detect the ENROLL_SESSION transition when sensor_mode is
- * updated by the host.
- */
-static uint32_t enroll_session;
+namespace
+{
 
-static uint32_t fp_process_enroll(void)
+void enable_sensor_irq()
+{
+#ifndef CONFIG_ZEPHYR
+	gpio_clear_pending_interrupt(GPIO_FPS_INT);
+	gpio_enable_interrupt(GPIO_FPS_INT);
+#endif
+}
+
+void enter_sensor_low_power([[maybe_unused]] uint32_t evt = 0)
+{
+#ifndef CONFIG_ZEPHYR
+	if (evt & TASK_EVENT_SENSOR_IRQ) {
+		gpio_clear_pending_interrupt(GPIO_FPS_INT);
+	}
+#endif
+	fp_sensor_low_power();
+}
+
+void prepare_for_mode_change()
+{
+	/*
+	 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
+	 * migration to Zephyr is completed.
+	 */
+#ifdef CONFIG_ZEPHYR
+	/*
+	 * We are about to change sensor mode, so exit any
+	 * previous states.
+	 */
+	fp_idle();
+#else
+	gpio_disable_interrupt(GPIO_FPS_INT);
+#endif
+}
+
+void prepare_for_sensor_or_timer_event([[maybe_unused]] uint32_t evt)
+{
+	/*
+	 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
+	 * migration to Zephyr is completed.
+	 */
+#ifdef CONFIG_ZEPHYR
+	/* On timeout, put sensor into idle state. */
+	if (evt & TASK_EVENT_TIMER) {
+		fp_idle();
+	}
+#else
+	gpio_disable_interrupt(GPIO_FPS_INT);
+#endif
+}
+
+} /* namespace */
+
+int FpSensorStateMachine::finish_enroll_session(uint8_t *templ)
+{
+	enroll_session_active_ = false;
+	return fp_enrollment_finish(templ);
+}
+
+uint32_t FpSensorStateMachine::process_enroll()
 {
 	int percent = 0;
 
 	/* Prevent enrollment if we have reached max capacity. */
-	if (global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
+	if (ctx_.templ_valid >= FP_MAX_FINGER_COUNT) {
 		CPRINTS("Error: Max templates reached.");
-		fp_enrollment_finish(nullptr);
-		global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
-		enroll_session &= ~FP_MODE_ENROLL_SESSION;
-		return EC_MKBP_FP_ENROLL |
-		       EC_MKBP_FP_ERRCODE(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+		finish_enroll_session();
+		return make_fp_enroll_event(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
 	}
 
-	if (global_context.template_newly_enrolled != FP_NO_SUCH_TEMPLATE)
+	if (ctx_.template_newly_enrolled != FP_NO_SUCH_TEMPLATE) {
 		CPRINTS("Warning: previously enrolled template has not been "
 			"read yet.");
+	}
 
 	/* begin/continue enrollment */
-	CPRINTS("[%d]Enrolling ...", global_context.templ_valid);
-	int res = fp_finger_enroll(fp_buffer, &percent);
-	CPRINTS("[%d]Enroll =>%d (%d%%)", global_context.templ_valid, res,
-		percent);
-	if (res < 0)
-		return EC_MKBP_FP_ENROLL |
-		       EC_MKBP_FP_ERRCODE(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
-	global_context.templ_dirty |= BIT(global_context.templ_valid);
+	CPRINTS("[%d]Enrolling ...", ctx_.templ_valid);
+	int res = fp_finger_enroll(image_buffer_.data(), &percent);
+	CPRINTS("[%d]Enroll =>%d (%d%%)", ctx_.templ_valid, res, percent);
+	if (res < 0) {
+		return make_fp_enroll_event(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	}
+	ctx_.templ_dirty |= BIT(ctx_.templ_valid);
 	if (percent == 100) {
-		res = fp_enrollment_finish(
-			fp_template[global_context.templ_valid]);
-		if (res) {
+		res = finish_enroll_session(templates_[ctx_.templ_valid]);
+		if (res != 0) {
 			res = EC_MKBP_FP_ERR_ENROLL_INTERNAL;
 		} else {
-			global_context.template_newly_enrolled =
-				global_context.templ_valid;
+			ctx_.template_newly_enrolled = ctx_.templ_valid;
 			fp_enable_positive_match_secret(
-				global_context.templ_valid,
-				&global_context.positive_match_secret_state);
+				ctx_.templ_valid,
+				&ctx_.positive_match_secret_state);
 
 			/*
 			 * In the classic flow we immediately use this template
@@ -155,36 +395,30 @@ static uint32_t fp_process_enroll(void)
 			 * confirmation.
 			 */
 			if (!fingerprint_auth_enabled()) {
-				global_context.templ_valid++;
+				ctx_.templ_valid++;
 			}
 		}
-		global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
-		enroll_session &= ~FP_MODE_ENROLL_SESSION;
 	}
-	return EC_MKBP_FP_ENROLL | EC_MKBP_FP_ERRCODE(res) |
-	       (percent << EC_MKBP_FP_ENROLL_PROGRESS_OFFSET);
+	return make_fp_enroll_event(res, percent);
 }
 
-static uint32_t fp_process_match(void)
+uint32_t FpSensorStateMachine::process_match(bool allow_template_update)
 {
-	timestamp_t t0 = get_time();
+	const timestamp_t t0 = get_time();
 	int res = -1;
 	uint32_t updated = 0;
 	int32_t fgr = FP_NO_SUCH_TEMPLATE;
-	timestamps_invalid = 0;
-	stats_template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
+	stats_.timestamps_invalid = 0;
+	stats_.template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
 
 	/* match finger against current templates */
-	fp_disable_positive_match_secret(
-		&global_context.positive_match_secret_state);
+	fp_disable_positive_match_secret(&ctx_.positive_match_secret_state);
 
-	CPRINTS("Matching/%d ...", global_context.templ_valid);
-	if (global_context.templ_valid) {
-		res = fp_finger_match(fp_template[0],
-				      global_context.templ_valid, fp_buffer,
-				      !(global_context.sensor_mode &
-					FP_MODE_MATCH_NO_TEMPLATE_UPDATE),
-				      &fgr, &updated);
+	CPRINTS("Matching/%d ...", ctx_.templ_valid);
+	if (ctx_.templ_valid > 0) {
+		res = fp_finger_match(templates_[0], ctx_.templ_valid,
+				      image_buffer_.data(),
+				      allow_template_update, &fgr, &updated);
 		CPRINTS("Match =>%d (finger %d)", res, fgr);
 
 		if (fp_match_success(res)) {
@@ -194,14 +428,14 @@ static uint32_t fp_process_match(void)
 			 * with EC_MKBP_FP_ERR_MATCH_NO_INTERNAL.
 			 */
 			if (fgr >= 0 && fgr < FP_MAX_FINGER_COUNT) {
-				stats_template_matched = fgr;
+				stats_.template_matched =
+					static_cast<int8_t>(fgr);
 				fp_enable_positive_match_secret(
-					fgr,
-					&global_context
-						 .positive_match_secret_state);
+					fgr, &ctx_.positive_match_secret_state);
 			} else {
 				res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
-				timestamps_invalid |= FPSTATS_MATCHING_INV;
+				stats_.timestamps_invalid |=
+					FPSTATS_MATCHING_INV;
 			}
 		} else if (res < 0) {
 			/*
@@ -211,298 +445,249 @@ static uint32_t fp_process_match(void)
 			 * happened.
 			 */
 			res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
-			timestamps_invalid |= FPSTATS_MATCHING_INV;
+			stats_.timestamps_invalid |= FPSTATS_MATCHING_INV;
 		}
 
 		fp_led::update_match(fp_match_success(res));
 
-		if (res == EC_MKBP_FP_ERR_MATCH_YES_UPDATED)
-			global_context.templ_dirty |= updated;
+		if (res == EC_MKBP_FP_ERR_MATCH_YES_UPDATED) {
+			ctx_.templ_dirty |= updated;
+		}
 	} else {
 		CPRINTS("No enrolled templates");
 		res = EC_MKBP_FP_ERR_MATCH_NO_TEMPLATES;
-		timestamps_invalid |= FPSTATS_MATCHING_INV;
+		stats_.timestamps_invalid |= FPSTATS_MATCHING_INV;
 	}
 
-	matching_time_us = time_since32(t0);
-	return EC_MKBP_FP_MATCH | EC_MKBP_FP_ERRCODE(res) |
-	       ((fgr << EC_MKBP_FP_MATCH_IDX_OFFSET) &
-		EC_MKBP_FP_MATCH_IDX_MASK);
+	stats_.matching_time_us = time_since32(t0);
+	return make_fp_match_event(res, fgr);
 }
 
-static void fp_process_finger(void)
+bool FpSensorStateMachine::process_finger_capture(const CaptureRequest &capture)
 {
-	timestamp_t t0 = get_time();
-	enum fp_capture_type capture_type =
-		FP_CAPTURE_TYPE(global_context.sensor_mode);
-	global_context.current_capture_type = FP_CAPTURE_TYPE_INVALID;
+	const timestamp_t t0 = get_time();
+	ctx_.current_capture_type = FP_CAPTURE_TYPE_INVALID;
 
 	CPRINTS("Capturing ...");
-	int res = fp_acquire_image(fp_buffer, capture_type);
-	capture_time_us = time_since32(t0);
-	if (res) {
-		timestamps_invalid |= FPSTATS_CAPTURE_INV;
-		return;
+	const int res =
+		fp_acquire_image(image_buffer_.data(), capture.capture_type);
+	stats_.capture_time_us = time_since32(t0);
+	if (res != 0) {
+		stats_.timestamps_invalid |= FPSTATS_CAPTURE_INV;
+		return false;
 	}
 
-	global_context.current_capture_type = capture_type;
-	uint32_t evt = EC_MKBP_FP_IMAGE_READY;
+	ctx_.current_capture_type = capture.capture_type;
 
 #ifndef CONFIG_ZEPHYR
 	/* Clean up SPI before clocking up to avoid hang on the dsb
 	 * in dma_go. Ignore the return value to let the WDT reboot
 	 * the MCU (and avoid getting trapped in the loop).
 	 * b/112781659 */
-	res = spi_transaction_flush(&spi_devices[0]);
-	if (res)
-		CPRINTS("Failed to flush SPI: 0x%x", res);
+	const int spi_res = spi_transaction_flush(&spi_devices[0]);
+	if (spi_res) {
+		CPRINTS("Failed to flush SPI: 0x%x", spi_res);
+	}
 #endif
 
 	/* we need CPU power to do the computations */
 	ScopedFastCpu fast_cpu;
 
-	if (global_context.sensor_mode & FP_MODE_ENROLL_IMAGE)
-		evt = fp_process_enroll();
-	else if (global_context.sensor_mode & FP_MODE_MATCH)
-		evt = fp_process_match();
+	const uint32_t evt = std::visit(
+		Overloaded{
+			[](const CaptureOnly &) -> uint32_t {
+				return EC_MKBP_FP_IMAGE_READY;
+			},
+			[this](const EnrollImage &) -> uint32_t {
+				return process_enroll();
+			},
+			[this](const MatchFinger &m) -> uint32_t {
+				return process_match(m.allow_template_update);
+			},
+		},
+		capture.kind);
 
-	global_context.sensor_mode &=
-		~(FP_MODE_ANY_CAPTURE | FP_MODE_CAPTURE_TYPE_MASK |
-		  FP_MODE_MATCH_NO_TEMPLATE_UPDATE);
-	overall_time_us = time_since32(overall_t0);
+	stats_.overall_time_us = time_since32(stats_.overall_t0);
 	send_mkbp_event(evt);
+	return true;
 }
-#endif /* HAVE_FP_PRIVATE_DRIVER */
 
-static enum ec_error_list encrypt_template(uint16_t fgr);
-static enum ec_status fp_commit_template(std::span<const uint8_t> context);
-
-extern "C" void fp_task(void)
+FpSensorStateMachine::State
+FpSensorStateMachine::transition_on_config(const Command &cmd)
 {
-	int timeout_us = -1;
-	__maybe_unused bool pm_locked = true;
-
-	/* Lock PM for initialization. */
-	pm_policy_state_all_lock_get();
-	CPRINTS("FP_SENSOR_SEL: %s",
-		fp_sensor_type_to_str(fpsensor_detect_get_type()));
-
-#ifdef HAVE_FP_PRIVATE_DRIVER
-	/* Reset and initialize the sensor IC */
-	fp_sensor_init();
-
-	global_context.fp_image_frame_params_cache.populate_cache(
-		sizeof(fp_buffer));
-
-	while (1) {
-		enum finger_state st = FINGER_NONE;
-
-		/* Unlock PM while waiting for an event except for an
-		 * enrollment process.
-		 */
-		if (!(global_context.sensor_mode & FP_MODE_ENROLL_SESSION)) {
-			pm_policy_state_all_lock_put();
-			pm_locked = false;
-		}
-		/* Wait for a sensor IRQ or a new mode configuration */
-		uint32_t evt = task_wait_event(timeout_us);
-
-		/* Lock PM for any FP related actions, especially communication
-		 * with a FP sensor.
-		 */
-		if (!pm_locked) {
-			pm_policy_state_all_lock_get();
-			pm_locked = true;
-		}
-
-		if (evt & TASK_EVENT_UPDATE_CONFIG) {
-			uint32_t mode = global_context.sensor_mode;
-			/*
-			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
-			 * migration to Zephyr is completed.
-			 */
-#ifdef CONFIG_ZEPHYR
-			/*
-			 * We are about to change sensor mode, so exit any
-			 * previous states.
-			 */
-			fp_idle();
-#else
-			gpio_disable_interrupt(GPIO_FPS_INT);
-#endif
-			if ((mode ^ enroll_session) & FP_MODE_ENROLL_SESSION) {
-				int ret = 0;
-				if (mode & FP_MODE_ENROLL_SESSION) {
-					ret = fp_enrollment_begin();
-					if (ret)
-						global_context.sensor_mode &=
-							~FP_MODE_ENROLL_SESSION;
-				} else {
-					fp_enrollment_finish(nullptr);
-				}
-				enroll_session =
-					ret ? 0 :
-					      (mode & FP_MODE_ENROLL_SESSION);
-			}
-			if (!is_finger_needed(mode)) {
-				enum fp_capture_type capture_type =
-					FP_CAPTURE_TYPE(mode);
-				global_context.current_capture_type =
+	return std::visit(
+		Overloaded{
+			[](const IdleCommand &c) -> State {
+				enter_sensor_low_power();
+				return IdleState{ .deepsleep = c.deepsleep };
+			},
+			[this](const ImmediateCaptureCommand &c) -> State {
+				ctx_.current_capture_type =
 					FP_CAPTURE_TYPE_INVALID;
-				if (!fp_acquire_image(fp_buffer,
-						      capture_type)) {
-					global_context.current_capture_type =
-						capture_type;
+				if (fp_acquire_image(image_buffer_.data(),
+						     c.capture_type) == 0) {
+					ctx_.current_capture_type =
+						c.capture_type;
 				}
-				global_context.sensor_mode &=
-					~(FP_MODE_CAPTURE |
-					  FP_MODE_CAPTURE_TYPE_MASK);
 				send_mkbp_event(EC_MKBP_FP_IMAGE_READY);
-				continue;
-			} else if (global_context.sensor_mode &
-				   FP_MODE_ANY_DETECT_FINGER) {
-				/* wait for a finger on the sensor */
+				return IdleState{};
+			},
+			[](const DetectFingerCommand &c) -> State {
 				fp_configure_detect();
-			}
-			if (global_context.sensor_mode & FP_MODE_DEEPSLEEP)
-				/* Shutdown the sensor */
-				fp_sensor_low_power();
-			if (global_context.sensor_mode & FP_MODE_FINGER_UP)
-				/* Poll the sensor to detect finger removal */
-				timeout_us = FINGER_POLLING_DELAY;
-			else
-				timeout_us = -1;
-			if (mode & FP_MODE_ANY_WAIT_IRQ) {
-				/*
-				 * FP_MODE_ANY_WAIT_IRQ is a subset of
-				 * FP_MODE_ANY_DETECT_FINGER. In Zephyr FPMCU
-				 * interrupts are enabled by the sensor driver
-				 * when configuring finger detection.
-				 */
-#ifndef CONFIG_ZEPHYR
-				gpio_clear_pending_interrupt(GPIO_FPS_INT);
-				gpio_enable_interrupt(GPIO_FPS_INT);
-#endif
-			} else if (mode & FP_MODE_RESET_SENSOR) {
+				if (c.state.deepsleep) {
+					enter_sensor_low_power();
+				}
+				if (c.state.waiting_for_irq()) {
+					enable_sensor_irq();
+				} else {
+					enter_sensor_low_power();
+				}
+				return c.state;
+			},
+			[](const ResetSensorCommand &) -> State {
 				fp_reset_and_clear_context();
-				global_context.sensor_mode &=
-					~FP_MODE_RESET_SENSOR;
-			} else if (mode & FP_MODE_SENSOR_MAINTENANCE) {
+				return IdleState{};
+			},
+			[](const MaintenanceCommand &) -> State {
 				fp_maintenance();
-				global_context.sensor_mode &=
-					~FP_MODE_SENSOR_MAINTENANCE;
-			} else if (mode & FP_MODE_ENCRYPT_TEMPLATE) {
-				global_context.fp_encryption_status &=
+				return IdleState{};
+			},
+			[this](const EncryptTemplateCommand &) -> State {
+				ctx_.fp_encryption_status &=
 					~FP_ENCRYPTED_TEMPLATE_READY;
-				if (global_context.template_encrypted_id !=
+				if (ctx_.template_encrypted_id !=
 				    FP_NO_SUCH_TEMPLATE) {
 					ScopedFastCpu fast_cpu;
-
 					if (encrypt_template(
-						    global_context
-							    .template_encrypted_id) ==
+						    ctx_.template_encrypted_id) ==
 					    EC_SUCCESS) {
-						global_context
-							.fp_encryption_status |=
+						ctx_.fp_encryption_status |=
 							FP_ENCRYPTED_TEMPLATE_READY;
 					}
 				}
-				global_context.sensor_mode &=
-					~FP_MODE_ENCRYPT_TEMPLATE;
-			} else if (mode & FP_MODE_DECRYPT_TEMPLATE) {
-				ScopedFastCpu fast_cpu;
-
-				enum ec_status res = fp_commit_template(
-					global_context.user_id);
-				atomic_set(&global_context
-						    .template_decryption_result,
-					   res);
-				global_context.sensor_mode &=
-					~FP_MODE_DECRYPT_TEMPLATE;
-			} else {
-				fp_sensor_low_power();
-			}
-		} else if (evt & (TASK_EVENT_SENSOR_IRQ | TASK_EVENT_TIMER)) {
-			overall_t0 = get_time();
-			/*
-			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
-			 * migration to Zephyr is completed.
-			 */
-#ifdef CONFIG_ZEPHYR
-			/* On timeout, put sensor into idle state. */
-			if (evt & TASK_EVENT_TIMER)
-				fp_idle();
-#else
-			gpio_disable_interrupt(GPIO_FPS_INT);
-#endif
-			if (global_context.sensor_mode &
-			    FP_MODE_ANY_DETECT_FINGER) {
-				st = fp_finger_status();
-				if (st == FINGER_PRESENT &&
-				    global_context.sensor_mode &
-					    FP_MODE_FINGER_DOWN) {
-					CPRINTS("Finger!");
-					global_context.sensor_mode &=
-						~FP_MODE_FINGER_DOWN;
-					send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);
+				return IdleState{};
+			},
+			[this](const DecryptTemplateCommand &) -> State {
+				{
+					ScopedFastCpu fast_cpu;
+					atomic_set(
+						&ctx_.template_decryption_result,
+						fp_commit_template(
+							ctx_.user_id));
 				}
-				if (st == FINGER_NONE &&
-				    global_context.sensor_mode &
-					    FP_MODE_FINGER_UP) {
-					global_context.sensor_mode &=
-						~FP_MODE_FINGER_UP;
-					timeout_us = -1;
-					send_mkbp_event(EC_MKBP_FP_FINGER_UP);
-				}
-			}
+				return IdleState{};
+			},
+		},
+		cmd);
+}
 
-			if (st == FINGER_PRESENT &&
-			    (global_context.sensor_mode &
-			     FP_MODE_ANY_CAPTURE)) {
-				CPRINTS("Finger down (capture mode)!");
-				/*
-				 * Send FINGER_DOWN immediately upon detection
-				 * during a capture session so the host can
-				 * accurately measure interaction latency.
-				 */
-				send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);
-				fp_process_finger();
-			}
+void FpSensorStateMachine::handle_config_update()
+{
+	prepare_for_mode_change();
 
-			if (global_context.sensor_mode & FP_MODE_ANY_WAIT_IRQ) {
-				fp_configure_detect();
-
-				/* In Zephyr FPMCU interrupts are enabled by the
-				 * sensor driver when configuring finger
-				 * detection.
-				 */
-#ifndef CONFIG_ZEPHYR
-				gpio_clear_pending_interrupt(GPIO_FPS_INT);
-				gpio_enable_interrupt(GPIO_FPS_INT);
-#endif
-			} else {
-				/*
-				 * In Zephyr FPMCU interrupts are managed by
-				 * the driver.
-				 */
-#ifndef CONFIG_ZEPHYR
-				if (evt & (TASK_EVENT_SENSOR_IRQ))
-					gpio_clear_pending_interrupt(
-						GPIO_FPS_INT);
-#endif
-				fp_sensor_low_power();
-			}
+	const FpSensorMode requested_mode(ctx_.sensor_mode);
+	const bool session_requested =
+		requested_mode.has_any(FP_MODE_ENROLL_SESSION);
+	if (session_requested != enroll_session_active_) {
+		if (session_requested) {
+			enroll_session_active_ = (fp_enrollment_begin() == 0);
+		} else {
+			finish_enroll_session();
 		}
-		fp_btn_ign_out::update(global_context.sensor_mode);
-		fp_led::update_mode(global_context.sensor_mode);
 	}
-#else /* !HAVE_FP_PRIVATE_DRIVER */
-	while (1) {
-		uint32_t evt = task_wait_event(timeout_us);
 
-		send_mkbp_event(evt);
+	const Command cmd = parse_command(requested_mode);
+	state_ = transition_on_config(cmd);
+	ctx_.sensor_mode = to_sensor_mode().raw;
+
+	if (!std::holds_alternative<ImmediateCaptureCommand>(cmd)) {
+		fp_btn_ign_out::update(ctx_.sensor_mode);
+		fp_led::update_mode(ctx_.sensor_mode);
 	}
-#endif /* !HAVE_FP_PRIVATE_DRIVER */
+}
+
+FpSensorStateMachine::State
+FpSensorStateMachine::transition_on_sensor_or_timer(IdleState state,
+						    uint32_t evt)
+{
+	enter_sensor_low_power(evt);
+	return state;
+}
+
+FpSensorStateMachine::State
+FpSensorStateMachine::transition_on_sensor_or_timer(DetectFingerState state,
+						    uint32_t evt)
+{
+	const finger_state st = fp_finger_status();
+	if (st == FINGER_PRESENT && state.notify_finger_down) {
+		CPRINTS("Finger!");
+		state.notify_finger_down = false;
+		send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);
+	}
+	if (st == FINGER_NONE && state.notify_finger_up) {
+		state.notify_finger_up = false;
+		send_mkbp_event(EC_MKBP_FP_FINGER_UP);
+	}
+	if (st == FINGER_PRESENT && state.capture.has_value()) {
+		CPRINTS("Finger down (capture mode)!");
+		/*
+		 * Send FINGER_DOWN immediately upon detection
+		 * during a capture session so the host can
+		 * accurately measure interaction latency.
+		 */
+		send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);
+		if (process_finger_capture(*state.capture)) {
+			state.capture.reset();
+		}
+	}
+
+	if (state.waiting_for_irq()) {
+		fp_configure_detect();
+		enable_sensor_irq();
+		return state;
+	}
+
+	enter_sensor_low_power(evt);
+	if (state.notify_finger_up) {
+		return state;
+	}
+	return IdleState{ .deepsleep = state.deepsleep };
+}
+
+void FpSensorStateMachine::handle_sensor_or_timer_event(uint32_t evt)
+{
+	stats_.overall_t0 = get_time();
+	prepare_for_sensor_or_timer_event(evt);
+
+	state_ = std::visit(
+		[this, evt](auto s) -> State {
+			return transition_on_sensor_or_timer(s, evt);
+		},
+		state_);
+	ctx_.sensor_mode = to_sensor_mode().raw;
+
+	fp_btn_ign_out::update(ctx_.sensor_mode);
+	fp_led::update_mode(ctx_.sensor_mode);
+}
+
+#endif /* HAVE_FP_PRIVATE_DRIVER */
+
+void FpSensorStateMachine::handle_event(uint32_t evt)
+{
+#ifdef HAVE_FP_PRIVATE_DRIVER
+	if (evt & TASK_EVENT_UPDATE_CONFIG) {
+		handle_config_update();
+	} else if (evt & (TASK_EVENT_SENSOR_IRQ | TASK_EVENT_TIMER)) {
+		handle_sensor_or_timer_event(evt);
+	}
+#else
+	send_mkbp_event(evt);
+#endif
+}
+
+extern "C" void fp_task(void)
+{
+	state_machine.run();
 }
 
 static enum ec_host_cmd_status
@@ -547,14 +732,6 @@ BUILD_ASSERT(FP_CONTEXT_NONCE_BYTES == 12);
 static enum ec_error_list encrypt_template(uint16_t fgr)
 {
 	enum ec_error_list ret;
-
-	/* Encrypted template is after the metadata. */
-	std::span templ = fp_enc_buffer.fp_template;
-	/* Positive match salt is after the template. */
-	std::span positive_match_salt = fp_enc_buffer.positive_match_salt;
-	std::span encrypted_template_and_positive_match_salt(
-		templ.data(),
-		templ.size_bytes() + positive_match_salt.size_bytes());
 
 	fp_enc_buffer = {};
 
@@ -607,17 +784,15 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	 * Copy the payload to |fp_enc_buffer| where it will be
 	 * encrypted in-place.
 	 */
-	std::ranges::copy(fp_template[fgr], templ.begin());
+	std::ranges::copy(fp_template[fgr], fp_enc_buffer.fp_template.begin());
 	std::ranges::copy(global_context.fp_positive_match_salt[fgr],
-			  positive_match_salt.begin());
+			  fp_enc_buffer.positive_match_salt.begin());
 
 	/* Encrypt the secret blob in-place. */
-	ret = aes_128_gcm_encrypt(key,
-				  encrypted_template_and_positive_match_salt,
-				  encrypted_template_and_positive_match_salt,
-				  nonce, tag);
+	std::span payload = fp_enc_buffer.payload();
+	ret = aes_128_gcm_encrypt(key, payload, payload, nonce, tag);
 	if (ret != EC_SUCCESS) {
-		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
+		fp_enc_buffer.clear();
 		CPRINTS("fgr%d: Failed to encrypt template", fgr);
 		return EC_ERROR_UNAVAILABLE;
 	}
@@ -635,8 +810,6 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 					    uint8_t *output)
 {
-	enum ec_error_list ret;
-
 	if (system_is_locked())
 		return EC_RES_ACCESS_DENIED;
 
@@ -652,8 +825,8 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 		return EC_RES_INVALID_PARAM;
 	}
 
-	ret = validate_fp_buffer_offset(current_frame_size, offset, size);
-	if (ret != EC_SUCCESS)
+	if (validate_fp_buffer_offset(current_frame_size, offset, size) !=
+	    EC_SUCCESS)
 		return EC_RES_INVALID_PARAM;
 
 	/*
@@ -662,24 +835,19 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	 * pattern1, and reset_test.
 	 */
 	if (skip_image_offset(global_context.current_capture_type)) {
-		uint32_t adjusted_offset;
-
 		if (check_add_overflow(
 			    offset,
 			    static_cast<uint32_t>(FP_SENSOR_IMAGE_OFFSET),
-			    &adjusted_offset)) {
+			    &offset)) {
 			return EC_RES_INVALID_PARAM;
 		}
-
-		ret = validate_fp_buffer_offset(sizeof(fp_buffer),
-						adjusted_offset, size);
-		if (ret != EC_SUCCESS)
-			return EC_RES_INVALID_PARAM;
-
-		offset = adjusted_offset;
 	}
 
-	memcpy(output, fp_buffer + offset, size);
+	auto frame_chunk = checked_subspan(fp_buffer, offset, size);
+	if (!frame_chunk.has_value())
+		return EC_RES_INVALID_PARAM;
+
+	std::ranges::copy(*frame_chunk, output);
 
 	return EC_RES_SUCCESS;
 }
@@ -690,18 +858,17 @@ fp_command_frame_v0(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
 		static_cast<const struct ec_params_fp_frame *>(args->input_buf);
-	void *out = args->output_buf;
+	auto *out = static_cast<uint8_t *>(args->output_buf);
 	uint16_t idx = FP_FRAME_GET_BUFFER_INDEX(params->offset);
 	uint32_t offset = params->offset & FP_FRAME_OFFSET_MASK;
 	uint32_t size = params->size;
-	enum ec_error_list ret;
 
 	if (size > args->output_buf_max)
 		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (idx == FP_FRAME_INDEX_RAW_IMAGE) {
 		/* The host requested a frame. */
-		enum ec_status ret = get_frame(offset, size, (uint8_t *)out);
+		enum ec_status ret = get_frame(offset, size, out);
 		if (ret != EC_RES_SUCCESS) {
 			return static_cast<enum ec_host_cmd_status>(ret);
 		}
@@ -713,7 +880,8 @@ fp_command_frame_v0(struct ec_host_cmd_handler_args *args)
 	/* The host requested a template. */
 
 	/* Encryption or decryption is in progress. */
-	if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+	if (FpSensorMode(global_context.sensor_mode)
+		    .has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 		return EC_HOST_CMD_BUSY;
 	}
 
@@ -724,8 +892,9 @@ fp_command_frame_v0(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_INVALID_PARAM;
 	if (fgr >= global_context.templ_valid)
 		return EC_HOST_CMD_UNAVAILABLE;
-	ret = validate_fp_buffer_offset(sizeof(fp_enc_buffer), offset, size);
-	if (ret != EC_SUCCESS)
+	auto enc_chunk =
+		checked_subspan(fp_enc_buffer.as_bytes(), offset, size);
+	if (!enc_chunk.has_value())
 		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (!offset) {
@@ -743,7 +912,7 @@ fp_command_frame_v0(struct ec_host_cmd_handler_args *args)
 			return EC_HOST_CMD_UNAVAILABLE;
 		}
 	}
-	memcpy(out, reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset, size);
+	std::ranges::copy(*enc_chunk, out);
 	args->output_buf_size = size;
 
 	return EC_HOST_CMD_SUCCESS;
@@ -773,10 +942,9 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params = static_cast<const struct ec_params_fp_frame_v1 *>(
 		args->input_buf);
-	void *out = args->output_buf;
+	auto *out = static_cast<uint8_t *>(args->output_buf);
 	uint32_t offset = params->offset;
 	uint32_t size = params->size;
-	enum ec_error_list ret;
 	enum ec_status status;
 
 	if (size > args->output_buf_max)
@@ -785,7 +953,7 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 	switch (params->cmd) {
 	case FP_FRAME_GET_RAW_IMAGE:
 		/* The host requested a frame. */
-		status = get_frame(offset, size, (uint8_t *)out);
+		status = get_frame(offset, size, out);
 		if (status != EC_RES_SUCCESS) {
 			return static_cast<enum ec_host_cmd_status>(status);
 		}
@@ -800,7 +968,8 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 		 * Do not change the content of fp_enc_buffer if the encryption
 		 * or decryption is in progress.
 		 */
-		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+		if (FpSensorMode(global_context.sensor_mode)
+			    .has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 			return EC_HOST_CMD_BUSY;
 		}
 
@@ -826,9 +995,10 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 		}
 		break;
 	}
-	case FP_FRAME_GET_ENCRYPTED_TEMPLATE:
+	case FP_FRAME_GET_ENCRYPTED_TEMPLATE: {
 		/* Encryption or decryption is still running */
-		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+		if (FpSensorMode(global_context.sensor_mode)
+			    .has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 			return EC_HOST_CMD_BUSY;
 		}
 
@@ -842,18 +1012,17 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 		}
 
 		/* Validate data request */
-		ret = validate_fp_buffer_offset(sizeof(fp_enc_buffer), offset,
-						size);
-		if (ret != EC_SUCCESS)
+		auto enc_chunk =
+			checked_subspan(fp_enc_buffer.as_bytes(), offset, size);
+		if (!enc_chunk.has_value())
 			return EC_HOST_CMD_INVALID_PARAM;
 
 		/* Encryption succeeded */
-		memcpy(out,
-		       reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset,
-		       size);
+		std::ranges::copy(*enc_chunk, out);
 		args->output_buf_size = size;
 
 		break;
+	}
 	}
 
 	return EC_HOST_CMD_SUCCESS;
@@ -876,14 +1045,15 @@ EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_FRAME, fp_command_frame,
 static enum ec_status fp_command_stats(struct host_cmd_handler_args *args)
 {
 	auto *r = static_cast<struct ec_response_fp_stats *>(args->response);
+	const FpSensorStats &stats = state_machine.stats();
 
-	r->capture_time_us = capture_time_us;
-	r->matching_time_us = matching_time_us;
-	r->overall_time_us = overall_time_us;
-	r->overall_t0.lo = overall_t0.le.lo;
-	r->overall_t0.hi = overall_t0.le.hi;
-	r->timestamps_invalid = timestamps_invalid;
-	r->template_matched = stats_template_matched;
+	r->capture_time_us = stats.capture_time_us;
+	r->matching_time_us = stats.matching_time_us;
+	r->overall_time_us = stats.overall_time_us;
+	r->overall_t0.lo = stats.overall_t0.le.lo;
+	r->overall_t0.hi = stats.overall_t0.le.hi;
+	r->timestamps_invalid = stats.timestamps_invalid;
+	r->template_matched = stats.template_matched;
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;
@@ -926,14 +1096,6 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context)
 		return EC_RES_INVALID_PARAM;
 	}
 
-	/* Encrypted template is after the metadata. */
-	std::span templ = fp_enc_buffer.fp_template;
-	/* Positive match salt is after the template. */
-	std::span positive_match_salt = fp_enc_buffer.positive_match_salt;
-	std::span encrypted_template_and_positive_match_salt(
-		templ.data(),
-		templ.size_bytes() + positive_match_salt.size_bytes());
-
 	FpEncryptionKey key;
 	enum ec_error_list ret =
 		derive_encryption_key(key, enc_info->encryption_salt, context,
@@ -944,31 +1106,30 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context)
 	}
 
 	/* Decrypt the secret blob in-place. */
-	ret = aes_128_gcm_decrypt(key,
-				  encrypted_template_and_positive_match_salt,
-				  encrypted_template_and_positive_match_salt,
-				  enc_info->nonce, enc_info->tag);
+	std::span payload = fp_enc_buffer.payload();
+	ret = aes_128_gcm_decrypt(key, payload, payload, enc_info->nonce,
+				  enc_info->tag);
 	if (ret != EC_SUCCESS) {
 		/* Don't leave partially decrypted data in the buffer! */
-		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
+		fp_enc_buffer.clear();
 		CPRINTS("fgr%d: Failed to decipher template", idx);
 		return EC_RES_UNAVAILABLE;
 	}
 
-	if (bytes_are_trivial(positive_match_salt.data(),
-			      positive_match_salt.size_bytes())) {
+	if (bytes_are_trivial(fp_enc_buffer.positive_match_salt.data(),
+			      fp_enc_buffer.positive_match_salt.size())) {
 		/* Don't leave decrypted data in the buffer! */
-		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
+		fp_enc_buffer.clear();
 		CPRINTS("fgr%d: Trivial positive match salt.", idx);
 		return EC_RES_INVALID_PARAM;
 	}
 
-	std::ranges::copy(templ, fp_template[idx]);
-	std::ranges::copy(positive_match_salt,
+	std::ranges::copy(fp_enc_buffer.fp_template, fp_template[idx]);
+	std::ranges::copy(fp_enc_buffer.positive_match_salt,
 			  global_context.fp_positive_match_salt[idx]);
 
 	/* Don't leave decrypted data in the buffer! */
-	OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
+	fp_enc_buffer.clear();
 
 	global_context.templ_valid++;
 	return EC_RES_SUCCESS;
@@ -988,20 +1149,19 @@ static enum ec_status fp_command_template_v0(struct host_cmd_handler_args *args)
 		return EC_RES_OVERFLOW;
 
 	/* Encryption or decryption is in progress. */
-	if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+	if (FpSensorMode(global_context.sensor_mode)
+		    .has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 		return EC_RES_BUSY;
 	}
 
 	if (args->params_size !=
 	    size + offsetof(struct ec_params_fp_template, data))
 		return EC_RES_INVALID_PARAM;
-	enum ec_error_list ret =
-		validate_fp_buffer_offset(sizeof(fp_enc_buffer), offset, size);
-	if (ret != EC_SUCCESS)
+	auto dest = checked_subspan(fp_enc_buffer.as_bytes(), offset, size);
+	if (!dest.has_value())
 		return EC_RES_INVALID_PARAM;
 
-	memcpy(reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset,
-	       params->data, size);
+	std::ranges::copy(std::span(params->data, size), dest->begin());
 
 	if (xfer_complete) {
 		return fp_commit_template(global_context.user_id);
@@ -1023,7 +1183,8 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 		uint32_t offset = params->offset;
 
 		/* Encryption or decryption is in progress. */
-		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+		if (FpSensorMode(global_context.sensor_mode)
+			    .has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 			return EC_RES_BUSY;
 		}
 
@@ -1036,9 +1197,9 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 		    size + offsetof(struct ec_params_fp_template_v1, data)) {
 			return EC_RES_INVALID_PARAM;
 		}
-		enum ec_error_list ret = validate_fp_buffer_offset(
-			sizeof(fp_enc_buffer), offset, size);
-		if (ret != EC_SUCCESS) {
+		auto dest =
+			checked_subspan(fp_enc_buffer.as_bytes(), offset, size);
+		if (!dest.has_value()) {
 			return EC_RES_INVALID_PARAM;
 		}
 
@@ -1051,8 +1212,7 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 		global_context.template_encrypted_id = FP_NO_SUCH_TEMPLATE;
 
 		/* Copy part of the template to buffer. */
-		memcpy(reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset,
-		       params->data, size);
+		std::ranges::copy(std::span(params->data, size), dest->begin());
 
 		return EC_RES_SUCCESS;
 	}
@@ -1060,7 +1220,8 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 		uint32_t mode_output;
 
 		/* Encryption or decryption is in progress. */
-		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+		if (FpSensorMode(global_context.sensor_mode)
+			    .has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 			return EC_RES_BUSY;
 		}
 
@@ -1080,7 +1241,8 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 	}
 	case FP_TEMPLATE_GET_RESULT:
 		/* Decryption is still running */
-		if (global_context.sensor_mode & FP_MODE_DECRYPT_TEMPLATE) {
+		if (FpSensorMode(global_context.sensor_mode)
+			    .has_any(FP_MODE_DECRYPT_TEMPLATE)) {
 			return EC_RES_BUSY;
 		}
 
@@ -1113,20 +1275,6 @@ fp_command_confirm_template(struct host_cmd_handler_args *args)
 	std::span<const uint8_t, FP_MAC_LENGTH> mac{ params->mac };
 
 	/*
-	 * The context for signing/verifying messages is Android user id
-	 * which is 4 byte integer.
-	 */
-	static_assert(global_context.user_id.size() >= sizeof(uint32_t));
-	std::span<const uint8_t> context{ global_context.user_id.data(),
-					  sizeof(uint32_t) };
-
-	/* The operation is just an "enroll_finish" string */
-	static constexpr uint8_t operation_str[] = { 'e', 'n', 'r', 'o', 'l',
-						     'l', '_', 'f', 'i', 'n',
-						     'i', 's', 'h' };
-	std::span<const uint8_t> operation{ operation_str };
-
-	/*
 	 * After successful enrollment, the 'template_newly_enrolled' (new
 	 * template id) must be equal to 'templ_valid'.
 	 */
@@ -1135,7 +1283,9 @@ fp_command_confirm_template(struct host_cmd_handler_args *args)
 		return EC_RES_ERROR;
 	}
 
-	if (validate_request(context, operation, mac) != EC_SUCCESS) {
+	if (validate_request(global_context.auth_user_id_context(),
+			     as_operation_span("enroll_finish"),
+			     mac) != EC_SUCCESS) {
 		return EC_RES_ACCESS_DENIED;
 	}
 

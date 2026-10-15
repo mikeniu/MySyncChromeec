@@ -12,6 +12,8 @@
 #include "ec_commands.h"
 
 #include <cstdint>
+#include <optional>
+#include <span>
 #include <string>
 
 /**
@@ -24,6 +26,21 @@
  */
 enum ec_error_list validate_fp_buffer_offset(uint32_t buffer_size,
 					     uint32_t offset, uint32_t size);
+
+/**
+ * Return a bounds-checked subspan [offset, offset + size) of |buffer|, or
+ * std::nullopt if offset + size overflows or exceeds buffer.size().
+ */
+[[nodiscard]] inline std::optional<std::span<uint8_t> >
+checked_subspan(std::span<uint8_t> buffer, uint32_t offset,
+		uint32_t size) noexcept
+{
+	if (validate_fp_buffer_offset(buffer.size(), offset, size) !=
+	    EC_SUCCESS) {
+		return std::nullopt;
+	}
+	return buffer.subspan(offset, size);
+}
 
 bool fp_match_success(int match_result);
 

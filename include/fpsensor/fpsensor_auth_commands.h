@@ -13,6 +13,18 @@
 
 #include <array>
 #include <span>
+#include <string_view>
+
+/**
+ * View a string literal / string_view operation name as a byte span for MAC
+ * signing and verification.
+ */
+[[nodiscard]] inline std::span<const uint8_t>
+as_operation_span(std::string_view operation) noexcept
+{
+	return { reinterpret_cast<const uint8_t *>(operation.data()),
+		 operation.size() };
+}
 
 /**
  * Check the context has been cleared or not.

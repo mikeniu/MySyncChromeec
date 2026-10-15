@@ -12,6 +12,7 @@
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_image_frame_params.h"
+#include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_matcher.h"
@@ -85,6 +86,11 @@ __test_only void fp_task_simulate(void)
 }
 /* LCOV_EXCL_STOP */
 
+void enc_buffer::clear() noexcept
+{
+	OPENSSL_cleanse(this, sizeof(*this));
+}
+
 void fp_clear_finger_context(uint16_t idx)
 {
 	OPENSSL_cleanse(fp_template[idx], sizeof(fp_template[0]));
@@ -100,7 +106,7 @@ void fp_reset_context()
 	global_context.fp_encryption_status &=
 		FP_ENC_STATUS_SEED_SET | FP_CONTEXT_SESSION_NONCE_SET |
 		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
-	OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
+	fp_enc_buffer.clear();
 	global_context.template_encrypted_id = FP_NO_SUCH_TEMPLATE;
 	OPENSSL_cleanse(global_context.user_id.data(),
 			sizeof(global_context.user_id));
@@ -156,8 +162,7 @@ static enum ec_status fp_command_tpm_seed(struct host_cmd_handler_args *args)
 		CPRINTS("Seed has already been set.");
 		return EC_RES_ACCESS_DENIED;
 	}
-	memcpy(global_context.tpm_seed.data(), params->seed,
-	       sizeof(global_context.tpm_seed));
+	std::ranges::copy(params->seed, global_context.tpm_seed.begin());
 	global_context.fp_encryption_status |= FP_ENC_STATUS_SEED_SET;
 
 	return EC_RES_SUCCESS;
@@ -179,19 +184,17 @@ fp_command_encryption_status(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_FP_ENC_STATUS, fp_command_encryption_status,
 		     EC_VER_MASK(0));
 
-static int validate_fp_mode(const uint32_t mode)
+static int validate_fp_mode(const FpSensorMode mode)
 {
-	uint32_t capture_type = FP_CAPTURE_TYPE(mode);
-	uint32_t algo_mode = mode & ~FP_MODE_CAPTURE_TYPE_MASK;
-	uint32_t cur_mode = global_context.sensor_mode;
+	const FpSensorMode cur_mode(global_context.sensor_mode);
 
-	if (capture_type >= FP_CAPTURE_TYPE_MAX)
+	if (mode.capture_type() >= FP_CAPTURE_TYPE_MAX)
 		return EC_ERROR_INVAL;
 
-	if (algo_mode & ~FP_VALID_MODES)
+	if (mode.algo_mode() & ~FP_VALID_MODES)
 		return EC_ERROR_INVAL;
 
-	if ((mode & FP_MODE_ENROLL_SESSION) &&
+	if (mode.has_any(FP_MODE_ENROLL_SESSION) &&
 	    global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
 		CPRINTS("Maximum number of fingers already enrolled: %d",
 			FP_MAX_FINGER_COUNT);
@@ -202,7 +205,8 @@ static int validate_fp_mode(const uint32_t mode)
 	 * FP_MODE_ENROLL_IMAGE requires an active enrollment session flag
 	 * to be set concurrently in the requested mode.
 	 */
-	if ((mode & FP_MODE_ENROLL_IMAGE) && !(mode & FP_MODE_ENROLL_SESSION)) {
+	if (mode.has_any(FP_MODE_ENROLL_IMAGE) &&
+	    !mode.has_any(FP_MODE_ENROLL_SESSION)) {
 		CPRINTS("FP_MODE_ENROLL_IMAGE requested without FP_MODE_ENROLL_SESSION");
 		return EC_ERROR_INVAL;
 	}
@@ -210,15 +214,16 @@ static int validate_fp_mode(const uint32_t mode)
 	/* Don't allow sensor reset if any other mode is
 	 * set (including FP_MODE_RESET_SENSOR itself).
 	 */
-	if ((mode & FP_MODE_RESET_SENSOR) && (cur_mode & FP_VALID_MODES)) {
+	if (mode.has_any(FP_MODE_RESET_SENSOR) &&
+	    cur_mode.has_any(FP_VALID_MODES)) {
 		return EC_ERROR_INVAL;
 	}
 
 	/*
 	 * Reject mode changes while a crypto operation is in progress.
 	 */
-	if (!(mode & FP_MODE_DONT_CHANGE) &&
-	    (cur_mode & FP_MODES_CRYPTO_IN_PROGRESS)) {
+	if (!mode.has_any(FP_MODE_DONT_CHANGE) &&
+	    cur_mode.has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 		return EC_ERROR_INVAL;
 	}
 
@@ -228,42 +233,19 @@ static int validate_fp_mode(const uint32_t mode)
 static enum ec_error_list
 authenticate_enroll(std::span<const uint8_t, SHA256_DIGEST_LENGTH> mac)
 {
-	/*
-	 * The context for signing/verifying messages is Android user id
-	 * which is 4 byte integer.
-	 */
-	static_assert(global_context.user_id.size() >= sizeof(uint32_t));
-	std::span<const uint8_t> context{ global_context.user_id.data(),
-					  sizeof(uint32_t) };
-
-	/* The operation is just an "enroll" string */
-	static constexpr uint8_t operation_str[] = { 'e', 'n', 'r',
-						     'o', 'l', 'l' };
-	std::span<const uint8_t> operation{ operation_str };
-
-	return validate_request(context, operation, mac);
+	return validate_request(global_context.auth_user_id_context(),
+				as_operation_span("enroll"), mac);
 }
 
 static enum ec_error_list
 authenticate_match(std::span<const uint8_t, SHA256_DIGEST_LENGTH> mac)
 {
-	/*
-	 * The context for signing/verifying messages is Android user id
-	 * which is 4 byte integer.
-	 */
-	static_assert(global_context.user_id.size() >= sizeof(uint32_t));
-	std::span<const uint8_t> context{ global_context.user_id.data(),
-					  sizeof(uint32_t) };
-
-	/* The operation is just an "auth" string */
-	static constexpr uint8_t operation_str[] = { 'a', 'u', 't', 'h' };
-	std::span<const uint8_t> operation{ operation_str };
-
-	return validate_request(context, operation, mac);
+	return validate_request(global_context.auth_user_id_context(),
+				as_operation_span("auth"), mac);
 }
 
 static enum ec_error_list authenticate_fp_mode(
-	const uint32_t mode,
+	const FpSensorMode mode,
 	std::optional<std::span<const uint8_t, SHA256_DIGEST_LENGTH> > mac)
 {
 	/* Allow for classic fingerprint flow. */
@@ -271,11 +253,11 @@ static enum ec_error_list authenticate_fp_mode(
 		return EC_SUCCESS;
 	}
 
-	uint32_t flags_changed = global_context.sensor_mode ^ mode;
-	uint32_t flags_enabled = mode & flags_changed;
+	const FpSensorMode flags_enabled = mode.newly_enabled_flags(
+		FpSensorMode(global_context.sensor_mode));
 
 	/* Modes that don't require authentication are allowed. */
-	if (!(flags_enabled & FP_MODES_WITH_AUTHENTICATION)) {
+	if (!flags_enabled.has_any(FP_MODES_WITH_AUTHENTICATION)) {
 		return EC_SUCCESS;
 	}
 
@@ -284,7 +266,7 @@ static enum ec_error_list authenticate_fp_mode(
 	 * set. A single cryptographic MAC is tied to exactly one operation
 	 * string.
 	 */
-	if (std::popcount(mode & FP_MODES_WITH_AUTHENTICATION) > 1) {
+	if (mode.count(FP_MODES_WITH_AUTHENTICATION) > 1) {
 		return EC_ERROR_INVAL;
 	}
 
@@ -293,13 +275,10 @@ static enum ec_error_list authenticate_fp_mode(
 		return EC_ERROR_ACCESS_DENIED;
 	}
 
-	if (flags_enabled & FP_MODE_ENROLL_SESSION) {
+	if (flags_enabled.has_any(FP_MODE_ENROLL_SESSION)) {
 		return authenticate_enroll(mac.value());
-	} else if (flags_enabled & FP_MODE_MATCH) {
-		return authenticate_match(mac.value());
 	}
-
-	return EC_ERROR_UNKNOWN;
+	return authenticate_match(mac.value());
 }
 
 enum ec_status fp_set_sensor_mode(
@@ -309,21 +288,23 @@ enum ec_status fp_set_sensor_mode(
 	if (mode_output == nullptr)
 		return EC_RES_INVALID_PARAM;
 
-	int ret = validate_fp_mode(mode);
+	const FpSensorMode requested_mode(mode);
+	int ret = validate_fp_mode(requested_mode);
 	if (ret != EC_SUCCESS) {
 		CPRINTS("Invalid FP mode 0x%x", mode);
 		return EC_RES_INVALID_PARAM;
 	}
 
-	if (!(mode & FP_MODE_DONT_CHANGE)) {
-		enum ec_error_list auth_err = authenticate_fp_mode(mode, mac);
+	if (!requested_mode.has_any(FP_MODE_DONT_CHANGE)) {
+		enum ec_error_list auth_err =
+			authenticate_fp_mode(requested_mode, mac);
 		if (auth_err != EC_SUCCESS) {
 			CPRINTS("Mode authentication failed with: %d",
 				auth_err);
 			return EC_RES_ACCESS_DENIED;
 		}
 
-		global_context.sensor_mode = mode;
+		global_context.sensor_mode = requested_mode.raw;
 		task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
 	}
 
@@ -365,7 +346,8 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 
 	switch (p->action) {
 	case FP_CONTEXT_ASYNC:
-		if (global_context.sensor_mode & FP_MODE_RESET_SENSOR)
+		if (FpSensorMode(global_context.sensor_mode)
+			    .has_any(FP_MODE_RESET_SENSOR))
 			return EC_RES_BUSY;
 
 		/**
@@ -378,7 +360,8 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 					  std::nullopt);
 
 	case FP_CONTEXT_GET_RESULT:
-		if (global_context.sensor_mode & FP_MODE_RESET_SENSOR)
+		if (FpSensorMode(global_context.sensor_mode)
+			    .has_any(FP_MODE_RESET_SENSOR))
 			return EC_RES_BUSY;
 
 		memcpy(global_context.user_id.data(), p->userid,
@@ -386,12 +369,10 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 
 		/* Set the FP_CONTEXT_USER_ID_SET bit if the user_id is
 		 * non-zero. */
-		for (size_t i = 0; i < std::size(global_context.user_id); i++) {
-			if (global_context.user_id[i] != 0) {
-				global_context.fp_encryption_status |=
-					FP_CONTEXT_USER_ID_SET;
-				break;
-			}
+		if (std::ranges::any_of(global_context.user_id,
+					[](uint8_t b) { return b != 0; })) {
+			global_context.fp_encryption_status |=
+				FP_CONTEXT_USER_ID_SET;
 		}
 
 		return EC_RES_SUCCESS;
@@ -497,18 +478,6 @@ static enum ec_status fp_command_sign_match(struct host_cmd_handler_args *args)
 	auto *response =
 		static_cast<ec_response_fp_sign_match *>(args->response);
 
-	/*
-	 * The context for signing/verifying messages is Android user id
-	 * which is 4 byte integer.
-	 */
-	static_assert(global_context.user_id.size() >= sizeof(uint32_t));
-	std::span<const uint8_t> context{ global_context.user_id.data(),
-					  sizeof(uint32_t) };
-
-	/* The operation is just an "auth" string */
-	static constexpr uint8_t operation_str[] = { 'a', 'u', 't', 'h' };
-	std::span<const uint8_t> operation{ operation_str };
-
 	std::span<const uint8_t, FP_CHALLENGE_SIZE> challenge{
 		params->challenge
 	};
@@ -536,7 +505,8 @@ static enum ec_status fp_command_sign_match(struct host_cmd_handler_args *args)
 		return EC_RES_TIMEOUT;
 	}
 
-	if (sign_message(context, operation, challenge, signature)) {
+	if (sign_message(global_context.auth_user_id_context(),
+			 as_operation_span("auth"), challenge, signature)) {
 		CPRINTS("Failed to sign message");
 		return EC_RES_ERROR;
 	}

@@ -57,6 +57,25 @@ struct enc_buffer {
 	struct ec_fp_template_encryption_metadata metadata{};
 	std::array<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE> fp_template{};
 	std::array<uint8_t, FP_POSITIVE_MATCH_SALT_BYTES> positive_match_salt{};
+
+	[[nodiscard]] std::span<uint8_t, FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE>
+	as_bytes() noexcept
+	{
+		return std::span<uint8_t, FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE>(
+			reinterpret_cast<uint8_t *>(this), sizeof(*this));
+	}
+
+	[[nodiscard]] std::span<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE +
+						 FP_POSITIVE_MATCH_SALT_BYTES>
+	payload() noexcept
+	{
+		return std::span<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE +
+						  FP_POSITIVE_MATCH_SALT_BYTES>(
+			fp_template.data(),
+			fp_template.size() + positive_match_salt.size());
+	}
+
+	void clear() noexcept;
 };
 BUILD_ASSERT(sizeof(enc_buffer) == FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE);
 
@@ -117,6 +136,18 @@ struct fpsensor_context {
 	uint16_t template_encrypted_id;
 	/** Template decryption result. */
 	atomic_t template_decryption_result;
+
+	/**
+	 * The context for signing/verifying messages is the Android user id,
+	 * which is the first 4-byte integer of user_id.
+	 */
+	[[nodiscard]] std::span<const uint8_t, sizeof(uint32_t)>
+	auth_user_id_context() const noexcept
+	{
+		static_assert(sizeof(user_id) >= sizeof(uint32_t));
+		return std::span<const uint8_t, sizeof(uint32_t)>(
+			user_id.data(), sizeof(uint32_t));
+	}
 };
 
 extern struct fpsensor_context global_context;
