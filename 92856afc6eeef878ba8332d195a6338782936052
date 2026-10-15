@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a653286_dff0480f",
+        "filename": "util/flash_ec",
+        "patchSetId": 2
+      },
+      "lineNbr": 2203,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:14:26Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "f00ce5ea_67d9a6b8",
+      "range": {
+        "startLine": 2203,
+        "startChar": 0,
+        "endLine": 2203,
+        "endChar": 0
+      },
+      "revId": "92856afc6eeef878ba8332d195a6338782936052",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cdf06b6_3c619020",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-14T19:30:29Z",
       "side": 1,
       "message": "Same here, this should include SPI_OFFSET:\n--spi_start\u003d$(printf \u00270x%08x\u0027 $(( SPI_OFFSET + CUR_START )))",
+      "range": {
+        "startLine": 2222,
+        "startChar": 0,
+        "endLine": 2222,
+        "endChar": 0
+      },
+      "revId": "92856afc6eeef878ba8332d195a6338782936052",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8728b9fa_d96756ec",
+        "filename": "util/flash_ec",
+        "patchSetId": 2
+      },
+      "lineNbr": 2222,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:14:26Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "6cdf06b6_3c619020",
       "range": {
         "startLine": 2222,
         "startChar": 0,
