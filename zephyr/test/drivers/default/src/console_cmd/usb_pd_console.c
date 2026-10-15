@@ -328,7 +328,7 @@ static void set_device_vdo(int port, enum tcpci_msg_type type)
 	struct pd_discovery *dev_disc;
 
 	dev_disc = pd_get_am_discovery_and_notify_access(port, type);
-	dev_disc->svid_cnt = 1;
+	dev_disc->svid_cnt = 2;
 	dev_disc->svids[0].svid = USB_VID_INTEL;
 	dev_disc->svids[0].discovery = PD_DISC_COMPLETE;
 	dev_disc->svids[0].mode_cnt = 1;
@@ -338,6 +338,11 @@ static void set_device_vdo(int port, enum tcpci_msg_type type)
 	device_resp.vendor_spec_b0 = VENDOR_SPECIFIC_NOT_SUPPORTED;
 	device_resp.vendor_spec_b1 = VENDOR_SPECIFIC_NOT_SUPPORTED;
 	dev_disc->svids[0].mode_vdo[0] = device_resp.raw_value;
+	dev_disc->svids[1].svid = USB_SID_DISPLAYPORT;
+	dev_disc->svids[1].discovery = PD_DISC_COMPLETE;
+	dev_disc->svids[1].mode_cnt = 2;
+	dev_disc->svids[1].mode_vdo[0] = 0x11111111;
+	dev_disc->svids[1].mode_vdo[1] = 0x22222222;
 }
 
 static void set_active_cable_type(int port, enum tcpci_msg_type type,
