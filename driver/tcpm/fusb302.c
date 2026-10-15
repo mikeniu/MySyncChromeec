@@ -1031,8 +1031,9 @@ void fusb302_tcpc_alert(int port)
 		/* (this interrupt fires after the GoodCRC finishes) */
 		if (state[port].rx_enable) {
 			/* Pull all RX messages from TCPC into EC memory */
-			while (!fusb302_rx_fifo_is_empty(port))
-				tcpm_enqueue_message(port);
+			while (!fusb302_rx_fifo_is_empty(port) &&
+			       tcpm_enqueue_message(port) == EC_SUCCESS)
+				;
 		} else {
 			/* flush rx fifo if rx isn't enabled */
 			fusb302_flush_rx_fifo(port);
