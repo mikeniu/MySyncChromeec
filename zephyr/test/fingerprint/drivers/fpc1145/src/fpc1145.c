@@ -169,6 +169,14 @@ ZTEST_F(fpc1145, test_get_info)
 
 ZTEST_F(fpc1145, test_enter_low_power_mode)
 {
+	const struct gpio_dt_spec spec =
+		GPIO_DT_SPEC_GET(DT_NODELABEL(fpc1145), irq_gpios);
+	gpio_flags_t flags;
+
+	/* Enable interrupt (they are disabled by default). */
+	zassert_ok(gpio_pin_interrupt_configure_dt(&spec,
+						   GPIO_INT_EDGE_TO_ACTIVE));
+
 	zassert_ok(fingerprint_set_mode(fixture->dev,
 					FINGERPRINT_SENSOR_MODE_LOW_POWER));
 	/*
@@ -176,6 +184,9 @@ ZTEST_F(fpc1145, test_enter_low_power_mode)
 	 * latency, expected power consumption).
 	 */
 	zassert_equal(fpc1145_get_low_power_mode(fixture->target), 0);
+
+	zassert_ok(gpio_emul_flags_get_dt(&spec, &flags));
+	zassert_equal(flags & GPIO_INT_ENABLE, 0);
 }
 
 ZTEST_F(fpc1145, test_enter_idle)
