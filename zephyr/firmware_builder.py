@@ -11,6 +11,7 @@
 This is the entry point for the custom firmware builder workflow recipe.
 """
 
+import argparse
 import collections
 from concurrent import futures
 import json
@@ -568,15 +569,13 @@ def _get_make_patterns(variable):
     return output.splitlines()
 
 
-def merge_shards(opts):
+def merge_shards(opts: argparse.Namespace) -> int:
     """Merges coverage artifacts from multiple build shards into a single report.
 
     Also prints the code coverage metrics of the merged report as JSON, in the
     format of the response that the recipe logs for test().
     """
-    retcode = merge_shard_coverage_reports(
-        opts, ZEPHYR_DIR, log_cmd, get_bundle_dir, write_metadata, firmware_pb2
-    )
+    retcode = merge_shard_coverage_reports(opts, ZEPHYR_DIR, log_cmd)
     if retcode:
         return retcode
 
