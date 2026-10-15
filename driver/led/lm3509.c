@@ -32,7 +32,7 @@ static int brightness_to_bmain(int percent)
 	int i;
 	int b = percent * 10;
 
-	for (i = 1; i < sizeof(lm3509_brightness); i++) {
+	for (i = 1; i < ARRAY_SIZE(lm3509_brightness); i++) {
 		int low = lm3509_brightness[i - 1];
 		int high = lm3509_brightness[i];
 		if (high < b)
