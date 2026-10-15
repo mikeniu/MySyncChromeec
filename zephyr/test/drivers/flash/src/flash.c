@@ -536,6 +536,17 @@ ZTEST_USER(flash, test_console_cmd_flash_erase__bad_args)
 	/* Check for alpha arg instead of number*/
 	CHECK_CONSOLE_CMD("flasherase xyz 100", NULL, EC_ERROR_PARAM1);
 	CHECK_CONSOLE_CMD("flasherase 100 xyz", NULL, EC_ERROR_PARAM2);
+
+	/* Negative offset or size, and exact 0 boundary */
+	CHECK_CONSOLE_CMD("flasherase -1 100", NULL, EC_ERROR_INVAL);
+	CHECK_CONSOLE_CMD("flasherase 0 " STRINGIFY(CONFIG_FLASH_ERASE_SIZE),
+			  NULL, EC_SUCCESS);
+	CHECK_CONSOLE_CMD("flasherase 100 -1", NULL, EC_ERROR_INVAL);
+	/*
+	 * size == 0 passes validate_flash_offset_size() and fails in
+	 * cros_flash_emul_erase() with -EINVAL (catching size <= 0 mutations).
+	 */
+	CHECK_CONSOLE_CMD("flasherase 0x10000 0", NULL, -EINVAL);
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_erase__overflow)
@@ -974,6 +985,18 @@ ZTEST_USER(flash, test_console_cmd_flash_write__bad_args)
 	/* Check for alpha arg instead of number*/
 	CHECK_CONSOLE_CMD("flashwrite xyz 100", NULL, EC_ERROR_PARAM1);
 	CHECK_CONSOLE_CMD("flashwrite 100 xyz", NULL, EC_ERROR_PARAM2);
+
+	/* Negative offset or size, and exact 0 boundary */
+	CHECK_CONSOLE_CMD("flashwrite -1 100", NULL, EC_ERROR_INVAL);
+	CHECK_CONSOLE_CMD("flashwrite 0 " STRINGIFY(CONFIG_FLASH_WRITE_SIZE),
+			  NULL, EC_SUCCESS);
+	CHECK_CONSOLE_CMD("flashwrite 100 -1", NULL, EC_ERROR_INVAL);
+	/*
+	 * size == 0 passes validate_flash_offset_size() and reaches
+	 * shared_mem_acquire(), which prints "Can't get shared mem".
+	 */
+	CHECK_CONSOLE_CMD("flashwrite 100 0", "Can't get shared mem",
+			  EC_ERROR_INVAL);
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_write__too_big)
@@ -1014,6 +1037,18 @@ ZTEST_USER(flash, test_console_cmd_flash_read__bad_args)
 	/* Check for alpha arg instead of number*/
 	CHECK_CONSOLE_CMD("flashread xyz 100", NULL, EC_ERROR_PARAM1);
 	CHECK_CONSOLE_CMD("flashread 100 xyz", NULL, EC_ERROR_PARAM2);
+
+	/* Negative offset or size, and exact 0 boundary */
+	CHECK_CONSOLE_CMD("flashread -1 100", NULL, EC_ERROR_INVAL);
+	CHECK_CONSOLE_CMD("flashread 0 " STRINGIFY(CONFIG_FLASH_WRITE_SIZE),
+			  NULL, EC_SUCCESS);
+	CHECK_CONSOLE_CMD("flashread 100 -1", NULL, EC_ERROR_INVAL);
+	/*
+	 * size == 0 passes validate_flash_offset_size() and reaches
+	 * shared_mem_acquire(), which prints "Can't get shared mem".
+	 */
+	CHECK_CONSOLE_CMD("flashread 100 0", "Can't get shared mem",
+			  EC_ERROR_INVAL);
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_read__too_big)
@@ -1221,6 +1256,7 @@ static void flash_reset(void *data)
 	cros_flash_emul_protect_reset();
 
 	/* Tests modify these banks. Erase them. */
+	zassert_ok(crec_flash_erase(0, 0x10000));
 	zassert_ok(crec_flash_erase(0x10000, 0x10000));
 	zassert_ok(crec_flash_erase(0x30000, 0x10000));
 	zassert_ok(crec_flash_erase(0x40000, 0x10000));
