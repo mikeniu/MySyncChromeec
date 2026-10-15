@@ -14,6 +14,7 @@
 #include <zephyr/ztest.h>
 
 #include <algorithm>
+#include <array>
 extern "C" {
 #include <ascp/ascp.h>
 }

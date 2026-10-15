@@ -12,6 +12,7 @@
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_image_frame_params.h"
+#include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_matcher.h"
@@ -179,19 +180,17 @@ fp_command_encryption_status(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_FP_ENC_STATUS, fp_command_encryption_status,
 		     EC_VER_MASK(0));
 
-static int validate_fp_mode(const uint32_t mode)
+static int validate_fp_mode(const FpSensorMode mode)
 {
-	uint32_t capture_type = FP_CAPTURE_TYPE(mode);
-	uint32_t algo_mode = mode & ~FP_MODE_CAPTURE_TYPE_MASK;
-	uint32_t cur_mode = global_context.sensor_mode;
+	const FpSensorMode cur_mode(global_context.sensor_mode);
 
-	if (capture_type >= FP_CAPTURE_TYPE_MAX)
+	if (mode.capture_type() >= FP_CAPTURE_TYPE_MAX)
 		return EC_ERROR_INVAL;
 
-	if (algo_mode & ~FP_VALID_MODES)
+	if (mode.algo_mode() & ~FP_VALID_MODES)
 		return EC_ERROR_INVAL;
 
-	if ((mode & FP_MODE_ENROLL_SESSION) &&
+	if (mode.has_any(FP_MODE_ENROLL_SESSION) &&
 	    global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
 		CPRINTS("Maximum number of fingers already enrolled: %d",
 			FP_MAX_FINGER_COUNT);
@@ -202,7 +201,8 @@ static int validate_fp_mode(const uint32_t mode)
 	 * FP_MODE_ENROLL_IMAGE requires an active enrollment session flag
 	 * to be set concurrently in the requested mode.
 	 */
-	if ((mode & FP_MODE_ENROLL_IMAGE) && !(mode & FP_MODE_ENROLL_SESSION)) {
+	if (mode.has_any(FP_MODE_ENROLL_IMAGE) &&
+	    !mode.has_any(FP_MODE_ENROLL_SESSION)) {
 		CPRINTS("FP_MODE_ENROLL_IMAGE requested without FP_MODE_ENROLL_SESSION");
 		return EC_ERROR_INVAL;
 	}
@@ -210,15 +210,16 @@ static int validate_fp_mode(const uint32_t mode)
 	/* Don't allow sensor reset if any other mode is
 	 * set (including FP_MODE_RESET_SENSOR itself).
 	 */
-	if ((mode & FP_MODE_RESET_SENSOR) && (cur_mode & FP_VALID_MODES)) {
+	if (mode.has_any(FP_MODE_RESET_SENSOR) &&
+	    cur_mode.has_any(FP_VALID_MODES)) {
 		return EC_ERROR_INVAL;
 	}
 
 	/*
 	 * Reject mode changes while a crypto operation is in progress.
 	 */
-	if (!(mode & FP_MODE_DONT_CHANGE) &&
-	    (cur_mode & FP_MODES_CRYPTO_IN_PROGRESS)) {
+	if (!mode.has_any(FP_MODE_DONT_CHANGE) &&
+	    cur_mode.has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 		return EC_ERROR_INVAL;
 	}
 
@@ -263,7 +264,7 @@ authenticate_match(std::span<const uint8_t, SHA256_DIGEST_LENGTH> mac)
 }
 
 static enum ec_error_list authenticate_fp_mode(
-	const uint32_t mode,
+	const FpSensorMode mode,
 	std::optional<std::span<const uint8_t, SHA256_DIGEST_LENGTH> > mac)
 {
 	/* Allow for classic fingerprint flow. */
@@ -271,11 +272,11 @@ static enum ec_error_list authenticate_fp_mode(
 		return EC_SUCCESS;
 	}
 
-	uint32_t flags_changed = global_context.sensor_mode ^ mode;
-	uint32_t flags_enabled = mode & flags_changed;
+	const FpSensorMode flags_enabled = mode.newly_enabled_flags(
+		FpSensorMode(global_context.sensor_mode));
 
 	/* Modes that don't require authentication are allowed. */
-	if (!(flags_enabled & FP_MODES_WITH_AUTHENTICATION)) {
+	if (!flags_enabled.has_any(FP_MODES_WITH_AUTHENTICATION)) {
 		return EC_SUCCESS;
 	}
 
@@ -284,7 +285,7 @@ static enum ec_error_list authenticate_fp_mode(
 	 * set. A single cryptographic MAC is tied to exactly one operation
 	 * string.
 	 */
-	if (std::popcount(mode & FP_MODES_WITH_AUTHENTICATION) > 1) {
+	if (mode.count(FP_MODES_WITH_AUTHENTICATION) > 1) {
 		return EC_ERROR_INVAL;
 	}
 
@@ -293,13 +294,10 @@ static enum ec_error_list authenticate_fp_mode(
 		return EC_ERROR_ACCESS_DENIED;
 	}
 
-	if (flags_enabled & FP_MODE_ENROLL_SESSION) {
+	if (flags_enabled.has_any(FP_MODE_ENROLL_SESSION)) {
 		return authenticate_enroll(mac.value());
-	} else if (flags_enabled & FP_MODE_MATCH) {
-		return authenticate_match(mac.value());
 	}
-
-	return EC_ERROR_UNKNOWN;
+	return authenticate_match(mac.value());
 }
 
 enum ec_status fp_set_sensor_mode(
@@ -309,21 +307,23 @@ enum ec_status fp_set_sensor_mode(
 	if (mode_output == nullptr)
 		return EC_RES_INVALID_PARAM;
 
-	int ret = validate_fp_mode(mode);
+	const FpSensorMode requested_mode(mode);
+	int ret = validate_fp_mode(requested_mode);
 	if (ret != EC_SUCCESS) {
 		CPRINTS("Invalid FP mode 0x%x", mode);
 		return EC_RES_INVALID_PARAM;
 	}
 
-	if (!(mode & FP_MODE_DONT_CHANGE)) {
-		enum ec_error_list auth_err = authenticate_fp_mode(mode, mac);
+	if (!requested_mode.has_any(FP_MODE_DONT_CHANGE)) {
+		enum ec_error_list auth_err =
+			authenticate_fp_mode(requested_mode, mac);
 		if (auth_err != EC_SUCCESS) {
 			CPRINTS("Mode authentication failed with: %d",
 				auth_err);
 			return EC_RES_ACCESS_DENIED;
 		}
 
-		global_context.sensor_mode = mode;
+		global_context.sensor_mode = requested_mode.raw;
 		task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
 	}
 
