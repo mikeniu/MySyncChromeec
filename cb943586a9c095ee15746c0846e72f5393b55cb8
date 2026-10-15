@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef5d0f95_1b5729f9",
+        "filename": "util/flash/stm32_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:12:26Z",
+      "side": 1,
+      "message": "Done. It uses gsc_ec_reset (the GSC\u0027s ecrst) on C2D2, like flash_ec\u0027s servo_ec_hard_reset_or_die().",
+      "parentUuid": "3a8b25b7_d6a155e8",
+      "range": {
+        "startLine": 99,
+        "startChar": 12,
+        "endLine": 101,
+        "endChar": 47
+      },
+      "revId": "cb943586a9c095ee15746c0846e72f5393b55cb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27dd1aed_c27999ec",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-14T22:55:22Z",
       "side": 1,
       "message": "Including -U (unprotect) during a read operation can be destructive on STM32 if read protection is active, as it triggers a mass erase. If the chip is not protected, -U is unnecessary. Consider removing it for read-only operations, especially the one used for FMAP preservation on line 179.",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 164,
+        "endChar": 0
+      },
+      "revId": "cb943586a9c095ee15746c0846e72f5393b55cb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c399b2a_fc8ab0d7",
+        "filename": "util/flash/stm32_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:12:26Z",
+      "side": 1,
+      "message": "Done, dropped -U from all three reads (--read, the FMAP-preserve read, and the verify read). The write keeps -U -u -e -w.",
+      "parentUuid": "27dd1aed_c27999ec",
       "range": {
         "startLine": 164,
         "startChar": 0,
