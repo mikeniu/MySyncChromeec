@@ -900,7 +900,7 @@
 
 	motionsense-sensor-info {
 		compatible = "cros-ec,motionsense-sensor-info";
-		accel-force-mode-sensors = <&ms_bma255 &ms_lis2dw12_accel>;
+		accel-force-mode-sensors = <&ms_bma255>;
 	};
 
 	/*

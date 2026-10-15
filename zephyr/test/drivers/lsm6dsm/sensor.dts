@@ -10,6 +10,7 @@
   aliases {
 		lsm6dsm-int = &ms_lsm6dsm_accel;
 		/delete-property/ bmi160-int;
+		/delete-property/ lis2dw12-int;
 		/delete-property/ bmi260-int;
 		/delete-property/ tcs3400-int;
 		/delete-property/ default-on-body-sensor;
