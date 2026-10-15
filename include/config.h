@@ -56,6 +56,13 @@
 /* When the ec_rate config is set, put the sensor in force mode */
 #undef CONFIG_SENSOR_EC_RATE_FORCE_MODE
 
+/*
+ * The EC owns the sensor bus only while the AP is off. Sensors active in S5
+ * are initialized after HOOK_CHIPSET_SHUTDOWN_COMPLETE and stopped at
+ * HOOK_CHIPSET_STARTUP.
+ */
+#undef CONFIG_SENSOR_BUS_AP_OFF_ONLY
+
 /* Add support for sensor FIFO */
 #undef CONFIG_ACCEL_FIFO
 

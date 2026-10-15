@@ -450,6 +450,12 @@ config LINK_TEST_SUITE_BODY_DETECTION
 	help
 	  Include the test suite exercising body detection behaviors in the binary.
 
+config LINK_TEST_SUITE_MOTION_SENSE_BUS_AP_OFF
+	bool "Link and test the motion sense AP-off-only sensor bus tests"
+	help
+	  Include the test suite exercising
+	  CONFIG_PLATFORM_EC_SENSOR_BUS_AP_OFF_ONLY in the binary.
+
 config LINK_TEST_SUITE_LED_PWM_FADE
 	bool "Link and test the led_pwm_fade.c tests"
 
