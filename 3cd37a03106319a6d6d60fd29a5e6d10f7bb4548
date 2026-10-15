@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49ee6b40_26c28dae",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:27:34Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Iterating directly over `futures` means that if a task takes a long time, progress reporting will stall, even if subsequent tasks have already finished. Wrapping this in `concurrent.futures.as_completed(futures)` will yield smoother progress updates.",
+      "range": {
+        "startLine": 409,
+        "startChar": 0,
+        "endLine": 409,
+        "endChar": 0
+      },
+      "revId": "3cd37a03106319a6d6d60fd29a5e6d10f7bb4548",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
