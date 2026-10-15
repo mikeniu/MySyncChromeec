@@ -314,6 +314,18 @@ static int check_reset_cause(void)
 		chip_flags = system_flags & EC_RESET_FLAG_AP_IDLE;
 	}
 
+	/*
+	 * Clear any stale EC_RESET_FLAG_INITIAL_PWR left in BBRAM if this is
+	 * not the expected second reset from H1 (e.g., on a sysjump where
+	 * chip_reset_cause is UNKNOWN_RST, or on a soft/watchdog reset).
+	 * On a cold power-on without EC_RESET_FLAG_HIBERNATE, POWERUP will
+	 * set EC_RESET_FLAG_INITIAL_PWR below.
+	 */
+	if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
+	    chip_reset_cause != VCC1_RST_PIN) {
+		system_flags &= ~EC_RESET_FLAG_INITIAL_PWR;
+	}
+
 	switch (chip_reset_cause) {
 	case POWERUP:
 		system_flags |= EC_RESET_FLAG_POWER_ON;
@@ -419,13 +431,18 @@ test_export_static int system_preinitialize(void)
 	 */
 #ifdef CONFIG_BOARD_RESET_AFTER_POWER_ON
 	if (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
-		/*
-		 * The current initial stage couldn't use the kernel delay
-		 * function. Use CPU nop instruction to wait for the external
-		 * reset from H1.
-		 */
-		for (uint32_t i = WAIT_RESET_TIME; i; i--)
-			arch_nop();
+		if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
+			/*
+			 * The current initial stage couldn't use the kernel
+			 * delay function. Use CPU nop instruction to wait for
+			 * the external reset from H1.
+			 */
+			for (uint32_t i = WAIT_RESET_TIME; i; i--)
+				arch_nop();
+		}
+		chip_save_reset_flags(chip_read_reset_flags() &
+				      ~EC_RESET_FLAG_INITIAL_PWR);
+		system_clear_reset_flags(EC_RESET_FLAG_INITIAL_PWR);
 	}
 #endif
 	return 0;
