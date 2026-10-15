@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "748e9931_7ffe1f44",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:34:06Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Changing the function name capture group from `([\\w.:]+)` to `([a-zA-Z_]\\w*)` drops support for C++ member functions (e.g., `MyClass::foo`), as `:` and `.` are no longer allowed in the function name. This causes C++ class methods to be missed by the script.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 0
+      },
+      "revId": "949c9935ba2e63908c658f299d7576988b87de57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e34384e_b1b9037b",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:34:06Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This non-greedy capture `[^;{}]*?` fails for functions with nested parentheses in their parameter lists, like function pointers (e.g., `void my_func(int (*callback)(int))`). The regex will consume until the first closing paren `)`, causing the rest of the regex to fail to match the opening brace `{`. Changing it to be greedy `[^;{}]*` is safe as it will stop at the first `;` or `{`, and will correctly match the full nested parens.",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 0
+      },
+      "revId": "949c9935ba2e63908c658f299d7576988b87de57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4d4b5ea_fcc4734d",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:34:06Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This pattern fails for `__attribute__` directives that have nested parentheses, such as `__attribute__((aligned(8)))`. The `[^)]*` will stop at the inner `)`, leaving one `)` unconsumed in the stream, which will cause the following `\\s*\\{` to fail to match. Consider using `(?:[^()]|\\([^()]*\\))*` instead of `[^)]*` to handle one level of nested parentheses safely.",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 0
+      },
+      "revId": "949c9935ba2e63908c658f299d7576988b87de57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5221866d_ed5b462d",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 540,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:34:06Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Splitting by `\u0026\u0026` first causes inverted precedence for expressions that mix `||` and `\u0026\u0026` without explicit parentheses (e.g., `CONFIG_A || CONFIG_B \u0026\u0026 CONFIG_C`). In C, `\u0026\u0026` has higher precedence than `||`, but this logic evaluates it as `(CONFIG_A || CONFIG_B) \u0026\u0026 CONFIG_C`, which may skip processing conditions correctly.",
+      "range": {
+        "startLine": 540,
+        "startChar": 0,
+        "endLine": 540,
+        "endChar": 0
+      },
+      "revId": "949c9935ba2e63908c658f299d7576988b87de57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f74543e9_f3b7de45",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:34:06Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This loop continuously calls `Path(inc)` repeatedly for all includes to grab their basename. Consider using `os.path.basename(inc) \u003d\u003d h_name` or doing a string search instead to optimize this as it runs for every header and file inclusion pair.",
+      "range": {
+        "startLine": 652,
+        "startChar": 0,
+        "endLine": 652,
+        "endChar": 0
+      },
+      "revId": "949c9935ba2e63908c658f299d7576988b87de57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90c5758b_512a7ece",
+        "filename": "util/find_unused.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:34:06Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Using `h_str.endswith(inc)` can lead to false positives when directories share suffixes. For example, a header named `mybar/baz.h` will be erroneously considered included if the directive is `bar/baz.h` as `mybar` ends with `bar`. Using `h_str.endswith(\u0027/\u0027 + inc) or h_str \u003d\u003d inc` would be safer and respect directory boundaries.",
+      "range": {
+        "startLine": 654,
+        "startChar": 0,
+        "endLine": 654,
+        "endChar": 0
+      },
+      "revId": "949c9935ba2e63908c658f299d7576988b87de57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
