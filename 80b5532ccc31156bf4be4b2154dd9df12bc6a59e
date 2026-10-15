@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed7e2eae_d7a5ebca",
+        "filename": "board/servo_v4p1/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T17:19:14Z",
+      "side": 1,
+      "message": "Because `USB_IFACE_MSC` and `USB_EP_MSC` are gated behind `#ifdef SECTION_IS_RO`, as soon as `servo_v4p1` performs its standard boot sysjump from `RO` to `RW`, Interface 1 reverts to `USB_IFACE_EMPTY` (`bNumEndpoints \u003d 0`) and `usb_msc.py` disables itself with `\"USB MSC endpoint not supported by current servo_v4p1 EC firmware\"`. (See also crrev.com/c/8119542 / go/servo-v4p1-virtual-usb for how MSC can be multiplexed over the existing `Interface 4` `USART4` stream so it works across both stock `RO` and `RW` firmware without needing a new USB endpoint.)",
+      "isAi": true,
+      "revId": "80b5532ccc31156bf4be4b2154dd9df12bc6a59e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "697243a4_ada11dac",
+        "filename": "board/servo_v4p1/servo_usb_bridge_frame.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 605,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T17:19:14Z",
+      "side": 1,
+      "message": "When `servo_bridge_pop_tx_frame()` pops a `SERVO_FRAME_MSC_DATA (0x90)` frame into `bridge_to_usart4`, it immediately clears `n-\u003epending_msc_len \u003d 0U` without credit flow control or per-chunk/per-sector ACK, allowing `bridge_arbiter_deferred()` (`usb_bridge.c:634`) to immediately consume the next `EP2 OUT` packet. During a 512-byte sector read (9 frames \u003d 585 UART wire bytes), all 585 bytes are streamed back-to-back at 1.000 Mbps (~5.85 ms) into the ATmega32U4\u0027s 256-byte `UartRx_Buffer`, which will overflow whenever `Bridge_Task()` on the ATmega32U4 is busy for \u003e2.56 ms.",
+      "isAi": true,
+      "revId": "80b5532ccc31156bf4be4b2154dd9df12bc6a59e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dd7097f_04e6cd1d",
+        "filename": "board/servo_v4p1/usb_bridge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T17:19:14Z",
+      "side": 1,
+      "message": "Using `.bInterfaceClass \u003d USB_CLASS_VENDOR_SPEC (0xFF)`, `.bInterfaceSubClass \u003d 0x50 (`USB_SUBCLASS_GOOGLE_SERIAL`)`, `.bInterfaceProtocol \u003d 0x01 (`USB_PROTOCOL_GOOGLE_SERIAL`)` causes the Linux kernel `usb_simple_serial` driver on the host labstation to automatically match Google VID `0x18d1` + `0xFF/0x50/0x01` and bind to Interface 1 as a `/dev/ttyUSBx` serial port.\n\nIf `udev`, `ModemManager`, or `servod`\u0027s serial port discovery opens that `/dev/ttyUSBx` node, the kernel submits Bulk IN URBs on `EP2 IN` (`0x82`) and steals `SERVO_FRAME_MSC_REQ` packets from `UsbMscInterface`. Notice that `USB_IFACE_BRIDGE` right below (lines 104-106) uses `0xFF / 0x00 / 0x00` specifically to prevent `usb_simple_serial` from binding—`USB_IFACE_MSC` should also avoid `0x50 / 0x01` (e.g. use `0xFF / 0x00 / 0x00` or a dedicated non-serial vendor subclass).",
+      "isAi": true,
+      "revId": "80b5532ccc31156bf4be4b2154dd9df12bc6a59e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
