@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d43a186_59a2371d",
+        "filename": "driver/tcpm/it83xx_pd.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-15T21:11:41Z",
+      "side": 1,
+      "message": "Nit: I think this should always be true when it matters. I presume that the goal here was to maintain a common set of macros with different expansions for IT83xx and IT8XXX2. Now, this driver only applies to IT8XXX2, so the conditionals should be superfluous. I think it\u0027s weird to conditionally compile stuff that doesn\u0027t have linkage anyway.",
+      "revId": "649394c0471d7a950ba680cbb9f5146784e1d337",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
