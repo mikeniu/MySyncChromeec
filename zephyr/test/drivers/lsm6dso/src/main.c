@@ -55,3 +55,40 @@ ZTEST(lsm6dso, test_set_data_rate_fifo_error)
 	/* Clear the failure */
 	lsm6dso_emul_set_write_fail_reg(emul, -1);
 }
+
+ZTEST(lsm6dso, test_push_fifo_data_oob_tags)
+{
+	/* Set FIFO length to 1 */
+	uint16_t sts = 1;
+	zassert_ok(i2c_write16(acc->port, acc->i2c_spi_addr_flags,
+			       LSM6DSO_FIFO_STS1_ADDR, sts));
+
+	/* Set invalid tag (0xFF >> 3 is 31, GYRO_TAG is 1) */
+	zassert_ok(i2c_write8(acc->port, acc->i2c_spi_addr_flags,
+			      LSM6DSO_FIFO_DATA_ADDR_TAG, 0xFF));
+
+	uint32_t event = CONFIG_ACCEL_LSM6DSO_INT_EVENT;
+	/* It should consume the event and not crash */
+	zassert_ok(acc->drv->irq_handler(acc, &event));
+}
+
+ZTEST(lsm6dso, test_set_range_rounding_clamping)
+{
+	/* Test accel clamping to max */
+	zassert_ok(acc->drv->set_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL * 2, 0));
+	zassert_equal(acc->current_range, LSM6DSO_ACCEL_FS_MAX_VAL);
+
+	/* Test accel rounding up */
+	zassert_ok(acc->drv->set_range(acc, LSM6DSO_ACCEL_FS_MIN_VAL + 1, 1));
+	/* Should round up to the next power of 2 */
+	zassert_equal(acc->current_range, LSM6DSO_ACCEL_FS_MIN_VAL * 2);
+
+	/* Test gyro clamping to max */
+	struct motion_sensor_t *gyro = &motion_sensors[GYR_SENSOR_ID];
+	zassert_ok(gyro->drv->set_range(gyro, 10000000, 0));
+
+	/* Test gyro rounding up */
+	zassert_ok(gyro->drv->set_range(gyro, LSM6DSO_GYRO_NORMALIZE_FS(0) + 1,
+					1));
+	zassert_equal(gyro->current_range, LSM6DSO_GYRO_NORMALIZE_FS(1));
+}
