@@ -40,12 +40,12 @@ int charger_profile_override_common(
 		if (test_flag_temp)
 			curr->batt.flags |= BATT_FLAG_BAD_TEMPERATURE;
 		else
-			curr->batt.flags &= BATT_FLAG_BAD_TEMPERATURE;
+			curr->batt.flags &= ~BATT_FLAG_BAD_TEMPERATURE;
 
 		if (test_flag_vtg)
 			curr->batt.flags |= BATT_FLAG_BAD_VOLTAGE;
 		else
-			curr->batt.flags &= BATT_FLAG_BAD_VOLTAGE;
+			curr->batt.flags &= ~BATT_FLAG_BAD_VOLTAGE;
 	}
 #endif
 
