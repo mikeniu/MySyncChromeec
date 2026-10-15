@@ -391,6 +391,8 @@ ZTEST(lis2dw12, test_lis2dw12_read)
 	intv3_t sample = { 0, 0, 0 };
 	int rv;
 
+	BUILD_ASSERT(LIS2DW12_STATUS_TAP == LIS2DW12_STATUS_REG);
+
 	/* Reading requires a range to be set. Use 1 so it has no effect
 	 * when scaling samples. Also need to set the sensor resolution
 	 * manually.
