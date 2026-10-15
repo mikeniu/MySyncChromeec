@@ -381,6 +381,7 @@ ZTEST_USER(console_cmd_usb_pd, test_pe)
 ZTEST_USER(console_cmd_usb_pd, test_pdcable)
 {
 	int rv;
+	struct pd_discovery *dev_disc;
 
 	rv = shell_execute_cmd(get_ec_shell(), "pdcable 0");
 	zassert_ok(rv, "Expected %d, but got %d", EC_SUCCESS, rv);
@@ -397,12 +398,24 @@ ZTEST_USER(console_cmd_usb_pd, test_pdcable)
 	rv = shell_execute_cmd(get_ec_shell(), "pdcable 0");
 	zassert_ok(rv, "Expected %d, but got %d", EC_SUCCESS, rv);
 
+	/* Test valid and out-of-bounds vbus_cur values */
+	dev_disc =
+		pd_get_am_discovery_and_notify_access(0, TCPCI_MSG_SOP_PRIME);
+	dev_disc->identity.product_t1.p_rev20.vbus_cur = USB_VBUS_CUR_3A;
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pdcable 0"));
+	dev_disc->identity.product_t1.p_rev20.vbus_cur = USB_VBUS_CUR_RES_3;
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pdcable 0"));
+
 	/* Handle error scenarios */
 	rv = shell_execute_cmd(get_ec_shell(), "pdcable");
 	zassert_equal(rv, EC_ERROR_PARAM_COUNT, "Expected %d, but got %d",
 		      EC_ERROR_PARAM_COUNT, rv);
 
 	rv = shell_execute_cmd(get_ec_shell(), "pdcable t");
+	zassert_equal(rv, EC_ERROR_PARAM2, "Expected %d, but got %d",
+		      EC_ERROR_PARAM2, rv);
+
+	rv = shell_execute_cmd(get_ec_shell(), "pdcable -1");
 	zassert_equal(rv, EC_ERROR_PARAM2, "Expected %d, but got %d",
 		      EC_ERROR_PARAM2, rv);
 }
