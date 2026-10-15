@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9d7018b_e98ae63f",
+        "filename": "util/flash/helpers.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:10:06Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "c91fe934_efb0d930",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 0
+      },
+      "revId": "1e793eaf6980b5a692910082f7c3a64a3800f3eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75a2d092_d581224b",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54accc27_7c80c6ae",
+        "filename": "util/flash/helpers.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:10:06Z",
+      "side": 1,
+      "message": "Done, the header row is skipped explicitly.",
+      "parentUuid": "75a2d092_d581224b",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 0
+      },
+      "revId": "1e793eaf6980b5a692910082f7c3a64a3800f3eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08456aa6_40e5a5af",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-14T23:09:16Z",
       "side": 1,
       "message": "If futility fails for a single section, the check\u003dTrue will cause the entire flasher to crash. If FMAP preservation is \u0027best effort\u0027, you should wrap this in a try/except block. If it is mandatory, the error message should be more descriptive about how to skip it.",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 0
+      },
+      "revId": "1e793eaf6980b5a692910082f7c3a64a3800f3eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b5fea30_4e086923",
+        "filename": "util/flash/helpers.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:10:06Z",
+      "side": 1,
+      "message": "It\u0027s mandatory, like flash_ec\u0027s preserve_sections(), so it still fails, but it now raises a RuntimeError that names the section and says to use --no_preserve to skip preserving it.",
+      "parentUuid": "08456aa6_40e5a5af",
       "range": {
         "startLine": 99,
         "startChar": 0,
