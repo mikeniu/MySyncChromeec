@@ -166,6 +166,10 @@ config LINK_TEST_SUITE_LOCATE_CHIP_ALTS
 config LINK_TEST_SUITE_LIS2DH
 	bool "Link tests for lis2dh driver"
 
+config LINK_TEST_SUITE_LSM6DSO
+	bool "Include lsm6dso tests"
+	default n
+
 config LINK_TEST_SUITE_LSM6DSM
 	bool "Link tests for lsm6dsm driver"
 
