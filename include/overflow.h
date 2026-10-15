@@ -8,6 +8,9 @@
 
 #include "compiler.h"
 
+#include <stdbool.h>
+#include <stdint.h>
+
 /*
  * __builtin_add_overflow, __builtin_sub_overflow and __builtin_mul_overflow
  * were added in gcc 5.1: https://gcc.gnu.org/gcc-5/changes.html
@@ -29,5 +32,14 @@
 #endif /* __clang__ */
 
 #include "third_party/linux/overflow.h"
+
+#ifdef __ZEPHYR__
+#include <zephyr/sys/math_extras.h>
+#else
+static inline bool u32_add_overflow(uint32_t a, uint32_t b, uint32_t *result)
+{
+	return check_add_overflow(a, b, result);
+}
+#endif /* __ZEPHYR__ */
 
 #endif /* PLATFORM_EC_INCLUDE_OVERFLOW_H_ */
