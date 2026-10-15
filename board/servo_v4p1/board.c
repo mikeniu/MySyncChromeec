@@ -358,29 +358,21 @@ void board_config_pre_init(void)
 	STM32_RCC_APB2ENR |= BIT(0);
 
 	/*
-	 * the DMA mapping is :
+	 * The DMA mapping is :
 	 *  Chan 2 : TIM1_CH1  (CHG RX) - Default mapping
 	 *  Chan 3 : SPI1_TX   (CHG TX) - Default mapping
-	 *  Chan 4 : USART1 TX - Remapped from default Chan 2
-	 *  Chan 5 : USART1 RX - Remapped from default Chan 3
-	 *  Chan 6 : TIM3_CH1  (DUT RX) - Remapped from default Chan 4
-	 *  Chan 7 : SPI2_TX   (DUT TX) - Remapped from default Chan 5
+	 *  Chan 4 : TIM3_CH1  (DUT RX) - Default mapping
+	 *  Chan 5 : SPI2_TX   (DUT TX) - Default mapping
+	 *  Chan 6 : USART4 RX (ATmega32U4) - Default mapping
+	 *  Chan 7 : USART4 TX (ATmega32U4) - Default mapping
 	 *
-	 * As described in the comments above, both USART1 TX/RX and DUT Tx/RX
-	 * channels must be remapped from the defulat locations. Remapping is
-	 * acoomplished by setting the following bits in the STM32_SYSCFG_CFGR1
-	 * register. Information about this register and its settings can be
-	 * found in section 11.3.7 DMA Request Mapping of the STM RM0091
-	 * Reference Manual
+	 * USART1 does not use DMA on this board (CONFIG_UART_TX/RX_DMA are
+	 * disabled and chip/stm32/uart.c clears DMAR/DMAT). Therefore, Port 1
+	 * DUT USB-PD TIM3_CH1 and SPI2_TX remain on their hardware-default
+	 * DMA1_CH4 and DMA1_CH5 (symmetric with Port 0 CHG TIM1_CH1 and SPI1_TX
+	 * on DMA1_CH2 and DMA1_CH3), leaving DMA1_CH6 and DMA1_CH7 free for
+	 * USART4_RX and USART4_TX with no SYSCFG_CFGR1 remap bits set.
 	 */
-	/* Remap USART1 Tx from DMA channel 2 to channel 4 */
-	STM32_SYSCFG_CFGR1 |= BIT(9);
-	/* Remap USART1 Rx from DMA channel 3 to channel 5 */
-	STM32_SYSCFG_CFGR1 |= BIT(10);
-	/* Remap TIM3_CH1 from DMA channel 4 to channel 6 */
-	STM32_SYSCFG_CFGR1 |= BIT(30);
-	/* Remap SPI2 Tx from DMA channel 5 to channel 7 */
-	STM32_SYSCFG_CFGR1 |= BIT(24);
 }
 
 /******************************************************************************
