@@ -1,0 +1,39 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+
+menuconfig FINGERPRINT_SENSOR_RTS5817MAA
+	bool "Fingerprint driver for RTS5817MAA"
+	default y
+	depends on DT_HAS_REALTEK_RTS5817MAA_ENABLED
+	help
+	  Driver for RTS5817MAA fingerprint sensor. It requires RTS5817MAA private
+	  library to implement cros_fingerprint API.
+
+if FINGERPRINT_SENSOR_RTS5817MAA
+
+config FINGERPRINT_SENSOR_RTS5817MAA_HEAP_SIZE
+	int "Size of heap for RTS5817MAA driver"
+	default 34816
+	help
+	  Size of heap to be used by RTS5817MAA private library. The heap must have
+	  enough size to keep finger templates during matching.
+	  106KB is enough to match 3 templates at once.
+
+config FINGERPRINT_SENSOR_RTS5817MAA_PAL
+	bool "Platform Abstraction Layer for RTS5817MAA private library"
+	default y if HAVE_RTS5817MAA_PRIVATE_DRIVER
+	help
+	  If enabled, Platform Abstraction Layer for RTS5817MAA private library will
+	  be compiled. The PAL is used to interact with the sensor (SPI, GPIO)
+	  and the system (heap allocations, printing messages, time functions).
+
+# Enabled in private driver Kconfig
+config HAVE_RTS5817MAA_PRIVATE_DRIVER
+	bool
+	default n
+	help
+	  If enabled, it indicates that the private driver is present.
+
+endif # FINGERPRINT_SENSOR_RTS5817MAA
