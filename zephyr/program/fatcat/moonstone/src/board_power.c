@@ -23,12 +23,35 @@ LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 /* Power cycling primary rail requires at least 30 ms 'off' time */
 #define BOARD_PTL_RVP_MINIMUM_POWER_DOWN_DELAY_MS 30
 
+static bool g3_pwr_up_req;
+
 static void board_ap_power_shutdown(void)
 {
 	int timeout_ms = X86_NON_DSX_FORCE_SHUTDOWN_TO_MS;
 
+	g3_pwr_up_req = false;
+
 	/* Turn off PCH_RMSRST to meet tPCH12 */
 	power_signal_set(PWR_EC_PCH_RSMRST, 1);
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_GESTURE_SENSOR_DOUBLE_TAP)) {
+		/*
+		 * Keep the S5 rails enabled in G3 so PP1800_S5 continues to
+		 * power the base accelerometer and its I2C/INT1 pull-ups for
+		 * double-tap detection while holding the PCH in RSMRST reset.
+		 */
+		power_signal_set(PWR_EN_PP5000_A, 1);
+		while (!power_signal_get(PWR_RSMRST_PWRGD) &&
+		       (timeout_ms > 0)) {
+			k_msleep(1);
+			timeout_ms--;
+		}
+		if (power_signal_get(PWR_RSMRST_PWRGD))
+			return;
+
+		LOG_WRN("RSMRST_PWRGD didn't come up in G3! Turning off PP5000_A.");
+		timeout_ms = X86_NON_DSX_FORCE_SHUTDOWN_TO_MS;
+	}
 
 	power_signal_set(PWR_EN_PP5000_A, 0);
 	/* Wait RSMRST to be off. */
@@ -59,6 +82,7 @@ static int board_ap_power_action_g3_run(void *data)
 	}
 
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
+		g3_pwr_up_req = true;
 		power_signal_set(PWR_EN_PP5000_A, 1);
 
 		/* Indication to soc on recovery boot */
@@ -76,7 +100,7 @@ static int board_ap_power_action_g3_run(void *data)
 	}
 
 	/* Return 0 only if power rails have been enabled  */
-	return !power_signal_get(PWR_EN_PP5000_A);
+	return !(g3_pwr_up_req && power_signal_get(PWR_EN_PP5000_A));
 }
 
 AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
