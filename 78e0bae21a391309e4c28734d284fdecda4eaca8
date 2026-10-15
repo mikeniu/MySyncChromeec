@@ -145,6 +145,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "960dd1b8_671706ad",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-15T08:39:01Z",
+      "side": 1,
+      "message": "I wouldn\u0027t say it\u0027s a good approach - checking lock_count suggests there is something designed incorrectly.\n\nI just realized, the case I described is handled by the `ScopedFastCpu` class. It\u0027s definitely not perfect, but should be enough for our case. I would just suggest to add synchronization for checking the mode, not fast calculations itself.",
+      "parentUuid": "7a7b961a_f0436162",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3700500b_33a80ce5",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
