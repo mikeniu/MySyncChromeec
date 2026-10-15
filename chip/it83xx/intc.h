@@ -16,6 +16,8 @@ static inline void data_serialization_barrier(void)
 {
 	if (IS_ENABLED(CHIP_CORE_NDS32))
 		asm volatile("dsb");
+	else if (IS_ENABLED(CHIP_CORE_RISCV))
+		asm volatile("fence.i" ::: "memory");
 }
 
 int intc_get_ec_int(void);
