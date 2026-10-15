@@ -130,3 +130,43 @@ ZTEST(lsm6dsm, test_disable_interrupt)
 	zassert_within(0x0000, data[1].data[Y], 1);
 	zassert_within(0x0000, data[1].data[Z], 1);
 }
+
+ZTEST(lsm6dsm, test_set_range)
+{
+	const struct {
+		int range;
+		int rnd;
+		int expected;
+	} cases[] = {
+		/* Clamped up to the minimum. */
+		{ -1, 0, LSM6DSM_ACCEL_FS_MIN_VAL },
+		{ 0, 0, LSM6DSM_ACCEL_FS_MIN_VAL },
+		{ LSM6DSM_ACCEL_FS_MIN_VAL - 1, 0, LSM6DSM_ACCEL_FS_MIN_VAL },
+		{ LSM6DSM_ACCEL_FS_MIN_VAL - 1, 1, LSM6DSM_ACCEL_FS_MIN_VAL },
+		/* Powers of two are not rounded up. */
+		{ LSM6DSM_ACCEL_FS_MIN_VAL, 0, LSM6DSM_ACCEL_FS_MIN_VAL },
+		{ LSM6DSM_ACCEL_FS_MIN_VAL, 1, LSM6DSM_ACCEL_FS_MIN_VAL },
+		{ 4, 1, 4 },
+		{ 8, 1, 8 },
+		/* Other values round down, or up if requested. */
+		{ LSM6DSM_ACCEL_FS_MIN_VAL + 1, 0, LSM6DSM_ACCEL_FS_MIN_VAL },
+		{ LSM6DSM_ACCEL_FS_MIN_VAL + 1, 1, 4 },
+		{ LSM6DSM_ACCEL_FS_MAX_VAL - 1, 0, 8 },
+		{ LSM6DSM_ACCEL_FS_MAX_VAL - 1, 1, LSM6DSM_ACCEL_FS_MAX_VAL },
+		/* At or above the maximum. */
+		{ LSM6DSM_ACCEL_FS_MAX_VAL, 1, LSM6DSM_ACCEL_FS_MAX_VAL },
+		{ LSM6DSM_ACCEL_FS_MAX_VAL + 1, 0, LSM6DSM_ACCEL_FS_MAX_VAL },
+		{ LSM6DSM_ACCEL_FS_MAX_VAL + 1, 1, LSM6DSM_ACCEL_FS_MAX_VAL },
+	};
+	const int orig_range = acc->current_range;
+
+	for (int i = 0; i < ARRAY_SIZE(cases); i++) {
+		zassert_ok(
+			acc->drv->set_range(acc, cases[i].range, cases[i].rnd));
+		zassert_equal(acc->current_range, cases[i].expected,
+			      "range %d rnd %d", cases[i].range, cases[i].rnd);
+	}
+
+	zassert_ok(acc->drv->set_range(acc, orig_range, 0));
+	zassert_equal(acc->current_range, orig_range);
+}
