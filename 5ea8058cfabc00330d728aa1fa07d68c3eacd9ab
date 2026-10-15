@@ -22,6 +22,30 @@
       },
       "revId": "5ea8058cfabc00330d728aa1fa07d68c3eacd9ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8b40ebd_682200a1",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T19:42:34Z",
+      "side": 1,
+      "message": "Good catch! On servo_micro, gsc_ec_reset is not defined so cold_reset is still needed there, whereas c2d2 should pulse gsc_ec_reset (since cold_reset on c2d2 triggers an H1 reset). Addressed in follow-up https://crrev.com/c/8588080 so we don\u0027t invalidate the CR+2 votes across this chain.",
+      "parentUuid": "d2f9c907_9b8fc959",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 0
+      },
+      "revId": "5ea8058cfabc00330d728aa1fa07d68c3eacd9ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
