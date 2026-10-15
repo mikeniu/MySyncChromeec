@@ -447,6 +447,9 @@ static void motion_sense_switch_sensor_rate(void)
 			if ((sensor->state != SENSOR_INITIALIZED) &&
 			    (sensor->state != SENSOR_READY))
 				continue;
+			if (!sensor->drv->list_activities ||
+			    !sensor->drv->manage_activity)
+				continue;
 			sensor->drv->list_activities(sensor, &enabled,
 						     &disabled);
 			/* exclude double tap, it is used internally. */
@@ -1662,6 +1665,8 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 		while (mask && ret == EC_HOST_CMD_SUCCESS) {
 			i = get_next_bit(&mask);
 			sensor = &motion_sensors[i];
+			if (!sensor->drv->list_activities)
+				continue;
 			ret = sensor->drv->list_activities(sensor, &enabled,
 							   &disabled);
 			if (ret == EC_RES_SUCCESS) {
@@ -1691,6 +1696,9 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 		while (mask && ret == EC_HOST_CMD_SUCCESS) {
 			i = get_next_bit(&mask);
 			sensor = &motion_sensors[i];
+			if (!sensor->drv->list_activities ||
+			    !sensor->drv->manage_activity)
+				continue;
 			sensor->drv->list_activities(sensor, &enabled,
 						     &disabled);
 			if ((1 << in->set_activity.activity) &

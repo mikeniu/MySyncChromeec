@@ -6,6 +6,7 @@
 #include "accelgyro.h"
 #include "body_detection.h"
 #include "console.h"
+#include "ec_cmd_api.h"
 #include "hooks.h"
 #include "hwtimer.h"
 #include "math_util.h"
@@ -378,6 +379,40 @@ ZTEST_USER(bodydetectinit, test_fifo_activity_sensor_bounds)
 	motion_sensors[0].oversampling_ratio = orig_oversampling;
 	motion_sense_fifo_reset();
 	motion_sense_fifo_reset_needed_flags();
+}
+
+ZTEST_USER(bodydetectinit, test_activity_null_drv_callbacks)
+{
+	struct ec_params_motion_sense params;
+	struct ec_response_motion_sense response;
+
+	/*
+	 * body_sensor->drv is set to mock_drv where list_activities and
+	 * manage_activity are NULL. Verify that host commands and chipset
+	 * shutdown do not dereference NULL function pointers.
+	 */
+	memset(&params, 0, sizeof(params));
+	params.cmd = MOTIONSENSE_CMD_LIST_ACTIVITIES;
+	zassert_equal(ec_cmd_motion_sense_cmd_v1(NULL, &params, &response),
+		      EC_RES_SUCCESS);
+
+	memset(&params, 0, sizeof(params));
+	params.cmd = MOTIONSENSE_CMD_SET_ACTIVITY;
+	params.set_activity.activity = MOTIONSENSE_ACTIVITY_BODY_DETECTION;
+	params.set_activity.enable = 1;
+	zassert_equal(ec_cmd_motion_sense_cmd_v1(NULL, &params, &response),
+		      EC_RES_SUCCESS);
+
+	hook_notify(HOOK_CHIPSET_SHUTDOWN);
+	k_sleep(K_MSEC(100));
+
+	/*
+	 * Back to S0 so the following tests do not run in S5. The resume path
+	 * initializes the sensor again, which the mock driver cannot do.
+	 */
+	body_sensor->drv = old_drv;
+	hook_notify(HOOK_CHIPSET_RESUME);
+	k_sleep(K_MSEC(100));
 }
 
 ZTEST_SUITE(bodydetectinit, drivers_predicate_post_main, NULL,
