@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a26ff9f0_178a36c3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-15T08:16:03Z",
+      "side": 1,
+      "message": "We don\u0027t have such test. Luckily, we have auto-suspend so the active mode is used only when any actions are running. Additionally, I checked with the hardware team to make sure we do not exceed maximum power consumption, limited by a voltage regulator. It\u0027s usually 1-2A, so we are far below that threshold.",
+      "parentUuid": "e5a9cfd5_2624215a",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 61
+      },
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0a3acce0_a44d4669",
@@ -63,6 +87,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dcccabb6_779f80ee",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-15T08:16:03Z",
+      "side": 1,
+      "message": "I\u0027m aware of that. It\u0027s not a trivial problem. The same happens after cold reboot, when the `SCLK_DIV` has reset value and the clock freq is increased `PRE_KERNEL_1`. I\u0027m not 100% sure how to deal with that. There will always be a window (window between setting system clock freq and SCLK_DIV), when SPI clock speed doesn\u0027t match expected value. There will be similar case when sysjumping to RO, SPI runs at 25MHz for a moment.\n\nIn current case, SPI runs at 100MHz for a moment, which is allowed for the used SPI chip. I would like to hear opinion from @jacky.lee@egistec.corp-partner.google.com and @jason.huang@egistec.corp-partner.google.com how to approach this. \n\nPlease keep in mind that modifying register of SPI used for memory-mapped read is not an easy task. It requires jumping to RAM and handling prefetching and IRQs.",
+      "parentUuid": "300e8293_08f27b78",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ef320f_25247478",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
@@ -81,6 +123,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "969f0e13_78a9ad0e",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-15T08:16:03Z",
+      "side": 1,
+      "message": "I think we can do that - @jason.huang@egistec.corp-partner.google.com can you please confirm?",
+      "parentUuid": "e5ef320f_25247478",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "92549eb1_25dab50b",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
@@ -93,6 +153,24 @@
       "side": 1,
       "message": "Since the ET171 APB clock is derived from the AHB clock (`APB_CLOCK \u003d (AHB_CLOCK / 2) / apb_divide` in [`soc_pre_init()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/soc/egis/et171/soc.c;l\u003d124-144;drc\u003d228e22a804096391c93a37e6dcfb14bb41bbb27d)), keeping `apb-divide \u003d \u003c1\u003e` while changing `ahb-divide` from `\u003c2\u003e` to `\u003c1\u003e` also doubles `SMU_CLK_APB` from **50 MHz to 100 MHz**.\n\nWhile [`mtimer`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/soc/egis/et171/soc.c;l\u003d175-178;drc\u003d228e22a804096391c93a37e6dcfb14bb41bbb27d) (and [`power.c`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/soc/egis/et171/power.c;l\u003d58;drc\u003da9fdf60e64bd0045d5a1c5198dfbe8cc2ce045d6)) and [`uart0`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/egis_module/dts/riscv/egis/clock.dtsi;l\u003d13-15;drc\u003d73822255050d10a27ef43a8250da97bcba26f9f3) query `HAL_SMU_GetClock(SMU_CLK_APB)` at runtime, is 100 MHz within the ET171 hardware specification for the APB bus and all APB peripherals (`uart0`, `gpio0`, `wdt`, `otpc`, `pit0`, `i2c`), or should `apb-divide` be set to `\u003c2\u003e` to keep APB at 50 MHz?",
       "isAi": true,
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "454ff261_c5794bec",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-15T08:16:03Z",
+      "side": 1,
+      "message": "That\u0027a s good catch. There is no need to increase APB clock. Keeping the original value saves 13mW.",
+      "parentUuid": "92549eb1_25dab50b",
       "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
