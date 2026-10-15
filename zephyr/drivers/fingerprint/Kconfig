@@ -28,6 +28,7 @@ config FINGERPRINT_SENSOR_IMAGE_SIZE
 	default 12800 if FINGERPRINT_SENSOR_ELAN80SG
 	default 12800 if FINGERPRINT_SENSOR_ELANI80SA
 	default 15600 if FINGERPRINT_SENSOR_ELANHV515RC
+	default 5120 if FINGERPRINT_SENSOR_RTS5817MAA
 	help
 	  This is a size of fingerprint image with an additional metadata.
 	  This size must be at least a size of raw image. For FPC1025,
@@ -46,6 +47,7 @@ config FINGERPRINT_SENSOR_IMAGE_OFFSET
 	default 172 if FINGERPRINT_SENSOR_EGIS660
 	default 0 if FINGERPRINT_SENSOR_ELAN_SERIES
 	default 0 if FINGERPRINT_SENSOR_FT98XX
+	default 0 if FINGERPRINT_SENSOR_RTS5817MAA
 	help
 	  This is an offset of the raw fingerprint image in the image data
 	  buffer.
@@ -57,6 +59,7 @@ rsource "Kconfig.egis"
 rsource "Kconfig.elan"
 rsource "Kconfig.fpc"
 rsource "Kconfig.ft"
+rsource "Kconfig.rts5817maa"
 rsource "Kconfig.sensor_sim"
 # zephyr-keep-sorted-stop
 
