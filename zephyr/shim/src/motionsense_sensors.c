@@ -383,6 +383,10 @@ BUILD_ASSERT(ARRAY_SIZE(motion_als_sensors) == ALS_COUNT);
 #define SENSOR_GPIO_ENABLE_INTERRUPT(i, id) \
 	gpio_enable_dt_interrupt(           \
 		GPIO_INT_FROM_NODE(DT_PHANDLE_BY_IDX(id, sensor_irqs, i)));
+#define SENSOR_GPIO_DISABLE_INTERRUPT(i, id) \
+	gpio_disable_dt_interrupt(           \
+		GPIO_INT_FROM_NODE(DT_PHANDLE_BY_IDX(id, sensor_irqs, i)));
+
 static void sensor_enable_irqs(void)
 {
 	if (motion_sensor_count == 0) {
@@ -398,7 +402,30 @@ static void sensor_enable_irqs(void)
 	LISTIFY(DT_PROP_LEN(SENSOR_INFO_NODE, sensor_irqs),
 		SENSOR_GPIO_ENABLE_INTERRUPT, (), SENSOR_INFO_NODE)
 }
-DECLARE_HOOK(HOOK_INIT, sensor_enable_irqs, HOOK_PRIO_DEFAULT);
+
+static void sensor_init_irqs(void)
+{
+	if (IS_ENABLED(CONFIG_SENSOR_BUS_AP_OFF_ONLY) &&
+	    chipset_in_state(SENSOR_ACTIVE_S0_S3))
+		return;
+
+	sensor_enable_irqs();
+}
+DECLARE_HOOK(HOOK_INIT, sensor_init_irqs, HOOK_PRIO_DEFAULT);
+
+#ifdef CONFIG_SENSOR_BUS_AP_OFF_ONLY
+static void sensor_disable_irqs(void)
+{
+	if (motion_sensor_count == 0)
+		return;
+
+	LISTIFY(DT_PROP_LEN(SENSOR_INFO_NODE, sensor_irqs),
+		SENSOR_GPIO_DISABLE_INTERRUPT, (), SENSOR_INFO_NODE)
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, sensor_disable_irqs, HOOK_PRIO_FIRST);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE, sensor_enable_irqs,
+	     HOOK_PRIO_DEFAULT);
+#endif /* CONFIG_SENSOR_BUS_AP_OFF_ONLY */
 #endif
 
 /* Handle the alternative motion sensors */

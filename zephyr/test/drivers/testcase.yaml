@@ -2213,6 +2213,10 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.motion_sense_bus_ap_off:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_MOTION_SENSE_BUS_AP_OFF=y
+    - CONFIG_PLATFORM_EC_SENSOR_BUS_AP_OFF_ONLY=y
   drivers.body_detection:
     tags:
     - host_cmd

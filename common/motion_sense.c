@@ -359,6 +359,34 @@ int sensor_init_done(struct motion_sensor_t *s)
 	}
 	return ret;
 }
+
+/*
+ * Stop a sensor that is not active in the current power state. It may lose
+ * power and will be initialized again when it becomes active.
+ */
+static void motion_sense_stop_sensor(struct motion_sensor_t *sensor)
+{
+	/*
+	 * Use mutex to be sure we are not changing the ODR in MOTIONSENSE, in
+	 * case it is running.
+	 */
+	k_mutex_lock(&g_sensor_mutex, K_FOREVER);
+	sensor->collection_rate = 0;
+	k_mutex_unlock(&g_sensor_mutex);
+	sensor->state = SENSOR_NOT_INITIALIZED;
+}
+
+/* Stop all the sensors that are not active in the current power state. */
+static void motion_sense_stop_inactive_sensors(void)
+{
+	int i;
+
+	for (i = 0; i < motion_sensor_count; ++i) {
+		if (!SENSOR_ACTIVE(&motion_sensors[i]))
+			motion_sense_stop_sensor(&motion_sensors[i]);
+	}
+}
+
 /*
  * motion_sense_switch_sensor_rate
  *
@@ -405,14 +433,7 @@ static void motion_sense_switch_sensor_rate(void)
 					tablet_set_mode(0, TABLET_TRIGGER_LID);
 			}
 		} else {
-			/*
-			 * Use mutex to be sure we are not changing the
-			 * ODR in MOTIONSENSE, in case it is running.
-			 */
-			k_mutex_lock(&g_sensor_mutex, K_FOREVER);
-			sensor->collection_rate = 0;
-			k_mutex_unlock(&g_sensor_mutex);
-			sensor->state = SENSOR_NOT_INITIALIZED;
+			motion_sense_stop_sensor(sensor);
 		}
 	}
 	if (sensor_setup_mask) {
@@ -506,9 +527,8 @@ static void motion_sense_shutdown(void)
 	sensor_active = SENSOR_ACTIVE_S5;
 	for (i = 0; i < motion_sensor_count; i++) {
 		sensor = &motion_sensors[i];
-		if (!SENSOR_ACTIVE(sensor)) {
-			sensor->state = SENSOR_NOT_INITIALIZED;
-		}
+		if (!SENSOR_ACTIVE(sensor))
+			motion_sense_stop_sensor(sensor);
 		/* Forget about changes made by the AP */
 		sensor->config[SENSOR_CONFIG_AP].odr = 0;
 		sensor->config[SENSOR_CONFIG_AP].ec_rate = 0;
@@ -518,17 +538,43 @@ static void motion_sense_shutdown(void)
 	/*
 	 * Run motion_sense_switch_sensor_rate_data in the HOOK task,
 	 * To be sure no 2 rate changes happens in parrallel.
+	 *
+	 * If the EC owns the sensor bus only while the AP is off, the bus is
+	 * still the AP's until the power-down sequence is done. Wait for
+	 * HOOK_CHIPSET_SHUTDOWN_COMPLETE.
 	 */
-	hook_call_deferred(&motion_sense_switch_sensor_rate_data, 0);
+	if (!IS_ENABLED(CONFIG_SENSOR_BUS_AP_OFF_ONLY))
+		hook_call_deferred(&motion_sense_switch_sensor_rate_data, 0);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, motion_sense_shutdown,
 	     MOTION_SENSE_HOOK_PRIO);
 
+#ifdef CONFIG_SENSOR_BUS_AP_OFF_ONLY
+static void motion_sense_shutdown_complete(void)
+{
+	/* Set up the sensors active in S5 after the EC regains the bus. */
+	hook_call_deferred(&motion_sense_switch_sensor_rate_data, 0);
+}
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE, motion_sense_shutdown_complete,
+	     HOOK_PRIO_LAST);
+
+static void motion_sense_chipset_startup(void)
+{
+	/*
+	 * The bus goes to the AP during the power-on sequence. Stop the
+	 * sensors that are only active with the AP off now instead of at
+	 * resume.
+	 */
+	hook_call_deferred(&motion_sense_switch_sensor_rate_data, -1);
+	sensor_active = SENSOR_ACTIVE_S3;
+	motion_sense_stop_inactive_sensors();
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, motion_sense_chipset_startup,
+	     HOOK_PRIO_FIRST);
+#endif /* CONFIG_SENSOR_BUS_AP_OFF_ONLY */
+
 static void motion_sense_suspend(void)
 {
-	struct motion_sensor_t *sensor;
-	int i;
-
 	motion_sense_print_stats("suspend");
 
 	/*
@@ -544,11 +590,7 @@ static void motion_sense_suspend(void)
 	 *  It does not prevent current sensor task to run, but next iteration
 	 *  will ignore work to do.
 	 */
-	for (i = 0; i < motion_sensor_count; ++i) {
-		sensor = &motion_sensors[i];
-		if (!SENSOR_ACTIVE(sensor))
-			sensor->state = SENSOR_NOT_INITIALIZED;
-	}
+	motion_sense_stop_inactive_sensors();
 	/*
 	 * During shutdown sequence sensor rails can be powered down
 	 * asynchronously to the EC hence EC cannot interlock the sensor
@@ -577,15 +619,21 @@ static void motion_sense_resume(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, motion_sense_resume, MOTION_SENSE_HOOK_PRIO);
 
-static void motion_sense_startup(void)
+test_export_static void motion_sense_startup(void)
 {
 	/*
 	 * If the AP is already in S0, call the resume hook now.
 	 * We may initialize the sensor 2 times (once in RO, another time in
 	 * RW), but it may be necessary if the init sequence has changed.
 	 */
-	if (chipset_in_state(SENSOR_ACTIVE_S0_S3_S5))
+	if (chipset_in_state(SENSOR_ACTIVE_S0_S3_S5)) {
 		motion_sense_shutdown();
+		/* If booting with the AP off, the EC already owns the bus. */
+		if (IS_ENABLED(CONFIG_SENSOR_BUS_AP_OFF_ONLY) &&
+		    !chipset_in_state(SENSOR_ACTIVE_S0_S3))
+			hook_call_deferred(
+				&motion_sense_switch_sensor_rate_data, 0);
+	}
 	if (chipset_in_state(SENSOR_ACTIVE_S0_S3))
 		motion_sense_suspend();
 	if (chipset_in_state(SENSOR_ACTIVE_S0))

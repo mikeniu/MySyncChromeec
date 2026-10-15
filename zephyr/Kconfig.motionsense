@@ -24,6 +24,16 @@ config PLATFORM_EC_SENSOR_EC_RATE_FORCE_MODE
       Enable this to toggle interrupt mode sensors to force mode at specific low
       intervals in order to save power in low power states (S3 and S5)
 
+config PLATFORM_EC_SENSOR_BUS_AP_OFF_ONLY
+    bool "EC owns the sensor bus only while the AP is off"
+    help
+      Enable this when the EC loses the sensor bus while the AP is up, for
+      example when the port is handed over to the AP as an I2C target at
+      power-on. Sensors active in S5 are initialized once
+      HOOK_CHIPSET_SHUTDOWN_COMPLETE gives the bus back, and the sensors that
+      are only active with the AP off are stopped at HOOK_CHIPSET_STARTUP.
+      The chipset driver must notify HOOK_CHIPSET_SHUTDOWN_COMPLETE.
+
 config PLATFORM_EC_MOTIONSENSE_DISABLE_HIGH_THROUGHPUT_PM
     bool "Disable power management when sensor sample rates are high"
     depends on PM
