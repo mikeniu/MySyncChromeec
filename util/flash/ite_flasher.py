@@ -299,15 +299,20 @@ class IteUartFlasher(_IteBaseFlasher):
                 self.servo.set("ec_uart_bitbang_en", "on")
 
     def cleanup_dut(self) -> None:
-        """Release sysrst or pulse cold_reset after UART flashing."""
+        """Release sysrst or pulse EC reset after UART flashing."""
         if not self.servo:
             return
-        if self._is_ccd():
+        controller = self._get_controller()
+        if controller == "ccd":
             logger.info("Deasserting sysrst on CCD...")
             try:
                 self.servo.set("gsc_uart_cmd", "sysrst deassert")
             except ServoError:
                 pass
+        elif controller == "c2d2":
+            self.servo.set_many(
+                [("gsc_ec_reset", "on"), ("gsc_ec_reset", "off")]
+            )
         else:
             self.servo.set_many([("cold_reset", "on"), ("cold_reset", "off")])
 

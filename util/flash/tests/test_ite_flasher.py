@@ -447,6 +447,21 @@ class TestIteUartFlasher(unittest.TestCase):
             [("cold_reset", "on"), ("cold_reset", "off")]
         )
 
+    def test_cleanup_dut_with_c2d2(self) -> None:
+        """Verify gsc_ec_reset pulse on C2D2 cleanup."""
+
+        def mock_get(key: str, default: str = "") -> str:
+            if key == "active_dut_controller":
+                return "c2d2"
+            return default
+
+        self.servo.get.side_effect = mock_get
+
+        self.flasher.cleanup_dut()
+        self.servo.set_many.assert_called_once_with(
+            [("gsc_ec_reset", "on"), ("gsc_ec_reset", "off")]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
