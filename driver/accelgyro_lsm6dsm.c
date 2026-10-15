@@ -431,12 +431,17 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 
 	switch (s->type) {
 	case MOTIONSENSE_TYPE_ACCEL:
+		newrange = CLAMP(newrange, LSM6DSM_ACCEL_FS_MIN_VAL,
+				 LSM6DSM_ACCEL_FS_MAX_VAL);
+
 		/* Adjust and check rounded value for acc. */
-		if (rnd && (newrange < LSM6DSM_ACCEL_NORMALIZE_FS(newrange)))
+		if (rnd && (newrange > LSM6DSM_ACCEL_NORMALIZE_FS(newrange)))
 			newrange *= 2;
 
 		if (newrange > LSM6DSM_ACCEL_FS_MAX_VAL)
 			newrange = LSM6DSM_ACCEL_FS_MAX_VAL;
+		else
+			newrange = LSM6DSM_ACCEL_NORMALIZE_FS(newrange);
 
 		reg_val = LSM6DSM_ACCEL_FS_REG(newrange);
 		break;
