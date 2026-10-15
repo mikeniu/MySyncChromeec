@@ -24,6 +24,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a43bdb4_fbab5a0f",
+        "filename": "util/find_unused.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1019,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T22:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ec6044c_6aad5b34",
+      "range": {
+        "startLine": 1019,
+        "startChar": 0,
+        "endLine": 1019,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "78da33592e8814ed43ea6c4ac0cd59c76c2dfce7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e33119c_2388febc",
@@ -47,6 +72,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e67224b_dc23d659",
+        "filename": "util/find_unused.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1047,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T22:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e33119c_2388febc",
+      "range": {
+        "startLine": 1047,
+        "startChar": 0,
+        "endLine": 1047,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "78da33592e8814ed43ea6c4ac0cd59c76c2dfce7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8cc9a23a_53e41536",
@@ -66,6 +116,31 @@
         "endLine": 1072,
         "endChar": 0
       },
+      "revId": "78da33592e8814ed43ea6c4ac0cd59c76c2dfce7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37b4d701_00858b86",
+        "filename": "util/find_unused.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1072,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T22:10:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cc9a23a_53e41536",
+      "range": {
+        "startLine": 1072,
+        "startChar": 0,
+        "endLine": 1072,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "78da33592e8814ed43ea6c4ac0cd59c76c2dfce7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
