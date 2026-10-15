@@ -1254,6 +1254,11 @@ static void charge_manager_make_change(enum charge_manager_change_type change,
 	/* Determine if this is a change which can affect charge status */
 	switch (change) {
 	case CHANGE_CHARGE:
+		if (supplier < 0 || supplier >= CHARGE_SUPPLIER_COUNT) {
+			CPRINTS("%s: s%d invalid", __func__, supplier);
+			return;
+		}
+
 		/* Ignore changes where charge is identical */
 		if (available_charge[supplier][port].current ==
 			    charge->current &&
@@ -1652,6 +1657,10 @@ int charge_manager_get_available_current(int supplier, int port)
 
 void charge_manager_set_supplier(int port, enum charge_supplier supplier)
 {
+	if (!is_valid_port(port) || supplier < 0 ||
+	    supplier >= CHARGE_SUPPLIER_COUNT)
+		return;
+
 	CM_MUTEX_LOCK(&cm_refresh);
 	if (charge_supplier != CHARGE_SUPPLIER_NONE ||
 	    charge_port != CHARGE_PORT_NONE) {
