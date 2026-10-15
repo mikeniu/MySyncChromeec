@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6795921_1f2be3df",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:12:56Z",
+      "side": 1,
+      "message": "Done, set to 115200/none after saving them.",
+      "parentUuid": "7b716940_6c6277ec",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f57d1c35_900443bf",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-14T20:47:47Z",
       "side": 1,
       "message": "The saved UART states (baudrate, parity, interp_connect) should be restored here to ensure the servo is returned to a usable state for the console. Call `self.servo.restore_state(\"ec_uart_baudrate\")`, etc.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db49cf90_d5d14e8a",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:12:56Z",
+      "side": 1,
+      "message": "Done. cleanup_dut() restores them before the cold reset, the same order as flash_ec\u0027s cleanup().",
+      "parentUuid": "f57d1c35_900443bf",
       "range": {
         "startLine": 77,
         "startChar": 0,
@@ -93,6 +141,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3acde78d_0b3e33d4",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:12:56Z",
+      "side": 1,
+      "message": "Done. --read uses RTK_FLASH_SIZE since there is no image to size it; the preserve read and the verify read use the image size.",
+      "parentUuid": "f41a1fd9_49e1616e",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdac59c7_cbf35754",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:12:56Z",
+      "side": 1,
+      "message": "Done, added RTK_FLASH_SIZE for the --read path.",
+      "parentUuid": "47123614_56c56261",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a774d439_4b1e860d",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-10-14T20:47:47Z",
       "side": 1,
       "message": "If `target_img` is smaller than 1MB, this will read the entire 1MB from the chip but only compare the first `ver_size` bytes. While correct, you could optimize this by passing `--bin_length\u003d{ver_size}` to the `read_bin` command instead of the hardcoded 1MB.",
+      "range": {
+        "startLine": 173,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 0
+      },
+      "revId": "1e25f61643e807aeece3df22899b1850ae276a59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc24232d_89881165",
+        "filename": "util/flash/rtk_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:12:56Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "a774d439_4b1e860d",
       "range": {
         "startLine": 173,
         "startChar": 0,
