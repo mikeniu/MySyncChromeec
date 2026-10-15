@@ -13,6 +13,7 @@
 		 */
 		lis2dh-int = &alt_lid_accel;
 		lis2dw12-int = &alt_base_accel;
+		tap-sensor = &base_accel;
 	};
 
 	/*
