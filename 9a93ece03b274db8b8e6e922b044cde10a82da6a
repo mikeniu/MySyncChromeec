@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "136fe4eb_496c95cc",
+        "filename": "zephyr/drivers/cros_system/cros_system_it8xxx2.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T22:57:23Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since this `if` block now only contains a single statement, you can remove the curly braces according to the style guide.",
+      "range": {
+        "startLine": 350,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 0
+      },
+      "revId": "9a93ece03b274db8b8e6e922b044cde10a82da6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
