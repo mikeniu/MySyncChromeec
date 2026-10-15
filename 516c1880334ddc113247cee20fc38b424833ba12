@@ -1,0 +1,92 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "250b08be_a0b25357",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Blocker — Action Required]** The description does not mention the removal of `CONFIG_PM_DEVICE\u003dy` and `CONFIG_SYSTEM_CLOCK_HW_CYCLES_PER_SEC_RUNTIME_UPDATE\u003dy`. Per go/cl-descriptions#review, please ensure the description reflects all changes in the CL. If these removals are intentional and related to the timer switch, please add their rationale to the description. If they are independent changes, please split them into a separate CL.\n[🔗](http://go/tj/4c4ae63b-7a8d-45b8-b1c8-d6e8c5b63069)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "516c1880334ddc113247cee20fc38b424833ba12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9367e0f9_f995409e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n*   **Functionality:** `❌` Undocumented behavioral changes with the removal of `CONFIG_PM_DEVICE\u003dy`.\n*   **Architecture \u0026 Component Fit:** `✅`\n*   **Code Simplicity:** `❌` The `#if defined(CONFIG_PM)` conditional in `ec_quirks.c` adds unnecessary branching that does not align with the unconditional devicetree configuration.\n*   **Idiomaticity \u0026 Readability:** `✅`\n*   **Security:** `✅`\n*   **Testing:** `✅` Physical timer switch; test device tree updated to compile.\n*   **CL Size \u0026 Scope:** `Size: S (+31, -5)` `❌` If the removal of `CONFIG_PM_DEVICE\u003dy` is unrelated to the LPTIM1 switch, this violates the Single Logical Change rule and must be split.\n*   **Commit Message:** `❌` The commit message lacks intent/rationale for the removed configs.\n\nPlease see the inline comments for details.\n[🔗](http://go/tj/4c4ae63b-7a8d-45b8-b1c8-d6e8c5b63069)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "516c1880334ddc113247cee20fc38b424833ba12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e345b7b2_ec31599e",
+        "filename": "zephyr/program/fpmcu/dartmonkey/prj.conf",
+        "patchSetId": 14
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \nWhy is `CONFIG_PM_DEVICE\u003dy` removed here? If this disables device power management across the board, it represents a separate behavioral change that is currently undocumented in the commit message. \n\nIf it is directly tied to the system timer switch, please document the rationale in the commit message. If it is an independent cleanup or change, it must be split into a separate CL per the Single Logical Change rule.\n[🔗](http://go/tj/4c4ae63b-7a8d-45b8-b1c8-d6e8c5b63069)",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "516c1880334ddc113247cee20fc38b424833ba12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce6f4e07_4cde8f59",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/ec_quirks.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \nSince `zephyr,system-timer \u003d \u0026lptim1;` is set unconditionally in `dartmonkey.dts`, `lptim1` is always the system timer for Dartmonkey builds, regardless of whether `CONFIG_PM` is enabled. Checking `CONFIG_PM` here conflates power management with the choice of timer. \n\nIf a build disables `CONFIG_PM` (e.g., a test build), this code will incorrectly fall back to `sys_clock_disable()`, which targets SysTick rather than `lptim1`. Please remove the `#if defined(CONFIG_PM)` conditional and reset `lptim1` unconditionally.\n[🔗](http://go/tj/4c4ae63b-7a8d-45b8-b1c8-d6e8c5b63069)",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "516c1880334ddc113247cee20fc38b424833ba12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
