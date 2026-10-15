@@ -3,8 +3,11 @@
  * found in the LICENSE file.
  */
 
+#include "common.h"
+#include "driver/accelgyro_lsm6dsm.h"
 #include "driver/accelgyro_lsm6dsm_public.h"
 #include "emul/emul_lsm6dsm.h"
+#include "i2c.h"
 #include "motion_sense.h"
 #include "motion_sense_fifo.h"
 #include "test/drivers/test_state.h"
@@ -21,6 +24,31 @@ static struct motion_sensor_t *acc = &motion_sensors[ACC_SENSOR_ID];
 // static struct motion_sensor_t *gyr = &motion_sensors[GYR_SENSOR_ID];
 
 ZTEST_SUITE(lsm6dsm, drivers_predicate_post_main, NULL, NULL, NULL, NULL);
+
+ZTEST(lsm6dsm, test_read_temp)
+{
+	/* OUT_TEMP_H is a signed offset in degrees C from 25 C. */
+	const struct {
+		uint8_t raw;
+		int celsius;
+	} cases[] = {
+		{ 0xff, 24 }, /* -1 C */
+		{ 0x80, -103 }, /* INT8_MIN */
+		{ 0x01, 26 }, /* +1 C */
+		{ 0x7f, 152 }, /* INT8_MAX */
+		{ 0x00, 25 }, /* 0 C, also restores the register */
+	};
+	int temp;
+
+	for (int i = 0; i < ARRAY_SIZE(cases); i++) {
+		zassert_ok(i2c_write8(acc->port, acc->i2c_spi_addr_flags,
+				      LSM6DSM_OUT_TEMP_L_ADDR + 1,
+				      cases[i].raw));
+		zassert_ok(acc->drv->read_temp(acc, &temp));
+		zassert_equal(temp, C_TO_K(cases[i].celsius), "raw 0x%02x",
+			      cases[i].raw);
+	}
+}
 
 ZTEST(lsm6dsm, test_disable_interrupt)
 {
