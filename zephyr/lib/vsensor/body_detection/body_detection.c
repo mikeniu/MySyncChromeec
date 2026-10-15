@@ -221,15 +221,17 @@ test_export_static void body_detect_step(float x, float y, float z,
 	 *      | 0%        | var < var_threshold - confidence_delta  |
 	 *      -------------------------------------------------------
 	 */
+	const float delta =
+		CLAMP(confidence_delta, 0.0f, MAX(var_threshold, 0.0f));
+
 	var = var * 1000.0f;
-	if (var < var_threshold - confidence_delta) {
+	if (var <= var_threshold - delta) {
 		motion_confidence = 0;
-	} else if (var > var_threshold + confidence_delta) {
+	} else if (var >= var_threshold + delta) {
 		motion_confidence = 100;
 	} else {
-		motion_confidence = 100.0f *
-				    (var - var_threshold + confidence_delta) /
-				    (2 * confidence_delta);
+		motion_confidence =
+			100.0f * (var - var_threshold + delta) / (2.0f * delta);
 	}
 
 	LOG_DBG("time=%lld conf=%d var=%d x=%d/%d y=%d/%d z=%d/%d [%d %d %d]",
