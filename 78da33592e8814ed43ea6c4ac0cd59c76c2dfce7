@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ec6044c_6aad5b34",
+        "filename": "util/find_unused.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1019,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:38:36Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This `if` filter is redundant because line 1022 applies `is_copybot_synced` to the concatenated set anyway. Omitting it would be consistent with how sources and headers are handled just above, and mathematically equivalent.",
+      "range": {
+        "startLine": 1019,
+        "startChar": 0,
+        "endLine": 1019,
+        "endChar": 0
+      },
+      "revId": "78da33592e8814ed43ea6c4ac0cd59c76c2dfce7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e33119c_2388febc",
+        "filename": "util/find_unused.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1047,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:38:36Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Calling `is_copybot_synced` here repeatedly for thousands of files can be inefficient and redundant. \n\nIf `args.ignore_copybot` is `True`, copybot files were already excluded from `results[\u0027unused_sources\u0027]` in line 936, so this will always evaluate to `False`. \nIf `args.ignore_copybot` is `False`, all copybot-synced file paths were already identified in `copybot_synced_files` (lines 1010-1025).\n\nA simpler and faster approach would be to track copybot-synced files as a set locally (e.g., `copybot_synced_set`), and replace this call with `if s in copybot_synced_set:`. (The same optimization applies to the headers and functions output formatting blocks below).",
+      "range": {
+        "startLine": 1047,
+        "startChar": 0,
+        "endLine": 1047,
+        "endChar": 0
+      },
+      "revId": "78da33592e8814ed43ea6c4ac0cd59c76c2dfce7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cc9a23a_53e41536",
+        "filename": "util/find_unused.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1072,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-15T15:38:36Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since functions already track their synced state explicitly, `or is_copybot_synced(...)` is redundant and can be omitted.",
+      "range": {
+        "startLine": 1072,
+        "startChar": 0,
+        "endLine": 1072,
+        "endChar": 0
+      },
+      "revId": "78da33592e8814ed43ea6c4ac0cd59c76c2dfce7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
