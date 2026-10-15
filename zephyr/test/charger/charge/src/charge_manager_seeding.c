@@ -25,6 +25,12 @@ ZTEST_USER(charge_manager_seeding_pre_main, test_unseeded)
 	zassert_equal(charge_manager_get_available_current(CHARGE_SUPPLIER_PD,
 							   0),
 		      CHARGE_CURRENT_UNINITIALIZED);
+
+	/* Out-of-bounds supplier or port seeding should be rejected. */
+	charge_manager_set_supplier(0, CHARGE_SUPPLIER_NONE);
+	charge_manager_set_supplier(0, CHARGE_SUPPLIER_COUNT);
+	charge_manager_set_supplier(CHARGE_PORT_NONE, CHARGE_SUPPLIER_PD);
+	zassert_equal(charge_manager_get_supplier(), CHARGE_SUPPLIER_NONE);
 }
 
 ZTEST_SUITE(charge_manager_seeding_post_main, charger_predicate_post_main, NULL,
