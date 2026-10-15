@@ -80,6 +80,11 @@ enum battery_type {
 #endif
 #endif
 
+#ifdef TEST_LM3509
+#define CONFIG_LED_DRIVER_LM3509
+#define I2C_PORT_KBLIGHT I2C_PORT_EEPROM
+#endif
+
 #ifdef TEST_MATH_UTIL
 #define CONFIG_MATH_UTIL
 #endif
