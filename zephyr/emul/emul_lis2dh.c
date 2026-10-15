@@ -48,6 +48,13 @@ struct lis2dh_emul_data {
 	uint8_t fifo_ctrl_reg;
 	/** FIFO SRC register */
 	uint8_t fifo_src_reg;
+	/** Click configuration and timing registers */
+	uint8_t click_cfg_reg;
+	uint8_t click_src_reg;
+	uint8_t click_ths_reg;
+	uint8_t time_limit_reg;
+	uint8_t time_latency_reg;
+	uint8_t time_window_reg;
 	/** Pointer to data that will be read from the FIFO. */
 	const int16_t *fifo_data;
 	/** Number of bytes remaining in fifo_data. */
@@ -103,6 +110,12 @@ void lis2dh_emul_reset(const struct emul *emul)
 	data->status_reg = 0;
 	data->fifo_ctrl_reg = 0;
 	data->fifo_src_reg = 0;
+	data->click_cfg_reg = 0;
+	data->click_src_reg = 0;
+	data->click_ths_reg = 0;
+	data->time_limit_reg = 0;
+	data->time_latency_reg = 0;
+	data->time_window_reg = 0;
 
 	data->fifo_data = 0;
 	data->fifo_available = 0;
@@ -209,6 +222,30 @@ static int lis2dh_emul_read_byte(const struct emul *emul, int reg, uint8_t *val,
 	case LIS2DH_FIFO_SRC_ADDR:
 		__ASSERT_NO_MSG(bytes == 0);
 		*val = data->fifo_src_reg;
+		break;
+	case LIS2DH_CLICK_CFG_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->click_cfg_reg;
+		break;
+	case LIS2DH_CLICK_SRC_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->click_src_reg;
+		break;
+	case LIS2DH_CLICK_THS_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->click_ths_reg;
+		break;
+	case LIS2DH_TIME_LIMIT_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->time_limit_reg;
+		break;
+	case LIS2DH_TIME_LATENCY_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->time_latency_reg;
+		break;
+	case LIS2DH_TIME_WINDOW_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->time_window_reg;
 		break;
 	case (0x80 | LIS2DH_OUT_X_L_ADDR):
 		/*
@@ -344,6 +381,21 @@ static int lis2dh_emul_write_byte(const struct emul *emul, int reg, uint8_t val,
 		break;
 	case LIS2DH_FIFO_SRC_ADDR:
 		data->fifo_src_reg = val;
+		break;
+	case LIS2DH_CLICK_CFG_ADDR:
+		data->click_cfg_reg = val;
+		break;
+	case LIS2DH_CLICK_THS_ADDR:
+		data->click_ths_reg = val;
+		break;
+	case LIS2DH_TIME_LIMIT_ADDR:
+		data->time_limit_reg = val;
+		break;
+	case LIS2DH_TIME_LATENCY_ADDR:
+		data->time_latency_reg = val;
+		break;
+	case LIS2DH_TIME_WINDOW_ADDR:
+		data->time_window_reg = val;
 		break;
 	default:
 		__ASSERT(false, "No write handler for register 0x%02x", reg);
