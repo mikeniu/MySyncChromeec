@@ -123,6 +123,18 @@ static inline struct ec_response_motion_sensor_data *get_fifo_head(void)
 	       (fifo.state->head & fifo.buffer_units_mask);
 }
 
+/*
+ * Activity events are staged with MOTION_SENSE_ACTIVITY_SENSOR_ID, which is
+ * one past the end of motion_sensors[]. Return the default threshold of 1 for
+ * it.
+ */
+static inline int get_spreading_threshold(int sensor_num)
+{
+	return sensor_num < motion_sensor_count ?
+		       motion_sensors[sensor_num].spreading_threshold :
+		       1;
+}
+
 /**
  * Pop one entry from the motion sense fifo. Poping will give priority to
  * committed data (data residing between the head and tail of the queue). If no
@@ -186,7 +198,7 @@ static void fifo_pop(void)
 	 * trigger interrupts only when multiple samples are available, so we
 	 * adjust the threshold to prevent unnecessary spreading.
 	 */
-	int thresh = motion_sensors[head->sensor_num].spreading_threshold;
+	int thresh = get_spreading_threshold(head->sensor_num);
 	/*
 	 * Decrement sample count. If the count drops below or equal to the
 	 * threshold, we might not need to spread anymore. Check other sensors.
@@ -196,7 +208,7 @@ static void fifo_pop(void)
 
 		fifo_staged.requires_spreading = 0;
 		for (i = 0; i < MAX_MOTION_SENSORS; i++) {
-			int t = motion_sensors[i].spreading_threshold;
+			int t = get_spreading_threshold(i);
 			if (fifo_staged.sample_count[i] > t) {
 				fifo_staged.requires_spreading = 1;
 				break;
@@ -329,8 +341,7 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 	 * configured spreading threshold.
 	 */
 	if (IS_ENABLED(CONFIG_SENSOR_TIGHT_TIMESTAMPS) && !is_timestamp(data)) {
-		int thresh =
-			motion_sensors[data->sensor_num].spreading_threshold;
+		int thresh = get_spreading_threshold(data->sensor_num);
 		if (++fifo_staged.sample_count[data->sensor_num] > thresh)
 			fifo_staged.requires_spreading = 1;
 	}
@@ -474,7 +485,7 @@ void motion_sense_fifo_stage_data(struct ec_response_motion_sensor_data *data,
 static void timestamp_spread(struct ec_response_motion_sensor_data *data,
 			     int sensor_num)
 {
-	int thresh = motion_sensors[sensor_num].spreading_threshold;
+	int thresh = get_spreading_threshold(sensor_num);
 	uint32_t ts_prev = next_timestamp[sensor_num].prev;
 	uint32_t ts_next = next_timestamp[sensor_num].next;
 	uint32_t ts = data->timestamp;
