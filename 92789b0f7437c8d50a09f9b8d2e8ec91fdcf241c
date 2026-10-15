@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d849ae40_49c269b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:36:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL.\n\n### Review Summary\n\n**CL Size \u0026 Scope:** ❌ **Changes Requested**\nSize: XL (+1867, -0). This CL is too large and bundles multiple independent logical changes (base config, power handling, EC quirks, hardware init, and tests). Per the Single Logical Change rule, please split this into smaller, self-contained CLs. For example:\n* CL 1: Base configuration, devicetree overlays, and build targets.\n* CL 2: Power and AP sleep event handling (`power.c`) with tests.\n* CL 3: Initialization and hardware detection (`init.c`) with tests.\n* CL 4: EC RO compatibility quirks (`ec_quirks.c`) with tests.\n\n**Functionality:** ✅ Looks good.\n**Architecture \u0026 Component Fit:** ✅ Looks good.\n**Code Simplicity:** ✅ Code is straightforward.\n**Idiomaticity \u0026 Readability:** ✅ Idiomatic overall.\n**Security:** ✅ No obvious issues.\n**Testing:** ✅ Tests are provided.\n**Commit Message:** ✅ Clear summary of the changes.\n\n[🔗](http://go/tj/10f9dde7-7a69-48c5-8149-e45c793af5e7)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "92789b0f7437c8d50a09f9b8d2e8ec91fdcf241c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0431847_6f3516b3",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/init.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:36:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Magic Values:** The delay duration `5` is a magic numeric literal. Please extract it to a named constant with explicit units (e.g., `#define DIV_HIGHSIDE_SETTLE_TIME_US 5`) to make the required settling time self-documenting.\n\n```c\n#define DIV_HIGHSIDE_SETTLE_TIME_US 5\n// ...\nk_usleep(DIV_HIGHSIDE_SETTLE_TIME_US);\n```\n[🔗](http://go/tj/10f9dde7-7a69-48c5-8149-e45c793af5e7)",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "92789b0f7437c8d50a09f9b8d2e8ec91fdcf241c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
