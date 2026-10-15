@@ -22,6 +22,31 @@
       },
       "revId": "8581df50fb336f81c2d44f5c99fc68958ae641f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d5b17da_1a6e542c",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T23:33:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bd50ac9_12445025",
+      "range": {
+        "startLine": 749,
+        "startChar": 0,
+        "endLine": 753,
+        "endChar": 56
+      },
+      "isAi": true,
+      "revId": "8581df50fb336f81c2d44f5c99fc68958ae641f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
