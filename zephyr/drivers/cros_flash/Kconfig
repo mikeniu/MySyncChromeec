@@ -63,6 +63,17 @@ config CROS_FLASH_RTK
 	  access the flash by read, write and erase. The rts5915 flash size
 	  is 1M byte.
 
+config CROS_FLASH_RTKFP
+	bool "REALTEK RTS5817 flash driver for the Zephyr shim"
+	depends on DT_HAS_REALTEK_RTKFP_CROS_FLASH_ENABLED
+	default y if PLATFORM_EC
+	select PLATFORM_EC_FLASH_CROS
+	select PLATFORM_EC_SPI_FLASH_REGS
+	help
+	  This option enables the flash driver for the rts5817 chip. We can
+	  access the flash by read, write and erase. The rts5817 flash size
+	  is 2M byte.
+
 config CROS_FLASH
 	bool "Generic cros-flash driver for the Zephyr shim"
 	depends on DT_HAS_CROS_EC_CROS_FLASH_ENABLED
