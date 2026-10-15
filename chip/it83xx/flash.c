@@ -200,6 +200,12 @@ void FLASH_DMA_CODE dma_flash_fsce_high(void)
 {
 	/* FSCE# high level */
 	IT83XX_SMFI_ECINDAR1 = 0xFE;
+	/*
+	 * Perform 2 consecutive writes to WNCKR (65.536 kHz) to ensure a
+	 * minimum 15 us delay before driving FSCE# high.
+	 */
+	IT83XX_GCTRL_WNCKR = 0;
+	IT83XX_GCTRL_WNCKR = 0;
 	IT83XX_SMFI_ECINDDR = 0x00;
 }
 
@@ -237,8 +243,10 @@ void FLASH_DMA_CODE dma_flash_transaction(int wlen, uint8_t *wbuf, int rlen,
 void FLASH_DMA_CODE dma_flash_cmd_read_status(enum flash_status_mask mask,
 					      enum flash_status_mask target)
 {
-	uint8_t status[1];
 	uint8_t cmd_rs[] = { FLASH_CMD_RS };
+
+	/* Send read status command */
+	dma_flash_transaction(sizeof(cmd_rs), cmd_rs, 0, NULL, 0);
 
 	/*
 	 * We prefer no timeout here. We can always get the status
@@ -247,13 +255,11 @@ void FLASH_DMA_CODE dma_flash_cmd_read_status(enum flash_status_mask mask,
 	 * This will avoid fetching unknown instruction from e-flash
 	 * and causing exception.
 	 */
-	while (1) {
-		/* read status */
-		dma_flash_transaction(sizeof(cmd_rs), cmd_rs, 1, status, 1);
-		/* only bit[1:0] valid */
-		if ((status[0] & mask) == target)
-			break;
-	}
+	while ((IT83XX_SMFI_ECINDDR & mask) != target)
+		IT83XX_GCTRL_WNCKR = 0;
+
+	/* Transaction done, drive FSCE# high */
+	dma_flash_fsce_high();
 }
 
 void FLASH_DMA_CODE dma_flash_cmd_write_enable(void)
