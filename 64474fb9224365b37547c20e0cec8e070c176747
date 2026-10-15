@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b31e314a_3a4d23c0",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_stm32_backend.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:19:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Defect: Potential missing workaround on `get` path**\n\nIf the upstream `flash_ex_op` implementation for `FLASH_STM32_EX_OP_RDP` returns the positive RDP mode index on success, does this affect the `get` operation in this function as well? \n\nIf `flash_ex_op` also returns a positive index when invoked with a `NULL` `in` parameter, `flash_get_rdp` will return that positive value instead of `0` on success, which could break callers that check `if (err)`. Consider whether the return value here needs the same `err \u003c 0 ? err : 0` squash applied. [🔗](http://go/tj/7dcd7b86-d1bf-44db-989e-fc58effa47b5)",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "64474fb9224365b37547c20e0cec8e070c176747",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
