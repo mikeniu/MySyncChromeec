@@ -6,6 +6,7 @@
 #include "crypto/cleanse_wrapper.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
+#include "fpsensor/fpsensor_utils.h"
 #include "openssl/aead.h"
 #include "openssl/evp.h"
 #include "openssl/hkdf.h"
@@ -18,7 +19,10 @@
 
 #include <stdbool.h>
 
+#include <algorithm>
+#include <array>
 #include <span>
+#include <string_view>
 
 #if !defined(CONFIG_BORINGSSL_CRYPTO) || !defined(CONFIG_ROLLBACK_SECRET_SIZE)
 #error "fpsensor requires CONFIG_BORINGSSL_CRYPTO and ROLLBACK_SECRET_SIZE"
@@ -113,7 +117,7 @@ get_otp_key(std::span<uint8_t, OTP_KEY_SIZE_BYTES> output)
 		return EC_ERROR_HW_INTERNAL;
 	}
 
-	if (bytes_are_trivial(output.data(), output.size())) {
+	if (bytes_are_trivial(output)) {
 		CPRINTS("ERROR: bytes read from OTP are trivial!");
 		return EC_ERROR_HW_INTERNAL;
 	}
@@ -139,8 +143,7 @@ static enum ec_error_list derive_key(std::span<uint8_t> output,
 	}
 
 	/* Make sure TPM Seed is set */
-	if (!tpm_seed.empty() &&
-	    bytes_are_trivial(tpm_seed.data(), tpm_seed.size_bytes())) {
+	if (!tpm_seed.empty() && bytes_are_trivial(tpm_seed)) {
 		CPRINTS("Seed hasn't been set.");
 		return EC_ERROR_ACCESS_DENIED;
 	}
@@ -185,24 +188,24 @@ static enum ec_error_list derive_key(std::span<uint8_t> output,
 }
 
 enum ec_error_list derive_positive_match_secret(
-	std::span<uint8_t> output,
-	std::span<const uint8_t> input_positive_match_salt,
+	std::span<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES> output,
+	std::span<const uint8_t, FP_POSITIVE_MATCH_SALT_BYTES>
+		input_positive_match_salt,
 	std::span<const uint8_t, FP_CONTEXT_USERID_BYTES> user_id,
 	std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed)
 {
-	static constexpr char info_prefix[] = "positive_match_secret for user ";
-	uint8_t info[sizeof(info_prefix) - 1 + user_id.size_bytes()];
+	static constexpr std::string_view info_prefix =
+		"positive_match_secret for user ";
+	std::array<uint8_t, info_prefix.size() + user_id.size_bytes()> info{};
 
-	if (bytes_are_trivial(input_positive_match_salt.data(),
-			      input_positive_match_salt.size())) {
+	if (bytes_are_trivial(input_positive_match_salt)) {
 		CPRINTS("Failed to derive positive match secret: "
 			"salt bytes are trivial.");
 		return EC_ERROR_INVAL;
 	}
 
-	memcpy(info, info_prefix, strlen(info_prefix));
-	memcpy(info + strlen(info_prefix), user_id.data(),
-	       user_id.size_bytes());
+	auto out = std::ranges::copy(info_prefix, info.begin()).out;
+	std::ranges::copy(user_id, out);
 
 	enum ec_error_list ret =
 		derive_key(output, input_positive_match_salt, tpm_seed, info);
@@ -211,7 +214,7 @@ enum ec_error_list derive_positive_match_secret(
 	}
 
 	/* Check that secret is not full of 0x00 or 0xff. */
-	if (bytes_are_trivial(output.data(), output.size())) {
+	if (bytes_are_trivial(output)) {
 		CPRINTS("Failed to derive positive match secret: "
 			"derived secret bytes are trivial.");
 		ret = EC_ERROR_HW_INTERNAL;
@@ -219,10 +222,11 @@ enum ec_error_list derive_positive_match_secret(
 	return ret;
 }
 
-enum ec_error_list
-derive_encryption_key(std::span<uint8_t> out_key, std::span<const uint8_t> salt,
-		      std::span<const uint8_t> info,
-		      std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed)
+enum ec_error_list derive_encryption_key(
+	std::span<uint8_t> out_key,
+	std::span<const uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> salt,
+	std::span<const uint8_t> info,
+	std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed)
 {
 	if (info.size() != SHA256_DIGEST_LENGTH) {
 		CPRINTS("Invalid info size: %zu", info.size());
@@ -232,9 +236,9 @@ derive_encryption_key(std::span<uint8_t> out_key, std::span<const uint8_t> salt,
 	return derive_key(out_key, salt, tpm_seed, info);
 }
 
-enum ec_error_list
-derive_pairing_key_encryption_key(std::span<uint8_t> output,
-				  std::span<const uint8_t> salt)
+enum ec_error_list derive_pairing_key_encryption_key(
+	std::span<uint8_t> output,
+	std::span<const uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> salt)
 {
 	static constexpr uint8_t info[] = "FPMCU & FingerGuard pairing key";
 

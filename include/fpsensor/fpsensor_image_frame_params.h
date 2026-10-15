@@ -6,10 +6,33 @@
 #ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_IMAGE_FRAME_PARAMS_H_
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_IMAGE_FRAME_PARAMS_H_
 
+#include "common.h"
 #include "ec_commands.h"
 
 #include <array>
 #include <cstdint>
+#include <span>
+
+/**
+ * Fixed-capacity stack buffer for querying variable-length
+ * ec_response_fp_info_v3 responses from fp_sensor_get_info().
+ */
+struct FpSensorInfoBuffer {
+	struct ec_response_fp_info_v3 header{};
+	std::array<struct fp_image_frame_params_v2, FP_MAX_CAPTURE_TYPES>
+		params{};
+
+	[[nodiscard]] std::span<const struct fp_image_frame_params_v2>
+	capture_types() const noexcept
+	{
+		return std::span(params).first(
+			header.sensor_info.num_capture_types);
+	}
+};
+BUILD_ASSERT(sizeof(FpSensorInfoBuffer) ==
+	     sizeof(struct ec_response_fp_info_v3) +
+		     sizeof(struct fp_image_frame_params_v2) *
+			     FP_MAX_CAPTURE_TYPES);
 
 struct FpImageFrameParam {
 	uint32_t frame_size_bytes = 0;

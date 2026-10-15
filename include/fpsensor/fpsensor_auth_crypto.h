@@ -16,6 +16,19 @@
 #include <span>
 
 /**
+ * Create a @fp_elliptic_curve_public_key from a 65-byte SEC1 uncompressed
+ * elliptic curve point (0x04 || x || y).
+ *
+ * @param[in] point 65-byte uncompressed point buffer
+ *
+ * @return @p fp_elliptic_curve_public_key on success
+ * @return std::nullopt if the leading octet is not 0x04
+ */
+std::optional<fp_elliptic_curve_public_key>
+create_pubkey_from_uncompressed_point(
+	std::span<const uint8_t, FP_ASCP_KEY_SIZE> point) noexcept;
+
+/**
  * Create a @fp_elliptic_curve_public_key with the content of boringssl @p
  * EC_KEY.
  *
@@ -46,8 +59,8 @@ create_ec_key_from_pubkey(const fp_elliptic_curve_public_key &pubkey);
  * @return @p EC_KEY on success
  * @return nullptr on error
  */
-bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(const uint8_t *privkey,
-						   size_t privkey_size);
+bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(
+	std::span<const uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> privkey);
 
 /**
  * Encrypt the data with a specific version of encryption method and output
@@ -198,10 +211,9 @@ enum ec_error_list generate_ecdh_shared_secret(const EC_KEY &private_key,
  * @return EC_SUCCESS on success
  * @return EC_ERROR_* on error
  */
-enum ec_error_list
-generate_ecdh_shared_secret_without_kdf(const EC_KEY &private_key,
-					const EC_KEY &public_key,
-					std::span<uint8_t> secret);
+enum ec_error_list generate_ecdh_shared_secret_without_kdf(
+	const EC_KEY &private_key, const EC_KEY &public_key,
+	std::span<uint8_t, FP_PAIRING_KEY_LEN> secret);
 
 /**
  * Generate a session key that is derived from FPMCU nonce, peer nonce and

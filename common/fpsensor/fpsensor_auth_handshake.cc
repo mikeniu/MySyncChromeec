@@ -23,19 +23,8 @@ static std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
 
 enum ec_error_list check_context_cleared()
 {
-	for (uint8_t partial : global_context.user_id)
-		if (partial != 0)
-			return EC_ERROR_ACCESS_DENIED;
-	if (global_context.templ_valid != 0)
-		return EC_ERROR_ACCESS_DENIED;
-	if (global_context.templ_dirty != 0)
-		return EC_ERROR_ACCESS_DENIED;
-	if (global_context.positive_match_secret_state.template_matched !=
-	    FP_NO_SUCH_TEMPLATE)
-		return EC_ERROR_ACCESS_DENIED;
-	if (global_context.fp_encryption_status & FP_CONTEXT_USER_ID_SET)
-		return EC_ERROR_ACCESS_DENIED;
-	return EC_SUCCESS;
+	return global_context.is_cleared() ? EC_SUCCESS :
+					     EC_ERROR_ACCESS_DENIED;
 }
 
 static enum ec_status

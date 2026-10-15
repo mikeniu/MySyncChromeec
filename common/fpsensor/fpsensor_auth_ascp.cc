@@ -7,6 +7,7 @@
 #include "crypto/cleanse_wrapper.h"
 #include "ec_commands.h"
 #include "fpsensor/fpsensor.h"
+#include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "host_command.h"
 
@@ -21,12 +22,11 @@ static ec_status fp_command_ascp_establish(struct host_cmd_handler_args *args)
 {
 	const auto *params =
 		static_cast<const ec_params_fp_ascp_establish *>(args->params);
-	if (params->pk_g[0] != 0x04) {
+	const auto pubkey = create_pubkey_from_uncompressed_point(params->pk_g);
+	if (!pubkey.has_value()) {
 		return EC_RES_INVALID_PARAM;
 	}
-	bssl::UniquePtr<EC_KEY> public_key = create_ec_key_from_pubkey(
-		*reinterpret_cast<const fp_elliptic_curve_public_key *>(
-			&params->pk_g[1]));
+	bssl::UniquePtr<EC_KEY> public_key = create_ec_key_from_pubkey(*pubkey);
 	if (public_key == nullptr) {
 		return EC_RES_INVALID_PARAM;
 	}
@@ -37,8 +37,7 @@ static ec_status fp_command_ascp_establish(struct host_cmd_handler_args *args)
 	if (ret != EC_SUCCESS) {
 		return EC_RES_ERROR;
 	}
-	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(sk_f.data(), sk_f.size());
+	bssl::UniquePtr<EC_KEY> private_key = create_ec_key_from_privkey(sk_f);
 	if (private_key == nullptr) {
 		return EC_RES_ERROR;
 	}
@@ -59,8 +58,6 @@ enum ec_error_list generate_session_key_with_context(
 	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> peer_nonce,
 	std::span<uint8_t, SHA256_DIGEST_LENGTH> session_key)
 {
-	static constexpr uint8_t session_context[] = { 's', 'd', 'c', 'p' };
-
 	return generate_session_key(fpmcu_nonce, peer_nonce, pairing_key,
-				    std::span{ session_context }, session_key);
+				    as_operation_span("sdcp"), session_key);
 }

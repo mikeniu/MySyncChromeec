@@ -21,27 +21,37 @@
 #include <array>
 
 std::optional<fp_elliptic_curve_public_key>
-create_pubkey_from_ec_key(const EC_KEY &key)
+create_pubkey_from_uncompressed_point(
+	std::span<const uint8_t, FP_ASCP_KEY_SIZE> point) noexcept
 {
-	fp_elliptic_curve_public_key pubkey;
-	static_assert(sizeof(pubkey) == sizeof(pubkey.x) + sizeof(pubkey.y));
-
 	/* POINT_CONVERSION_UNCOMPRESSED indicates that the point is encoded as
 	 * z||x||y, where z is the octet 0x04. */
+	if (point[0] != POINT_CONVERSION_UNCOMPRESSED) {
+		return std::nullopt;
+	}
+
+	fp_elliptic_curve_public_key pubkey{};
+	static_assert(point.size() == 1 + sizeof(pubkey.x) + sizeof(pubkey.y));
+	std::ranges::copy(point.subspan<1, sizeof(pubkey.x)>(), pubkey.x);
+	std::ranges::copy(
+		point.subspan<1 + sizeof(pubkey.x), sizeof(pubkey.y)>(),
+		pubkey.y);
+	return pubkey;
+}
+
+std::optional<fp_elliptic_curve_public_key>
+create_pubkey_from_ec_key(const EC_KEY &key)
+{
 	uint8_t *data = nullptr;
 	if (EC_KEY_key2buf(&key, POINT_CONVERSION_UNCOMPRESSED, &data,
-			   nullptr) !=
-	    sizeof(pubkey.x) + sizeof(pubkey.y) + 1) {
+			   nullptr) != FP_ASCP_KEY_SIZE) {
 		return std::nullopt;
 	}
 
 	bssl::UniquePtr<uint8_t> pubkey_data(data);
-	uint8_t *pubkey_ptr = reinterpret_cast<uint8_t *>(&pubkey);
-	std::copy(pubkey_data.get() + 1,
-		  pubkey_data.get() + 1 + sizeof(pubkey.x) + sizeof(pubkey.y),
-		  pubkey_ptr);
-
-	return pubkey;
+	return create_pubkey_from_uncompressed_point(
+		std::span<const uint8_t, FP_ASCP_KEY_SIZE>(pubkey_data.get(),
+							   FP_ASCP_KEY_SIZE));
 }
 
 bssl::UniquePtr<EC_KEY>
@@ -75,8 +85,8 @@ create_ec_key_from_pubkey(const fp_elliptic_curve_public_key &pubkey)
 	return key;
 }
 
-bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(const uint8_t *privkey,
-						   size_t privkey_size)
+bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(
+	std::span<const uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> privkey)
 {
 	bssl::UniquePtr<EC_KEY> key(
 		EC_KEY_new_by_curve_name(NID_X9_62_prime256v1));
@@ -84,7 +94,7 @@ bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(const uint8_t *privkey,
 		return nullptr;
 	}
 
-	if (EC_KEY_oct2priv(key.get(), privkey, privkey_size) != 1) {
+	if (EC_KEY_oct2priv(key.get(), privkey.data(), privkey.size()) != 1) {
 		return nullptr;
 	}
 
@@ -108,10 +118,9 @@ enum ec_error_list generate_ecdh_shared_secret(const EC_KEY &private_key,
 	return EC_SUCCESS;
 }
 
-enum ec_error_list
-generate_ecdh_shared_secret_without_kdf(const EC_KEY &private_key,
-					const EC_KEY &public_key,
-					std::span<uint8_t> secret)
+enum ec_error_list generate_ecdh_shared_secret_without_kdf(
+	const EC_KEY &private_key, const EC_KEY &public_key,
+	std::span<uint8_t, FP_PAIRING_KEY_LEN> secret)
 {
 	const EC_POINT *public_point = EC_KEY_get0_public_key(&public_key);
 	if (public_point == nullptr) {

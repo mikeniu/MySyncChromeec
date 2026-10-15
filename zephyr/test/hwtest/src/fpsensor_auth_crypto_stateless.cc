@@ -90,8 +90,7 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_create_ec_key_from_privkey)
 					 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 					 2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
 
-	bssl::UniquePtr<EC_KEY> key =
-		create_ec_key_from_privkey(data.data(), data.size());
+	bssl::UniquePtr<EC_KEY> key = create_ec_key_from_privkey(data);
 
 	zassert_not_equal(key.get(), nullptr);
 
@@ -100,10 +99,9 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_create_ec_key_from_privkey)
 
 ZTEST(fpsensor_auth_crypto_stateless, test_fp_create_ec_key_from_privkey_fail)
 {
-	std::array<uint8_t, 1> data = {};
+	std::array<uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> data = {};
 
-	bssl::UniquePtr<EC_KEY> key =
-		create_ec_key_from_privkey(data.data(), data.size());
+	bssl::UniquePtr<EC_KEY> key = create_ec_key_from_privkey(data);
 
 	zassert_equal(key.get(), nullptr);
 }
@@ -134,7 +132,7 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_generate_ecdh_shared_secret)
 					    2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
 
 	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(privkey.data(), privkey.size());
+		create_ec_key_from_privkey(privkey);
 
 	zassert_not_equal(private_key.get(), nullptr);
 
@@ -181,7 +179,7 @@ ZTEST(fpsensor_auth_crypto_stateless,
 					    2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
 
 	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(privkey.data(), privkey.size());
+		create_ec_key_from_privkey(privkey);
 
 	zassert_not_equal(private_key.get(), nullptr);
 

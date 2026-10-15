@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <ec_commands.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <span>
 
 /* Define the missing FFF mocks for the linker */
@@ -405,6 +406,146 @@ ZTEST_USER(fpsensor_state,
 		FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
 		"Expected sensor_mode to be ENROLL_IMAGE | ENROLL_SESSION, got 0x%x",
 		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_encrypt_template_no_such_template)
+{
+	fpsensor_context ctx = {
+		.fp_encryption_status = FP_ENCRYPTED_TEMPLATE_READY,
+		.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE,
+		.template_encrypted_id = std::nullopt,
+	};
+	FpSensorStateMachine sm(ctx);
+
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_false(ctx.sensor_mode & FP_MODE_ENCRYPT_TEMPLATE);
+	zassert_false(ctx.fp_encryption_status & FP_ENCRYPTED_TEMPLATE_READY);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_unhandled_and_idle_irq_events)
+{
+	fpsensor_context ctx = {
+		.sensor_mode = FP_MODE_DEEPSLEEP,
+	};
+	FpSensorStateMachine sm(ctx);
+
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_equal(ctx.sensor_mode, FP_MODE_DEEPSLEEP);
+
+	/* Unhandled event (0) leaves state and sensor_mode unchanged. */
+	sm.handle_event(0);
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_equal(ctx.sensor_mode, FP_MODE_DEEPSLEEP);
+
+	/* Sensor IRQ while in IdleState transitions cleanly to low power. */
+	sm.handle_event(TASK_EVENT_SENSOR_IRQ);
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_equal(ctx.sensor_mode, FP_MODE_DEEPSLEEP);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_parse_commands_and_timeout)
+{
+	using SM = FpSensorStateMachine;
+
+	static_assert(FpSensorMode::create(0).has_value());
+	static_assert(!FpSensorMode::create(FP_MODE_ENROLL_IMAGE).has_value());
+	static_assert(FpSensorMode::create(FP_MODE_ENROLL_IMAGE |
+					   FP_MODE_ENROLL_SESSION)
+			      .has_value());
+
+	zassert_true(std::holds_alternative<SM::IdleCommand>(
+		SM::parse_command(FpSensorMode{})));
+	zassert_true(std::holds_alternative<SM::ImmediateCaptureCommand>(
+		SM::parse_command(*FpSensorMode::create(
+			FP_MODE_CAPTURE |
+			(FP_CAPTURE_PATTERN0 << FP_MODE_CAPTURE_TYPE_SHIFT)))));
+	zassert_true(std::holds_alternative<SM::DetectFingerCommand>(
+		SM::parse_command(*FpSensorMode::create(FP_MODE_FINGER_DOWN))));
+	zassert_true(std::holds_alternative<SM::ResetSensorCommand>(
+		SM::parse_command(*FpSensorMode::create(FP_MODE_RESET_SENSOR))));
+	zassert_true(std::holds_alternative<SM::MaintenanceCommand>(
+		SM::parse_command(
+			*FpSensorMode::create(FP_MODE_SENSOR_MAINTENANCE))));
+	zassert_true(std::holds_alternative<SM::EncryptTemplateCommand>(
+		SM::parse_command(
+			*FpSensorMode::create(FP_MODE_ENCRYPT_TEMPLATE))));
+	zassert_true(std::holds_alternative<SM::DecryptTemplateCommand>(
+		SM::parse_command(
+			*FpSensorMode::create(FP_MODE_DECRYPT_TEMPLATE))));
+
+	fpsensor_context ctx = {
+		.sensor_mode = FP_MODE_FINGER_DOWN,
+	};
+	SM sm(ctx);
+	zassert_equal(sm.timeout_us(), SM::kWaitForeverUs);
+
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_true(std::holds_alternative<SM::DetectFingerState>(sm.state()));
+	zassert_equal(sm.timeout_us(), SM::kWaitForeverUs);
+
+	ctx.sensor_mode = FP_MODE_FINGER_UP;
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_true(std::holds_alternative<SM::DetectFingerState>(sm.state()));
+	zassert_equal(sm.timeout_us(), SM::kFingerPollingDelayUs);
+}
+
+ZTEST_USER(fpsensor_state, test_positive_match_secret_state)
+{
+	const auto fgr0 = *FpTemplateId::create(0);
+	const auto fgr1 = *FpTemplateId::create(1);
+
+	positive_match_secret_state state{};
+	zassert_false(state.has_any_match());
+	zassert_false(state.is_matched(fgr0));
+
+	/* First enable succeeds; second enable while readable fails and resets.
+	 */
+	zassert_equal(state.enable(fgr0), EC_SUCCESS);
+	zassert_true(state.has_any_match());
+	zassert_true(state.is_matched(fgr0));
+	zassert_false(state.is_matched(fgr1));
+	zassert_equal(state.enable(fgr0), EC_ERROR_UNKNOWN);
+	zassert_false(state.has_any_match());
+
+	/* Invalid finger indices are rejected by fp_read_match_secret. */
+	std::array<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES> secret{};
+	zassert_equal(fp_read_match_secret(-1, secret), EC_RES_INVALID_PARAM);
+	zassert_equal(fp_read_match_secret(FP_MAX_FINGER_COUNT, secret),
+		      EC_RES_INVALID_PARAM);
+
+	/* Reading when not readable or for a non-matching finger is denied. */
+	global_context.positive_match_secret_state.deadline.val =
+		get_time().val + (15 * SECOND);
+	zassert_equal(fp_read_match_secret(0, secret), EC_RES_ACCESS_DENIED);
+
+	zassert_equal(global_context.positive_match_secret_state.enable(fgr1),
+		      EC_SUCCESS);
+	zassert_equal(fp_read_match_secret(0, secret), EC_RES_ACCESS_DENIED);
+
+	/* Verify fpsensor_context::is_cleared() checks. */
+	fpsensor_context ctx{};
+	zassert_true(ctx.is_cleared());
+	ctx.user_id[0] = 1;
+	zassert_false(ctx.is_cleared());
+	ctx.user_id[0] = 0;
+	ctx.templ_valid = 1;
+	zassert_false(ctx.is_cleared());
+	ctx.templ_valid = 0;
+	ctx.mark_template_dirty(fgr0);
+	zassert_false(ctx.is_cleared());
+	ctx.clear_template_dirty(fgr0);
+	zassert_equal(ctx.positive_match_secret_state.enable(fgr0), EC_SUCCESS);
+	zassert_false(ctx.is_cleared());
+	ctx.positive_match_secret_state.disable();
+	ctx.fp_encryption_status = FP_CONTEXT_USER_ID_SET;
+	zassert_false(ctx.is_cleared());
 }
 
 static void *fpsensor_setup(void)

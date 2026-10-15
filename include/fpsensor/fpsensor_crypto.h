@@ -64,26 +64,26 @@ bool hkdf_sha256(std::span<uint8_t> out_key,
  * @param tpm_seed the seed from the TPM for deriving secret.
  * @return EC_SUCCESS on success and error code otherwise.
  */
-enum ec_error_list
-derive_encryption_key(std::span<uint8_t> out_key, std::span<const uint8_t> salt,
-		      std::span<const uint8_t> info,
-		      std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed);
+enum ec_error_list derive_encryption_key(
+	std::span<uint8_t> out_key,
+	std::span<const uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> salt,
+	std::span<const uint8_t> info,
+	std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed);
 
 /**
  * Derive positive match secret from |input_positive_match_salt| and
  * SBP_Src_Key.
  *
- * @param output buffer to store positive match secret, must be at least
- * FP_POSITIVE_MATCH_SECRET_BYTES in size.
- * @param input_positive_match_salt the salt for deriving secret, must be at
- * least FP_POSITIVE_MATCH_SALT_BYTES in size.
+ * @param output buffer to store positive match secret.
+ * @param input_positive_match_salt the salt for deriving secret.
  * @param user_id the user_id used for deriving secret.
  * @param tpm_seed the seed from the TPM for deriving secret.
  * @return EC_SUCCESS on success and error code otherwise.
  */
 enum ec_error_list derive_positive_match_secret(
-	std::span<uint8_t> output,
-	std::span<const uint8_t> input_positive_match_salt,
+	std::span<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES> output,
+	std::span<const uint8_t, FP_POSITIVE_MATCH_SALT_BYTES>
+		input_positive_match_salt,
 	std::span<const uint8_t, FP_CONTEXT_USERID_BYTES> user_id,
 	std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed);
 
@@ -94,9 +94,9 @@ enum ec_error_list derive_positive_match_secret(
  * @param salt the salt to use in HKDF.
  * @return EC_SUCCESS on success and error code otherwise.
  */
-enum ec_error_list
-derive_pairing_key_encryption_key(std::span<uint8_t> output,
-				  std::span<const uint8_t> salt);
+enum ec_error_list derive_pairing_key_encryption_key(
+	std::span<uint8_t> output,
+	std::span<const uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> salt);
 
 /**
  * Encrypt |plaintext| using AES-GCM128.
