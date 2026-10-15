@@ -158,3 +158,53 @@ ZTEST_USER_F(pd_log, test_log_recv_vdm)
 		      "type=%d, received=%d", response->type,
 		      fixture->log_entry.type);
 }
+
+ZTEST_USER_F(pd_log, test_fifo_wrap_and_overflow)
+{
+	uint8_t payload[PD_LOG_ENTRY_DATA_SIZE] = {
+		0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+	};
+	const int unit_count =
+		CONFIG_EVENT_LOG_SIZE / sizeof(struct event_log_entry);
+
+	/*
+	 * Fill 63 of the 64 units with 1-unit (0-byte payload) entries so the
+	 * next entry starts at the last slot (index 63) and wraps around to
+	 * index 0.
+	 */
+	for (int i = 0; i < unit_count - 1; i++) {
+		log_add_event(PD_EVENT_MCU_CONNECT, 0, i, NULL, 0);
+	}
+
+	/*
+	 * Enqueue a 2-unit entry (header at index 63, 8-byte payload wrapped to
+	 * index 0). This overflows the 64-unit FIFO by 1 unit, discarding
+	 * entry 0 (at index 0) and advancing log_head to entry 1 (at index 1).
+	 */
+	log_add_event(PD_EVENT_MCU_CHARGE, sizeof(payload), 0xbeef, payload, 0);
+
+	/*
+	 * Verify entry 1 (at index 1) was not corrupted by the wrap-around
+	 * payload copy into index 0.
+	 */
+	for (int i = 1; i < unit_count - 1; i++) {
+		zassert_equal(sizeof(struct event_log_entry),
+			      log_dequeue_event(&fixture->log_entry));
+		zassert_equal(PD_EVENT_MCU_CONNECT, fixture->log_entry.type);
+		zassert_equal(0, fixture->log_entry.size);
+		zassert_equal(i, fixture->log_entry.data);
+	}
+
+	/* Verify the wrapped 2-unit entry at the tail */
+	zassert_equal(sizeof(struct event_log_entry) + sizeof(payload),
+		      log_dequeue_event(&fixture->log_entry));
+	zassert_equal(PD_EVENT_MCU_CHARGE, fixture->log_entry.type);
+	zassert_equal(sizeof(payload), fixture->log_entry.size);
+	zassert_equal(0xbeef, fixture->log_entry.data);
+	zassert_mem_equal(fixture->log_entry.payload, payload, sizeof(payload));
+
+	/* FIFO should now be empty */
+	zassert_equal(sizeof(struct event_log_entry),
+		      log_dequeue_event(&fixture->log_entry));
+	zassert_equal(EVENT_LOG_NO_ENTRY, fixture->log_entry.type);
+}

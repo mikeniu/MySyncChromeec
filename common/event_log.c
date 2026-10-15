@@ -23,23 +23,16 @@ BUILD_ASSERT(POWER_OF_TWO(UNIT_COUNT));
  * "log_head" is the next available event to dequeue.
  * "log_tail" is marking the end of the FIFO content (after last committed
  *  event)
- * "log_tail_next" is the next available spot to enqueue events.
  * The pointers are not wrapped until they are used, so we don't need an extra
  * entry to disambiguate between full and empty FIFO.
  *
  * For concurrency, several tasks might try to enqueue events in parallel with
- * log_add_event(). Only one task is dequeuing events (host commands, VDM,
- * TPM command handler). When the FIFO is full, log_add_event() will discard
- * the oldest events, so "log_head" is incremented/decremented in a critical
- * section since it is accessed from both log_add_event() and
- * log_dequeue_event(). log_tail_next is also protected as several writers can
- * race to add an event to the queue.
- * When a writer is done adding its event, it is updating log_tail,
- * so the event can be consumed by log_dequeue_event().
+ * log_add_event() while another task is dequeuing events with
+ * log_dequeue_event(), so FIFO accesses and updates are serialized in critical
+ * sections.
  */
 static size_t log_head;
 static size_t log_tail;
-static size_t log_tail_next;
 
 /* Size of one FIFO entry */
 #define ENTRY_SIZE(payload_sz) (1 + DIV_ROUND_UP((payload_sz), UNIT_SIZE))
@@ -53,22 +46,15 @@ void log_add_event(uint8_t type, uint8_t size, uint16_t data, void *payload,
 	size_t current_tail, first;
 	uint32_t lock_key;
 
-	/* --- critical section : reserve queue space --- */
 	lock_key = irq_lock();
-	current_tail = log_tail_next;
-	log_tail_next = current_tail + total_size;
-	irq_unlock(lock_key);
-	/* --- end of critical section --- */
+	current_tail = log_tail;
 
 	/* Out of space : discard the oldest entry */
 	while ((UNIT_COUNT - (current_tail - log_head)) < total_size) {
 		struct event_log_entry *oldest;
-		/* --- critical section : atomically free-up space --- */
-		lock_key = irq_lock();
+
 		oldest = log_events + (log_head & UNIT_COUNT_MASK);
 		log_head += ENTRY_SIZE(EVENT_LOG_SIZE(oldest->size));
-		irq_unlock(lock_key);
-		/* --- end of critical section --- */
 	}
 
 	r = log_events + (current_tail & UNIT_COUNT_MASK);
@@ -84,10 +70,10 @@ void log_add_event(uint8_t type, uint8_t size, uint16_t data, void *payload,
 		memcpy(r->payload, payload, first * UNIT_SIZE);
 	if (first < total_size - 1)
 		memcpy(log_events, ((uint8_t *)payload) + first * UNIT_SIZE,
-		       (total_size - first) * UNIT_SIZE);
-	/* mark the entry available in the queue if nobody is behind us */
-	if (current_tail == log_tail)
-		log_tail = log_tail_next;
+		       (total_size - 1 - first) * UNIT_SIZE);
+
+	log_tail = current_tail + total_size;
+	irq_unlock(lock_key);
 }
 
 int log_dequeue_event(struct event_log_entry *r)
@@ -98,10 +84,12 @@ int log_dequeue_event(struct event_log_entry *r)
 	size_t current_head;
 	uint32_t lock_key;
 
-retry:
+	lock_key = irq_lock();
 	current_head = log_head;
+
 	/* The log FIFO is empty */
 	if (log_tail == current_head) {
+		irq_unlock(lock_key);
 		memset(r, 0, UNIT_SIZE);
 		r->type = EVENT_LOG_NO_ENTRY;
 		return UNIT_SIZE;
@@ -114,15 +102,8 @@ retry:
 	if (first < total_size)
 		memcpy(r + first, log_events, (total_size - first) * UNIT_SIZE);
 
-	/* --- critical section : remove the entry from the queue --- */
-	lock_key = irq_lock();
-	if (log_head != current_head) { /* our entry was thrown away */
-		irq_unlock(lock_key);
-		goto retry;
-	}
 	log_head += total_size;
 	irq_unlock(lock_key);
-	/* --- end of critical section --- */
 
 	/* fixup the timestamp : number of milliseconds in the past */
 	r->timestamp = now - r->timestamp;
@@ -143,7 +124,7 @@ static int command_dlog(int argc, const char **argv)
 	if (argc > 1) {
 		if (!strcasecmp(argv[1], "clear")) {
 			interrupt_disable();
-			log_head = log_tail = log_tail_next = 0;
+			log_head = log_tail = 0;
 			interrupt_enable();
 
 			return EC_SUCCESS;
