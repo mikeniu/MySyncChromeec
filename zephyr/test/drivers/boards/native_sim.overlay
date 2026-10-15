@@ -868,6 +868,7 @@
 			};
 		};
 
+
 		tcs3400_rgb: tcs3400-rgb {
 			compatible = "cros-ec,tcs3400-rgb";
 			status = "okay";
@@ -892,7 +893,7 @@
 
 	motionsense-sensor-info {
 		compatible = "cros-ec,motionsense-sensor-info";
-		accel-force-mode-sensors = <&ms_bma255 &ms_lis2dw12_accel>;
+		accel-force-mode-sensors = <&ms_bma255>;
 	};
 
 	/*

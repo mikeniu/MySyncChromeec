@@ -32,3 +32,9 @@
 		};
 	};
 };
+
+/ {
+	aliases {
+		lis2dw12-int = &ms_lis2dw12_accel;
+	};
+};
