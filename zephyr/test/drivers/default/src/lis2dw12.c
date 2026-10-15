@@ -6,6 +6,7 @@
 #include "driver/accel_lis2dw12.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_lis2dw12.h"
+#include "motion_sense_fifo.h"
 #include "test/drivers/test_state.h"
 
 #include <zephyr/drivers/emul.h>
@@ -470,3 +471,37 @@ ZTEST(lis2dw12, test_lis2dw12_read)
 
 ZTEST_SUITE(lis2dw12, drivers_predicate_post_main, NULL, lis2dw12_before,
 	    lis2dw12_after, NULL);
+
+ZTEST(lis2dw12, test_lis2dw12_irq_handler_fifo)
+{
+#ifdef CONFIG_ACCEL_LIS2DW12_INT_EVENT
+	const struct emul *emul = EMUL_DT_GET(LIS2DW12_EMUL_NODE);
+	struct motion_sensor_t *ms = &motion_sensors[LIS2DW12_SENSOR_ID];
+	struct stprivate_data *drvdata = ms->drv_data;
+	int rv;
+	uint32_t event;
+
+	/* Reading requires a range to be set. */
+	ms->drv->set_range(ms, 1, 0);
+	drvdata->resol = LIS2DW12_RESOLUTION;
+
+	/* Reset FIFO info just in case */
+	if (IS_ENABLED(CONFIG_ACCEL_FIFO)) {
+		motion_sense_fifo_reset();
+	}
+
+	/* Set FIFO sample count to 2 samples */
+	lis2dw12_emul_set_fifo_samples(emul, 2);
+
+	/* Set some fake sample data for OUT_X_L_ADDR */
+	intv3_t fake_sample = { 10, -20, 30 };
+	lis2dw12_emul_set_accel_reading(emul, fake_sample);
+
+	/* Setup event to trigger the IRQ handler */
+	event = CONFIG_ACCEL_LIS2DW12_INT_EVENT;
+
+	/* Call IRQ handler */
+	rv = ms->drv->irq_handler(ms, &event);
+	zassert_equal(rv, EC_SUCCESS, "Expected EC_SUCCESS but got %d", rv);
+#endif
+}
