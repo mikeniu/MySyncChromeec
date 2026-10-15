@@ -5,7 +5,9 @@
 
 #define DT_DRV_COMPAT cros_lsm6dso_emul
 
+#include "driver/accelgyro_lsm6dso.h"
 #include "driver/accelgyro_lsm6dso_public.h"
+#include "emul/emul_lsm6dso.h"
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/emul.h>
@@ -18,6 +20,7 @@ LOG_MODULE_REGISTER(lsm6dso_emul, CONFIG_SENSOR_LOG_LEVEL);
 
 struct lsm6dso_emul_data {
 	uint8_t reg[0x7f];
+	int fail_reg;
 };
 
 struct lsm6dso_emul_cfg {};
@@ -34,6 +37,10 @@ static int lsm6dso_emul_handle_write(const struct emul *target, uint8_t regn,
 				     uint8_t value)
 {
 	struct lsm6dso_emul_data *data = target->data;
+
+	if (data->fail_reg == regn) {
+		return -EIO;
+	}
 
 	switch (regn) {
 	case LSM6DSO_CTRL3_ADDR:
@@ -87,6 +94,16 @@ static int lsm6dso_emul_transfer_i2c(const struct emul *target,
 		for (int i = 0; i < msgs->len; ++i) {
 			msgs->buf[i] = data->reg[regn + i];
 		}
+		if (regn == 0x78 /* LSM6DSO_FIFO_DATA_ADDR_TAG */) {
+			uint16_t sts = data->reg[LSM6DSO_FIFO_STS1_ADDR] |
+				       (data->reg[LSM6DSO_FIFO_STS2_ADDR] << 8);
+			if ((sts & LSM6DSO_FIFO_DIFF_MASK) > 0) {
+				sts--;
+				data->reg[LSM6DSO_FIFO_STS1_ADDR] = sts & 0xff;
+				data->reg[LSM6DSO_FIFO_STS2_ADDR] = (sts >> 8) &
+								    0xff;
+			}
+		}
 	} else {
 		/* Write data */
 		int rc = lsm6dso_emul_handle_write(target, regn, msgs->buf[1]);
@@ -104,8 +121,15 @@ static int lsm6dso_emul_init(const struct emul *target,
 	struct lsm6dso_emul_data *data = target->data;
 
 	data->reg[LSM6DSO_WHO_AM_I_REG] = LSM6DSO_WHO_AM_I;
+	data->fail_reg = -1;
 
 	return 0;
+}
+
+void lsm6dso_emul_set_write_fail_reg(const struct emul *target, int reg)
+{
+	struct lsm6dso_emul_data *data = target->data;
+	data->fail_reg = reg;
 }
 
 static const struct i2c_emul_api lsm6dso_emul_api_i2c = {
