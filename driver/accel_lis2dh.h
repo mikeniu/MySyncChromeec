@@ -52,10 +52,12 @@
 
 #define LIS2DH_CTRL2_ADDR 0x21
 #define LIS2DH_CTRL2_RESET_VAL 0x00
+#define LIS2DH_CTRL2_HPCLICK 0x04
 
 #define LIS2DH_CTRL3_ADDR 0x22
 #define LIS2DH_CTRL3_RESET_VAL 0x00
 #define LIS2DH_CTRL3_I1_WM 0x04
+#define LIS2DH_CTRL3_I1_CLICK 0x80
 
 #define LIS2DH_CTRL4_ADDR 0x23
 #define LIS2DH_BDU_MASK 0x80
@@ -102,8 +104,59 @@ enum lis2dh_fmode {
 /* Interrupt source status register */
 #define LIS2DH_INT1_SRC_REG 0x31
 
+/* Click / double-tap detection registers */
+#define LIS2DH_CLICK_CFG_ADDR 0x38
+#define LIS2DH_CLICK_XD 0x02
+#define LIS2DH_CLICK_YD 0x08
+#define LIS2DH_CLICK_ZD 0x20
+
+#define LIS2DH_CLICK_SRC_ADDR 0x39
+#define LIS2DH_CLICK_SRC_SCLICK 0x10
+#define LIS2DH_CLICK_SRC_DCLICK 0x20
+#define LIS2DH_CLICK_SRC_IA 0x40
+
+#define LIS2DH_CLICK_THS_ADDR 0x3a
+#define LIS2DH_CLICK_THS_MASK 0x7f
+#define LIS2DH_CLICK_LIR 0x80
+/*
+ * Click threshold: 1 LSB of CLICK_THS is FS / 128 (in g), and 0 disables
+ * click detection.
+ */
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+#define LIS2DH_CLICK_THS_REG(_fs)                                    \
+	MIN(MAX(DIV_ROUND_NEAREST(CONFIG_GESTURE_TAP_THRES_MG * 128, \
+				  (_fs) * 1000),                     \
+		1),                                                  \
+	    LIS2DH_CLICK_THS_MASK)
+#else
+#define LIS2DH_CLICK_THS_REG(_fs) 0
+#endif
+
+/*
+ * Click timing registers at ODR = 400 Hz (1 LSB = 1 / 400 s = 2.5 ms):
+ * - TIME_LIMIT   (0x3b): 20 LSB = 50 ms max tap pulse width
+ * - TIME_LATENCY (0x3c): 32 LSB = 80 ms quiet latency & INT1 pulse width
+ * - TIME_WINDOW  (0x3d): max interval after latency for the second tap
+ */
+#define LIS2DH_TIME_LIMIT_ADDR 0x3b
+#define LIS2DH_TIME_LIMIT_VAL 0x14
+
+#define LIS2DH_TIME_LATENCY_ADDR 0x3c
+#define LIS2DH_TIME_LATENCY_VAL 0x20
+
+#define LIS2DH_TIME_WINDOW_ADDR 0x3d
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+#define LIS2DH_TIME_WINDOW_VAL \
+	MIN((CONFIG_GESTURE_TAP_MAX_INTERSTICE_T * 400) / 1000, 0xff)
+#else
+#define LIS2DH_TIME_WINDOW_VAL 0
+#endif
+
 #define LIS2DH_INT1_FTH_ADDR LIS2DH_CTRL3_ADDR
 #define LIS2DH_INT1_FTH_MASK LIS2DH_CTRL3_I1_WM
+
+#define LIS2DH_INT1_CLICK_ADDR LIS2DH_CTRL3_ADDR
+#define LIS2DH_INT1_CLICK_MASK LIS2DH_CTRL3_I1_CLICK
 
 #define LIS2DH_H_ACTIVE_ADDR LIS2DH_CTRL6_ADDR
 #define LIS2DH_H_ACTIVE_MASK 0x02

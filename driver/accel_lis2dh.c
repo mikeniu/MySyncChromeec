@@ -17,6 +17,7 @@
 #include "hwtimer.h"
 #include "i2c.h"
 #include "math_util.h"
+#include "motion_sense.h"
 #include "motion_sense_fifo.h"
 #include "task.h"
 #include "util.h"
@@ -27,6 +28,48 @@
 
 STATIC_IF(ACCEL_LIS2DH_INT_ENABLE)
 volatile uint32_t last_interrupt_timestamp;
+STATIC_IF(ACCEL_LIS2DH_INT_ENABLE)
+bool click_active;
+
+static bool is_tap_sensor(const struct motion_sensor_t *s)
+{
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+	return s == &motion_sensors[CONFIG_GESTURE_TAP_SENSOR];
+#else
+	return false;
+#endif
+}
+
+static bool double_tap_enabled(const struct motion_sensor_t *s)
+{
+	if (!is_tap_sensor(s))
+		return false;
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	{
+		struct stprivate_data *data = s->drv_data;
+
+		return data->enabled_activities &
+		       BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+	}
+#else
+	/* Without the host interface, double-tap stays on once configured */
+	return true;
+#endif
+}
+
+/*
+ * The click threshold LSB is the accel full scale / 128, so it has to follow
+ * the range to keep the threshold at CONFIG_GESTURE_TAP_THRES_MG.
+ */
+static int set_tap_threshold(const struct motion_sensor_t *s, int range)
+{
+	if (!is_tap_sensor(s))
+		return EC_SUCCESS;
+
+	return st_write_data_with_mask(s, LIS2DH_CLICK_THS_ADDR,
+				       LIS2DH_CLICK_THS_MASK,
+				       LIS2DH_CLICK_THS_REG(range));
+}
 
 /**
  * lis2dh_enable_fifo - Enable/Disable FIFO in LIS2DH
@@ -36,6 +79,8 @@ volatile uint32_t last_interrupt_timestamp;
 static __maybe_unused int lis2dh_enable_fifo(const struct motion_sensor_t *s,
 					     enum lis2dh_fmode mode)
 {
+	if (mode == LIS2DH_FIFO_BYPASS_MODE)
+		click_active = false;
 	return st_write_data_with_mask(s, LIS2DH_FIFO_CTRL_ADDR,
 				       LIS2DH_FIFO_MODE_MASK, mode);
 }
@@ -65,7 +110,46 @@ lis2dh_config_interrupt(const struct motion_sensor_t *s)
 	RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_CTRL5_ADDR,
 					     LIS2DH_CTRL5_FIFO_EN_MASK, 0x1));
 
-	RETURN_ERROR(s->drv->enable_interrupt(s, true));
+	if (is_tap_sensor(s)) {
+		/*
+		 * Configure built-in double-click detection on Z axis with a
+		 * pulsed (non-latched, LIR_Click = 0) interrupt on INT1.
+		 */
+		RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_CTRL2_ADDR,
+						     LIS2DH_CTRL2_HPCLICK,
+						     LIS2DH_EN_BIT));
+		RETURN_ERROR(st_raw_write8(
+			s->port, s->i2c_spi_addr_flags, LIS2DH_CLICK_THS_ADDR,
+			LIS2DH_CLICK_THS_REG(BASE_RANGE(s->default_range))));
+		RETURN_ERROR(st_raw_write8(s->port, s->i2c_spi_addr_flags,
+					   LIS2DH_TIME_LIMIT_ADDR,
+					   LIS2DH_TIME_LIMIT_VAL));
+		RETURN_ERROR(st_raw_write8(s->port, s->i2c_spi_addr_flags,
+					   LIS2DH_TIME_LATENCY_ADDR,
+					   LIS2DH_TIME_LATENCY_VAL));
+		RETURN_ERROR(st_raw_write8(s->port, s->i2c_spi_addr_flags,
+					   LIS2DH_TIME_WINDOW_ADDR,
+					   LIS2DH_TIME_WINDOW_VAL));
+		RETURN_ERROR(st_raw_write8(s->port, s->i2c_spi_addr_flags,
+					   LIS2DH_CLICK_CFG_ADDR,
+					   LIS2DH_CLICK_ZD));
+		RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_INT1_CLICK_ADDR,
+						     LIS2DH_INT1_CLICK_MASK,
+						     LIS2DH_EN_BIT));
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+		{
+			struct stprivate_data *data = s->drv_data;
+
+			data->enabled_activities |=
+				BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+			data->disabled_activities &=
+				~BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+		}
+#endif
+	}
+
+	RETURN_ERROR(
+		s->drv->enable_interrupt(s, !motion_sensor_in_forced_mode(s)));
 
 	return EC_SUCCESS;
 }
@@ -185,10 +269,29 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	bool commit_needed = false;
 	int nsamples;
 
-	if ((!(*event & ACCEL_LIS2DH_INT_EVENT)) ||
-	    motion_sensor_in_forced_mode(s)) {
+	if (!(*event & ACCEL_LIS2DH_INT_EVENT))
 		return EC_ERROR_NOT_HANDLED;
+
+	if (double_tap_enabled(s)) {
+		struct stprivate_data *data = s->drv_data;
+		int status = 0;
+
+		if (st_raw_read8(s->port, s->i2c_spi_addr_flags,
+				 LIS2DH_CLICK_SRC_ADDR,
+				 &status) == EC_SUCCESS) {
+			bool dclick = status & LIS2DH_CLICK_SRC_DCLICK;
+
+			if (dclick && !click_active)
+				*event |= TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(
+					MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+			click_active = dclick &&
+				       !motion_sensor_in_forced_mode(s) &&
+				       (data->base.odr > 0);
+		}
 	}
+
+	if (motion_sensor_in_forced_mode(s))
+		return EC_ERROR_NOT_HANDLED;
 
 	do {
 		RETURN_ERROR(lis2dh_get_fifo_samples(s, &nsamples));
@@ -209,6 +312,23 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 
 static int lis2dh_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 {
+	struct stprivate_data *data = s->drv_data;
+
+	if (!enable)
+		RETURN_ERROR(lis2dh_enable_fifo(s, LIS2DH_FIFO_BYPASS_MODE));
+
+	/*
+	 * Route I1_CLICK to INT1 only when the FIFO watermark interrupt is
+	 * inactive (!enable or ODR == 0); when FIFO streaming is active,
+	 * I1_WTM already wakes lis2dh_irq_handler() every 5 ms to poll
+	 * CLICK_SRC without holding INT1 low across watermark intervals.
+	 */
+	if (is_tap_sensor(s))
+		RETURN_ERROR(st_write_data_with_mask(
+			s, LIS2DH_INT1_CLICK_ADDR, LIS2DH_INT1_CLICK_MASK,
+			(!enable || data->base.odr == 0) &&
+				double_tap_enabled(s)));
+
 	/* Enable interrupt on FIFO watermark and route to int1. */
 	RETURN_ERROR(st_write_data_with_mask(s, LIS2DH_INT1_FTH_ADDR,
 					     LIS2DH_INT1_FTH_MASK, enable));
@@ -225,6 +345,7 @@ static int lis2dh_enable_interrupt(const struct motion_sensor_t *s, bool enable)
  */
 static int set_range(struct motion_sensor_t *s, int range, int rnd)
 {
+	struct stprivate_data *data = s->drv_data;
 	int normalized_range;
 	int val;
 	int err = EC_SUCCESS;
@@ -268,12 +389,17 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	/* Save Gain in range for speed up data path */
 	if (err == EC_SUCCESS) {
 		s->current_range = normalized_range;
+		err = set_tap_threshold(s, normalized_range);
+		if (err != EC_SUCCESS)
+			goto unlock_rate;
 	} else {
 		goto unlock_rate;
 	}
 
 	/* FIFO restart collecting events in Stream  mode. */
-	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE))
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE) &&
+	    !motion_sensor_in_forced_mode(s) &&
+	    (data->base.odr > 0 || !double_tap_enabled(s)))
 		err = lis2dh_enable_fifo(s, LIS2DH_STREAM_MODE);
 
 unlock_rate:
@@ -309,12 +435,23 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	}
 
 	if (rate == 0) {
-		/* Power Off device */
+		/*
+		 * Keep the accelerometer running at 400 Hz when double-tap
+		 * detection is active while leaving the FIFO in bypass mode.
+		 */
+		reg_val = double_tap_enabled(s) ? LIS2DH_ODR_400HZ_VAL :
+						  LIS2DH_ODR_0HZ_VAL;
 		ret = st_write_data_with_mask(s, LIS2DH_CTRL1_ADDR,
-					      LIS2DH_ACC_ODR_MASK,
-					      LIS2DH_ODR_0HZ_VAL);
-		if (ret == EC_SUCCESS)
+					      LIS2DH_ACC_ODR_MASK, reg_val);
+		if (ret == EC_SUCCESS) {
 			data->base.odr = 0;
+			if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE) &&
+			    is_tap_sensor(s))
+				ret = st_write_data_with_mask(
+					s, LIS2DH_INT1_CLICK_ADDR,
+					LIS2DH_INT1_CLICK_MASK,
+					double_tap_enabled(s));
+		}
 		goto unlock_rate;
 	}
 
@@ -327,8 +464,16 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	}
 
 	if (normalized_rate > LIS2DH_ODR_MAX_VAL ||
-	    normalized_rate < LIS2DH_ODR_MIN_VAL)
-		return EC_RES_INVALID_PARAM;
+	    normalized_rate < LIS2DH_ODR_MIN_VAL) {
+		ret = EC_RES_INVALID_PARAM;
+		goto unlock_rate;
+	}
+
+	if (double_tap_enabled(s) && reg_val < LIS2DH_ODR_400HZ_VAL) {
+		reg_val = LIS2DH_ODR_400HZ_VAL;
+		if (!motion_sensor_in_forced_mode(s))
+			normalized_rate = LIS2DH_REG_TO_NORMALIZE(reg_val);
+	}
 
 	/*
 	 * Lock accel resource to prevent another task from attempting
@@ -341,7 +486,17 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 
 	/* FIFO restart collecting events in Stream mode. */
 	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
-		ret = lis2dh_enable_fifo(s, LIS2DH_STREAM_MODE);
+		if (is_tap_sensor(s)) {
+			ret = st_write_data_with_mask(
+				s, LIS2DH_INT1_CLICK_ADDR,
+				LIS2DH_INT1_CLICK_MASK,
+				motion_sensor_in_forced_mode(s) &&
+					double_tap_enabled(s));
+			if (ret != EC_SUCCESS)
+				goto unlock_rate;
+		}
+		if (!motion_sensor_in_forced_mode(s))
+			ret = lis2dh_enable_fifo(s, LIS2DH_STREAM_MODE);
 	}
 
 unlock_rate:
@@ -498,6 +653,50 @@ err_unlock:
 	return ret;
 }
 
+#if defined(ACCEL_LIS2DH_INT_ENABLE) && defined(CONFIG_GESTURE_HOST_DETECTION)
+/* The return value goes back to the host, so it is an EC_RES_* code. */
+static int manage_activity(const struct motion_sensor_t *s,
+			   enum motionsensor_activity activity, int enable,
+			   const struct ec_motion_sense_activity *param)
+{
+	int ret = EC_RES_INVALID_PARAM;
+	struct stprivate_data *data = s->drv_data;
+
+	if (!is_tap_sensor(s))
+		return EC_RES_INVALID_PARAM;
+
+	switch (activity) {
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+	case MOTIONSENSE_ACTIVITY_DOUBLE_TAP:
+		k_mutex_lock(s->mutex, K_FOREVER);
+		ret = st_write_data_with_mask(
+			s, LIS2DH_CLICK_CFG_ADDR, LIS2DH_CLICK_ZD,
+			enable ? LIS2DH_EN_BIT : LIS2DH_DIS_BIT);
+		k_mutex_unlock(s->mutex);
+		if (ret != EC_SUCCESS)
+			return EC_RES_UNAVAILABLE;
+		ret = EC_RES_SUCCESS;
+		break;
+#endif
+	default:
+		return EC_RES_INVALID_PARAM;
+	}
+
+	if (enable) {
+		data->enabled_activities |= BIT(activity);
+		data->disabled_activities &= ~BIT(activity);
+	} else {
+		data->enabled_activities &= ~BIT(activity);
+		data->disabled_activities |= BIT(activity);
+	}
+
+	if (set_data_rate(s, data->base.odr, 0) != EC_SUCCESS)
+		return EC_RES_UNAVAILABLE;
+
+	return ret;
+}
+#endif
+
 const struct accelgyro_drv lis2dh_drv = {
 	.init = init,
 	.read = read,
@@ -510,5 +709,9 @@ const struct accelgyro_drv lis2dh_drv = {
 #ifdef ACCEL_LIS2DH_INT_ENABLE
 	.enable_interrupt = lis2dh_enable_interrupt,
 	.irq_handler = lis2dh_irq_handler,
-#endif /* ACCEL_LIS2DW12_INT_ENABLE */
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	.manage_activity = manage_activity,
+	.list_activities = st_list_activities,
+#endif
+#endif /* ACCEL_LIS2DH_INT_ENABLE */
 };
