@@ -6,44 +6,11 @@
 #ifndef PLATFORM_EC_INCLUDE_OVERFLOW_H_
 #define PLATFORM_EC_INCLUDE_OVERFLOW_H_
 
-#ifdef __ZEPHYR__
-
+/*
+ * Retained as a compatibility header because common/fpsensor/* is synced by
+ * CopyBot to the legacy non-Zephyr ec-legacy branch, where
+ * <zephyr/sys/math_extras.h> is not available.
+ */
 #include <zephyr/sys/math_extras.h>
-
-#else
-
-#include "compiler.h"
-
-#include <stdbool.h>
-#include <stdint.h>
-
-/*
- * __builtin_add_overflow, __builtin_sub_overflow and __builtin_mul_overflow
- * were added in gcc 5.1: https://gcc.gnu.org/gcc-5/changes.html
- */
-#if TOOLCHAIN_GCC_VERSION > 50100
-#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
-#endif
-
-/*
- * __has_builtin available in
- * clang 10 and newer: https://clang.llvm.org/docs/LanguageExtensions.html
- */
-#ifdef __clang__
-#if __has_builtin(__builtin_add_overflow) &&     \
-	__has_builtin(__builtin_sub_overflow) && \
-	__has_builtin(__builtin_mul_overflow)
-#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
-#endif
-#endif /* __clang__ */
-
-#include "third_party/linux/overflow.h"
-
-static inline bool u32_add_overflow(uint32_t a, uint32_t b, uint32_t *result)
-{
-	return check_add_overflow(a, b, result);
-}
-
-#endif /* __ZEPHYR__ */
 
 #endif /* PLATFORM_EC_INCLUDE_OVERFLOW_H_ */
