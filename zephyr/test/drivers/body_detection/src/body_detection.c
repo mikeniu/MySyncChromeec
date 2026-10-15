@@ -7,7 +7,9 @@
 #include "body_detection.h"
 #include "console.h"
 #include "hooks.h"
+#include "hwtimer.h"
 #include "math_util.h"
+#include "motion_sense_fifo.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 
@@ -310,6 +312,72 @@ ZTEST_USER(bodydetectinit, test_change_sensor_index)
 	motion_sense_set_on_body_sensor_index(MOTION_SENSE_INVALID_SENSOR_ID);
 	zassert_equal(MOTION_SENSE_INVALID_SENSOR_ID,
 		      motion_sense_get_on_body_sensor_index());
+}
+
+ZTEST_USER(bodydetectinit, test_fifo_activity_sensor_bounds)
+{
+	const uint32_t now = __hw_clock_source_read();
+	struct ec_response_motion_sensor_data data[CONFIG_ACCEL_FIFO_SIZE] = {
+		0
+	};
+	uint8_t fifo_info_buffer
+		[sizeof(struct ec_response_motion_sense_fifo_info) +
+		 sizeof(uint16_t) * MAX_MOTION_SENSORS];
+	struct ec_response_motion_sense_fifo_info *fifo_info =
+		(void *)fifo_info_buffer;
+	uint16_t data_bytes_read;
+	uint16_t orig_oversampling = motion_sensors[0].oversampling_ratio;
+	int read_count;
+
+	motion_sense_fifo_reset();
+	motion_sense_fifo_reset_needed_flags();
+
+	/*
+	 * Activity events (e.g. double-tap, body detection, orientation) use
+	 * MOTION_SENSE_ACTIVITY_SENSOR_ID (== motion_sensor_count), which is
+	 * one past the end of the motion_sensors[] array.
+	 */
+	zassert_equal(MOTION_SENSE_ACTIVITY_SENSOR_ID, motion_sensor_count);
+	data[0].flags = MOTIONSENSE_SENSOR_FLAG_WAKEUP;
+	data[0].activity_data.activity = MOTIONSENSE_ACTIVITY_BODY_DETECTION;
+	data[0].activity_data.state = 1;
+	data[0].sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID;
+
+	motion_sense_fifo_stage_data(&data[0], NULL, 0, now);
+	motion_sense_fifo_commit_data();
+
+	read_count =
+		motion_sense_fifo_read(sizeof(data), 4, data, &data_bytes_read);
+	zassert_equal(read_count, 2);
+	zassert_true(data[0].flags & MOTIONSENSE_SENSOR_FLAG_TIMESTAMP);
+	zassert_equal(data[1].sensor_num, MOTION_SENSE_ACTIVITY_SENSOR_ID);
+	zassert_equal(data[1].activity_data.activity,
+		      MOTIONSENSE_ACTIVITY_BODY_DETECTION);
+
+	/*
+	 * Also verify overflowing the staged FIFO when the head entry is an
+	 * activity sensor event (exercises fifo_pop() bounds check).
+	 */
+	motion_sensors[0].oversampling_ratio = 1;
+	data[0].flags = 0;
+	data[0].sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID;
+	motion_sense_fifo_stage_data(&data[0], NULL, 0, now);
+
+	data[0].sensor_num = 0;
+	for (int i = 0; i < CONFIG_ACCEL_FIFO_SIZE; i++) {
+		motion_sense_fifo_stage_data(&data[0], &motion_sensors[0], 1,
+					     now + i * 10);
+	}
+	motion_sense_fifo_commit_data();
+
+	/* The activity event is the oldest entry, so it is evicted first. */
+	motion_sense_fifo_get_info(fifo_info, false);
+	zassert_equal(fifo_info->lost[MOTION_SENSE_ACTIVITY_SENSOR_ID], 1);
+	zassert_true(fifo_info->total_lost >= 2);
+
+	motion_sensors[0].oversampling_ratio = orig_oversampling;
+	motion_sense_fifo_reset();
+	motion_sense_fifo_reset_needed_flags();
 }
 
 ZTEST_SUITE(bodydetectinit, drivers_predicate_post_main, NULL,
