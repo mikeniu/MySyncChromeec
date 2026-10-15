@@ -511,7 +511,8 @@ void __enter_hibernate(uint32_t seconds, uint32_t microseconds)
 		 * Set reset flag in case board_hibernate_late() doesn't
 		 * return.
 		 */
-		chip_save_reset_flags(EC_RESET_FLAG_HIBERNATE);
+		chip_save_reset_flags(chip_read_reset_flags() |
+				      EC_RESET_FLAG_HIBERNATE);
 		board_hibernate_late();
 	}
 
