@@ -10,6 +10,7 @@
 # IT8xxx2 is RISC-V core.
 ifeq ($(CHIP_FAMILY), it8xxx2)
 CORE:=riscv-rv32i
+_ZIFENCEI_EXTENSION=_zifencei
 else
 CORE:=nds32
 endif
