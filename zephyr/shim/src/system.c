@@ -324,6 +324,7 @@ static int check_reset_cause(void)
 		 * for EC but not for H1, so do not wait for the second reset.
 		 */
 		if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
+		    IS_ENABLED(CONFIG_CROS_EC_RO) &&
 		    ((system_flags & EC_RESET_FLAG_HIBERNATE) == 0)) {
 			system_flags |= EC_RESET_FLAG_INITIAL_PWR;
 			chip_flags |= EC_RESET_FLAG_INITIAL_PWR;
@@ -417,6 +418,7 @@ test_export_static int system_preinitialize(void)
 	 */
 #ifdef CONFIG_BOARD_RESET_AFTER_POWER_ON
 	if (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
+		system_clear_reset_flags(EC_RESET_FLAG_INITIAL_PWR);
 		/*
 		 * The current initial stage couldn't use the kernel delay
 		 * function. Use CPU nop instruction to wait for the external
@@ -424,6 +426,13 @@ test_export_static int system_preinitialize(void)
 		 */
 		for (uint32_t i = WAIT_RESET_TIME; i; i--)
 			arch_nop();
+		/*
+		 * H1 is expected to reset the EC during the wait loop above.
+		 * If the wait timed out without a reset, clear the flag from
+		 * BBRAM so it does not persist across subsequent reboots.
+		 */
+		chip_save_reset_flags(chip_read_reset_flags() &
+				      ~EC_RESET_FLAG_INITIAL_PWR);
 	}
 #endif
 	system_common_pre_init();
