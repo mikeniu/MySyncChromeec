@@ -61,6 +61,9 @@ static const uint8_t out_preamble[EC_SPI_PREAMBLE_LENGTH] = {
 	EC_SPI_FRAME_START,
 };
 
+/* A host command is in processing by the host command task? */
+static bool shi_cmd_processing;
+
 /* Store read and write data buffer */
 static uint8_t in_msg[SPI_RX_MAX_FIFO_SIZE] __aligned(4);
 static uint8_t out_msg[SPI_TX_MAX_FIFO_SIZE] __aligned(4);
@@ -108,7 +111,7 @@ static void reset_rx_fifo(void)
 }
 
 /* This routine handles spi received unexcepted data */
-static void spi_bad_received_data(int count)
+static void spi_bad_received_data(const uint8_t *buf, size_t count)
 {
 	/* State machine mismatch, timeout, or protocol we can't handle. */
 	spi_set_state(SPI_STATE_RX_BAD);
@@ -117,8 +120,8 @@ static void spi_bad_received_data(int count)
 
 	CPRINTS("SPI rx bad data");
 	CPRINTF("in_msg=[");
-	for (int i = 0; i < count; i++)
-		CPRINTF("%02x ", in_msg[i]);
+	for (size_t i = 0; i < count; i++)
+		CPRINTF("%02x ", buf[i]);
 	CPRINTF("]\n");
 }
 
@@ -167,6 +170,8 @@ static void spi_send_response_packet(struct host_packet *pkt)
 {
 	int tx_size;
 
+	shi_cmd_processing = false;
+
 	if (shi_state != SPI_STATE_PROCESSING) {
 		CPRINTS("The request data is not processing.");
 		return;
@@ -206,26 +211,28 @@ static void spi_host_request_data(uint8_t *in_msg_addr, int count)
 /* Parse header for version of spi-protocol */
 static void spi_parse_header(void)
 {
-	struct ec_host_request *r = (struct ec_host_request *)in_msg;
+	struct ec_host_request r __aligned(4);
 
-	/* Store request data from Rx FIFO to in_msg buffer */
-	spi_host_request_data(in_msg, sizeof(*r));
+	/* Store request header from Rx FIFO to local buffer */
+	spi_host_request_data((uint8_t *)&r, sizeof(r));
 
 	/* Protocol version 3 */
-	if (in_msg[0] == EC_HOST_REQUEST_VERSION) {
+	if (r.struct_version == EC_HOST_REQUEST_VERSION) {
 		int pkt_size;
 
 		/* Check how big the packet should be */
-		pkt_size = host_request_expected_size(r);
+		pkt_size = host_request_expected_size(&r);
 
 		if (pkt_size == 0 || pkt_size > sizeof(in_msg)) {
-			spi_bad_received_data(pkt_size);
+			spi_bad_received_data((const uint8_t *)&r, sizeof(r));
 			return;
 		}
 
+		/* Copy verified header to in_msg buffer */
+		memcpy(in_msg, &r, sizeof(r));
+
 		/* Store request data from Rx FIFO to in_msg buffer */
-		spi_host_request_data(in_msg + sizeof(*r),
-				      pkt_size - sizeof(*r));
+		spi_host_request_data(in_msg + sizeof(r), pkt_size - sizeof(r));
 
 		/* Set up parameters for host request */
 		spi_packet.send_response = spi_send_response_packet;
@@ -244,11 +251,12 @@ static void spi_parse_header(void)
 		spi_packet.driver_result = EC_RES_SUCCESS;
 
 		/* Go to common-layer to handle request */
+		shi_cmd_processing = true;
 		host_packet_receive(&spi_packet);
 	} else {
 		/* Invalid version number */
 		CPRINTS("Invalid version number");
-		spi_bad_received_data(1);
+		spi_bad_received_data((const uint8_t *)&r, 1);
 	}
 }
 
@@ -282,6 +290,13 @@ static void shi_ite_int_handler(const void *arg)
 	if (IT83XX_SPI_RX_VLISR & IT83XX_SPI_RVLI) {
 		/* write clear slave status */
 		IT83XX_SPI_RX_VLISR = IT83XX_SPI_RVLI;
+		if (shi_cmd_processing ||
+		    (shi_state != SPI_STATE_READY_TO_RECV &&
+		     shi_state != SPI_STATE_RECEIVING)) {
+			LOG_ERR("Received SPI RVLI in invalid state %d (busy=%d)",
+				shi_state, shi_cmd_processing);
+			return;
+		}
 		/* Move to processing state */
 		spi_set_state(SPI_STATE_PROCESSING);
 		/* Parse header for version of spi-protocol */
@@ -292,8 +307,12 @@ static void shi_ite_int_handler(const void *arg)
 void spi_event(enum gpio_signal signal)
 {
 	if (chipset_in_state(CHIPSET_STATE_ON)) {
-		/* Move to processing state */
-		spi_set_state(SPI_STATE_PROCESSING);
+		if (shi_cmd_processing ||
+		    shi_state != SPI_STATE_READY_TO_RECV) {
+			return;
+		}
+		/* Move to receiving state */
+		spi_set_state(SPI_STATE_RECEIVING);
 		/* Disable idle task deep sleep bit of SPI in S0. */
 		disable_sleep(SLEEP_MASK_SPI);
 	}
