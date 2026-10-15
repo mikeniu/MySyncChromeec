@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04e5691e_78d9825a",
+        "filename": "chip/npcx/system.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T20:16:19Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Instead of overwriting the reset flags with `EC_RESET_FLAG_HIBERNATE` and then clearing them with `0`, it would be safer to read the existing flags, add `EC_RESET_FLAG_HIBERNATE`, and then restore them if `board_hibernate_late()` returns. \n\n`chip_save_reset_flags()` overwrites the entire value in BBRAM. This means that if `CONFIG_POWER_BUTTON_INIT_IDLE` is enabled, `EC_RESET_FLAG_AP_IDLE` might be present in the saved flags and will be lost.\n\nConsider doing this instead:\n```c\n\t\tuint32_t saved_flags \u003d chip_read_reset_flags();\n\t\tchip_save_reset_flags(saved_flags | EC_RESET_FLAG_HIBERNATE);\n\t\tboard_hibernate_late();\n\t\tchip_save_reset_flags(saved_flags);\n```",
+      "range": {
+        "startLine": 633,
+        "startChar": 0,
+        "endLine": 633,
+        "endChar": 0
+      },
+      "revId": "3b3ba4071cbdbdd6a8ad550c15c1fe1cbc74dc63",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
