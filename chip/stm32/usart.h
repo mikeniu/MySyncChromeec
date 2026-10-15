@@ -31,6 +31,11 @@ struct usart_state {
 	 * that were lost due to overrun conditions.
 	 */
 	uint32_t rx_overrun;
+
+	/*
+	 * Counter of framing errors detected on receive.
+	 */
+	uint32_t rx_framing_error;
 };
 
 struct usart_config;

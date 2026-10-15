@@ -76,6 +76,12 @@ struct usart_rx_dma_state {
 	 * Maximum number of bytes transferred in any one RX interrupt.
 	 */
 	uint32_t max_bytes;
+
+	/*
+	 * Set if an error (framing, parity, noise, overrun) occurred on the
+	 * current burst.
+	 */
+	uint8_t rx_err;
 };
 
 /*
