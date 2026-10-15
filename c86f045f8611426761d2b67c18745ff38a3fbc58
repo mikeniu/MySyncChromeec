@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35b390da_9c3f2bb5",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "342e4286_1ae3af32",
+      "range": {
+        "startLine": 193,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e1123d9b_116f4131",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-14T17:56:01Z",
       "side": 1,
       "message": "The sleeps here are 0.5s, whereas IteI2cFlasher (lines 67-69) uses 2s and 3s for the same operation. If ITE debugger mode entry is slow, these shorter sleeps might lead to flakiness. Standardizing them or noting why they differ would be helpful.",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf23d785_37f3dffe",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done, the UART path now uses the same 2s/3s waits as the I2C path.",
+      "parentUuid": "e1123d9b_116f4131",
       "range": {
         "startLine": 242,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cd729b7_99884422",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "50c05d3e_56835a3f",
+      "range": {
+        "startLine": 302,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ad86e5e_0bb4ba07",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-10-14T17:56:01Z",
       "side": 1,
       "message": "Calling sudo internally can be problematic in automated environments or if it triggers a password prompt unexpectedly. Since iteflash doesn\u0027t require it, is there a specific reason itecomdbgr needs root (e.g., PTY ownership)? If so, a comment explaining it would be useful.",
+      "range": {
+        "startLine": 306,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 0
+      },
+      "revId": "c86f045f8611426761d2b67c18745ff38a3fbc58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7df3719e_7019b330",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Dropped it. itecomdbgr only opens the servod UART PTY, and servod chowns its PTYs to the user that started it (SUDO_UID/SUDO_GID in hdctools stm32uart.py and ec3po_interface.py), which is why flash_ec already runs rtkupdate and uartupdatetool without sudo.",
+      "parentUuid": "5ad86e5e_0bb4ba07",
       "range": {
         "startLine": 306,
         "startChar": 0,

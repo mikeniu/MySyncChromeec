@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be3f13aa_d57c44ac",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done. Added _get_controller(), which reads active_dut_controller once (falling back to servo_type), and _get_serial() and the rest switch on that.",
+      "parentUuid": "e9358847_0f5c2ea4",
+      "range": {
+        "startLine": 30,
+        "startChar": 37,
+        "endLine": 30,
+        "endChar": 47
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15cb48f8_f46773f4",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-14T17:56:01Z",
       "side": 1,
       "message": "Use gsc_i2c_ctrl",
+      "range": {
+        "startLine": 68,
+        "startChar": 28,
+        "endLine": 68,
+        "endChar": 41
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bcf2bbd_17271798",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "15cb48f8_f46773f4",
       "range": {
         "startLine": 68,
         "startChar": 28,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39776b4b_ec160ca2",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done, removed the servo_v2 path.",
+      "parentUuid": "857f9f9b_5cd5d8df",
+      "range": {
+        "startLine": 70,
+        "startChar": 14,
+        "endLine": 70,
+        "endChar": 22
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae4ae0fd_6a2e8049",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-10-14T17:56:01Z",
       "side": 1,
       "message": "All of this logic is suspect. servo_type will contain multiple of these. I.e. servo_v4p1_with_ccd_and_servo_micro.\n\nYou should pick the interface you are going to use once, and then have everything else switch off that one choice.",
+      "range": {
+        "startLine": 56,
+        "startChar": 6,
+        "endLine": 79,
+        "endChar": 55
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c91b7e7_d955e97c",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done. The interface is picked once in _get_controller() and the I2C and UART paths switch on that value. The factory and the other flashers still use servo_type substrings; I\u0027ll unify those in a follow-up so the active device is resolved once, like flash_ec\u0027s SERVO_TYPE normalization.",
+      "parentUuid": "ae4ae0fd_6a2e8049",
       "range": {
         "startLine": 56,
         "startChar": 6,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3387362_d8223f16",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "9582cfa4_829d4886",
+      "range": {
+        "startLine": 127,
+        "startChar": 26,
+        "endLine": 127,
+        "endChar": 38
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e847f64e_cb9bb396",
@@ -139,6 +259,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cb855a9_cff85681",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e847f64e_cb9bb396",
+      "range": {
+        "startLine": 237,
+        "startChar": 26,
+        "endLine": 237,
+        "endChar": 39
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a80f1793_cdf4ecbe",
@@ -152,6 +296,30 @@
       "writtenOn": "2026-10-14T17:56:01Z",
       "side": 1,
       "message": "s/cr50/gsc/ everywhere",
+      "range": {
+        "startLine": 244,
+        "startChar": 32,
+        "endLine": 244,
+        "endChar": 45
+      },
+      "revId": "22b1a4c43916fc21f0226841c0ff33053a9ffab5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62a79d4b_8542cc4e",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:11:50Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "a80f1793_cdf4ecbe",
       "range": {
         "startLine": 244,
         "startChar": 32,
