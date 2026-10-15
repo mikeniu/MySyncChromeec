@@ -56,19 +56,24 @@ Driver driver(DT_INST_REG_ADDR(0),
 
 }  // namespace cros::dsp::service
 
-static void dsp_service_startup(struct ap_power_ev_callback*,
-                                struct ap_power_ev_data) {
+static void dsp_service_power_ev(struct ap_power_ev_callback*,
+                                 struct ap_power_ev_data data) {
   static bool started;
 
-  if (started) {
-    return;
+  if (data.event == AP_POWER_STARTUP) {
+    if (!started) {
+      started = true;
+      cros::dsp::service::driver.Init().IgnoreError();
+    } else {
+      cros::dsp::service::driver.RegisterTarget();
+    }
+  } else if (data.event == AP_POWER_SHUTDOWN) {
+    cros::dsp::service::driver.UnregisterTarget();
   }
-  /* Only run this once */
-  started = true;
-
-  cros::dsp::service::driver.Init().IgnoreError();
 }
-AP_POWER_EVENT_CALLBACK_DEFINE(dsp_service_startup, AP_POWER_STARTUP);
+AP_POWER_EVENT_CALLBACK_DEFINE(dsp_service_power_ev,
+                               AP_POWER_STARTUP,
+                               AP_POWER_SHUTDOWN);
 
 static inline int ParseGetCbiFlagsRequest(
     const cros_dsp_comms_GetCbiFlagsRequest& request,
@@ -324,8 +329,10 @@ cros::dsp::service::Driver::Driver(
         LOG_DBG("NotifyClientCallback(%d)", has_data);
         if (has_data) {
           k_sem_give(&this->data_processing_semaphore_);
-          int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_ON);
-          LOG_DBG("asserting GPIO (%d)", rc);
+          if (this->target_registered_) {
+            int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_ON);
+            LOG_DBG("asserting GPIO (%d)", rc);
+          }
         } else {
           int rc = gpio_pin_set_dt(&this->interrupt_, CROS_DSP_GPIO_OFF);
           LOG_DBG("deasserting GPIO (%d)", rc);
@@ -336,6 +343,31 @@ cros::dsp::service::Driver::Driver(
 
   target_cfg_.address = target_address;
   target_cfg_.callbacks = target_callbacks;
+}
+
+void cros::dsp::service::Driver::RegisterTarget() {
+  if (is_disabled_ || target_registered_) {
+    return;
+  }
+
+  LOG_INF("Setting up target %s::0x%02x", bus_->name, target_cfg_.address);
+
+  int rc = i2c_target_register(bus_, &target_cfg_);
+  PW_CHECK_INT_EQ(rc, 0);
+  target_registered_ = true;
+}
+
+void cros::dsp::service::Driver::UnregisterTarget() {
+  if (!target_registered_) {
+    return;
+  }
+
+  LOG_INF("Unregistering target %s::0x%02x", bus_->name, target_cfg_.address);
+
+  target_registered_ = false;
+  (void)gpio_pin_set_dt(&interrupt_, CROS_DSP_GPIO_OFF);
+  int rc = i2c_target_unregister(bus_, &target_cfg_);
+  PW_CHECK_INT_EQ(rc, 0);
 }
 
 pw::Status cros::dsp::service::Driver::Init() {
@@ -350,16 +382,12 @@ pw::Status cros::dsp::service::Driver::Init() {
   if (ish_enabled == ISH_DISABLED) {
     // Match, disable the service
     LOG_INF("Disabling DSP comms service");
+    is_disabled_ = true;
     return pw::OkStatus();
   }
 #endif
   k_work_init(&get_cbi_flags_work_, dsp_service_handle_get_cbi_flags_request);
   k_work_init_delayable(&mode_handling_work_, mode_handling_delayed);
-
-  LOG_INF("Setting up target %s::0x%02x", bus_->name, target_cfg_.address);
-
-  rc |= i2c_target_register(bus_, &target_cfg_);
-  PW_CHECK_INT_EQ(rc, 0);
 
   PW_CHECK(gpio_is_ready_dt(&interrupt_));
 
@@ -368,6 +396,8 @@ pw::Status cros::dsp::service::Driver::Init() {
 
   rc |= gpio_pin_set_dt(&interrupt_, CROS_DSP_GPIO_OFF);
   PW_CHECK_INT_EQ(rc, 0);
+
+  RegisterTarget();
 
   LOG_INF("DSP Initialization rc=%d", rc);
   if (rc == 0) {

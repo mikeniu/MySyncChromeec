@@ -79,6 +79,8 @@ class Driver {
          struct gpio_dt_spec interrupt);
 
   pw::Status Init();
+  void RegisterTarget();
+  void UnregisterTarget();
 
   friend int ::dsp_service_read_requested(struct i2c_target_config* cfg,
                                           uint8_t* out);
@@ -134,6 +136,8 @@ class Driver {
   uint32_t request_buffer_size_ = 0;
   cros_dsp_comms_EcService pending_service_request_ = {};
   uint8_t mode_val = 0;
+  bool is_disabled_ = false;
+  bool target_registered_ = false;
 };
 
 extern Driver driver;

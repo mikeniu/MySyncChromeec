@@ -583,4 +583,28 @@ TEST_F(DspComms, DspServiceNotebookModeWhileLidClosed) {
   hook_notify(HOOK_LID_CHANGE);
 }
 
+TEST_F(DspComms, DspServicePowerLifecycle) {
+  cros_dsp_comms_EcService service = {
+      .which_request = cros_dsp_comms_EcService_notify_notebook_mode_change_tag,
+      .request =
+          {
+              .notify_notebook_mode_change =
+                  {
+                      .new_mode =
+                          cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_NOTEBOOK,
+                  },
+          },
+  };
+
+  ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN);
+  // Redundant shutdown should be a no-op
+  ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN);
+  ASSERT_NE(0, SendServiceRequest(service));
+
+  ap_power_ev_send_callbacks(AP_POWER_STARTUP);
+  // Redundant startup should be a no-op
+  ap_power_ev_send_callbacks(AP_POWER_STARTUP);
+  ASSERT_EQ(0, SendServiceRequest(service));
+}
+
 }  // namespace
