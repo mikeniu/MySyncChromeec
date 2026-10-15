@@ -38,7 +38,7 @@
  * Mutex for the read-offset of the rx queue. Needed since the
  * queue is read and flushed from different contexts
  */
-static mutex_t rx_queue_readoffset_mutex;
+static K_MUTEX_DEFINE(rx_queue_readoffset_mutex);
 
 /* Queue of completed incoming CEC messages */
 static struct cec_rx_queue cec_rx_queue[CEC_PORT_COUNT];

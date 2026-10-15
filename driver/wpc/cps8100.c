@@ -137,9 +137,10 @@ static const int cps8100_wake_up_delay_ms = 10;
 
 /* TODO: This should belong to PCHG context. Driver should be state-less. */
 struct cps8100_state {
-	mutex_t mtx;
 	uint32_t reg;
 };
+
+static K_MUTEX_DEFINE(cps8100_mtx);
 
 /* Note: Assume there is only one port. */
 static struct cps8100_state cps8100_state;
@@ -250,9 +251,9 @@ static void cps8100_print_irq_type_names(const char *preamble, uint32_t reg)
 
 static void cps8100_status_update(struct pchg *ctx, uint32_t reg)
 {
-	mutex_lock(&cps8100_state.mtx);
+	mutex_lock(&cps8100_mtx);
 	cps8100_state.reg = reg;
-	mutex_unlock(&cps8100_state.mtx);
+	mutex_unlock(&cps8100_mtx);
 }
 
 static int cps8100_i2c_write(int port, int addr, const uint8_t *buf, size_t len)
