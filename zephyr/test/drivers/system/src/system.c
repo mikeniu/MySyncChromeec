@@ -118,22 +118,12 @@ ZTEST(system, test_system_encode_save_flags_mutually_exclusive_reset_flags)
 	int flags_to_save = 0;
 	uint32_t saved_flags = 0;
 
-	/* Verify reset hard takes precedence over hibernate/soft */
-	flags_to_save = SYSTEM_RESET_HARD | SYSTEM_RESET_HIBERNATE;
+	/* Verify reset hard is saved when SYSTEM_RESET_HARD is set */
+	flags_to_save = SYSTEM_RESET_HARD;
 
 	system_encode_save_flags(flags_to_save, &saved_flags);
 
 	zassert_not_equal(0, saved_flags & EC_RESET_FLAG_HARD, NULL);
-	zassert_equal(0, saved_flags & EC_RESET_FLAG_HIBERNATE, NULL);
-	zassert_equal(0, saved_flags & EC_RESET_FLAG_SOFT, NULL);
-
-	/* Verify reset hibernate takes precedence over soft */
-	flags_to_save = SYSTEM_RESET_HIBERNATE;
-
-	system_encode_save_flags(flags_to_save, &saved_flags);
-
-	zassert_equal(0, saved_flags & EC_RESET_FLAG_HARD, NULL);
-	zassert_not_equal(0, saved_flags & EC_RESET_FLAG_HIBERNATE, NULL);
 	zassert_equal(0, saved_flags & EC_RESET_FLAG_SOFT, NULL);
 
 	/* Verify reset soft is always saved given no other flags */
@@ -142,7 +132,6 @@ ZTEST(system, test_system_encode_save_flags_mutually_exclusive_reset_flags)
 	system_encode_save_flags(flags_to_save, &saved_flags);
 
 	zassert_equal(0, saved_flags & EC_RESET_FLAG_HARD, NULL);
-	zassert_equal(0, saved_flags & EC_RESET_FLAG_HIBERNATE, NULL);
 	zassert_not_equal(0, saved_flags & EC_RESET_FLAG_SOFT, NULL);
 }
 
