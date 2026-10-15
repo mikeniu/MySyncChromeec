@@ -19,36 +19,105 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <span>
 #ifdef CONFIG_PLATFORM_EC_WP_EXTERNAL
 #include <wp_external.h>
 #endif
 
-/* The session nonce for session key. */
-static std::array<uint8_t, FP_CK_SESSION_NONCE_LEN> session_nonce;
-
-static std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key;
-
-/* Current challenge */
-static std::array<uint8_t, FP_CHALLENGE_SIZE> challenge;
-test_export_static timestamp_t challenge_ctime;
-
-bool fingerprint_auth_enabled()
+void FpCryptoContext::reset_session() noexcept
 {
-	return global_context.fp_encryption_status &
-	       FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	cleanse(session_nonce);
+	cleanse(session_key);
+	clear_tpm_seed();
+	fp_encryption_status &= ~(FP_CONTEXT_SESSION_NONCE_SET |
+				  FP_CONTEXT_STATUS_SESSION_ESTABLISHED);
+}
+
+void FpCryptoContext::generate_nonce(
+	std::span<uint8_t, FP_CK_SESSION_NONCE_LEN> out)
+{
+	RAND_bytes(session_nonce.data(), session_nonce.size());
+	std::ranges::copy(session_nonce, out.begin());
+	fp_encryption_status |= FP_CONTEXT_SESSION_NONCE_SET;
+}
+
+void FpCryptoContext::generate_challenge(
+	std::span<uint8_t, FP_CHALLENGE_SIZE> out)
+{
+	RAND_bytes(challenge.data(), challenge.size());
+	std::ranges::copy(challenge, out.begin());
+	challenge_ctime = get_time();
+	fp_encryption_status |= FP_AUTH_CHALLENGE_SET;
+}
+
+std::expected<void, ec_error_list>
+FpCryptoContext::consume_and_validate_challenge_age(timestamp_t now) noexcept
+{
+	if (!(fp_encryption_status & FP_AUTH_CHALLENGE_SET)) {
+		return std::unexpected(EC_ERROR_ACCESS_DENIED);
+	}
+	fp_encryption_status &= ~FP_AUTH_CHALLENGE_SET;
+	if (now.val > (challenge_ctime + kChallengeExpiry).val) {
+		return std::unexpected(EC_ERROR_TIMEOUT);
+	}
+	return {};
+}
+
+std::expected<void, ec_error_list>
+FpCryptoContext::validate_request(std::span<const uint8_t> context,
+				  std::span<const uint8_t> operation,
+				  std::span<const uint8_t, FP_MAC_LENGTH> mac)
+{
+	if (const auto res = consume_and_validate_challenge_age();
+	    !res.has_value()) {
+		return res;
+	}
+
+	/* We expect the message to come from Fingerguard. */
+	const auto computed_mac = compute_message_signature(
+		session_key, context, as_operation_span("finger_guard"),
+		operation, challenge);
+	if (!computed_mac.has_value()) {
+		return std::unexpected(EC_ERROR_INVAL);
+	}
+
+	/* Compare computed signature with received one. */
+	static_assert(mac.size() == sizeof(*computed_mac));
+	if (CRYPTO_memcmp(mac.data(), computed_mac->data(), mac.size())) {
+		return std::unexpected(EC_ERROR_ACCESS_DENIED);
+	}
+
+	return {};
+}
+
+std::expected<std::array<uint8_t, FP_MAC_LENGTH>, ec_error_list>
+FpCryptoContext::sign_message(
+	std::span<const uint8_t> context, std::span<const uint8_t> operation,
+	std::span<const uint8_t, FP_CHALLENGE_SIZE> peer_challenge) const
+{
+	/*
+	 * The Session Key is used to sign messages. Let's make sure
+	 * it's available.
+	 */
+	if (!auth_enabled()) {
+		return std::unexpected(EC_ERROR_ACCESS_DENIED);
+	}
+
+	return compute_message_signature(session_key, context,
+					 as_operation_span("fpmcu"), operation,
+					 peer_challenge);
+}
+
+bool fingerprint_auth_enabled(const fpsensor_context &ctx)
+{
+	return ctx.crypto.auth_enabled();
 }
 
 __maybe_unused test_export_static void reset_session(void)
 {
-	OPENSSL_cleanse(session_nonce.data(), session_nonce.size());
-	OPENSSL_cleanse(session_key.data(), session_key.size());
-	OPENSSL_cleanse(global_context.tpm_seed.data(),
-			global_context.tpm_seed.size());
-	global_context.fp_encryption_status &= ~(
-		FP_CONTEXT_SESSION_NONCE_SET |
-		FP_CONTEXT_STATUS_SESSION_ESTABLISHED | FP_ENC_STATUS_SEED_SET);
+	global_context.crypto.reset_session();
 }
 
 static enum ec_status
@@ -58,11 +127,7 @@ fp_command_generate_nonce(struct host_cmd_handler_args *args)
 
 	ScopedFastCpu fast_cpu;
 
-	RAND_bytes(session_nonce.data(), session_nonce.size());
-
-	std::ranges::copy(session_nonce, r->nonce);
-
-	global_context.fp_encryption_status |= FP_CONTEXT_SESSION_NONCE_SET;
+	global_context.crypto.generate_nonce(r->nonce);
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;
@@ -75,27 +140,21 @@ fp_command_establish_session(struct host_cmd_handler_args *args)
 {
 	const auto *p = static_cast<const ec_params_fp_establish_session *>(
 		args->params);
-	static constexpr uint8_t tpm_seed_aad[] = { 't', 'p', 'm', '_',
-						    's', 'e', 'e', 'd' };
-	constexpr auto aad = std::span{ tpm_seed_aad };
 
-	if (!(global_context.fp_encryption_status &
-	      FP_CONTEXT_SESSION_NONCE_SET)) {
+	if (!global_context.crypto.session_nonce_set()) {
 		CPRINTS("No existing session nonce");
 		return EC_RES_ACCESS_DENIED;
 	}
 
 	/* Do not establish session if any operation on templates is running */
-	if (global_context.sensor_mode & FP_MODES_TEMPLATE_OPERATION) {
+	if (global_context.has_any_mode(FP_MODES_TEMPLATE_OPERATION)) {
 		return EC_RES_BUSY;
 	}
 
 	ScopedFastCpu fast_cpu;
 
 	/* Avoid using old TPM Seed if the seed decryption fails. */
-	global_context.fp_encryption_status &= ~FP_ENC_STATUS_SEED_SET;
-	OPENSSL_cleanse(global_context.tpm_seed.data(),
-			global_context.tpm_seed.size());
+	global_context.crypto.clear_tpm_seed();
 
 	/* Invalidate the existing context and templates to prevent
 	 * adding new templates unauthorized by TA.
@@ -107,31 +166,34 @@ fp_command_establish_session(struct host_cmd_handler_args *args)
 	 * EC_CMD_FP_SEED_SET command (which is possible when the TPM Seed is
 	 * not set, e.g. due to seed decryption error).
 	 */
-	global_context.fp_encryption_status &=
+	global_context.crypto.fp_encryption_status &=
 		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 
-	enum ec_error_list ret = generate_session_key_with_context(
-		session_nonce, p->peer_nonce, session_key);
-	if (ret != EC_SUCCESS) {
+	const auto new_session_key = generate_session_key_with_context(
+		global_context.crypto.session_nonce, p->peer_nonce);
+	if (!new_session_key.has_value()) {
 		return EC_RES_INVALID_PARAM;
 	}
+	global_context.crypto.session_key = *new_session_key;
 
-	static_assert(sizeof(global_context.tpm_seed) ==
+	static_assert(sizeof(global_context.crypto.tpm_seed) ==
 		      sizeof(p->enc_tpm_seed));
-	CleanseWrapper<std::array<uint8_t, sizeof(global_context.tpm_seed)> >
+	CleanseWrapper<
+		std::array<uint8_t, sizeof(global_context.crypto.tpm_seed)> >
 		tpm_seed;
 
-	ret = decrypt_data_with_session_key(session_key, p->enc_tpm_seed,
-					    tpm_seed, p->nonce, p->tag, aad);
-	if (ret != EC_SUCCESS) {
+	if (!decrypt_data_with_session_key(
+		     global_context.crypto.session_key, p->enc_tpm_seed,
+		     tpm_seed, p->nonce, p->tag, as_operation_span("tpm_seed"))
+		     .has_value()) {
 		return EC_RES_ERROR;
 	}
 
 	/* Set the TPM Seed. */
-	std::ranges::copy(tpm_seed, global_context.tpm_seed.begin());
-	global_context.fp_encryption_status |= FP_ENC_STATUS_SEED_SET;
-	global_context.fp_encryption_status &= ~FP_CONTEXT_SESSION_NONCE_SET;
-	global_context.fp_encryption_status |=
+	global_context.crypto.set_tpm_seed(tpm_seed);
+	global_context.crypto.fp_encryption_status &=
+		~FP_CONTEXT_SESSION_NONCE_SET;
+	global_context.crypto.fp_encryption_status |=
 		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 
 	return EC_RES_SUCCESS;
@@ -153,13 +215,7 @@ fp_cmd_generate_challenge(struct host_cmd_handler_args *args)
 
 	ScopedFastCpu fast_cpu;
 
-	RAND_bytes(challenge.data(), challenge.size());
-	std::ranges::copy(challenge, r->challenge);
-
-	timestamp_t now = get_time();
-	challenge_ctime.val = now.val;
-
-	global_context.fp_encryption_status |= FP_AUTH_CHALLENGE_SET;
+	global_context.crypto.generate_challenge(r->challenge);
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;
@@ -167,68 +223,21 @@ fp_cmd_generate_challenge(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_FP_GENERATE_CHALLENGE, fp_cmd_generate_challenge,
 		     EC_VER_MASK(0));
 
-test_mockable enum ec_error_list
+test_mockable std::expected<void, ec_error_list>
 validate_request(std::span<const uint8_t> context,
 		 std::span<const uint8_t> operation,
 		 std::span<const uint8_t, SHA256_DIGEST_LENGTH> mac)
 {
-	/* We expect the message to come from Fingerguard. */
-	static constexpr uint8_t sender_str[] = {
-		'f', 'i', 'n', 'g', 'e', 'r', '_', 'g', 'u', 'a', 'r', 'd'
-	};
-	static constexpr std::span sender = sender_str;
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> computed_mac{};
-
-	/* Make sure new challenge was generated. */
-	if (!(global_context.fp_encryption_status & FP_AUTH_CHALLENGE_SET)) {
-		return EC_ERROR_ACCESS_DENIED;
-	}
-
-	/* Remove the bit so the challenge is not reused. */
-	global_context.fp_encryption_status &= ~FP_AUTH_CHALLENGE_SET;
-
-	/* Make sure the challenge has not expired. */
-	timestamp_t now = get_time();
-	if (now.val > challenge_ctime.val + (5 * SECOND)) {
-		return EC_ERROR_TIMEOUT;
-	}
-
-	/* Compute expected signature. */
-	if (compute_message_signature(session_key, context, sender, operation,
-				      challenge, computed_mac) != EC_SUCCESS) {
-		return EC_ERROR_INVAL;
-	}
-
-	/* Compare computed signature with received one. */
-	static_assert(mac.size() == computed_mac.size());
-	if (CRYPTO_memcmp(mac.data(), computed_mac.data(), mac.size())) {
-		return EC_ERROR_ACCESS_DENIED;
-	}
-
-	return EC_SUCCESS;
+	return global_context.crypto.validate_request(context, operation, mac);
 }
 
-enum ec_error_list
+std::expected<std::array<uint8_t, SHA256_DIGEST_LENGTH>, ec_error_list>
 sign_message(std::span<const uint8_t> context,
 	     std::span<const uint8_t> operation,
 	     std::span<const uint8_t, FP_CHALLENGE_SIZE> peer_challenge,
-	     std::span<uint8_t, SHA256_DIGEST_LENGTH> output)
+	     const fpsensor_context &ctx)
 {
-	static constexpr uint8_t sender_str[] = { 'f', 'p', 'm', 'c', 'u' };
-	static constexpr std::span sender = sender_str;
-
-	/* The Session Key is used to sign messages. Let's make sure
-	 * it's available. */
-	if (!fingerprint_auth_enabled()) {
-		return EC_ERROR_ACCESS_DENIED;
-	}
-
-	if (compute_message_signature(session_key, context, sender, operation,
-				      peer_challenge, output) != EC_SUCCESS) {
-		return EC_ERROR_INVAL;
-	}
-
-	return EC_SUCCESS;
+	return ctx.crypto.sign_message(context, operation, peer_challenge);
 }
 
 #ifdef CONFIG_PLATFORM_EC_WP_EXTERNAL
@@ -238,16 +247,10 @@ fp_command_unlock_dev_options(struct host_cmd_handler_args *args)
 	const auto *p = static_cast<const ec_params_fp_unlock_dev_options *>(
 		args->params);
 
-	/* Define the empty context (no user_id) */
-	static constexpr std::span<const uint8_t> context;
-
-	static constexpr uint8_t operation_str[] = { 'e', 'n', 'a', 'b', 'l',
-						     'e', '_', 'd', 'e', 'v',
-						     '_', 'o', 'p', 't', 'i',
-						     'o', 'n', 's' };
-	static constexpr std::span operation = operation_str;
-
-	if (validate_request(context, operation, p->hmac) != EC_SUCCESS) {
+	/* Validate with an empty context (no user_id). */
+	if (!validate_request({}, as_operation_span("enable_dev_options"),
+			      p->hmac)
+		     .has_value()) {
 		return EC_RES_ACCESS_DENIED;
 	}
 

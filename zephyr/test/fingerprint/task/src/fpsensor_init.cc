@@ -278,6 +278,27 @@ ZTEST_USER(fpsensor_init, test_maintenance_mode_dead_pixel_max_minus_1)
 	zassert_false(response.mode & FP_MODE_SENSOR_MAINTENANCE);
 }
 
+ZTEST_USER(fpsensor_init, test_fp_info_v3_overflow)
+{
+	zassert_equal(
+		EC_RES_OVERFLOW,
+		ec_cmd_fp_info_v3(NULL, test_info_buffer,
+				  sizeof(struct ec_response_fp_info_v3) - 1));
+}
+
+ZTEST_USER(fpsensor_init, test_fp_info_v3_get_info_error)
+{
+	struct fingerprint_sensor_state state;
+
+	fingerprint_get_state(fp_sim, &state);
+	state.get_info_result = -EINVAL;
+	fingerprint_set_state(fp_sim, &state);
+
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_info_v3(NULL, test_info_buffer,
+					test_info_buffer_size));
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */

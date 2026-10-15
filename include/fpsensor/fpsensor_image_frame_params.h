@@ -6,10 +6,36 @@
 #ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_IMAGE_FRAME_PARAMS_H_
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_IMAGE_FRAME_PARAMS_H_
 
+#include "common.h"
 #include "ec_commands.h"
 
 #include <array>
 #include <cstdint>
+#include <expected>
+#include <span>
+
+/**
+ * Fixed-capacity stack buffer for querying variable-length
+ * ec_response_fp_info_v3 responses from fp_sensor_get_info().
+ */
+struct FpSensorInfoBuffer {
+	struct ec_response_fp_info_v3 header{};
+	std::array<struct fp_image_frame_params_v2, FP_MAX_CAPTURE_TYPES>
+		params{};
+
+	[[nodiscard]] std::expected<void, ec_error_list> query();
+
+	[[nodiscard]] std::span<const struct fp_image_frame_params_v2>
+	capture_types() const noexcept
+	{
+		return std::span(params).first(
+			header.sensor_info.num_capture_types);
+	}
+};
+BUILD_ASSERT(sizeof(FpSensorInfoBuffer) ==
+	     sizeof(struct ec_response_fp_info_v3) +
+		     sizeof(struct fp_image_frame_params_v2) *
+			     FP_MAX_CAPTURE_TYPES);
 
 struct FpImageFrameParam {
 	uint32_t frame_size_bytes = 0;
@@ -43,10 +69,12 @@ class FpImageFrameParamsCache {
 	 *
 	 * @param capture_type The enum fp_capture_type to look up.
 	 *
-	 * @return The frame size (uint32_t) if found, or 0 otherwise (e.g., for
-	 * an invalid type or if size is 0, or if the cache is uninitialized).
+	 * @return The frame size (uint32_t) if found, or EC_ERROR_INVAL
+	 * otherwise (e.g., for an invalid type or if size is 0, or if the cache
+	 * is uninitialized).
 	 */
-	uint32_t get_frame_size(enum fp_capture_type capture_type) const;
+	[[nodiscard]] std::expected<uint32_t, ec_error_list>
+	get_frame_size(enum fp_capture_type capture_type) const;
 
     private:
 	std::array<FpImageFrameParam, FP_CAPTURE_TYPE_MAX> frame_params_ = {};

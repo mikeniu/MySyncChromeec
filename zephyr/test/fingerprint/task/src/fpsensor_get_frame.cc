@@ -42,9 +42,10 @@ static void get_frame_before(void *f)
 	mkbp_send_event_fake.return_val = 0;
 
 	/* Populate the C++ class cache object layout matrix. */
-	global_context.fp_image_frame_params_cache.populate_cache(
+	global_context.frame.frame_params_cache.populate_cache(
 		sizeof(fp_buffer));
-	global_context.current_capture_type = FP_CAPTURE_VENDOR_FORMAT;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_VENDOR_FORMAT);
 
 	/* Zero-out the shared frame buffer. */
 	memset(fp_buffer, 0, FP_SENSOR_IMAGE_SIZE);
@@ -83,7 +84,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_invalid_capture_type)
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = 0;
 
-	global_context.current_capture_type = FP_CAPTURE_TYPE_INVALID;
+	global_context.frame.current_capture_type = std::nullopt;
 
 	enum ec_status status = get_frame(offset, size, output_buffer);
 
@@ -123,7 +124,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 	uint32_t offset = 0;
 
 	/* Initialize the cache normally so it allocates its internal states. */
-	global_context.fp_image_frame_params_cache.populate_cache(
+	global_context.frame.frame_params_cache.populate_cache(
 		FP_SENSOR_IMAGE_SIZE);
 
 	/*
@@ -131,7 +132,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 	 * without violating strict aliasing rules.
 	 */
 	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
-			     global_context.fp_image_frame_params_cache,
+			     global_context.frame.frame_params_cache,
 			     FP_CAPTURE_VENDOR_FORMAT,
 			     FP_SENSOR_IMAGE_SIZE + 1),
 		     "Failed to set valid frame size for capture type %d",
@@ -194,7 +195,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
 	uint8_t output_buffer[kMaxReadSize];
 	memset(output_buffer, 0xA5, sizeof(output_buffer));
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1;
@@ -229,7 +231,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 	uint32_t offset = 0;
 
 	/* Set capture type to true for skip_image_offset() evaluation. */
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
 	 * Simulate production buffer data layout: Shifting offset forward
@@ -266,11 +269,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 
 	uint32_t size = kMaxReadSize;
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	/* Get the active real frame size limit dynamically from the cache. */
 	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+		*global_context.frame.frame_params_cache.get_frame_size(
 			FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
@@ -308,10 +312,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 
 	uint32_t size = kMaxReadSize;
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+		*global_context.frame.frame_params_cache.get_frame_size(
 			FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
@@ -350,14 +355,15 @@ ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 		"Test setup: Offset calculation wrapped. "
 		"FP_SENSOR_IMAGE_OFFSET + size must be <= sizeof(fp_buffer) + 1.");
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
 	 * Cache Pollution: Use the test-only setter to override the cache value
 	 * without violating strict aliasing rules.
 	 */
 	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
-			     global_context.fp_image_frame_params_cache,
+			     global_context.frame.frame_params_cache,
 			     FP_CAPTURE_SIMPLE_IMAGE, sizeof(fp_buffer)),
 		     "Failed to set valid frame size for capture type %d",
 		     FP_CAPTURE_SIMPLE_IMAGE);

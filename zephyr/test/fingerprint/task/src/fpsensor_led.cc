@@ -43,7 +43,7 @@ static bool is_suspend_locked()
 
 static void test_fp_led_init(void *data)
 {
-	fp_led::update_mode(0);
+	fp_led::update_mode(FpSensorMode{});
 	zassert_false(is_suspend_locked(),
 		      "Suspend should not be locked initially");
 }
@@ -61,7 +61,7 @@ constexpr uint32_t BRIGHTNESS_OFF = 0;
 
 ZTEST(fp_led, test_enroll)
 {
-	fp_led::update_mode(FP_MODE_ENROLL_SESSION);
+	fp_led::update_mode(*FpSensorMode::create(FP_MODE_ENROLL_SESSION));
 	k_sleep(K_MSEC(500));
 	zassert_equal(fp_led_get(), BRIGHTNESS_ENROLL, "Led %d%% after enroll",
 		      BRIGHTNESS_ENROLL);
@@ -72,14 +72,14 @@ ZTEST(fp_led, test_enroll)
 		      "Led %d%% 30s after enroll", BRIGHTNESS_ENROLL);
 	zassert_true(is_suspend_locked(),
 		     "Suspend should be locked during enroll");
-	fp_led::update_mode(0);
+	fp_led::update_mode(FpSensorMode{});
 	zassert_false(is_suspend_locked(),
 		      "Suspend should be unlocked after off");
 }
 
 ZTEST(fp_led, test_match)
 {
-	fp_led::update_mode(FP_MODE_MATCH);
+	fp_led::update_mode(*FpSensorMode::create(FP_MODE_MATCH));
 	k_sleep(K_MSEC(500));
 	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH, "Led %d%% after match",
 		      BRIGHTNESS_MATCH);
@@ -123,13 +123,13 @@ ZTEST(fp_led, test_match_nok)
 
 ZTEST(fp_led, test_off)
 {
-	fp_led::update_mode(FP_MODE_ENROLL_SESSION);
+	fp_led::update_mode(*FpSensorMode::create(FP_MODE_ENROLL_SESSION));
 	k_sleep(K_MSEC(500));
 	zassert_equal(fp_led_get(), BRIGHTNESS_ENROLL, "Led %d%% after enroll",
 		      BRIGHTNESS_ENROLL);
 	zassert_true(is_suspend_locked(),
 		     "Suspend should be locked during enroll");
-	fp_led::update_mode(0);
+	fp_led::update_mode(FpSensorMode{});
 	zassert_equal(fp_led_get(), BRIGHTNESS_OFF, "Led off immediately");
 	zassert_false(is_suspend_locked(),
 		      "Suspend should be unlocked after off");
@@ -143,7 +143,7 @@ ZTEST(fp_led, test_off_do_not_disturb)
 		      "Led %d%% after match OK", BRIGHTNESS_MATCH_OK);
 	zassert_true(is_suspend_locked(),
 		     "Suspend should be locked during match OK");
-	fp_led::update_mode(0);
+	fp_led::update_mode(FpSensorMode{});
 	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH_OK, "Led still %d%%",
 		      BRIGHTNESS_MATCH_OK);
 	zassert_true(is_suspend_locked(),
