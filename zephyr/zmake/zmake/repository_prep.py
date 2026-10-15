@@ -62,8 +62,9 @@ def find_checkout():
     """Find the path to the base of the checkout (e.g., ~/chromiumos)."""
     if _CONFIG["checkout_path"]:
         return _CONFIG["checkout_path"]
+    markers = (".repo", ".supermanifest", "../.citc")
     for path in pathlib.Path(__file__).resolve().parents:
-        if (path / ".repo").is_dir():
+        if any((path / m).exists() for m in markers):
             return path
     raise FileNotFoundError("Unable to locate the root of the checkout")
 

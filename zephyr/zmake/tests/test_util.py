@@ -68,18 +68,21 @@ def test_c_str(input_str, expected_result):
     [
         (".repo", True),
         (".supermanifest", False),
+        ("../.citc", True),
     ],
 )
 def test_locate_cros_checkout(tmp_path, monkeypatch, marker, is_dir):
-    """Test locate_cros_checkout with .repo and .supermanifest checkouts."""
-    subdir = tmp_path / "src" / "platform" / "ec"
+    """Test locate_cros_checkout with .repo, .supermanifest, and .citc."""
+    checkout_root = tmp_path / "chrome-internal"
+    subdir = checkout_root / "src" / "platform" / "ec"
     subdir.mkdir(parents=True)
+    marker_path = (checkout_root / marker).resolve()
     if is_dir:
-        (tmp_path / marker).mkdir()
+        marker_path.mkdir()
     else:
-        (tmp_path / marker).touch()
+        marker_path.touch()
 
     monkeypatch.delenv("CROS_WORKON_SRCROOT", raising=False)
     monkeypatch.chdir(subdir)
 
-    assert util.locate_cros_checkout() == tmp_path.resolve()
+    assert util.locate_cros_checkout() == checkout_root.resolve()
