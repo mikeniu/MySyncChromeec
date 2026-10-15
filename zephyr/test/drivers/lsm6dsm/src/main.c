@@ -118,3 +118,25 @@ ZTEST(lsm6dsm, test_disable_interrupt)
 	zassert_within(0x0000, data[1].data[Y], 1);
 	zassert_within(0x0000, data[1].data[Z], 1);
 }
+
+ZTEST(lsm6dsm, test_set_range)
+{
+	const int orig_range = acc->current_range;
+
+	/* Round down 3G -> 2G */
+	zassert_ok(acc->drv->set_range(acc, 3, 0));
+	zassert_equal(acc->current_range, 2);
+
+	/* Round up 3G -> 4G */
+	zassert_ok(acc->drv->set_range(acc, 3, 1));
+	zassert_equal(acc->current_range, 4);
+
+	/* Clamp below minimum (1G -> 2G) and above maximum (20G -> 16G) */
+	zassert_ok(acc->drv->set_range(acc, 1, 0));
+	zassert_equal(acc->current_range, 2);
+	zassert_ok(acc->drv->set_range(acc, 20, 0));
+	zassert_equal(acc->current_range, 16);
+
+	/* Restore original range */
+	zassert_ok(acc->drv->set_range(acc, orig_range, 0));
+	zassert_equal(acc->current_range, orig_range);
