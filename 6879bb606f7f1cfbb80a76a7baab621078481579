@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e47909a0_64ea0c01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:29:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL.\n\n### Review Summary\n\n*   **Functionality:** ✅ The changes correctly apply upstream PM mechanisms for STM32H7 to the dartmonkey board.\n*   **Architecture \u0026 Component Fit:** ✅ The configuration correctly targets the appropriate `\u0026pll` and `\u0026pwr` nodes in the device tree.\n*   **Code Simplicity:** ✅ The added DTS properties are minimal and direct.\n*   **Idiomaticity \u0026 Readability:** ✅ Standard Zephyr DTS property syntax is used.\n*   **Security:** ✅ No security vulnerabilities introduced.\n*   **Testing:** ✅ (Hardware/Physical Exception) These are hardware power state configurations (PLL/VOS) which cannot be easily unit-tested.\n*   **CL Size \u0026 Scope:** ❌ Size: XS (+5, -0). Although the CL is very small in line count, it violates the Single Logical Change rule. The commit message lists two distinct issues (\"how to avoid enabling PLL1\" and \"how to avoid scaling voltage\"). These are two independent hardware configurations that can be committed separately and pass the Independent-Revert test. Please split this into:\n    1. CL 1: Avoid enabling PLL1 on Stop exit (`no-auto-enable` in `\u0026pll`).\n    2. CL 2: Avoid scaling voltage to VOS0 (`voltage-scale\u003d\u003c3\u003e` in `\u0026pwr`).\n*   **Commit Message:** ✅ The commit message clearly explains the \"why\" and \"what\", and provides good context on the upstream requirements.\n\n[🔗](http://go/tj/420c740d-63b5-45bd-b7b4-88c6f241c3a1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6879bb606f7f1cfbb80a76a7baab621078481579",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
