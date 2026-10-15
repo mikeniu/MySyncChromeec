@@ -793,18 +793,6 @@
  */
 #undef CONFIG_BOARD_FORCE_RESET_PIN
 
-/*
- * For some boards on power-on, the EC is reset by the H1 after power-on,
- * so the EC sees 2 resets. This config enables the EC to save a flag
- * on the first power-up restart, and then wait for the second reset before
- * any other setup is done (such as GPIOs, timers, UART etc.)
- * On the second reset, the saved flag is used to detect the previous
- * power-on, and treat the second reset as a power-on instead of a reset.
- *
- * NOTE: Implemented only for npcx and ite
- */
-#undef CONFIG_BOARD_RESET_AFTER_POWER_ON
-
 /* Permanent LM4 boot configuration */
 #undef CONFIG_BOOTCFG_VALUE
 

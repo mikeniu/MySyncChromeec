@@ -15,11 +15,6 @@
 
 #include <drivers/cros_system.h>
 
-/* 2 second delay for waiting the H1 reset */
-#define WAIT_RESET_TIME                                     \
-	(CONFIG_PLATFORM_EC_PREINIT_HW_CYCLES_PER_SEC * 2 / \
-	 CONFIG_PLATFORM_EC_WAIT_RESET_CYCLES_PER_ITERATION)
-
 LOG_MODULE_REGISTER(shim_system, LOG_LEVEL_ERR);
 
 static const struct device *const bbram_dev =
@@ -317,48 +312,10 @@ static int check_reset_cause(void)
 	switch (chip_reset_cause) {
 	case POWERUP:
 		system_flags |= EC_RESET_FLAG_POWER_ON;
-		/*
-		 * Power-on restart, so set a flag and save it for the next
-		 * imminent reset. Later code will check for this flag and wait
-		 * for the second reset. Waking from PSL hibernate is power-on
-		 * for EC but not for H1, so do not wait for the second reset.
-		 */
-		if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
-		    ((system_flags & EC_RESET_FLAG_HIBERNATE) == 0)) {
-			system_flags |= EC_RESET_FLAG_INITIAL_PWR;
-			chip_flags |= EC_RESET_FLAG_INITIAL_PWR;
-		}
 		break;
 
 	case VCC1_RST_PIN:
-		/*
-		 * If configured, check the saved flags to see whether the
-		 * previous restart was a power-on, in which case treat this
-		 * restart as a power-on as well. This is to workaround the fact
-		 * that the H1 will reset the EC at power up.
-		 */
-		if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON)) {
-			if (system_flags & EC_RESET_FLAG_INITIAL_PWR) {
-				/*
-				 * The previous restart was a power-on so treat
-				 * this restart as that, and clear the flag so
-				 * later code will not wait for the second
-				 * reset.
-				 */
-				system_flags = (system_flags &
-						~EC_RESET_FLAG_INITIAL_PWR) |
-					       EC_RESET_FLAG_POWER_ON;
-			} else {
-				/*
-				 * No previous reset flag, so this is a
-				 * subsequent restart i.e any restarts after the
-				 * second restart caused by the H1.
-				 */
-				system_flags |= EC_RESET_FLAG_RESET_PIN;
-			}
-		} else {
-			system_flags |= EC_RESET_FLAG_RESET_PIN;
-		}
+		system_flags |= EC_RESET_FLAG_RESET_PIN;
 		break;
 
 	case DEBUG_RST:
@@ -406,26 +363,6 @@ test_export_static int system_preinitialize(void)
 		return -1;
 	}
 
-	/*
-	 * For some boards on power-on, the EC is reset by the H1 after
-	 * power-on, so the EC sees 2 resets. This config enables the EC to save
-	 * a flag on the first power-up restart, and then wait for the second
-	 * reset before any other setup is done (such as GPIOs, timers, UART
-	 * etc.) On the second reset, the saved flag is used to detect the
-	 * previous power-on, and treat the second reset as a power-on instead
-	 * of a reset.
-	 */
-#ifdef CONFIG_BOARD_RESET_AFTER_POWER_ON
-	if (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
-		/*
-		 * The current initial stage couldn't use the kernel delay
-		 * function. Use CPU nop instruction to wait for the external
-		 * reset from H1.
-		 */
-		for (uint32_t i = WAIT_RESET_TIME; i; i--)
-			arch_nop();
-	}
-#endif
 	system_common_pre_init();
 	return 0;
 }

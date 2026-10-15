@@ -305,12 +305,6 @@ ZTEST(system, test_init_cause_vcc1_rst_pin)
 
 	zassert_ok(system_preinitialize(NULL));
 	zassert_equal(EC_RESET_FLAG_RESET_PIN, system_get_reset_flags());
-
-	chip_save_reset_flags(EC_RESET_FLAG_INITIAL_PWR);
-	zassert_ok(system_preinitialize(NULL));
-	zassert_equal(EC_RESET_FLAG_RESET_PIN | EC_RESET_FLAG_POWER_ON |
-			      EC_RESET_FLAG_POWER_ON,
-		      system_get_reset_flags());
 }
 
 ZTEST(system, test_init_cause_debug_rst)

@@ -1548,16 +1548,9 @@ void tc_state_init(int port)
 
 	/*
 	 * If this is non-EFS2 device, battery is not present or at some minimum
-	 * voltage and EC RO doesn't keep power-on reset flag after reset caused
-	 * by H1, then don't apply CC open because it will cause brown out.
-	 *
-	 * Please note that we are checking if CONFIG_BOARD_RESET_AFTER_POWER_ON
-	 * is defined now, but actually we need to know if it was enabled in
-	 * EC RO! It was assumed that if CONFIG_BOARD_RESET_AFTER_POWER_ON is
-	 * defined now it was defined in EC RO too.
+	 * voltage, then don't apply CC open because it will cause brown out.
 	 */
-	if (!IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
-	    !IS_ENABLED(CONFIG_VBOOT_EFS2) && IS_ENABLED(CONFIG_BATTERY) &&
+	if (!IS_ENABLED(CONFIG_VBOOT_EFS2) && IS_ENABLED(CONFIG_BATTERY) &&
 	    !pd_is_battery_capable()) {
 		first_state = TC_UNATTACHED_SNK;
 	}
