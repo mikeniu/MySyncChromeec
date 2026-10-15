@@ -1,0 +1,318 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <string.h>
+
+#include <zephyr/fff.h>
+#include <zephyr/sys/util.h>
+#include <zephyr/ztest.h>
+
+#include <fingerprint/fingerprint_alg.h>
+#include <zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h>
+
+DEFINE_FFF_GLOBALS;
+
+/* Mocks for the private RTS5817MAA algorithm library. */
+FAKE_VALUE_FUNC(rts_fp_return_t, rts_bio_algorithm_init);
+FAKE_VOID_FUNC(rts_bio_algorithm_exit);
+FAKE_VALUE_FUNC(rts_fp_return_t, rts_bio_enroll_start);
+FAKE_VALUE_FUNC(rts_fp_return_t, rts_bio_enroll_step, const uint8_t *const,
+		int *);
+FAKE_VOID_FUNC(rts_bio_enroll_finish, void *);
+FAKE_VALUE_FUNC(rts_fp_return_t, rts_bio_match, void *, uint32_t,
+		const uint8_t *const, bool, int32_t *, uint32_t *);
+
+#define TEST_IMAGE_SIZE 16
+#define TEST_TEMPL_SIZE 64
+
+extern const struct fingerprint_algorithm rts5817maa_algorithm;
+extern const rts5817maa_bio_info_t rts_bio_info;
+
+struct rts5817maa_alg_fixture {
+	const struct fingerprint_algorithm *alg;
+	uint8_t image[TEST_IMAGE_SIZE];
+	uint8_t templ[TEST_TEMPL_SIZE];
+};
+
+static rts_fp_return_t custom_enroll_step(const uint8_t *const image,
+					  int *completion)
+{
+	if (completion) {
+		*completion = 42;
+	}
+
+	return RTS_FP_SUCCESS;
+}
+
+static rts_fp_return_t custom_match(void *templ, uint32_t templ_count,
+				    const uint8_t *const image,
+				    bool template_update, int32_t *match_index,
+				    uint32_t *update_bitmap)
+{
+	if (match_index) {
+		*match_index = 0;
+	}
+
+	if (update_bitmap) {
+		*update_bitmap = BIT(1);
+	}
+
+	return RTS_FP_SUCCESS;
+}
+
+static void *rts5817maa_alg_setup(void)
+{
+	static struct rts5817maa_alg_fixture fixture;
+
+	/* Referencing rts5817maa_algorithm directly prevents linker stripping. */
+	fixture.alg = &rts5817maa_algorithm;
+	zassert_not_null(fixture.alg);
+
+	return &fixture;
+}
+
+static void rts5817maa_alg_before(void *f)
+{
+	struct rts5817maa_alg_fixture *fixture = f;
+
+	FFF_RESET_HISTORY();
+
+	RESET_FAKE(rts_bio_algorithm_init);
+	RESET_FAKE(rts_bio_algorithm_exit);
+	RESET_FAKE(rts_bio_enroll_start);
+	RESET_FAKE(rts_bio_enroll_step);
+	RESET_FAKE(rts_bio_enroll_finish);
+	RESET_FAKE(rts_bio_match);
+
+	rts_bio_algorithm_init_fake.return_val = RTS_FP_SUCCESS;
+	rts_bio_enroll_start_fake.return_val = RTS_FP_SUCCESS;
+	rts_bio_enroll_step_fake.return_val = RTS_FP_SUCCESS;
+	rts_bio_match_fake.return_val = RTS_FP_SUCCESS;
+
+	memset(fixture->image, 0, sizeof(fixture->image));
+	memset(fixture->templ, 0, sizeof(fixture->templ));
+}
+
+ZTEST_F(rts5817maa_alg, test_template_size)
+{
+	zassert_equal(rts_bio_info.template_size,
+		      CONFIG_FP_ALGORITHM_TEMPLATE_SIZE);
+}
+
+ZTEST_F(rts5817maa_alg, test_init_success)
+{
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	zassert_equal(rts_bio_algorithm_init_fake.call_count, 1);
+}
+
+ZTEST_F(rts5817maa_alg, test_init_failure)
+{
+	rts_bio_algorithm_init_fake.return_val = RTS_ERROR_UNKNOWN;
+
+	zassert_equal(fingerprint_algorithm_init(fixture->alg),
+		      RTS_ERROR_UNKNOWN);
+	zassert_equal(rts_bio_algorithm_init_fake.call_count, 1);
+}
+
+ZTEST_F(rts5817maa_alg, test_exit_success)
+{
+	zassert_ok(fingerprint_algorithm_exit(fixture->alg));
+
+	zassert_equal(rts_bio_algorithm_exit_fake.call_count, 1);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_start_success)
+{
+	zassert_ok(fingerprint_enroll_start(fixture->alg));
+	zassert_equal(rts_bio_enroll_start_fake.call_count, 1);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_start_failure)
+{
+	rts_bio_enroll_start_fake.return_val = RTS_ERROR_NOT_ENOUGH_MEMORY;
+
+	zassert_equal(fingerprint_enroll_start(fixture->alg),
+		      RTS_ERROR_NOT_ENOUGH_MEMORY);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_step_success)
+{
+	int completion = 0;
+
+	rts_bio_enroll_step_fake.custom_fake = custom_enroll_step;
+
+	zassert_equal(
+		fingerprint_enroll_step(fixture->alg, fixture->image,
+					&completion),
+		FP_ENROLLMENT_RESULT_OK);
+	zassert_equal(completion, 42);
+	zassert_equal_ptr(rts_bio_enroll_step_fake.arg0_val, fixture->image);
+	zassert_equal_ptr(rts_bio_enroll_step_fake.arg1_val, &completion);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_step_immobile)
+{
+	rts_bio_enroll_step_fake.return_val = RTS_FP_IMMOBILE;
+
+	zassert_equal(fingerprint_enroll_step(fixture->alg, fixture->image,
+					      NULL),
+		      FP_ENROLLMENT_RESULT_IMMOBILE);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_step_poor_quality)
+{
+	rts_bio_enroll_step_fake.return_val = RTS_FP_POOR_QUALITY;
+
+	zassert_equal(fingerprint_enroll_step(fixture->alg, fixture->image,
+					      NULL),
+		      FP_ENROLLMENT_RESULT_LOW_QUALITY);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_step_low_coverage)
+{
+	rts_bio_enroll_step_fake.return_val = RTS_FP_TOO_HIGH;
+	zassert_equal(fingerprint_enroll_step(fixture->alg, fixture->image,
+					      NULL),
+		      FP_ENROLLMENT_RESULT_LOW_COVERAGE);
+
+	rts_bio_enroll_step_fake.return_val = RTS_FP_TOO_LOW;
+	zassert_equal(fingerprint_enroll_step(fixture->alg, fixture->image,
+					      NULL),
+		      FP_ENROLLMENT_RESULT_LOW_COVERAGE);
+
+	rts_bio_enroll_step_fake.return_val = RTS_FP_TOO_LEFT;
+	zassert_equal(fingerprint_enroll_step(fixture->alg, fixture->image,
+					      NULL),
+		      FP_ENROLLMENT_RESULT_LOW_COVERAGE);
+
+	rts_bio_enroll_step_fake.return_val = RTS_FP_TOO_RIGHT;
+	zassert_equal(fingerprint_enroll_step(fixture->alg, fixture->image,
+					      NULL),
+		      FP_ENROLLMENT_RESULT_LOW_COVERAGE);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_step_unmapped_error)
+{
+	rts_bio_enroll_step_fake.return_val = RTS_FP_INTERNAL_ERROR;
+
+	zassert_equal(fingerprint_enroll_step(fixture->alg, fixture->image,
+					      NULL),
+		      -EINVAL);
+}
+
+ZTEST_F(rts5817maa_alg, test_enroll_finish_success)
+{
+	zassert_ok(fingerprint_enroll_finish(fixture->alg, fixture->templ));
+	zassert_equal(rts_bio_enroll_finish_fake.call_count, 1);
+	zassert_equal_ptr(rts_bio_enroll_finish_fake.arg0_val,
+			  fixture->templ);
+}
+
+ZTEST_F(rts5817maa_alg, test_match_success)
+{
+	int32_t match_index = -1;
+	uint32_t update_bitmap = 0;
+
+	rts_bio_match_fake.custom_fake = custom_match;
+
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_MATCH);
+	zassert_equal(match_index, 0);
+	zassert_equal(update_bitmap, BIT(1));
+	zassert_equal_ptr(rts_bio_match_fake.arg0_val, fixture->templ);
+	zassert_equal(rts_bio_match_fake.arg1_val, 1);
+	zassert_equal_ptr(rts_bio_match_fake.arg2_val, fixture->image);
+	zassert_false(rts_bio_match_fake.arg3_val);
+	zassert_equal_ptr(rts_bio_match_fake.arg4_val, &match_index);
+	zassert_equal_ptr(rts_bio_match_fake.arg5_val, &update_bitmap);
+}
+
+ZTEST_F(rts5817maa_alg, test_match_updated)
+{
+	int32_t match_index = -1;
+	uint32_t update_bitmap = 0;
+
+	rts_bio_match_fake.return_val = RTS_FP_MATCH_UPDATED;
+
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, true, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_MATCH_UPDATED);
+}
+
+ZTEST_F(rts5817maa_alg, test_match_fail)
+{
+	int32_t match_index = -1;
+	uint32_t update_bitmap = 0;
+
+	rts_bio_match_fake.return_val = RTS_FP_MATCH_FAIL;
+
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_NO_MATCH);
+}
+
+ZTEST_F(rts5817maa_alg, test_match_poor_quality)
+{
+	int32_t match_index = -1;
+	uint32_t update_bitmap = 0;
+
+	rts_bio_match_fake.return_val = RTS_FP_POOR_QUALITY;
+
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_LOW_QUALITY);
+}
+
+ZTEST_F(rts5817maa_alg, test_match_low_coverage)
+{
+	int32_t match_index = -1;
+	uint32_t update_bitmap = 0;
+
+	rts_bio_match_fake.return_val = RTS_FP_TOO_HIGH;
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_LOW_COVERAGE);
+
+	rts_bio_match_fake.return_val = RTS_FP_TOO_LOW;
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_LOW_COVERAGE);
+
+	rts_bio_match_fake.return_val = RTS_FP_TOO_LEFT;
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_LOW_COVERAGE);
+
+	rts_bio_match_fake.return_val = RTS_FP_TOO_RIGHT;
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      FP_MATCH_RESULT_LOW_COVERAGE);
+}
+
+ZTEST_F(rts5817maa_alg, test_match_unmapped_error)
+{
+	int32_t match_index = -1;
+	uint32_t update_bitmap = 0;
+
+	rts_bio_match_fake.return_val = RTS_FP_INTERNAL_ERROR;
+
+	zassert_equal(fingerprint_match(fixture->alg, fixture->templ, 1,
+					fixture->image, false, &match_index,
+					&update_bitmap),
+		      -EINVAL);
+}
+
+ZTEST_SUITE(rts5817maa_alg, NULL, rts5817maa_alg_setup, rts5817maa_alg_before,
+	    NULL, NULL);
