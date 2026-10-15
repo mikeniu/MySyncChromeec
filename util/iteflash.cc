@@ -126,6 +126,7 @@ struct iteflash_config {
 	int erase; /* boolean */
 	int i2c_mux; /* boolean */
 	int debug; /* boolean */
+	int reset_gpio; /* boolean */
 	int disable_watchdog; /* boolean */
 	int disable_protect_path; /* boolean */
 	int block_write_size;
@@ -772,10 +773,25 @@ static int check_chipid(struct common_hnd *chnd)
 		/*
 		 * In deep rescue mode when the main EC core clock domain is
 		 * asleep, 0xF02085 reads back 0x00 (e.g. 0x01202 on IT81202 or
-		 * 0x01302 on IT81302). Restore the leading 0x8 nibble.
+		 * 0x01302 on IT81302). Restore the leading 0x8 nibble and skip
+		 * 0xF0xxxx EC core register writes (GPIO reset, watchdog
+		 * disable, and protect-path disable) which NACK while the core
+		 * clock domain is gated.
 		 */
-		if ((id & 0xff00f) == 0x01002 || (id & 0xff00f) == 0x02002)
+		if ((id & 0xff00f) == 0x01002 || (id & 0xff00f) == 0x02002) {
 			id |= 0x80000;
+			if (chnd->conf.reset_gpio ||
+			    chnd->conf.disable_watchdog ||
+			    chnd->conf.disable_protect_path) {
+				printf("Boot ROM deep-rescue mode detected "
+				       "(0xF0xxxx core clock gated); skipping "
+				       "GPIO reset, watchdog disable, and "
+				       "protect-path disable.\n");
+				chnd->conf.reset_gpio = 0;
+				chnd->conf.disable_watchdog = 0;
+				chnd->conf.disable_protect_path = 0;
+			}
+		}
 
 		if ((id & 0xf000f) == 0x80001 || (id & 0xf000f) == 0x80002) {
 			chnd->flash_cmd_v2 = 1;
@@ -2713,6 +2729,7 @@ int main(int argc, char **argv)
 		/* Default flag settings. */
 		.conf = {
 			.send_waveform = 1,
+			.reset_gpio = 1,
 			.disable_watchdog = 1,
 			.disable_protect_path = 1,
 			.preserve_pin = -1,
@@ -2767,12 +2784,14 @@ int main(int argc, char **argv)
 	}
 
 	/* Turn off power rails by reset GPIOs to default (input). */
-	dbgr_reset_gpio(&chnd);
+	if (chnd.conf.reset_gpio)
+		dbgr_reset_gpio(&chnd);
 
 	check_flashid(&chnd);
 
 	/* add wdt restart to prevent wdt interrupt flashing */
-	restart_wdt(&chnd);
+	if (chnd.conf.disable_watchdog)
+		restart_wdt(&chnd);
 
 	ret = post_waveform_work(&chnd);
 	if (ret)
