@@ -19,7 +19,7 @@
 #include "watchdog.h"
 
 #define FLASH_DMA_START ((uint32_t)&__flash_dma_start)
-#define FLASH_DMA_CODE __attribute__((section(".flash_direct_map")))
+#define FLASH_DMA_CODE __attribute__((noinline, section(".flash_direct_map")))
 #define FLASH_ILM0_ADDR ((uint32_t)&__ilm0_ram_code)
 
 /* erase size of sector is 1KB or 4KB */
