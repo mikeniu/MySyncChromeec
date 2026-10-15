@@ -119,6 +119,12 @@ ZTEST_USER(lis2dh, test_lis2dh__set_data_rate)
 	zassert_ok(acc->drv->set_data_rate(acc, 10000, 1));
 	zassert_equal(drvdata->base.odr, 10000);
 
+	/* Out-of-range ODR must fail and leave the sensor mutex unlocked */
+	zassert_equal(acc->drv->set_data_rate(acc, LIS2DH_ODR_MAX_VAL * 2, 1),
+		      EC_RES_INVALID_PARAM);
+	zassert_equal(acc->mutex->lock_count, 0);
+	zassert_equal(drvdata->base.odr, 10000);
+
 	/* Set data rate to 0 (Power Off) */
 	zassert_ok(acc->drv->set_data_rate(acc, 0, 1));
 	zassert_equal(drvdata->base.odr, 0);
