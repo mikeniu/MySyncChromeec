@@ -298,7 +298,9 @@ test_mockable void system_reset(int flags)
 
 static int check_reset_cause(void)
 {
-	uint32_t system_flags = chip_read_reset_flags(); /* system reset flag */
+	/* Clear EC_RESET_FLAG_INITIAL_PWR so it is only ever kept in BBRAM */
+	uint32_t system_flags = chip_read_reset_flags() &
+				~EC_RESET_FLAG_INITIAL_PWR;
 	uint32_t chip_flags = 0; /* used to write back to the BBRAM */
 	int chip_reset_cause = 0; /* chip-level reset cause */
 
@@ -318,14 +320,14 @@ static int check_reset_cause(void)
 	case POWERUP:
 		system_flags |= EC_RESET_FLAG_POWER_ON;
 		/*
-		 * Power-on restart, so set a flag and save it for the next
+		 * Power-on restart, so save a flag in BBRAM for the next
 		 * imminent reset. Later code will check for this flag and wait
 		 * for the second reset. Waking from PSL hibernate is power-on
 		 * for EC but not for H1, so do not wait for the second reset.
 		 */
 		if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
+		    IS_ENABLED(CONFIG_CROS_EC_RO) &&
 		    ((system_flags & EC_RESET_FLAG_HIBERNATE) == 0)) {
-			system_flags |= EC_RESET_FLAG_INITIAL_PWR;
 			chip_flags |= EC_RESET_FLAG_INITIAL_PWR;
 		}
 		break;
@@ -337,26 +339,19 @@ static int check_reset_cause(void)
 		 * restart as a power-on as well. This is to workaround the fact
 		 * that the H1 will reset the EC at power up.
 		 */
-		if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON)) {
-			if (system_flags & EC_RESET_FLAG_INITIAL_PWR) {
-				/*
-				 * The previous restart was a power-on so treat
-				 * this restart as that, and clear the flag so
-				 * later code will not wait for the second
-				 * reset.
-				 */
-				system_flags = (system_flags &
-						~EC_RESET_FLAG_INITIAL_PWR) |
-					       EC_RESET_FLAG_POWER_ON;
-			} else {
-				/*
-				 * No previous reset flag, so this is a
-				 * subsequent restart i.e any restarts after the
-				 * second restart caused by the H1.
-				 */
-				system_flags |= EC_RESET_FLAG_RESET_PIN;
-			}
+		if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
+		    (chip_read_reset_flags() & EC_RESET_FLAG_INITIAL_PWR)) {
+			/*
+			 * The previous restart was a power-on so treat this
+			 * restart as that.
+			 */
+			system_flags |= EC_RESET_FLAG_POWER_ON;
 		} else {
+			/*
+			 * No previous reset flag, so this is a subsequent
+			 * restart i.e any restarts after the second restart
+			 * caused by the H1.
+			 */
 			system_flags |= EC_RESET_FLAG_RESET_PIN;
 		}
 		break;
@@ -416,7 +411,7 @@ test_export_static int system_preinitialize(void)
 	 * of a reset.
 	 */
 #ifdef CONFIG_BOARD_RESET_AFTER_POWER_ON
-	if (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
+	if (chip_read_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
 		/*
 		 * The current initial stage couldn't use the kernel delay
 		 * function. Use CPU nop instruction to wait for the external
@@ -424,6 +419,13 @@ test_export_static int system_preinitialize(void)
 		 */
 		for (uint32_t i = WAIT_RESET_TIME; i; i--)
 			arch_nop();
+		/*
+		 * H1 is expected to reset the EC during the wait loop above.
+		 * If the wait timed out without a reset, clear the flag from
+		 * BBRAM so it does not persist across subsequent reboots.
+		 */
+		chip_save_reset_flags(chip_read_reset_flags() &
+				      ~EC_RESET_FLAG_INITIAL_PWR);
 	}
 #endif
 	system_common_pre_init();
