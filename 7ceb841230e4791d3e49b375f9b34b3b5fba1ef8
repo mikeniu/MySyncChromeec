@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55242a09_2e818f98",
+        "filename": "zephyr/program/ocelot/blanc/usb_typec.dtsi",
+        "patchSetId": 33
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-15T01:52:13Z",
+      "side": 1,
+      "message": "use two PDCs, both need fw update, need remove",
+      "range": {
+        "startLine": 55,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 15
+      },
+      "revId": "7ceb841230e4791d3e49b375f9b34b3b5fba1ef8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
