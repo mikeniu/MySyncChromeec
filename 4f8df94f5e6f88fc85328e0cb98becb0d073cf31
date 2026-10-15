@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15217060_d07acea6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-15T18:55:54Z",
+      "side": 1,
+      "message": "I\u0027m not that concerned about \u003c 95% coverage on this CL. It adds an error-handling clause, but that clause goes away in the next CL, which folds it into the common error case, which is already covered. This CL is here to make that CL a no-op.\n\nAlso, based on the supposedly uncovered lines, I\u0027m suspicious that the accounting is slightly off anyway.\n\nCould PRL testing cover error scenarios more exhaustively, such that this special error case would be covered explicitly? Yeah, but that\u0027s a big enough job to be out  of scope here.",
+      "revId": "4f8df94f5e6f88fc85328e0cb98becb0d073cf31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
