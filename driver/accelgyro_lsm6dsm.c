@@ -739,7 +739,7 @@ static int read_temp(const struct motion_sensor_t *s, int *temp)
 
 	RETURN_ERROR(st_raw_read_n_noinc(s->port, s->i2c_spi_addr_flags,
 					 LSM6DSM_OUT_TEMP_L_ADDR, raw, 2));
-	*temp = C_TO_K(25 + (int)raw[1]);
+	*temp = C_TO_K(25 + (int8_t)raw[1]);
 
 	return EC_SUCCESS;
 }

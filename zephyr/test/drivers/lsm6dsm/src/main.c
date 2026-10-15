@@ -3,8 +3,11 @@
  * found in the LICENSE file.
  */
 
+#include "common.h"
+#include "driver/accelgyro_lsm6dsm.h"
 #include "driver/accelgyro_lsm6dsm_public.h"
 #include "emul/emul_lsm6dsm.h"
+#include "i2c.h"
 #include "motion_sense.h"
 #include "motion_sense_fifo.h"
 #include "test/drivers/test_state.h"
@@ -21,6 +24,19 @@ static struct motion_sensor_t *acc = &motion_sensors[ACC_SENSOR_ID];
 // static struct motion_sensor_t *gyr = &motion_sensors[GYR_SENSOR_ID];
 
 ZTEST_SUITE(lsm6dsm, drivers_predicate_post_main, NULL, NULL, NULL, NULL);
+
+ZTEST(lsm6dsm, test_read_temp)
+{
+	int temp = 0;
+
+	/* Negative temperature offset (-1 C from 25 C = 24 C = 297 K) */
+	zassert_ok(i2c_write8(acc->port, acc->i2c_spi_addr_flags,
+			      LSM6DSM_OUT_TEMP_L_ADDR + 1, 0xff));
+	zassert_ok(acc->drv->read_temp(acc, &temp));
+	zassert_equal(temp, C_TO_K(24));
+	zassert_ok(i2c_write8(acc->port, acc->i2c_spi_addr_flags,
+			      LSM6DSM_OUT_TEMP_L_ADDR + 1, 0x00));
+}
 
 ZTEST(lsm6dsm, test_disable_interrupt)
 {
