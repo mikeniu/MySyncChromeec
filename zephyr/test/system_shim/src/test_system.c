@@ -297,6 +297,32 @@ ZTEST(system, test_init_invalid_reset_cause)
 	zassert_equal(-1, system_preinitialize(NULL));
 }
 
+ZTEST(system, test_init_cause_powerup)
+{
+	cros_system_get_reset_cause_fake.return_val = POWERUP;
+	chip_save_reset_flags(0);
+	system_clear_reset_flags(0xffffffff);
+
+	/*
+	 * If the 2-second wait for a second H1 reset expires without an
+	 * external reset, EC_RESET_FLAG_INITIAL_PWR should be cleared from
+	 * both BBRAM and system reset flags.
+	 */
+	zassert_ok(system_preinitialize(NULL));
+	zassert_equal(EC_RESET_FLAG_POWER_ON, system_get_reset_flags());
+	zassert_equal(0, chip_read_reset_flags());
+
+	/*
+	 * On wake from hibernate, EC_RESET_FLAG_INITIAL_PWR is never set.
+	 */
+	chip_save_reset_flags(EC_RESET_FLAG_HIBERNATE);
+	system_clear_reset_flags(0xffffffff);
+	zassert_ok(system_preinitialize(NULL));
+	zassert_equal(EC_RESET_FLAG_HIBERNATE | EC_RESET_FLAG_POWER_ON,
+		      system_get_reset_flags());
+	zassert_equal(0, chip_read_reset_flags());
+}
+
 ZTEST(system, test_init_cause_vcc1_rst_pin)
 {
 	cros_system_get_reset_cause_fake.return_val = VCC1_RST_PIN;
@@ -307,10 +333,9 @@ ZTEST(system, test_init_cause_vcc1_rst_pin)
 	zassert_equal(EC_RESET_FLAG_RESET_PIN, system_get_reset_flags());
 
 	chip_save_reset_flags(EC_RESET_FLAG_INITIAL_PWR);
+	system_clear_reset_flags(0xffffffff);
 	zassert_ok(system_preinitialize(NULL));
-	zassert_equal(EC_RESET_FLAG_RESET_PIN | EC_RESET_FLAG_POWER_ON |
-			      EC_RESET_FLAG_POWER_ON,
-		      system_get_reset_flags());
+	zassert_equal(EC_RESET_FLAG_POWER_ON, system_get_reset_flags());
 }
 
 ZTEST(system, test_init_cause_debug_rst)
