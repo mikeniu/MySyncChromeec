@@ -332,9 +332,9 @@ static uint32_t __wait_evt(int timeout_us, task_id_t resched)
 
 void task_set_event(task_id_t tskid, uint32_t event)
 {
-	task_ *receiver = __task_id_to_ptr(tskid);
+	task_ *receiver;
 
-	if (tskid > TASK_ID_COUNT) {
+	if (tskid >= TASK_ID_COUNT) {
 		receiver = current_task;
 		tskid = receiver - tasks;
 	} else {
