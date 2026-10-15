@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62c7ee11_b2e18d6e",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T20:35:12Z",
+      "side": 1,
+      "message": "Consider rebasing this onto https://crrev.com/c/6603833 (and abandoning parent CL 8582652), and updating the panicinfo example in docs/panic_data.md to reflect ipsr moving below dfsr and the addition of shcsr.",
+      "isAi": true,
+      "revId": "1f0d0820b71511ff0108fc5dcf252af975e7ac5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
