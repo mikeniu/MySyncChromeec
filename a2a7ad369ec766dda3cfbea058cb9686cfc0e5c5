@@ -22,6 +22,30 @@
       },
       "revId": "a2a7ad369ec766dda3cfbea058cb9686cfc0e5c5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6d507e4_e19379f9",
+        "filename": "common/usbc/usb_prl_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1712,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-15T18:51:03Z",
+      "side": 1,
+      "message": "I don\u0027t think this would work. Straightforwardly turning this check into a guard clause would make the timeout check below unreachable. Switching the ordering and turning the timeout check into a guard clause would cause a chunk that arrived right at the deadline to be treated as an error rather than a successful reception. In the rest of the TCPM, we check the received flag first and then the timeout to avoid an error in this marginal case.",
+      "parentUuid": "366bf9ce_30ac634f",
+      "range": {
+        "startLine": 1712,
+        "startChar": 0,
+        "endLine": 1712,
+        "endChar": 0
+      },
+      "revId": "a2a7ad369ec766dda3cfbea058cb9686cfc0e5c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
