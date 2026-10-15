@@ -11,6 +11,11 @@
 			compatible = "named-usbc-port";
 			tcpc = <&raa489000_emul>;
 		};
+
+		port1@1 {
+			compatible = "named-usbc-port";
+			chg = <&isl923x_sec_emul>;
+		};
 	};
 };
 
@@ -24,5 +29,12 @@
 		tcpc-flags = <(
 			TCPC_FLAGS_TCPCI_REV2_0 |
 			TCPC_FLAGS_VBUS_MONITOR)>;
+	};
+
+	isl923x_sec_emul: isl923x-sec@9 {
+		compatible = "cros,isl923x-emul";
+		status = "okay";
+		reg = <0x9>;
+		battery = <&battery>;
 	};
 };
