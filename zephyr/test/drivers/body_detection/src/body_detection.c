@@ -526,6 +526,43 @@ DECLARE_HOOK(HOOK_BODY_DETECT_CHANGE, body_detect_change_hook,
 	     HOOK_PRIO_DEFAULT);
 
 /**
+ * @brief TestPurpose: verify V2 body detection processes samples at the
+ * optimal 15Hz ODR (decimation_factor == 1).
+ */
+ZTEST_USER(bodydetectsample, test_optimal_odr)
+{
+	int i, cnt;
+	float fs = 15.0f;
+	int G_1 = 16384;
+
+	get_data_rate_fake.return_val = 15 * 1000;
+	time_fake_value = 0;
+	body_detect_reset();
+
+	/* Stationary samples at 15Hz must reach OFF_BODY. */
+	cnt = 2 * 60 * fs;
+	for (i = 0; i < cnt; i++) {
+		time_fake_value = (1000000 / fs * i);
+		body_sensor->xyz[X] = 0;
+		body_sensor->xyz[Y] = 0;
+		body_sensor->xyz[Z] = G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state());
+
+	/* Motion at 15Hz must transition back to ON_BODY. */
+	for (i = 0; i < 60; i++) {
+		time_fake_value = (1000000 / fs * (cnt + i));
+		body_sensor->xyz[X] = (i % 2 == 0) ? G_1 : -G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state());
+
+	get_data_rate_fake.return_val = 50 * 1000;
+	body_detect_reset();
+}
+
+/**
  * @brief TestPurpose: verify ON_BODY hysteresis uses OFF_BODY_CON (10%) rather
  * than ON_BODY_CON (90%), so moderate motion (~35% confidence) keeps the
  * device ON_BODY, and verify body_detect_reset() clears filter state without
