@@ -7,6 +7,7 @@
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_lis2dw12.h"
 #include "test/drivers/test_state.h"
+#include "motion_sense_fifo.h"
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/ztest.h>
@@ -220,6 +221,7 @@ ZTEST(lis2dw12, test_lis2dw12_set_power_mode)
 	rv = lis2dw12_set_power_mode(ms, LIS2DW12_LOW_POWER,
 				     LIS2DW12_LOW_POWER_MODE_2);
 	zassert_equal(rv, EC_SUCCESS, "Expected %d but got %d", EC_SUCCESS, rv);
+#endif
 
 	/* Part 2: unimplemented modes */
 	rv = lis2dw12_set_power_mode(ms, LIS2DW12_LOW_POWER,
@@ -249,22 +251,26 @@ ZTEST(lis2dw12, test_lis2dw12_set_range)
 
 	rv = ms->drv->set_range(ms, LIS2DW12_ACCEL_FS_MIN_VAL - 1, 0);
 	zassert_equal(rv, EC_SUCCESS, "Expected %d but got %d", EC_SUCCESS, rv);
+#endif
 	zassert_equal(ms->current_range, LIS2DW12_ACCEL_FS_MIN_VAL,
 		      "Expected %d but got %d", LIS2DW12_ACCEL_FS_MIN_VAL,
 		      ms->current_range);
 
 	rv = ms->drv->set_range(ms, 3, 0);
 	zassert_equal(rv, EC_SUCCESS, "Expected %d but got %d", EC_SUCCESS, rv);
+#endif
 	zassert_equal(ms->current_range, 2, "Expected %d but got %d", 2,
 		      ms->current_range);
 
 	rv = ms->drv->set_range(ms, 3, 1);
 	zassert_equal(rv, EC_SUCCESS, "Expected %d but got %d", EC_SUCCESS, rv);
+#endif
 	zassert_equal(ms->current_range, 4, "Expected %d but got %d", 4,
 		      ms->current_range);
 
 	rv = ms->drv->set_range(ms, LIS2DW12_ACCEL_FS_MAX_VAL + 1, 0);
 	zassert_equal(rv, EC_SUCCESS, "Expected %d but got %d", EC_SUCCESS, rv);
+#endif
 	zassert_equal(ms->current_range, LIS2DW12_ACCEL_FS_MAX_VAL,
 		      "Expected %d but got %d", LIS2DW12_ACCEL_FS_MAX_VAL,
 		      ms->current_range);
@@ -293,6 +299,7 @@ ZTEST(lis2dw12, test_lis2dw12_set_rate)
 		      "Output data rate should be %d but got %d",
 		      LIS2DW12_ODR_POWER_OFF_VAL, drv_data->base.odr);
 	zassert_equal(rv, EC_SUCCESS, "Returned %d but expected %d", rv,
+#endif
 		      EC_SUCCESS);
 
 	/* Part 2: Set some output data rates. We will request a certain rate
@@ -425,6 +432,7 @@ ZTEST(lis2dw12, test_lis2dw12_read)
 	rv = ms->drv->read(ms, sample);
 
 	zassert_equal(rv, EC_SUCCESS, "Expected return val of %d but got %d",
+#endif
 		      EC_SUCCESS, rv);
 	CHECK_XYZ_EQUALS(sample, ms->raw_xyz);
 
@@ -464,9 +472,45 @@ ZTEST(lis2dw12, test_lis2dw12_read)
 	rv = ms->drv->read(ms, sample);
 
 	zassert_equal(rv, EC_SUCCESS, "Expected return val of %d but got %d",
+#endif
 		      EC_SUCCESS, rv);
 	CHECK_XYZ_EQUALS(sample, expected_sample);
 }
 
 ZTEST_SUITE(lis2dw12, drivers_predicate_post_main, NULL, lis2dw12_before,
 	    lis2dw12_after, NULL);
+
+ZTEST(lis2dw12, test_lis2dw12_irq_handler_fifo)
+{
+#ifdef CONFIG_ACCEL_LIS2DW12_INT_EVENT
+	const struct emul *emul = EMUL_DT_GET(LIS2DW12_EMUL_NODE);
+	struct motion_sensor_t *ms = &motion_sensors[LIS2DW12_SENSOR_ID];
+	struct stprivate_data *drvdata = ms->drv_data;
+	int rv;
+	uint32_t event;
+
+	/* Reading requires a range to be set. */
+	ms->drv->set_range(ms, 1, 0);
+	drvdata->resol = LIS2DW12_RESOLUTION;
+
+	/* Reset FIFO info just in case */
+	if (IS_ENABLED(CONFIG_ACCEL_FIFO)) {
+		motion_sense_fifo_reset();
+	}
+
+	/* Set FIFO sample count to 2 samples */
+	lis2dw12_emul_set_fifo_samples(emul, 2);
+
+	/* Set some fake sample data for OUT_X_L_ADDR */
+	intv3_t fake_sample = { 10, -20, 30 };
+	lis2dw12_emul_set_accel_reading(emul, fake_sample);
+
+	/* Setup event to trigger the IRQ handler */
+	event = CONFIG_ACCEL_LIS2DW12_INT_EVENT;
+
+	/* Call IRQ handler */
+	rv = ms->drv->irq_handler(ms, &event);
+	zassert_equal(rv, EC_SUCCESS, "Expected EC_SUCCESS but got %d", rv);
+#endif
+
+}
