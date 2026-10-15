@@ -617,6 +617,69 @@ ZTEST_USER(bodydetectsample, test_on_body_hysteresis)
 	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state());
 	zassert_equal(1, body_detect_change_cnt);
 }
+
+/**
+ * @brief TestPurpose: verify V2 body detection clamps confidence_delta
+ * when confidence_delta > var_threshold or confidence_delta == 0.
+ */
+ZTEST_USER(bodydetectsample, test_confidence_delta_clamping)
+{
+	static const struct body_detect_params large_delta_params = {
+		.var_threshold = 1000,
+		.confidence_delta = 3000,
+	};
+	static const struct body_detect_params min_delta_params = {
+		.var_threshold = 1000,
+		.confidence_delta = 1,
+	};
+	int i, cnt;
+	float fs = 50.0f;
+	int G_1 = 16384;
+
+	body_sensor->bd_params = &large_delta_params;
+	time_fake_value = 0;
+	body_detect_reset();
+	zassert_true(confidence_delta > var_threshold);
+
+	/* Stationary samples must reach OFF_BODY even when
+	 * confidence_delta > var_threshold.
+	 */
+	cnt = 2 * 60 * fs;
+	for (i = 0; i < cnt; i++) {
+		time_fake_value = (1000000 / fs * i);
+		body_sensor->xyz[X] = 0;
+		body_sensor->xyz[Y] = 0;
+		body_sensor->xyz[Z] = G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state());
+
+	/* Motion must transition back to ON_BODY. */
+	for (i = 0; i < 60; i++) {
+		time_fake_value = (1000000 / fs * (cnt + i));
+		body_sensor->xyz[X] = (i % 2 == 0) ? G_1 : -G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state());
+
+	/* Verify step boundary with minimal/zero delta does not produce NaN. */
+	body_sensor->bd_params = &min_delta_params;
+	time_fake_value = 0;
+	body_detect_reset();
+	confidence_delta = 0.0f;
+	var_threshold = 0.0f;
+	for (i = 0; i < cnt; i++) {
+		time_fake_value = (1000000 / fs * i);
+		body_sensor->xyz[X] = 0;
+		body_sensor->xyz[Y] = 0;
+		body_sensor->xyz[Z] = G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state());
+
+	body_sensor->bd_params = NULL;
+	body_detect_reset();
+}
 #else
 /**
  * @brief TestPurpose: verify calculate_motion_confidence does not underflow
