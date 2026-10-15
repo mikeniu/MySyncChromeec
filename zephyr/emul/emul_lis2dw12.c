@@ -45,6 +45,13 @@ struct lis2dw12_emul_data {
 	int16_t accel_data[3];
 	/** FIFO control register */
 	uint8_t fifo_ctrl;
+	/** Tap configuration and source registers */
+	uint8_t tap_ths_x_reg;
+	uint8_t tap_ths_y_reg;
+	uint8_t tap_ths_z_reg;
+	uint8_t int_dur_reg;
+	uint8_t wake_up_ths_reg;
+	uint8_t tap_src_reg;
 };
 
 struct lis2dw12_emul_cfg {
@@ -66,8 +73,16 @@ void lis2dw12_emul_reset(const struct emul *emul)
 	data->ctrl1_reg = 0;
 	data->ctrl2_reg = 0;
 	data->ctrl3_reg = 0;
+	data->ctrl4_reg = 0;
 	data->ctrl6_reg = 0;
 	data->status_reg = 0;
+	data->fifo_ctrl = 0;
+	data->tap_ths_x_reg = 0;
+	data->tap_ths_y_reg = 0;
+	data->tap_ths_z_reg = 0;
+	data->int_dur_reg = 0;
+	data->wake_up_ths_reg = 0;
+	data->tap_src_reg = 0;
 	data->soft_reset_count = 0;
 
 	memset(data->accel_data, 0, sizeof(data->accel_data));
@@ -152,6 +167,30 @@ static int lis2dw12_emul_read_byte(const struct emul *emul, int reg,
 	case LIS2DW12_CTRL4_ADDR:
 		__ASSERT_NO_MSG(bytes == 0);
 		*val = data->ctrl4_reg;
+		break;
+	case LIS2DW12_TAP_THS_X_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->tap_ths_x_reg;
+		break;
+	case LIS2DW12_TAP_THS_Y_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->tap_ths_y_reg;
+		break;
+	case LIS2DW12_TAP_THS_Z_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->tap_ths_z_reg;
+		break;
+	case LIS2DW12_INT_DUR_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->int_dur_reg;
+		break;
+	case LIS2DW12_WAKE_UP_THS_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->wake_up_ths_reg;
+		break;
+	case LIS2DW12_TAP_SRC_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->tap_src_reg;
 		break;
 	default:
 		__ASSERT(false, "No read handler for register 0x%02x", reg);
@@ -247,6 +286,21 @@ static int lis2dw12_emul_write_byte(const struct emul *emul, int reg,
 		break;
 	case LIS2DW12_CTRL4_ADDR:
 		data->ctrl4_reg = val;
+		break;
+	case LIS2DW12_TAP_THS_X_ADDR:
+		data->tap_ths_x_reg = val;
+		break;
+	case LIS2DW12_TAP_THS_Y_ADDR:
+		data->tap_ths_y_reg = val;
+		break;
+	case LIS2DW12_TAP_THS_Z_ADDR:
+		data->tap_ths_z_reg = val;
+		break;
+	case LIS2DW12_INT_DUR_ADDR:
+		data->int_dur_reg = val;
+		break;
+	case LIS2DW12_WAKE_UP_THS_ADDR:
+		data->wake_up_ths_reg = val;
 		break;
 	default:
 		__ASSERT(false, "No write handler for register 0x%02x", reg);
