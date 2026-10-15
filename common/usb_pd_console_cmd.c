@@ -121,13 +121,14 @@ static int command_cable(int argc, const char **argv)
 	union tbt_mode_resp_cable cable_tbt_mode_resp;
 	union dp_mode_resp_cable cable_dp_mode_resp;
 	uint8_t dp_bit_rate;
+	uint8_t vbus_cur;
 	enum dp21_cable_type active_comp;
 
 	if (argc < 2)
 		return EC_ERROR_PARAM_COUNT;
 
 	port = strtoi(argv[1], &e, 0);
-	if (*e || port >= board_get_usb_pd_port_count())
+	if (*e || port < 0 || port >= board_get_usb_pd_port_count())
 		return EC_ERROR_PARAM2;
 
 	ptype = get_usb_pd_cable_type(port);
@@ -160,15 +161,11 @@ static int command_cable(int argc, const char **argv)
 	ccprintf("Connector Type: %d\n",
 		 disc->identity.product_t1.p_rev20.connector);
 
-	if (disc->identity.product_t1.p_rev20.vbus_cur) {
-		ccprintf("Cable Current: %s\n",
-			 disc->identity.product_t1.p_rev20.vbus_cur >
-					 ARRAY_SIZE(cable_curr) ?
-				 "Invalid" :
-				 cable_curr[disc->identity.product_t1.p_rev20
-						    .vbus_cur]);
-	} else
-		ccprintf("Cable Current: Invalid\n");
+	vbus_cur = disc->identity.product_t1.p_rev20.vbus_cur;
+	ccprintf("Cable Current: %s\n",
+		 (vbus_cur < ARRAY_SIZE(cable_curr) && cable_curr[vbus_cur]) ?
+			 cable_curr[vbus_cur] :
+			 "Invalid");
 
 	/*
 	 * For Rev 3.0 passive cables and Rev 2.0 active and passive cables,
@@ -215,9 +212,10 @@ static int command_cable(int argc, const char **argv)
 				 (dp_ver ? "2.1 or higher" : "2.0 or earlier"));
 			dp_bit_rate = dp_get_cable_bit_rate(port);
 			ccprintf("DP Cable bitrate : %s\n",
-				 ((dp_bit_rate <= DP_UHBR20) ?
-					  dp21_cable_speed[dp_bit_rate] :
-					  "Invalid"));
+				 (dp_bit_rate < ARRAY_SIZE(dp21_cable_speed) &&
+				  dp21_cable_speed[dp_bit_rate]) ?
+					 dp21_cable_speed[dp_bit_rate] :
+					 "Invalid");
 			ccprintf("DP UHBR13.5 Support : %s\n",
 				 (cable_dp_mode_resp.uhbr13_5_support ?
 					  "True" :
