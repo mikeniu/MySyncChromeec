@@ -664,10 +664,8 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	if (skip_image_offset(global_context.current_capture_type)) {
 		uint32_t adjusted_offset;
 
-		if (check_add_overflow(
-			    offset,
-			    static_cast<uint32_t>(FP_SENSOR_IMAGE_OFFSET),
-			    &adjusted_offset)) {
+		if (u32_add_overflow(offset, FP_SENSOR_IMAGE_OFFSET,
+				     &adjusted_offset)) {
 			return EC_RES_INVALID_PARAM;
 		}
 
