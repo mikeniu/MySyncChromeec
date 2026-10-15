@@ -60,7 +60,7 @@ static void dump_pe(int port)
 	/* TODO(b/152418267): Display discovered SVIDs and modes for SOP' */
 	for (i = 0; i < pd_get_svid_count(port, TCPCI_MSG_SOP); i++) {
 		ccprintf("SVID[%d]: %04x MODES:", i, disc->svids[i].svid);
-		for (j = 0; j < disc->svids[j].mode_cnt; j++)
+		for (j = 0; j < disc->svids[i].mode_cnt; j++)
 			ccprintf(" [%d] %08x", j + 1,
 				 disc->svids[i].mode_vdo[j]);
 		ccprintf("\n");
