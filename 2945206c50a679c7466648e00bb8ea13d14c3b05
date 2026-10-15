@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b76989e_16520644",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:45:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n*   **Functionality:** ✅ The `#undef CEC` successfully resolves the token-pasting collision with the STM32H7 CMSIS header.\n*   **Architecture \u0026 Component Fit:** ✅ The workaround is properly isolated to the Zephyr shim layer for the specific STM32H7 architecture (`CONFIG_SOC_SERIES_STM32H7X`). This pragmatically avoids a sprawling refactor of the `TASK_ID_CEC` enum across the wider EC codebase.\n*   **Code Simplicity:** ✅ Minimal and direct fix.\n*   **Idiomaticity \u0026 Readability:** ✅ Standard preprocessor conditional workaround for hardware register macro collisions.\n*   **Security:** ✅ N/A (compile-time macro adjustment).\n*   **Testing:** ✅ This is a pure compile-time macro collision fix. Automated runtime logic tests are not applicable.\n*   **CL Size \u0026 Scope:** ✅ Size: XS (+8, -0). The CL is atomic and correctly scoped to a single logical change.\n*   **Commit Message:** ✅ The one-line commit message accurately and concisely explains the problem and the solution, which is appropriate for a trivial build fix.\n\n[[trajectory](https://goto.corp.google.com/traj/2f3d5c3a-3563-48f8-bcf8-6b3d1727821f)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2945206c50a679c7466648e00bb8ea13d14c3b05",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
