@@ -10,6 +10,7 @@ import pathlib
 import subprocess
 from unittest import mock
 
+# pylint: disable=import-error
 import pytest
 from zmake.repository_prep import _find_override_files
 from zmake.repository_prep import _find_patch_files
@@ -17,6 +18,7 @@ from zmake.repository_prep import _has_files
 from zmake.repository_prep import CodebasePreparer
 from zmake.repository_prep import copy_outputs_back
 from zmake.repository_prep import create_shadow_checkout
+from zmake.repository_prep import find_checkout
 from zmake.repository_prep import find_git_repo
 from zmake.repository_prep import fix_symlinks
 from zmake.repository_prep import get_dirty_files
@@ -784,5 +786,46 @@ def test_prepared_workspace_shadow_and_partial_failure(
         with pytest.raises(RepositoryPrepError):
             with prepared_workspace(opts, modules={"ec": ec_path}):
                 pass
+    finally:
+        set_checkout(old_co)
+
+
+@pytest.mark.parametrize(
+    ["marker", "is_dir"],
+    [
+        (".repo", True),
+        (".supermanifest", False),
+        ("../.citc", True),
+    ],
+)
+def test_find_checkout(tmp_path, monkeypatch, marker, is_dir):
+    """Test find_checkout with .repo, .supermanifest, and parent .citc."""
+    old_co = set_checkout(None)
+    try:
+        checkout_root = tmp_path / "chrome-internal"
+        fake_file = (
+            checkout_root
+            / "src"
+            / "platform"
+            / "ec"
+            / "zephyr"
+            / "zmake"
+            / "zmake"
+            / "repository_prep.py"
+        )
+        fake_file.parent.mkdir(parents=True)
+        fake_file.touch()
+        monkeypatch.setattr("zmake.repository_prep.__file__", str(fake_file))
+
+        with pytest.raises(FileNotFoundError):
+            find_checkout()
+
+        marker_path = (checkout_root / marker).resolve()
+        if is_dir:
+            marker_path.mkdir()
+        else:
+            marker_path.touch()
+
+        assert find_checkout() == checkout_root.resolve()
     finally:
         set_checkout(old_co)
