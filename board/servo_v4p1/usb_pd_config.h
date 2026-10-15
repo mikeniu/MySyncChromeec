@@ -84,11 +84,11 @@ static inline void spi_enable_clock(int port)
 		STM32_RCC_APB1ENR |= STM32_RCC_PB1_SPI2;
 }
 
-/* DMA for transmit uses DMA CH3 for CHG and DMA_CH7 for DUT */
-#define DMAC_SPI_TX(p) ((p) ? STM32_DMAC_CH7 : STM32_DMAC_CH3)
+/* DMA for transmit uses DMA CH3 for CHG and DMA_CH5 for DUT */
+#define DMAC_SPI_TX(p) ((p) ? STM32_DMAC_CH5 : STM32_DMAC_CH3)
 
 /* RX uses COMP1 and TIM1_CH1 on port CHG and COMP2 and TIM3_CH1 for port DUT*/
-/* DUT RX use CMP1, TIM3_CH1, DMA_CH6 */
+/* DUT RX use CMP1, TIM3_CH1, DMA_CH4 */
 #define CMP1OUTSEL STM32_COMP_CMP1OUTSEL_TIM3_IC1
 /* CHG RX use CMP2, TIM1_CH1, DMA_CH2 */
 #define CMP2OUTSEL STM32_COMP_CMP2OUTSEL_TIM1_IC1
@@ -108,8 +108,8 @@ static inline void spi_enable_clock(int port)
 /* triggers packet detection on comparator falling edge */
 #define EXTI_XTSR STM32_EXTI_FTSR
 
-/* DMA for receive uses DMA_CH2 for CHG and DMA_CH6 for DUT */
-#define DMAC_TIM_RX(p) ((p) ? STM32_DMAC_CH6 : STM32_DMAC_CH2)
+/* DMA for receive uses DMA_CH2 for CHG and DMA_CH4 for DUT */
+#define DMAC_TIM_RX(p) ((p) ? STM32_DMAC_CH4 : STM32_DMAC_CH2)
 
 /*
  * For specific DUTs we need servo to be able to present 1.5A
