@@ -99,6 +99,34 @@ ZTEST_USER(charge_manager, test_available_current)
 		charge_manager_get_available_current(CHARGE_SUPPLIER_TYPEC, 0),
 		0);
 
+	/* Valid boundary suppliers (0 and CHARGE_SUPPLIER_COUNT - 1). */
+	charge.current = 500;
+	charge.voltage = 5000;
+	charge_manager_update_charge(CHARGE_SUPPLIER_PD, 0, &charge);
+	charge_manager_update_charge(CHARGE_SUPPLIER_COUNT - 1, 0, &charge);
+	zassert_equal(charge_manager_get_available_current(CHARGE_SUPPLIER_PD,
+							   0),
+		      500);
+	zassert_equal(charge_manager_get_available_current(
+			      CHARGE_SUPPLIER_COUNT - 1, 0),
+		      500);
+
+	charge.current = 0;
+	charge.voltage = 0;
+	charge_manager_update_charge(CHARGE_SUPPLIER_PD, 0, &charge);
+	charge_manager_update_charge(CHARGE_SUPPLIER_COUNT - 1, 0, &charge);
+	zassert_equal(
+		charge_manager_get_available_current(CHARGE_SUPPLIER_PD, 0), 0);
+	zassert_equal(charge_manager_get_available_current(
+			      CHARGE_SUPPLIER_COUNT - 1, 0),
+		      0);
+
+	/* Out-of-bounds supplier updates should be safely ignored. */
+	charge.current = 500;
+	charge.voltage = 5000;
+	charge_manager_update_charge(CHARGE_SUPPLIER_NONE, 0, &charge);
+	charge_manager_update_charge(CHARGE_SUPPLIER_COUNT, 0, &charge);
+
 	/* An invalid supplier or port has no current. */
 	zassert_equal(charge_manager_get_available_current(CHARGE_SUPPLIER_NONE,
 							   0),
