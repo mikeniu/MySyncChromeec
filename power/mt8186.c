@@ -354,6 +354,37 @@ enum power_state power_chipset_init(void)
 		exit_hard_off = 0;
 	}
 
+	/* ======== Workaround for PMIC stuck issue ======== */
+	/*
+	 * If reset by (ESC+Refresh+power button) but signal shows S0 while sigs
+	 * == 0, it means PMIC state machine froze before signals initialized.
+	 * Force exit_hard_off = 1 and correct init_state to POWER_S5 to trigger
+	 * chipset_force_shutdown() followed by auto power-on.
+	 */
+	else if (IS_ENABLED(CONFIG_PLATFORM_EC_PMIC_HANG_WORKAROUND) &&
+		 (system_get_reset_flags() & EC_RESET_FLAG_RESET_PIN) &&
+		 (init_state != POWER_S5)) {
+		CPRINTS("[PMIC STUCK DETECTED]"
+			"*** power state %d, Force REBOOT.",
+			init_state);
+
+		/* 1. Preserve the boot intent and automatically boot up after
+		 * discharging. */
+		exit_hard_off = 1;
+
+		/*
+		 * 2. Manually set init_state so the state machine initiates
+		 * from the S5 safe landing point.
+		 */
+		init_state = POWER_S5;
+
+		/*
+		 * 3. Explicitly invoke Force Shutdown, forcing the PMIC to
+		 * perform an 8-second power-off discharge!
+		 */
+		chipset_force_shutdown(CHIPSET_SHUTDOWN_INIT);
+	}
+
 	/* If the init signal state is at S5, assigns it to G3 to match the
 	 * default GPIO and PP4200_S5 rail states.
 	 */
