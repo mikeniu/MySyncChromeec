@@ -18,6 +18,23 @@
       "isAi": true,
       "revId": "087e09fd4d187112a9a12818822f95ae0d193bce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b0e62c6_e77f8c89",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T17:41:57Z",
+      "side": 1,
+      "message": "Looks like this fails on other boards. We can fix it with something like this: http://b/574030199",
+      "revId": "087e09fd4d187112a9a12818822f95ae0d193bce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
