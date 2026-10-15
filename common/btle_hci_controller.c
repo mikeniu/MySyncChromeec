@@ -570,18 +570,18 @@ static int command_ble_hci_adv(int argc, const char **argv)
 		return EC_ERROR_PARAM_COUNT;
 
 	adv = strtoi(argv[1], &e, 0);
-	if (*e || adv < 0 || adv > sizeof(adverts))
+	if (*e || adv < 0 || adv >= ARRAY_SIZE(adverts))
 		return EC_ERROR_PARAM1;
 
 	if (argc > 2) {
 		p = strtoi(argv[2], &e, 0);
-		if (*e || p < 0 || p > sizeof(adv_params))
+		if (*e || p < 0 || p >= ARRAY_SIZE(adv_params))
 			return EC_ERROR_PARAM2;
 	}
 
 	if (argc > 3) {
 		scan_rsp = strtoi(argv[3], &e, 0);
-		if (*e || scan_rsp < 0 || scan_rsp > sizeof(scans))
+		if (*e || scan_rsp < 0 || scan_rsp >= ARRAY_SIZE(scans))
 			return EC_ERROR_PARAM3;
 	}
 

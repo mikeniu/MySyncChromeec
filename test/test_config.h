@@ -55,6 +55,11 @@ enum battery_type {
 #define CONFIG_BACKLIGHT_REQ_GPIO GPIO_PCH_BKLTEN
 #endif
 
+#ifdef TEST_BTLE_HCI_CONTROLLER
+#define CONFIG_BLUETOOTH_LE
+#define CONFIG_BLUETOOTH_HCI_DEBUG
+#endif
+
 #ifdef TEST_CBI_WP
 #define CONFIG_EEPROM_CBI_WP
 #endif
