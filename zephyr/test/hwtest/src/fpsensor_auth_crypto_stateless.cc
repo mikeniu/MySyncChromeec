@@ -90,8 +90,7 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_create_ec_key_from_privkey)
 					 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 					 2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
 
-	bssl::UniquePtr<EC_KEY> key =
-		create_ec_key_from_privkey(data.data(), data.size());
+	bssl::UniquePtr<EC_KEY> key = create_ec_key_from_privkey(data);
 
 	zassert_not_equal(key.get(), nullptr);
 
@@ -100,10 +99,9 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_create_ec_key_from_privkey)
 
 ZTEST(fpsensor_auth_crypto_stateless, test_fp_create_ec_key_from_privkey_fail)
 {
-	std::array<uint8_t, 1> data = {};
+	std::array<uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> data = {};
 
-	bssl::UniquePtr<EC_KEY> key =
-		create_ec_key_from_privkey(data.data(), data.size());
+	bssl::UniquePtr<EC_KEY> key = create_ec_key_from_privkey(data);
 
 	zassert_equal(key.get(), nullptr);
 }
@@ -134,14 +132,14 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_generate_ecdh_shared_secret)
 					    2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
 
 	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(privkey.data(), privkey.size());
+		create_ec_key_from_privkey(privkey);
 
 	zassert_not_equal(private_key.get(), nullptr);
 
 	std::array<uint8_t, 32> shared_secret;
-	zassert_equal(generate_ecdh_shared_secret(*private_key, *public_key,
-						  shared_secret),
-		      EC_SUCCESS);
+	zassert_true(generate_ecdh_shared_secret(*private_key, *public_key,
+						 shared_secret)
+			     .has_value());
 
 	std::array<uint8_t, 32> expected_result = {
 		0x46, 0x86, 0xca, 0x75, 0xce, 0xa1, 0xde, 0x23,
@@ -181,14 +179,13 @@ ZTEST(fpsensor_auth_crypto_stateless,
 					    2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
 
 	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(privkey.data(), privkey.size());
+		create_ec_key_from_privkey(privkey);
 
 	zassert_not_equal(private_key.get(), nullptr);
 
-	std::array<uint8_t, 32> shared_secret;
-	zassert_equal(generate_ecdh_shared_secret_without_kdf(
-			      *private_key, *public_key, shared_secret),
-		      EC_SUCCESS);
+	const auto shared_secret = generate_ecdh_shared_secret_without_kdf(
+		*private_key, *public_key);
+	zassert_true(shared_secret.has_value());
 
 	std::array<uint8_t, 32> expected_result = {
 		0x4d, 0x1f, 0x52, 0x54, 0xf8, 0x75, 0xf1, 0xee,
@@ -197,8 +194,8 @@ ZTEST(fpsensor_auth_crypto_stateless,
 		0x40, 0x91, 0xaf, 0xe8, 0xdd, 0x07, 0x90, 0x18,
 	};
 
-	zassert_mem_equal(shared_secret.data(), expected_result.data(),
-			  shared_secret.size());
+	zassert_mem_equal(shared_secret->data(), expected_result.data(),
+			  shared_secret->size());
 }
 
 ZTEST(fpsensor_auth_crypto_stateless, test_fp_generate_session_key)
@@ -214,11 +211,9 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_generate_session_key)
 						1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 						2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
 
-	std::array<uint8_t, 32> gsc_session_key;
-
-	zassert_equal(generate_session_key(session_nonce, gsc_nonce,
-					   pairing_key, {}, gsc_session_key),
-		      EC_SUCCESS);
+	const auto gsc_session_key =
+		generate_session_key(session_nonce, gsc_nonce, pairing_key, {});
+	zassert_true(gsc_session_key.has_value());
 
 	std::array<uint8_t, 32> expected_gsc_session_key = {
 		0x50, 0x98, 0xde, 0xbd, 0x86, 0xb5, 0xc9, 0x2b,
@@ -227,9 +222,9 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_generate_session_key)
 		0x8c, 0x03, 0xa3, 0x2f, 0x39, 0x08, 0x02, 0x4b,
 	};
 
-	zassert_mem_equal(gsc_session_key.data(),
+	zassert_mem_equal(gsc_session_key->data(),
 			  expected_gsc_session_key.data(),
-			  gsc_session_key.size());
+			  gsc_session_key->size());
 }
 
 ZTEST(fpsensor_auth_crypto_stateless, test_fp_decrypt_data_with_session_key)
@@ -263,9 +258,9 @@ ZTEST(fpsensor_auth_crypto_stateless, test_fp_decrypt_data_with_session_key)
 
 	std::array<uint8_t, 32> output{};
 
-	zassert_equal(decrypt_data_with_session_key(session_key, input, output,
-						    nonce, tag, aad),
-		      EC_SUCCESS);
+	zassert_true(decrypt_data_with_session_key(session_key, input, output,
+						   nonce, tag, aad)
+			     .has_value());
 
 	std::array<uint8_t, 32> expected_output = { 0, 1, 2, 3, 4, 5, 6, 7,
 						    8, 9, 0, 1, 2, 3, 4, 5,
@@ -309,6 +304,7 @@ ZTEST(fpsensor_auth_crypto_stateless,
 	std::array<uint8_t, 31> output{};
 
 	zassert_equal(decrypt_data_with_session_key(session_key, input, output,
-						    nonce, tag, aad),
+						    nonce, tag, aad)
+			      .error(),
 		      EC_ERROR_OVERFLOW);
 }

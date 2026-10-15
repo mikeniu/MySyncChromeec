@@ -238,7 +238,6 @@ ZTEST(fpsensor_crypto, test_hmac_sha256)
 
 	for (const auto &test_vector : test_vectors) {
 		const auto &expected_result = test_vector.result;
-		std::array<uint8_t, SHA256_DIGEST_LENGTH> actual_result{};
 
 		std::vector<std::span<const uint8_t> > inputs(
 			test_vector.messages.size());
@@ -246,10 +245,9 @@ ZTEST(fpsensor_crypto, test_hmac_sha256)
 			inputs.emplace_back(message);
 		}
 
-		zassert_equal(hmac_sha256(test_vector.key, inputs,
-					  actual_result),
-			      EC_SUCCESS);
-		zassert_mem_equal(expected_result.data(), actual_result.data(),
+		const auto actual_result = hmac_sha256(test_vector.key, inputs);
+		zassert_true(actual_result.has_value());
+		zassert_mem_equal(expected_result.data(), actual_result->data(),
 				  expected_result.size());
 	}
 }
@@ -281,10 +279,9 @@ ZTEST(fpsensor_crypto, test_hmac_sha256_with_empty_spans)
 		message_span.subspan(3),
 	};
 
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> actual_result{};
-
-	zassert_equal(hmac_sha256(key, inputs, actual_result), EC_SUCCESS);
-	zassert_mem_equal(expected_result.data(), actual_result.data(),
+	const auto actual_result = hmac_sha256(key, inputs);
+	zassert_true(actual_result.has_value());
+	zassert_mem_equal(expected_result.data(), actual_result->data(),
 			  expected_result.size());
 }
 

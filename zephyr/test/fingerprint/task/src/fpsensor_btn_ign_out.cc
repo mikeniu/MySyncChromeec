@@ -33,16 +33,17 @@ ZTEST_SUITE(fpsensor_btn_ign, NULL, NULL, test_btn_ign_init, NULL, NULL);
 
 ZTEST(fpsensor_btn_ign, test_activate)
 {
-	fp_btn_ign_out::update(FP_MODE_MATCH);
+	fp_btn_ign_out::update(*FpSensorMode::create(FP_MODE_MATCH));
 	zassert_equal(btn_ign_get(), 1,
 		      "GPIO pin should be high after activation");
 }
 
 ZTEST(fpsensor_btn_ign, test_deactivate)
 {
-	fp_btn_ign_out::update(FP_MODE_MATCH | FP_MODE_ENROLL_SESSION);
+	fp_btn_ign_out::update(
+		*FpSensorMode::create(FP_MODE_MATCH | FP_MODE_ENROLL_SESSION));
 	k_sleep(K_MSEC(100));
-	fp_btn_ign_out::update(0);
+	fp_btn_ign_out::update(FpSensorMode{});
 
 	k_sleep(K_MSEC(1000));
 	zassert_equal(btn_ign_get(), 1, "GPIO should still be high");
@@ -54,19 +55,19 @@ ZTEST(fpsensor_btn_ign, test_deactivate)
 
 ZTEST(fpsensor_btn_ign, test_activate_deactivate_consecutive_calls)
 {
-	fp_btn_ign_out::update(FP_MODE_MATCH);
+	fp_btn_ign_out::update(*FpSensorMode::create(FP_MODE_MATCH));
 	zassert_equal(btn_ign_get(), 1,
 		      "GPIO should be high after first activate");
 
-	fp_btn_ign_out::update(0);
-	fp_btn_ign_out::update(FP_MODE_ENROLL_SESSION);
+	fp_btn_ign_out::update(FpSensorMode{});
+	fp_btn_ign_out::update(*FpSensorMode::create(FP_MODE_ENROLL_SESSION));
 
 	k_sleep(K_MSEC(2500));
 	zassert_equal(
 		btn_ign_get(), 1,
 		"GPIO should still be high due to cancelled deactivation");
 
-	fp_btn_ign_out::update(0);
+	fp_btn_ign_out::update(FpSensorMode{});
 	k_sleep(K_MSEC(2500));
 	zassert_equal(btn_ign_get(), 0,
 		      "GPIO should be low after final deactivation");
@@ -74,12 +75,12 @@ ZTEST(fpsensor_btn_ign, test_activate_deactivate_consecutive_calls)
 
 ZTEST(fpsensor_btn_ign, test_deactivate_multiple_calls)
 {
-	fp_btn_ign_out::update(FP_MODE_CAPTURE);
+	fp_btn_ign_out::update(*FpSensorMode::create(FP_MODE_CAPTURE));
 	zassert_equal(btn_ign_get(), 1, "GPIO should be high after activate");
 
-	fp_btn_ign_out::update(0);
+	fp_btn_ign_out::update(FpSensorMode{});
 	k_sleep(K_MSEC(1000));
-	fp_btn_ign_out::update(0);
+	fp_btn_ign_out::update(FpSensorMode{});
 
 	k_sleep(K_MSEC(1500));
 	zassert_equal(btn_ign_get(), 0,

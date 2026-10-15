@@ -7,8 +7,6 @@
 #include "fpsensor/fpsensor_utils.h"
 #include "overflow.h"
 
-#include <stdio.h>
-
 #include <cctype>
 #include <string>
 
@@ -56,12 +54,9 @@ bool skip_image_offset(enum fp_capture_type capture_type)
 
 const std::string fourcc_to_string(uint32_t value)
 {
-	std::string str(4, '.');
-	auto get_char = [&value](int index) {
+	auto get_char = [value](int index) -> char {
 		const unsigned char ch = (value >> (index * 8)) & 0xFF;
-		return std::isprint(ch) ? ch : '.';
+		return std::isprint(ch) ? static_cast<char>(ch) : '.';
 	};
-	snprintf(str.data(), str.size() + 1, "%c%c%c%c", get_char(0),
-		 get_char(1), get_char(2), get_char(3));
-	return str;
+	return { get_char(0), get_char(1), get_char(2), get_char(3) };
 }
