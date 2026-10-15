@@ -220,9 +220,7 @@ static int system_it8xxx2_hibernate_by_deep_doze(uint32_t seconds,
 	__asm__ volatile("wfi");
 
 	/* Reset EC when wake up from sleep mode (system hibernate) */
-	system_reset(SYSTEM_RESET_HIBERNATE);
-
-	return 0;
+	return cros_system_soc_reset();
 }
 
 #ifdef CONFIG_PLATFORM_EC_HIBERNATE_ELPM
@@ -348,11 +346,6 @@ int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 	 * being turn off entirely.
 	 */
 	if (board_hibernate_late) {
-		/*
-		 * Set reset flag in case board_hibernate_late() doesn't
-		 * return.
-		 */
-		chip_save_reset_flags(EC_RESET_FLAG_HIBERNATE);
 		board_hibernate_late();
 	}
 
