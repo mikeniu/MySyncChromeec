@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17c3356f_68d758aa",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-15T10:39:07Z",
+      "side": 1,
+      "message": "what\u0027s the sleep for? some hardware quirk? worth naming the constant or add a comment about it",
+      "revId": "c7db732804ef3893aa793782ed94260ab0989ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
