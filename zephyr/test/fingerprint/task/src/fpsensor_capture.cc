@@ -558,6 +558,84 @@ ZTEST_USER(fpsensor_capture,
 		      EC_RES_INVALID_PARAM);
 }
 
+ZTEST_USER(fpsensor_capture, test_finger_capture_pattern0_immediate_success)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_CAPTURE |
+			(FP_CAPTURE_PATTERN0 << FP_MODE_CAPTURE_TYPE_SHIFT),
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	uint32_t fp_events = 0;
+
+	/* Switch mode to PATTERN0 capture (does not require finger touch). */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+
+	/* Give opportunity for fpsensor task to acquire pattern0 immediately.
+	 */
+	k_msleep(1);
+
+	/* Confirm MKBP event was sent with EC_MKBP_FP_IMAGE_READY. */
+	zassert_equal(mkbp_send_event_fake.call_count, 1);
+	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	fp_get_next_event(reinterpret_cast<uint8_t *>(&fp_events));
+	zassert_true(fp_events & EC_MKBP_FP_IMAGE_READY);
+
+	/* Confirm that capture mode and capture type bits were cleared. */
+	params.mode = FP_MODE_DONT_CHANGE;
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_false(response.mode &
+		      (FP_MODE_CAPTURE | FP_MODE_CAPTURE_TYPE_MASK));
+	zassert_equal(global_context.current_capture_type, FP_CAPTURE_PATTERN0);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_equal(state.last_acquire_image_mode,
+		      FINGERPRINT_CAPTURE_TYPE_PATTERN0);
+}
+
+ZTEST_USER(fpsensor_capture, test_finger_capture_pattern0_immediate_failure)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_CAPTURE |
+			(FP_CAPTURE_PATTERN0 << FP_MODE_CAPTURE_TYPE_SHIFT),
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	uint32_t fp_events = 0;
+
+	fingerprint_get_state(fp_sim, &state);
+	state.acquire_image_result = FINGERPRINT_SENSOR_SCAN_TOO_FAST;
+	fingerprint_set_state(fp_sim, &state);
+
+	/* Switch mode to PATTERN0 capture when acquisition fails. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+
+	/* Give opportunity for fpsensor task to process mode. */
+	k_msleep(1);
+
+	/* Confirm MKBP event was sent and current_capture_type is invalid. */
+	zassert_equal(mkbp_send_event_fake.call_count, 1);
+	fp_get_next_event(reinterpret_cast<uint8_t *>(&fp_events));
+	zassert_true(fp_events & EC_MKBP_FP_IMAGE_READY);
+	zassert_equal(global_context.current_capture_type,
+		      FP_CAPTURE_TYPE_INVALID);
+}
+
+ZTEST_USER(fpsensor_capture, test_deepsleep_mode)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_DEEPSLEEP | FP_MODE_FINGER_DOWN,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	k_msleep(1);
+
+	fingerprint_get_state(fp_sim, &state);
+	zassert_true(state.low_power_mode);
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */

@@ -10,9 +10,21 @@
 
 #include "common.h"
 #include "ec_commands.h"
+#include "util.h"
 
 #include <cstdint>
+#include <optional>
+#include <span>
 #include <string>
+
+/**
+ * Return true if all bytes in |bytes| are 0x00 or all bytes are 0xff.
+ */
+[[nodiscard]] inline bool
+bytes_are_trivial(std::span<const uint8_t> bytes) noexcept
+{
+	return ::bytes_are_trivial(bytes.data(), bytes.size());
+}
 
 /**
  * Test that size+offset does not exceed buffer_size
@@ -24,6 +36,22 @@
  */
 enum ec_error_list validate_fp_buffer_offset(uint32_t buffer_size,
 					     uint32_t offset, uint32_t size);
+
+/**
+ * Return a bounds-checked subspan [offset, offset + size) of |buffer|, or
+ * std::nullopt if offset + size overflows or exceeds buffer.size().
+ */
+template <typename T, size_t Extent>
+[[nodiscard]] inline std::optional<std::span<T> >
+checked_subspan(std::span<T, Extent> buffer, uint32_t offset,
+		uint32_t size) noexcept
+{
+	if (validate_fp_buffer_offset(buffer.size(), offset, size) !=
+	    EC_SUCCESS) {
+		return std::nullopt;
+	}
+	return buffer.subspan(offset, size);
+}
 
 bool fp_match_success(int match_result);
 

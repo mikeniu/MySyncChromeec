@@ -105,6 +105,24 @@ int64_t timer_scheduled_at_ticks = 0;
 
 K_SEM_DEFINE(led_lock, 1, 1);
 
+class ScopedSemLock {
+    public:
+	explicit ScopedSemLock(struct k_sem &sem)
+		: sem_(sem)
+	{
+		k_sem_take(&sem_, K_FOREVER);
+	}
+	~ScopedSemLock()
+	{
+		k_sem_give(&sem_);
+	}
+	ScopedSemLock(const ScopedSemLock &) = delete;
+	ScopedSemLock &operator=(const ScopedSemLock &) = delete;
+
+    private:
+	struct k_sem &sem_;
+};
+
 bool ignore_off(Mode mode)
 {
 	return mode == Mode::OFF || mode == Mode::MATCH_OK ||
@@ -117,13 +135,12 @@ K_WORK_DELAYABLE_DEFINE(led_update_dwork, led_update_handler);
 
 void led_update_handler(struct k_work *work)
 {
-	k_sem_take(&led_lock, K_FOREVER);
+	ScopedSemLock lock(led_lock);
 	bool is_timer_expired = k_uptime_ticks() >= timer_scheduled_at_ticks;
 	if (is_timer_expired) {
 		led_mode = Mode::OFF;
 		set_led_brightness(BRIGHTNESS_OFF);
 	}
-	k_sem_give(&led_lock);
 }
 
 void set_led(uint8_t brightness)
@@ -155,65 +172,70 @@ void set_led_with_timeout(uint8_t brightness, int32_t delay_ms)
 
 void enroll()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	if (led_mode == Mode::ENROLL) {
-		k_sem_give(&led_lock);
-		return;
+	{
+		ScopedSemLock lock(led_lock);
+		if (led_mode == Mode::ENROLL) {
+			return;
+		}
+		led_mode = Mode::ENROLL;
+		set_led(BRIGHTNESS_ENROLL);
 	}
-	led_mode = Mode::ENROLL;
-	set_led(BRIGHTNESS_ENROLL);
-	k_sem_give(&led_lock);
 
 	LOG_INF("Fingerprint led enroll.");
 }
 
 void match()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	if (led_mode == Mode::MATCH) {
-		k_sem_give(&led_lock);
-		return;
+	{
+		ScopedSemLock lock(led_lock);
+		if (led_mode == Mode::MATCH) {
+			return;
+		}
+		led_mode = Mode::MATCH;
+		set_led_with_timeout(
+			BRIGHTNESS_MATCH,
+			CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS);
 	}
-	led_mode = Mode::MATCH;
-	set_led_with_timeout(BRIGHTNESS_MATCH,
-			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS);
-	k_sem_give(&led_lock);
 
 	LOG_INF("Fingerprint led match.");
 }
 
 void match_ok()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	led_mode = Mode::MATCH_OK;
-	set_led_with_timeout(BRIGHTNESS_MATCH_OK,
-			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_OK_MS);
-	k_sem_give(&led_lock);
+	{
+		ScopedSemLock lock(led_lock);
+		led_mode = Mode::MATCH_OK;
+		set_led_with_timeout(
+			BRIGHTNESS_MATCH_OK,
+			CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_OK_MS);
+	}
 
 	LOG_INF("Fingerprint led match OK.");
 }
 
 void match_nok()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	led_mode = Mode::MATCH_NOK;
-	set_led_with_timeout(BRIGHTNESS_MATCH_NOK,
-			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_NOK_MS);
-	k_sem_give(&led_lock);
+	{
+		ScopedSemLock lock(led_lock);
+		led_mode = Mode::MATCH_NOK;
+		set_led_with_timeout(
+			BRIGHTNESS_MATCH_NOK,
+			CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_NOK_MS);
+	}
 
 	LOG_INF("Fingerprint led match NOK.");
 }
 
 void off()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	if (ignore_off(led_mode)) {
-		k_sem_give(&led_lock);
-		return;
+	{
+		ScopedSemLock lock(led_lock);
+		if (ignore_off(led_mode)) {
+			return;
+		}
+		set_led(BRIGHTNESS_OFF);
+		led_mode = Mode::OFF;
 	}
-	set_led(BRIGHTNESS_OFF);
-	led_mode = Mode::OFF;
-	k_sem_give(&led_lock);
 
 	LOG_INF("Fingerprint led off.");
 }

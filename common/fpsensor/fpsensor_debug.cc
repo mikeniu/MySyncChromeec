@@ -16,6 +16,9 @@
 #include "util.h"
 #include "watchdog.h"
 
+#include <algorithm>
+#include <span>
+#include <string_view>
 #include <vector>
 
 #ifdef CONFIG_ZEPHYR
@@ -65,10 +68,10 @@
  *
  */
 test_export_static enum ec_error_list
-upload_pgm_image(uint8_t *frame,
+upload_pgm_image(std::span<const uint8_t> frame,
 		 const struct fp_image_frame_params_v2 &image_frame_params)
 {
-	uint8_t *ptr = frame;
+	const uint8_t *ptr = frame.data();
 	uint8_t bytes_per_pixel = DIV_ROUND_UP(image_frame_params.bpp, 8);
 
 	if (bytes_per_pixel != 1 && bytes_per_pixel != 2) {
@@ -88,9 +91,11 @@ upload_pgm_image(uint8_t *frame,
 		watchdog_reload();
 		for (int x = 0; x < image_frame_params.width;
 		     x++, ptr += bytes_per_pixel) {
-			CPRINTF("%d ", (bytes_per_pixel == 2) ?
-					       *(uint16_t *)ptr :
-					       *ptr);
+			CPRINTF("%d ",
+				(bytes_per_pixel == 2) ?
+					*reinterpret_cast<const uint16_t *>(
+						ptr) :
+					*ptr);
 		}
 		CPRINTF("\n");
 		cflush();
@@ -105,10 +110,7 @@ static enum ec_error_list fp_console_action(uint32_t mode)
 	if (!(global_context.sensor_mode & FP_MODE_RESET_SENSOR))
 		CPRINTS("Waiting for finger ...");
 
-	uint32_t mode_output = 0;
-	const int rc = fp_set_sensor_mode(mode, &mode_output, std::nullopt);
-
-	if (rc != EC_RES_SUCCESS) {
+	if (!fp_set_sensor_mode(mode).has_value()) {
 		/*
 		 * EC host command errors do not directly map to console command
 		 * errors.
@@ -186,8 +188,9 @@ static int command_fpcapture(int argc, const char **argv)
 				ret);
 			return ret;
 		}
-		return upload_pgm_image(fp_buffer + FP_SENSOR_IMAGE_OFFSET,
-					image_frame_params);
+		return upload_pgm_image(
+			std::span(fp_buffer).subspan(FP_SENSOR_IMAGE_OFFSET),
+			image_frame_params);
 	}
 
 	return rc;
@@ -212,16 +215,23 @@ static int command_fpupload(int argc, const char **argv)
 	int offset = atoi(argv[1]);
 	if (offset < 0)
 		return EC_ERROR_PARAM1;
-	uint8_t *dest = fp_buffer + FP_SENSOR_IMAGE_OFFSET + offset;
 
-	const char *pixels_str = argv[2];
-	while (*pixels_str) {
-		if (dest >= fp_buffer + FP_SENSOR_IMAGE_SIZE)
-			return EC_ERROR_PARAM1;
-		const char hex_str[] = { pixels_str[0], pixels_str[1], '\0' };
-		*dest = static_cast<uint8_t>(strtol(hex_str, nullptr, 16));
-		pixels_str += 2;
-		++dest;
+	std::string_view pixels_str(argv[2]);
+	auto image_dest = std::span(fp_buffer).subspan(FP_SENSOR_IMAGE_OFFSET);
+	auto dest = checked_subspan(image_dest, static_cast<uint32_t>(offset),
+				    DIV_ROUND_UP(pixels_str.size(), 2));
+	if (!dest.has_value())
+		return EC_ERROR_PARAM1;
+
+	for (uint8_t &byte : *dest) {
+		const char hex_str[] = {
+			pixels_str[0],
+			pixels_str.size() > 1 ? pixels_str[1] : '\0',
+			'\0',
+		};
+		byte = static_cast<uint8_t>(strtol(hex_str, nullptr, 16));
+		pixels_str.remove_prefix(
+			std::min<size_t>(2, pixels_str.size()));
 	}
 
 	return EC_SUCCESS;
@@ -250,8 +260,9 @@ static int command_fpdownload(int argc, const char **argv)
 		CPRINTF("Failed to get image frame params, error: %d\n", ret);
 		return ret;
 	}
-	return upload_pgm_image(fp_buffer + FP_SENSOR_IMAGE_OFFSET,
-				image_frame_params);
+	return upload_pgm_image(
+		std::span(fp_buffer).subspan(FP_SENSOR_IMAGE_OFFSET),
+		image_frame_params);
 }
 DECLARE_CONSOLE_COMMAND(fpdownload, command_fpdownload, nullptr,
 			"Copy fp image from fpmcu fpsensor buffer");
@@ -394,11 +405,7 @@ DECLARE_CONSOLE_COMMAND(fpclear, command_fpclear, nullptr,
 static int command_fpmaintenance(int argc, const char **argv)
 {
 #ifdef HAVE_FP_PRIVATE_DRIVER
-	uint32_t mode_output = 0;
-	const int rc = fp_set_sensor_mode(FP_MODE_SENSOR_MAINTENANCE,
-					  &mode_output, std::nullopt);
-
-	if (rc != EC_RES_SUCCESS) {
+	if (!fp_set_sensor_mode(FP_MODE_SENSOR_MAINTENANCE).has_value()) {
 		/*
 		 * EC host command errors do not directly map to console command
 		 * errors.

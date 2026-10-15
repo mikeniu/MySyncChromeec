@@ -46,8 +46,8 @@ create_ec_key_from_pubkey(const fp_elliptic_curve_public_key &pubkey);
  * @return @p EC_KEY on success
  * @return nullptr on error
  */
-bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(const uint8_t *privkey,
-						   size_t privkey_size);
+bssl::UniquePtr<EC_KEY>
+create_ec_key_from_privkey(std::span<const uint8_t> privkey);
 
 /**
  * Encrypt the data with a specific version of encryption method and output

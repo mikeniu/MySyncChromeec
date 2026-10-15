@@ -75,8 +75,8 @@ create_ec_key_from_pubkey(const fp_elliptic_curve_public_key &pubkey)
 	return key;
 }
 
-bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(const uint8_t *privkey,
-						   size_t privkey_size)
+bssl::UniquePtr<EC_KEY>
+create_ec_key_from_privkey(std::span<const uint8_t> privkey)
 {
 	bssl::UniquePtr<EC_KEY> key(
 		EC_KEY_new_by_curve_name(NID_X9_62_prime256v1));
@@ -84,7 +84,7 @@ bssl::UniquePtr<EC_KEY> create_ec_key_from_privkey(const uint8_t *privkey,
 		return nullptr;
 	}
 
-	if (EC_KEY_oct2priv(key.get(), privkey, privkey_size) != 1) {
+	if (EC_KEY_oct2priv(key.get(), privkey.data(), privkey.size()) != 1) {
 		return nullptr;
 	}
 

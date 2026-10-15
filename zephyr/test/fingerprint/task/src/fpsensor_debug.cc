@@ -185,21 +185,18 @@ ZTEST(fpsensor_debug, test_command_fpenroll)
 }
 
 enum ec_error_list
-upload_pgm_image(uint8_t *frame,
+upload_pgm_image(std::span<const uint8_t> frame,
 		 const struct fp_image_frame_params_v2 &image_frame_params);
 
 ZTEST(fpsensor_debug, test_upload_pgm_image_wrong_bpp)
 {
 	std::array<uint8_t, 100> frame{};
 
-	zassert_equal(upload_pgm_image(frame.data(), { .bpp = 0 }),
-		      EC_ERROR_UNKNOWN);
+	zassert_equal(upload_pgm_image(frame, { .bpp = 0 }), EC_ERROR_UNKNOWN);
 
-	zassert_equal(upload_pgm_image(frame.data(), { .bpp = 17 }),
-		      EC_ERROR_UNKNOWN);
+	zassert_equal(upload_pgm_image(frame, { .bpp = 17 }), EC_ERROR_UNKNOWN);
 
-	zassert_equal(upload_pgm_image(frame.data(), { .bpp = 23 }),
-		      EC_ERROR_UNKNOWN);
+	zassert_equal(upload_pgm_image(frame, { .bpp = 23 }), EC_ERROR_UNKNOWN);
 }
 
 ZTEST(fpsensor_debug, test_get_image_frame_params)

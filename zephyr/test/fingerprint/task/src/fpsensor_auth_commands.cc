@@ -1245,7 +1245,8 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_success)
 	set_test_fp_context();
 
 	global_context.templ_valid = 1;
-	global_context.template_newly_enrolled = global_context.templ_valid;
+	global_context.template_newly_enrolled =
+		FpTemplateId::create(global_context.templ_valid);
 
 	generate_and_sign_challenge(session_key, kTestUserId,
 				    kSenderFingerGuard, kOpEnrollFinish,
@@ -1268,7 +1269,8 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_invalid_signature)
 	set_test_fp_context();
 
 	global_context.templ_valid = 1;
-	global_context.template_newly_enrolled = global_context.templ_valid;
+	global_context.template_newly_enrolled =
+		FpTemplateId::create(global_context.templ_valid);
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_GENERATE_CHALLENGE, 0,
 					     nullptr, 0, &challenge_response,
@@ -1291,7 +1293,7 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_state_mismatch)
 	set_test_fp_context();
 
 	global_context.templ_valid = 1;
-	global_context.template_newly_enrolled = 0;
+	global_context.template_newly_enrolled = FpTemplateId::create(0);
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_CONFIRM_TEMPLATE, 0,
 					     &params, sizeof(params), nullptr,
@@ -1314,8 +1316,8 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_success)
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.positive_match_secret_state.template_matched = 0;
-	global_context.positive_match_secret_state.readable = true;
+	global_context.positive_match_secret_state.enable(
+		*FpTemplateId::create(0));
 	global_context.positive_match_secret_state.deadline.val =
 		get_time().val + 5 * USEC_PER_SEC;
 
@@ -1341,8 +1343,7 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_no_match)
 	zassert_equal(establish_session(), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.positive_match_secret_state.template_matched =
-		FP_NO_SUCH_TEMPLATE;
+	global_context.positive_match_secret_state.disable();
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
 					     sizeof(params), &response,
@@ -1358,8 +1359,8 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_deadline_passed)
 	zassert_equal(establish_session(), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.positive_match_secret_state.template_matched = 0;
-	global_context.positive_match_secret_state.readable = true;
+	global_context.positive_match_secret_state.enable(
+		*FpTemplateId::create(0));
 	global_context.positive_match_secret_state.deadline.val =
 		get_time().val - 1;
 
@@ -1402,8 +1403,8 @@ ZTEST(fpsensor_auth_commands, test_fp_reset_does_not_clear_session)
 		     FP_CONTEXT_STATUS_SESSION_ESTABLISHED);
 
 	std::ranges::copy(kTestUserId, global_context.user_id.begin());
-	global_context.positive_match_secret_state.template_matched = 0;
-	global_context.positive_match_secret_state.readable = true;
+	global_context.positive_match_secret_state.enable(
+		*FpTemplateId::create(0));
 	global_context.positive_match_secret_state.deadline.val =
 		get_time().val + 5 * USEC_PER_SEC;
 
@@ -1708,6 +1709,32 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_tag)
 		      EC_RES_UNAVAILABLE);
 
 	zassert_equal(global_context.templ_valid, 0u);
+}
+
+ZTEST(fpsensor_auth_commands, test_fp_info_and_frame_host_cmd_handlers)
+{
+	constexpr size_t info_buf_size =
+		sizeof(ec_response_fp_info_v3) +
+		sizeof(fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
+	std::array<uint8_t, info_buf_size> info_buf{};
+	auto *info_resp =
+		reinterpret_cast<ec_response_fp_info_v3 *>(info_buf.data());
+
+	zassert_ok(ec_cmd_fp_info_v3(nullptr, info_resp, info_buf.size()));
+
+	ec_params_fp_frame frame_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 0,
+	};
+	zassert_equal(ec_cmd_fp_frame(nullptr, &frame_v0, info_buf.data()),
+		      EC_HOST_CMD_UNAVAILABLE);
+
+	ec_params_fp_frame_v1 frame_v1 = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+	zassert_equal(ec_cmd_fp_frame_v1(nullptr, &frame_v1, nullptr),
+		      EC_HOST_CMD_UNAVAILABLE);
 }
 
 } // namespace

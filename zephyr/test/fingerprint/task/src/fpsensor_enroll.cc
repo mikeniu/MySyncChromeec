@@ -578,6 +578,87 @@ ZTEST_USER(fpsensor_enroll, test_enroll_max_capacity_reached)
 		      "Algorithm enrollment state should be aborted");
 }
 
+ZTEST_USER(fpsensor_enroll, test_enroll_warning_when_previous_template_unread)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	uint32_t fp_events = 0;
+
+	/* Simulate a previously enrolled template that has not been read yet.
+	 */
+	global_context.template_newly_enrolled = FpTemplateId::create(0);
+
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	k_msleep(1);
+
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	memset(image_buffer, 1, IMAGE_SIZE);
+	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
+
+	enroll_percent = 50;
+	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
+
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+
+	fp_get_next_event(reinterpret_cast<uint8_t *>(&fp_events));
+	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
+	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), 0);
+	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
+}
+
+ZTEST_USER(fpsensor_enroll,
+	   test_enroll_step_finish_with_fingerprint_auth_enabled)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	uint32_t fp_events = 0;
+
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	k_msleep(1);
+
+	/* Enable Fingerprint Auth session before enrollment finishes. */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	memset(image_buffer, 1, IMAGE_SIZE);
+	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
+
+	enroll_percent = 100;
+	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
+
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+
+	fp_get_next_event(reinterpret_cast<uint8_t *>(&fp_events));
+	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
+	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), 0);
+	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), 100);
+	zassert_true(global_context.template_newly_enrolled ==
+		     FpTemplateId::create(0));
+	/*
+	 * When fingerprint_auth_enabled() is true, templ_valid is not
+	 * incremented until EC_CMD_FP_CONFIRM_TEMPLATE is called.
+	 */
+	zassert_equal(global_context.templ_valid, 0);
+
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */

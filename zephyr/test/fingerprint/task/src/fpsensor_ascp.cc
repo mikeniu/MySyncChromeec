@@ -14,6 +14,7 @@
 #include <zephyr/ztest.h>
 
 #include <algorithm>
+#include <array>
 extern "C" {
 #include <ascp/ascp.h>
 }
@@ -89,8 +90,7 @@ ZTEST(hc_fp_ascp, test_fp_ascp_establish_ok)
 	bssl::UniquePtr<EC_KEY> public_key = create_ec_key_from_pubkey(
 		*reinterpret_cast<const fp_elliptic_curve_public_key *>(
 			&pk_f[1]));
-	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(sk_g.data(), sk_g.size());
+	bssl::UniquePtr<EC_KEY> private_key = create_ec_key_from_privkey(sk_g);
 	zassert_not_equal(public_key, nullptr);
 	zassert_not_equal(private_key, nullptr);
 

@@ -9,7 +9,41 @@
 
 #include <stddef.h>
 
+#include <span>
 #include <vector>
+
+namespace
+{
+
+bool validate_frame_param(const fp_image_frame_params_v2 &param,
+			  uint32_t max_frame_size_bytes,
+			  size_t max_capture_types)
+{
+	const uint8_t type = param.fp_capture_type;
+	const uint32_t size = param.frame_size;
+
+	if (size > max_frame_size_bytes) {
+		CPRINTS("Error: Type %u frame size (%u) exceeds max allowed (%u).",
+			type, size, max_frame_size_bytes);
+		return false;
+	}
+
+	if (type >= max_capture_types) {
+		CPRINTS("ERROR: Invalid fp_capture_type %u received from EC, max "
+			"supported is %zu.",
+			type, max_capture_types);
+		return false;
+	}
+
+	if (size == 0) {
+		CPRINTS("ERROR: Invalid 0 size for capture type %u.", type);
+		return false;
+	}
+
+	return true;
+}
+
+} /* namespace */
 
 void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 {
@@ -34,42 +68,19 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 		return;
 	}
 
-	auto *params = info->image_frame_params;
-
-	for (uint8_t i = 0; i < num_types; ++i) {
-		const uint8_t type = params[i].fp_capture_type;
-		const uint32_t size = params[i].frame_size;
-
-		if (size > max_frame_size_bytes) {
-			CPRINTS("Error: Type %u frame size (%u) exceeds max allowed (%u).",
-				type, size, max_frame_size_bytes);
-			goto error_exit;
+	for (const auto &param :
+	     std::span(info->image_frame_params, num_types)) {
+		if (!validate_frame_param(param, max_frame_size_bytes,
+					  frame_params_.size())) {
+			/* Invalidate cache. */
+			frame_params_.fill({});
+			return;
 		}
 
-		if (type >= frame_params_.size()) {
-			CPRINTS("ERROR: Invalid fp_capture_type %u received from EC, max "
-				"supported is %zu.",
-				type, frame_params_.size());
-			goto error_exit;
-		}
-
-		if (size == 0) {
-			CPRINTS("ERROR: Invalid 0 size for capture type %u.",
-				type);
-			goto error_exit;
-		}
-
-		frame_params_[type] = {
-			.frame_size_bytes = size,
+		frame_params_[param.fp_capture_type] = {
+			.frame_size_bytes = param.frame_size,
 		};
 	}
-
-	return;
-
-error_exit:
-	/* Invalidate cache. */
-	frame_params_.fill({});
-	return;
 }
 
 uint32_t
