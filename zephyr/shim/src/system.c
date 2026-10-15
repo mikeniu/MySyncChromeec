@@ -16,9 +16,13 @@
 #include <drivers/cros_system.h>
 
 /* 2 second delay for waiting the H1 reset */
+#ifdef CONFIG_BOARD_RESET_AFTER_POWER_ON
 #define WAIT_RESET_TIME                                     \
 	(CONFIG_PLATFORM_EC_PREINIT_HW_CYCLES_PER_SEC * 2 / \
 	 CONFIG_PLATFORM_EC_WAIT_RESET_CYCLES_PER_ITERATION)
+#else
+#define WAIT_RESET_TIME 0
+#endif
 
 LOG_MODULE_REGISTER(shim_system, LOG_LEVEL_ERR);
 
@@ -324,6 +328,7 @@ static int check_reset_cause(void)
 		 * for EC but not for H1, so do not wait for the second reset.
 		 */
 		if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
+		    IS_ENABLED(CONFIG_CROS_EC_RO) &&
 		    ((system_flags & EC_RESET_FLAG_HIBERNATE) == 0)) {
 			system_flags |= EC_RESET_FLAG_INITIAL_PWR;
 			chip_flags |= EC_RESET_FLAG_INITIAL_PWR;
@@ -415,17 +420,26 @@ test_export_static int system_preinitialize(void)
 	 * previous power-on, and treat the second reset as a power-on instead
 	 * of a reset.
 	 */
-#ifdef CONFIG_BOARD_RESET_AFTER_POWER_ON
-	if (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR) {
+	if (IS_ENABLED(CONFIG_BOARD_RESET_AFTER_POWER_ON) &&
+	    (system_get_reset_flags() & EC_RESET_FLAG_INITIAL_PWR)) {
+		if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
+			/*
+			 * The current initial stage couldn't use the kernel
+			 * delay function. Use CPU nop instruction to wait for
+			 * the external reset from H1.
+			 */
+			for (uint32_t i = WAIT_RESET_TIME; i; i--)
+				arch_nop();
+		}
 		/*
-		 * The current initial stage couldn't use the kernel delay
-		 * function. Use CPU nop instruction to wait for the external
-		 * reset from H1.
+		 * H1 is expected to reset the EC during the wait loop above.
+		 * If the wait timed out without a reset, clear the flag from
+		 * BBRAM so it does not persist across subsequent reboots.
 		 */
-		for (uint32_t i = WAIT_RESET_TIME; i; i--)
-			arch_nop();
+		system_clear_reset_flags(EC_RESET_FLAG_INITIAL_PWR);
+		chip_save_reset_flags(chip_read_reset_flags() &
+				      ~EC_RESET_FLAG_INITIAL_PWR);
 	}
-#endif
 	system_common_pre_init();
 	return 0;
 }
