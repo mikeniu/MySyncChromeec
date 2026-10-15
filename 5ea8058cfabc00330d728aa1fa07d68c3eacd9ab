@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2f9c907_9b8fc959",
+        "filename": "util/flash/ite_flasher.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-15T19:30:11Z",
+      "side": 1,
+      "message": "In `prepare_dut()`, `c2d2` uses `gsc_ec_reset` instead of `cold_reset` to reset the EC (line 254). Should we also check for `c2d2` here and pulse `gsc_ec_reset` to ensure the EC reboots properly? Or just always use gsc_ec_reset and never use cold_reset?\n\n```python\n        controller \u003d self._get_controller()\n        if controller \u003d\u003d \"ccd\":\n            logger.info(\"Deasserting sysrst on CCD...\")\n            # ...\n        elif controller \u003d\u003d \"c2d2\":\n            self.servo.set_many([(\"gsc_ec_reset\", \"on\"), (\"gsc_ec_reset\", \"off\")])\n        else:\n            self.servo.set_many([(\"cold_reset\", \"on\"), (\"cold_reset\", \"off\")])\n```",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 0
+      },
+      "revId": "5ea8058cfabc00330d728aa1fa07d68c3eacd9ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
