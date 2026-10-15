@@ -147,6 +147,11 @@ static void push_fifo_data(struct motion_sensor_t *main_s, uint8_t *fifo,
 	 */
 	ptr = fifo + LSM6DSO_TAG_SIZE;
 	tag = (*fifo >> 3) - LSM6DSO_GYRO_TAG;
+	if (tag >= ARRAY_SIZE(ag_maps)) {
+		CPRINTS("%s Unexpected FIFO tag: 0x%02x", main_s->name,
+			*fifo >> 3);
+		return;
+	}
 	id = ag_maps[tag];
 
 	/* Discard samples every ODR changes. */
