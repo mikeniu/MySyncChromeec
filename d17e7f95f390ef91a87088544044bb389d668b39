@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f78b162d_7d917a1d",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1658,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-15T23:39:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "225552dc_1e29cbc0",
+      "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e924cf40_113fca76",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Moving `tc_detached()` to the `attached_*_exit` functions and `restart_tc_sm()` runs into two issues:\n\n1. `ctx-\u003ecurrent` has not updated yet in exit functions: `set_state()` calls exit functions before updating `ctx-\u003ecurrent \u003d new_state`. When `tc_detached()` fires `HOOK_USB_PD_DISCONNECT` from `tc_attached_*_exit()`, `pd_is_disconnected(port)` is still false.\n2. Not all non-PRS exits from Attached.SRC / CTAttached.SNK are port detaches: Transitions to `CTUnattached.SNK` are not power role swaps, but the CTVPD remains attached to the port until `CTUnattached.SNK` -\u003e `Unattached.SNK`.",
       "parentUuid": "e924cf40_113fca76",
+      "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "235b20ee_e7e6d778",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 2177,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-15T23:39:50Z",
+      "side": 1,
+      "message": "Ack. Would it work to have something like `tc_state_is_attached(get_last_state_tc())`? That would obviate the flag. Or can you get to a state where you need to detach without coming directly from a restart or from one of the attached states where you set the flag here?",
+      "parentUuid": "23863890_e412c60a",
       "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
