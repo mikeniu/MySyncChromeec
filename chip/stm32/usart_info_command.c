@@ -21,9 +21,13 @@ static int command_usart_info(int argc, const char **argv)
 
 		ccprintf("USART%d\n"
 			 "    dropped %u bytes\n"
-			 "    overran %u times\n",
+			 "    overran %u times\n"
+			 "    framing errors %u\n"
+			 "    noise errors %u\n",
 			 config->hw->index + 1, config->state->rx_dropped,
-			 config->state->rx_overrun);
+			 config->state->rx_overrun,
+			 config->state->rx_framing_error,
+			 config->state->rx_noise_error);
 
 		if (config->rx->info)
 			config->rx->info(config);

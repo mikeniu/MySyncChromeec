@@ -82,6 +82,8 @@ void usart_init(struct usart_config const *config)
 	 */
 	config->state->rx_overrun = 0;
 	config->state->rx_dropped = 0;
+	config->state->rx_framing_error = 0;
+	config->state->rx_noise_error = 0;
 
 	/*
 	 * Enable the USART, this must be done last since most of the
