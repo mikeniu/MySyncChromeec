@@ -49,7 +49,7 @@ static bool body_detect_enable = IS_ENABLED(CONFIG_BODY_DETECTION);
 static bool body_detect_initialized;
 static bool body_detect_rate_is_set;
 static int inactivity_cnt;
-STATIC_IF(CONFIG_ACCEL_SPOOF_MODE) bool spoof_enable;
+extern bool spoof_enable;
 
 /* Depends on body_detect_common.c */
 extern uint64_t onbody_lasttime;
