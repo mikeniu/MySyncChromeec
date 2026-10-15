@@ -262,6 +262,13 @@ config PLATFORM_EC_POWERSEQ_MT8189
 	  Use the MT8189 code for power sequencing. Re-use MT8186 common
 	  code.
 
+config PLATFORM_EC_PMIC_HANG_WORKAROUND
+	bool "Enable PMIC workaround for MT8189"
+	depends on PLATFORM_EC_POWERSEQ_MT8189
+	help
+	 The PMIC sometimes will hang after EC reset, add the workaround
+	 to avoid the boot fail issue.
+
 config PLATFORM_EC_POWERSEQ_MT8196
 	bool "Use common MT8196 code for power sequencing"
 	default y
