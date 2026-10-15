@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f402d84a_04a6ece7",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:14:54Z",
+      "side": 1,
+      "message": "Done, it uses truthiness now (for verify too).",
+      "parentUuid": "c4444cdf_12993466",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 0
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbb651d1_1cc756c8",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-14T20:18:09Z",
       "side": 1,
       "message": "elif rw_only and ro_only: raise?",
+      "range": {
+        "startLine": 210,
+        "startChar": 12,
+        "endLine": 210,
+        "endChar": 40
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "787669aa_9513500d",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:14:54Z",
+      "side": 1,
+      "message": "Done. --ro and --rw are now a mutually exclusive argparse group, so the flasher can\u0027t get both.",
+      "parentUuid": "fbb651d1_1cc756c8",
       "range": {
         "startLine": 210,
         "startChar": 12,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7410b15a_106347df",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:14:54Z",
+      "side": 1,
+      "message": "Done. get_writable_ranges() now raises if a requested region isn\u0027t in the image FMAP, so --ro/--rw and the CCD case (WP_RO + EC_RW, like flash_ec\u0027s -i EC_RW -i WP_RO) error out instead of silently writing the whole chip. I also matched flash_ec\u0027s CCD condition (Raiden and not servo_micro), so servo_micro takes the normal path. Without --ro/--rw and off CCD, target_regions\u003dNone is the normal whole-image write (minus preserved sections), so that path doesn\u0027t raise.",
+      "parentUuid": "a3dc33b3_29e7114c",
+      "range": {
+        "startLine": 212,
+        "startChar": 12,
+        "endLine": 213,
+        "endChar": 51
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d6700cf_1ca998b7",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-10-14T20:18:09Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: This test is named `test_parse_args_defaults`, but it now explicitly passes `--ro`. It would be better to keep this test for actual defaults and add a separate test for the new flags.",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 0
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5183074_82a55e58",
+        "filename": "util/flash/tests/test_servo_and_cli.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:14:54Z",
+      "side": 1,
+      "message": "Done. test_parse_args_defaults checks the real defaults again, and test_parse_args_region_flags covers --ro/--rw.",
+      "parentUuid": "4d6700cf_1ca998b7",
       "range": {
         "startLine": 85,
         "startChar": 0,
