@@ -294,12 +294,17 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 
 	ctrl_reg = LSM6DSO_RANGE_REG(s->type);
 	if (s->type == MOTIONSENSE_TYPE_ACCEL) {
+		newrange = CLAMP(newrange, LSM6DSO_ACCEL_FS_MIN_VAL,
+				 LSM6DSO_ACCEL_FS_MAX_VAL);
+
 		/* Adjust and check rounded value for Acc. */
-		if (rnd && (newrange < LSM6DSO_ACCEL_NORMALIZE_FS(newrange)))
+		if (rnd && (newrange > LSM6DSO_ACCEL_NORMALIZE_FS(newrange)))
 			newrange *= 2;
 
 		if (newrange > LSM6DSO_ACCEL_FS_MAX_VAL)
 			newrange = LSM6DSO_ACCEL_FS_MAX_VAL;
+		else
+			newrange = LSM6DSO_ACCEL_NORMALIZE_FS(newrange);
 
 		reg_val = lsm6dso_accel_fs_reg(newrange);
 	} else {
@@ -321,7 +326,7 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 
 	mutex_unlock(s->mutex);
 
-	return EC_SUCCESS;
+	return err;
 }
 
 /**

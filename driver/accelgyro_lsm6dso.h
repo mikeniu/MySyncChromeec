@@ -116,6 +116,7 @@ struct lsm6dso_fstatus {
 #define LSM6DSO_ACCEL_FS_8G_VAL 0x03
 #define LSM6DSO_ACCEL_FS_16G_VAL 0x01
 
+#define LSM6DSO_ACCEL_FS_MIN_VAL 2
 #define LSM6DSO_ACCEL_FS_MAX_VAL 16
 
 /* Accel reg value from Full Scale range */
