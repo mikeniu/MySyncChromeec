@@ -2400,3 +2400,12 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./rt3645/imvp.dts
+  drivers.pchg:
+    tags:
+    - peripheral_charger
+    timeout: 360
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_PCHG=y
+    extra_conf_files:
+    - prj.conf
+    - pchg/prj.conf
