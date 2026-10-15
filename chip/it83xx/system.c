@@ -36,6 +36,10 @@ void system_hibernate(uint32_t seconds, uint32_t microseconds)
 	if (board_hibernate)
 		board_hibernate();
 
+	/* Save 'wake-up from hibernate' reset flag */
+	chip_save_reset_flags(chip_read_reset_flags() |
+			      EC_RESET_FLAG_HIBERNATE);
+
 	/* chip specific standby mode */
 	__enter_hibernate(seconds, microseconds);
 }
@@ -336,7 +340,7 @@ void system_reset(int flags)
 	system_encode_save_flags(flags, &save_flags);
 
 	if (clock_ec_wake_from_sleep())
-		save_flags |= EC_RESET_FLAG_HIBERNATE;
+		save_flags |= chip_read_reset_flags() | EC_RESET_FLAG_HIBERNATE;
 
 	/* Store flags to battery backed RAM. */
 	chip_save_reset_flags(save_flags);
