@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71051303_602de1ef",
+        "filename": "util/flash_ec",
+        "patchSetId": 4
+      },
+      "lineNbr": 798,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:09:42Z",
+      "side": 1,
+      "message": "Thanks, I dropped the BASEBOARD check from the G1 fallback (see below).",
+      "parentUuid": "beeda6e3_72eea129",
+      "range": {
+        "startLine": 784,
+        "startChar": 0,
+        "endLine": 798,
+        "endChar": 2
+      },
+      "revId": "13d18ca05574e0f1682c5becc48b3a086990018d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2866b012_086b31c3",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff464d24_c25417e7",
+        "filename": "util/flash_ec",
+        "patchSetId": 4
+      },
+      "lineNbr": 1619,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:09:42Z",
+      "side": 1,
+      "message": "Done, removed the cr50_uart_cmd fallback.",
+      "parentUuid": "2866b012_086b31c3",
+      "range": {
+        "startLine": 1619,
+        "startChar": 23,
+        "endLine": 1619,
+        "endChar": 36
+      },
+      "revId": "13d18ca05574e0f1682c5becc48b3a086990018d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff061731_548058b5",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-14T23:07:06Z",
       "side": 1,
       "message": "Baseboard will never be \u003d\u003d corsola, see above.",
+      "range": {
+        "startLine": 1773,
+        "startChar": 10,
+        "endLine": 1773,
+        "endChar": 37
+      },
+      "revId": "13d18ca05574e0f1682c5becc48b3a086990018d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fbb4b95_34b1d33d",
+        "filename": "util/flash_ec",
+        "patchSetId": 4
+      },
+      "lineNbr": 1773,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:09:42Z",
+      "side": 1,
+      "message": "Done, the G1 fallback only checks BOARD now.",
+      "parentUuid": "ff061731_548058b5",
       "range": {
         "startLine": 1773,
         "startChar": 10,
