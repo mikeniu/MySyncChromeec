@@ -315,12 +315,23 @@ void dma_enable_tc_interrupt_callback(enum dma_channel channel,
 void dma_disable_tc_interrupt(enum dma_channel channel)
 {
 	stm32_dma_chan_t *chan = dma_get_channel(channel);
+	int irq = dma_get_irq(channel);
+	int i;
+	bool keep_irq = 0;
 
 	chan->ccr &= ~STM32_DMA_CCR_TCIE;
-	task_disable_irq(dma_get_irq(channel));
 
 	dma_irq[channel].cb = NULL;
 	dma_irq[channel].cb_data = NULL;
+
+	for (i = 0; i < STM32_DMAC_COUNT; i++) {
+		if (dma_irq[i].cb != NULL && dma_get_irq(i) == irq) {
+			keep_irq = 1;
+			break;
+		}
+	}
+	if (!keep_irq)
+		task_disable_irq(irq);
 }
 
 void dma_clear_isr(enum dma_channel channel)
@@ -334,11 +345,10 @@ void dma_clear_isr(enum dma_channel channel)
 #ifdef CHIP_FAMILY_STM32F0
 static void dma_event_interrupt_channel_1(void)
 {
-	if (STM32_DMA1_REGS->isr & STM32_DMA_ISR_TCIF(STM32_DMAC_CH1)) {
+	if (dma_irq[STM32_DMAC_CH1].cb != NULL &&
+	    (STM32_DMA1_REGS->isr & STM32_DMA_ISR_TCIF(STM32_DMAC_CH1))) {
 		dma_clear_isr(STM32_DMAC_CH1);
-		if (dma_irq[STM32_DMAC_CH1].cb != NULL)
-			(*dma_irq[STM32_DMAC_CH1].cb)(
-				dma_irq[STM32_DMAC_CH1].cb_data);
+		(*dma_irq[STM32_DMAC_CH1].cb)(dma_irq[STM32_DMAC_CH1].cb_data);
 	}
 }
 DECLARE_IRQ(STM32_IRQ_DMA_CHANNEL_1, dma_event_interrupt_channel_1, 1);
@@ -348,10 +358,10 @@ static void dma_event_interrupt_channel_2_3(void)
 	int i;
 
 	for (i = STM32_DMAC_CH2; i <= STM32_DMAC_CH3; i++) {
-		if (STM32_DMA1_REGS->isr & STM32_DMA_ISR_TCIF(i)) {
+		if (dma_irq[i].cb != NULL &&
+		    (STM32_DMA1_REGS->isr & STM32_DMA_ISR_TCIF(i))) {
 			dma_clear_isr(i);
-			if (dma_irq[i].cb != NULL)
-				(*dma_irq[i].cb)(dma_irq[i].cb_data);
+			(*dma_irq[i].cb)(dma_irq[i].cb_data);
 		}
 	}
 }
@@ -360,11 +370,12 @@ DECLARE_IRQ(STM32_IRQ_DMA_CHANNEL_2_3, dma_event_interrupt_channel_2_3, 1);
 static void dma_event_interrupt_channel_4_7(void)
 {
 	int i;
+
 	for (i = STM32_DMAC_CH4; i < STM32_DMAC_COUNT; i++) {
-		if (STM32_DMA1_REGS->isr & STM32_DMA_ISR_TCIF(i)) {
+		if (dma_irq[i].cb != NULL &&
+		    (STM32_DMA1_REGS->isr & STM32_DMA_ISR_TCIF(i))) {
 			dma_clear_isr(i);
-			if (dma_irq[i].cb != NULL)
-				(*dma_irq[i].cb)(dma_irq[i].cb_data);
+			(*dma_irq[i].cb)(dma_irq[i].cb_data);
 		}
 	}
 }
