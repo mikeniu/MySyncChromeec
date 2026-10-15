@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c3be640_40639f90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:27:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n*   **Functionality:** Looks good.\n*   **Architecture \u0026 Component Fit:** The change correctly delegates the remote flash command to `servo_micro`.\n*   **Code Simplicity:** ❌ **Failed** — `sock.sendall(img_file.read())` reads the entire binary into memory. It should be simplified and optimized using `sock.sendfile(img_file)`. See inline comment.\n*   **Idiomaticity \u0026 Readability:** ❌ **Failed** — Magic timeouts (`10`, `300`), port numbers (`10001`), and protocol strings (`b\"REMOTE_FLASH_OK\"`) are hardcoded inline. See inline comment.\n*   **Security:** Looks good.\n*   **Testing:** ❌ **Failed** — No unit tests were added for the new socket communication and error handling branch. See inline comment.\n*   **CL Size \u0026 Scope:** ✅ **Passed** — Size: S (+26, -8). This is a single logical change allowing remote execution for `servo_micro`.\n*   **Commit Message:** ✅ **Passed** — Accurately describes the motivation (local builds are resource intensive) and the what (run script remotely targeting a dev board connected over servo_micro).\n\n[🔗](http://go/tj/c2374d8b-54d8-4c3f-9086-a9cff2199266)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4f8820a_ea8a8b12",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:27:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n**Code Simplicity:** Reading the entire file payload into memory before sending (`img_file.read()`) is unnecessary and memory-intensive for large binaries. Use `sock.sendfile(img_file)` instead, which streams the file and uses high-performance zero-copy OS APIs (`sendfile`) where available.\n\n```python\n                        with open(image_path, \"rb\") as img_file:\n                            sock.sendfile(img_file)\n```\n\n[🔗](http://go/tj/c2374d8b-54d8-4c3f-9086-a9cff2199266)",
+      "range": {
+        "startLine": 409,
+        "startChar": 0,
+        "endLine": 410,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fb36183_6680402f",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:27:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n**Magic Values:** Please extract these raw numeric and string literals into descriptive named constants at the module level (e.g., `_DEFAULT_REMOTE_FLASH_PORT \u003d 10001`, `_REMOTE_CONNECT_TIMEOUT_SEC \u003d 10`, `_REMOTE_FLASH_TIMEOUT_SEC \u003d 300`, `_REMOTE_FLASH_SUCCESS_MSG \u003d b\"REMOTE_FLASH_OK\"`). Timeouts must include explicit `_SEC` or `_MS` unit suffixes in the constant name.\n\nOther locations:\n* Line 406: `timeout\u003d10`\n* Line 408: `sock.settimeout(300)`\n* Line 417: `return b\"REMOTE_FLASH_OK\" in response`\n\n[🔗](http://go/tj/c2374d8b-54d8-4c3f-9086-a9cff2199266)",
+      "range": {
+        "startLine": 397,
+        "startChar": 0,
+        "endLine": 417,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f30dc92_fbf031c1",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:27:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n**Testing:** Automated test coverage is mandatory for new logic and error handling paths. Please add unit tests in `test/run_device_tests_unittest.py` covering this new remote execution branch.\n\nAt a minimum, verify:\n1. **Success Path:** Mock `socket.create_connection` and verify that the file payload is sent and the socket receives the `b\"REMOTE_FLASH_OK\"` response.\n2. **Failure Path:** Verify that `False` is returned when the response does not contain the success string.\n3. **Error Handling:** Verify that the `OSError` exception path is caught and returns `False`.\n\n[🔗](http://go/tj/c2374d8b-54d8-4c3f-9086-a9cff2199266)",
+      "range": {
+        "startLine": 396,
+        "startChar": 0,
+        "endLine": 420,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
