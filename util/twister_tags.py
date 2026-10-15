@@ -26,6 +26,7 @@ import yaml  # pylint: disable=import-error
 
 
 TAG_TO_DESCRIPTION = {
+    "peripheral_charger": "Peripheral charger tests",
     "common": "Directly test shared code in the ec/common dir",
     "host_cmd": "EC host command related tests",
     "mkbp": "Testing the MKBP (Matrix Keyboard Protocol) stack",
