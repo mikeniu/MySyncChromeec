@@ -793,6 +793,48 @@ class RepositoryPrepTest(unittest.TestCase):
                     with self.assertRaises(repository_prep.RepositoryPrepError):
                         preparer.commit_changes()
 
+    def test_find_checkout(self):
+        """Test find_checkout with .repo, .supermanifest, and parent .citc."""
+        prev_co = repository_prep.set_checkout(None)
+        try:
+            for marker, is_dir in (
+                (".repo", True),
+                (".supermanifest", False),
+                ("../.citc", True),
+            ):
+                with tempfile.TemporaryDirectory() as tmp:
+                    checkout_root = (
+                        pathlib.Path(tmp).resolve() / "chrome-internal"
+                    )
+                    fake_file = (
+                        checkout_root
+                        / "src"
+                        / "platform"
+                        / "ec-legacy"
+                        / "util"
+                        / "repository_prep.py"
+                    )
+                    fake_file.parent.mkdir(parents=True)
+                    fake_file.touch()
+                    with mock.patch.object(
+                        repository_prep, "__file__", str(fake_file)
+                    ):
+                        with self.assertRaises(FileNotFoundError):
+                            repository_prep.find_checkout()
+
+                        marker_path = (checkout_root / marker).resolve()
+                        if is_dir:
+                            marker_path.mkdir()
+                        else:
+                            marker_path.touch()
+
+                        self.assertEqual(
+                            repository_prep.find_checkout(),
+                            checkout_root.resolve(),
+                        )
+        finally:
+            repository_prep.set_checkout(prev_co)
+
 
 if __name__ == "__main__":
     unittest.main()
