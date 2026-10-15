@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4bd6bc9_9bb3c3fa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:23:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested:** The commit message only mentions adding test configurations for dartmonkey, but the CL includes a behavioral change to production code (`zephyr/shim/chip/stm32/debug.c`).\n\nPlease split the `debug.c` fix into a separate prerequisite CL. Once split, update the commit message for the test CL:\n\n```text\ntest: hwtest: add dartmonkey HW test configs\n\nAdd test configurations and pass criteria to allow execution\nof hardware tests on dartmonkey.\n\nBUG\u003db:355653341\nTEST\u003d./test/run_device_tests.py --board dartmonkey --zephyr --flasher servo_micro --remote 127.0.0.1 --console_port 10000\n```\n[🔗](http://go/tj/aa3b6004-fcef-4922-b971-d711fb06d0d7)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9f2b14aadb2f468f57caa1980999d71c5f6e860f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b0cfada_03c78eb8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:23:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL.**\n\n### Review Summary\n**Functionality:** ❌ Defect found in `timer.c`: casting `uint32_t` to `uint64_t` before subtraction breaks wrap-around arithmetic.\n**Architecture \u0026 Component Fit:** ✅ No issues.\n**Code Simplicity:** ✅ No issues.\n**Idiomaticity \u0026 Readability:** ✅ No issues.\n**Security:** ✅ No issues.\n**Testing:** ✅ No issues.\n**CL Size \u0026 Scope:** ❌ Size: M (+44, -11). This CL bundles a production code fix (`zephyr/shim/chip/stm32/debug.c`) with new test configurations (`dartmonkey` configs and HW test updates). Please split the `debug.c` change into a separate prerequisite CL.\n**Commit Message:** ❌ The commit message only mentions adding test configurations for dartmonkey, but the diff includes a behavioral change to `debug.c` (`CONFIG_STM32_ENABLE_DEBUG_SLEEP_STOP` guard).\n\n**CL Split Plan:**\n1. CL 1: Production code fix for `debugger_was_connected` in `zephyr/shim/chip/stm32/debug.c`.\n2. CL 2: Test configurations and HW test support for dartmonkey.\n\n[[trajectory](https://goto.corp.google.com/traj/aa3b6004-fcef-4922-b971-d711fb06d0d7)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9f2b14aadb2f468f57caa1980999d71c5f6e860f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "595124ca_6de8d3ba",
+        "filename": "zephyr/test/hwtest/src/timer.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:23:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect:** Casting the 32-bit cycle count to `uint64_t` *before* subtraction breaks wrap-around arithmetic.\n\nIf `sys_clock_cycle_get_32()` wraps around during the `crec_usleep()` call (e.g., `start_time \u003d 0xFFFFFFF0` and `now \u003d 0x00000010`), `now` will be numerically smaller than `start_time`. Because both are cast to `uint64_t` before the subtraction, `now - start_time` will yield a massive 64-bit value instead of the correct small time difference.\n\nStore the 32-bit cycle counts in `uint32_t` variables, subtract them first, and *then* cast the result to `uint64_t`.\n\n```c\n#if defined(CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER)\n\tuint64_t start_time \u003d sys_clock_cycle_get_64();\n#else\n\tuint32_t start_time \u003d sys_clock_cycle_get_32();\n#endif\n\t/* This test is trying to test the functionality of crec_usleep, so we\n\t * allow the usage even though it\u0027s in Zephyr code.\n\t */\n\tcrec_usleep(expected_duration); /* NOLINT_EC_SYMBOL */\n#if defined(CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER)\n\tuint64_t now \u003d sys_clock_cycle_get_64();\n\tuint64_t cycles_elapsed \u003d now - start_time;\n#else\n\tuint32_t now \u003d sys_clock_cycle_get_32();\n\tuint64_t cycles_elapsed \u003d now - start_time;\n#endif\n\tuint64_t sleep_duration \u003d (cycles_elapsed * USEC_PER_SEC) /\n\t\t\t\t  sys_clock_hw_cycles_per_sec();\n```\n[🔗](http://go/tj/aa3b6004-fcef-4922-b971-d711fb06d0d7)",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9f2b14aadb2f468f57caa1980999d71c5f6e860f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
