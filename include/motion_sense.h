@@ -288,7 +288,7 @@ int sensor_init_done(struct motion_sensor_t *sensor);
  * Board specific function that is called when a double_tap event is detected.
  *
  */
-void sensor_board_proc_double_tap(void);
+__override_proto void sensor_board_proc_double_tap(void);
 
 /**
  * Board specific function to double check lid angle calculation is possible.

@@ -108,6 +108,13 @@ __attribute__((weak)) int sensor_board_is_lid_angle_available(void)
 }
 #endif
 
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+__overridable void sensor_board_proc_double_tap(void)
+{
+	CPRINTS("double tap");
+}
+#endif
+
 STATIC_IF_NOT(CONFIG_TEST)
 enum sensor_config motion_sense_get_ec_config(void)
 {

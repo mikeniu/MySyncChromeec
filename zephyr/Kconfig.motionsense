@@ -196,6 +196,38 @@ config PLATFORM_EC_GESTURE_HOST_DETECTION
 	help
 	  Enable gesture host interface
 
+config PLATFORM_EC_GESTURE_SENSOR_DOUBLE_TAP
+	bool "Hardware sensor double-tap detection"
+	select PLATFORM_EC_GESTURE_DETECTION
+	help
+	  Enable hardware double-tap gesture detection in motion_sense.
+
+if PLATFORM_EC_GESTURE_SENSOR_DOUBLE_TAP
+
+config PLATFORM_EC_GESTURE_TAP_THRES_MG
+	int "Double-tap acceleration threshold (mg)"
+	default 100
+	help
+	  Acceleration threshold in mg required to detect a single tap impulse
+	  for hardware double-tap detection. The default of 100 mg matches the
+	  setting used on Pixelbook (eve) and Kukui.
+
+config PLATFORM_EC_GESTURE_TAP_MAX_INTERSTICE_T
+	int "Maximum double-tap interstice window (ms)"
+	default 500
+	help
+	  Maximum time in milliseconds allowed between the first and second tap
+	  impulses for hardware double-tap detection. The default of 500 ms
+	  matches the setting used on Pixelbook (eve), Ryu, and Kukui.
+
+config PLATFORM_EC_GESTURE_SENSOR_DOUBLE_TAP_FOR_HOST
+	bool "Forward hardware sensor double-tap wakeup event to host"
+	depends on PLATFORM_EC_GESTURE_HOST_DETECTION
+	help
+	  Mark double-tap activity FIFO events as host wakeup events.
+
+endif # PLATFORM_EC_GESTURE_SENSOR_DOUBLE_TAP
+
 rsource "Kconfig.sensor_devices"
 
 endif # PLATFORM_EC_MOTIONSENSE

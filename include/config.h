@@ -2504,6 +2504,7 @@
 
 /* Enable double tap support. */
 #undef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+#undef CONFIG_GESTURE_SENSOR_DOUBLE_TAP_FOR_HOST
 
 /*
  * Double tap detection parameters
