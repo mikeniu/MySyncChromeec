@@ -3,11 +3,17 @@
  * found in the LICENSE file.
  */
 
+#include "charger.h"
+#include "driver/charger/isl923x.h"
+#include "driver/charger/isl923x_public.h"
 #include "driver/tcpm/raa489000.h"
 #include "driver/tcpm/tcpci.h"
 #include "ec_commands.h"
+#include "emul/emul_common_i2c.h"
+#include "emul/emul_isl923x.h"
 #include "emul/tcpc/emul_raa489000.h"
 #include "emul/tcpc/emul_tcpci.h"
+#include "ocpc.h"
 #include "test/drivers/tcpci_test_common.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -132,6 +138,50 @@ ZTEST(tcpc_raa489000, test_init_error)
 	zassert_not_equal(EC_SUCCESS, drv->init(RAA489000_PORT));
 	i2c_common_emul_set_read_fail_reg(common_data,
 					  I2C_COMMON_EMUL_NO_FAIL_REG);
+}
+
+ZTEST(tcpc_raa489000, test_charger_read_errors)
+{
+	const struct emul *primary_emul =
+		EMUL_DT_GET(DT_NODELABEL(isl923x_emul));
+	const struct emul *sec_emul =
+		EMUL_DT_GET(DT_NODELABEL(isl923x_sec_emul));
+	struct i2c_common_emul_data *primary_common =
+		emul_isl923x_get_i2c_common_data(primary_emul);
+	struct ocpc_data ocpc = {
+		.rsys_mo = 50,
+		.rbatt_mo = 50,
+	};
+	int current = -1;
+
+	/* Fail reading RAA489000_REG_ADC_CHARGE_CURRENT in get_actual_current
+	 */
+	i2c_common_emul_set_read_fail_reg(primary_common,
+					  RAA489000_REG_ADC_CHARGE_CURRENT);
+	zassert_not_equal(EC_SUCCESS, isl923x_drv.get_actual_current(
+					      CHARGER_PRIMARY, &current));
+	zassert_equal(current, -1);
+
+	/* Fail reading ISL923X_REG_CONTROL2 in enable_linear_charge */
+	i2c_common_emul_set_read_fail_reg(primary_common, ISL923X_REG_CONTROL2);
+	zassert_equal(EC_ERROR_UNKNOWN,
+		      isl923x_drv.enable_linear_charge(CHARGER_PRIMARY, true));
+
+	/* Fail reading primary RAA489000_REG_CONTROL10 in set_vsys_compensation
+	 */
+	isl923x_emul_set_device_id(sec_emul, RAA489000_DEV_ID_B0);
+	i2c_common_emul_set_read_fail_reg(primary_common,
+					  RAA489000_REG_CONTROL10);
+	zassert_equal(EC_ERROR_UNKNOWN,
+		      isl923x_drv.set_vsys_compensation(CHARGER_SECONDARY,
+							&ocpc, 0, 0));
+
+	i2c_common_emul_set_read_fail_reg(primary_common,
+					  I2C_COMMON_EMUL_NO_FAIL_REG);
+	zassert_ok(isl923x_drv.get_actual_current(CHARGER_PRIMARY, &current));
+	zassert_ok(isl923x_drv.enable_linear_charge(CHARGER_PRIMARY, true));
+	zassert_ok(isl923x_drv.set_vsys_compensation(CHARGER_SECONDARY, &ocpc,
+						     0, 0));
 }
 
 ZTEST_SUITE(tcpc_raa489000, drivers_predicate_post_main, NULL, NULL, NULL,
