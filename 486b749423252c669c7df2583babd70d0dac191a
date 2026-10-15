@@ -38,6 +38,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6c1a1ad_a06bcdf4",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_fpc1145.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-15T07:05:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7960e454_c8f3b5a0",
+      "revId": "486b749423252c669c7df2583babd70d0dac191a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b46e12a_e0835792",
@@ -58,6 +76,30 @@
         "endChar": 55
       },
       "isAi": true,
+      "revId": "486b749423252c669c7df2583babd70d0dac191a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "749c510a_7146b49d",
+        "filename": "zephyr/test/fingerprint/drivers/fpc1145/src/fpc1145.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-15T07:05:39Z",
+      "side": 1,
+      "message": "Makes sense, thanks for the suggestion",
+      "parentUuid": "2b46e12a_e0835792",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 55
+      },
       "revId": "486b749423252c669c7df2583babd70d0dac191a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
