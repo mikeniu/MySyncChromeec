@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ee6e61b_c759d04e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-15T23:41:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please merge test commit**\n\n### Review Summary\n\n**CL Size \u0026 Scope:** Size: M (+147, -0). The commit message explicitly states: `Unit tests, added in the next commit`. Per the **Single Logical Change** rule, production code and its corresponding unit tests must be kept in the same CL. This ensures the change is verifiable, atomic, and safely revertible if issues arise. Please squash the test commit into this CL.\n\n**Code Simplicity \u0026 Idiomaticity:** The HAL/LL interactions for the clock switch (VOS scaling, PLL readiness, flash latency) are clean and correctly ordered. \n\nPlease squash the tests into this CL so they can be reviewed alongside the logic they verify. [🔗](http://go/tj/e84ce86b-fca1-4f71-b3a6-f1700dc9ec19)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c8cc12dbfd16a79fec2e86137202b718f0456284",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
