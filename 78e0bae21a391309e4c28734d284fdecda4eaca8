@@ -179,6 +179,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71fc3646_f403615a",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-15T12:03:23Z",
+      "side": 1,
+      "message": "Discussed F2F, agreed on a semaphore-based lock that only guarantees consistent hardware state. `vboot_hash.c` is never compiled for fpmcu targets, meaning that `ScopedFastCpu` does not need to be synchronized with these calls.\n\n@dawidn@google.com I\u0027m resolving the comment",
+      "parentUuid": "5ac103e7_e02021f0",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3700500b_33a80ce5",
