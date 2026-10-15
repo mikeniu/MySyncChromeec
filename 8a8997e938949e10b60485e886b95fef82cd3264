@@ -16,6 +16,25 @@
       "message": "I think you\u0027ll probably want to compact these down and adjust this.",
       "revId": "8a8997e938949e10b60485e886b95fef82cd3264",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cebeb552_236d21af",
+        "filename": "include/usb_pd.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-15T21:28:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7961ac1_d2dd940a",
+      "isAi": true,
+      "revId": "8a8997e938949e10b60485e886b95fef82cd3264",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
