@@ -121,7 +121,7 @@ static void ap_sku_id_restore_state(void)
 		AP_SKUID_SYSJUMP_TAG, &version, &size);
 
 	if (prev_ap_sku_id && version == AP_SKUID_HOOK_VERSION &&
-	    size == sizeof(prev_ap_sku_id)) {
+	    size == sizeof(ap_sku_id)) {
 		memcpy(&ap_sku_id, prev_ap_sku_id, sizeof(ap_sku_id));
 	}
 }
