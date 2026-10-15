@@ -32,12 +32,24 @@ void usart_rx_dma_init(struct usart_config const *config)
 	if (IS_ENABLED(CHIP_FAMILY_STM32F4))
 		options.flags |= STM32_DMA_CCR_CHANNEL(STM32_REQ_USART1_RX);
 
+	dma_disable(dma_config->channel);
+	dma_clear_isr(dma_config->channel);
+
+#ifdef STM32_USART_CR1_IDLEIE
+	STM32_USART_CR3(base) &= ~STM32_USART_CR3_OVRDIS;
+	STM32_USART_CR3(base) |= STM32_USART_CR3_DMAR | STM32_USART_CR3_EIE;
+	STM32_USART_ICR(base) = STM32_USART_ICR_IDLECF | STM32_USART_ICR_ORECF |
+				STM32_USART_ICR_NCF | STM32_USART_ICR_FECF;
+	STM32_USART_CR1(base) |= STM32_USART_CR1_IDLEIE | STM32_USART_CR1_RE;
+#else
 	STM32_USART_CR1(base) |= STM32_USART_CR1_RXNEIE;
 	STM32_USART_CR1(base) |= STM32_USART_CR1_RE;
 	STM32_USART_CR3(base) |= STM32_USART_CR3_DMAR;
+#endif
 
 	dma_config->state->index = 0;
 	dma_config->state->max_bytes = 0;
+	dma_config->state->rx_err = 0;
 
 	dma_start_rx(&options, dma_config->fifo_size, dma_config->fifo_buffer);
 }
@@ -53,6 +65,58 @@ static void usart_rx_dma_interrupt_common(struct usart_config const *config,
 	size_t old_index = dma_config->state->index;
 	size_t new_bytes = 0;
 	size_t added = 0;
+#ifdef STM32_USART_CR1_IDLEIE
+	intptr_t base = config->hw->base;
+	int32_t status = STM32_USART_SR(base);
+	size_t avail;
+
+	if (status &
+	    (STM32_USART_SR_ORE | STM32_USART_SR_FE | STM32_USART_SR_NE)) {
+		STM32_USART_ICR(base) = STM32_USART_ICR_ORECF |
+					STM32_USART_ICR_NCF |
+					STM32_USART_ICR_FECF;
+		if (!dma_config->state->rx_err) {
+			dma_config->state->rx_err = 1;
+			if (status & STM32_USART_SR_FE)
+				atomic_add(
+					(atomic_t *)&(
+						config->state->rx_framing_error),
+					1);
+			if (status & STM32_USART_SR_ORE)
+				atomic_add((atomic_t *)&(
+						   config->state->rx_overrun),
+					   1);
+			if (status & STM32_USART_SR_NE)
+				atomic_add(
+					(atomic_t *)&(
+						config->state->rx_noise_error),
+					1);
+		}
+		if (!(status & STM32_USART_SR_IDLE))
+			STM32_USART_CR3(base) &= ~STM32_USART_CR3_EIE;
+	}
+
+	avail = (new_index >= old_index) ?
+			(new_index - old_index) :
+			(dma_config->fifo_size - (old_index - new_index));
+
+	if (!(status & STM32_USART_SR_IDLE) &&
+	    (dma_config->state->rx_err || avail < dma_config->fifo_size / 2))
+		return;
+
+	if (status & STM32_USART_SR_IDLE) {
+		STM32_USART_ICR(base) = STM32_USART_ICR_IDLECF;
+		STM32_USART_CR3(base) |= STM32_USART_CR3_EIE;
+	}
+
+	if (dma_config->state->rx_err) {
+		dma_config->state->index = new_index;
+		dma_config->state->rx_err = 0;
+		config->producer.queue->policy->add(
+			config->producer.queue->policy, 0);
+		return;
+	}
+#endif
 
 	if (new_index > old_index) {
 		new_bytes = new_index - old_index;
