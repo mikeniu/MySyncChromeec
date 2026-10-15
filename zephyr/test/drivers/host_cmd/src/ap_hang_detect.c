@@ -4,6 +4,7 @@
  */
 
 #include "ap_reset_log.h"
+#include "hooks.h"
 #include "host_command.h"
 #include "test/drivers/test_state.h"
 #include "timer.h"
@@ -64,6 +65,30 @@ ZTEST_USER(ap_hang_detect, test_cancel)
 
 	/* wait and check if watchdog has rebooted the AP */
 	k_sleep(K_SECONDS(30));
+
+	req.command = EC_HANG_DETECT_CMD_GET_STATUS;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+	zassert_equal(resp.status, EC_HANG_DETECT_AP_BOOT_NORMAL);
+}
+
+ZTEST_USER(ap_hang_detect, test_chipset_reset_cancels_watchdog)
+{
+	struct ec_params_hang_detect req = { 0 };
+	struct ec_response_hang_detect resp;
+	struct host_cmd_handler_args args;
+
+	req.command = EC_HANG_DETECT_CMD_GET_STATUS;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+	zassert_equal(resp.status, EC_HANG_DETECT_AP_BOOT_NORMAL);
+
+	set_timeout(EC_HANG_DETECT_MIN_TIMEOUT);
+	req.command = EC_HANG_DETECT_CMD_RELOAD;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+
+	k_sleep(K_SECONDS(1));
+	hook_notify(HOOK_CHIPSET_RESET);
+
+	k_sleep(K_SECONDS(2 * EC_HANG_DETECT_MIN_TIMEOUT));
 
 	req.command = EC_HANG_DETECT_CMD_GET_STATUS;
 	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
