@@ -27,5 +27,10 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "gmr_tablet_switch_isr";
 		};
+		int_base_accel: ec_base_accel {
+			irq-pin = <&gpio_ec_accel_mb_int_l>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "motion_base_interrupt";
+		};
 	};
 };
