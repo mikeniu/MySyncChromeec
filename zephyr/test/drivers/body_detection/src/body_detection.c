@@ -126,6 +126,11 @@ ZTEST_USER(bodydetectmode, test_setbodydetectionmode_forced)
 	ret = shell_execute_cmd(get_ec_shell(), "bodydetectmode reset");
 	zassert_equal(ret, EC_SUCCESS, "unexpected command return status: %d",
 		      ret);
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+	body_detect_state = body_detect_get_state();
+	zassert_equal(body_detect_state, BODY_DETECTION_ON_BODY,
+		      "unexpected body detect mode: %d", body_detect_state);
+#endif
 	k_sleep(K_SECONDS(1));
 	body_detect_state = body_detect_get_state();
 	zassert_equal(body_detect_state, BODY_DETECTION_ON_BODY,
