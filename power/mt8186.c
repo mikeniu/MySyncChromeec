@@ -334,6 +334,7 @@ static enum power_state power_get_signal_state(void)
 
 enum power_state power_chipset_init(void)
 {
+	uint32_t sigs = power_get_signals();
 	int exit_hard_off = 1;
 	enum power_state init_state = power_get_signal_state();
 
@@ -352,6 +353,38 @@ enum power_state power_chipset_init(void)
 		}
 	} else if (system_get_reset_flags() & EC_RESET_FLAG_AP_OFF) {
 		exit_hard_off = 0;
+	}
+
+	/* ======== Workaround for PMIC stuck issue ======== */
+	/*
+	 * If reset by (ESC+Refresh+power button) but signal shows S0 while sigs
+	 * == 0, it means PMIC state machine froze before signals initialized.
+	 * Force exit_hard_off = 1 and correct init_state to POWER_G3 to trigger
+	 * chipset_force_shutdown() followed by auto power-on.
+	 */
+	else if (IS_ENABLED(CONFIG_PLATFORM_EC_PMIC_HANG_WORKAROUND) &&
+		 (system_get_reset_flags() & EC_RESET_FLAG_RESET_PIN) &&
+		 (init_state == POWER_S0) && (sigs == 0)) {
+		cprints(CC_CHIPSET,
+			"*** [PMIC STUCK DETECTED] STOP PRESSING BUTTON! ***\n"
+			"*** power state %d = S0, in 0x%04x. Force REBOOT. ***\n",
+			init_state, sigs);
+
+		/* 1. Preserve the boot intent and automatically boot up after
+		 * discharging. */
+		exit_hard_off = 1;
+
+		/*
+		 * 2. Manually set init_state so the state machine initiates
+		 * from the G3 safe landing point.
+		 */
+		init_state = POWER_G3;
+
+		/*
+		 * 3. Explicitly invoke Force Shutdown, forcing the PMIC to
+		 * perform an 8-second power-off discharge!
+		 */
+		chipset_force_shutdown(CHIPSET_SHUTDOWN_INIT);
 	}
 
 	/* If the init signal state is at S5, assigns it to G3 to match the
