@@ -462,7 +462,7 @@ void motion_sense_fifo_stage_data(struct ec_response_motion_sensor_data *data,
 	 *                 <--------- time allowed for new interrupt
 	 */
 	if (sensor && sensor->config[SENSOR_CONFIG_AP].ec_rate > 0 &&
-	    BASE_ODR(sensor->config[SENSOR_CONFIG_AP].odr > 0) &&
+	    BASE_ODR(sensor->config[SENSOR_CONFIG_AP].odr) > 0 &&
 	    time_after(time, ts_last_int[id] +
 				     sensor->config[SENSOR_CONFIG_AP].ec_rate -
 				     expected_data_periods[id] / 2)) {
