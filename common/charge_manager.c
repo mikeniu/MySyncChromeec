@@ -233,6 +233,11 @@ static int is_valid_port(int port)
 	return 1;
 }
 
+static bool is_valid_supplier(int supplier)
+{
+	return supplier >= 0 && supplier < CHARGE_SUPPLIER_COUNT;
+}
+
 static bool is_valid_override_port(int port)
 {
 	return (OVERRIDE_DONT_CHARGE <= port) && (port < CHARGE_PORT_COUNT);
@@ -1255,6 +1260,11 @@ static void charge_manager_make_change(enum charge_manager_change_type change,
 	/* Determine if this is a change which can affect charge status */
 	switch (change) {
 	case CHANGE_CHARGE:
+		if (!is_valid_supplier(supplier)) {
+			CPRINTS("%s: s%d invalid", __func__, supplier);
+			return;
+		}
+
 		/* Ignore changes where charge is identical */
 		if (available_charge[supplier][port].current ==
 			    charge->current &&
@@ -1644,8 +1654,7 @@ enum charge_supplier charge_manager_get_supplier(void)
 
 int charge_manager_get_available_current(int supplier, int port)
 {
-	if (supplier < 0 || supplier >= CHARGE_SUPPLIER_COUNT ||
-	    !is_valid_port(port))
+	if (!is_valid_supplier(supplier) || !is_valid_port(port))
 		return 0;
 
 	return available_charge[supplier][port].current;
@@ -1653,6 +1662,9 @@ int charge_manager_get_available_current(int supplier, int port)
 
 void charge_manager_set_supplier(int port, enum charge_supplier supplier)
 {
+	if (!is_valid_port(port) || !is_valid_supplier(supplier))
+		return;
+
 	CM_MUTEX_LOCK(&cm_refresh);
 	if (charge_supplier != CHARGE_SUPPLIER_NONE ||
 	    charge_port != CHARGE_PORT_NONE) {
