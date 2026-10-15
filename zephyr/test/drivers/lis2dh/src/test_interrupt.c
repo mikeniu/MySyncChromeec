@@ -155,10 +155,9 @@ ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_read_long)
 
 	/*
 	 * Validate each set of sensor XYZ samples.
-	 * Verify that we read up to FIFO_READ_LEN / OUT_XYZ_SIZE which is 8
-	 * samples.
+	 * Verify that all samples across both FIFO chunks are read.
 	 */
-	for (i = 0; i < FIFO_READ_LEN / OUT_XYZ_SIZE; i++) {
+	for (i = 0; i < ARRAY_SIZE(fake_sample) / 3; i++) {
 		zassert_equal(fifo_data[i * 2].flags,
 			      MOTIONSENSE_SENSOR_FLAG_TIMESTAMP);
 		zassert_equal(fifo_data[i * 2].sensor_num, ACC_SENSOR_ID);
@@ -235,7 +234,10 @@ ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_read_fail)
 ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_read_spoof)
 {
 	struct stprivate_data *drvdata = acc->drv_data;
-	int16_t fake_sample[] = { 10, 20, 30 };
+	int16_t fake_sample[] = { 10, 20, 30, 40, 50, 60 };
+	const intv3_t expected_spoof = { 50 << (15 - LIS2DH_RESOLUTION),
+					 60 << (15 - LIS2DH_RESOLUTION),
+					 70 << (15 - LIS2DH_RESOLUTION) };
 	uint32_t evt = ACCEL_LIS2DH_INT_EVENT;
 	static struct ec_response_motion_sensor_data
 		fifo_data[ARRAY_SIZE(fake_sample) / 3 * 2];
@@ -268,9 +270,9 @@ ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_read_spoof)
 	acc->flags |= MOTIONSENSE_FLAG_IN_SPOOF_MODE;
 
 	/* Set values to be spoofed */
-	acc->spoof_xyz[X] = 50 << (15 - LIS2DH_RESOLUTION);
-	acc->spoof_xyz[Y] = 60 << (15 - LIS2DH_RESOLUTION);
-	acc->spoof_xyz[Z] = 70 << (15 - LIS2DH_RESOLUTION);
+	acc->spoof_xyz[X] = expected_spoof[X];
+	acc->spoof_xyz[Y] = expected_spoof[Y];
+	acc->spoof_xyz[Z] = expected_spoof[Z];
 
 	/*
 	 * Samples from the lis2dh are left aligned so shift left by requiired
@@ -297,9 +299,13 @@ ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_read_spoof)
 	zassert_equal(count, ARRAY_SIZE(fake_sample) / 3 * 2);
 
 	/* Data from fifo should match spoof values */
-	zassert_equal(fifo_data[1].data[X], acc->spoof_xyz[X]);
-	zassert_equal(fifo_data[1].data[Y], acc->spoof_xyz[Y]);
-	zassert_equal(fifo_data[1].data[Z], acc->spoof_xyz[Z]);
+	for (i = 0; i < ARRAY_SIZE(fake_sample) / 3; i++) {
+		zassert_equal(fifo_data[i * 2 + 1].data[X], expected_spoof[X]);
+		zassert_equal(fifo_data[i * 2 + 1].data[Y], expected_spoof[Y]);
+		zassert_equal(fifo_data[i * 2 + 1].data[Z], expected_spoof[Z]);
+	}
+
+	acc->flags &= ~MOTIONSENSE_FLAG_IN_SPOOF_MODE;
 }
 
 ZTEST_USER(lis2dh, test_lis2dh__trigger_interrupt)

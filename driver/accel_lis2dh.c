@@ -79,9 +79,8 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 			    uint32_t timestamp)
 {
 	int ret, left, length, i;
-	int *axis = s->raw_xyz;
 	uint8_t fifo[FIFO_READ_LEN];
-	int read_count;
+	int read_count = 0;
 	uint32_t ts;
 
 	/* Each sample are OUT_XYZ_SIZE bytes. */
@@ -102,8 +101,9 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 		if (ret != EC_SUCCESS)
 			return ret;
 
-		read_count = 0;
 		for (i = 0; i < length; i += OUT_XYZ_SIZE) {
+			int *axis = s->raw_xyz;
+
 			/* Apply precision, sensitivity and rotation vector. */
 			st_normalize(s, axis, &fifo[i]);
 
@@ -140,8 +140,8 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 			} else {
 				motion_sense_push_raw_xyz(s);
 			}
-			left -= length;
 		}
+		left -= length;
 	} while (left > 0);
 
 	return EC_SUCCESS;
