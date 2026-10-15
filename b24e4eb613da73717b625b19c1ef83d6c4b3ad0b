@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3aa940c_46e4e233",
+        "filename": "util/flash/factory.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:13:22Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "325e9caa_e0ae8d43",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 0
+      },
+      "revId": "b24e4eb613da73717b625b19c1ef83d6c4b3ad0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d885902_979e8e0d",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cde5e7ae_9e6df749",
+        "filename": "util/flash/openocd_flasher.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:13:22Z",
+      "side": 1,
+      "message": "Done. --ocd_chip_cfg is now required (ValueError if missing) instead of defaulting to stm32f1x.cfg. Nothing in the factory routes STM32 chips here.",
+      "parentUuid": "3d885902_979e8e0d",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 0
+      },
+      "revId": "b24e4eb613da73717b625b19c1ef83d6c4b3ad0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ade7c351_38ddc52c",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-14T20:52:59Z",
       "side": 1,
       "message": "While manual quoting for spaces works, `shlex.quote` is generally safer for handling special characters in paths. However, since this string is being embedded into a Jim Tcl command for OpenOCD, double quotes are usually correct. Just be aware that this logic doesn\u0027t handle paths that might contain literal double quotes.\n\nSo maybe just raise an error if image_arg contains quotes.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 0
+      },
+      "revId": "b24e4eb613da73717b625b19c1ef83d6c4b3ad0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d1a94dc_069b20c9",
+        "filename": "util/flash/openocd_flasher.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-15T15:13:22Z",
+      "side": 1,
+      "message": "Done, it now raises ValueError if the path contains a double quote.",
+      "parentUuid": "ade7c351_38ddc52c",
       "range": {
         "startLine": 75,
         "startChar": 0,
