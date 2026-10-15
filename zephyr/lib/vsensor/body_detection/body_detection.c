@@ -158,7 +158,7 @@ test_export_static void body_detect_step(float x, float y, float z,
 	}
 
 	/* Check if we need to decimate */
-	if (iir_decimator_step(&decimator, &x, &y, &z)) {
+	if (!iir_decimator_step(&decimator, &x, &y, &z)) {
 		/* Value was decimated */
 		return;
 	}
