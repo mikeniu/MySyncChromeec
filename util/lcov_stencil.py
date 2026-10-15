@@ -18,10 +18,12 @@ import fnmatch
 import logging
 import re
 import sys
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, TextIO
 
 
-def parse_args(argv=None):
+def parse_args(
+    argv: Optional[List[str]] = None,
+) -> argparse.Namespace:
     """Parses command line args"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -57,6 +59,14 @@ def parse_args(argv=None):
         help="Only exclude patterns from input files without stenciling lines",
     )
     parser.add_argument(
+        "--test-name",
+        "-t",
+        help=(
+            "Use records matching this test name (TN:) in template_file as "
+            "the stencil template and keep only empty and matching TN: records"
+        ),
+    )
+    parser.add_argument(
         "template_file",
         help=(
             "lcov info file to use as template (or input file if "
@@ -83,7 +93,9 @@ def compile_exclude_patterns(
 
 
 def parse_template_file(
-    filename: str, exclude_re: Optional[re.Pattern] = None
+    filename: str,
+    exclude_re: Optional[re.Pattern] = None,
+    test_name: Optional[str] = None,
 ) -> Dict[str, Set[str]]:
     """Reads the template file and returns covered lines.
 
@@ -96,24 +108,34 @@ def parse_template_file(
         A dictionary of filename to set of covered line numbers (as strings)
     """
     logging.info("Reading template file %s", filename)
+    sanitized_tn = (
+        re.sub(r"\W", "_", test_name) if test_name is not None else None
+    )
     with open(filename, "r", encoding="utf-8") as template_file:
         data_by_path: Dict[str, Set[str]] = defaultdict(set)
-        file_name = None
+        file_name: Optional[str] = None
+        current_tn: Optional[str] = None
         for line in template_file:
             line = line.strip()
             if line == "end_of_record":
                 file_name = None
+                current_tn = None
+            elif line.startswith("TN:"):
+                current_tn = line[3:]
             elif line.startswith(
-                ("TN:", "FNDA:", "FNF:", "FNH:", "BRF:", "BRH:", "LF:", "LH:")
+                ("FNDA:", "FNF:", "FNH:", "BRF:", "BRH:", "LF:", "LH:")
             ):
                 pass
             elif line.startswith("SF:"):
                 file_path = line[3:]
-                if exclude_re and exclude_re.match(file_path):
+                if (
+                    sanitized_tn is not None and current_tn != sanitized_tn
+                ) or (exclude_re and exclude_re.match(file_path)):
                     for skip_l in template_file:
                         if skip_l.strip() == "end_of_record":
                             break
                     file_name = None
+                    current_tn = None
                     continue
                 file_name = line
                 if file_name not in data_by_path:
@@ -132,7 +154,12 @@ def parse_template_file(
         return data_by_path
 
 
-def filter_coverage_file(filename, output_file, data_by_path):
+def filter_coverage_file(
+    filename: str,
+    output_file: TextIO,
+    data_by_path: Dict[str, Set[str]],
+    test_name: Optional[str] = None,
+) -> None:
     """Reads a coverage file from filename and writes filtered lines to
     output_file.
 
@@ -143,16 +170,30 @@ def filter_coverage_file(filename, output_file, data_by_path):
     after filtering, and records that refer to unknown files are omitted.
     """
     logging.info("Merging file %s", filename)
+    sanitized_tn = (
+        re.sub(r"\W", "_", test_name) if test_name is not None else None
+    )
     with open(filename, "r", encoding="utf-8") as input_file:
+        current_tn: Optional[str] = None
         for raw_line in input_file:
             line = raw_line.strip()
+            if line.startswith("TN:"):
+                current_tn = line[3:]
+                continue
+            if line == "end_of_record":
+                current_tn = None
+                continue
             if line.startswith("SF:"):
                 target_lines = data_by_path.get(line)
-                if not target_lines:
+                if not target_lines or (
+                    sanitized_tn is not None
+                    and current_tn not in (None, "", sanitized_tn)
+                ):
                     # Fast skip entire record if file is not in template
                     for skip_l in input_file:
                         if skip_l.strip() == "end_of_record":
                             break
+                    current_tn = None
                     continue
 
                 record_lines = [raw_line]
@@ -173,6 +214,7 @@ def filter_coverage_file(filename, output_file, data_by_path):
                             output_file.write("".join(record_lines))
                         else:
                             logging.debug("Omitting record %s", line)
+                        current_tn = None
                         break
 
                     if rec_line.startswith("TN:"):
@@ -279,7 +321,7 @@ def exclude_patterns_from_file(
             output_file.writelines(record_lines)
 
 
-def main(argv=None):
+def main(argv: Optional[List[str]] = None) -> None:
     """Merges lcov files."""
     opts = parse_args(argv)
     logging.basicConfig(level=opts.log_level)
@@ -292,16 +334,20 @@ def main(argv=None):
         )
 
     exclude_re = compile_exclude_patterns(opts.exclude_patterns)
-    if opts.exclude_only or not opts.lcov_input:
+    if opts.exclude_only or (not opts.lcov_input and not opts.test_name):
         inputs = [opts.template_file] + opts.lcov_input
         with output_file:
             for lcov_input in inputs:
                 exclude_patterns_from_file(lcov_input, output_file, exclude_re)
     else:
-        data_by_path = parse_template_file(opts.template_file, exclude_re)
+        data_by_path = parse_template_file(
+            opts.template_file, exclude_re, opts.test_name
+        )
         with output_file:
             for lcov_input in [opts.template_file] + opts.lcov_input:
-                filter_coverage_file(lcov_input, output_file, data_by_path)
+                filter_coverage_file(
+                    lcov_input, output_file, data_by_path, opts.test_name
+                )
 
 
 if __name__ == "__main__":

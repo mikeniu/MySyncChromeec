@@ -295,6 +295,58 @@ class TestLcovStencil(unittest.TestCase):
             self.assertIn("/ec/common/main.c", result)
             self.assertNotIn("/ec/zephyr/test/mock/mock.c", result)
 
+    def test_main_with_test_name_single_merged_file(self) -> None:
+        """Tests stenciling a board from a single merged lcov.info with --test-name."""
+        merged_content = (
+            "TN:\n"
+            "SF:/ec/common/main.c\n"
+            "DA:10,5\n"
+            "DA:20,3\n"
+            "LF:2\n"
+            "LH:2\n"
+            "end_of_record\n"
+            "TN:brox_sku4\n"
+            "SF:/ec/common/main.c\n"
+            "DA:10,0\n"
+            "LF:1\n"
+            "LH:0\n"
+            "end_of_record\n"
+            "TN:other_board\n"
+            "SF:/ec/common/main.c\n"
+            "DA:10,9\n"
+            "DA:20,9\n"
+            "LF:2\n"
+            "LH:2\n"
+            "end_of_record\n"
+            "TN:other_board\n"
+            "SF:/ec/common/other.c\n"
+            "DA:1,1\n"
+            "LF:1\n"
+            "LH:1\n"
+            "end_of_record\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            in_path = Path(tmpdir) / "lcov.info"
+            out_path = Path(tmpdir) / "brox-sku4_stenciled.info"
+            in_path.write_text(merged_content, encoding="utf-8")
+
+            lcov_stencil.main(
+                [
+                    "--test-name",
+                    "brox-sku4",
+                    "-o",
+                    str(out_path),
+                    str(in_path),
+                ]
+            )
+
+            result = out_path.read_text(encoding="utf-8")
+            self.assertIn("SF:/ec/common/main.c\nDA:10,5\nLF:1\nLH:1\n", result)
+            self.assertIn("SF:/ec/common/main.c\nDA:10,0\nLF:1\nLH:0\n", result)
+            self.assertNotIn("DA:20", result)
+            self.assertNotIn("DA:10,9", result)
+            self.assertNotIn("/ec/common/other.c", result)
+
 
 if __name__ == "__main__":
     unittest.main()

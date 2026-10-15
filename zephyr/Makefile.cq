@@ -134,10 +134,14 @@ $(BUILD)/zephyr/zephyr_merged.info: $(BUILD)/zephyr/all_tests.info $(BUILD)/zeph
 	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
 	-a $(BUILD)/zephyr/all_tests.info -a $(BUILD)/zephyr/all_builds.info
 
+# In sharded parent builds, merge-shards produces lcov.info directly without
+# all_builds.info or zephyr_merged.info.
+ifneq ($(wildcard $(BUILD)/zephyr/all_builds.info)-$(wildcard $(BUILD)/zephyr/lcov.info),-$(BUILD)/zephyr/lcov.info)
 $(BUILD)/zephyr/lcov.info: $(BUILD)/zephyr/zephyr_merged.info
 	$(PLATFORM_EC)/util/lcov_stencil.py \
 	$(foreach p, $(GENERATED_AND_SYSTEM_PATTERNS), --exclude-pattern $(p)) \
 	-o $@ $<
+endif
 
 $(BUILD)/zephyr/lcov_no_tests.info: $(BUILD)/zephyr/lcov.info
 	$(PLATFORM_EC)/util/lcov_stencil.py \
@@ -153,11 +157,6 @@ lcov_rpt: $(BUILD)/zephyr/lcov_rpt
 special_boards_info: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_final.info)
 special_boards_rpt: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_rpt)
 special_boards: special_boards_info special_boards_rpt
-
-$(BUILD)/zephyr/%_merged.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/all_tests.info
-	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \
-	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
-	-a $(BUILD)/zephyr/all_tests.info -a $<
 
 BOARD_EXCLUDE_PATTERNS='$(PLATFORM_EC)/zephyr/drivers/cros_displight/*' \
 	'$(PLATFORM_EC)/zephyr/drivers/cros_flash/*' \
@@ -187,10 +186,11 @@ BOARD_EXCLUDE_PATTERNS='$(PLATFORM_EC)/zephyr/drivers/cros_displight/*' \
 	'$(PLATFORM_EC)/driver/tcpm/it8xxx2.c' \
 	$(GENERATED_AND_SYSTEM_PATTERNS) $(TEST_PATTERNS)
 
-$(BUILD)/zephyr/%_stenciled.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/%_merged.info
+$(BUILD)/zephyr/%_stenciled.info: $(BUILD)/zephyr/lcov.info
 	$(PLATFORM_EC)/util/lcov_stencil.py \
+	--test-name $* \
 	$(foreach p, $(BOARD_EXCLUDE_PATTERNS), --exclude-pattern $(p)) \
-	-o $@ $^
+	-o $@ $<
 
 .PRECIOUS: $(BUILD)/zephyr/%_final.info
 $(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
