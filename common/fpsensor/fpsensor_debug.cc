@@ -105,10 +105,7 @@ static enum ec_error_list fp_console_action(uint32_t mode)
 	if (!(global_context.sensor_mode & FP_MODE_RESET_SENSOR))
 		CPRINTS("Waiting for finger ...");
 
-	uint32_t mode_output = 0;
-	const int rc = fp_set_sensor_mode(mode, &mode_output, std::nullopt);
-
-	if (rc != EC_RES_SUCCESS) {
+	if (!fp_set_sensor_mode(mode).has_value()) {
 		/*
 		 * EC host command errors do not directly map to console command
 		 * errors.
@@ -394,11 +391,7 @@ DECLARE_CONSOLE_COMMAND(fpclear, command_fpclear, nullptr,
 static int command_fpmaintenance(int argc, const char **argv)
 {
 #ifdef HAVE_FP_PRIVATE_DRIVER
-	uint32_t mode_output = 0;
-	const int rc = fp_set_sensor_mode(FP_MODE_SENSOR_MAINTENANCE,
-					  &mode_output, std::nullopt);
-
-	if (rc != EC_RES_SUCCESS) {
+	if (!fp_set_sensor_mode(FP_MODE_SENSOR_MAINTENANCE).has_value()) {
 		/*
 		 * EC host command errors do not directly map to console command
 		 * errors.
