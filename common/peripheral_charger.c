@@ -108,7 +108,7 @@ static const char *_text_event(enum pchg_event event)
 	};
 	BUILD_ASSERT(ARRAY_SIZE(event_names) == PCHG_EVENT_COUNT);
 
-	if (event >= sizeof(event_names))
+	if (event >= ARRAY_SIZE(event_names))
 		return "UNDEF";
 
 	return event_names[event];
@@ -194,7 +194,7 @@ static const char *_text_state(enum pchg_state state)
 
 	BUILD_ASSERT(ARRAY_SIZE(state_names) == PCHG_STATE_COUNT);
 
-	if (state >= sizeof(state_names))
+	if (state >= ARRAY_SIZE(state_names))
 		return "UNDEF";
 
 	return state_names[state];
