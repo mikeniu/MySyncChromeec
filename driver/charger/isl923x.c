@@ -498,12 +498,15 @@ static enum ec_error_list raa489000_get_actual_current(int chgnum, int *current)
 	int reg;
 
 	rv = raw_read16(chgnum, RAA489000_REG_ADC_CHARGE_CURRENT, &reg);
+	if (rv)
+		return rv;
+
 	/* The value is in 22.2mA increments. */
 	reg *= 222;
 	reg /= 10;
 
 	*current = REG_TO_CURRENT(reg);
-	return rv;
+	return EC_SUCCESS;
 }
 #endif /* CONFIG_CHARGER_RAA489000 */
 
@@ -1453,6 +1456,7 @@ static enum ec_error_list raa489000_enable_linear_charge(int chgnum,
 	int precharge_current;
 	int regval;
 	enum ec_error_list rv;
+	int read_rv;
 	int act_chg = charge_get_active_chg_chip();
 
 	batt_info = battery_get_info();
@@ -1486,12 +1490,15 @@ static enum ec_error_list raa489000_enable_linear_charge(int chgnum,
 		precharge_current = max(64, batt_info->precharge_current);
 		trickle_regval = precharge_current / 32;
 		trickle_regval--; /* convert to 0-based field */
-		rv |= raw_read16(CHARGER_PRIMARY, ISL923X_REG_CONTROL2,
-				 &regval);
-		regval &= ~(GENMASK(15, 13));
-		regval |= trickle_regval << 13;
-		rv |= raw_write16(CHARGER_PRIMARY, ISL923X_REG_CONTROL2,
-				  regval);
+		read_rv = raw_read16(CHARGER_PRIMARY, ISL923X_REG_CONTROL2,
+				     &regval);
+		rv |= read_rv;
+		if (!read_rv) {
+			regval &= ~(GENMASK(15, 13));
+			regval |= trickle_regval << 13;
+			rv |= raw_write16(CHARGER_PRIMARY, ISL923X_REG_CONTROL2,
+					  regval);
+		}
 
 		/* Enable DVC trickle charge and DVC charge mode. */
 		rv |= raw_update16(
@@ -1612,8 +1619,11 @@ static enum ec_error_list raa489000_set_vsys_compensation(int chgnum,
 
 	/* Lastly, enable DVC fast charge mode for the primary charger IC. */
 	rv = raw_read16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10, &regval);
-	regval |= RAA489000_C10_ENABLE_DVC_CHARGE_MODE;
-	rv |= raw_write16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10, regval);
+	if (!rv) {
+		regval |= RAA489000_C10_ENABLE_DVC_CHARGE_MODE;
+		rv |= raw_write16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10,
+				  regval);
+	}
 	if (rv) {
 		CPRINTS("%s Failed to enable DVC on primary charger!",
 			__func__);
