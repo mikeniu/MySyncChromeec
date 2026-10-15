@@ -222,7 +222,8 @@ static int accelgyro_config_fifo(const struct motion_sensor_t *s)
 	samples_to_discard[s->type] = LSM6DSO_DISCARD_SAMPLES;
 
 	fifo_odr_mask = LSM6DSO_FIFO_ODR_MASK(s);
-	reg_val = LSM6DSO_ODR_TO_REG(data->base.odr);
+	reg_val = data->base.odr ? LSM6DSO_ODR_TO_REG(data->base.odr) :
+				   LSM6DSO_DIS_BIT;
 	err = st_write_data_with_mask(s, LSM6DSO_FIFO_CTRL3_ADDR, fifo_odr_mask,
 				      reg_val);
 	if (err != EC_SUCCESS)
@@ -355,7 +356,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	if (ret == EC_SUCCESS) {
 		data->base.odr = normalized_rate;
 		if (IS_ENABLED(ACCEL_LSM6DSO_INT_ENABLE))
-			accelgyro_config_fifo(s);
+			ret = accelgyro_config_fifo(s);
 	}
 
 	mutex_unlock(s->mutex);
