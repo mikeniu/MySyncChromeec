@@ -34,6 +34,24 @@
       "parentUuid": "17c3356f_68d758aa",
       "revId": "c7db732804ef3893aa793782ed94260ab0989ec3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e8f4abd_0d242b99",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-15T14:42:11Z",
+      "side": 1,
+      "message": "ok but then you are pulling a device specific quirk in an otherwise device agnostic code, how about adding this to `pac194x_attr_set` in the `SENSOR_ATTR_CHANNEL_ENABLED` handler upstream?",
+      "parentUuid": "e0c2ee2e_a04a3b3a",
+      "revId": "c7db732804ef3893aa793782ed94260ab0989ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
