@@ -100,7 +100,11 @@ virtual_nvmem-y=virtual_nvmem.o
 
 x25519-y=x25519.o
 
-TPM2_ROOT := $(CROS_WORKON_SRCROOT)/src/third_party/tpm2$(BRANCH_EXT)
+ifneq ($(CROS_WORKON_SRCROOT),)
+TPM2_ROOT ?= $(CROS_WORKON_SRCROOT)/src/third_party/tpm2$(BRANCH_EXT)
+else
+TPM2_ROOT ?= $(realpath ../../third_party/tpm2$(BRANCH_EXT))
+endif
 $(out)/RO/common/new_nvmem.o: CFLAGS += -I$(TPM2_ROOT) -I chip/g
 $(out)/RO/test/nvmem.o: CFLAGS += -I$(TPM2_ROOT)
 $(out)/RO/test/virtual_nvmem.o: CFLAGS += -I$(TPM2_ROOT) -I board/cr50 \
