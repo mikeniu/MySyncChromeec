@@ -31,5 +31,17 @@ DECLARE_FAKE_VALUE_FUNC(int, mock_alg_match,
 
 FFF_END_EXTERN_C
 
+#ifdef __cplusplus
+inline void reset_mock_alg_fakes() noexcept
+{
+	RESET_FAKE(mock_alg_init);
+	RESET_FAKE(mock_alg_exit);
+	RESET_FAKE(mock_alg_enroll_start);
+	RESET_FAKE(mock_alg_enroll_step);
+	RESET_FAKE(mock_alg_enroll_finish);
+	RESET_FAKE(mock_alg_match);
+}
+#endif
+
 #endif /* PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_TASK_SRC_MOCK_FINGERPRINT_ALGORITHM_H_ \
 	*/

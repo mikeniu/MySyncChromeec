@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
 #include "mock_fingerprint_algorithm.h"
 
 #include <zephyr/device.h>
@@ -24,14 +25,7 @@
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
-#define fp_sim DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
-
-static const size_t test_info_buffer_size =
-	sizeof(struct ec_response_fp_info_v3) +
-	sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
-static uint8_t buffer[test_info_buffer_size];
-static struct ec_response_fp_info_v3 *test_info_buffer =
-	(struct ec_response_fp_info_v3 *)buffer;
+static FpSensorInfoBuffer test_info_buffer;
 
 ZTEST_USER(fpsensor_init, test_tpm_seed_init)
 {
@@ -46,24 +40,24 @@ ZTEST_USER(fpsensor_init, test_tpm_seed_init)
 	};
 
 	/* Get FP encryption flags. */
-	zassert_ok(ec_cmd_fp_encryption_status(NULL, &status));
+	zassert_ok(ec_cmd_fp_encryption_status(nullptr, &status));
 
 	/* Confirm TPM seed is not set */
 	zassert_true(status.valid_flags & FP_ENC_STATUS_SEED_SET);
 	zassert_false(status.status & FP_ENC_STATUS_SEED_SET);
 
 	/* Set TPM seed. */
-	zassert_ok(ec_cmd_fp_seed(NULL, &params));
+	zassert_ok(ec_cmd_fp_seed(nullptr, &params));
 
 	/* Get FP encryption flags. */
-	zassert_ok(ec_cmd_fp_encryption_status(NULL, &status));
+	zassert_ok(ec_cmd_fp_encryption_status(nullptr, &status));
 
 	/* Confirm that FP_ENC_STATUS_SEED_SET is set. */
 	zassert_true(status.valid_flags & FP_ENC_STATUS_SEED_SET);
 	zassert_true(status.status & FP_ENC_STATUS_SEED_SET);
 
 	/* Try to set TPM seed once again (should fail). */
-	zassert_equal(EC_RES_ACCESS_DENIED, ec_cmd_fp_seed(NULL, &params));
+	zassert_equal(EC_RES_ACCESS_DENIED, ec_cmd_fp_seed(nullptr, &params));
 }
 
 ZTEST_USER(fpsensor_init, test_tpm_seed_invalid)
@@ -79,7 +73,7 @@ ZTEST_USER(fpsensor_init, test_tpm_seed_invalid)
 	};
 
 	/* Try to set TPM seed (should fail). */
-	zassert_equal(EC_RES_INVALID_PARAM, ec_cmd_fp_seed(NULL, &params));
+	zassert_equal(EC_RES_INVALID_PARAM, ec_cmd_fp_seed(nullptr, &params));
 }
 
 ZTEST_USER(fpsensor_init, test_set_fp_context)
@@ -91,191 +85,104 @@ ZTEST_USER(fpsensor_init, test_set_fp_context)
 	struct ec_response_fp_encryption_status status;
 
 	/* Set context (asynchronously). */
-	zassert_ok(ec_cmd_fp_context_v1(NULL, &params));
+	zassert_ok(ec_cmd_fp_context_v1(nullptr, &params));
 
 	/* Now any attempt to set context should return EC_RES_BUSY. */
-	zassert_equal(EC_RES_BUSY, ec_cmd_fp_context_v1(NULL, &params));
+	zassert_equal(EC_RES_BUSY, ec_cmd_fp_context_v1(nullptr, &params));
 
 	/* Now any attempt to get command result should return EC_RES_BUSY. */
 	params.action = FP_CONTEXT_GET_RESULT;
-	zassert_equal(EC_RES_BUSY, ec_cmd_fp_context_v1(NULL, &params));
+	zassert_equal(EC_RES_BUSY, ec_cmd_fp_context_v1(nullptr, &params));
 
 	/* Give opportunity for fpsensor task to change mode. */
 	k_msleep(1);
 
 	/* Get command result. */
-	zassert_ok(ec_cmd_fp_context_v1(NULL, &params));
+	zassert_ok(ec_cmd_fp_context_v1(nullptr, &params));
 
 	/* Get FP encryption flags. */
-	zassert_ok(ec_cmd_fp_encryption_status(NULL, &status));
+	zassert_ok(ec_cmd_fp_encryption_status(nullptr, &status));
 
 	/* Confirm that FP_CONTEXT_USER_ID_SET is set. */
 	zassert_true(status.status & FP_CONTEXT_USER_ID_SET);
 }
 
-ZTEST_USER(fpsensor_init, test_maintenance_mode_dead_pixel_3)
+static void verify_maintenance_dead_pixels(int reported_bad_pixels,
+					   int expected_dead_pixels)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_SENSOR_MAINTENANCE,
-	};
-	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
 
-	const int dead_pixels = 3;
+	update_sim_state([reported_bad_pixels](auto &s) {
+		s.bad_pixels = reported_bad_pixels;
+	});
 
-	/* Confirm that number of dead pixels is unknown. */
-	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
+	/* Change fingerprint mode to maintenance. */
+	zassert_true(set_fp_mode(FP_MODE_SENSOR_MAINTENANCE) &
+		     FP_MODE_SENSOR_MAINTENANCE);
+
+	/* Check that maintenance was run. */
+	fingerprint_get_state(fp_sim, &state);
+	zassert_true(state.maintenance_ran);
+
+	/* Confirm that number of dead pixels is correct. */
+	zassert_ok(ec_cmd_fp_info_v3(nullptr, test_info_buffer,
+				     test_info_buffer.size()));
+	zassert_equal(
+		FP_ERROR_DEAD_PIXELS(test_info_buffer->sensor_info.errors),
+		expected_dead_pixels);
+
+	/*
+	 * Confirm that maintenance flag is not set after the maintenance
+	 * operation is finished.
+	 */
+	zassert_false(get_fp_mode() & FP_MODE_SENSOR_MAINTENANCE);
+}
+
+ZTEST_USER(fpsensor_init, test_maintenance_mode_dead_pixel_3)
+{
+	/* Confirm that number of dead pixels is unknown initially. */
+	zassert_ok(ec_cmd_fp_info_v3(nullptr, test_info_buffer,
+				     test_info_buffer.size()));
 	zassert_equal(
 		FP_ERROR_DEAD_PIXELS(test_info_buffer->sensor_info.errors),
 		FP_ERROR_DEAD_PIXELS_UNKNOWN);
 
-	fingerprint_get_state(fp_sim, &state);
-	state.bad_pixels = dead_pixels;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Change fingerprint mode to maintenance. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode & FP_MODE_SENSOR_MAINTENANCE);
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Check that maintenance was run. */
-	fingerprint_get_state(fp_sim, &state);
-	zassert_true(state.maintenance_ran);
-
-	/* Confirm that number of dead pixels is correct. */
-	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
-	zassert_equal(
-		FP_ERROR_DEAD_PIXELS(test_info_buffer->sensor_info.errors),
-		dead_pixels);
-
-	/*
-	 * Confirm that maintenance flag is not set after the maintenance
-	 * operation is finished.
-	 */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_SENSOR_MAINTENANCE);
+	verify_maintenance_dead_pixels(3, 3);
 }
 
 ZTEST_USER(fpsensor_init, test_maintenance_mode_dead_pixel_max_plus_2)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_SENSOR_MAINTENANCE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-
-	fingerprint_get_state(fp_sim, &state);
-	state.bad_pixels = FP_ERROR_DEAD_PIXELS_MAX + 2;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Change fingerprint mode to maintenance. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode & FP_MODE_SENSOR_MAINTENANCE);
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Check that maintenance was run. */
-	fingerprint_get_state(fp_sim, &state);
-	zassert_true(state.maintenance_ran);
-
-	/* Confirm that number of dead pixels is correct. */
-	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
-	zassert_equal(
-		FP_ERROR_DEAD_PIXELS(test_info_buffer->sensor_info.errors),
-		FP_ERROR_DEAD_PIXELS_MAX);
-
-	/*
-	 * Confirm that maintenance flag is not set after the maintenance
-	 * operation is finished.
-	 */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_SENSOR_MAINTENANCE);
+	verify_maintenance_dead_pixels(FP_ERROR_DEAD_PIXELS_MAX + 2,
+				       FP_ERROR_DEAD_PIXELS_MAX);
 }
 
 ZTEST_USER(fpsensor_init, test_maintenance_mode_dead_pixel_max)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_SENSOR_MAINTENANCE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-
-	fingerprint_get_state(fp_sim, &state);
-	state.bad_pixels = FP_ERROR_DEAD_PIXELS_MAX;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Change fingerprint mode to maintenance. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode & FP_MODE_SENSOR_MAINTENANCE);
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Check that maintenance was run. */
-	fingerprint_get_state(fp_sim, &state);
-	zassert_true(state.maintenance_ran);
-
-	/* Confirm that number of dead pixels is correct. */
-	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
-	zassert_equal(
-		FP_ERROR_DEAD_PIXELS(test_info_buffer->sensor_info.errors),
-		FP_ERROR_DEAD_PIXELS_MAX);
-
-	/*
-	 * Confirm that maintenance flag is not set after the maintenance
-	 * operation is finished.
-	 */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_SENSOR_MAINTENANCE);
+	verify_maintenance_dead_pixels(FP_ERROR_DEAD_PIXELS_MAX,
+				       FP_ERROR_DEAD_PIXELS_MAX);
 }
 
 ZTEST_USER(fpsensor_init, test_maintenance_mode_dead_pixel_max_minus_1)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_SENSOR_MAINTENANCE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
+	verify_maintenance_dead_pixels(FP_ERROR_DEAD_PIXELS_MAX - 1,
+				       FP_ERROR_DEAD_PIXELS_MAX - 1);
+}
 
-	fingerprint_get_state(fp_sim, &state);
-	state.bad_pixels = FP_ERROR_DEAD_PIXELS_MAX - 1;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Change fingerprint mode to maintenance. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode & FP_MODE_SENSOR_MAINTENANCE);
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Check that maintenance was run. */
-	fingerprint_get_state(fp_sim, &state);
-	zassert_true(state.maintenance_ran);
-
-	/* Confirm that number of dead pixels is correct. */
-	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
+ZTEST_USER(fpsensor_init, test_fp_info_v3_overflow)
+{
 	zassert_equal(
-		FP_ERROR_DEAD_PIXELS(test_info_buffer->sensor_info.errors),
-		FP_ERROR_DEAD_PIXELS_MAX - 1);
+		EC_RES_OVERFLOW,
+		ec_cmd_fp_info_v3(nullptr, test_info_buffer,
+				  sizeof(struct ec_response_fp_info_v3) - 1));
+}
 
-	/*
-	 * Confirm that maintenance flag is not set after the maintenance
-	 * operation is finished.
-	 */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_SENSOR_MAINTENANCE);
+ZTEST_USER(fpsensor_init, test_fp_info_v3_get_info_error)
+{
+	update_sim_state([](auto &state) { state.get_info_result = -EINVAL; });
+
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_info_v3(nullptr, test_info_buffer,
+					test_info_buffer.size()));
 }
 
 static void *fpsensor_setup(void)
@@ -284,37 +191,16 @@ static void *fpsensor_setup(void)
 	start_ec_tasks();
 	k_msleep(100);
 
-	return NULL;
+	return nullptr;
 }
 
 static void fpsensor_before(void *f)
 {
-	struct fingerprint_sensor_state state = {
-		.bad_pixels = 0,
-		.maintenance_ran = false,
-		.detect_mode = false,
-		.low_power_mode = false,
-		.finger_state = FINGERPRINT_FINGER_STATE_NONE,
-		.init_result = 0,
-		.deinit_result = 0,
-		.config_result = 0,
-		.get_info_result = 0,
-		.acquire_image_result = FINGERPRINT_SENSOR_SCAN_GOOD,
-		.last_acquire_image_mode = -1,
-	};
-	struct ec_params_fp_mode params = {
-		.mode = 0,
-	};
-	struct ec_response_fp_mode response;
+	zassert_equal(set_fp_mode(0), 0);
 
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_equal(response.mode, 0);
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	fingerprint_set_state(fp_sim, &state);
+	reset_sim_state();
 	RESET_FAKE(mkbp_send_event);
 }
 
-ZTEST_SUITE(fpsensor_init, NULL, fpsensor_setup, fpsensor_before, NULL, NULL);
+ZTEST_SUITE(fpsensor_init, nullptr, fpsensor_setup, fpsensor_before, nullptr,
+	    nullptr);
