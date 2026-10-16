@@ -83,6 +83,12 @@ class IteI2cFlasher(_IteBaseFlasher):
             time.sleep(2)
             self.servo.set("gsc_i2c_ctrl", "ite_debugger_mode")
             time.sleep(3)
+            # Cr50 warm-reboots after sending ite_debugger_mode, which clears
+            # sysrst and allows the AP to wake mid-erase unless re-asserted.
+            try:
+                self.servo.set("gsc_uart_cmd", "sysrst assert")
+            except ServoError:
+                pass
         else:
             raise ValueError(
                 f"Servo controller not supported for ITE I2C: {controller}"
@@ -163,7 +169,19 @@ class IteI2cFlasher(_IteBaseFlasher):
         board_lower = (getattr(self.args, "board", "") or "").lower()
         if ap_rst_pin and "Problem with" not in ap_rst_pin:
             cmd.append(f"--dbgr-preserve-pin={ap_rst_pin}")
-        elif board_lower in ("corsola", "veluza"):
+        elif board_lower in (
+            "corsola",
+            "krabby",
+            "tentacruel",
+            "magikarp",
+            "chinchou",
+            "skitty",
+            "veluza",
+            "staryu",
+            "wugtrio",
+            "starmie",
+            "wyrdeer",
+        ):
             cmd.append("--dbgr-preserve-pin=G1")
 
         if self.args.verbose:

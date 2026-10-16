@@ -13,6 +13,7 @@ from unittest.mock import patch
 from flash.ite_flasher import IteI2cFlasher
 from flash.ite_flasher import IteUartFlasher
 from flash.servo_utils import ServoDriver
+from flash.servo_utils import ServoError
 
 
 class TestIteI2cFlasher(unittest.TestCase):
@@ -46,11 +47,41 @@ class TestIteI2cFlasher(unittest.TestCase):
 
         self.flasher.prepare_dut()
 
-        self.servo.set.assert_any_call("gsc_uart_cmd", "sysrst assert")
-        self.servo.set.assert_any_call("gsc_i2c_ctrl", "ite_debugger_mode")
+        self.servo.set.assert_has_calls(
+            [
+                call("gsc_uart_cmd", "sysrst assert"),
+                call("gsc_i2c_ctrl", "ite_debugger_mode"),
+                call("gsc_uart_cmd", "sysrst assert"),
+            ]
+        )
 
         self.flasher.cleanup_dut()
         self.servo.set.assert_any_call("gsc_uart_cmd", "sysrst deassert")
+
+    @patch("time.sleep")
+    def test_prepare_and_cleanup_ccd_ignores_sysrst_servo_error(
+        self, _mock_sleep: MagicMock
+    ) -> None:
+        """Verify ServoError on gsc_uart_cmd sysrst does not abort CCD DFU."""
+
+        def mock_get(key: str, default: str = "") -> str:
+            if key == "servo_type":
+                return "servo_v4_with_ccd_cr50"
+            if key == "ccd_i2c_en":
+                return "Always"
+            return default
+
+        def mock_set(key: str, _val: str) -> None:
+            if key == "gsc_uart_cmd":
+                raise ServoError("gsc_uart_cmd failed")
+
+        self.servo.get.side_effect = mock_get
+        self.servo.set.side_effect = mock_set
+        self.servo.has_control.return_value = True
+
+        self.flasher.prepare_dut()
+        self.servo.set.assert_any_call("gsc_i2c_ctrl", "ite_debugger_mode")
+        self.flasher.cleanup_dut()
 
     @patch("time.sleep")
     def test_prepare_dut_reads_enable_ite_dfu(
@@ -168,7 +199,7 @@ class TestIteI2cFlasher(unittest.TestCase):
         _mock_locate: MagicMock,
         _mock_exists: MagicMock,
     ) -> None:
-        """Verify --block-write-size=256 and --dbgr-preserve-pin=G1 on veluza."""
+        """Verify --block-write-size=256 and --dbgr-preserve-pin=G1 on corsola/staryu."""
 
         def mock_get(key: str, default: str = "") -> str:
             if key == "servo_type":
@@ -180,22 +211,26 @@ class TestIteI2cFlasher(unittest.TestCase):
         self.servo.get.side_effect = mock_get
         self.servo.has_control.return_value = False
 
-        self.flasher.execute_flash()
+        for board in ("veluza", "staryu", "wugtrio"):
+            with self.subTest(board=board):
+                mock_run.reset_mock()
+                self.args.board = board
+                self.flasher.execute_flash()
 
-        mock_run.assert_called_once_with(
-            [
-                "/mock/iteflash",
-                "--send-waveform=0",
-                "--i2c-interface=usb",
-                "-s",
-                "CCD123",
-                "--block-write-size=256",
-                "--dbgr-preserve-pin=G1",
-                "--erase",
-                "--write=/tmp/image.bin",
-            ],
-            check=True,
-        )
+                mock_run.assert_called_once_with(
+                    [
+                        "/mock/iteflash",
+                        "--send-waveform=0",
+                        "--i2c-interface=usb",
+                        "-s",
+                        "CCD123",
+                        "--block-write-size=256",
+                        "--dbgr-preserve-pin=G1",
+                        "--erase",
+                        "--write=/tmp/image.bin",
+                    ],
+                    check=True,
+                )
 
     @patch("flash.ite_flasher.parse_fmap_areas", return_value={})
     @patch("time.sleep")

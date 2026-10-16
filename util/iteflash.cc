@@ -853,34 +853,43 @@ static int exit_dbgr_mode(struct common_hnd *chnd)
 static int dbgr_reset_gpio(struct common_hnd *chnd)
 {
 	int ret = 0;
-	int addr;
+
+	if (chnd->conf.preserve_pin == 0)
+		return 0;
 
 	printf("Reset GPIOs to default safely.\n");
 	if (chnd->dbgr_addr_3bytes)
 		ret |= i2c_write_byte(chnd, 0x80, 0xf0);
-	ret |= i2c_write_byte(chnd, 0x2f, 0x16);
 
-	/*
-	 * Iterate GPCR registers (0xF01610..0xF0166F) instead of issuing a
-	 * global GPIO reset (0xF02007 = BIT(1)) so alternate-function pins
-	 * (0x00) and any caller-specified preserve_pin (e.g. AP_RST_L) are
-	 * not floated to High-Z input mid-flash.
-	 */
-	for (addr = 0x1610; addr <= 0x166f; addr++) {
-		uint8_t val = 0;
-		int r;
+	if (chnd->conf.preserve_pin == -1) {
+		ret |= i2c_write_byte(chnd, 0x2f, 0x20);
+		ret |= i2c_write_byte(chnd, 0x2e, 0x07);
+		ret |= i2c_write_byte(chnd, 0x30, BIT(1));
+	} else {
+		/*
+		 * Iterate GPCR registers (0xF01610..0xF0166F) instead of
+		 * issuing a global GPIO reset (0xF02007 = BIT(1)) so
+		 * alternate-function pins and the caller-specified
+		 * preserve_pin (e.g. AP_RST_L) are not floated to High-Z
+		 * input mid-flash. Only switch pins configured as Output
+		 * (BIT(6)) to Input (0x80).
+		 */
+		ret |= i2c_write_byte(chnd, 0x2f, 0x16);
+		for (int addr = 0x1610; addr <= 0x166f; addr++) {
+			uint8_t val = 0;
+			int r;
 
-		if (chnd->conf.preserve_pin != -1 &&
-		    addr == chnd->conf.preserve_pin)
-			continue;
+			if (addr == chnd->conf.preserve_pin)
+				continue;
 
-		r = i2c_write_byte(chnd, 0x2e, addr & 0xff);
-		if (!r)
-			r = i2c_read_byte(chnd, 0x30, &val);
-		if (r < 0)
-			ret |= r;
-		else if (val != 0x00)
-			ret |= i2c_write_byte(chnd, 0x30, 0x80);
+			r = i2c_write_byte(chnd, 0x2e, addr & 0xff);
+			if (!r)
+				r = i2c_read_byte(chnd, 0x30, &val);
+			if (r < 0)
+				ret |= r;
+			else if (val & BIT(6))
+				ret |= i2c_write_byte(chnd, 0x30, 0x80);
+		}
 	}
 
 	if (ret < 0)
@@ -2425,8 +2434,8 @@ static void display_usage(const char *program)
 	fprintf(stderr, "-b, --block-write-size <size> : Perform writes in\n"
 			"\tblocks of this many bytes.\n");
 	fprintf(stderr,
-		"-P, --dbgr-preserve-pin <addr|port_pin> : Skip resetting\n"
-		"\tspecified GPCR offset (e.g. 0x1641 or G1) during DBGR.\n");
+		"-P, --dbgr-preserve-pin <addr|port_pin|all> : Skip resetting\n"
+		"\tspecified GPCR offset (e.g. 0x1641, G1, or all) during DBGR.\n");
 	fprintf(stderr, "-p, --product <0x1234> : USB product ID\n");
 	fprintf(stderr,
 		"-R, --range base[:size] : Allow to read or write"
@@ -2533,8 +2542,9 @@ static int parse_skip_range_options(const char *str, const char *size_arg,
 }
 
 /*
- * Parses -P / --dbgr-preserve-pin parameter, accepting either a GPCR register
- * offset (e.g. "0x1641") or a port+pin name (e.g. "G1" -> 0x1641).
+ * Parses -P / --dbgr-preserve-pin parameter, accepting a GPCR register
+ * offset (e.g. "0x1641"), a port+pin name (e.g. "G1" -> 0x1641), or "all"
+ * (0, skip GPIO reset completely).
  */
 static int parse_preserve_pin_option(const char *str,
 				     struct iteflash_config *conf)
@@ -2544,6 +2554,11 @@ static int parse_preserve_pin_option(const char *str,
 
 	if (!str || !*str)
 		return -1;
+
+	if (!strcasecmp(str, "all")) {
+		conf->preserve_pin = 0;
+		return 0;
+	}
 
 	if (((str[0] >= 'A' && str[0] <= 'L') ||
 	     (str[0] >= 'a' && str[0] <= 'l')) &&
@@ -2560,7 +2575,7 @@ static int parse_preserve_pin_option(const char *str,
 	if (!endptr || *endptr != '\0' || val < 0x1610 || val > 0x166f) {
 		fprintf(stderr,
 			"Invalid -P / --dbgr-preserve-pin value: %s "
-			"(expected 0x1610..0x166f or A0..L7)\n",
+			"(expected 0x1610..0x166f, A0..L7, or all)\n",
 			str);
 		return -1;
 	}
@@ -2772,7 +2787,8 @@ int main(int argc, char **argv)
 	check_flashid(&chnd);
 
 	/* add wdt restart to prevent wdt interrupt flashing */
-	restart_wdt(&chnd);
+	if (chnd.conf.disable_watchdog)
+		restart_wdt(&chnd);
 
 	ret = post_waveform_work(&chnd);
 	if (ret)
