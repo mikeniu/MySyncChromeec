@@ -403,7 +403,12 @@ static void board_customize_usbc_mux(uint32_t board_version)
 {
 	if (board_version > 0) {
 		/* not proto, override the mux setting */
-		memcpy(usb_muxes, ampton_usb_muxes, sizeof(ampton_usb_muxes));
+		usb_muxes[USB_PD_PORT_ITE_0].mux =
+			&ampton_usb_muxes[USB_PD_PORT_ITE_0];
+		usb_muxes[USB_PD_PORT_ITE_0].next = NULL;
+		usb_muxes[USB_PD_PORT_ITE_1].mux =
+			&ampton_usb_muxes[USB_PD_PORT_ITE_1];
+		usb_muxes[USB_PD_PORT_ITE_1].next = NULL;
 	}
 }
 
