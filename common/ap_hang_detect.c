@@ -34,7 +34,6 @@ DECLARE_DEFERRED(hang_detect_reboot);
 
 static void hang_detect_reload(void)
 {
-	CPRINTS("Reloaded on AP request (timeout: %ds)", reboot_timeout_sec);
 	hook_call_deferred(&hang_detect_reboot_data,
 			   reboot_timeout_sec * SECOND);
 }
