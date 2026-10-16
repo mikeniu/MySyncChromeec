@@ -52,4 +52,12 @@ config CHRE_DYNAMIC_NANOAPPS
 	  The resulting nanoapps are output under nanoapps/ in the build
 	  directory, ready for loading via ectool chreload.
 
+config CHRE_HOST_TUNNEL
+	bool "Enable bidirectional FlatBuffer tunneling for CHRE host daemon"
+	default y
+	help
+	  Enable EC_CMD_CHRE_HOST_TO_TARGET and EC_CMD_CHRE_TARGET_TO_HOST
+	  commands for bidirectional CHRE FlatBuffer communication with the
+	  host chre_daemon_cros over /dev/cros_ish.
+
 endif # ISH_CHRE

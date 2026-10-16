@@ -4,6 +4,7 @@
 
 if(CONFIG_ISH_CHRE)
   zephyr_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>)
+  zephyr_compile_definitions(FLATBUFFERS_CHRE)
 
   pw_add_library(chre.platform.ec.log INTERFACE
     HEADERS
@@ -26,9 +27,16 @@ if(CONFIG_ISH_CHRE)
   )
 
   if(DEFINED CHRE_ROOT)
+    target_sources_ifdef(CONFIG_CHRE_HOST_TUNNEL app PRIVATE
+      chre_host_tunnel.cc
+    )
     set(CHRE_PLATFORM_PIGWEED ON CACHE BOOL "" FORCE)
     zephyr_compile_options(-include zephyr/sys/util_macro.h)
     add_compile_definitions(CHRE_ATOMIC_UINT32_REF_ENABLED=1)
+    target_include_directories(app PRIVATE
+      ${CHRE_ROOT}/platform/shared/fbs/include
+      ${CHRE_ROOT}/external/flatbuffers/include
+    )
     include(${CHRE_ROOT}/chre_api/backend.cmake)
     include(${CHRE_ROOT}/platform/backend.cmake)
     include(${CHRE_ROOT}/platform/shared/backend.cmake)

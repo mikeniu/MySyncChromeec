@@ -4182,6 +4182,9 @@ enum ec_mkbp_event {
 	/* Bluetooth passthrough event */
 	EC_MKBP_EVENT_BLUETOOTH = 14,
 
+	/* Context Hub Runtime Environment (CHRE) event */
+	EC_MKBP_EVENT_CHRE = 15,
+
 	/* Number of MKBP events */
 	EC_MKBP_EVENT_COUNT,
 };
@@ -4205,6 +4208,7 @@ BUILD_ASSERT(EC_MKBP_EVENT_COUNT <= EC_MKBP_EVENT_TYPE_MASK);
 		[EC_MKBP_EVENT_PCHG] = "PCHG",                                 \
 		[EC_MKBP_EVENT_PWRMON] = "PWRMON",                             \
 		[EC_MKBP_EVENT_BLUETOOTH] = "BLUETOOTH",                       \
+		[EC_MKBP_EVENT_CHRE] = "CHRE",                                 \
 	}
 /* clang-format on */
 
@@ -8561,6 +8565,35 @@ struct ec_response_chre_load_nanoapp {
 
 struct ec_params_chre_unload_nanoapp {
 	uint64_t app_id;
+} __ec_align4;
+
+/* CHRE bidirectional host communication tunneling */
+#define EC_CMD_CHRE_HOST_TO_TARGET 0x0152
+
+struct ec_params_chre_tunnel_msg {
+	uint32_t total_size;
+	uint32_t offset;
+	uint16_t fragment_id;
+	uint16_t fragment_size;
+	uint8_t data[FLEXIBLE_ARRAY_MEMBER_SIZE];
+} __ec_align4;
+
+struct ec_response_chre_tunnel_msg {
+	uint32_t status;
+} __ec_align4;
+
+#define EC_CMD_CHRE_TARGET_TO_HOST 0x0153
+
+struct ec_params_chre_target_to_host {
+	uint16_t max_size;
+} __ec_align4;
+
+struct ec_response_chre_target_to_host {
+	uint32_t total_size;
+	uint32_t offset;
+	uint16_t fragment_id;
+	uint16_t fragment_size;
+	uint8_t data[FLEXIBLE_ARRAY_MEMBER_SIZE];
 } __ec_align4;
 
 /*****************************************************************************/
