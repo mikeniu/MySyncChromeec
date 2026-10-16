@@ -1143,14 +1143,17 @@ __overridable void board_power_5v_enable(int enable)
 static uint32_t pwr_5v_en_req;
 static K_MUTEX_DEFINE(pwr_5v_ctl_mtx);
 
+/* The task IDs and the POWER_5V_REQ_* IDs share the request bitmask. */
+BUILD_ASSERT(TASK_ID_COUNT + EXTRA_TASK_COUNT <= POWER_5V_REQ_LED);
+
 void power_5v_enable(task_id_t tid, int enable)
 {
 	k_mutex_lock(&pwr_5v_ctl_mtx, K_FOREVER);
 
 	if (enable) /* Set the bit indicating the request. */
-		pwr_5v_en_req |= 1 << tid;
+		pwr_5v_en_req |= BIT(tid);
 	else /* Clear the task's request bit. */
-		pwr_5v_en_req &= ~(1 << tid);
+		pwr_5v_en_req &= ~BIT(tid);
 
 	/*
 	 * If there are any outstanding requests for the rail to be enabled,

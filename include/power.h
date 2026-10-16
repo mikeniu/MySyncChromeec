@@ -418,10 +418,17 @@ __override_proto void board_power_5v_enable(int enable);
  * NOTE: Be careful when calling from deferred functions, as they will all be
  * executed within the same task context! (The HOOKS task).
  *
- * @param tid: The caller's task ID.
+ * @param tid: The caller's task ID, or one of the POWER_5V_REQ_* IDs.
  * @param enable: 1 to turn on the rail, 0 to request the rail to be turned off.
  */
 void power_5v_enable(task_id_t tid, int enable);
+
+/*
+ * Requester IDs for callers of power_5v_enable() that are not a single task,
+ * like a LED driver updated from hooks, host commands and the console. They
+ * use the request bits above the task IDs.
+ */
+#define POWER_5V_REQ_LED 31
 
 #ifdef CONFIG_ZTEST
 /**
