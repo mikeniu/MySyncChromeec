@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6634580_39145158",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:52:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `TEST\u003d` field currently relies on a manual build command (`zmake build realtekfp`). Automated test coverage is mandatory for new drivers. Please implement unit tests (e.g., using `ztest` and mocking the SPI/flash interfaces to verify protection flag translation and state transitions) and update this line to reflect the test execution command.\n\n[🔗](http://go/tj/ec7549c1-c0c7-4f2e-af71-c7149221500f)",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3b7e8af_caf0b9d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:52:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** [[trajectory](http://go/tj/ec7549c1-c0c7-4f2e-af71-c7149221500f)]\n\n### Review Summary\n**Functionality**: The code appears functionally correct, bridging the EC protection flags to the RTS5817 SPI flash registers.\n**Architecture \u0026 Component Fit**: The driver appropriately uses the Zephyr SPI flash extensions and maps well to the `cros_flash_driver_api`.\n**Code Simplicity**: The code is mostly direct. Left an inline comment to flatten a branch block.\n**Idiomaticity \u0026 Readability**: Follows Zephyr EC C idioms nicely, utilizing early returns.\n**Security**: Software-only write protection is correctly enforced, preventing rollback of protection ranges when the hardware WP pin is asserted.\n**Testing**: ❌ **Missing Unit Tests**: Automated unit tests are missing. Please add a `ztest` suite that tests the logic within `cros_flash_rtkfp_get_protect_flags` and `cros_flash_rtkfp_protect_at_boot` by providing a mocked status register readout. Test cases should cover edge cases such as exact boundary thresholds and off-by-one lengths for the `CONFIG_RW_MEM_OFF` and `CONFIG_ROLLBACK_OFF` bounds.\n**CL Size \u0026 Scope**: `Size: L (+615, -0)`. This CL is **Too large (STRICTLY BLOCKING)**. It must be split into smaller, independent CLs.\nProposed split plan:\n1. **CL 1**: Core driver skeleton, initialization (`cros_flash_rtkfp_init`), basic status register getters/setters, and configuration files (`CMakeLists.txt`, `Kconfig`, `yaml`).\n2. **CL 2**: Introduce the flash write-protection logic (`cros_flash_rtkfp_protect_at_boot`, `cros_flash_rtkfp_get_protect_flags`, etc.) along with its automated unit tests using a mocked status register state.\n3. **CL 3**: Add the physical write and erase operations (`cros_flash_rtkfp_write`, `cros_flash_rtkfp_erase`).\n**Commit Message**: Accurate description, but requires updating the `TEST\u003d` line once automated tests are implemented.\n\nTAG\u003dagy\nCONV\u003df3a4d394-c5b5-41ed-aac0-f633d9e85da3",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad0c0693_4a6af2bc",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:52:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Automated test coverage is required for all new state transition and boundary logic. To test this logic without requiring physical hardware, you can decouple the flag translation logic from the hardware reads, or use a mock flash driver. \n\nFor instance, a basic ZTest validating the boundaries could look like this:\n\n```c\n#include \u003czephyr/ztest.h\u003e\n#include \"cros_flash_rtkfp.h\" // Or test via a mock Zephyr flash device\n\nZTEST(cros_flash_rtkfp, test_get_protect_flags_ro_only) {\n    // Arrange: Mock status registers covering up to WP_STORAGE_OFF + SIZE\n    uint8_t mock_sr1 \u003d ...;\n    uint8_t mock_sr2 \u003d ...;\n\n    // Act: Call the pure translation function or trigger via mock API\n    uint32_t flags \u003d mock_get_protect_flags(mock_sr1, mock_sr2);\n\n    // Assert: Verify only RO_AT_BOOT is set\n    zassert_equal(flags, EC_FLASH_PROTECT_RO_AT_BOOT, \"Expected RO_AT_BOOT flags\");\n}\n```\nPlease ensure automated tests covering the boundary bounds (e.g., `CONFIG_RW_MEM_OFF` and `CONFIG_ROLLBACK_OFF`) are added before this CL is merged.\n\n[🔗](http://go/tj/ec7549c1-c0c7-4f2e-af71-c7149221500f)",
+      "range": {
+        "startLine": 336,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e3282fd_59b6b3f2",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:52:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This control flow can be flattened by using an early return on error, which eliminates the nested `if (!ret)` blocks and makes the success path linear:\n\n```c\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tret \u003d cros_flash_rtkfp_sw_protect(dev, true);\n\tif (!ret) {\n\t\tdata-\u003esw_protected \u003d 1;\n\t}\n\n\treturn ret;\n```\n\n[🔗](http://go/tj/ec7549c1-c0c7-4f2e-af71-c7149221500f)",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
