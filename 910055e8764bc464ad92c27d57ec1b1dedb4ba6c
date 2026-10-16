@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40843be2_10cda838",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:41:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n*   **Functionality:** Looks good.\n*   **Architecture \u0026 Component Fit:** The new tests integrate seamlessly with the Zephyr test framework using standard `ztest` scenarios.\n*   **Code Simplicity:** Test logic is simple and straightforward.\n*   **Idiomaticity \u0026 Readability:** Excellent readability. Left a minor suggestion for improving the clarity of hex expected values.\n*   **Security:** N/A (test additions).\n*   **Testing:** Thorough boundary value checks and coverage of reset behaviors. Left minor suggestions for combining flags and explicitly validating the chip revision cache behavior.\n*   **CL Size \u0026 Scope:** Size: M (+110, -0). The CL focuses entirely on adding a cohesive suite of tests for the `cros_system_rtkfp` driver (Single Logical Change).\n*   **Commit Message:** The commit message correctly uses the required Chromium tags (`BUG\u003db:...`, `TEST\u003d...`) and concisely summarizes the added test scope.\n\n[🔗](http://go/tj/13fe2bc2-88fb-4b8c-a804-36c181a0a3d6)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "910055e8764bc464ad92c27d57ec1b1dedb4ba6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "171687fa_8ff4cbd7",
+        "filename": "zephyr/test/drivers/cros_system_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:41:57Z",
+      "side": 1,
+      "message": "Since the input chip version is provided in hexadecimal (e.g., `0x00420000`, `0x00ff0000`), using hex literals for the expected return values makes the correspondence much clearer and more consistent with the final assertion (`0x34`).\n\n```c\n\tzassert_equal(cros_system_rtkfp_get_chip_version(0x00000000), 0);\n\tzassert_equal(cros_system_rtkfp_get_chip_version(0x00420000), 0x42);\n\tzassert_equal(cros_system_rtkfp_get_chip_version(0x00ff0000), 0xff);\n```\n [🔗](http://go/tj/13fe2bc2-88fb-4b8c-a804-36c181a0a3d6)",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "910055e8764bc464ad92c27d57ec1b1dedb4ba6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "000c79c0_630eef18",
+        "filename": "zephyr/test/drivers/cros_system_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:41:57Z",
+      "side": 1,
+      "message": "Consider adding a test case that combines `TEST_SYSTEM_RUN_FLAG` with other bits (e.g., `TEST_SYSTEM_RUN_FLAG | BIT(0)`) to verify that the watchdog reset is correctly detected even when unrelated flags are set.\n\n```c\n\tzassert_equal(\n\t\tcros_system_rtkfp_determine_reset_cause(TEST_SYSTEM_RUN_FLAG | BIT(0)),\n\t\tWATCHDOG_RST);\n```\n [🔗](http://go/tj/13fe2bc2-88fb-4b8c-a804-36c181a0a3d6)",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "910055e8764bc464ad92c27d57ec1b1dedb4ba6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b5a11a9_a829ebc6",
+        "filename": "zephyr/test/drivers/cros_system_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:41:57Z",
+      "side": 1,
+      "message": "If the goal is to verify that the revision is evaluated only once and cached, consider modifying the backing register before the second call to prove that the cached value is returned instead of re-reading the register:\n\n```c\n\tzassert_str_equal(cros_system_chip_revision(), \"5\");\n\t/* The revision never changes, so it is evaluated only once. */\n\tcros_system_rtkfp_test_r_sys_sts \u003d 0x00420000;\n\tzassert_str_equal(cros_system_chip_revision(), \"5\");\n```\n [🔗](http://go/tj/13fe2bc2-88fb-4b8c-a804-36c181a0a3d6)",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "910055e8764bc464ad92c27d57ec1b1dedb4ba6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
