@@ -197,6 +197,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "be5a7af5_294ecbbd",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-10-16T09:23:52Z",
+      "side": 1,
+      "message": "\u003e Isn\u0027t max frequency 104MHz 2READ,4READ instructions?\n\nI think I understand the discrepancy in the specs we are looking at.\nThe 104MHz you mentioned is likely from the Puya datasheet.\nHowever, the 60MHz limitation comes from the design constraints of our development board—I suspect the maximum frequency was lowered due to PCB trace routing.\nIf it were on the final module, we should be able to follow the Puya spec.\nThat being said, if necessary, I can reset the SPI clock before configuring the system clock in soc/egis/et171/soc.c:\n```\n+   ** move to ram func\n+   ** calculate flash freq via spi_div\n\t/* AHB ~200Mhz / 3 \u003d 66MHz AHB , ~66Mhz / 2 / 2 \u003d 18Mhz APB */\n\tHAL_SMU_SetRootClock(ROOT_CLK_250M, SET_AHB_DIV, SET_APB_DIV);\n*   ** restore flash freq\n```",
+      "parentUuid": "bc4eb821_f40d9151",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ef320f_25247478",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
