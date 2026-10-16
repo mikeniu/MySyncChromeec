@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba9e6674_8749f976",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:15:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n*   **Functionality:** The SPI flash protection table and configuration for RTS5817 are correctly mapped and aligned with the chip specifications.\n*   **Architecture \u0026 Component Fit:** Integrates cleanly into the existing Zephyr flash layout configuration mechanism.\n*   **Code Simplicity:** The added definitions are minimal and straightforward.\n*   **Idiomaticity \u0026 Readability:** Clean macro definitions and struct table. Left a minor inline suggestion to reuse `DT_PROP` instead of hardcoded literal values for flash sizes.\n*   **Security:** No issues identified.\n*   **Testing:** Exempt from automated tests as this is a declarative hardware configuration map that cannot be mocked or simulated effectively without physical hardware.\n*   **CL Size \u0026 Scope:** Size: S (+47, -0). The change represents a single logical change focused on adding the GD25Q16 flash geometry and configuration.\n*   **Commit Message:** The commit message clearly explains the *Why* (preparation for `cros_flash` driver) and the *What*, strictly following the 1-3 paragraph prose rule without narrating the diff.\n\n[🔗](http://go/tj/6e0cad92-ef62-44b0-ab27-a7edb3de84e9)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "16a1a3153a5c865794f919e97db56801d570a4e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c624a9c4_c1bf4a39",
+        "filename": "zephyr/shim/chip/rtkfp/include/flash_chip.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:15:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \nSince this platform uses the Zephyr flash page layout (as noted in the commit description), the write and erase block sizes are likely already defined in the Zephyr device tree.\n\nConsider reusing those properties via `DT_PROP` instead of hardcoding `1` and `0x1000`. This ensures a single source of truth and matches the pattern used by other chips (e.g., `rtk/include/flash_chip.h` and `stm32/include/flash_chip.h`):\n\n```c\n/* Minimum write size */\n#define CONFIG_FLASH_WRITE_SIZE \\\n\tDT_PROP(DT_INST(0, soc_nv_flash), write_block_size)\n/* Erase sector size */\n#define CONFIG_FLASH_ERASE_SIZE \\\n\tDT_PROP(DT_INST(0, soc_nv_flash), erase_block_size)\n```\n\n[🔗](http://go/tj/6e0cad92-ef62-44b0-ab27-a7edb3de84e9)",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "16a1a3153a5c865794f919e97db56801d570a4e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
