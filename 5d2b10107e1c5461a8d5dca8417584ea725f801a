@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "715ad696_b46fe4fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T07:17:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/51e7e5ba-c459-4e5e-8e07-3954bb1a1be5)]\n\n### Review Summary\n\n*   **CL Size \u0026 Scope:** ✅ `Size: XS (+3, -3)`. This is a small, atomic CL making a single, focused logical change.\n*   **Functionality:** ✅ The device tree changes correctly double the AHB clock frequency while adjusting the APB divider to maintain its original frequency, and correctly update the SPI reference frequencies to match.\n*   **Architecture \u0026 Component Fit:** ✅ The configuration correctly overrides the appropriate `soc.dtsi` for the ET171 FPMCU.\n*   **Code Simplicity:** ✅ Direct and minimal configuration change.\n*   **Idiomaticity \u0026 Readability:** ✅ Standard and idiomatic Zephyr Device Tree syntax.\n*   **Testing:** ✅ Hardware/Physical Exception applies. The CL correctly relies on manual hardware testing on `srebrna` and `sanok` to verify the CPU frequency increase and its effect on enrollment/matching time, which is appropriate for low-level CPU clock adjustments.\n*   **Security:** ✅ No security concerns with this configuration change.\n*   **Commit Message:** ✅ The commit message is well-written—it provides a clear high-level summary of the change, details the rationale (speeding up enrollment), documents the power consumption trade-offs, and correctly specifies the manual testing performed.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5d2b10107e1c5461a8d5dca8417584ea725f801a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
