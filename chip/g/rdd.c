@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "case_closed_debug.h"
 #include "ccd_config.h"
 #include "clock.h"
 #include "console.h"
@@ -14,6 +15,7 @@
 #include "system.h"
 #include "task.h"
 #include "timer.h"
+#include "uartn.h"
 #include "usb_api.h"
 
 #define CPRINTS(format, args...) cprints(CC_USB, format, ## args)
@@ -80,7 +82,7 @@ void print_rdd_state(void)
 /**
  * Handle debug accessory disconnecting
  */
-static void rdd_disconnect(void)
+void rdd_disconnect(void)
 {
 	CPRINTS("Rdd disconnect");
 	state = DEVICE_STATE_DISCONNECTED;
@@ -94,6 +96,9 @@ static void rdd_disconnect(void)
 	 * CCD_MODE_L.
 	 */
 	gpio_set_level(GPIO_CCD_MODE_L, 1);
+	if (!ccd_ext_is_enabled() && gpio_get_level(GPIO_CCD_MODE_L) &&
+	    !uartn_is_enabled(UART_AP))
+		enable_sleep(SLEEP_MASK_RDD);
 }
 DECLARE_DEFERRED(rdd_disconnect);
 
@@ -104,7 +109,7 @@ DECLARE_DEFERRED(rdd_disconnect);
  * it needs to check the current state to determine whether we're already
  * connected.
  */
-static void rdd_connect(void)
+void rdd_connect(void)
 {
 	/* If we were debouncing, we're done, and still connected */
 	if (state == DEVICE_STATE_DEBOUNCING)
@@ -117,6 +122,7 @@ static void rdd_connect(void)
 	/* We were previously disconnected, so connect */
 	CPRINTS("Rdd connect");
 	state = DEVICE_STATE_CONNECTED;
+	disable_sleep(SLEEP_MASK_RDD);
 
 	/* Assert CCD_MODE_L to enable the SBUx muxes */
 	gpio_set_level(GPIO_CCD_MODE_L, 0);

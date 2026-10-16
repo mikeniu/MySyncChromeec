@@ -14,6 +14,7 @@ else
 test-list-host = aes
 test-list-host += base32
 test-list-host += base64
+test-list-host += ccd_sleep_inhibit
 test-list-host += cec
 test-list-host += console_edit
 test-list-host += crc32
@@ -58,6 +59,9 @@ endif
 aes-y=aes.o
 base32-y=base32.o
 base64-y=base64.o
+ccd_sleep_inhibit-y=ccd_sleep_inhibit.o
+ccd_sleep_inhibit-y+=../board/cr50/rdd.o
+ccd_sleep_inhibit-y+=../chip/g/rdd.o
 cec-y=cec.o
 console_edit-y=console_edit.o
 crc32-y=crc32.o
@@ -111,6 +115,13 @@ $(out)/RO/test/virtual_nvmem.o: CFLAGS += -I$(TPM2_ROOT) -I board/cr50 \
 	-I board/cr50/tpm2 -I chip/g
 $(out)/RO/test/nvmem_tpm2_mock.o: CFLAGS += -I$(TPM2_ROOT)
 $(out)/RO/common/u2f.o: CFLAGS += -DU2F_TEST
+dirs-y += board/cr50 chip/g
+CCD_TEST_CFLAGS = -I chip/g -I board/cr50 -include chip/host/registers.h
+$(out)/RO/test/../board/cr50/rdd.o: CFLAGS += $(CCD_TEST_CFLAGS) \
+	-include chip/g/hw_regdefs.h
+$(out)/RO/test/../chip/g/rdd.o: CFLAGS += $(CCD_TEST_CFLAGS) \
+	-include chip/g/hw_regdefs.h
+$(out)/RO/test/ccd_sleep_inhibit.o: CFLAGS += $(CCD_TEST_CFLAGS)
 
 host-is_enabled_error: TEST_SCRIPT=is_enabled_error.sh
 is_enabled_error-y=is_enabled_error.o.cmd
