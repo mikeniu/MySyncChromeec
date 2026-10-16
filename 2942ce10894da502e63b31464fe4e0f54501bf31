@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a05a5a3_18abf421",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T22:05:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ Correctly updates the `ampton_usb_muxes` array to `struct usb_mux_chain`, aligning with the rest of the codebase and resolving the alignment fault and memory corruption issue.\n*   **Architecture \u0026 Component Fit:** ✅ The board struct changes are localized, standard, and cleanly map hardware routing.\n*   **Code Simplicity:** ✅ The change is as minimal and direct as possible.\n*   **Idiomaticity \u0026 Readability:** ✅ Uses proper C99 compound literals (`\u0026(const struct usb_mux) { ... }`) to initialize the internal pointers cleanly.\n*   **Security:** ✅ Fixes a memory corruption vulnerability (out-of-bounds overwrite).\n*   **Testing:** ✅ Applies a hardware configuration change; `TEST\u003dmake BOARD\u003dampton -j; boot ampton/apel/nospike to OS` is appropriate here.\n*   **CL Size \u0026 Scope:** ✅ `Size: S (+21, -17)`. The CL is atomic and correctly scoped to a single logical bug fix.\n*   **Commit Message:** ✅ Clear description of the problem, the commit that caused the drift, and the applied fix, following ChromiumOS style guidelines.\n\n[[trajectory](https://goto.corp.google.com/traj/e8bf5d24-10ad-4444-8247-1c7e12346e3a)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2942ce10894da502e63b31464fe4e0f54501bf31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
