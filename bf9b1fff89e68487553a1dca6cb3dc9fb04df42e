@@ -215,6 +215,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7a48177d_cdf0198c",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-16T10:45:46Z",
+      "side": 1,
+      "message": "I think that make sense, so changing AHB frequency doesn\u0027t affect flash SPI.",
+      "parentUuid": "be5a7af5_294ecbbd",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ef320f_25247478",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
