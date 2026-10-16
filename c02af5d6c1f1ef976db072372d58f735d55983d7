@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "c02af5d6c1f1ef976db072372d58f735d55983d7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f0f90a1_d6fa6978",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-16T15:38:50Z",
+      "side": 1,
+      "message": "Nit: Have we considered using Zephyr\u0027s ring buffer for this? https://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/third_party/zephyrproject/zephyr/include/zephyr/sys/ring_buffer.h",
+      "revId": "c02af5d6c1f1ef976db072372d58f735d55983d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
