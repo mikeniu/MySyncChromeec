@@ -213,6 +213,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c23f3db_7a10b55e",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-10-16T07:41:02Z",
+      "side": 1,
+      "message": "Actually, I’m not very familiar with the ET171; @jacky.lee@egistec.corp-partner.google.com is the real expert on that.:) But I can perform performance tests on the egis660.",
+      "parentUuid": "c6ecc78c_c2b65636",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92549eb1_25dab50b",
