@@ -1,0 +1,117 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/*
+ * LSM6DSV double-tap sensor (rework, not for submission).
+ *
+ * The IMU is on the EC/ADSP battery bus with SA0 high (0x6b) and its
+ * interrupt outputs are wired to the fan PWM nets:
+ *   INT1 -> EC_FAN_PWM  (GPB7, normally PWM5 for fan 1)
+ *   INT2 -> EC_FAN2_PWM (GPB6, normally PWM4 for fan 2)
+ *
+ * The IMU interrupt outputs are push-pull, so disable the fans and PWM
+ * channels and configure GPB6/GPB7 as GPIO inputs.
+ *
+ * The EC owns the bus only while the AP is off, so the sensor is active in
+ * S5 only (see CONFIG_PLATFORM_EC_SENSOR_BUS_AP_OFF_ONLY).
+ */
+
+#include <dt-bindings/motionsense/utils.h>
+
+/ {
+	aliases {
+		lsm6dsv-int = &base_accel;
+		tap-sensor = &base_accel;
+	};
+
+	fans {
+		status = "disabled";
+	};
+
+	named-gpios {
+		gpio_imu_int1: imu_int1 {
+			gpios = <&gpiob 7 GPIO_INPUT>;
+		};
+		gpio_imu_int2: imu_int2 {
+			gpios = <&gpiob 6 GPIO_INPUT>;
+		};
+	};
+
+	gpio-interrupts {
+		int_imu_int1: imu_int1 {
+			irq-pin = <&gpio_imu_int1>;
+			/* The driver configures INT1 active low */
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "lsm6dsv_interrupt";
+		};
+	};
+
+	motionsense-mutex {
+		compatible = "cros-ec,motionsense-mutex";
+		base_mutex: base-mutex {
+		};
+	};
+
+	motionsense-rotation-ref {
+		compatible = "cros-ec,motionsense-rotation-ref";
+		base_rot_ref: base-rotation-ref {
+			mat33 = <1 0 0
+				 0 1 0
+				 0 0 1>;
+		};
+	};
+
+	motionsense-sensor-data {
+		lsm6dsv_data: lsm6dsv-drv-data {
+			compatible = "cros-ec,drvdata-lsm6dsv";
+			status = "okay";
+		};
+	};
+
+	motionsense-sensor {
+		base_accel: base-accel {
+			compatible = "cros-ec,lsm6dsv-accel";
+			status = "okay";
+
+			/* The EC owns the bus only while the AP is off */
+			active-mask = "SENSOR_ACTIVE_S5";
+			location = "MOTIONSENSE_LOC_BASE";
+			mutex = <&base_mutex>;
+			port = <&i2c_ec_i2c_adsp>;
+			rot-standard-ref = <&base_rot_ref>;
+			default-range = <4>;
+			drv-data = <&lsm6dsv_data>;
+			/* SA0 is strapped high on the rework */
+			i2c-spi-addr-flags = "LSM6DSV_ADDR1_FLAGS";
+			configs {
+				compatible =
+					"cros-ec,motionsense-sensor-config";
+				ec-s5 {
+					/*
+					 * Use forced mode with 0 Hz EC polling
+					 * so the EC only wakes on INT1
+					 * double-tap interrupts while the
+					 * sensor runs at 480 Hz internally.
+					 */
+					odr = <0>;
+					ec-rate = <0>;
+				};
+			};
+		};
+	};
+
+	motionsense-sensor-info {
+		compatible = "cros-ec,motionsense-sensor-info";
+		sensor-irqs = <&int_imu_int1>;
+	};
+};
+
+&pwm4 {
+	status = "disabled";
+};
+
+&pwm5 {
+	status = "disabled";
+};
