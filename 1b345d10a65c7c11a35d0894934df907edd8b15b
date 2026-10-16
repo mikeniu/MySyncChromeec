@@ -35,6 +35,42 @@
       "message": "This looks good. I would like to verify the test passes on Renode.",
       "revId": "1b345d10a65c7c11a35d0894934df907edd8b15b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a03c5fd3_d77335c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T16:20:20Z",
+      "side": 1,
+      "message": "Let\u0027s go ahead and submit this. But we still need to make sure the test passes on Renode for the AVL approval.",
+      "parentUuid": "c21bb0f6_8a60d9a2",
+      "revId": "1b345d10a65c7c11a35d0894934df907edd8b15b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af4b8952_57d565bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T16:20:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb37f976_dd80e26a",
+      "revId": "1b345d10a65c7c11a35d0894934df907edd8b15b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
