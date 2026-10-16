@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb45df60_f1ba2c5b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:31:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/780295f9-1160-4c16-9f25-a4587d6afd4f)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cad6f8371bceb2042f4e0e60e05111f3c6f14650",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "101819e6_f40dc152",
+        "filename": "zephyr/test/fingerprint/algorithm/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:31:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This branch can be flattened to a direct boolean assignment to eliminate control-flow complexity:\n```c\n\tfixture-\u003eis_initialized \u003d (res \u003d\u003d 0);\n```\n[🔗](http://go/tj/780295f9-1160-4c16-9f25-a4587d6afd4f)",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cad6f8371bceb2042f4e0e60e05111f3c6f14650",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
