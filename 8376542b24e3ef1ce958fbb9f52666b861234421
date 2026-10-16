@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c4452ac_5f3aac2d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T07:20:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/1ca40ab3-54f8-4199-9f82-0ef476babac4)]\n\n### Review Summary\n*   **Functionality:** `✅` The change properly maps the clock property using the clock_control driver.\n*   **Architecture \u0026 Component Fit:** `✅` Standard Zephyr device tree configuration.\n*   **Code Simplicity:** `✅` Clear and atomic change.\n*   **Idiomaticity \u0026 Readability:** `✅` Proper use of `/delete-property/` and `clocks` attributes in device tree overlay.\n*   **Security:** `✅` (N/A)\n*   **Testing:** `✅` N/A for purely hardware/DTS configuration bindings.\n*   **CL Size \u0026 Scope:** `✅` Size: XS (+2, -1). Single logical change.\n*   **Commit Message:** `✅` Clear, accurate, and properly formatted with BUG/TEST tags.\n\n[🔗](http://go/tj/1ca40ab3-54f8-4199-9f82-0ef476babac4)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8376542b24e3ef1ce958fbb9f52666b861234421",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0266f9ce_5bf0058d",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T07:20:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:** `spi0` also appears to use a hardcoded `clock-frequency`. If this SPI bus is in use, consider updating it to use the `clock_control` driver in a follow-up CL as well for consistency.\n\n[🔗](http://go/tj/1ca40ab3-54f8-4199-9f82-0ef476babac4)",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8376542b24e3ef1ce958fbb9f52666b861234421",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
