@@ -1369,14 +1369,6 @@ function flash_flashrom() {
 			# Assert EC reset.
 			dut_control cold_reset:on
 		fi
-
-		# Temp layout
-		L=/tmp/flash_spi_layout_$$
-		DELETE_LIST+=( "${L}" )
-
-		[[ -z "${FLAGS_read}" ]] && dump_fmap -F "${IMG}" > "${L}"
-
-		FLASHROM_OPTIONS=(-i EC_RW -i WP_RO -l "${L}" --noverify-all)
 	fi
 
 	# Generate the correct flashrom command base.
@@ -1400,6 +1392,7 @@ function flash_flashrom() {
 		T=/tmp/flash_spi_$$
 		DELETE_LIST+=( "${T}" )
 
+		local PATCH_OFFSET=0
 		if [[ "${CHIP}" =~ ^npcx(|_int)_spi$ ]] || \
 		   [[ "${CHIP}" =~ "ite_spi_ccd_i2c" ]] ||
 		   [[ "${CHIP}" =~ "ite_spi_ccd_uart" ]] ||
@@ -1415,6 +1408,7 @@ function flash_flashrom() {
 		else
 		{	# Patch temp image up to SPI_SIZE
 			if [[ ${IMG_SIZE} -lt ${SPI_SIZE} ]] ; then
+				PATCH_OFFSET="${PATCH_SIZE}"
 				dd if=/dev/zero bs="${PATCH_SIZE}" count=1 | \
 					tr '\0' '\377'
 			fi
@@ -1422,7 +1416,68 @@ function flash_flashrom() {
 		} > "${T}"
 		fi
 
+		local PRESERVE_SECTIONS=""
 		if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" ]]; then
+			PRESERVE_SECTIONS="$(get_preserve_sections "${IMG}")"
+		fi
+		if [[ -n "${PRESERVE_SECTIONS}" ]]; then
+			L=/tmp/flash_spi_layout_$$
+			DELETE_LIST+=( "${L}" )
+			: > "${L}"
+			FLASHROM_OPTIONS=()
+			local BASE_RANGES=""
+			if on_raiden && [[ ! "${SERVO_TYPE}" =~ "servo_micro" ]]; then
+				BASE_RANGES="$(dump_fmap "${IMG}" -e 2>/dev/null | \
+					awk '$1 == "WP_RO" || $1 == "EC_RW" {print $2, $3}' | \
+					sort -k1,1n)"
+			fi
+			if [[ -z "${BASE_RANGES}" ]]; then
+				BASE_RANGES="0 $(( SPI_SIZE - PATCH_OFFSET ))"
+			fi
+			local IDX=0
+			local BASE_OFF BASE_LEN CUR_START BASE_END
+			local SEC_NAME SEC_OFFSET SEC_SIZE SEC_START SEC_END SUB_END
+			while read -r BASE_OFF BASE_LEN; do
+				[[ -z "${BASE_OFF}" ]] && continue
+				CUR_START=$(( BASE_OFF + PATCH_OFFSET ))
+				BASE_END=$(( BASE_OFF + BASE_LEN + PATCH_OFFSET ))
+				while read -r SEC_NAME SEC_OFFSET SEC_SIZE; do
+					[[ -z "${SEC_NAME}" ]] && continue
+					SEC_START=$(( SEC_OFFSET + PATCH_OFFSET ))
+					SEC_END=$(( SEC_START + SEC_SIZE ))
+					if (( SEC_END <= CUR_START || SEC_START >= BASE_END )); then
+						continue
+					fi
+					if (( SEC_START > CUR_START )); then
+						SUB_END="${SEC_START}"
+						printf "%08x:%08x WRITE_%d\n" \
+							"${CUR_START}" "$(( SUB_END - 1 ))" "${IDX}" >> "${L}"
+						FLASHROM_OPTIONS+=( -i "WRITE_${IDX}" )
+						(( IDX += 1 ))
+					fi
+					info "Skipping preserved FMAP section" \
+						"${SEC_NAME} (${SEC_OFFSET}+${SEC_SIZE})"
+					if (( SEC_END > CUR_START )); then
+						CUR_START="${SEC_END}"
+					fi
+				done <<< "${PRESERVE_SECTIONS}"
+				if (( CUR_START < BASE_END )); then
+					printf "%08x:%08x WRITE_%d\n" \
+						"${CUR_START}" "$(( BASE_END - 1 ))" "${IDX}" >> "${L}"
+					FLASHROM_OPTIONS+=( -i "WRITE_${IDX}" )
+					(( IDX += 1 ))
+				fi
+			done <<< "${BASE_RANGES}"
+			FLASHROM_OPTIONS+=( -l "${L}" --noverify-all )
+		elif on_raiden && [[ ! "${SERVO_TYPE}" =~ "servo_micro" ]]; then
+			L=/tmp/flash_spi_layout_$$
+			DELETE_LIST+=( "${L}" )
+			dump_fmap -F "${IMG}" > "${L}"
+			FLASHROM_OPTIONS=(-i EC_RW -i WP_RO -l "${L}" --noverify-all)
+		elif [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" ]] && \
+		     ! dump_fmap "${IMG}" -e >/dev/null 2>&1; then
+			# Without dump_fmap we can't find CBI; fall back to the
+			# read-modify-write, which fails safely.
 			local IMG_CPY
 
 			IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
@@ -1775,13 +1830,27 @@ function flash_it83xx() {
 
 	if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" && \
 	      -z "${FLAGS_read}" ]]; then
-		local IMG_CPY
+		local PRESERVE_SECTIONS
+		PRESERVE_SECTIONS="$(get_preserve_sections "${IMG}")"
+		if [[ -n "${PRESERVE_SECTIONS}" ]] && \
+		   "${ITEFLASH_BIN}" -h 2>&1 | grep -q -- '--skip-range'; then
+			local SEC_NAME SEC_OFFSET SEC_SIZE SKIP_SPEC
+			while read -r SEC_NAME SEC_OFFSET SEC_SIZE; do
+				[[ -z "${SEC_NAME}" ]] && continue
+				SKIP_SPEC="$(printf '0x%x:0x%x' "${SEC_OFFSET}" "${SEC_SIZE}")"
+				info "Skipping preserved FMAP section ${SEC_NAME} (${SKIP_SPEC})"
+				ITEFLASH_ARGS+=( "--skip-range=${SKIP_SPEC}" )
+			done <<< "${PRESERVE_SECTIONS}"
+		elif [[ -n "${PRESERVE_SECTIONS}" ]] || \
+		     ! dump_fmap "${IMG}" -e >/dev/null 2>&1; then
+			local IMG_CPY
 
-		IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
-		cat "${IMG}" > "${IMG_CPY}"
-		IMG="${IMG_CPY}"
-		preserve_sections "ite_i2c" "${IMG}" "${TEMP_DIR}"    \
-			"${ITEFLASH_ARGS[@]}" || die "${MSG_PROGRAM_FAIL}"
+			IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
+			cat "${IMG}" > "${IMG_CPY}"
+			IMG="${IMG_CPY}"
+			preserve_sections "ite_i2c" "${IMG}" "${TEMP_DIR}"    \
+				"${ITEFLASH_ARGS[@]}" || die "${MSG_PROGRAM_FAIL}"
+		fi
 	fi
 
 	local ERROR_MSG
@@ -1884,13 +1953,28 @@ function flash_ite_uart_common() {
 
 	if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" && \
 	      -z "${FLAGS_read}" ]]; then
-		local IMG_CPY
+		local PRESERVE_SECTIONS
+		PRESERVE_SECTIONS="$(get_preserve_sections "${IMG}")"
+		if [[ -n "${PRESERVE_SECTIONS}" ]] && \
+		   "${ITECOMDBGR_BIN}" -h 2>&1 | grep -q -- '-S'; then
+			local SEC_NAME SEC_OFFSET SEC_SIZE SKIP_OFF SKIP_LEN
+			while read -r SEC_NAME SEC_OFFSET SEC_SIZE; do
+				[[ -z "${SEC_NAME}" ]] && continue
+				SKIP_OFF="$(printf '0x%x' "${SEC_OFFSET}")"
+				SKIP_LEN="$(printf '0x%x' "${SEC_SIZE}")"
+				info "Skipping preserved FMAP section ${SEC_NAME} (${SKIP_OFF} ${SKIP_LEN})"
+				ITEFLASH_ARGS+=( "-S" "${SKIP_OFF}" "${SKIP_LEN}" )
+			done <<< "${PRESERVE_SECTIONS}"
+		elif [[ -n "${PRESERVE_SECTIONS}" ]] || \
+		     ! dump_fmap "${IMG}" -e >/dev/null 2>&1; then
+			local IMG_CPY
 
-		IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
-		cat "${IMG}" > "${IMG_CPY}"
-		IMG="${IMG_CPY}"
-		preserve_sections "ite_uart" "${IMG}" "${TEMP_DIR}"    \
-			"${ITEFLASH_ARGS[@]}" || die "${MSG_PROGRAM_FAIL}"
+			IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
+			cat "${IMG}" > "${IMG_CPY}"
+			IMG="${IMG_CPY}"
+			preserve_sections "ite_uart" "${IMG}" "${TEMP_DIR}"    \
+				"${ITEFLASH_ARGS[@]}" || die "${MSG_PROGRAM_FAIL}"
+		fi
 	fi
 
 	if [[ -n "${FLAGS_read}" ]]; then
@@ -2107,25 +2191,70 @@ function flash_rtk_uart() {
 	if [[ -z "${IMG_READ}" ]]; then
 
 		info "Programming EC firmware image."
+		local PRESERVE_SECTIONS=""
 		if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" ]]; then
-			local IMG_CPY
-
-			IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
-			cat "${IMG}" > "${IMG_CPY}"
-			IMG="${IMG_CPY}"
-			preserve_sections "rtk_uart" "${IMG}" "${TEMP_DIR}"    \
-				"${RTK_UUT}" "--uart_device=${EC_UART}" || die "${MSG_PROGRAM_FAIL}"
+			PRESERVE_SECTIONS="$(get_preserve_sections "${IMG}")"
 		fi
+		if [[ -n "${PRESERVE_SECTIONS}" ]]; then
+			local CUR_START=0
+			local SEC_NAME SEC_OFFSET SEC_SIZE SEC_END SLICE_LEN SLICE_FILE SLICE_OFF
+			while read -r SEC_NAME SEC_OFFSET SEC_SIZE; do
+				[[ -z "${SEC_NAME}" ]] && continue
+				if (( SEC_OFFSET > CUR_START )); then
+					SLICE_LEN=$(( SEC_OFFSET - CUR_START ))
+					SLICE_FILE="${TEMP_DIR}/ec.slice.${CUR_START}.bin"
+					SLICE_OFF="$(printf '0x%08x' $(( SPI_OFFSET + CUR_START )))"
+					dd if="${IMG}" of="${SLICE_FILE}" bs=64K \
+						iflag=skip_bytes,count_bytes \
+						skip="${CUR_START}" count="${SLICE_LEN}" 2>/dev/null
+					print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
+						"${RTK_UUT}" "--method=flash" \
+						"--spi_start=${SLICE_OFF}" \
+						"--file=${SLICE_FILE}" \
+						"--uart_device=${EC_UART}" || die "${MSG_PROGRAM_FAIL}"
+				fi
+				info "Skipping preserved FMAP section" \
+					"${SEC_NAME} (${SEC_OFFSET}+${SEC_SIZE})"
+				SEC_END=$(( SEC_OFFSET + SEC_SIZE ))
+				if (( SEC_END > CUR_START )); then
+					CUR_START="${SEC_END}"
+				fi
+			done <<< "${PRESERVE_SECTIONS}"
+			if (( CUR_START < IMG_SIZE )); then
+				SLICE_LEN=$(( IMG_SIZE - CUR_START ))
+				SLICE_FILE="${TEMP_DIR}/ec.slice.${CUR_START}.bin"
+				SLICE_OFF="$(printf '0x%08x' $(( SPI_OFFSET + CUR_START )))"
+				dd if="${IMG}" of="${SLICE_FILE}" bs=64K \
+					iflag=skip_bytes,count_bytes \
+					skip="${CUR_START}" count="${SLICE_LEN}" 2>/dev/null
+				print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
+					"${RTK_UUT}" "--method=flash" \
+					"--spi_start=${SLICE_OFF}" \
+					"--file=${SLICE_FILE}" \
+					"--uart_device=${EC_UART}" || die "${MSG_PROGRAM_FAIL}"
+			fi
+		else
+			if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" ]] && \
+			   ! dump_fmap "${IMG}" -e >/dev/null 2>&1; then
+				local IMG_CPY
 
-		local UUT_WR=(
-				"${RTK_UUT}" \
-				"--method=flash" \
-				"--spi_start=${SPI_OFFSET}" \
-				"--file=${IMG}" \
-				"--uart_device=${EC_UART}")
+				IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
+				cat "${IMG}" > "${IMG_CPY}"
+				IMG="${IMG_CPY}"
+				preserve_sections "rtk_uart" "${IMG}" "${TEMP_DIR}"    \
+					"${RTK_UUT}" "--uart_device=${EC_UART}" || \
+					die "${MSG_PROGRAM_FAIL}"
+			fi
+			local UUT_WR=(
+					"${RTK_UUT}" \
+					"--method=flash" \
+					"--spi_start=${SPI_OFFSET}" \
+					"--file=${IMG}" \
+					"--uart_device=${EC_UART}")
 
-		print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
-			"${UUT_WR[@]}" || die "${MSG_PROGRAM_FAIL}"
+			print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
+				"${UUT_WR[@]}" || die "${MSG_PROGRAM_FAIL}"
+		fi
 
 		# If it is a program-verify request, then make a temporary
 		# directory to store the image.
@@ -2154,7 +2283,16 @@ function flash_rtk_uart() {
 	# only if it was a flash write request.
 	if [[ -z "${FLAGS_read}" && "${FLAGS_verify}" == "${FLAGS_TRUE}" ]]; then
 		info "Verifying EC firmware image."
-
+		if [[ -n "${PRESERVE_SECTIONS:-}" ]]; then
+			local SEC_NAME SEC_OFFSET SEC_SIZE
+			while read -r SEC_NAME SEC_OFFSET SEC_SIZE; do
+				[[ -z "${SEC_NAME}" ]] && continue
+				dd if="${IMG}" of="${IMG_READ}" bs=64K \
+					iflag=skip_bytes,count_bytes oflag=seek_bytes \
+					skip="${SEC_OFFSET}" seek="${SEC_OFFSET}" \
+					count="${SEC_SIZE}" conv=notrunc 2>/dev/null
+			done <<< "${PRESERVE_SECTIONS}"
+		fi
 		print_or_run cmp -s -n "${IMG_SIZE}" "${IMG}" "${IMG_READ}" \
 			|| die "${MSG_VERIFY_FAIL}"
 	fi
@@ -2273,22 +2411,65 @@ function flash_npcx_uut() {
 			die "Failed to load monitor binary."
 		fi
 
-		if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" ]]; then
-			local IMG_CPY
-
-			IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
-			cat "${IMG}" > "${IMG_CPY}"
-			IMG="${IMG_CPY}"
-			preserve_sections "${CHIP}" "${IMG}" "${TEMP_DIR}"    \
-				"${NPCX_UUT}" "${UUT_ARGS[@]}" || die "${MSG_PROGRAM_FAIL}"
+		local PRESERVE_SECTIONS=""
+		if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" && \
+		      "${FLAGS_offset}" -eq 0 ]]; then
+			PRESERVE_SECTIONS="$(get_preserve_sections "${IMG}")"
 		fi
 
 		info "Programming EC firmware image."
-		local UUT_WR=( "${NPCX_UUT}" "${UUT_ARGS[@]}"      \
-			       "--auto" "--offset=${FLAGS_offset}" \
-			       "--file=${IMG}" )
-		print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
-			"${UUT_WR[@]}" || die "${MSG_PROGRAM_FAIL}"
+		if [[ -n "${PRESERVE_SECTIONS}" ]]; then
+			local CUR_START=0
+			local SEC_NAME SEC_OFFSET SEC_SIZE SEC_END SLICE_LEN SLICE_FILE
+			while read -r SEC_NAME SEC_OFFSET SEC_SIZE; do
+				[[ -z "${SEC_NAME}" ]] && continue
+				if (( SEC_OFFSET > CUR_START )); then
+					SLICE_LEN=$(( SEC_OFFSET - CUR_START ))
+					SLICE_FILE="${TEMP_DIR}/ec.slice.${CUR_START}.bin"
+					dd if="${IMG}" of="${SLICE_FILE}" bs=64K \
+						iflag=skip_bytes,count_bytes \
+						skip="${CUR_START}" count="${SLICE_LEN}" 2>/dev/null
+					print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
+						"${NPCX_UUT}" "${UUT_ARGS[@]}" \
+						"--auto" "--offset=${CUR_START}" \
+						"--file=${SLICE_FILE}" || die "${MSG_PROGRAM_FAIL}"
+				fi
+				info "Skipping preserved FMAP section" \
+					"${SEC_NAME} (${SEC_OFFSET}+${SEC_SIZE})"
+				SEC_END=$(( SEC_OFFSET + SEC_SIZE ))
+				if (( SEC_END > CUR_START )); then
+					CUR_START="${SEC_END}"
+				fi
+			done <<< "${PRESERVE_SECTIONS}"
+			if (( CUR_START < IMG_SIZE )); then
+				SLICE_LEN=$(( IMG_SIZE - CUR_START ))
+				SLICE_FILE="${TEMP_DIR}/ec.slice.${CUR_START}.bin"
+				dd if="${IMG}" of="${SLICE_FILE}" bs=64K \
+					iflag=skip_bytes,count_bytes \
+					skip="${CUR_START}" count="${SLICE_LEN}" 2>/dev/null
+				print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
+					"${NPCX_UUT}" "${UUT_ARGS[@]}" \
+					"--auto" "--offset=${CUR_START}" \
+					"--file=${SLICE_FILE}" || die "${MSG_PROGRAM_FAIL}"
+			fi
+		else
+			if [[ "${FLAGS_no_preserve}" == "${FLAGS_FALSE}" ]] && \
+			   { [[ "${FLAGS_offset}" -ne 0 ]] || \
+			     ! dump_fmap "${IMG}" -e >/dev/null 2>&1; }; then
+				local IMG_CPY
+
+				IMG_CPY="${TEMP_DIR}/ec.new.cpy.bin"
+				cat "${IMG}" > "${IMG_CPY}"
+				IMG="${IMG_CPY}"
+				preserve_sections "${CHIP}" "${IMG}" "${TEMP_DIR}"    \
+					"${NPCX_UUT}" "${UUT_ARGS[@]}" || die "${MSG_PROGRAM_FAIL}"
+			fi
+			local UUT_WR=( "${NPCX_UUT}" "${UUT_ARGS[@]}"      \
+				       "--auto" "--offset=${FLAGS_offset}" \
+				       "--file=${IMG}" )
+			print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
+				"${UUT_WR[@]}" || die "${MSG_PROGRAM_FAIL}"
+		fi
 
 		# If it is a program-verify request, then make a temporary
 		# directory to store the image.
@@ -2312,6 +2493,16 @@ function flash_npcx_uut() {
 	# only if it was a flash write request.
 	if [[ -z "${FLAGS_read}" && "${FLAGS_verify}" == "${FLAGS_TRUE}" ]]; then
 		info "Verifying EC firmware image."
+		if [[ -n "${PRESERVE_SECTIONS:-}" ]]; then
+			local SEC_NAME SEC_OFFSET SEC_SIZE
+			while read -r SEC_NAME SEC_OFFSET SEC_SIZE; do
+				[[ -z "${SEC_NAME}" ]] && continue
+				dd if="${IMG}" of="${IMG_READ}" bs=64K \
+					iflag=skip_bytes,count_bytes oflag=seek_bytes \
+					skip="${SEC_OFFSET}" seek="${SEC_OFFSET}" \
+					count="${SEC_SIZE}" conv=notrunc 2>/dev/null
+			done <<< "${PRESERVE_SECTIONS}"
+		fi
 
 		print_or_run cmp -s -n "${IMG_SIZE}" "${IMG}" "${IMG_READ}" \
 			|| die "${MSG_VERIFY_FAIL}"
@@ -2417,6 +2608,15 @@ fi
 if [ "${NEED_SERVO}" != "no" ] ; then
 	servo_save
 fi
+
+function get_preserve_sections() {
+	local IMG_PATH=${1:?"missing arg 1: EC image path"}
+	if command -v dump_fmap >/dev/null 2>&1; then
+		dump_fmap "${IMG_PATH}" -e 2>/dev/null | \
+			awk '$4 == "preserve" || $1 == "CBI" {print $1, $2, $3}' | \
+			sort -k2,2n
+	fi
+}
 
 function preserve_sections() {
 	local CHIP_TYPE
