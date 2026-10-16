@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "8376542b24e3ef1ce958fbb9f52666b861234421",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6091c335_0cf6eb06",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-16T07:23:59Z",
+      "side": 1,
+      "message": "spi0 uses a different driver, which can not use the same mechanism.",
+      "parentUuid": "0266f9ce_5bf0058d",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9999
+      },
+      "revId": "8376542b24e3ef1ce958fbb9f52666b861234421",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
