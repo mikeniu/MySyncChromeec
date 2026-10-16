@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "60f9f2f02312d5356299fd4ce4a279f850b97e95",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12927417_461bae02",
+        "filename": "core/nds32/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1179294
+      },
+      "writtenOn": "2026-10-16T09:51:36Z",
+      "side": 1,
+      "message": "Good catch. Since reading IT83XX_ETWD_ETXCNTOR already flushes the EC register write buffer, this change is redundant. I am going to abandon this change.\n\nWhile discussing this with the HW timer module owner, we found an additional detail: timer settings, such as the control and counter registers, do not take effect immediately after the EC register write buffer is flushed. They only take effect after the next rising edge of the timer\u0027s input clock source.\nFor example, if we set a new counter value for an event timer running at 32.768 kHz, it may take up to one clock cycle, or about 30.5 µs, for the new value to take effect.",
+      "parentUuid": "abe51c1a_25dd11de",
+      "revId": "60f9f2f02312d5356299fd4ce4a279f850b97e95",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
