@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "1f0d0820b71511ff0108fc5dcf252af975e7ac5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6680c4e_6add8ab6",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T10:58:40Z",
+      "side": 1,
+      "message": "Done — updated docs/panic_data.md in PS2.",
+      "parentUuid": "62c7ee11_b2e18d6e",
+      "revId": "1f0d0820b71511ff0108fc5dcf252af975e7ac5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
