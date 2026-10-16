@@ -32,6 +32,7 @@
 #define BMI3_ACC_MODE_LOW_PWR 0x03
 #define BMI3_ACC_MODE_NORMAL 0X04
 #define BMI3_ACC_MODE_HIGH_PERF 0x07
+#define BMI3_ACC_ODR_200HZ 0x09
 
 #define BMI3_REG_GYR_DATA_X 0x06
 #define BMI3_REG_GYR_DATA_Y 0x07
@@ -129,17 +130,43 @@
 #define BMI3_INT_STATUS_FWM 0x4000
 #define BMI3_INT_STATUS_FFULL 0x8000
 #define BMI3_INT_STATUS_ORIENTATION 0x0008
+#define BMI3_INT_STATUS_TAP 0x0100
 
 #define BMI3_FIFO_GYRO_I2C_SYNC_FRAME 0x7f02
 #define BMI3_FIFO_ACCEL_I2C_SYNC_FRAME 0x7f01
 
-/* Gyro self calibration address */
+/* Feature engine extended register addresses */
+#define BMI3_BASE_ADDR_TAP2 0x1F
 #define BMI3_BASE_ADDR_SC 0x26
 #define BMI3_CMD_SELF_CALIB 0x0101
+
+/*
+ * EXT.TAP_2 (0x1F):
+ * - tap_peak_thres (bits 9:0): 1 LSB = 1/512 g (~1.953 mg)
+ * - max_gesture_dur (bits 15:10): 1 LSB = 40 ms
+ */
+#define BMI3_TAP_PEAK_THRES_MASK 0x03FF
+#define BMI3_TAP_MAX_DUR_POS 10
+#define BMI3_TAP_MAX_DUR_MASK 0x3F
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+#define BMI3_TAP_THRES_VAL                                                  \
+	MIN(MAX(DIV_ROUND_NEAREST(CONFIG_GESTURE_TAP_THRES_MG * 512, 1000), \
+		1),                                                         \
+	    BMI3_TAP_PEAK_THRES_MASK)
+#define BMI3_TAP_MAX_DUR_VAL                                                \
+	MIN(MAX(DIV_ROUND_NEAREST(CONFIG_GESTURE_TAP_MAX_INTERSTICE_T, 40), \
+		1),                                                         \
+	    BMI3_TAP_MAX_DUR_MASK)
+#define BMI3_TAP2_VAL \
+	(BMI3_TAP_THRES_VAL | (BMI3_TAP_MAX_DUR_VAL << BMI3_TAP_MAX_DUR_POS))
+#else
+#define BMI3_TAP2_VAL 0
+#endif /* CONFIG_GESTURE_SENSOR_DOUBLE_TAP */
 
 /* Feature engine General purpose register 1. */
 #define BMI3_FEATURE_IO_0 0x10
 #define BMI3_ANY_MOTION_X_EN_MASK 0x08
+#define BMI3_D_TAP_EN_MASK 0x20
 
 #define BMI3_FEATURE_IO_1 0x11
 #define BMI3_FEATURE_IO_1_ERROR_MASK 0x0F
@@ -147,6 +174,10 @@
 #define BMI3_SC_ST_STATUS_MASK 0x10
 #define BMI3_SC_RESULT_MASK 0x20
 #define BMI3_UGAIN_OFFS_UPD_COMPLETE 0x01
+
+#define BMI3_FEATURE_IO_2 0x12
+#define BMI3_FEATURE_IO_2_STARTUP_LSB 0x2C
+#define BMI3_FEATURE_IO_2_STARTUP_MSB 0x01
 
 #define BMI3_FEATURE_IO_STATUS 0x14
 
@@ -221,6 +252,9 @@
 
 #define BMI3_ORIENT_INT_MASK 0xC0
 #define BMI3_ORIENT_INT_POS 6
+
+#define BMI3_TAP_INT_MASK 0x03
+#define BMI3_TAP_INT_POS 0
 
 /*  Mask definitions for interrupt pin configuration */
 #define BMI3_INT_LATCH_MASK 0x0001
