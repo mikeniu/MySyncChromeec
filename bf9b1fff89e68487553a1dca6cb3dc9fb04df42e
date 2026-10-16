@@ -179,6 +179,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bc4eb821_f40d9151",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-16T08:59:07Z",
+      "side": 1,
+      "message": "Isn\u0027t max frequency 104MHz 2READ,4READ instructions?",
+      "parentUuid": "24da0dcf_3f97b525",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ef320f_25247478",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
