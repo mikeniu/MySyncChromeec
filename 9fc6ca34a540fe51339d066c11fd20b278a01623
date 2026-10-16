@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a863c71b_3c98aa77",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:38:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/1a426d8d-ca2d-4da4-b213-96e92b61c174)]\n\n### Review Summary\n*   **Functionality:** Looks good.\n*   **Architecture \u0026 Component Fit:** The new driver Kconfig, bindings, and CMake entries follow the established pattern for fingerprint drivers in Zephyr.\n*   **Code Simplicity:** Simple and direct declarative additions.\n*   **Idiomaticity \u0026 Readability:** Good. I left an inline suggestion about a mismatched comment regarding the heap size.\n*   **Security:** N/A.\n*   **Testing:** This CL adds declarative configurations (bindings, Kconfig) and no procedural logic, so new automated tests are not applicable here.\n*   **CL Size \u0026 Scope:** `Size: M (+67, -0)`. This CL is atomic and focused on a single logical change.\n*   **Commit Message:** The commit message concisely explains the changes and follows Chromium OS tagging conventions. [🔗](http://go/tj/1a426d8d-ca2d-4da4-b213-96e92b61c174)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9fc6ca34a540fe51339d066c11fd20b278a01623",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d6a5c02_3d0e40cc",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.rts5817maa",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:38:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The default heap size is `34816` (34KB), but the help text mentions `106KB`. This looks like a copy-paste error from `Kconfig.egis`. Please update the comment to match the default value (e.g. `34KB is enough...`).\n\n```kconfig\nconfig FINGERPRINT_SENSOR_RTS5817MAA_HEAP_SIZE\n\tint \"Size of heap for RTS5817MAA driver\"\n\tdefault 34816\n\thelp\n\t  Size of heap to be used by RTS5817MAA private library. The heap must have\n\t  enough size to keep finger templates during matching.\n\t  34KB is enough to match 3 templates at once.\n```\n[🔗](http://go/tj/1a426d8d-ca2d-4da4-b213-96e92b61c174)",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9fc6ca34a540fe51339d066c11fd20b278a01623",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
