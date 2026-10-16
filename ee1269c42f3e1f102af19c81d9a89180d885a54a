@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "398726ec_41ced193",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T16:19:07Z",
+      "side": 1,
+      "message": "I think we can actually go ahead and submit this. Technically it does depend on other CLs, but since it\u0027s not yet running on anything it\u0027s safe to submit. Note that we\u0027ll still need to make sure the test passes on Renode for the AVL approval.",
+      "parentUuid": "c87abfe2_39d3aa7f",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9999
+      },
+      "revId": "ee1269c42f3e1f102af19c81d9a89180d885a54a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "1f4cab82_c29fdfb3",
