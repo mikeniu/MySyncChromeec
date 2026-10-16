@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
 #include "mock_fingerprint_algorithm.h"
 
 #include <zephyr/device.h>
@@ -46,12 +47,7 @@ static const struct fingerprint_image_frame_params
 		FP_SIMULATOR_IMAGE_FRAME_PARAM_INITIALIZER, (, ),
 		DT_NODELABEL(fpsensor_sim)) };
 
-static const size_t test_info_buffer_size =
-	sizeof(struct ec_response_fp_info_v3) +
-	sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
-static uint8_t buffer[test_info_buffer_size];
-static struct ec_response_fp_info_v3 *test_info_buffer =
-	(struct ec_response_fp_info_v3 *)buffer;
+static FpSensorInfoBuffer test_info_buffer;
 
 ZTEST_USER(fpsensor_shim, test_shim_sensor_type_elan)
 {
@@ -138,7 +134,8 @@ ZTEST_USER(fpsensor_shim, test_shim_get_info_success)
 {
 	/* We need to initialize driver first to initialize 'error' field */
 	zassert_ok(fp_sensor_init());
-	zassert_ok(fp_sensor_get_info(test_info_buffer, test_info_buffer_size));
+	zassert_ok(
+		fp_sensor_get_info(test_info_buffer, test_info_buffer.size()));
 
 	zassert_equal(test_info_buffer->sensor_info.vendor_id,
 		      FOURCC('C', 'r', 'O', 'S'));
@@ -170,7 +167,7 @@ ZTEST_USER(fpsensor_shim, test_shim_get_info_failed)
 	fingerprint_set_state(fp_sim, &state);
 
 	zassert_equal(fp_sensor_get_info(test_info_buffer,
-					 test_info_buffer_size),
+					 test_info_buffer.size()),
 		      -EINVAL);
 }
 

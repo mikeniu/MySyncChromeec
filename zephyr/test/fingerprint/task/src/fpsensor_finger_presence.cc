@@ -12,11 +12,13 @@
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
 
+#include <chrono>
 #include <drivers/fingerprint.h>
 #include <drivers/fingerprint_sim.h>
 #include <ec_commands.h>
 #include <ec_tasks.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <host_command.h>
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
@@ -25,9 +27,12 @@ FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 /*
  * Time we wait for fpsensor task to check if the finger was removed.
- * This must be greater or equal to FINGER_POLLING_DELAY.
+ * Derived directly from FpSensorStateMachine::kFingerPollingDelay.
  */
-#define FPSENSOR_POLLING_DELAY_MS 100
+constexpr auto kPollingDelayMs =
+	std::chrono::duration_cast<std::chrono::milliseconds>(
+		FpSensorStateMachine::kFingerPollingDelay)
+		.count();
 
 ZTEST_USER(fpsensor_finger_presence, test_finger_down_mode)
 {
@@ -214,7 +219,6 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_up_no_finger_no_interrupt)
 		.mode = FP_MODE_FINGER_UP,
 	};
 	struct ec_response_fp_mode response;
-	uint32_t fp_events;
 
 	/* Detect finger up. */
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
@@ -232,13 +236,12 @@ ZTEST_USER(fpsensor_finger_presence, test_finger_up_no_finger_no_interrupt)
 	zassert_equal(mkbp_send_event_fake.call_count, 0);
 
 	/* Wait for fpsensor task to check the finger state. */
-	k_msleep(FPSENSOR_POLLING_DELAY_MS);
+	k_msleep(kPollingDelayMs);
 
 	/* Confirm MKBP event was sent. */
 	zassert_equal(mkbp_send_event_fake.call_count, 1);
 	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_UP);
+	zassert_true(global_context.take_events() & EC_MKBP_FP_FINGER_UP);
 
 	/* Confirm that finger up flag is not set. */
 	params.mode = FP_MODE_DONT_CHANGE;
@@ -254,7 +257,6 @@ ZTEST_USER(fpsensor_finger_presence,
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
 
 	/* Put finger on the sensor. */
 	fingerprint_get_state(fp_sim, &state);
@@ -279,8 +281,7 @@ ZTEST_USER(fpsensor_finger_presence,
 	/* Confirm MKBP event was sent. */
 	zassert_equal(mkbp_send_event_fake.call_count, 1);
 	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_UP);
+	zassert_true(global_context.take_events() & EC_MKBP_FP_FINGER_UP);
 
 	/* Confirm that finger up flag is not set after the finger is up. */
 	params.mode = FP_MODE_DONT_CHANGE;
@@ -296,7 +297,6 @@ ZTEST_USER(fpsensor_finger_presence,
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
 
 	/* Put finger on the sensor. */
 	fingerprint_get_state(fp_sim, &state);
@@ -315,13 +315,12 @@ ZTEST_USER(fpsensor_finger_presence,
 	fingerprint_set_state(fp_sim, &state);
 
 	/* Wait for fpsensor task to check the finger state. */
-	k_msleep(FPSENSOR_POLLING_DELAY_MS);
+	k_msleep(kPollingDelayMs);
 
 	/* Confirm MKBP event was sent. */
 	zassert_equal(mkbp_send_event_fake.call_count, 1);
 	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_UP);
+	zassert_true(global_context.take_events() & EC_MKBP_FP_FINGER_UP);
 
 	/* Confirm that finger up flag is not set after the finger is up. */
 	params.mode = FP_MODE_DONT_CHANGE;
@@ -355,7 +354,7 @@ ZTEST_USER(fpsensor_finger_presence,
 	fingerprint_set_state(fp_sim, &state);
 
 	/* Wait for fpsensor task to check the finger state. */
-	k_msleep(FPSENSOR_POLLING_DELAY_MS);
+	k_msleep(kPollingDelayMs);
 
 	/* Confirm MKBP event was not sent. */
 	zassert_equal(mkbp_send_event_fake.call_count, 0);
@@ -374,7 +373,6 @@ ZTEST_USER(fpsensor_finger_presence,
 	};
 	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
 
 	/* Put finger on the sensor. */
 	fingerprint_get_state(fp_sim, &state);
@@ -393,13 +391,12 @@ ZTEST_USER(fpsensor_finger_presence,
 	fingerprint_set_state(fp_sim, &state);
 
 	/* Wait for fpsensor task to check the finger state. */
-	k_msleep(FPSENSOR_POLLING_DELAY_MS);
+	k_msleep(kPollingDelayMs);
 
 	/* Confirm MKBP event was sent. */
 	zassert_equal(mkbp_send_event_fake.call_count, 1);
 	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_UP);
+	zassert_true(global_context.take_events() & EC_MKBP_FP_FINGER_UP);
 
 	/* Confirm that finger up flag is not set after the finger is up. */
 	params.mode = FP_MODE_DONT_CHANGE;

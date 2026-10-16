@@ -46,12 +46,12 @@ void test_tpm_seed_before_reboot(void)
 	LOG_INF("Step 1: tpm_seed_clear");
 	cflush();
 
-	zassert_mem_equal(global_context.tpm_seed.data(), zero_fake_tpm_seed,
-			  FP_CONTEXT_TPM_BYTES);
+	zassert_mem_equal(global_context.crypto.tpm_seed.data(),
+			  zero_fake_tpm_seed, FP_CONTEXT_TPM_BYTES);
 	std::ranges::copy(default_fake_tpm_seed,
-			  global_context.tpm_seed.begin());
-	zassert_mem_equal(global_context.tpm_seed.data(), default_fake_tpm_seed,
-			  FP_CONTEXT_TPM_BYTES);
+			  global_context.crypto.tpm_seed.begin());
+	zassert_mem_equal(global_context.crypto.tpm_seed.data(),
+			  default_fake_tpm_seed, FP_CONTEXT_TPM_BYTES);
 	system_reset(SYSTEM_RESET_HARD);
 }
 
@@ -60,8 +60,8 @@ void test_tpm_seed_after_reboot(void)
 	LOG_INF("Step 2: tpm_seed_clear");
 	cflush();
 
-	zassert_mem_equal(global_context.tpm_seed.data(), zero_fake_tpm_seed,
-			  FP_CONTEXT_TPM_BYTES);
+	zassert_mem_equal(global_context.crypto.tpm_seed.data(),
+			  zero_fake_tpm_seed, FP_CONTEXT_TPM_BYTES);
 }
 
 static void (*test_steps[])(void) = { test_tpm_seed_before_reboot,

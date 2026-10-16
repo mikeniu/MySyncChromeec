@@ -12,6 +12,7 @@
 #include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "fpsensor/fpsensor_state.h"
+#include "fpsensor_test_utils.h"
 #include "mock/otpi_mock.h"
 #include "openssl/aes.h"
 #include "openssl/bn.h"
@@ -43,12 +44,6 @@
 #include <variant>
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
-
-/* Function used to cleanup session secrets and flags. */
-void reset_session();
-
-/* Challenge creation time. */
-extern timestamp_t challenge_ctime;
 
 extern "C" ec_status test_send_host_command(int command, int version,
 					    const void *params, int params_size,
@@ -129,7 +124,7 @@ struct __packed test_v0_template_layout {
 	uint32_t size;
 	ec_fp_template_encryption_metadata metadata;
 	uint8_t template_data[sizeof(fp_template[0])];
-	uint8_t salt[sizeof(global_context.fp_positive_match_salt[0])];
+	uint8_t salt[sizeof(global_context.templates.fp_positive_match_salt[0])];
 };
 
 static void setup_and_encrypt_v0_template(test_v0_template_layout &params,
@@ -161,19 +156,20 @@ static void setup_and_encrypt_v0_template(test_v0_template_layout &params,
 	std::ranges::fill(params.salt, salt_fill);
 
 	if (encrypt) {
-		fp_auth_command_encryption_metadata info{};
 		uint8_t *payload_start = params.template_data;
 		size_t payload_size =
 			sizeof(params.template_data) + sizeof(params.salt);
 
-		encrypt_data_in_place(1, info, global_context.user_id,
-				      global_context.tpm_seed,
-				      { payload_start, payload_size });
+		const auto info =
+			encrypt_data_in_place(1, global_context.crypto.user_id,
+					      global_context.crypto.tpm_seed,
+					      { payload_start, payload_size });
+		zassert_true(info.has_value());
 
-		std::ranges::copy(info.nonce, params.metadata.nonce);
-		std::ranges::copy(info.encryption_salt,
+		std::ranges::copy(info->nonce, params.metadata.nonce);
+		std::ranges::copy(info->encryption_salt,
 				  params.metadata.encryption_salt);
-		std::ranges::copy(info.tag, params.metadata.tag);
+		std::ranges::copy(info->tag, params.metadata.tag);
 
 		if (corrupt_tag) {
 			params.metadata.tag[0] ^= 0x01;
@@ -345,16 +341,16 @@ initialize_pairing_key(std::span<uint8_t, FP_PAIRING_KEY_LEN> pairing_key)
 	zassert_not_equal(ecdh_key.get(), nullptr);
 
 	/* Get public key from that key */
-	std::optional<fp_elliptic_curve_public_key> pubkey =
-		create_pubkey_from_ec_key(*ecdh_key);
+	const auto pubkey = create_pubkey_from_ec_key(*ecdh_key);
 	zassert_true(pubkey.has_value());
 
-	wrap_params.peers_pubkey = pubkey.value();
+	wrap_params.peers_pubkey = *pubkey;
 
 	/* Generate Pairing Key on our side */
-	ec_error_list ret = generate_ecdh_shared_secret_without_kdf(
-		*ecdh_key, *fpmcu_public_key, pairing_key);
-	zassert_equal(ret, EC_SUCCESS);
+	const auto generated_key = generate_ecdh_shared_secret_without_kdf(
+		*ecdh_key, *fpmcu_public_key);
+	zassert_true(generated_key.has_value());
+	std::ranges::copy(*generated_key, pairing_key.begin());
 
 	/*
 	 * Send our public key to the FPMCU. FPMCU will return encrypted
@@ -392,10 +388,9 @@ static ec_error_list generate_valid_establish_session_request(
 	};
 
 	/* Obtain session key on our side */
-	std::array<uint8_t, SHA256_DIGEST_SIZE> session_key;
-	ec_error_list ret = generate_session_key(fpmcu_nonce, session_nonce,
-						 pairing_key, {}, session_key);
-	zassert_equal(ret, EC_SUCCESS);
+	const auto session_key = generate_session_key(
+		fpmcu_nonce, session_nonce, pairing_key, {});
+	zassert_true(session_key.has_value());
 
 	zassert_equal(tpm_seed.size(), sizeof(session_params->enc_tpm_seed));
 
@@ -408,7 +403,8 @@ static ec_error_list generate_valid_establish_session_request(
 	/* Encrypt tpm_seed using session key */
 	bssl::ScopedEVP_AEAD_CTX ctx;
 	int aead_ret = EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_256_gcm(),
-					 session_key.data(), session_key.size(),
+					 session_key->data(),
+					 session_key->size(),
 					 sizeof(session_params->tag), nullptr);
 	zassert_equal(aead_ret, 1);
 
@@ -449,9 +445,10 @@ establish_session(std::span<uint8_t, SHA256_DIGEST_LENGTH> session_key,
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
 
-	zassert_equal(generate_session_key(nonce_response.nonce, peer_nonce,
-					   pairing_key, {}, session_key),
-		      EC_SUCCESS);
+	const auto generated_session_key = generate_session_key(
+		nonce_response.nonce, peer_nonce, pairing_key, {});
+	zassert_true(generated_session_key.has_value());
+	std::ranges::copy(*generated_session_key, session_key.begin());
 
 	zassert_equal(generate_valid_establish_session_request(
 			      pairing_key, nonce_response.nonce, tpm_seed,
@@ -485,7 +482,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session)
 	zassert_equal(get_fp_encryption_status(&status), EC_SUCCESS);
 	zassert_true((status & FP_ENC_STATUS_SEED_SET) == 0);
 
-	global_context.templ_valid = 1;
+	global_context.templates.templ_valid = 1;
 
 	rv = test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, nullptr, 0,
 				    &nonce_response, sizeof(nonce_response));
@@ -510,7 +507,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session)
 	zassert_true((status & FP_ENC_STATUS_SEED_SET) ==
 		     FP_ENC_STATUS_SEED_SET);
 
-	zassert_equal(global_context.templ_valid, 0u);
+	zassert_equal(global_context.templates.templ_valid, 0u);
 }
 
 ZTEST(fpsensor_auth_commands,
@@ -775,7 +772,7 @@ struct __packed test_v1_template_layout {
 	uint8_t cmd;
 	ec_fp_template_encryption_metadata metadata;
 	uint8_t template_data[sizeof(fp_template[0])];
-	uint8_t salt[sizeof(global_context.fp_positive_match_salt[0])];
+	uint8_t salt[sizeof(global_context.templates.fp_positive_match_salt[0])];
 };
 
 static_assert(offsetof(test_v1_template_layout, metadata) ==
@@ -805,15 +802,16 @@ static void load_v1_template(const v1_template_options &opts = {})
 	}
 
 	if (opts.encrypt) {
-		fp_auth_command_encryption_metadata info{};
-		encrypt_data_in_place(1, info, global_context.user_id,
-				      global_context.tpm_seed,
-				      { params.template_data, payload_size });
+		const auto info = encrypt_data_in_place(
+			1, global_context.crypto.user_id,
+			global_context.crypto.tpm_seed,
+			{ params.template_data, payload_size });
+		zassert_true(info.has_value());
 
-		std::ranges::copy(info.nonce, params.metadata.nonce);
-		std::ranges::copy(info.encryption_salt,
+		std::ranges::copy(info->nonce, params.metadata.nonce);
+		std::ranges::copy(info->encryption_salt,
 				  params.metadata.encryption_salt);
-		std::ranges::copy(info.tag, params.metadata.tag);
+		std::ranges::copy(info->tag, params.metadata.tag);
 	}
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, &params,
@@ -917,10 +915,11 @@ static void generate_and_sign_challenge(
 					     sizeof(challenge_response)),
 		      EC_RES_SUCCESS);
 
-	zassert_equal(compute_message_signature(
-			      session_key, user_id, sender, operation,
-			      challenge_response.challenge, mac_out),
-		      EC_SUCCESS);
+	const auto sig = compute_message_signature(
+		session_key, user_id, sender, operation,
+		challenge_response.challenge);
+	zassert_true(sig.has_value());
+	std::ranges::copy(*sig, mac_out.begin());
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_generate_challenge)
@@ -967,8 +966,7 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request)
 	zassert_equal(get_fp_encryption_status(&status), EC_SUCCESS);
 	zassert_true((status & FP_AUTH_CHALLENGE_SET) == FP_AUTH_CHALLENGE_SET);
 
-	zassert_equal(validate_request(kTestUserId, kOpEnroll, mac),
-		      EC_SUCCESS);
+	zassert_true(validate_request(kTestUserId, kOpEnroll, mac).has_value());
 
 	zassert_equal(get_fp_encryption_status(&status), EC_SUCCESS);
 	zassert_true((status & FP_AUTH_CHALLENGE_SET) == 0);
@@ -980,7 +978,7 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request_fail_no_challenge)
 
 	zassert_equal(establish_session(), EC_SUCCESS);
 
-	zassert_equal(validate_request(kTestUserId, kOpEnroll, mac),
+	zassert_equal(validate_request(kTestUserId, kOpEnroll, mac).error(),
 		      EC_ERROR_ACCESS_DENIED);
 }
 
@@ -996,14 +994,13 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request_fail_invalid_signature)
 					     sizeof(challenge_response)),
 		      EC_RES_SUCCESS);
 
-	zassert_equal(validate_request(kTestUserId, kOpEnroll, mac),
+	zassert_equal(validate_request(kTestUserId, kOpEnroll, mac).error(),
 		      EC_ERROR_ACCESS_DENIED);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_validate_request_fail_timeout)
 {
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
 	ec_response_fp_generate_challenge challenge_response{};
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
@@ -1013,18 +1010,20 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request_fail_timeout)
 					     sizeof(challenge_response)),
 		      EC_RES_SUCCESS);
 
-	if (challenge_ctime.val >= 6 * USEC_PER_SEC) {
-		challenge_ctime.val -= 6 * USEC_PER_SEC;
+	if (global_context.crypto.active_challenge->ctime.val >=
+	    6 * USEC_PER_SEC) {
+		global_context.crypto.active_challenge->ctime.val -=
+			6 * USEC_PER_SEC;
 	} else {
 		k_sleep(K_SECONDS(6));
 	}
 
-	zassert_equal(compute_message_signature(
-			      session_key, kTestUserId, kSenderFingerGuard,
-			      kOpEnroll, challenge_response.challenge, mac),
-		      EC_SUCCESS);
+	const auto mac = compute_message_signature(
+		session_key, kTestUserId, kSenderFingerGuard, kOpEnroll,
+		challenge_response.challenge);
+	zassert_true(mac.has_value());
 
-	zassert_equal(validate_request(kTestUserId, kOpEnroll, mac),
+	zassert_equal(validate_request(kTestUserId, kOpEnroll, *mac).error(),
 		      EC_ERROR_TIMEOUT);
 }
 
@@ -1035,28 +1034,27 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_message)
 		8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5,
 	};
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_mac{};
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
-	zassert_equal(sign_message(kTestUserId, kOpEnroll, challenge, mac),
-		      EC_SUCCESS);
+	const auto mac = global_context.crypto.sign_message(
+		kTestUserId, kOpEnroll, challenge);
+	zassert_true(mac.has_value());
 
-	zassert_equal(compute_message_signature(session_key, kTestUserId,
-						kSenderFpmcu, kOpEnroll,
-						challenge, expected_mac),
-		      EC_SUCCESS);
+	const auto expected_mac = compute_message_signature(
+		session_key, kTestUserId, kSenderFpmcu, kOpEnroll, challenge);
+	zassert_true(expected_mac.has_value());
 
-	zassert_mem_equal(mac.data(), expected_mac.data(), mac.size());
+	zassert_mem_equal(mac->data(), expected_mac->data(), mac->size());
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_sign_message_fail_no_session)
 {
 	constexpr std::array<const uint8_t, FP_CHALLENGE_SIZE> challenge = {};
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
 
-	zassert_equal(sign_message(kTestUserId, kOpEnroll, challenge, mac),
+	zassert_equal(global_context.crypto
+			      .sign_message(kTestUserId, kOpEnroll, challenge)
+			      .error(),
 		      EC_ERROR_ACCESS_DENIED);
 }
 
@@ -1244,8 +1242,9 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_success)
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.templ_valid = 1;
-	global_context.template_newly_enrolled = global_context.templ_valid;
+	global_context.templates.templ_valid = 1;
+	global_context.templates.template_newly_enrolled =
+		*FpTemplateId::create(global_context.templates.templ_valid);
 
 	generate_and_sign_challenge(session_key, kTestUserId,
 				    kSenderFingerGuard, kOpEnrollFinish,
@@ -1256,7 +1255,7 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_success)
 					     0),
 		      EC_RES_SUCCESS);
 
-	zassert_equal(global_context.templ_valid, 2);
+	zassert_equal(global_context.templates.templ_valid, 2);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_invalid_signature)
@@ -1267,8 +1266,9 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_invalid_signature)
 	zassert_equal(establish_session(), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.templ_valid = 1;
-	global_context.template_newly_enrolled = global_context.templ_valid;
+	global_context.templates.templ_valid = 1;
+	global_context.templates.template_newly_enrolled =
+		*FpTemplateId::create(global_context.templates.templ_valid);
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_GENERATE_CHALLENGE, 0,
 					     nullptr, 0, &challenge_response,
@@ -1280,7 +1280,7 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_invalid_signature)
 					     0),
 		      EC_RES_ACCESS_DENIED);
 
-	zassert_equal(global_context.templ_valid, 1);
+	zassert_equal(global_context.templates.templ_valid, 1);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_state_mismatch)
@@ -1290,15 +1290,16 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_state_mismatch)
 	zassert_equal(establish_session(), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.templ_valid = 1;
-	global_context.template_newly_enrolled = 0;
+	global_context.templates.templ_valid = 1;
+	global_context.templates.template_newly_enrolled =
+		*FpTemplateId::create(0);
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_CONFIRM_TEMPLATE, 0,
 					     &params, sizeof(params), nullptr,
 					     0),
 		      EC_RES_ERROR);
 
-	zassert_equal(global_context.templ_valid, 1);
+	zassert_equal(global_context.templates.templ_valid, 1);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_sign_match_success)
@@ -1309,14 +1310,13 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_success)
 			       8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5 },
 	};
 	ec_response_fp_sign_match response{};
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_signature{};
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.positive_match_secret_state.template_matched = 0;
-	global_context.positive_match_secret_state.readable = true;
-	global_context.positive_match_secret_state.deadline.val =
+	global_context.templates.positive_match_secret_state.enable(
+		*FpTemplateId::create(0));
+	global_context.templates.positive_match_secret_state.deadline.val =
 		get_time().val + 5 * USEC_PER_SEC;
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
@@ -1324,13 +1324,13 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_success)
 					     sizeof(response)),
 		      EC_RES_SUCCESS);
 
-	zassert_equal(compute_message_signature(
-			      session_key, kTestUserId, kSenderFpmcu, kOpAuth,
-			      params.challenge, expected_signature),
-		      EC_SUCCESS);
+	const auto expected_signature = compute_message_signature(
+		session_key, kTestUserId, kSenderFpmcu, kOpAuth,
+		params.challenge);
+	zassert_true(expected_signature.has_value());
 
-	zassert_mem_equal(response.signature, expected_signature.data(),
-			  expected_signature.size());
+	zassert_mem_equal(response.signature, expected_signature->data(),
+			  expected_signature->size());
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_no_match)
@@ -1341,8 +1341,7 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_no_match)
 	zassert_equal(establish_session(), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.positive_match_secret_state.template_matched =
-		FP_NO_SUCH_TEMPLATE;
+	global_context.templates.positive_match_secret_state.disable();
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
 					     sizeof(params), &response,
@@ -1358,9 +1357,9 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_deadline_passed)
 	zassert_equal(establish_session(), EC_SUCCESS);
 	set_test_fp_context();
 
-	global_context.positive_match_secret_state.template_matched = 0;
-	global_context.positive_match_secret_state.readable = true;
-	global_context.positive_match_secret_state.deadline.val =
+	global_context.templates.positive_match_secret_state.enable(
+		*FpTemplateId::create(0));
+	global_context.templates.positive_match_secret_state.deadline.val =
 		get_time().val - 1;
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
@@ -1388,23 +1387,22 @@ ZTEST(fpsensor_auth_commands, test_fp_reset_does_not_clear_session)
 			       8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5 },
 	};
 	ec_response_fp_sign_match response{};
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_signature{};
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
-	zassert_true((global_context.fp_encryption_status &
+	zassert_true((global_context.crypto.fp_encryption_status &
 		      FP_CONTEXT_STATUS_SESSION_ESTABLISHED) ==
 		     FP_CONTEXT_STATUS_SESSION_ESTABLISHED);
 
-	fp_reset_and_clear_context();
+	global_context.reset_and_clear_context();
 
-	zassert_true((global_context.fp_encryption_status &
+	zassert_true((global_context.crypto.fp_encryption_status &
 		      FP_CONTEXT_STATUS_SESSION_ESTABLISHED) ==
 		     FP_CONTEXT_STATUS_SESSION_ESTABLISHED);
 
-	std::ranges::copy(kTestUserId, global_context.user_id.begin());
-	global_context.positive_match_secret_state.template_matched = 0;
-	global_context.positive_match_secret_state.readable = true;
-	global_context.positive_match_secret_state.deadline.val =
+	std::ranges::copy(kTestUserId, global_context.crypto.user_id.begin());
+	global_context.templates.positive_match_secret_state.enable(
+		*FpTemplateId::create(0));
+	global_context.templates.positive_match_secret_state.deadline.val =
 		get_time().val + 5 * USEC_PER_SEC;
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
@@ -1412,13 +1410,13 @@ ZTEST(fpsensor_auth_commands, test_fp_reset_does_not_clear_session)
 					     sizeof(response)),
 		      EC_RES_SUCCESS);
 
-	zassert_equal(compute_message_signature(
-			      session_key, kTestUserId, kSenderFpmcu, kOpAuth,
-			      params.challenge, expected_signature),
-		      EC_SUCCESS);
+	const auto expected_signature = compute_message_signature(
+		session_key, kTestUserId, kSenderFpmcu, kOpAuth,
+		params.challenge);
+	zassert_true(expected_signature.has_value());
 
-	zassert_mem_equal(response.signature, expected_signature.data(),
-			  expected_signature.size());
+	zassert_mem_equal(response.signature, expected_signature->data(),
+			  expected_signature->size());
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_clears_context)
@@ -1457,7 +1455,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_clears_context)
 
 	/* Set UserID and some templates */
 	set_test_fp_context({ 1, 2, 3, 4, 5, 6, 7, 8 });
-	global_context.templ_valid = 1;
+	global_context.templates.templ_valid = 1;
 
 	/* Verify current state */
 	zassert_equal(get_fp_encryption_status(&status), EC_SUCCESS);
@@ -1465,9 +1463,9 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_clears_context)
 		     FP_ENC_STATUS_SEED_SET);
 	zassert_true((status & FP_CONTEXT_USER_ID_SET) ==
 		     FP_CONTEXT_USER_ID_SET);
-	zassert_equal(global_context.templ_valid, 1u);
-	zassert_mem_equal(global_context.tpm_seed.data(), tpm_seed_1.data(),
-			  tpm_seed_1.size());
+	zassert_equal(global_context.templates.templ_valid, 1u);
+	zassert_mem_equal(global_context.crypto.tpm_seed.data(),
+			  tpm_seed_1.data(), tpm_seed_1.size());
 
 	/* 2. Establish second session with tpm_seed_2 */
 	zassert_equal(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0,
@@ -1491,16 +1489,16 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_clears_context)
 		     FP_ENC_STATUS_SEED_SET);
 	/* User ID should be cleared */
 	zassert_true((status & FP_CONTEXT_USER_ID_SET) == 0);
-	for (uint8_t val : global_context.user_id) {
+	for (uint8_t val : global_context.crypto.user_id) {
 		zassert_equal(val, 0);
 	}
 
 	/* Templates should be cleared */
-	zassert_equal(global_context.templ_valid, 0u);
+	zassert_equal(global_context.templates.templ_valid, 0u);
 
 	/* TPM seed should be updated to tpm_seed_2 */
-	zassert_mem_equal(global_context.tpm_seed.data(), tpm_seed_2.data(),
-			  tpm_seed_2.size());
+	zassert_mem_equal(global_context.crypto.tpm_seed.data(),
+			  tpm_seed_2.data(), tpm_seed_2.size());
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_corrupted_seed)
@@ -1626,7 +1624,8 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_busy)
 	};
 
 	/* Pretend that the session nonce was generated. */
-	global_context.fp_encryption_status |= FP_CONTEXT_SESSION_NONCE_SET;
+	global_context.crypto.fp_encryption_status |=
+		FP_CONTEXT_SESSION_NONCE_SET;
 
 	for (uint32_t mode : modes) {
 		/* Pretend that an operation on templates is running. */
@@ -1652,7 +1651,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_decrypted)
 					     sizeof(params), nullptr, 0),
 		      EC_RES_SUCCESS);
 
-	zassert_equal(global_context.templ_valid, 1u);
+	zassert_equal(global_context.templates.templ_valid, 1u);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_trivial_salt)
@@ -1665,7 +1664,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_trivial_salt)
 					     sizeof(params), nullptr, 0),
 		      EC_RES_INVALID_PARAM);
 
-	zassert_equal(global_context.templ_valid, 0u);
+	zassert_equal(global_context.templates.templ_valid, 0u);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_v3)
@@ -1680,7 +1679,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_v3)
 					     sizeof(params), nullptr, 0),
 		      EC_RES_INVALID_PARAM);
 
-	zassert_equal(global_context.templ_valid, 0u);
+	zassert_equal(global_context.templates.templ_valid, 0u);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_without_seed)
@@ -1694,7 +1693,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_without_seed)
 					     sizeof(params), nullptr, 0),
 		      EC_RES_UNAVAILABLE);
 
-	zassert_equal(global_context.templ_valid, 0u);
+	zassert_equal(global_context.templates.templ_valid, 0u);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_tag)
@@ -1707,7 +1706,29 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_tag)
 					     sizeof(params), nullptr, 0),
 		      EC_RES_UNAVAILABLE);
 
-	zassert_equal(global_context.templ_valid, 0u);
+	zassert_equal(global_context.templates.templ_valid, 0u);
+}
+
+ZTEST(fpsensor_auth_commands, test_fp_info_and_frame_host_cmd_handlers)
+{
+	FpSensorInfoBuffer info_buf{};
+
+	zassert_ok(ec_cmd_fp_info_v3(nullptr, info_buf, info_buf.size()));
+
+	ec_params_fp_frame frame_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 0,
+	};
+	zassert_equal(ec_cmd_fp_frame(nullptr, &frame_v0,
+				      reinterpret_cast<uint8_t *>(&info_buf)),
+		      EC_HOST_CMD_UNAVAILABLE);
+
+	ec_params_fp_frame_v1 frame_v1 = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+	zassert_equal(ec_cmd_fp_frame_v1(nullptr, &frame_v1, nullptr),
+		      EC_HOST_CMD_UNAVAILABLE);
 }
 
 } // namespace
@@ -1752,8 +1773,8 @@ static void before_fpsensor_auth_commands(void *fixture)
 	 * Reset fingerprint context, session secrets, and sensor mode for a
 	 * clean state.
 	 */
-	fp_reset_and_clear_context();
-	reset_session();
+	global_context.reset_and_clear_context();
+	global_context.crypto.reset_session();
 	global_context.sensor_mode = 0;
 }
 

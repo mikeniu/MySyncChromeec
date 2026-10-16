@@ -23,7 +23,7 @@ constexpr size_t kMaxReadSize = CONFIG_EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE;
 static uint8_t expected_canary[kMaxReadSize];
 
 /* Forward declaration. */
-enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output);
+enum ec_status get_frame(uint32_t offset, std::span<uint8_t> output);
 
 FAKE_VALUE_FUNC(int, system_is_locked);
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
@@ -42,9 +42,10 @@ static void get_frame_before(void *f)
 	mkbp_send_event_fake.return_val = 0;
 
 	/* Populate the C++ class cache object layout matrix. */
-	global_context.fp_image_frame_params_cache.populate_cache(
+	global_context.frame.frame_params_cache.populate_cache(
 		sizeof(fp_buffer));
-	global_context.current_capture_type = FP_CAPTURE_VENDOR_FORMAT;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_VENDOR_FORMAT);
 
 	/* Zero-out the shared frame buffer. */
 	memset(fp_buffer, 0, FP_SENSOR_IMAGE_SIZE);
@@ -63,7 +64,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_system_locked)
 
 	system_is_locked_fake.return_val = 1;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(status, EC_RES_ACCESS_DENIED,
 		      "Expected EC_RES_ACCESS_DENIED when system is locked");
@@ -83,9 +85,10 @@ ZTEST(fpsensor_get_frame, test_get_frame_invalid_capture_type)
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = 0;
 
-	global_context.current_capture_type = FP_CAPTURE_TYPE_INVALID;
+	global_context.frame.current_capture_type = std::nullopt;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(status, EC_RES_INVALID_PARAM,
 		      "Expected EC_RES_INVALID_PARAM for invalid capture type");
@@ -104,7 +107,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_size_zero)
 	uint32_t offset = 0;
 
 	/* A size of 0 is a valid request that safely copies zero bytes. */
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(status, EC_RES_SUCCESS,
 		      "Zero-length request should return EC_RES_SUCCESS");
@@ -123,7 +127,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 	uint32_t offset = 0;
 
 	/* Initialize the cache normally so it allocates its internal states. */
-	global_context.fp_image_frame_params_cache.populate_cache(
+	global_context.frame.frame_params_cache.populate_cache(
 		FP_SENSOR_IMAGE_SIZE);
 
 	/*
@@ -131,13 +135,14 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 	 * without violating strict aliasing rules.
 	 */
 	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
-			     global_context.fp_image_frame_params_cache,
+			     global_context.frame.frame_params_cache,
 			     FP_CAPTURE_VENDOR_FORMAT,
 			     FP_SENSOR_IMAGE_SIZE + 1),
 		     "Failed to set valid frame size for capture type %d",
 		     FP_CAPTURE_VENDOR_FORMAT);
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(status, EC_RES_INVALID_PARAM,
 		      "Expected cache size overflow failure");
@@ -159,7 +164,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_linear_overflow)
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = (FP_SENSOR_IMAGE_SIZE - size) + 1;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(
 		status, EC_RES_INVALID_PARAM,
@@ -178,7 +184,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_integer_overflow)
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = UINT32_MAX;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(
 		status, EC_RES_INVALID_PARAM,
@@ -194,7 +201,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
 	uint8_t output_buffer[kMaxReadSize];
 	memset(output_buffer, 0xA5, sizeof(output_buffer));
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1;
@@ -207,7 +215,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
 		(uint64_t)offset + FP_SENSOR_IMAGE_OFFSET > UINT32_MAX,
 		"Test setup: Expected overflow condition, but calculation is safe.");
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(
 		status, EC_RES_INVALID_PARAM,
@@ -229,7 +238,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 	uint32_t offset = 0;
 
 	/* Set capture type to true for skip_image_offset() evaluation. */
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
 	 * Simulate production buffer data layout: Shifting offset forward
@@ -248,7 +258,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 	expected_output[0] = 0xDE;
 	expected_output[1] = 0xAD;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(status, EC_RES_SUCCESS,
 		      "Frame copy should succeed within shifted layout bounds");
@@ -266,11 +277,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 
 	uint32_t size = kMaxReadSize;
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	/* Get the active real frame size limit dynamically from the cache. */
 	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+		*global_context.frame.frame_params_cache.get_frame_size(
 			FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
@@ -292,7 +304,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 	expected_output[0] = 0xBE;
 	expected_output[1] = 0xEF;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(
 		status, EC_RES_SUCCESS,
@@ -308,10 +321,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 
 	uint32_t size = kMaxReadSize;
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+		*global_context.frame.frame_params_cache.get_frame_size(
 			FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
@@ -320,7 +334,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 	 */
 	uint32_t offset = (active_frame_size - size) + 1;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(status, EC_RES_INVALID_PARAM,
 		      "Expected skipped offset overflow failure");
@@ -350,19 +365,21 @@ ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 		"Test setup: Offset calculation wrapped. "
 		"FP_SENSOR_IMAGE_OFFSET + size must be <= sizeof(fp_buffer) + 1.");
 
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	global_context.frame.current_capture_type =
+		*FpCaptureType::create(FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
 	 * Cache Pollution: Use the test-only setter to override the cache value
 	 * without violating strict aliasing rules.
 	 */
 	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
-			     global_context.fp_image_frame_params_cache,
+			     global_context.frame.frame_params_cache,
 			     FP_CAPTURE_SIMPLE_IMAGE, sizeof(fp_buffer)),
 		     "Failed to set valid frame size for capture type %d",
 		     FP_CAPTURE_SIMPLE_IMAGE);
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(status, EC_RES_INVALID_PARAM,
 		      "Expected skipped offset overflow failure");
@@ -390,7 +407,8 @@ ZTEST(fpsensor_get_frame, test_get_frame_absolute_success)
 	expected_output[1] = 0xBB;
 	expected_output[2] = 0xCC;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
+	enum ec_status status =
+		get_frame(offset, std::span(output_buffer, size));
 
 	zassert_equal(
 		status, EC_RES_SUCCESS,

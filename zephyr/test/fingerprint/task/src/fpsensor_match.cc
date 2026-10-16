@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
 #include "mock_fingerprint_algorithm.h"
 
 #include <zephyr/device.h>
@@ -43,12 +44,7 @@ static uint8_t image_buffer[IMAGE_SIZE];
 
 static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
 
-static const size_t test_info_buffer_size =
-	sizeof(struct ec_response_fp_info_v3) +
-	sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
-static uint8_t buffer[test_info_buffer_size];
-static struct ec_response_fp_info_v3 *test_info_buffer =
-	(struct ec_response_fp_info_v3 *)buffer;
+static FpSensorInfoBuffer test_info_buffer;
 
 /* The fake TPM seed is "very_secret_32_bytes_of_tpm_seed" */
 #define FAKE_TPM_SEED                                                       \
@@ -147,8 +143,6 @@ static void trigger_match_attempt(uint32_t mode)
 
 ZTEST_USER(fpsensor_match, test_match_no_templates_mkbp_event)
 {
-	uint32_t fp_events;
-
 	/* Trigger match with no templates loaded. */
 	trigger_match_attempt(FP_MODE_MATCH);
 
@@ -164,7 +158,7 @@ ZTEST_USER(fpsensor_match, test_match_no_templates_mkbp_event)
 	 * - Match failed with NO_TEMPLATES
 	 * - Finger ID is FP_NO_SUCH_TEMPLATE
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
+	const uint32_t fp_events = global_context.take_events();
 	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
@@ -230,8 +224,6 @@ ZTEST_USER(fpsensor_match, test_match_correct_template_and_image)
 
 ZTEST_USER(fpsensor_match, test_match_no_match_mkbp_event)
 {
-	uint32_t fp_events;
-
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
 		NULL,
@@ -259,7 +251,7 @@ ZTEST_USER(fpsensor_match, test_match_no_match_mkbp_event)
 	 * - Match failed with NO_MATCH
 	 * - Finger ID is FP_NO_SUCH_TEMPLATE
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
+	const uint32_t fp_events = global_context.take_events();
 	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), EC_MKBP_FP_ERR_MATCH_NO);
@@ -312,8 +304,6 @@ ZTEST_USER(fpsensor_match, test_match_no_template_update)
 
 ZTEST_USER(fpsensor_match, test_match_success_mkbp_event)
 {
-	uint32_t fp_events;
-
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
 		NULL,
@@ -344,7 +334,7 @@ ZTEST_USER(fpsensor_match, test_match_success_mkbp_event)
 	 * - Match succeeded with MATCH_YES
 	 * - Finger ID is 0
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
+	const uint32_t fp_events = global_context.take_events();
 	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), EC_MKBP_FP_ERR_MATCH_YES);
@@ -353,8 +343,6 @@ ZTEST_USER(fpsensor_match, test_match_success_mkbp_event)
 
 ZTEST_USER(fpsensor_match, test_match_success_template_updated_mkbp_event)
 {
-	uint32_t fp_events;
-
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
 		NULL,
@@ -385,7 +373,7 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_mkbp_event)
 	 * - Match succeeded with MATCH_YES_UPDATED
 	 * - Finger ID is 0
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
+	const uint32_t fp_events = global_context.take_events();
 	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
@@ -395,8 +383,6 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_mkbp_event)
 
 ZTEST_USER(fpsensor_match, test_match_success_template_update_failed_mkbp_event)
 {
-	uint32_t fp_events;
-
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
 		NULL,
@@ -427,7 +413,7 @@ ZTEST_USER(fpsensor_match, test_match_success_template_update_failed_mkbp_event)
 	 * - Match succeeded with MATCH_YES_UPDATE_FAILED
 	 * - Finger ID is 0
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
+	const uint32_t fp_events = global_context.take_events();
 	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
@@ -456,7 +442,7 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_dirty_template)
 
 	/* Confirm that dirty templates bitmap is correct. */
 	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
+				     test_info_buffer.size()));
 	zassert_equal(test_info_buffer->template_info.template_dirty, 0x1);
 }
 
@@ -482,7 +468,7 @@ ZTEST_USER(fpsensor_match,
 
 	/* Confirm that dirty templates bitmap is correct. */
 	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
+				     test_info_buffer.size()));
 	zassert_equal(test_info_buffer->template_info.template_dirty, 0x0);
 }
 
@@ -507,7 +493,7 @@ ZTEST_USER(fpsensor_match, test_match_success_no_template_update_dirty_template)
 
 	/* Confirm that dirty templates bitmap is correct. */
 	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
+				     test_info_buffer.size()));
 	zassert_equal(test_info_buffer->template_info.template_dirty, 0x0);
 }
 
@@ -531,7 +517,7 @@ ZTEST_USER(fpsensor_match, test_match_no_template_update_dirty_template)
 	/* Confirm that dirty templates bitmap is correct (no templates dirty).
 	 */
 	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
+				     test_info_buffer.size()));
 	zassert_equal(test_info_buffer->template_info.template_dirty, 0x0);
 }
 
@@ -692,8 +678,6 @@ ZTEST_USER(fpsensor_match, test_match_error_no_positive_match_secret)
 
 ZTEST_USER(fpsensor_match, test_match_error_mkbp_event)
 {
-	uint32_t fp_events;
-
 	/* Load example template. */
 	zassert_ok(ec_cmd_fp_template(
 		NULL,
@@ -722,7 +706,7 @@ ZTEST_USER(fpsensor_match, test_match_error_mkbp_event)
 	 * - Match failed with NO_INTERNAL
 	 * - Finger ID is FP_NO_SUCH_TEMPLATE
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
+	const uint32_t fp_events = global_context.take_events();
 	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
@@ -806,6 +790,58 @@ ZTEST_USER(fpsensor_match, test_match_no_templates_sets_invalid)
 		     "Invalid flag should be set if no templates are enrolled");
 }
 
+ZTEST_USER(fpsensor_match,
+	   test_match_success_negative_finger_index_fails_internal)
+{
+	struct ec_response_fp_stats stats = {};
+
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	match_result = FP_MATCH_RESULT_MATCH;
+	finger_index = -1;
+	finger_updated_bitmap = 0;
+	mock_alg_match_fake.custom_fake = custom_match;
+
+	trigger_match_attempt(FP_MODE_MATCH);
+
+	const uint32_t fp_events = global_context.take_events();
+	zassert_true(fp_events & EC_MKBP_FP_MATCH);
+	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
+		      EC_MKBP_FP_ERR_MATCH_NO_INTERNAL);
+
+	zassert_ok(ec_cmd_fp_stats(NULL, &stats));
+	zassert_true(stats.timestamps_invalid & FPSTATS_MATCHING_INV);
+}
+
+ZTEST_USER(fpsensor_match,
+	   test_match_success_out_of_bounds_finger_index_fails_internal)
+{
+	struct ec_response_fp_stats stats = {};
+
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	match_result = FP_MATCH_RESULT_MATCH;
+	finger_index = FP_MAX_FINGER_COUNT;
+	finger_updated_bitmap = 0;
+	mock_alg_match_fake.custom_fake = custom_match;
+
+	trigger_match_attempt(FP_MODE_MATCH);
+
+	const uint32_t fp_events = global_context.take_events();
+	zassert_true(fp_events & EC_MKBP_FP_MATCH);
+	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
+		      EC_MKBP_FP_ERR_MATCH_NO_INTERNAL);
+
+	zassert_ok(ec_cmd_fp_stats(NULL, &stats));
+	zassert_true(stats.timestamps_invalid & FPSTATS_MATCHING_INV);
+}
+
 static void *fpsensor_setup(void)
 {
 	struct ec_params_fp_seed fp_seed_params = {
@@ -863,7 +899,6 @@ static void fpsensor_before(void *f)
 		.action = FP_CONTEXT_ASYNC,
 		.userid = FAKE_USER_ID,
 	};
-	uint32_t fp_events;
 
 	fingerprint_set_state(fp_sim, &state);
 	RESET_FAKE(mkbp_send_event);
@@ -890,7 +925,7 @@ static void fpsensor_before(void *f)
 	ec_cmd_fp_context_v1(NULL, &fp_context_params);
 
 	/* Clear MKBP events from previous tests. */
-	fp_get_next_event((uint8_t *)&fp_events);
+	(void)global_context.take_events();
 }
 
 ZTEST_SUITE(fpsensor_match, NULL, fpsensor_setup, fpsensor_before, NULL, NULL);
