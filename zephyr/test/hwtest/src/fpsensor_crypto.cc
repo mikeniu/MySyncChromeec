@@ -9,11 +9,12 @@
 
 #include <zephyr/ztest.h>
 
+#include <algorithm>
 #include <array>
 #include <span>
 #include <vector>
 
-ZTEST_SUITE(fpsensor_crypto, NULL, NULL, NULL, NULL, NULL);
+ZTEST_SUITE(fpsensor_crypto, nullptr, nullptr, nullptr, nullptr, nullptr);
 
 struct HmacSha256TestVector {
 	std::vector<uint8_t> key;
@@ -238,19 +239,15 @@ ZTEST(fpsensor_crypto, test_hmac_sha256)
 
 	for (const auto &test_vector : test_vectors) {
 		const auto &expected_result = test_vector.result;
-		std::array<uint8_t, SHA256_DIGEST_LENGTH> actual_result{};
 
 		std::vector<std::span<const uint8_t> > inputs(
-			test_vector.messages.size());
-		for (const auto &message : test_vector.messages) {
-			inputs.emplace_back(message);
-		}
+			test_vector.messages.begin(),
+			test_vector.messages.end());
 
-		zassert_equal(hmac_sha256(test_vector.key, inputs,
-					  actual_result),
-			      EC_SUCCESS);
-		zassert_mem_equal(expected_result.data(), actual_result.data(),
-				  expected_result.size());
+		const auto actual_result = hmac_sha256(test_vector.key, inputs);
+		zassert_true(actual_result.has_value());
+		zassert_true(
+			std::ranges::equal(expected_result, *actual_result));
 	}
 }
 
@@ -281,11 +278,9 @@ ZTEST(fpsensor_crypto, test_hmac_sha256_with_empty_spans)
 		message_span.subspan(3),
 	};
 
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> actual_result{};
-
-	zassert_equal(hmac_sha256(key, inputs, actual_result), EC_SUCCESS);
-	zassert_mem_equal(expected_result.data(), actual_result.data(),
-			  expected_result.size());
+	const auto actual_result = hmac_sha256(key, inputs);
+	zassert_true(actual_result.has_value());
+	zassert_true(std::ranges::equal(expected_result, *actual_result));
 }
 
 ZTEST(fpsensor_crypto, test_hkdf_expand)
@@ -420,9 +415,9 @@ ZTEST(fpsensor_crypto, test_hkdf_expand)
 		};
 
 		zassert_true(hkdf_sha256(actual_okm, ikm, test_vector.salt,
-					 test_vector.info));
-		zassert_mem_equal(expected_okm.data(), actual_okm.data(),
-				  expected_okm.size());
+					 test_vector.info)
+				     .has_value());
+		zassert_true(std::ranges::equal(expected_okm, actual_okm));
 	}
 
 	/* OKM size too big. */
@@ -433,7 +428,8 @@ ZTEST(fpsensor_crypto, test_hkdf_expand)
 	};
 
 	zassert_false(hkdf_sha256(unused_output, ikm, test_vector.salt,
-				  test_vector.info));
+				  test_vector.info)
+			      .has_value());
 }
 
 ZTEST(fpsensor_crypto, test_aes_128_gcm_encrypt_in_place)
@@ -456,10 +452,7 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_encrypt_in_place)
 		0x0e,
 		0x0f,
 	} };
-	std::array<uint8_t, 16> plaintext = { 0x00, 0x00, 0x00, 0x00,
-					      0x00, 0x00, 0x00, 0x00,
-					      0x00, 0x00, 0x00, 0x00,
-					      0x00, 0x00, 0x00, 0x00 };
+	std::array<uint8_t, 16> plaintext{};
 	constexpr std::array<uint8_t, 16> expected_ciphertext = {
 		0x9b, 0xde, 0x09, 0x85, 0x27, 0x8c, 0x70, 0x89,
 		0x54, 0x28, 0xcc, 0x4e, 0x7a, 0x36, 0xb1, 0x2d,
@@ -474,12 +467,10 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_encrypt_in_place)
 		0xa1, 0xab, 0x8f, 0xb3, 0x70, 0x75, 0xab, 0x48,
 	};
 
-	ec_error_list ret =
-		aes_128_gcm_encrypt(key, plaintext, plaintext, nonce, tag);
-	zassert_equal(ret, EC_SUCCESS);
-	zassert_mem_equal(plaintext.data(), expected_ciphertext.data(),
-			  plaintext.size());
-	zassert_mem_equal(tag.data(), expected_tag.data(), tag.size());
+	zassert_true(aes_128_gcm_encrypt(key, plaintext, plaintext, nonce, tag)
+			     .has_value());
+	zassert_true(std::ranges::equal(plaintext, expected_ciphertext));
+	zassert_true(std::ranges::equal(tag, expected_tag));
 }
 
 ZTEST(fpsensor_crypto, test_aes_128_gcm_decrypt_in_place)
@@ -505,10 +496,7 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_decrypt_in_place)
 	/* Using the same values as from test_aes_gcm_encrypt_in_place means we
 	 * should get back the original plaintext from that function.
 	 */
-	constexpr std::array<uint8_t, 16> expected_plaintext = {
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-	};
+	constexpr std::array<uint8_t, 16> expected_plaintext{};
 	std::array<uint8_t, 16> ciphertext = {
 		0x9b, 0xde, 0x09, 0x85, 0x27, 0x8c, 0x70, 0x89,
 		0x54, 0x28, 0xcc, 0x4e, 0x7a, 0x36, 0xb1, 0x2d,
@@ -522,12 +510,10 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_decrypt_in_place)
 		0xa1, 0xab, 0x8f, 0xb3, 0x70, 0x75, 0xab, 0x48,
 	};
 
-	ec_error_list ret =
-		aes_128_gcm_decrypt(key, ciphertext, ciphertext, nonce, tag);
-	;
-	zassert_equal(ret, EC_SUCCESS);
-	zassert_mem_equal(ciphertext.data(), expected_plaintext.data(),
-			  ciphertext.size());
+	zassert_true(
+		aes_128_gcm_decrypt(key, ciphertext, ciphertext, nonce, tag)
+			.has_value());
+	zassert_true(std::ranges::equal(ciphertext, expected_plaintext));
 }
 
 ZTEST(fpsensor_crypto, test_aes_128_gcm_encrypt_invalid_nonce_size)
@@ -539,8 +525,8 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_encrypt_invalid_nonce_size)
 	/* Use an invalid nonce size. */
 	constexpr std::array<uint8_t, FP_CONTEXT_NONCE_BYTES - 1> nonce{};
 
-	ec_error_list ret = aes_128_gcm_encrypt(key, text, text, nonce, tag);
-	zassert_equal(ret, EC_ERROR_INVAL);
+	zassert_equal(aes_128_gcm_encrypt(key, text, text, nonce, tag).error(),
+		      EC_ERROR_INVAL);
 }
 
 ZTEST(fpsensor_crypto, test_aes_128_gcm_decrypt_invalid_nonce_size)
@@ -552,8 +538,8 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_decrypt_invalid_nonce_size)
 	/* Use an invalid nonce size. */
 	constexpr std::array<uint8_t, FP_CONTEXT_NONCE_BYTES - 1> nonce{};
 
-	ec_error_list ret = aes_128_gcm_decrypt(key, text, text, nonce, tag);
-	zassert_equal(ret, EC_ERROR_INVAL);
+	zassert_equal(aes_128_gcm_decrypt(key, text, text, nonce, tag).error(),
+		      EC_ERROR_INVAL);
 }
 
 ZTEST(fpsensor_crypto, test_aes_128_gcm_encrypt_invalid_key_size)
@@ -563,11 +549,11 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_encrypt_invalid_key_size)
 	constexpr std::array<uint8_t, FP_CONTEXT_NONCE_BYTES> nonce{};
 
 	/* Use an invalid key size. Key must be exactly 128 bits. */
-	BUILD_ASSERT(sizeof(FpEncryptionKey) == 16);
+	static_assert(sizeof(FpEncryptionKey) == 16);
 	constexpr std::array<uint8_t, 15> key{};
 
-	ec_error_list ret = aes_128_gcm_encrypt(key, text, text, nonce, tag);
-	zassert_equal(ret, EC_ERROR_UNKNOWN);
+	zassert_equal(aes_128_gcm_encrypt(key, text, text, nonce, tag).error(),
+		      EC_ERROR_UNKNOWN);
 }
 
 ZTEST(fpsensor_crypto, test_aes_128_gcm_decrypt_invalid_key_size)
@@ -577,9 +563,9 @@ ZTEST(fpsensor_crypto, test_aes_128_gcm_decrypt_invalid_key_size)
 	constexpr std::array<uint8_t, FP_CONTEXT_NONCE_BYTES> nonce{};
 
 	/* Use an invalid key size. Key must be exactly 128 bits. */
-	BUILD_ASSERT(sizeof(FpEncryptionKey) == 16);
+	static_assert(sizeof(FpEncryptionKey) == 16);
 	constexpr std::array<uint8_t, 15> key{};
 
-	ec_error_list ret = aes_128_gcm_decrypt(key, text, text, nonce, tag);
-	zassert_equal(ret, EC_ERROR_UNKNOWN);
+	zassert_equal(aes_128_gcm_decrypt(key, text, text, nonce, tag).error(),
+		      EC_ERROR_UNKNOWN);
 }
