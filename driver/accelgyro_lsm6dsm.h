@@ -118,6 +118,36 @@
 #define LSM6DSM_TAP_DUR_MASK 0xf0
 #define LSM6DSM_TAP_QUIET_MASK 0x0c
 
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+/*
+ * Tap threshold: 1 LSB of TAP_THS is FS_XL / 32 (in g), and 0 disables
+ * tap detection.
+ */
+#define LSM6DSM_TAP_THS_REG(_fs)                                    \
+	MIN(MAX(DIV_ROUND_NEAREST(CONFIG_GESTURE_TAP_THRES_MG * 32, \
+				  (_fs) * 1000),                    \
+		1),                                                 \
+	    LSM6DSM_TAP_TH_MASK)
+
+/*
+ * INT_DUR2 fields at ODR_XL = 416 Hz (aligned with Pixelbook settings):
+ * - SHOCK[1:0] (bits 1:0): 1 LSB = 8 / ODR_XL (3 -> 57.7 ms)
+ * - QUIET[1:0] (bits 3:2): 1 LSB = 4 / ODR_XL (3 -> 28.8 ms)
+ * - DUR[3:0]   (bits 7:4): 1 LSB = 32 / ODR_XL (6 -> 461.5 ms for 500 ms
+ * window)
+ */
+#define LSM6DSM_TAP_SHOCK_DEFAULT 0x03
+#define LSM6DSM_TAP_QUIET_DEFAULT (0x03 << 2)
+#define LSM6DSM_TAP_DUR_REG(_ms) \
+	(MIN(((_ms) * 416) / (32 * 1000), LSM6DSM_TAP_DUR_MASK >> 4) << 4)
+#define LSM6DSM_TAP_DUR_VAL                                         \
+	(LSM6DSM_TAP_DUR_REG(CONFIG_GESTURE_TAP_MAX_INTERSTICE_T) | \
+	 LSM6DSM_TAP_QUIET_DEFAULT | LSM6DSM_TAP_SHOCK_DEFAULT)
+#else
+#define LSM6DSM_TAP_THS_REG(_fs) 0
+#define LSM6DSM_TAP_DUR_VAL 0
+#endif /* CONFIG_GESTURE_SENSOR_DOUBLE_TAP */
+
 #define LSM6DSM_WUP_THS_ADDR 0x5b
 #define LSM6DSM_S_D_TAP_MASK 0x80
 #define LSM6DSM_STAP_EN 0
@@ -173,6 +203,7 @@ struct fstatus {
 
 /* ODR reg value from selected data rate in mHz */
 #define LSM6DSM_ODR_TO_REG(_odr) (__fls(_odr / LSM6DSM_ODR_MIN_VAL) + 1)
+#define LSM6DSM_ODR_416HZ_VAL LSM6DSM_ODR_TO_REG(416000)
 
 /* normalized ODR value from selected data rate in mHz */
 #define LSM6DSM_REG_TO_ODR(_reg) (LSM6DSM_ODR_MIN_VAL << (_reg - 1))
