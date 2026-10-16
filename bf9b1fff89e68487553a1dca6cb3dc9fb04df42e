@@ -161,6 +161,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "24da0dcf_3f97b525",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-10-16T08:55:02Z",
+      "side": 1,
+      "message": "\u003e What do you generally think about current approach? Do you see a problem that flash SPI runs at 100MHz for a short period?\n\nI believe it is the hardware\u0027s initial power-on reset (POR) value. I have verified this behavior through JTAG live debugging.\nI have tested running the flash at 100MHz and it works, but the spec is 60MHz, so I wouldn\u0027t recommend it. Overclocking does not guarantee that all modules will work properly, even for a short duration.",
+      "parentUuid": "6a3ce62f_3d2a728a",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ef320f_25247478",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
