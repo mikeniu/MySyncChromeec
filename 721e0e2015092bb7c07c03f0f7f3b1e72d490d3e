@@ -22,6 +22,30 @@
       },
       "revId": "721e0e2015092bb7c07c03f0f7f3b1e72d490d3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6bb5120_cc140f35",
+        "filename": "zephyr/program/atria/power_signals.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-16T16:13:41Z",
+      "side": 1,
+      "message": "Done. Moved chosen node to common.overlay.",
+      "parentUuid": "b71781ad_caacabb8",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 40
+      },
+      "revId": "721e0e2015092bb7c07c03f0f7f3b1e72d490d3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
