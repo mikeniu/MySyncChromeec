@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cf2baf5_7c78de23",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-16T16:14:18Z",
+      "side": 1,
+      "message": "Done. Updated the commit message to reflect Firas\u0027s initial hardware verification on Ruby (flashed srebrna firmware, enrolled and matched 3 fingers) on CL:8008794 prior to splitting.",
+      "parentUuid": "f6cb3e14_4cc5ad3c",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 57
+      },
+      "revId": "baac3da180039b59140bd9ad9ec37abd03f3f64e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a358f3d0_bbf98631",
