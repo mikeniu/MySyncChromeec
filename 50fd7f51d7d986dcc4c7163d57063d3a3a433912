@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11fb5497_c697bc9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:48:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** ✅ The test suite correctly implements the `rts5817` ex-op fake and validates the driver\u0027s protection logic.\n**Architecture \u0026 Component Fit:** ✅ The driver tests integrate well with the Zephyr `ztest` framework.\n**Code Simplicity:** ✅ Test fixtures and fake implementations are straightforward.\n**Idiomaticity \u0026 Readability:** ❌ Magic numbers (`0x1000`, `0x50000`, `0x70000`, `0x20000`) are used for offset tests instead of deriving them from the constants under test.\n**Testing:** ❌ Missing exact-boundary tests for the protected region (`WP_BANK - 1`).\n**CL Size \u0026 Scope:** ❌ `Size: L (+562, -0)`. This CL is too large and exceeds the maximum for a single atomic change. Even though this is unit test code, it must be decomposed.\nPlease split this CL into smaller, logical chunks, such as:\n1. CL 1: Base fake test environment and baseline initialization tests (`test_baseline_no_protection`, `test_init_clears_srp_preserves_other_bits`, `test_write_erase_roundtrip`).\n2. CL 2: RO and ALL protection boot/runtime tests.\n3. CL 3: Protection error mapping tests.\n**Commit Message:** ✅ Accurate, concise, and provides the necessary test command. [🔗](http://go/tj/3fe6a065-8c59-4ad6-8ed9-a62f4178cab0)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "50fd7f51d7d986dcc4c7163d57063d3a3a433912",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8632ee81_8b3d8a02",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:48:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing - Boundary Value Analysis (`ROR` / Off-By-One Mutation Check):**\n\nThis asserts protection on bank `0` (inside the protected region) and `WP_BANK` (the first bank outside the region).\n\nBy Boundary Value Analysis, tests should verify the exact boundary value (`WP_BANK - 1`, which is the last bank inside the protected region) alongside the adjacent off-by-one value (`WP_BANK`). If the logic contained an off-by-one error, checking `0` might not catch it.\n\nPlease add an assertion for the exact boundary:\n```c\n\t/* Protection covers RO, not RW. */\n\tzassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK - 1), 1);\n\tzassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK), 0);\n```\n\n*(Also applies to `test_protect_now_ro` at **line 375**)* [🔗](http://go/tj/3fe6a065-8c59-4ad6-8ed9-a62f4178cab0)",
+      "range": {
+        "startLine": 259,
+        "startChar": 0,
+        "endLine": 262,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "50fd7f51d7d986dcc4c7163d57063d3a3a433912",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68855952_4b5125d7",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:48:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity - No Magic Values in Boundary Tests:**\n\nThe offsets `0x1000` and `0x50000` are magic numbers. Boundary test cases must derive from the named constant under test rather than hardcoding raw numbers.\n\nInstead of arbitrary addresses, derive the exact offsets relative to the boundary (`CONFIG_WP_STORAGE_SIZE`), which enforces the invariant programmatically.\n\n```c\n\t/* Writes into the protected region are rejected... */\n\tzassert_equal(cros_flash_physical_write(cros_flash_dev, CONFIG_WP_STORAGE_SIZE - sizeof(value),\n\t\t\t\t\t\tsizeof(value),\n\t\t\t\t\t\t(const char *)\u0026value),\n\t\t      EC_ERROR_ACCESS_DENIED);\n\n\t/* ...writes outside of it are allowed. */\n\tzassert_equal(cros_flash_physical_write(cros_flash_dev, CONFIG_WP_STORAGE_SIZE,\n\t\t\t\t\t\tsizeof(value),\n\t\t\t\t\t\t(const char *)\u0026value),\n\t\t      EC_SUCCESS);\n```\n\nAlso applies to the magic numbers used in other tests:\n* **Line 411:** `0x70000` in `test_protect_now_all` (consider using `FAKE_FLASH_SIZE - sizeof(value)`)\n* **Line 463:** `0x20000` in `test_write_erase_roundtrip` (consider using `0` or defining a `TEST_OFFSET` constant) [🔗](http://go/tj/3fe6a065-8c59-4ad6-8ed9-a62f4178cab0)",
+      "range": {
+        "startLine": 379,
+        "startChar": 0,
+        "endLine": 389,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "50fd7f51d7d986dcc4c7163d57063d3a3a433912",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
