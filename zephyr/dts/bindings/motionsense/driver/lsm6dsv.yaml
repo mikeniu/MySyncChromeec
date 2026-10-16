@@ -1,0 +1,14 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+include: motionsense-sensor-base.yaml
+
+properties:
+  i2c-spi-addr-flags:
+    type: string
+    description: i2c address or SPI peripheral logic GPIO
+    enum:
+      - "LSM6DSV_ADDR0_FLAGS"
+      - "LSM6DSV_ADDR1_FLAGS"
+    default: "LSM6DSV_ADDR0_FLAGS"
