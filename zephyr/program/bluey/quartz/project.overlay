@@ -20,6 +20,7 @@
 #include "gpios.dtsi"
 #include "battery.dtsi"
 #include "fan.dtsi"
+#include "imu.dtsi"
 #include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
 #include "i2c.dtsi"
