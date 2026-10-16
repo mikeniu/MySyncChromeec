@@ -73,7 +73,8 @@
 
 &spi1 {
 	status = "okay";
-	clock-frequency = <100000000>;
+	/delete-property/ clock-frequency;
+	clocks = <&clock ET171_CLOCK_SPIM2>;
 };
 
 &syscon {
