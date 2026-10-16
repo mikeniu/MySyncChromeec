@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "060d8fc9_aa7d5ee0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-10-16T05:57:36Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8667824122760425729) is being automatically retried for the following reasons:\n- Some tests are now retryable:hatch-cq.helios.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "33eb445836f932a5fa21ab5de3f07b37e9caf03b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
