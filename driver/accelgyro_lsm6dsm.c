@@ -59,6 +59,55 @@ static inline int get_xyz_reg(enum motionsensor_type type)
 	       (LSM6DSM_ACCEL_OUT_X_L_ADDR - LSM6DSM_GYRO_OUT_X_L_ADDR) * type;
 }
 
+/*
+ * The tap threshold LSB is the accel full scale / 32, so it has to follow
+ * the range to keep the threshold at CONFIG_GESTURE_TAP_THRES_MG.
+ */
+static int set_tap_threshold(const struct motion_sensor_t *s, int range)
+{
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+	uint8_t ths = LSM6DSM_TAP_THS_REG(range);
+
+	return st_write_data_with_mask(s, LSM6DSM_TAP_THS_6D,
+				       LSM6DSM_TAP_TH_MASK, ths);
+#else
+	return EC_SUCCESS;
+#endif
+}
+
+static bool double_tap_enabled(const struct motion_sensor_t *s)
+{
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	struct stprivate_data *data = s->drv_data;
+
+	return data->enabled_activities & BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+#else
+	/* Without the host interface, double-tap stays on once configured */
+	return true;
+#endif
+}
+
+static int update_odr(const struct motion_sensor_t *s, int rate)
+{
+	uint8_t ctrl_reg = LSM6DSM_ODR_REG(s->type);
+	uint8_t reg_val = 0;
+
+	if (rate > 0)
+		reg_val = LSM6DSM_ODR_TO_REG(rate);
+
+	/*
+	 * The tap engine needs the accel to run at 416 Hz or above, even when
+	 * the EC/AP requested ODR is 0 (so the EC task does not poll XYZ data
+	 * while waiting for tap interrupts).
+	 */
+	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+	    s->type == MOTIONSENSE_TYPE_ACCEL && double_tap_enabled(s) &&
+	    reg_val < LSM6DSM_ODR_416HZ_VAL)
+		reg_val = LSM6DSM_ODR_416HZ_VAL;
+
+	return st_write_data_with_mask(s, ctrl_reg, LSM6DSM_ODR_MASK, reg_val);
+}
+
 /**
  * Configure interrupt int 1 to fire handler for:
  *
@@ -69,6 +118,10 @@ static inline int get_xyz_reg(enum motionsensor_type type)
 __maybe_unused static int config_interrupt(const struct motion_sensor_t *accel)
 {
 	int int1_ctrl_val;
+#if defined(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) && \
+	defined(CONFIG_GESTURE_HOST_DETECTION)
+	struct stprivate_data *data = accel->drv_data;
+#endif
 
 	RETURN_ERROR(st_raw_read8(accel->port, accel->i2c_spi_addr_flags,
 				  LSM6DSM_INT1_CTRL, &int1_ctrl_val));
@@ -79,6 +132,30 @@ __maybe_unused static int config_interrupt(const struct motion_sensor_t *accel)
 				   OUT_XYZ_SIZE / sizeof(uint16_t)));
 	int1_ctrl_val |= LSM6DSM_INT_FIFO_TH | LSM6DSM_INT_FIFO_OVR |
 			 LSM6DSM_INT_FIFO_FULL;
+
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+	/*
+	 * Configure built-in double-tap detection on all axes with a pulsed
+	 * (non-latched, LIR = 0) interrupt on INT1.
+	 */
+	RETURN_ERROR(st_write_data_with_mask(
+		accel, LSM6DSM_LIR_ADDR, LSM6DSM_TAP_MASK | LSM6DSM_LIR_MASK,
+		LSM6DSM_EN_INT | LSM6DSM_EN_TAP));
+	RETURN_ERROR(
+		set_tap_threshold(accel, BASE_RANGE(accel->default_range)));
+	RETURN_ERROR(st_raw_write8(accel->port, accel->i2c_spi_addr_flags,
+				   LSM6DSM_INT_DUR2_ADDR, LSM6DSM_TAP_DUR_VAL));
+	RETURN_ERROR(st_write_data_with_mask(accel, LSM6DSM_WUP_THS_ADDR,
+					     LSM6DSM_S_D_TAP_MASK,
+					     LSM6DSM_DTAP_EN));
+	RETURN_ERROR(st_write_data_with_mask(accel, LSM6DSM_MD1_CFG_ADDR,
+					     LSM6DSM_INT1_DTAP,
+					     LSM6DSM_EN_BIT));
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	data->enabled_activities |= BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+	data->disabled_activities &= ~BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+#endif
+#endif /* CONFIG_GESTURE_SENSOR_DOUBLE_TAP */
 
 	return st_raw_write8(accel->port, accel->i2c_spi_addr_flags,
 			     LSM6DSM_INT1_CTRL, int1_ctrl_val);
@@ -202,13 +279,9 @@ static int fifo_enable(const struct motion_sensor_t *accel)
 	 * accelerometer data stream.
 	 */
 	if (max_odr > max(odrs[FIFO_DEV_ACCEL], odrs[FIFO_DEV_GYRO])) {
-		st_write_data_with_mask(accel, LSM6DSM_ODR_REG(accel->type),
-					LSM6DSM_ODR_MASK,
-					LSM6DSM_ODR_TO_REG(max_odr));
+		update_odr(accel, max_odr);
 	} else {
-		st_write_data_with_mask(
-			accel, LSM6DSM_ODR_REG(accel->type), LSM6DSM_ODR_MASK,
-			LSM6DSM_ODR_TO_REG(odrs[FIFO_DEV_ACCEL]));
+		update_odr(accel, odrs[FIFO_DEV_ACCEL]);
 	}
 #endif
 	/*
@@ -382,6 +455,54 @@ test_mockable void lsm6dsm_interrupt(enum gpio_signal signal)
 	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCEL_LSM6DSM_INT_EVENT);
 }
 
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+/* The return value goes back to the host, so it is an EC_RES_* code. */
+static int manage_activity(const struct motion_sensor_t *s,
+			   enum motionsensor_activity activity, int enable,
+			   const struct ec_motion_sense_activity *param)
+{
+	int ret = EC_RES_INVALID_PARAM;
+	struct stprivate_data *data = s->drv_data;
+
+	if (s->type != MOTIONSENSE_TYPE_ACCEL)
+		return EC_RES_INVALID_PARAM;
+
+	k_mutex_lock(s->mutex, K_FOREVER);
+
+	switch (activity) {
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+	case MOTIONSENSE_ACTIVITY_DOUBLE_TAP:
+		if (st_write_data_with_mask(
+			    s, LSM6DSM_MD1_CFG_ADDR, LSM6DSM_INT1_DTAP,
+			    enable ? LSM6DSM_EN_BIT : LSM6DSM_DIS_BIT))
+			ret = EC_RES_UNAVAILABLE;
+		else
+			ret = EC_RES_SUCCESS;
+		break;
+#endif
+	default:
+		break;
+	}
+
+	if (ret == EC_RES_SUCCESS) {
+		if (enable) {
+			data->enabled_activities |= BIT(activity);
+			data->disabled_activities &= ~BIT(activity);
+		} else {
+			data->enabled_activities &= ~BIT(activity);
+			data->disabled_activities |= BIT(activity);
+		}
+		/* Update the hardware ODR if the activity state changed. */
+		if (update_odr(s, data->base.odr) != EC_SUCCESS)
+			ret = EC_RES_UNAVAILABLE;
+	}
+
+	k_mutex_unlock(s->mutex);
+
+	return ret;
+}
+#endif /* CONFIG_GESTURE_HOST_DETECTION */
+
 /**
  * irq_handler - bottom half of the interrupt stack
  */
@@ -394,6 +515,20 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 
 	if ((s->type != MOTIONSENSE_TYPE_ACCEL) ||
 	    (!(*event & CONFIG_ACCEL_LSM6DSM_INT_EVENT)))
+		return EC_ERROR_NOT_HANDLED;
+
+	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+	    double_tap_enabled(s)) {
+		int status = 0;
+
+		if (st_raw_read8(s->port, s->i2c_spi_addr_flags,
+				 LSM6DSM_TAP_SRC_ADDR, &status) == EC_SUCCESS &&
+		    (status & LSM6DSM_DTAP_DETECT))
+			*event |= TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(
+				MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+	}
+
+	if (motion_sensor_in_forced_mode(s))
 		return EC_ERROR_NOT_HANDLED;
 
 	while (!fifo_empty) {
@@ -457,9 +592,13 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	ctrl_reg = LSM6DSM_RANGE_REG(s->type);
 	k_mutex_lock(s->mutex, K_FOREVER);
 	err = st_write_data_with_mask(s, ctrl_reg, LSM6DSM_RANGE_MASK, reg_val);
-	if (err == EC_SUCCESS)
+	if (err == EC_SUCCESS) {
 		/* Save internally gain for speed optimization. */
 		s->current_range = newrange;
+		if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+		    s->type == MOTIONSENSE_TYPE_ACCEL)
+			err = set_tap_threshold(s, newrange);
+	}
 	k_mutex_unlock(s->mutex);
 	return err;
 }
@@ -478,7 +617,7 @@ int lsm6dsm_set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	const struct motion_sensor_t *accel = LSM6DSM_MAIN_SENSOR(s);
 	struct lsm6dsm_data *private = LSM6DSM_GET_DATA(accel);
 	int ret = EC_SUCCESS, normalized_rate = 0;
-	uint8_t ctrl_reg, reg_val = 0;
+	uint8_t reg_val = 0;
 
 	/* FIFO must be disabled before setting any ODR values */
 	ret = fifo_disable(accel);
@@ -524,9 +663,7 @@ int lsm6dsm_set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 		k_mutex_lock(s->mutex, K_FOREVER);
 	} else {
 		k_mutex_lock(s->mutex, K_FOREVER);
-		ctrl_reg = LSM6DSM_ODR_REG(s->type);
-		ret = st_write_data_with_mask(s, ctrl_reg, LSM6DSM_ODR_MASK,
-					      reg_val);
+		ret = update_odr(s, normalized_rate);
 	}
 	if (ret == EC_SUCCESS) {
 		struct lsm6dsm_accel_fifo_state *fifo_state =
@@ -547,17 +684,23 @@ int lsm6dsm_set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 __maybe_unused static int
 lsm6dsm_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 {
+	int ret;
+
 	/* To enable the interrupt we just update the FIFO enablement.
 	 * This is not ideal, but the lsmg6dsm driver uses the watermark
 	 * configuration in order to actuate the interrupt. If we were to update
 	 * the interrupt CTRL register instead, it could cause a configuration
 	 * conflict. More refactoring is likely needed on this driver.
 	 */
+	k_mutex_lock(s->mutex, K_FOREVER);
 	if (enable) {
-		return fifo_enable(LSM6DSM_MAIN_SENSOR(s));
+		ret = fifo_enable(LSM6DSM_MAIN_SENSOR(s));
 	} else {
-		return fifo_disable(LSM6DSM_MAIN_SENSOR(s));
+		ret = fifo_disable(LSM6DSM_MAIN_SENSOR(s));
 	}
+	k_mutex_unlock(s->mutex);
+
+	return ret;
 }
 
 static int is_data_ready(const struct motion_sensor_t *s, int *ready)
@@ -768,6 +911,9 @@ const struct accelgyro_drv lsm6dsm_drv = {
 #ifdef ACCEL_LSM6DSM_INT_ENABLE
 	.irq_handler = irq_handler,
 	.enable_interrupt = lsm6dsm_enable_interrupt,
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	.manage_activity = manage_activity,
+#endif
 #endif /* ACCEL_LSM6DSM_INT_ENABLE */
 #ifdef CONFIG_BODY_DETECTION
 	.get_rms_noise = get_rms_noise,
