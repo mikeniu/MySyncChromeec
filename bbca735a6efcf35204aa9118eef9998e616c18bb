@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a6c1ba0_93761b3d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:35:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nThe `TEST\u003d` line indicates this CL was only built (`zmake build realtekfp`), but automated test coverage is mandatory for all new logic (including new device drivers, using standard fakes/mocks as seen in `zephyr/test/fingerprint/drivers/`). Manual testing or building is not an acceptable substitute.\n\nPlease add unit tests and update this line with the verification command used (e.g. `TEST\u003dzmake test ...`).\n[🔗](http://go/tj/ab2cabf5-a54f-4771-8b8a-326801cda675)",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18df0718_e8b0fa9f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:35:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL and add tests**\n\n### Review Summary\n\n*   **Functionality:** Found a bug in `rts5817maa_init` where initialization failures are masked by a `return 0;` fallback despite non-zero `ret`.\n*   **Architecture \u0026 Component Fit:** The driver encapsulates sensor interactions correctly and maps well to Cros EC fingerprint APIs.\n*   **Code Simplicity:** `rts5817_spi_xfer` contains redundant branching that can be simplified.\n*   **Idiomaticity \u0026 Readability:** `rts5817maa_get_info` uses unidiomatic `memcpy` for struct assignments rather than native C assignments.\n*   **Security:** No obvious vulnerabilities or memory leaks. `rts5817maa_irq` handles GPIO callbacks safely.\n*   **Testing \u0026 Test Coverage:** Missing automated test coverage. A driver of this size must include unit tests using standard fakes/mocks, following the established conventions seen in `zephyr/test/fingerprint/drivers/`. Updating the commit message to `TEST\u003dzmake build realtekfp` is not an acceptable substitute.\n*   **CL Size \u0026 Scope:** Size: L (+835, -0). This CL is still too large and must be split. While earlier integrations were removed, adding the core driver alongside its Platform Abstraction Layer (PAL) without unit tests is still too large. Please split this into smaller CLs:\n    *   **CL 1:** Platform Abstraction Layer (PAL) and private headers (`fingerprint_rts5817maa_pal.c`, `_pal.h`, `_private.h`).\n    *   **CL 2:** Core sensor driver (`fingerprint_rts5817maa.c`) along with its unit tests in `zephyr/test/fingerprint/drivers/rts5817maa/`.\n*   **Commit Message:** The `TEST\u003d` tag only documents building; it must be updated with the automated test command once tests are added.\n\n[🔗](http://go/tj/ab2cabf5-a54f-4771-8b8a-326801cda675)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22a981e6_8a882023",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:35:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nCurrently, `rts5817maa_init` returns `0` (success) even when `rts5817maa_sensor_init()` fails and `ret` is non-zero. This silently masks the initialization failure from the OS/caller.\n\nPlease return `ret` instead of falling through to `return 0;` on failure:\n```c\n\tif (ret) {\n\t\tLOG_ERR(\"sensor init failed %d\", ret);\n\t\tdata-\u003eerrors |\u003d (ret | FINGERPRINT_ERROR_INIT_FAIL);\n\t\treturn ret;\n\t}\n\n\treturn 0;\n```\n[🔗](http://go/tj/ab2cabf5-a54f-4771-8b8a-326801cda675)",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f9b1137_77e4c4aa",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:35:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nInstead of using low-level `memcpy` for a struct assignment, please prefer native C struct assignment for better type safety and conciseness:\n\n```c\n\t*sensor_info \u003d cfg-\u003esensor_info;\n```\n[🔗](http://go/tj/ab2cabf5-a54f-4771-8b8a-326801cda675)",
+      "range": {
+        "startLine": 190,
+        "startChar": 0,
+        "endLine": 191,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdae4958_5ecbeeca",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_pal.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:35:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nThis multi-way branch duplicates the `return ret;` call and can be simplified by directly returning the result of `spi_transceive_dt`.\n\nSuggested replacement:\n```c\n\treturn spi_transceive_dt(\u0026cfg-\u003espi, \u0026buf_set, \u0026buf_set);\n```\n[🔗](http://go/tj/ab2cabf5-a54f-4771-8b8a-326801cda675)",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
