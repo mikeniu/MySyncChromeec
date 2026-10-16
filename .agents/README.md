@@ -1,6 +1,7 @@
 # Overview
 
-Add context, skills and commands that make doing EC development with agents more efficient.
+Add context, rules, skills and commands that make doing EC development with agents more efficient.
+See `.agents/rules/ec_flasher_safety.md` for safety rules when modifying `util/flash_ec` or `util/flash/`.
 
 # Guidelines
 

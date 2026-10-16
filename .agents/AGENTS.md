@@ -258,3 +258,7 @@ the test directory under `zephyr/test/`, here `zephyr/test/drivers/`.
 *   **Public Only**: This repository is public. Internal-only context, skills,
     or commands MUST be added to the internal `cros-ec-development` extension
     instead.
+*   **EC Flasher Safety Rules**: When modifying `util/flash_ec` or
+    `util/flash/`, follow `.agents/rules/ec_flasher_safety.md` for `CBI`/`FMAP`
+    section preservation, `try/finally` `cleanup_dut()` state restoration, and
+    I2C DFU VBUS brownout protection.
