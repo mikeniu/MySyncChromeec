@@ -38,6 +38,38 @@ static int set_tap_threshold(const struct motion_sensor_t *s, int range)
 #endif
 }
 
+static bool double_tap_enabled(const struct motion_sensor_t *s)
+{
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	struct stprivate_data *data = s->drv_data;
+
+	return data->enabled_activities & BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+#else
+	/* Without the host interface, double-tap stays on once configured */
+	return true;
+#endif
+}
+
+static int update_odr(const struct motion_sensor_t *s, int rate)
+{
+	uint8_t reg_val = 0;
+
+	if (rate > 0)
+		reg_val = LSM6DSV_ODR_TO_REG(rate);
+
+	/*
+	 * The tap engine needs the accel to run at 480 Hz or above, even when
+	 * the EC/AP requested ODR is 0 (so the EC task does not poll XYZ data
+	 * while waiting for tap interrupts).
+	 */
+	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+	    double_tap_enabled(s) && reg_val < LSM6DSV_ODR_480HZ_VAL)
+		reg_val = LSM6DSV_ODR_480HZ_VAL;
+
+	return st_write_data_with_mask(s, LSM6DSV_CTRL1_ADDR, LSM6DSV_ODR_MASK,
+				       reg_val);
+}
+
 #ifdef ACCEL_LSM6DSV_INT_ENABLE
 #ifdef CONFIG_GESTURE_HOST_DETECTION
 /* The return value goes back to the host, so it is an EC_RES_* code. */
@@ -73,6 +105,9 @@ static int manage_activity(const struct motion_sensor_t *s,
 			data->enabled_activities &= ~BIT(activity);
 			data->disabled_activities |= BIT(activity);
 		}
+		/* Update the hardware ODR if the activity state changed. */
+		if (update_odr(s, data->base.odr) != EC_SUCCESS)
+			ret = EC_RES_UNAVAILABLE;
 	}
 
 	k_mutex_unlock(s->mutex);
@@ -134,7 +169,8 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	 * Double-tap is the only source routed to INT1 and the pulsed
 	 * interrupt (LIR = 0) self-clears without an I2C read.
 	 */
-	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP))
+	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+	    double_tap_enabled(s))
 		*event |= TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(
 			MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
 
@@ -185,7 +221,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 {
 	int ret, normalized_rate = 0;
 	struct stprivate_data *data = s->drv_data;
-	uint8_t reg_val = 0, hw_odr_val = 0;
+	uint8_t reg_val = 0;
 
 	if (rate > 0) {
 		if (rate < LSM6DSV_ODR_MIN_VAL) {
@@ -206,14 +242,8 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 			return EC_ERROR_INVAL;
 	}
 
-	hw_odr_val = reg_val;
-	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
-	    hw_odr_val < LSM6DSV_ODR_480HZ_VAL)
-		hw_odr_val = LSM6DSV_ODR_480HZ_VAL;
-
 	k_mutex_lock(s->mutex, K_FOREVER);
-	ret = st_write_data_with_mask(s, LSM6DSV_CTRL1_ADDR, LSM6DSV_ODR_MASK,
-				      hw_odr_val);
+	ret = update_odr(s, normalized_rate);
 	if (ret == EC_SUCCESS)
 		data->base.odr = normalized_rate;
 	k_mutex_unlock(s->mutex);
