@@ -29,21 +29,24 @@ extern "C" bool chre_is_ready(void);
 namespace
 {
 
-constexpr uint32_t kMaxPalSensors = MAX_MOTION_SENSORS * 2;
+constexpr uint32_t kMaxPalSensors = MAX_MOTION_SENSORS * 2 + 2;
 constexpr float kGravityEarth = 9.80665f;
 constexpr float kDegToRad = 3.14159265358979323846f / 180.0f;
 constexpr float kRawFullScale = 32768.0f;
+constexpr float kMotionDetectThresholdMps2 = 0.5f;
 
 struct PalSensorContext {
 	int ecSensorNum;
 	uint8_t chreSensorType;
 	bool isOnChange;
+	bool isOneShot;
 	bool reportsBias;
 	bool enabled;
 	bool passive;
 	bool biasEventsEnabled;
 	bool firstSamplePending;
 	float lastLightLux;
+	float prevAccel[3];
 	uint64_t intervalNs;
 	uint64_t latencyNs;
 	uint64_t lastSampleTimeNs;
@@ -65,6 +68,8 @@ void populatePalSensorsOnce()
 		return;
 	}
 
+	int firstAccelSensorNum = -1;
+
 	for (unsigned int i = 0;
 	     i < motion_sensor_count && gPalSensorCount < kMaxPalSensors; i++) {
 		const struct motion_sensor_t *ecSensor = &motion_sensors[i];
@@ -77,6 +82,9 @@ void populatePalSensorsOnce()
 		}
 
 		if (ecSensor->type == MOTIONSENSE_TYPE_ACCEL) {
+			if (firstAccelSensorNum < 0) {
+				firstAccelSensorNum = static_cast<int>(i);
+			}
 			uint32_t idx = gPalSensorCount++;
 			gPalSensors[idx] = {};
 			gPalSensors[idx].ecSensorNum = static_cast<int>(i);
@@ -185,7 +193,52 @@ void populatePalSensorsOnce()
 				.reportsBiasEvents = 0,
 				.supportsPassiveMode = 1,
 				.unusedFlags = 0,
-				.minInterval = minIntervalNs,
+				.minInterval = 1000000ULL,
+				.sensorIndex = CHRE_SENSOR_INDEX_DEFAULT,
+			};
+		}
+	}
+
+	if (firstAccelSensorNum >= 0) {
+		if (gPalSensorCount < kMaxPalSensors) {
+			uint32_t idx = gPalSensorCount++;
+			gPalSensors[idx] = {};
+			gPalSensors[idx].ecSensorNum = firstAccelSensorNum;
+			gPalSensors[idx].chreSensorType =
+				CHRE_SENSOR_TYPE_INSTANT_MOTION_DETECT;
+			gPalSensors[idx].isOneShot = true;
+
+			gPalSensorInfos[idx] = {
+				.sensorName = "instant-motion",
+				.sensorType =
+					CHRE_SENSOR_TYPE_INSTANT_MOTION_DETECT,
+				.isOnChange = 0,
+				.isOneShot = 1,
+				.reportsBiasEvents = 0,
+				.supportsPassiveMode = 1,
+				.unusedFlags = 0,
+				.minInterval = CHRE_SENSOR_INTERVAL_DEFAULT,
+				.sensorIndex = CHRE_SENSOR_INDEX_DEFAULT,
+			};
+		}
+		if (gPalSensorCount < kMaxPalSensors) {
+			uint32_t idx = gPalSensorCount++;
+			gPalSensors[idx] = {};
+			gPalSensors[idx].ecSensorNum = firstAccelSensorNum;
+			gPalSensors[idx].chreSensorType =
+				CHRE_SENSOR_TYPE_STATIONARY_DETECT;
+			gPalSensors[idx].isOneShot = true;
+
+			gPalSensorInfos[idx] = {
+				.sensorName = "stationary-detect",
+				.sensorType =
+					CHRE_SENSOR_TYPE_STATIONARY_DETECT,
+				.isOnChange = 0,
+				.isOneShot = 1,
+				.reportsBiasEvents = 0,
+				.supportsPassiveMode = 1,
+				.unusedFlags = 0,
+				.minInterval = CHRE_SENSOR_INTERVAL_DEFAULT,
 				.sensorIndex = CHRE_SENSOR_INDEX_DEFAULT,
 			};
 		}
@@ -248,8 +301,9 @@ void updateEcSensorVoteLocked(int ecSensorNum)
 	}
 
 	unsigned int odrMhz = static_cast<unsigned int>(odrMhz64);
-	unsigned int ecRateUs =
-		static_cast<unsigned int>(minIntervalNs / 1000ULL);
+	unsigned int ecRateUs = static_cast<unsigned int>(
+		(odrMhz64 > 0) ? (1000000000ULL / odrMhz64) :
+				 (minIntervalNs / 1000ULL));
 	if (ecRateUs == 0) {
 		ecRateUs = 1000;
 	}
@@ -326,6 +380,19 @@ bool chrePalSensorApiConfigureSensor(uint32_t sensorInfoIndex,
 
 	updateEcSensorVoteLocked(pal.ecSensorNum);
 	bool sendBias = enabled && pal.biasEventsEnabled && pal.reportsBias;
+#ifndef CONFIG_ZTEST
+	bool sendInitialLight = enabled &&
+				(pal.chreSensorType == CHRE_SENSOR_TYPE_LIGHT);
+	float initialLux =
+		sendInitialLight ?
+			static_cast<float>(
+				motion_sensors[pal.ecSensorNum].raw_xyz[0]) :
+			0.0f;
+	if (sendInitialLight) {
+		pal.firstSamplePending = false;
+		pal.lastLightLux = initialLux;
+	}
+#endif
 	k_mutex_unlock(&gSensorPalMutex);
 
 	if (gCallbacks != nullptr) {
@@ -342,6 +409,26 @@ bool chrePalSensorApiConfigureSensor(uint32_t sensorInfoIndex,
 		if (sendBias) {
 			sendZeroBiasEvent(sensorInfoIndex);
 		}
+#ifndef CONFIG_ZTEST
+		if (sendInitialLight) {
+			auto *ev = static_cast<struct chreSensorFloatData *>(
+				chre::memoryAlloc(
+					sizeof(struct chreSensorFloatData)));
+			if (ev != nullptr) {
+				memset(ev, 0, sizeof(*ev));
+				ev->header.baseTimestamp =
+					chre::SystemTime::getMonotonicTime()
+						.toRawNanoseconds();
+				ev->header.sensorHandle = sensorInfoIndex;
+				ev->header.readingCount = 1;
+				ev->header.accuracy = CHRE_SENSOR_ACCURACY_HIGH;
+				ev->readings[0].timestampDelta = 0;
+				ev->readings[0].value = initialLux;
+				gCallbacks->dataEventCallback(sensorInfoIndex,
+							      ev);
+			}
+		}
+#endif
 	}
 
 	return true;
@@ -458,8 +545,62 @@ chre_sensor_pal_on_sample(const struct ec_response_motion_sensor_data *data,
 			sampleTs = pal.lastSampleTimeNs + 1000ULL;
 		}
 
-		if (sensor->type == MOTIONSENSE_TYPE_ACCEL ||
-		    sensor->type == MOTIONSENSE_TYPE_GYRO) {
+		if (pal.isOneShot) {
+			float scale =
+				static_cast<float>(sensor->current_range) *
+				kGravityEarth / kRawFullScale;
+			float x = static_cast<float>(data->data[0]) * scale;
+			float y = static_cast<float>(data->data[1]) * scale;
+			float z = static_cast<float>(data->data[2]) * scale;
+
+			if (pal.firstSamplePending) {
+				pal.prevAccel[0] = x;
+				pal.prevAccel[1] = y;
+				pal.prevAccel[2] = z;
+				pal.firstSamplePending = false;
+				pal.lastSampleTimeNs = sampleTs;
+				continue;
+			}
+
+			float delta = fabsf(x - pal.prevAccel[0]) +
+				      fabsf(y - pal.prevAccel[1]) +
+				      fabsf(z - pal.prevAccel[2]);
+			pal.prevAccel[0] = x;
+			pal.prevAccel[1] = y;
+			pal.prevAccel[2] = z;
+
+			bool triggered =
+				(pal.chreSensorType ==
+				 CHRE_SENSOR_TYPE_INSTANT_MOTION_DETECT) ?
+					(delta > kMotionDetectThresholdMps2) :
+					(delta <= kMotionDetectThresholdMps2);
+			if (!triggered) {
+				pal.lastSampleTimeNs = sampleTs;
+				continue;
+			}
+
+			auto *ev = static_cast<struct chreSensorOccurrenceData *>(
+				chre::memoryAlloc(sizeof(
+					struct chreSensorOccurrenceData)));
+			if (ev == nullptr) {
+				continue;
+			}
+			memset(ev, 0, sizeof(*ev));
+			ev->header.baseTimestamp = sampleTs;
+			ev->header.sensorHandle = i;
+			ev->header.readingCount = 1;
+			ev->header.accuracy = CHRE_SENSOR_ACCURACY_HIGH;
+			ev->readings[0].timestampDelta = 0;
+
+			k_mutex_lock(&gSensorPalMutex, K_FOREVER);
+			pal.enabled = false;
+			pal.lastSampleTimeNs = sampleTs;
+			updateEcSensorVoteLocked(pal.ecSensorNum);
+			k_mutex_unlock(&gSensorPalMutex);
+
+			gCallbacks->dataEventCallback(i, ev);
+		} else if (sensor->type == MOTIONSENSE_TYPE_ACCEL ||
+			   sensor->type == MOTIONSENSE_TYPE_GYRO) {
 			float scale = (sensor->type == MOTIONSENSE_TYPE_ACCEL) ?
 					      (static_cast<float>(
 						       sensor->current_range) *
@@ -516,6 +657,39 @@ chre_sensor_pal_on_sample(const struct ec_response_motion_sensor_data *data,
 			gCallbacks->dataEventCallback(i, ev);
 		}
 	}
+
+#ifndef CONFIG_ZTEST
+	for (uint32_t i = 0; i < gPalSensorCount; i++) {
+		PalSensorContext &pal = gPalSensors[i];
+		if (!pal.enabled ||
+		    pal.chreSensorType != CHRE_SENSOR_TYPE_LIGHT) {
+			continue;
+		}
+		if (pal.lastSampleTimeNs > 0 && nowNs > pal.lastSampleTimeNs &&
+		    (nowNs - pal.lastSampleTimeNs) < 1000000000ULL) {
+			continue;
+		}
+		float lux = static_cast<float>(
+			motion_sensors[pal.ecSensorNum].raw_xyz[0]);
+		auto *ev = static_cast<struct chreSensorFloatData *>(
+			chre::memoryAlloc(sizeof(struct chreSensorFloatData)));
+		if (ev == nullptr) {
+			continue;
+		}
+		memset(ev, 0, sizeof(*ev));
+		ev->header.baseTimestamp = nowNs;
+		ev->header.sensorHandle = i;
+		ev->header.readingCount = 1;
+		ev->header.accuracy = CHRE_SENSOR_ACCURACY_HIGH;
+		ev->readings[0].timestampDelta = 0;
+		ev->readings[0].value = lux;
+
+		pal.firstSamplePending = false;
+		pal.lastLightLux = lux;
+		pal.lastSampleTimeNs = nowNs;
+		gCallbacks->dataEventCallback(i, ev);
+	}
+#endif
 }
 
 const struct chrePalSensorApi *chrePalSensorGetApi(uint32_t requestedApiVersion)

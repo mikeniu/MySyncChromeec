@@ -18,6 +18,8 @@ extern "C" {
 	(((a) & UINT32_C(0xFFFF0000)) == ((b) & UINT32_C(0xFFFF0000)))
 
 #define CHRE_SENSOR_TYPE_ACCELEROMETER UINT8_C(1)
+#define CHRE_SENSOR_TYPE_INSTANT_MOTION_DETECT UINT8_C(2)
+#define CHRE_SENSOR_TYPE_STATIONARY_DETECT UINT8_C(3)
 #define CHRE_SENSOR_TYPE_GYROSCOPE UINT8_C(6)
 #define CHRE_SENSOR_TYPE_LIGHT UINT8_C(12)
 #define CHRE_SENSOR_TYPE_UNCALIBRATED_ACCELEROMETER UINT8_C(55)
@@ -97,6 +99,15 @@ struct chreSensorFloatSampleData {
 struct chreSensorFloatData {
 	struct chreSensorDataHeader header;
 	struct chreSensorFloatSampleData readings[1];
+};
+
+struct chreSensorOccurrenceSampleData {
+	uint32_t timestampDelta;
+};
+
+struct chreSensorOccurrenceData {
+	struct chreSensorDataHeader header;
+	struct chreSensorOccurrenceSampleData readings[1];
 };
 
 struct chrePalSystemApi {

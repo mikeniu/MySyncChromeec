@@ -44,6 +44,7 @@ static const struct device *const ipm_dev = DEVICE_DT_GET(DT_NODELABEL(ipi));
 static struct ec_host_cmd_rx_ctx *scp_rx_ctx;
 static struct ec_host_cmd_tx_buf *scp_tx_buf;
 static uint8_t *scp_tx_rpmsg_buf;
+static bool scp_ipi_ready;
 
 #ifdef CONFIG_SCP_CHRE
 /*
@@ -57,8 +58,8 @@ static uint8_t *scp_tx_rpmsg_buf;
 	(CHRE_RPMSG_MAX_PKT_SIZE - CHRE_RPMSG_HDR_SIZE)
 #define CHRE_RPMSG_FIRST_CHUNK_FLAG 0x8000
 #define CHRE_RPMSG_TOTAL_LEN_MASK 0x7FFF
-#define CHRE_RX_MSG_MAX_SIZE 2048
-#define CHRE_RX_QUEUE_DEPTH 32
+#define CHRE_RX_MSG_MAX_SIZE 4096
+#define CHRE_RX_QUEUE_DEPTH 16
 
 struct chre_rpmsg_chunk_hdr {
 	uint16_t chunk_len;
@@ -123,7 +124,8 @@ bool chrePlatformSendMessageToHost(const uint8_t *data, size_t size)
 	uint8_t pkt[CHRE_RPMSG_MAX_PKT_SIZE] __aligned(4);
 	size_t offset = 0;
 
-	if (data == NULL || size == 0 || size > CHRE_RPMSG_TOTAL_LEN_MASK) {
+	if (!scp_ipi_ready || data == NULL || size == 0 ||
+	    size > CHRE_RPMSG_TOTAL_LEN_MASK) {
 		return false;
 	}
 
@@ -145,7 +147,7 @@ bool chrePlatformSendMessageToHost(const uint8_t *data, size_t size)
 		}
 		memcpy(pkt + CHRE_RPMSG_HDR_SIZE, data + offset, chunk_len);
 
-		for (int retry = 0; retry < 50; retry++) {
+		for (int retry = 0; retry < 3; retry++) {
 			ret = ipm_send(ipm_dev, 1, SCP_IPI_CHRE, pkt,
 				       CHRE_RPMSG_HDR_SIZE + chunk_len);
 			if (ret == 0) {
@@ -197,6 +199,10 @@ static int scp_host_cmd_send(const struct ec_host_cmd_backend *backend)
 {
 	ARG_UNUSED(backend);
 
+	if (!scp_ipi_ready) {
+		return -EBUSY;
+	}
+
 	memset(scp_tx_rpmsg_buf, 0, RPMSG_PREAMBLE_SIZE);
 	scp_tx_rpmsg_buf[0] = HOST_COMMAND_MARK;
 
@@ -226,6 +232,10 @@ int mkbp_set_host_active_via_custom(int active, uint32_t *timestamp)
 
 	if (!active) {
 		return EC_SUCCESS;
+	}
+
+	if (!scp_ipi_ready) {
+		return EC_ERROR_BUSY;
 	}
 
 	ret = ipm_send(ipm_dev, 1, SCP_IPI_HOST_COMMAND, &event_resp,
@@ -425,5 +435,7 @@ static void scp_boot_handshake(void)
 			SCP_IPI_CHRE);
 	}
 #endif /* CONFIG_SCP_CHRE */
+
+	scp_ipi_ready = true;
 }
-DECLARE_HOOK(HOOK_INIT, scp_boot_handshake, HOOK_PRIO_LAST);
+DECLARE_HOOK(HOOK_INIT, scp_boot_handshake, HOOK_PRIO_FIRST);

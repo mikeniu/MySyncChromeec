@@ -209,7 +209,7 @@ ZTEST(chre_sensor_pal, test_sensor_pal_open_and_discovery)
 	uint32_t count = 0;
 	zassert_true(g_api->getSensors(&sensors, &count));
 	zassert_not_null(sensors);
-	zassert_equal(count, 5, "Expected 5 CHRE sensors, got %u", count);
+	zassert_equal(count, 7, "Expected 7 CHRE sensors, got %u", count);
 
 	zassert_equal(sensors[0].sensorType, CHRE_SENSOR_TYPE_ACCELEROMETER);
 	zassert_str_equal(sensors[0].sensorName, "lid-accel");
@@ -232,6 +232,14 @@ ZTEST(chre_sensor_pal, test_sensor_pal_open_and_discovery)
 	zassert_str_equal(sensors[4].sensorName, "lid-als");
 	zassert_equal(sensors[4].isOnChange, 1);
 	zassert_equal(sensors[4].reportsBiasEvents, 0);
+
+	zassert_equal(sensors[5].sensorType,
+		      CHRE_SENSOR_TYPE_INSTANT_MOTION_DETECT);
+	zassert_equal(sensors[5].isOneShot, 1);
+
+	zassert_equal(sensors[6].sensorType,
+		      CHRE_SENSOR_TYPE_STATIONARY_DETECT);
+	zassert_equal(sensors[6].isOneShot, 1);
 
 	g_api->close();
 }

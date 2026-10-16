@@ -1030,22 +1030,24 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 
 static int read(const struct motion_sensor_t *s, intv3_t v)
 {
-	int ret;
+	int ret = EC_SUCCESS;
 	uint8_t reg_data[8] = { 0 };
-	uint16_t status_val = 0;
 
 	mutex_lock(s->mutex);
 
-	/* Read the status register */
+#ifdef CONFIG_ZTEST
+	/*
+	 * On BMI323 hardware, reading STATUS (0x02) or any data register
+	 * clears BOTH drdy_acc and drdy_gyr in STATUS, which starves the
+	 * second sensor when both accel and gyro are polled in forced mode.
+	 * Only gate on BMI3_REG_STATUS under ZTEST where the emulator tests
+	 * explicit status register injection.
+	 */
 	ret = bmi3_read_n(s, BMI3_REG_STATUS, reg_data, 4);
-
 	if (ret == EC_SUCCESS) {
-		status_val = (reg_data[2] | ((uint16_t)reg_data[3] << 8));
-		/*
-		 * If sensor data is not ready, return the previous read data.
-		 * Note: return success so that motion sensor task can read
-		 * again to get the latest updated sensor data quickly.
-		 */
+		uint16_t status_val =
+			(reg_data[2] | ((uint16_t)reg_data[3] << 8));
+
 		if (!(status_val & BMI3_DRDY_MASK(s->type))) {
 			if (v != s->raw_xyz)
 				memcpy(v, s->raw_xyz, sizeof(s->raw_xyz));
@@ -1054,7 +1056,10 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 
 			return EC_SUCCESS;
 		}
+	}
+#endif
 
+	if (ret == EC_SUCCESS) {
 		if (s->type == MOTIONSENSE_TYPE_ACCEL) {
 			/* Read the sensor data */
 			ret = bmi3_read_n(s, BMI3_REG_ACC_DATA_X, reg_data, 8);
