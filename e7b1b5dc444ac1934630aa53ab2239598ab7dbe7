@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c653036_41b44d6c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T21:19:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The commit message narrates the exact code changes (\"assigning the .mux pointers and setting .next to NULL individually on each port\"). Commit messages should describe the conceptual change rather than transcribing the diff.\n\nConsider this more concise, non-narrating replacement:\n\n```text\nampton: Fix usb_mux override corruption and alignment check crash\n\nIn board_customize_usbc_mux(), ampton copied ampton_usb_muxes (an array\nof struct usb_mux) into usb_muxes using memcpy(usb_muxes,\nampton_usb_muxes, sizeof(ampton_usb_muxes)).\n\nWhen usb_muxes was updated across octopus to use struct usb_mux_chain,\nthis memcpy remained, overflowing the smaller usb_mux_chain array and\ncorrupting the chain pointers with raw struct usb_mux bytes on any board\nwith board_version \u003e 0. During early init, configure_mux() traversed the\ncorrupted chain, dereferenced an invalid mux pointer, and triggered a\nGeneral exception [Alignment check] crash loop at ~15 ms after boot.\n\nFix this by properly initializing the `usb_mux_chain` structures for each\nport instead of using a bulk memory copy.\n\nBUG\u003dNone\nTEST\u003dmake BOARD\u003dampton\nTEST\u003d/mnt/336bcd7c-aca6-4625-b004-42e4e240ad3d/chromiumos/chromite/bin/cros format --check board/ampton/board.c\nTEST\u003d/mnt/336bcd7c-aca6-4625-b004-42e4e240ad3d/chromiumos/chromite/bin/cros lint board/ampton/board.c\n\nChange-Id: I8a69ad846cdfaa51bde525587e67247010f3f50a\n```\n[🔗](http://go/tj/b800808f-d694-426a-89fe-2534b313a1b4)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e7b1b5dc444ac1934630aa53ab2239598ab7dbe7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9e8ab4f_c348620c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T21:19:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n*   **Functionality:** ✅ Looks good. The memory corruption fix is correct.\n*   **Architecture \u0026 Component Fit:** ✅ Looks good.\n*   **Code Simplicity:** ❌ The initialization duplicates logic for each port. Use a loop over `ARRAY_SIZE` to initialize the array.\n*   **Idiomaticity \u0026 Readability:** ✅ Looks good.\n*   **Security:** ✅ Looks good.\n*   **Testing:** ✅ Acceptable under the Narrow Hardware/Physical Exception, as this modifies physical hardware mapping configuration arrays tied to the SKU/version and there are no existing board initialization unit tests.\n*   **CL Size \u0026 Scope:** ✅ Size: XS (+6, -1). Single logical change.\n*   **Commit Message:** ❌ The commit message narrates the exact code changes line-by-line rather than describing the conceptual change. See inline comment for a replacement.\n\n[[trajectory](https://goto.corp.google.com/traj/b800808f-d694-426a-89fe-2534b313a1b4)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e7b1b5dc444ac1934630aa53ab2239598ab7dbe7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d33ccc34_18230a79",
+        "filename": "board/ampton/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T21:19:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This manual unrolling duplicates the initialization logic for each port. Consider using a loop over `ARRAY_SIZE` to avoid repetition and automatically scale if more ports are added:\n\n```c\n\t\tfor (int i \u003d 0; i \u003c ARRAY_SIZE(ampton_usb_muxes); i++) {\n\t\t\tusb_muxes[i].mux \u003d \u0026ampton_usb_muxes[i];\n\t\t\tusb_muxes[i].next \u003d NULL;\n\t\t}\n```\n[🔗](http://go/tj/b800808f-d694-426a-89fe-2534b313a1b4)",
+      "range": {
+        "startLine": 406,
+        "startChar": 0,
+        "endLine": 411,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e7b1b5dc444ac1934630aa53ab2239598ab7dbe7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
