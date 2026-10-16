@@ -125,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "797f15b5_68d3da36",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-10-16T06:13:53Z",
+      "side": 1,
+      "message": "Cold boot directly targets the boot ROM via the reset vector, so the flash is not utilized until the SPI clock is configured.\nAlso, as far as I know, a warm boot sets the SPI divider to 1.\nTherefore, even if the AHB is running at 200MHz at that moment, the SPI will still remain at 50MHz.",
+      "parentUuid": "dcccabb6_779f80ee",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ef320f_25247478",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
@@ -155,6 +173,24 @@
       "side": 1,
       "message": "I think we can do that - @jason.huang@egistec.corp-partner.google.com can you please confirm?",
       "parentUuid": "e5ef320f_25247478",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a98d4cc0_6414ab7a",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-10-16T06:13:53Z",
+      "side": 1,
+      "message": "Yes, this matches exactly how I configured it locally:\n```\n\u0026spi1 {\n\tstatus \u003d \"okay\";\n\t/delete-property/ clock-frequency;\n\tclocks \u003d \u003c\u0026clock ET171_CLOCK_SPIM2\u003e;\n};\n```\nAdditionally, the fp_sensor can currently run at a maximum speed of 8MHz.\nWe can also adjust this together if needed:\n```\n\u0026spi1 {\n\tfp_sensor: egis630@0 {\n..\n\t\tspi-max-frequency \u003d \u003c8000000\u003e;\n```",
+      "parentUuid": "969f0e13_78a9ad0e",
       "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
