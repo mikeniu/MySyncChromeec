@@ -162,10 +162,11 @@ config PLATFORM_EC_ACCELGYRO_LSM6DSM
 config PLATFORM_EC_ACCELGYRO_LSM6DSV
 	bool "LSM6DSV Accelgyro Driver"
 	default y
-	depends on DT_HAS_CROS_EC_LSM6DSV_ACCEL_ENABLED
+	depends on DT_HAS_CROS_EC_LSM6DSV_ACCEL_ENABLED || DT_HAS_CROS_EC_LSM6DSV_GYRO_ENABLED
 	select PLATFORM_EC_STM_MEMS_COMMON
 	help
-	  The driver supports ST's LSM6DSV/LSM6DSVQ 3D digital accelerometer.
+	  The driver supports ST's LSM6DSV/LSM6DSVQ 3D digital accelerometer
+	  and gyroscope.
 
 config PLATFORM_EC_STM_MEMS_COMMON
 	bool
