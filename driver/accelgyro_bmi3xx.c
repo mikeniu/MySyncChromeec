@@ -53,6 +53,18 @@ static inline int bmi3_write_n(const struct motion_sensor_t *s, const int reg,
 	return bmi_write_n(s->port, s->i2c_spi_addr_flags, reg, data_ptr, len);
 }
 
+static bool double_tap_enabled(const struct motion_sensor_t *s)
+{
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	struct bmi_drv_data_t *data = BMI_GET_DATA(s);
+
+	return data->enabled_activities & BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+#else
+	/* Without the host interface, double-tap stays on once configured */
+	return true;
+#endif
+}
+
 #ifdef ACCELGYRO_BMI3XX_INT_ENABLE
 
 #ifdef CONFIG_BMI_ORIENTATION_SENSOR
@@ -161,12 +173,21 @@ static int config_interrupt(const struct motion_sensor_t *s)
 	if (ret)
 		goto err_unlock;
 
-	reg_data[5] = BMI3_SET_BITS(reg_data[5], BMI3_FWM_INT, BMI3_INT1);
-	reg_data[5] = BMI3_SET_BITS(reg_data[5], BMI3_FFULL_INT, BMI3_INT1);
+	if (!motion_sensor_in_forced_mode(s)) {
+		reg_data[5] =
+			BMI3_SET_BITS(reg_data[5], BMI3_FWM_INT, BMI3_INT1);
+		reg_data[5] =
+			BMI3_SET_BITS(reg_data[5], BMI3_FFULL_INT, BMI3_INT1);
+	}
 	if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR)) {
 		/* Map orientation to INT1 pin */
 		reg_data[2] =
 			BMI3_SET_BITS(reg_data[2], BMI3_ORIENT_INT, BMI3_INT1);
+	}
+	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP)) {
+		/* Map tap interrupt to INT1 pin */
+		reg_data[4] =
+			BMI3_SET_BITS(reg_data[4], BMI3_TAP_INT, BMI3_INT1);
 	}
 
 	ret = bmi3_write_n(s, BMI3_REG_INT_MAP1, &reg_data[2], 4);
@@ -202,13 +223,33 @@ static int config_interrupt(const struct motion_sensor_t *s)
 	if (ret)
 		goto err_unlock;
 
-	if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR)) {
-		/* Enable the orientation feature in BMI3 */
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+	/* Set tap peak threshold and maximum inter-tap duration in EXT.TAP_2 */
+	reg_data[0] = BMI3_BASE_ADDR_TAP2;
+	reg_data[1] = 0;
+	ret = bmi3_write_n(s, BMI3_FEATURE_ENGINE_DMA_TX, reg_data, 2);
+	if (ret)
+		goto err_unlock;
+
+	reg_data[0] = BMI3_TAP2_VAL & BMI3_SET_LOW_BYTE;
+	reg_data[1] = (BMI3_TAP2_VAL & BMI3_SET_HIGH_BYTE) >> 8;
+	ret = bmi3_write_n(s, BMI3_FEATURE_ENGINE_DMA_TX_DATA, reg_data, 2);
+	if (ret)
+		goto err_unlock;
+#endif
+
+	if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR) ||
+	    IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP)) {
+		/* Enable orientation / double-tap features in BMI3 */
 		ret = bmi3_read_n(s, BMI3_FEATURE_IO_0, reg_data, 4);
 		if (ret)
 			goto err_unlock;
 
-		reg_data[2] |= BMI3_ANY_MOTION_X_EN_MASK;
+		if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR))
+			reg_data[2] |= BMI3_ANY_MOTION_X_EN_MASK;
+		if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP))
+			reg_data[3] |= BMI3_D_TAP_EN_MASK;
+
 		ret = bmi3_write_n(s, BMI3_FEATURE_IO_0, &reg_data[2], 2);
 		if (ret)
 			goto err_unlock;
@@ -218,6 +259,16 @@ static int config_interrupt(const struct motion_sensor_t *s)
 		reg_data[1] = 0;
 		ret = bmi3_write_n(s, BMI3_FEATURE_IO_STATUS, reg_data, 2);
 	}
+
+#if defined(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) && \
+	defined(CONFIG_GESTURE_HOST_DETECTION)
+	if (!ret) {
+		BMI_GET_DATA(s)->enabled_activities |=
+			BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+		BMI_GET_DATA(s)->disabled_activities &=
+			~BIT(MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+	}
+#endif
 
 err_unlock:
 	k_mutex_unlock(s->mutex);
@@ -351,9 +402,20 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	int i;
 
 	if ((s->type != MOTIONSENSE_TYPE_ACCEL) ||
-	    (!(*event & CONFIG_ACCELGYRO_BMI3XX_INT_EVENT)) ||
-	    motion_sensor_in_forced_mode(s))
+	    (!(*event & CONFIG_ACCELGYRO_BMI3XX_INT_EVENT)))
 		return EC_ERROR_NOT_HANDLED;
+
+	if (motion_sensor_in_forced_mode(s)) {
+		if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+		    double_tap_enabled(s) &&
+		    bmi3_read_n(s, BMI3_REG_INT_STATUS_INT1,
+				(uint8_t *)reg_data,
+				sizeof(reg_data)) == EC_SUCCESS &&
+		    (reg_data[1] & BMI3_INT_STATUS_TAP))
+			*event |= TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(
+				MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
+		return EC_ERROR_NOT_HANDLED;
+	}
 
 	/*
 	 * We have to loop until we see the interrupt status as 0 to avoid
@@ -375,6 +437,12 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 		if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR) &&
 		    (BMI3_INT_STATUS_ORIENTATION & burst.int_status))
 			irq_set_orientation(s);
+
+		if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+		    double_tap_enabled(s) &&
+		    (BMI3_INT_STATUS_TAP & burst.int_status))
+			*event |= TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(
+				MOTIONSENSE_ACTIVITY_DOUBLE_TAP);
 
 		if ((burst.int_status &
 		     (BMI3_INT_STATUS_FWM | BMI3_INT_STATUS_FFULL)) == 0)
@@ -448,6 +516,35 @@ static int bmi3xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 
 	if (s->type != MOTIONSENSE_TYPE_ACCEL)
 		return EC_SUCCESS;
+
+	if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP)) {
+		uint8_t pin = enable ? BMI3_INT1 : BMI3_INT_NONE;
+
+		k_mutex_lock(s->mutex, K_FOREVER);
+
+		if (!enable) {
+			ret = enable_fifo(s, 0);
+			if (ret) {
+				k_mutex_unlock(s->mutex);
+				return ret;
+			}
+		}
+
+		ret = bmi3_read_n(s, BMI3_REG_INT_MAP1, reg_data, 6);
+		if (ret == EC_SUCCESS) {
+			reg_data[5] =
+				BMI3_SET_BITS(reg_data[5], BMI3_FWM_INT, pin);
+			reg_data[5] =
+				BMI3_SET_BITS(reg_data[5], BMI3_FFULL_INT, pin);
+			ret = bmi3_write_n(s, BMI3_REG_INT_MAP1, &reg_data[2],
+					   4);
+		}
+
+		k_mutex_unlock(s->mutex);
+		if (ret == EC_SUCCESS && enable)
+			bmi3xx_interrupt(0 /* unused */);
+		return ret;
+	}
 
 	if (enable) {
 		RETURN_ERROR(config_interrupt(s));
@@ -882,24 +979,47 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 #ifdef ACCELGYRO_BMI3XX_INT_ENABLE
 			ret = enable_fifo(s, 0);
 #endif
-
-			/*
-			 * Disable accel to set rate equal to zero.
-			 * Accel does not have suspend mode.
-			 */
-			reg_data[3] = BMI3_SET_BITS(reg_data[3],
-						    BMI3_POWER_MODE,
-						    BMI3_ACC_MODE_DISABLE);
+			if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+			    double_tap_enabled(s)) {
+				/*
+				 * The BMI3xx tap detector requires an accel ODR
+				 * of at least 200 Hz. Keep the accel in
+				 * low-power mode at 200 Hz while
+				 * saved_data->odr is 0 so FIFO and EC polling
+				 * stay off.
+				 */
+				reg_data[3] = BMI3_SET_BITS(
+					reg_data[3], BMI3_POWER_MODE,
+					BMI3_ACC_MODE_LOW_PWR);
+				reg_val = BMI3_ACC_ODR_200HZ;
+			} else {
+				/*
+				 * Disable accel to set rate equal to zero.
+				 * Accel does not have suspend mode.
+				 */
+				reg_data[3] = BMI3_SET_BITS(
+					reg_data[3], BMI3_POWER_MODE,
+					BMI3_ACC_MODE_DISABLE);
+			}
 
 			saved_data->odr = 0;
-		} else if (saved_data->odr == 0) {
-			/*
-			 * Power mode changed from suspend to
-			 * normal
-			 */
-			reg_data[3] = BMI3_SET_BITS(reg_data[3],
-						    BMI3_POWER_MODE,
-						    BMI3_ACC_MODE_NORMAL);
+		} else {
+			if (saved_data->odr == 0) {
+				/*
+				 * Power mode changed from suspend to
+				 * normal
+				 */
+				reg_data[3] = BMI3_SET_BITS(
+					reg_data[3], BMI3_POWER_MODE,
+					BMI3_ACC_MODE_NORMAL);
+			}
+			if (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) &&
+			    double_tap_enabled(s) &&
+			    reg_val < BMI3_ACC_ODR_200HZ) {
+				reg_val = BMI3_ACC_ODR_200HZ;
+				if (!motion_sensor_in_forced_mode(s))
+					normalized_rate = 200000;
+			}
 		}
 	} else if (s->type == MOTIONSENSE_TYPE_GYRO) {
 		if (rate == 0) {
@@ -944,13 +1064,72 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	 * They will be discarded if AP does not want them.
 	 */
 #ifdef ACCELGYRO_BMI3XX_INT_ENABLE
-	if (rate > 0)
+	if (rate > 0 && !motion_sensor_in_forced_mode(s))
 		ret = enable_fifo(s, 1);
 #endif
 
 	k_mutex_unlock(s->mutex);
 	return ret;
 }
+
+#if defined(ACCELGYRO_BMI3XX_INT_ENABLE) && \
+	defined(CONFIG_GESTURE_HOST_DETECTION)
+/* The return value goes back to the host, so it is an EC_RES_* code. */
+static int manage_activity(const struct motion_sensor_t *s,
+			   enum motionsensor_activity activity, int enable,
+			   const struct ec_motion_sense_activity *param)
+{
+	int ret = EC_RES_INVALID_PARAM;
+	struct bmi_drv_data_t *data = BMI_GET_DATA(s);
+	struct accelgyro_saved_data_t *saved_data = BMI_GET_SAVED_DATA(s);
+	uint8_t reg_data[6];
+
+	if (s->type != MOTIONSENSE_TYPE_ACCEL)
+		return EC_RES_INVALID_PARAM;
+
+	k_mutex_lock(s->mutex, K_FOREVER);
+
+	switch (activity) {
+#ifdef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+	case MOTIONSENSE_ACTIVITY_DOUBLE_TAP:
+		if (bmi3_read_n(s, BMI3_REG_INT_MAP1, reg_data, 6) ==
+		    EC_SUCCESS) {
+			reg_data[4] = BMI3_SET_BITS(reg_data[4], BMI3_TAP_INT,
+						    enable ? BMI3_INT1 :
+							     BMI3_INT_NONE);
+			if (bmi3_write_n(s, BMI3_REG_INT_MAP1, &reg_data[2],
+					 4) == EC_SUCCESS)
+				ret = EC_RES_SUCCESS;
+			else
+				ret = EC_RES_UNAVAILABLE;
+		} else {
+			ret = EC_RES_UNAVAILABLE;
+		}
+		break;
+#endif
+	default:
+		break;
+	}
+
+	if (ret == EC_RES_SUCCESS) {
+		if (enable) {
+			data->enabled_activities |= BIT(activity);
+			data->disabled_activities &= ~BIT(activity);
+		} else {
+			data->enabled_activities &= ~BIT(activity);
+			data->disabled_activities |= BIT(activity);
+		}
+	}
+
+	k_mutex_unlock(s->mutex);
+
+	if (ret == EC_RES_SUCCESS &&
+	    set_data_rate(s, saved_data->odr, 0) != EC_SUCCESS)
+		ret = EC_RES_UNAVAILABLE;
+
+	return ret;
+}
+#endif
 
 static int get_resolution(const struct motion_sensor_t *s)
 {
@@ -1117,12 +1296,34 @@ static int init(struct motion_sensor_t *s)
 		/* Delay of 2ms after soft reset*/
 		crec_msleep(2);
 
+		if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR) ||
+		    IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP)) {
+			/*
+			 * Write the startup configuration to FEATURE_IO_2 and
+			 * latch it via FEATURE_IO_STATUS before enabling the
+			 * feature engine (BST-BMI323-DS000 section 5.6).
+			 */
+			reg_data[0] = BMI3_FEATURE_IO_2_STARTUP_LSB;
+			reg_data[1] = BMI3_FEATURE_IO_2_STARTUP_MSB;
+			RETURN_ERROR(bmi3_write_n(s, BMI3_FEATURE_IO_2,
+						  reg_data, 2));
+
+			reg_data[0] = BMI3_ENABLE;
+			reg_data[1] = 0;
+			RETURN_ERROR(bmi3_write_n(s, BMI3_FEATURE_IO_STATUS,
+						  reg_data, 2));
+		}
+
 		/* Enable feature engine bit */
 		reg_data[0] = BMI3_ENABLE;
 		reg_data[1] = 0;
 
 		RETURN_ERROR(bmi3_write_n(s, BMI3_REG_FEATURE_ENGINE_GLOB_CTRL,
 					  reg_data, 2));
+
+		if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR) ||
+		    IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP))
+			crec_msleep(4);
 
 #ifdef ACCELGYRO_BMI3XX_INT_ENABLE
 		RETURN_ERROR(config_interrupt(s));
@@ -1160,6 +1361,9 @@ const struct accelgyro_drv bmi3xx_drv = {
 	.irq_handler = irq_handler,
 	.enable_interrupt = bmi3xx_enable_interrupt,
 	.interrupt = bmi3xx_interrupt,
+#ifdef CONFIG_GESTURE_HOST_DETECTION
+	.manage_activity = manage_activity,
+#endif
 #endif
 #ifdef CONFIG_GESTURE_HOST_DETECTION
 	.list_activities = bmi_list_activities,
