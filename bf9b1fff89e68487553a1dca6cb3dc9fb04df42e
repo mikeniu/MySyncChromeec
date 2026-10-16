@@ -195,6 +195,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6ecc78c_c2b65636",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-16T07:16:02Z",
+      "side": 1,
+      "message": "I added a parent CL to get clock speed via clock_control driver. I will keep 4Hmz for now, not to make too many impacting changes at once.",
+      "parentUuid": "a98d4cc0_6414ab7a",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92549eb1_25dab50b",
