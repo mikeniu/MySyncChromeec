@@ -34,6 +34,7 @@
 		};
 		gpio_ec_en_pp5000_s5: ec_en_pp5000_s5 {
 			gpios = <&gpio4 0 (GPIO_OUTPUT)>;
+			enum-name = "GPIO_EN_PP5000";
 		};
 		gpio_pp1800_l1i_s3_ec: pp1800_l1i_s3_ec {
 			gpios = <&gpio5 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
