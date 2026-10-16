@@ -8,7 +8,23 @@
 
 #include <zephyr/sys/printk.h>
 
+#include <drivers/fingerprint_sim.h>
 #include <fpsensor/fpsensor_image_frame_params.h>
+
+#define FP_SIMULATOR_IMAGE_FRAME_PARAM_INITIALIZER(idx, node_id)            \
+	{                                                                   \
+		.frame_size = FINGERPRINT_SENSOR_FRAME_SIZE(idx, node_id),  \
+		.image_data_offset_bytes =                                  \
+			FINGERPRINT_SENSOR_IMAGE_OFFSET(idx, node_id),      \
+		.pixel_format =                                             \
+			FINGERPRINT_SENSOR_V4L2_PIXEL_FORMAT(idx, node_id), \
+		.width = FINGERPRINT_SENSOR_RES_X(idx, node_id),            \
+		.height = FINGERPRINT_SENSOR_RES_Y(idx, node_id),           \
+		.bpp = FINGERPRINT_SENSOR_RES_BPP(idx, node_id),            \
+		.fp_capture_type =                                          \
+			FINGERPRINT_SENSOR_CAPTURE_TYPE(idx, node_id),      \
+		.reserved = 0,                                              \
+	}
 
 class FpImageFrameParamsCacheTestHelper {
     public:

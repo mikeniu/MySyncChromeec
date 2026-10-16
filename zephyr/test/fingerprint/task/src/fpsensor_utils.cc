@@ -13,7 +13,7 @@
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
-ZTEST_SUITE(fpsensor_utils, NULL, NULL, NULL, NULL, NULL);
+ZTEST_SUITE(fpsensor_utils, nullptr, nullptr, nullptr, nullptr, nullptr);
 
 enum ec_error_list rollback_get_secret(uint8_t *secret)
 {

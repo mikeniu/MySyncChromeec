@@ -14,11 +14,13 @@
 #include <zephyr/ztest.h>
 
 #include <algorithm>
+#include <array>
 extern "C" {
 #include <ascp/ascp.h>
 }
 #include <ec_commands.h>
 #include <fpsensor/fpsensor.h>
+#include <fpsensor/fpsensor_state.h>
 #include <fpsensor/fpsensor_state_driver.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <fpsensor_driver.h>
@@ -27,8 +29,6 @@ extern "C" {
 #include <ranges>
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
-
-extern std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
 
 static constexpr std::array<uint8_t, 32> sk_f = {
 	0x64, 0xfb, 0xd5, 0x8f, 0x6b, 0x57, 0x2a, 0x41, 0xef, 0x00, 0x0e,
@@ -77,77 +77,68 @@ extern "C" int ascp_get_sk_f(uint8_t *buffer, size_t len)
 	return EC_SUCCESS;
 }
 
+static ec_params_fp_ascp_establish make_establish_params()
+{
+	ec_params_fp_ascp_establish params{};
+	std::ranges::copy(pk_g, std::begin(params.pk_g));
+	return params;
+}
+
 ZTEST(hc_fp_ascp, test_fp_ascp_establish_ok)
 {
-	int ret;
-	ec_params_fp_ascp_establish params;
-	std::ranges::copy(pk_g, std::begin(params.pk_g));
+	ec_params_fp_ascp_establish params = make_establish_params();
 
-	ret = ec_cmd_fp_ascp_establish(nullptr, &params);
-	zassert_equal(EC_RES_SUCCESS, ret);
+	zassert_equal(EC_RES_SUCCESS,
+		      ec_cmd_fp_ascp_establish(nullptr, &params));
 
-	bssl::UniquePtr<EC_KEY> public_key = create_ec_key_from_pubkey(
-		*reinterpret_cast<const fp_elliptic_curve_public_key *>(
-			&pk_f[1]));
-	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(sk_g.data(), sk_g.size());
+	const auto pubkey_f = create_pubkey_from_uncompressed_point(pk_f);
+	zassert_true(pubkey_f.has_value());
+	bssl::UniquePtr<EC_KEY> public_key =
+		create_ec_key_from_pubkey(*pubkey_f);
+	bssl::UniquePtr<EC_KEY> private_key = create_ec_key_from_privkey(sk_g);
 	zassert_not_equal(public_key, nullptr);
 	zassert_not_equal(private_key, nullptr);
 
-	std::array<uint8_t, FP_PAIRING_KEY_LEN> host_pairing_key;
-	ret = generate_ecdh_shared_secret_without_kdf(*private_key, *public_key,
-						      host_pairing_key);
-	zassert_equal(EC_SUCCESS, ret);
+	const auto host_pairing_key = generate_ecdh_shared_secret_without_kdf(
+		*private_key, *public_key);
+	zassert_true(host_pairing_key.has_value());
 
-	zassert_true(std::ranges::equal(host_pairing_key, pairing_key));
+	zassert_true(std::ranges::equal(*host_pairing_key,
+					global_context.crypto.pairing_key));
 }
 
 ZTEST(hc_fp_ascp, test_fp_ascp_establish_pk_g_first_not_ok)
 {
-	int ret;
-	ec_params_fp_ascp_establish params;
-	std::ranges::copy(pk_g, std::begin(params.pk_g));
-
+	ec_params_fp_ascp_establish params = make_establish_params();
 	params.pk_g[0] = 0x05;
 
-	ret = ec_cmd_fp_ascp_establish(nullptr, &params);
-	zassert_equal(EC_RES_INVALID_PARAM, ret);
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      ec_cmd_fp_ascp_establish(nullptr, &params));
 }
 
 ZTEST(hc_fp_ascp, test_fp_ascp_establish_pk_g_later_not_ok)
 {
-	int ret;
-	ec_params_fp_ascp_establish params;
-	std::ranges::copy(pk_g, std::begin(params.pk_g));
-
+	ec_params_fp_ascp_establish params = make_establish_params();
 	params.pk_g[1] = 0x00;
 
-	ret = ec_cmd_fp_ascp_establish(nullptr, &params);
-	zassert_equal(EC_RES_INVALID_PARAM, ret);
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      ec_cmd_fp_ascp_establish(nullptr, &params));
 }
 
 ZTEST(hc_fp_ascp, test_fp_ascp_establish_ascp_get_sk_f_not_ok)
 {
-	int ret;
-	ec_params_fp_ascp_establish params;
-	std::ranges::copy(pk_g, std::begin(params.pk_g));
-
+	ec_params_fp_ascp_establish params = make_establish_params();
 	ascp_get_sk_f_custom_ret = -1;
 
-	ret = ec_cmd_fp_ascp_establish(nullptr, &params);
-	zassert_equal(EC_RES_ERROR, ret);
+	zassert_equal(EC_RES_ERROR, ec_cmd_fp_ascp_establish(nullptr, &params));
 }
 
 ZTEST(hc_fp_ascp, test_fp_ascp_establish_sk_f_not_ok)
 {
-	int ret;
-	ec_params_fp_ascp_establish params;
-	std::ranges::copy(pk_g, std::begin(params.pk_g));
-
+	ec_params_fp_ascp_establish params = make_establish_params();
 	std::ranges::fill(ascp_get_sk_f_custom_sk_f, 0);
 
-	ret = ec_cmd_fp_ascp_establish(nullptr, &params);
-	zassert_equal(EC_RES_ERROR, ret);
+	zassert_equal(EC_RES_ERROR, ec_cmd_fp_ascp_establish(nullptr, &params));
 }
 
 static void reset(void *data)

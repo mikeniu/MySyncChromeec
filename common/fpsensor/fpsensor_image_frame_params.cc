@@ -6,27 +6,67 @@
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_image_frame_params.h"
+#include "fpsensor/fpsensor_modes.h"
 
-#include <stddef.h>
+#include <cstddef>
+#include <expected>
+#include <span>
+#include <utility>
 
-#include <vector>
+namespace
+{
+
+std::expected<std::pair<FpCaptureType, FpImageFrameParam>, ec_error_list>
+parse_frame_param(const fp_image_frame_params_v2 &param,
+		  uint32_t max_frame_size_bytes)
+{
+	const uint8_t type = param.fp_capture_type;
+	const uint32_t size = param.frame_size;
+
+	if (size > max_frame_size_bytes) {
+		CPRINTS("Error: Type %u frame size (%u) exceeds max allowed (%u).",
+			type, size, max_frame_size_bytes);
+		return std::unexpected(EC_ERROR_INVAL);
+	}
+
+	const auto capture_type = FpCaptureType::create(type);
+	if (!capture_type.has_value()) {
+		CPRINTS("ERROR: Invalid fp_capture_type %u received from EC, max "
+			"supported is %zu.",
+			type, static_cast<size_t>(FP_CAPTURE_TYPE_MAX));
+		return std::unexpected(EC_ERROR_INVAL);
+	}
+
+	if (size == 0) {
+		CPRINTS("ERROR: Invalid 0 size for capture type %u.", type);
+		return std::unexpected(EC_ERROR_INVAL);
+	}
+
+	return std::pair{ *capture_type,
+			  FpImageFrameParam{ .frame_size_bytes = size } };
+}
+
+} /* namespace */
+
+std::expected<std::span<const struct fp_image_frame_params_v2>, ec_error_list>
+FpSensorInfoBuffer::query()
+{
+	*this = {};
+	if (fp_sensor_get_info(&header, sizeof(*this)) < 0) {
+		return std::unexpected(EC_ERROR_UNKNOWN);
+	}
+	return capture_types();
+}
 
 void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 {
-	const size_t buffer_size =
-		sizeof(struct ec_response_fp_info_v3) +
-		sizeof(struct fp_image_frame_params_v2) * frame_params_.size();
-
-	std::vector<uint8_t> buffer(buffer_size);
-	auto *info = reinterpret_cast<struct ec_response_fp_info_v3 *>(
-		buffer.data());
-
-	if (fp_sensor_get_info(info, buffer.size()) < 0) {
+	FpSensorInfoBuffer buffer{};
+	if (!buffer.query().has_value()) {
 		CPRINTS("Error: Failed to get fingerprint sensor info.");
 		return;
 	}
 
-	const uint8_t num_types = info->sensor_info.num_capture_types;
+	const uint8_t num_types = buffer.header.sensor_info.num_capture_types;
 
 	if (num_types > frame_params_.size()) {
 		CPRINTS("ERROR - EC returned %u types, max supported is %zu.",
@@ -34,59 +74,44 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 		return;
 	}
 
-	auto *params = info->image_frame_params;
-
-	for (uint8_t i = 0; i < num_types; ++i) {
-		const uint8_t type = params[i].fp_capture_type;
-		const uint32_t size = params[i].frame_size;
-
-		if (size > max_frame_size_bytes) {
-			CPRINTS("Error: Type %u frame size (%u) exceeds max allowed (%u).",
-				type, size, max_frame_size_bytes);
-			goto error_exit;
+	for (const auto &param : buffer.capture_types()) {
+		const auto parsed =
+			parse_frame_param(param, max_frame_size_bytes);
+		if (!parsed.has_value()) {
+			/* Invalidate cache. */
+			frame_params_.fill({});
+			return;
 		}
 
-		if (type >= frame_params_.size()) {
-			CPRINTS("ERROR: Invalid fp_capture_type %u received from EC, max "
-				"supported is %zu.",
-				type, frame_params_.size());
-			goto error_exit;
-		}
-
-		if (size == 0) {
-			CPRINTS("ERROR: Invalid 0 size for capture type %u.",
-				type);
-			goto error_exit;
-		}
-
-		frame_params_[type] = {
-			.frame_size_bytes = size,
-		};
+		frame_params_[parsed->first.raw()] = parsed->second;
 	}
-
-	return;
-
-error_exit:
-	/* Invalidate cache. */
-	frame_params_.fill({});
-	return;
 }
 
-uint32_t
+std::expected<uint32_t, ec_error_list>
+FpImageFrameParamsCache::get_frame_size(FpCaptureType capture_type) const
+{
+	const uint32_t size =
+		frame_params_[capture_type.raw()].frame_size_bytes;
+	if (size == 0) {
+		CPRINTS("Error: FpImageFrameParamsCache is uninitialized or capture type %u"
+			" is invalid, returning size 0.",
+			capture_type.raw());
+		return std::unexpected(EC_ERROR_INVAL);
+	}
+
+	return size;
+}
+
+std::expected<uint32_t, ec_error_list>
 FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
 {
-	if (static_cast<size_t>(capture_type) >= frame_params_.size()) {
+	const auto valid_type = FpCaptureType::create(capture_type);
+	if (!valid_type.has_value()) {
 		CPRINTS("Error: Invalid fp_capture_type %d requested (max: %zu), "
 			"returning size 0.",
 			capture_type, frame_params_.size());
-		return 0;
+		return std::unexpected(EC_ERROR_INVAL);
 	}
 
-	if (frame_params_[capture_type].frame_size_bytes == 0) {
-		CPRINTS("Error: FpImageFrameParamsCache is uninitialized or capture type %u"
-			" is invalid, returning size 0.",
-			capture_type);
-	}
-
-	return frame_params_[capture_type].frame_size_bytes;
+	return get_frame_size(*valid_type);
 }

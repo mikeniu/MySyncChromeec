@@ -15,27 +15,18 @@
 #include "host_command.h"
 #include "scoped_fast_cpu.h"
 
-/* Pointer to the FPMCU's ECDH private key */
-static bssl::UniquePtr<EC_KEY> ecdh_key;
-
-/* The FPMCU pairing key. */
-static std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
-
-enum ec_error_list check_context_cleared()
+std::expected<fp_elliptic_curve_public_key, ec_status>
+FpCryptoContext::establish_pairing_key_keygen()
 {
-	for (uint8_t partial : global_context.user_id)
-		if (partial != 0)
-			return EC_ERROR_ACCESS_DENIED;
-	if (global_context.templ_valid != 0)
-		return EC_ERROR_ACCESS_DENIED;
-	if (global_context.templ_dirty != 0)
-		return EC_ERROR_ACCESS_DENIED;
-	if (global_context.positive_match_secret_state.template_matched !=
-	    FP_NO_SUCH_TEMPLATE)
-		return EC_ERROR_ACCESS_DENIED;
-	if (global_context.fp_encryption_status & FP_CONTEXT_USER_ID_SET)
-		return EC_ERROR_ACCESS_DENIED;
-	return EC_SUCCESS;
+	ScopedFastCpu fast_cpu;
+
+	ecdh_key = generate_elliptic_curve_key();
+	if (ecdh_key == nullptr) {
+		return std::unexpected(EC_RES_UNAVAILABLE);
+	}
+
+	return create_pubkey_from_ec_key(*ecdh_key).transform_error(
+		[](ec_error_list) { return EC_RES_UNAVAILABLE; });
 }
 
 static enum ec_status
@@ -44,26 +35,55 @@ fp_command_establish_pairing_key_keygen(struct host_cmd_handler_args *args)
 	auto *r = static_cast<ec_response_fp_establish_pairing_key_keygen *>(
 		args->response);
 
-	ScopedFastCpu fast_cpu;
-
-	ecdh_key = generate_elliptic_curve_key();
-	if (ecdh_key == nullptr) {
-		return EC_RES_UNAVAILABLE;
-	}
-
-	std::optional<fp_elliptic_curve_public_key> pubkey =
-		create_pubkey_from_ec_key(*ecdh_key);
+	const auto pubkey =
+		global_context.crypto.establish_pairing_key_keygen();
 	if (!pubkey.has_value()) {
-		return EC_RES_UNAVAILABLE;
+		return pubkey.error();
 	}
 
-	r->pubkey = pubkey.value();
+	r->pubkey = *pubkey;
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN,
 		     fp_command_establish_pairing_key_keygen, EC_VER_MASK(0));
+
+std::expected<ec_fp_encrypted_pairing_key, ec_status>
+FpCryptoContext::establish_pairing_key_wrap(
+	const fp_elliptic_curve_public_key &peers_pubkey)
+{
+	if (ecdh_key == nullptr) {
+		return std::unexpected(EC_RES_UNAVAILABLE);
+	}
+
+	ScopedFastCpu fast_cpu;
+
+	bssl::UniquePtr<EC_KEY> public_key =
+		create_ec_key_from_pubkey(peers_pubkey);
+	if (public_key == nullptr) {
+		return std::unexpected(EC_RES_UNAVAILABLE);
+	}
+
+	/*
+	 * The Pairing Key is only used to produce the Session Key.
+	 * It's not used as a key for symmetric encryption. It's okay
+	 * to not apply KDF in this case.
+	 */
+	return generate_ecdh_shared_secret_without_kdf(*ecdh_key, *public_key)
+		.and_then([](const auto &new_pairing_key) {
+			return encrypt_pairing_key(
+				FP_AES_KEY_ENC_METADATA_VERSION,
+				new_pairing_key);
+		})
+		.transform([this](const auto &encrypted_key) {
+			/* Deallocate the FPMCU's ECDH private key. */
+			ecdh_key = nullptr;
+			return encrypted_key;
+		})
+		.transform_error(
+			[](ec_error_list) { return EC_RES_UNAVAILABLE; });
+}
 
 static enum ec_status
 fp_command_establish_pairing_key_wrap(struct host_cmd_handler_args *args)
@@ -74,41 +94,13 @@ fp_command_establish_pairing_key_wrap(struct host_cmd_handler_args *args)
 	auto *r = static_cast<ec_response_fp_establish_pairing_key_wrap *>(
 		args->response);
 
-	CleanseWrapper<std::array<uint8_t, FP_PAIRING_KEY_LEN> > new_pairing_key;
-
-	if (ecdh_key == nullptr) {
-		return EC_RES_UNAVAILABLE;
+	const auto encrypted_pairing_key =
+		global_context.crypto.establish_pairing_key_wrap(
+			params->peers_pubkey);
+	if (!encrypted_pairing_key.has_value()) {
+		return encrypted_pairing_key.error();
 	}
-
-	ScopedFastCpu fast_cpu;
-
-	bssl::UniquePtr<EC_KEY> public_key =
-		create_ec_key_from_pubkey(params->peers_pubkey);
-	if (public_key == nullptr) {
-		return EC_RES_UNAVAILABLE;
-	}
-
-	/*
-	 * The Pairing Key is only used to produce the Session Key.
-	 * It's not used as a key for symmetric encryption. It's okay
-	 * to not apply KDF in this case.
-	 */
-	enum ec_error_list ret = generate_ecdh_shared_secret_without_kdf(
-		*ecdh_key, *public_key, new_pairing_key);
-	if (ret != EC_SUCCESS) {
-		return EC_RES_UNAVAILABLE;
-	}
-
-	ret = encrypt_pairing_key(FP_AES_KEY_ENC_METADATA_VERSION,
-				  r->encrypted_pairing_key.info,
-				  new_pairing_key,
-				  r->encrypted_pairing_key.data);
-	if (ret != EC_SUCCESS) {
-		return EC_RES_UNAVAILABLE;
-	}
-
-	/* Deallocate the FPMCU's ECDH private key. */
-	ecdh_key = nullptr;
+	r->encrypted_pairing_key = *encrypted_pairing_key;
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;
@@ -130,37 +122,35 @@ DECLARE_HOST_COMMAND(EC_CMD_FP_ESTABLISH_PAIRING_KEY_WRAP,
  *
  * Isolation and security rely entirely on the session establishment flow:
  * establishing a new session mandatorily clears existing templates and resets
- * the TPM seed context via fp_reset_context(). Because a compromised host/HAL
+ * the TPM seed context via reset_context(). Because a compromised host/HAL
  * already possesses authority to assert Class 1/2 biometric results directly
  * to the host OS, re-establishing a local session domain does not grant
  * additional capabilities or alter the threat model boundary.
  */
+ec_status FpCryptoContext::load_pairing_key(
+	const ec_fp_encrypted_pairing_key &encrypted_pairing_key)
+{
+	ScopedFastCpu fast_cpu;
+
+	const auto decrypted_key = decrypt_pairing_key(
+		encrypted_pairing_key.info, encrypted_pairing_key.data);
+	if (!decrypted_key.has_value()) {
+		CPRINTS("load_pairing_key: Failed to decrypt pairing key");
+		return EC_RES_UNAVAILABLE;
+	}
+	pairing_key = *decrypted_key;
+
+	return EC_RES_SUCCESS;
+}
+
 static enum ec_status
 fp_command_load_pairing_key(struct host_cmd_handler_args *args)
 {
 	const auto *params = static_cast<const ec_params_fp_load_pairing_key *>(
 		args->params);
 
-	ScopedFastCpu fast_cpu;
-
-	enum ec_error_list ret = decrypt_pairing_key(
-		params->encrypted_pairing_key.info,
-		params->encrypted_pairing_key.data, pairing_key);
-	if (ret != EC_SUCCESS) {
-		CPRINTS("load_pairing_key: Failed to decrypt pairing key");
-		return EC_RES_UNAVAILABLE;
-	}
-
-	return EC_RES_SUCCESS;
+	return global_context.crypto.load_pairing_key(
+		params->encrypted_pairing_key);
 }
 DECLARE_HOST_COMMAND(EC_CMD_FP_LOAD_PAIRING_KEY, fp_command_load_pairing_key,
 		     EC_VER_MASK(0));
-
-enum ec_error_list generate_session_key_with_context(
-	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> fpmcu_nonce,
-	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> peer_nonce,
-	std::span<uint8_t, SHA256_DIGEST_LENGTH> session_key)
-{
-	return generate_session_key(fpmcu_nonce, peer_nonce, pairing_key, {},
-				    session_key);
-}
