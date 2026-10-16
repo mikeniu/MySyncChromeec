@@ -10,7 +10,7 @@
  * compilation failure if any file includes registers.h
  */
 
-#define GNAME(mname, rname)  "GC_ ## mname ## _ ## rname ## _NAME"
+#define GNAME(mname, rname)  "GC_" #mname "_" #rname "_NAME"
 #define GREG32(mname, rname)	REG32(get_reg_addr(GNAME(mname, rname)))
 
 void *get_reg_addr(const char * const reg_name);

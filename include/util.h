@@ -67,6 +67,11 @@ extern "C" {
 
 #ifndef HIDE_EC_STDLIB
 /* Standard library functions */
+#undef memcmp
+#undef memcpy
+#undef memset
+#undef memmove
+#undef memchr
 int atoi(const char *nptr);
 int isdigit(int c);
 int isspace(int c);
