@@ -231,6 +231,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "056f5fa2_87ca1c64",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-16T07:42:22Z",
+      "side": 1,
+      "message": "Thanks for the comment. I don\u0027t want to check SPI clock to sensors for now.",
+      "parentUuid": "6c23f3db_7a10b55e",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92549eb1_25dab50b",
