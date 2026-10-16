@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc16baa6_2f9c79b9",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. Replaced with bool(getattr(self.args, ...)).",
+      "parentUuid": "c4444cdf_12993466",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 0
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbb651d1_1cc756c8",
@@ -84,6 +108,30 @@
       "writtenOn": "2026-10-15T15:14:54Z",
       "side": 1,
       "message": "Done. --ro and --rw are now a mutually exclusive argparse group, so the flasher can\u0027t get both.",
+      "parentUuid": "fbb651d1_1cc756c8",
+      "range": {
+        "startLine": 210,
+        "startChar": 12,
+        "endLine": 210,
+        "endChar": 40
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f8cf273_978b66c9",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. Both are validated mutually exclusive and raise ValueError.",
       "parentUuid": "fbb651d1_1cc756c8",
       "range": {
         "startLine": 210,
@@ -142,6 +190,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "773eb110_68104044",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. Added explicit else branch with explanatory comment.",
+      "parentUuid": "a3dc33b3_29e7114c",
+      "range": {
+        "startLine": 212,
+        "startChar": 12,
+        "endLine": 213,
+        "endChar": 51
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d6700cf_1ca998b7",
@@ -178,6 +250,30 @@
       "writtenOn": "2026-10-15T15:14:54Z",
       "side": 1,
       "message": "Done. test_parse_args_defaults checks the real defaults again, and test_parse_args_region_flags covers --ro/--rw.",
+      "parentUuid": "4d6700cf_1ca998b7",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 0
+      },
+      "revId": "98f42f09618bba76a61fe053116a40faa06deed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff79f05a_8766c33d",
+        "filename": "util/flash/tests/test_servo_and_cli.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. test_parse_args_defaults covers real defaults, and test_parse_args_region_flags covers --ro and --rw.",
       "parentUuid": "4d6700cf_1ca998b7",
       "range": {
         "startLine": 85,

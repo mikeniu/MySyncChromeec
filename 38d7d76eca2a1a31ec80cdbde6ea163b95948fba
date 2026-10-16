@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "394d1118_9ada6b45",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. Added explicit check raising ValueError(\"Cannot specify both --ro and --rw\") if both ro and rw are set.",
+      "parentUuid": "cfd68bc4_a1699d71",
+      "range": {
+        "startLine": 205,
+        "startChar": 12,
+        "endLine": 205,
+        "endChar": 27
+      },
+      "revId": "38d7d76eca2a1a31ec80cdbde6ea163b95948fba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06a7e768_42abb990",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-15T21:33:30Z",
       "side": 1,
       "message": "else: raise?",
+      "range": {
+        "startLine": 211,
+        "startChar": 0,
+        "endLine": 211,
+        "endChar": 51
+      },
+      "revId": "38d7d76eca2a1a31ec80cdbde6ea163b95948fba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "942ff004_9384ff90",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. Added explicit else: target_regions \u003d None with an explanatory comment clarifying that non-CCD programmers write the entire image (preserving CBI), while CCD targets [\u0027WP_RO\u0027, \u0027EC_RW\u0027].",
+      "parentUuid": "06a7e768_42abb990",
       "range": {
         "startLine": 211,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b307c831_dd28cd17",
+        "filename": "util/flash/helpers.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. Restructured to check \u0027if areas: return areas\u0027 inside the signature check so missing or invalid areas cleanly fall through to dump_fmap.",
+      "parentUuid": "fc1e3786_d07ee52b",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 0
+      },
+      "revId": "38d7d76eca2a1a31ec80cdbde6ea163b95948fba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10003db9_6145826f",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-10-15T21:33:30Z",
       "side": 1,
       "message": "If the user specifies `--rw`, `self.args.ro` will be False and this will fall back to `flash_npcx_all` (writing the whole chip) instead of just the RW region.\n\nIf `--rw` is not supported over NPCX JTAG, consider raising an error here explicitly so the user is aware:\n```python\n        if getattr(self.args, \"rw\", False):\n            raise ValueError(\"--rw is not supported over NPCX JTAG\")\n        proc \u003d \"flash_npcx_ro\" if self.args.ro else \"flash_npcx_all\"\n```",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 288,
+        "endChar": 0
+      },
+      "revId": "38d7d76eca2a1a31ec80cdbde6ea163b95948fba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1973d115_9d03a25e",
+        "filename": "util/flash/npcx_flasher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T04:53:38Z",
+      "side": 1,
+      "message": "Done. Added explicit check raising ValueError(\"--rw is not supported over NPCX JTAG\").",
+      "parentUuid": "10003db9_6145826f",
       "range": {
         "startLine": 288,
         "startChar": 0,
