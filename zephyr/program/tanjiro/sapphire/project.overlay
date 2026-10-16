@@ -27,6 +27,7 @@
 	aliases {
 		bmi3xx-int = &lid_accel;
 		lsm6dsm-int = &lid_accel;
+		tap-sensor = &lid_accel;
 		tcs3400-int = &als_clear;
 		gpio-btn-ign-in = &gpio_usb_fp_btn_ign;
 	};
@@ -142,7 +143,7 @@
 			compatible = "cros-ec,bmi3xx-accel";
 			status = "okay";
 
-			active-mask = "SENSOR_ACTIVE_S0";
+			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
 			location = "MOTIONSENSE_LOC_LID";
 			mutex = <&lid_mutex>;
 			port = <&i2c_ec_i2c_sensor_scl_1v8>;
@@ -206,7 +207,7 @@
 			compatible = "cros-ec,lsm6dsm-accel";
 			status = "okay";
 
-			active-mask = "SENSOR_ACTIVE_S0";
+			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
 			location = "MOTIONSENSE_LOC_LID";
 			mutex = <&lid_mutex>;
 			port = <&i2c_ec_i2c_sensor_scl_1v8>;
