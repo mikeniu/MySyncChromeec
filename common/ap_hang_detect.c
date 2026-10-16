@@ -5,6 +5,7 @@
 
 /* AP hang detect logic */
 
+#include "ap_reset_log.h"
 #include "chipset.h"
 #include "common.h"
 #include "console.h"
@@ -17,23 +18,60 @@
 /* Console output macro */
 #define CPRINTS(format, args...) cprints(CC_CHIPSET, "APHD: " format, ##args)
 
+/* Delay between forcing AP shutdown and powering AP back on */
+#define HANG_DETECT_COLD_REBOOT_OFF_DELAY_US SECOND
+
 static uint16_t reboot_timeout_sec;
 static uint8_t bootstatus = EC_HANG_DETECT_AP_BOOT_NORMAL;
+
+static void hang_detect_power_on(void)
+{
+	CPRINTS("Powering on AP after cold reset");
+	report_ap_reset(CHIPSET_RESET_HANG_REBOOT);
+	bootstatus = EC_HANG_DETECT_AP_BOOT_EC_WDT;
+	chipset_power_on();
+}
+DECLARE_DEFERRED(hang_detect_power_on);
+
+static void hang_detect_cold_reboot(void)
+{
+	if (chipset_in_state(CHIPSET_STATE_ANY_OFF))
+		return;
+
+	CPRINTS("Warm reset failed; forcing cold reboot");
+	chipset_force_shutdown(CHIPSET_RESET_HANG_REBOOT);
+	hook_call_deferred(&hang_detect_power_on_data,
+			   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
+}
+DECLARE_DEFERRED(hang_detect_cold_reboot);
 
 /**
  * hang detect handlers for reboot.
  */
 static void hang_detect_reboot(void)
 {
-	/* If we're rebooting the AP, stop hang detection */
+	if (chipset_in_state(CHIPSET_STATE_ANY_OFF))
+		return;
+
+	/*
+	 * Warm reset the AP first. If the AP fails to recover and clear
+	 * bootstatus (via cros_ec_wdt_probe() during early kernel boot) or
+	 * pet/cancel the watchdog (via daisydog) within another
+	 * reboot_timeout_sec window, escalate to a cold reboot (force
+	 * shutdown + power on).
+	 */
 	CPRINTS("Triggering reboot");
 	chipset_reset(CHIPSET_RESET_HANG_REBOOT);
 	bootstatus = EC_HANG_DETECT_AP_BOOT_EC_WDT;
+	hook_call_deferred(&hang_detect_cold_reboot_data,
+			   reboot_timeout_sec * SECOND);
 }
 DECLARE_DEFERRED(hang_detect_reboot);
 
 static void hang_detect_reload(void)
 {
+	hook_call_deferred(&hang_detect_cold_reboot_data, -1);
+	hook_call_deferred(&hang_detect_power_on_data, -1);
 	hook_call_deferred(&hang_detect_reboot_data,
 			   reboot_timeout_sec * SECOND);
 }
@@ -42,6 +80,8 @@ static void hang_detect_cancel(void)
 {
 	CPRINTS("Stop on AP request");
 	hook_call_deferred(&hang_detect_reboot_data, -1);
+	hook_call_deferred(&hang_detect_cold_reboot_data, -1);
+	hook_call_deferred(&hang_detect_power_on_data, -1);
 }
 
 /*****************************************************************************/
@@ -75,9 +115,10 @@ hang_detect_host_command(struct ec_host_cmd_handler_args *args)
 		break;
 
 	case EC_HANG_DETECT_CMD_SET_TIMEOUT:
-		if (p->reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT) {
-			CPRINTS("Reboot timeout has to be greater than %ds",
-				EC_HANG_DETECT_MIN_TIMEOUT);
+		if (p->reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT ||
+		    p->reboot_timeout_sec > INT32_MAX / SECOND) {
+			CPRINTS("Invalid reboot timeout: %ds",
+				p->reboot_timeout_sec);
 			ret = EC_HOST_CMD_INVALID_PARAM;
 			break;
 		}
@@ -118,6 +159,8 @@ hang_detect_host_command(struct ec_host_cmd_handler_args *args)
 	case EC_HANG_DETECT_CMD_CLEAR_STATUS:
 		CPRINTS("Clearing bootstatus");
 		bootstatus = EC_HANG_DETECT_AP_BOOT_NORMAL;
+		hook_call_deferred(&hang_detect_cold_reboot_data, -1);
+		hook_call_deferred(&hang_detect_power_on_data, -1);
 		break;
 
 	default:
