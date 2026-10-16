@@ -163,6 +163,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7e661a0_eb02eab7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-16T16:24:04Z",
+      "side": 1,
+      "message": "Yes,  will need the reverse shim support from https://crrev.com/c/8329799 (\"host_command: Unify handler struct and implement reverse shim\"). That change unifies the handler struct layout ( and ) via anonymous unions and introduces reverse-shimming support so that upstream  handlers can compile cleanly in legacy environments without littering  guards across shared files like .",
+      "parentUuid": "c7e81b5c_72600862",
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d6b55c4_f32595a6",
