@@ -21,6 +21,10 @@ from flash.servo_utils import ServoError
 
 logger = logging.getLogger(__name__)
 
+# Boards whose EC must stay in cold_reset while flashing over a debug header
+# (e.g. servo_micro); a running or crash-looping EC disturbs the SPI bus.
+BOARDS_HOLD_COLD_RESET_DBG_HDR = ("coral", "reef")
+
 
 class FlashromFlasher(BaseEcFlasher):
     """Flasher implementation for SPI-connected ECs using flashrom."""
@@ -80,6 +84,11 @@ class FlashromFlasher(BaseEcFlasher):
                 except ServoError:
                     pass
 
+        servo_type = self.servo.get("servo_type", default="")
+        hold_reset = board in BOARDS_HOLD_COLD_RESET_DBG_HDR and (
+            not self.on_raiden() or "servo_micro" in servo_type
+        )
+
         if chip in (
             "ite_spi",
             "it8xxx2",
@@ -98,14 +107,16 @@ class FlashromFlasher(BaseEcFlasher):
             self.servo.set("cold_reset", "on")
             self.servo.set("fw_up", "on")
             time.sleep(0.2)
-            self.servo.set("cold_reset", "off")
+            if not hold_reset:
+                self.servo.set("cold_reset", "off")
         elif chip == "npcx_spi":
             self.servo.save_state("dev_mode")
             self.servo.set("dev_mode", "on")
             self.servo.set("cold_reset", "on")
             self.servo.save_state("spi_hold")
             self.servo.set("spi_hold", "off")
-            self.servo.set("cold_reset", "off")
+            if not hold_reset:
+                self.servo.set("cold_reset", "off")
         else:
             # Held in reset while flashing; cleanup_dut() releases it.
             self.servo.set("cold_reset", "on")

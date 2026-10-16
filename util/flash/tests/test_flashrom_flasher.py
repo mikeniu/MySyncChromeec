@@ -541,6 +541,51 @@ class TestFlashromFlasher(unittest.TestCase):
         )
 
 
+class TestFlashromColdResetHold(unittest.TestCase):
+    """Tests for holding cold_reset during debug-header SPI flashing."""
+
+    def setUp(self) -> None:
+        self.servo = MagicMock()
+        self.args = MagicMock()
+        self.args.raiden = False
+        self.flasher = FlashromFlasher(self.servo, self.args)
+
+    @patch("time.sleep")
+    def test_prepare_dut_holds_cold_reset_dbg_hdr(
+        self, _mock_sleep: MagicMock
+    ) -> None:
+        """Verify coral/reef keep cold_reset on over a debug header."""
+        for servo_type in ("", "servo_micro"):
+            for board in ("coral", "reef"):
+                for chip in ("npcx_int_spi", "npcx_spi"):
+                    with self.subTest(servo=servo_type, board=board, chip=chip):
+                        self.servo.reset_mock()
+                        self.servo.get.return_value = servo_type
+                        self.args.board = board
+                        self.args.chip = chip
+                        self.flasher.prepare_dut()
+                        self.servo.set.assert_any_call("cold_reset", "on")
+                        self.assertNotIn(
+                            call("cold_reset", "off"),
+                            self.servo.set.call_args_list,
+                        )
+
+    @patch("time.sleep")
+    def test_prepare_dut_releases_cold_reset(
+        self, _mock_sleep: MagicMock
+    ) -> None:
+        """Verify cold_reset is released for other boards and over CCD."""
+        for servo_type, board in (("", "other"), ("ccd_cr50", "coral")):
+            for chip in ("npcx_int_spi", "npcx_spi"):
+                with self.subTest(servo=servo_type, board=board, chip=chip):
+                    self.servo.reset_mock()
+                    self.servo.get.return_value = servo_type
+                    self.args.board = board
+                    self.args.chip = chip
+                    self.flasher.prepare_dut()
+                    self.servo.set.assert_any_call("cold_reset", "off")
+
+
 class TestFlashromRegionSelection(unittest.TestCase):
     """Tests for FlashromFlasher --ro/--rw and CCD region selection."""
 
