@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8824be7f_0f7d067a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T22:10:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The description transcribes code expressions verbatim and includes local absolute paths in the `TEST\u003d` tags.\n\n1. **Diff Narration:** Avoid restating the exact `while` loop condition from the code in the description. A brief conceptual explanation is better.\n2. **Local Paths in TEST tags:** The `TEST\u003d` tags contain local developer mount paths (`/mnt/.../chromiumos/...`) which will not be meaningful to other developers or in the git history. Consider shortening these to just the commands run (e.g., `cros format --check board/coral/board.c`).\n\n**Suggested replacement:**\n```text\ncoral: Reload watchdog in board_tcpc_init battery wait loop\n\nDuring board initialization, coral waits up to 2 seconds for a\ndisconnected battery to wake up.\n\nSince board_tcpc_init() runs as a HOOK_INIT hook, periodic tick\nhooks (which normally handle watchdog reloads) have not yet started.\nIf a DUT has a dead, uninitialized, or slow-waking battery, the\nwait loop can exceed the ~1.127 s hardware watchdog timeout on\nNPCX5, causing the EC to reset and loop indefinitely.\n\nReload the watchdog explicitly in each iteration of the battery\nwait loop to avoid tripping the watchdog during early HOOK_INIT\nexecution.\n\nBUG\u003dNone\nTEST\u003dmake BOARD\u003dcoral\nTEST\u003dcros format --check board/coral/board.c\nTEST\u003dcros lint board/coral/board.c\n```\n[🔗](http://go/tj/567ed3e5-994b-4e01-a45e-8f9680b95c0f)",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3868a97ee74010fbd08c9caa1a9178bc7071cf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71fc1cce_82f66ff6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T22:10:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n* **Functionality:** ✅ Looks good.\n* **Architecture \u0026 Component Fit:** ✅\n* **Code Simplicity:** ✅\n* **Idiomaticity \u0026 Readability:** ✅\n* **Security:** ✅\n* **Testing:** ✅ Exempted under the hardware exception (purely physical hardware timing issue with the watchdog during early `HOOK_INIT`).\n* **CL Size \u0026 Scope:** ✅ Size: XS (+2, -0) - Atomic change.\n* **Commit Message:** ❌ The commit message transcribes exact code expressions from the diff and includes local developer paths in the `TEST\u003d` lines. See inline comment on `/COMMIT_MSG`.\n[🔗](http://go/tj/567ed3e5-994b-4e01-a45e-8f9680b95c0f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3868a97ee74010fbd08c9caa1a9178bc7071cf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
