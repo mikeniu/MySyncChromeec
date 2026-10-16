@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8cf0836_3f975160",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:21:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** ✅ The test logic appears functionally correct.\n**Architecture \u0026 Component Fit:** ✅ The new test file aligns with existing patterns for driver unit tests in Zephyr.\n**Code Simplicity:** ✅ Test cases are well-structured without redundant control flow.\n**Idiomaticity \u0026 Readability:** ❌ **Changes Requested.** Some magic values (9, 1) were hardcoded without explanation. See inline comments.\n**Security:** ✅ N/A\n**Testing:** ❌ **Changes Requested.** Test oracles for error flags use weak inequality checks instead of asserting the exact bitmask expected. See inline comments.\n**CL Size \u0026 Scope:** ❌ **Changes Requested — Please split this CL.** \nSize: L (+571, -0)\nThis CL introduces 571 lines of test additions spanning boilerplate configuration, fake/mock initialization, driver init/deinit tests, interrupt handling, image acquisition, and mode transitions. To ensure atomic, easily reviewable changes, please split this CL.\n\nProposed Split Plan:\n*   CL 1: Test harness setup, configuration files (`CMakeLists.txt`, `native_sim.overlay`, `prj.conf`, `testcase.yaml`), test fixture initialization, and basic driver `init`/`deinit` tests.\n*   CL 2: Mode transition (`set_mode`) and interrupt/callback tests.\n*   CL 3: Image acquisition and fingerprint status tests.\n\n**Commit Message:** ✅ Clear and concise, adhering to Chromium OS guidelines.\n\n[🔗](http://go/tj/eb277200-673e-4afd-9ff2-3897a3e8a7dd)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "822b2541_7de0a637",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:21:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Test Oracle Integrity**\n\nAvoid weak inequality oracles (`zassert_true` with bitwise `\u0026`) when checking the exact expected error state. Assert the exact expected bitmask to ensure no other unexpected error flags are set.\n\n```c\n\tzassert_equal(sensor_info.errors, FINGERPRINT_ERROR_BAD_HWID | FINGERPRINT_ERROR_INIT_FAIL);\n``` [🔗](http://go/tj/eb277200-673e-4afd-9ff2-3897a3e8a7dd)",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b51e0ba9_7e7cf00c",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:21:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Test Oracle Integrity**\n\nAssert the exact expected bitmask rather than checking individual bits with `zassert_true`, to ensure no other unexpected error flags are set.\n\n```c\n\tzassert_equal(sensor_info.errors, FINGERPRINT_ERROR_SPI_COMM | FINGERPRINT_ERROR_INIT_FAIL);\n``` [🔗](http://go/tj/eb277200-673e-4afd-9ff2-3897a3e8a7dd)",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74c4acc4_12e9cc17",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:21:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Test Oracle Integrity**\n\nAssert the exact expected bitmask rather than checking individual bits with `zassert_true`, to ensure no other unexpected error flags are set.\n\n```c\n\tzassert_equal(sensor_info.errors, FINGERPRINT_ERROR_INIT_FAIL);\n``` [🔗](http://go/tj/eb277200-673e-4afd-9ff2-3897a3e8a7dd)",
+      "range": {
+        "startLine": 194,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4529dbb1_12d43224",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:21:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Magic Values / Unexplained Literals**\n\n`9` and `1` are unexplained magic numbers. Please extract these into named constants (e.g., matching the driver\u0027s internal macros or `RTS5817MAA_PRODUCT_ID`) to clarify their meaning, rather than hardcoding raw numbers in the test oracle.\n\n```c\n\tzassert_equal(sensor_info.product_id, RTS5817MAA_EXPECTED_PRODUCT_ID);\n\tzassert_equal(sensor_info.version, RTS5817MAA_EXPECTED_VERSION);\n``` [🔗](http://go/tj/eb277200-673e-4afd-9ff2-3897a3e8a7dd)",
+      "range": {
+        "startLine": 218,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
