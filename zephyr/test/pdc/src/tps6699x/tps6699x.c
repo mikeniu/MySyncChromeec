@@ -972,3 +972,72 @@ ZTEST_USER(tps6699x, test_delayed_response)
 	emul_pdc_set_response_delay(emul, 0);
 	zassert_true(pdc_is_init_done(dev));
 }
+
+ZTEST_USER(tps6699x, test_set_src_pdos_updates_source_info)
+{
+	struct i2c_dt_spec i2c_spec = I2C_DT_SPEC_GET(TPS6699X_NODE);
+	union reg_source_info source_info = { 0 };
+	struct pdc_callback callback;
+	uint32_t src_pdo_1_5a = PDO_FIXED(5000, 1500, 0);
+	uint32_t src_pdo_3_0a = PDO_FIXED(5000, 3000, 0);
+	uint32_t snk_pdo = PDO_FIXED(20000, 3000, 0);
+
+	/* Configure 15W Max PDP and verify Maximum PDP is set to 15W. */
+	zassert_ok(pdc_set_max_pdp(dev, MAX_PDP_15W));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_ok(tps_rw_source_info(&i2c_spec, &source_info, I2C_MSG_READ));
+	zassert_equal(source_info.maximum_pdp, 15);
+	zassert_equal(source_info.maximum_pdp_2, 30);
+	zassert_equal(source_info.port_managed_garunteed, 0);
+
+	/* Setting 5V/1.5A (7.5W) Source PDO should set Present & Reported PDP
+	 * to 7W while preserving Maximum PDP at 15W.
+	 */
+	zassert_ok(pdc_set_pdos(dev, SOURCE_PDO, &src_pdo_1_5a, 1));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_ok(tps_rw_source_info(&i2c_spec, &source_info, I2C_MSG_READ));
+	zassert_equal(source_info.present_pdp, 7);
+	zassert_equal(source_info.reported_pdp, 7);
+	zassert_equal(source_info.maximum_pdp, 15);
+
+	/* Upgrading to 5V/3.0A (15W) Source PDO should update Present &
+	 * Reported PDP to 15W.
+	 */
+	zassert_ok(pdc_set_pdos(dev, SOURCE_PDO, &src_pdo_3_0a, 1));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_ok(tps_rw_source_info(&i2c_spec, &source_info, I2C_MSG_READ));
+	zassert_equal(source_info.present_pdp, 15);
+	zassert_equal(source_info.reported_pdp, 15);
+	zassert_equal(source_info.maximum_pdp, 15);
+
+	/* Setting Sink PDO should not modify Source Info PDP fields. */
+	zassert_ok(pdc_set_pdos(dev, SINK_PDO, &snk_pdo, 1));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_ok(tps_rw_source_info(&i2c_spec, &source_info, I2C_MSG_READ));
+	zassert_equal(source_info.present_pdp, 15);
+	zassert_equal(source_info.reported_pdp, 15);
+
+	/* Verify error handling when REG_TX_SOURCE_INFO read or write fails. */
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+
+	emul_pdc_fail_reg_read(emul, REG_TX_SOURCE_INFO);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	zassert_ok(pdc_set_pdos(dev, SOURCE_PDO, &src_pdo_1_5a, 1));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+
+	emul_pdc_fail_reg_write(emul, REG_TX_SOURCE_INFO);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	zassert_ok(pdc_set_pdos(dev, SOURCE_PDO, &src_pdo_1_5a, 1));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}

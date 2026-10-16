@@ -401,6 +401,7 @@ static void cmd_set_sx_app_config(struct pdc_data_t *data);
 static int write_task_cmd(struct pdc_config_t const *cfg,
 			  enum command_task task, union reg_data *cmd_data);
 static void cmd_set_max_pdp(struct pdc_data_t *data);
+static void cmd_set_pdos(struct pdc_data_t *data);
 static void cmd_set_battery_capability(struct pdc_data_t *data);
 static void cmd_set_battery_status(struct pdc_data_t *data);
 static void task_trig(struct pdc_data_t *data);
@@ -921,7 +922,7 @@ static enum smf_state_result st_idle_run(void *o)
 			task_ucsi(data, UCSI_GET_PDOS);
 			break;
 		case CMD_SET_PDOS:
-			task_ucsi(data, UCSI_SET_PDOS);
+			cmd_set_pdos(data);
 			break;
 		case CMD_GET_CONNECTOR_STATUS:
 		case CMD_GET_VBUS_VOLTAGE:
@@ -2082,6 +2083,42 @@ static void cmd_set_battery_capability(struct pdc_data_t *data)
 
 error_recovery:
 	set_state(data, ST_ERROR_RECOVERY);
+}
+
+static void cmd_set_pdos(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	union reg_source_info source_info;
+	int rv;
+
+	if (data->pdo_type == SOURCE_PDO) {
+		uint32_t pdp = (PDO_FIXED_VOLTAGE(data->pdos[0]) *
+				PDO_FIXED_CURRENT(data->pdos[0])) /
+			       1000000;
+
+		rv = tps_rw_source_info(&cfg->i2c, &source_info, I2C_MSG_READ);
+		if (rv) {
+			LOG_ERR("TI%d: Read Source Info failed (%d)",
+				cfg->connector_number, rv);
+			set_state(data, ST_ERROR_RECOVERY);
+			return;
+		}
+		if (source_info.present_pdp != pdp ||
+		    source_info.reported_pdp != pdp) {
+			source_info.present_pdp = pdp;
+			source_info.reported_pdp = pdp;
+			rv = tps_rw_source_info(&cfg->i2c, &source_info,
+						I2C_MSG_WRITE);
+			if (rv) {
+				LOG_ERR("TI%d: Write Source Info failed (%d)",
+					cfg->connector_number, rv);
+				set_state(data, ST_ERROR_RECOVERY);
+				return;
+			}
+		}
+	}
+
+	task_ucsi(data, UCSI_SET_PDOS);
 }
 
 static int write_task_cmd(struct pdc_config_t const *cfg,
