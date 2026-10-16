@@ -6,6 +6,7 @@
 """Unit tests for IteI2cFlasher and IteUartFlasher."""
 
 import unittest
+from unittest.mock import call
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -306,7 +307,7 @@ class TestIteUartFlasher(unittest.TestCase):
 
     @patch("time.sleep")
     def test_prepare_dut_with_ccd(self, _mock_sleep: MagicMock) -> None:
-        """Verify sysrst assert and ite_debugger_mode on CCD."""
+        """Verify sysrst assert and CCD UART UUT boot0 sequence on CCD."""
 
         def mock_get(key: str, default: str = "") -> str:
             if key == "servo_type":
@@ -317,8 +318,20 @@ class TestIteUartFlasher(unittest.TestCase):
 
         self.flasher.prepare_dut()
 
-        self.servo.set.assert_any_call("gsc_uart_cmd", "sysrst assert")
-        self.servo.set.assert_any_call("gsc_i2c_ctrl", "ite_debugger_mode")
+        self.servo.set.assert_has_calls(
+            [
+                call("gsc_uart_cmd", "sysrst assert"),
+                call("cold_reset", "on"),
+                call("ccd_ec_boot_mode_uut", "on"),
+                call("cold_reset", "on"),
+                call("cold_reset", "off"),
+                call("ccd_ec_boot_mode_uut", "off"),
+            ]
+        )
+        self.assertNotIn(
+            call("gsc_i2c_ctrl", "ite_debugger_mode"),
+            self.servo.set.call_args_list,
+        )
         self.servo.set.assert_any_call("ec_uart_parity", "even")
 
     @patch("time.sleep")
@@ -419,8 +432,53 @@ class TestIteUartFlasher(unittest.TestCase):
             check=True,
         )
 
+    @patch("flash.ite_flasher.parse_fmap_areas", return_value={})
+    @patch("time.sleep")
+    @patch("shutil.copyfile")
+    @patch(
+        "flash.ite_flasher.preserve_sections_with_cur_image",
+        return_value=False,
+    )
+    @patch("os.path.exists", return_value=True)
+    @patch("flash.ite_flasher.locate_tool", return_value="/mock/itecomdbgr")
+    @patch("subprocess.run")
+    def test_execute_flash_re_enters_boot0_after_preserve_read(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+        _mock_preserve: MagicMock,
+        _mock_copy: MagicMock,
+        _mock_sleep: MagicMock,
+        _mock_areas: MagicMock,
+    ) -> None:
+        """Verify UART boot0 mode is re-entered after fallback itecomdbgr -r."""
+        self.args.no_preserve = False
+
+        def mock_get(key: str, default: str = "") -> str:
+            if key == "servo_type":
+                return "ccd_cr50"
+            if key == "raw_ec_uart_pty":
+                return "/dev/pts/1"
+            return default
+
+        self.servo.get.side_effect = mock_get
+
+        self.flasher.execute_flash()
+
+        self.assertEqual(mock_run.call_count, 2)
+        self.servo.set.assert_has_calls(
+            [
+                call("cold_reset", "on"),
+                call("ccd_ec_boot_mode_uut", "on"),
+                call("cold_reset", "on"),
+                call("cold_reset", "off"),
+                call("ccd_ec_boot_mode_uut", "off"),
+            ]
+        )
+
     def test_cleanup_dut_with_ccd(self) -> None:
-        """Verify sysrst deassert on CCD cleanup."""
+        """Verify boot0/bitbang off, cold_reset pulse, and sysrst deassert on CCD."""
 
         def mock_get(key: str, default: str = "") -> str:
             if key == "servo_type":
@@ -430,7 +488,16 @@ class TestIteUartFlasher(unittest.TestCase):
         self.servo.get.side_effect = mock_get
 
         self.flasher.cleanup_dut()
-        self.servo.set.assert_any_call("gsc_uart_cmd", "sysrst deassert")
+        self.servo.set.assert_has_calls(
+            [
+                call("cold_reset", "off"),
+                call("ccd_ec_boot_mode_uut", "off"),
+                call("ccd_ec_boot_mode_bitbang", "off"),
+                call("cold_reset", "on"),
+                call("cold_reset", "off"),
+                call("gsc_uart_cmd", "sysrst deassert"),
+            ]
+        )
 
     def test_cleanup_dut(self) -> None:
         """Verify cold_reset pulse on non-CCD cleanup."""

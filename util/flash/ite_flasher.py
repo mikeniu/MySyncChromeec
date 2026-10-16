@@ -239,26 +239,21 @@ class IteUartFlasher(_IteBaseFlasher):
             return 3000000
         return 115200
 
-    def prepare_dut(self) -> None:
-        """Configure UART controls, resets, and bitbang mode prior to flash."""
+    def _enter_uart_boot0(self) -> None:
+        """Reset EC with UART UUT boot0 strapping asserted."""
         if not self.servo:
             return
-
         controller = self._get_controller()
         if controller == "ccd":
-            logger.info(
-                "Asserting sysrst and enabling ITE debugger mode on CCD..."
-            )
-            try:
-                self.servo.set("gsc_uart_cmd", "sysrst assert")
-            except ServoError:
-                pass
-            time.sleep(2)
-            try:
-                self.servo.set("gsc_i2c_ctrl", "ite_debugger_mode")
-            except ServoError:
-                pass
-            time.sleep(3)
+            # Ti50 requires EC reset to be asserted before UUT mode can be
+            # enabled; Cr50 does not mind.
+            self.servo.set("cold_reset", "on")
+            self.servo.set("ccd_ec_boot_mode_uut", "on")
+            self.servo.set("cold_reset", "on")
+            self.servo.set("cold_reset", "off")
+            time.sleep(0.3)
+            self.servo.set("ccd_ec_boot_mode_uut", "off")
+            time.sleep(0.3)
         else:
             boot_ctrl = (
                 "ec_boot_mode_uut" if controller == "c2d2" else "ec_boot_mode"
@@ -275,6 +270,21 @@ class IteUartFlasher(_IteBaseFlasher):
             time.sleep(0.3)
             self.servo.set(boot_ctrl, "off")
             time.sleep(0.3)
+
+    def prepare_dut(self) -> None:
+        """Configure UART controls, resets, and bitbang mode prior to flash."""
+        if not self.servo:
+            return
+
+        controller = self._get_controller()
+        if controller == "ccd":
+            logger.info("Asserting sysrst to hold AP off during ITE UART flash")
+            try:
+                self.servo.set("gsc_uart_cmd", "sysrst assert")
+            except ServoError:
+                pass
+
+        self._enter_uart_boot0()
 
         self.servo.save_state("ec_uart_en")
         self.servo.set("ec_uart_en", "on")
@@ -299,11 +309,16 @@ class IteUartFlasher(_IteBaseFlasher):
                 self.servo.set("ec_uart_bitbang_en", "on")
 
     def cleanup_dut(self) -> None:
-        """Release sysrst or pulse EC reset after UART flashing."""
+        """Release boot0, pulse EC reset, and deassert sysrst after flashing."""
         if not self.servo:
             return
         controller = self._get_controller()
         if controller == "ccd":
+            self.servo.set("cold_reset", "off")
+            self.servo.set("ccd_ec_boot_mode_uut", "off")
+            self.servo.set("ccd_ec_boot_mode_bitbang", "off")
+            self.servo.set("cold_reset", "on")
+            self.servo.set("cold_reset", "off")
             logger.info("Deasserting sysrst on CCD...")
             try:
                 self.servo.set("gsc_uart_cmd", "sysrst deassert")
@@ -373,6 +388,7 @@ class IteUartFlasher(_IteBaseFlasher):
                     )
                     if not self.args.dry_run:
                         subprocess.run(read_cmd, check=True)
+                        self._enter_uart_boot0()
                         temp_new = os.path.join(temp_dir, "ec.new.cpy.bin")
                         shutil.copyfile(target_img, temp_new)
                         if preserve_sections_with_cur_image(
