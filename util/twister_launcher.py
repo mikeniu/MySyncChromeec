@@ -26,6 +26,17 @@ import tempfile
 import time
 
 
+sys.path.insert(
+    1, str(Path(__file__).resolve().parents[1] / "zephyr" / "zmake")
+)
+
+# pylint: disable=wrong-import-position,import-error
+from zmake.repository_prep import fix_lcov_info_paths
+
+
+# pylint: enable=wrong-import-position,import-error
+
+
 # Paths under the EC base dir that contain tests. This is used to define
 # Twister's search scope.
 EC_TEST_PATHS = [
@@ -534,6 +545,16 @@ def main():
             check=False,
             close_fds=False,  # For GNUMakefile jobserver
         )
+
+        if intercepted_args.coverage:
+            cros_checkout = find_checkout()
+            origin_checkout = os.environ.get("ZMAKE_ORIGIN_CHECKOUT")
+            if cros_checkout and origin_checkout:
+                fix_lcov_info_paths(
+                    Path(intercepted_args.outdir),
+                    origin_checkout,
+                    cros_checkout,
+                )
 
         if result.returncode == 0:
             print("TEST EXECUTION SUCCESSFUL")

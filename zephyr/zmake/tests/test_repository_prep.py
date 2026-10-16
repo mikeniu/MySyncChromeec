@@ -10,6 +10,7 @@ import pathlib
 import subprocess
 from unittest import mock
 
+# pylint: disable=import-error
 import pytest
 from zmake.repository_prep import _find_override_files
 from zmake.repository_prep import _find_patch_files
@@ -18,6 +19,7 @@ from zmake.repository_prep import CodebasePreparer
 from zmake.repository_prep import copy_outputs_back
 from zmake.repository_prep import create_shadow_checkout
 from zmake.repository_prep import find_git_repo
+from zmake.repository_prep import fix_lcov_info_paths
 from zmake.repository_prep import fix_symlinks
 from zmake.repository_prep import get_dirty_files
 from zmake.repository_prep import get_patch_modified_files
@@ -733,6 +735,7 @@ def test_prepared_workspace_shadow_and_partial_failure(
         ) as shadow_ec:
             assert shadow_ec is not None
             assert os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1"
+            assert os.environ.get("ZMAKE_ORIGIN_CHECKOUT") == str(real_co)
             assert opts.checkout == shadow_ec.parents[2]
             assert opts.zephyr_base.is_relative_to(opts.checkout)
             assert opts.projects_dirs[0] == shadow_ec / "zephyr"
@@ -745,16 +748,33 @@ def test_prepared_workspace_shadow_and_partial_failure(
             )
             (shadow_ec / "twister-out-llvm").mkdir()
             (shadow_ec / "twister-out-llvm" / "coverage.info").write_text(
-                "cov\n", encoding="utf-8"
+                f"SF:{real_co}/src/third_party/zephyr/subsys/ztest.c\n"
+                "end_of_record\n",
+                encoding="utf-8",
+            )
+            fix_lcov_info_paths(
+                shadow_ec / "twister-out-llvm",
+                os.environ["ZMAKE_ORIGIN_CHECKOUT"],
+                os.environ["CROS_WORKON_SRCROOT"],
+            )
+            assert (shadow_ec / "twister-out-llvm" / "coverage.info").read_text(
+                encoding="utf-8"
+            ) == (
+                f"SF:{opts.checkout}/src/third_party/zephyr/subsys/ztest.c\n"
+                "end_of_record\n"
             )
 
         assert os.environ.get("ZMAKE_WORKSPACE_PREPARED") is None
+        assert os.environ.get("ZMAKE_ORIGIN_CHECKOUT") is None
         assert (ec_path / "build" / "out.bin").read_text(
             encoding="utf-8"
         ) == "artifact\n"
         assert (ec_path / "twister-out-llvm" / "coverage.info").read_text(
             encoding="utf-8"
-        ) == "cov\n"
+        ) == (
+            f"SF:{real_co}/src/third_party/zephyr/subsys/ztest.c\n"
+            "end_of_record\n"
+        )
 
         # bundle and merge_shards prepare real_co in-place so genhtml sees
         # patched/overridden files at canonical real_co paths.

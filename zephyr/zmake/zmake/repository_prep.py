@@ -877,7 +877,11 @@ def prepared_workspace(opts, modules=None, checkout=None):
         and getattr(opts, "subcommand", None) != "compare-builds"
         and func_name not in ("bundle", "merge_shards")
     )
-    env_keys = ("ZMAKE_WORKSPACE_PREPARED", "CROS_WORKON_SRCROOT")
+    env_keys = (
+        "ZMAKE_WORKSPACE_PREPARED",
+        "CROS_WORKON_SRCROOT",
+        "ZMAKE_ORIGIN_CHECKOUT",
+    )
     saved_env = {k: os.environ.get(k) for k in env_keys}
     try:
         if not use_shadow:
@@ -919,6 +923,7 @@ def prepared_workspace(opts, modules=None, checkout=None):
                 ):
                     os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
                     os.environ["CROS_WORKON_SRCROOT"] = str(shadow_co)
+                    os.environ["ZMAKE_ORIGIN_CHECKOUT"] = str(real_co)
                     shadow_ready = True
                     yield shadow_co / ec_rel
             finally:
