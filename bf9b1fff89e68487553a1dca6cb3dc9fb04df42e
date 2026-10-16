@@ -143,6 +143,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6a3ce62f_3d2a728a",
+        "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-16T07:58:43Z",
+      "side": 1,
+      "message": "\u003e Cold boot directly targets the boot ROM via the reset vector, so the flash is not utilized until the SPI clock is configured.\n\nSure, but then RO configures AHB clock to 200MHz (or any other value), while the SPI configuration remains the same (as configured by BootROM), till flash driver changes it in POST_KERNEL, right? So there is still a window when SPI runs at an  undesired frequency.\n\n\u003e Also, as far as I know, a warm boot sets the SPI divider to 1.\n\nI\u0027m not aware of it. Do you know what actually sets the divider to 1.\n\nWhat do you generally think about current approach? Do you see a problem that flash SPI runs at 100MHz for a short period?",
+      "parentUuid": "797f15b5_68d3da36",
+      "revId": "bf9b1fff89e68487553a1dca6cb3dc9fb04df42e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5ef320f_25247478",
         "filename": "zephyr/program/fpmcu/et171/soc.dtsi",
         "patchSetId": 1
