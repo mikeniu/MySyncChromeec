@@ -1,0 +1,13 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: motionsense sensor node for LSM6DSV Gyroscope
+
+compatible: "cros-ec,lsm6dsv-gyro"
+
+include: lsm6dsv.yaml
+
+properties:
+  default-range:
+    default: 1000
