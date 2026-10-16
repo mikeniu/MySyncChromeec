@@ -53,6 +53,7 @@
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
 #include "util.h"
+#include "watchdog.h"
 
 #define CPRINTS(format, args...) cprints(CC_USBCHARGE, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_USBCHARGE, format, ##args)
@@ -380,6 +381,7 @@ void board_tcpc_init(void)
 	/* Wait for disconnected battery to wake up */
 	while (battery_hw_present() == BP_YES &&
 	       battery_is_present() == BP_NO) {
+		watchdog_reload();
 		crec_usleep(100 * MSEC);
 		/* Give up waiting after 2 seconds */
 		if (++count > 20)
