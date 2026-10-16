@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "30b75500c3e0c5c31faca9eb73f8c531313a81a4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "578ef75e_2055ec4d",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-16T10:51:46Z",
+      "side": 1,
+      "message": "Done — abandoning this CL in favor of https://crrev.com/c/6603833 and rebasing https://crrev.com/c/8582653 onto main.",
+      "parentUuid": "abf396f3_b0df44ae",
+      "revId": "30b75500c3e0c5c31faca9eb73f8c531313a81a4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
