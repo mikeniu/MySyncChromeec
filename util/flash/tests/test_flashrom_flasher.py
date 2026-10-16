@@ -541,6 +541,109 @@ class TestFlashromFlasher(unittest.TestCase):
         )
 
 
+class TestFlashromDualServoAndFlexBuffer(unittest.TestCase):
+    """Tests for SPI programmer serial selection and flex buffer controls."""
+
+    @patch("flash.flashrom_flasher.locate_tool", return_value="flashrom")
+    @patch("subprocess.run")
+    def test_read_uses_programmer_serial(
+        self, mock_run: MagicMock, _mock_locate: MagicMock
+    ) -> None:
+        """Verify the serial matches flash_ec's get_serial() per servo type."""
+        serials = {
+            "serialname": "V4",
+            "servo_micro_serialname": "SM",
+            "c2d2_serialname": "C2D2",
+            "ccd_serialname": "CCD",
+        }
+        cases = (
+            (
+                "servo_v4_with_servo_micro_and_ccd_cr50",
+                "--programmer=raiden_debug_spi:serial=SM",
+            ),
+            (
+                "servo_v4p1_with_servo_micro",
+                "--programmer=raiden_debug_spi:serial=SM",
+            ),
+            (
+                "servo_v4_with_c2d2",
+                "--programmer=raiden_debug_spi:target=EC,serial=C2D2",
+            ),
+            (
+                "servo_v4_with_ccd_cr50",
+                "--programmer=raiden_debug_spi:target=EC,serial=CCD",
+            ),
+            ("servo_micro", "--programmer=raiden_debug_spi:serial=V4"),
+        )
+        for servo_type, programmer in cases:
+            with self.subTest(servo_type=servo_type):
+                servo = MagicMock()
+                servo.get.side_effect = (
+                    lambda ctrl, default="", st=servo_type: (
+                        st
+                        if ctrl == "servo_type"
+                        else serials.get(ctrl, default)
+                    )
+                )
+                args = MagicMock(read="out.bin", dry_run=False, raiden=False)
+                FlashromFlasher(servo, args).execute_flash()
+                mock_run.assert_called_with(
+                    ["sudo", "flashrom", programmer, "-r", "out.bin"],
+                    check=True,
+                )
+
+    def test_prepare_dut_flex_buffer_supported(self) -> None:
+        """Verify spi1_buf_on_flex_en is saved and set when supported."""
+        servo = MagicMock()
+        servo.get.return_value = ""
+        servo.has_control.side_effect = (
+            lambda ctrl: ctrl == "spi1_buf_on_flex_en"
+        )
+        args = MagicMock(
+            board="other", chip="other", dry_run=False, raiden=False
+        )
+        flasher = FlashromFlasher(servo, args)
+        flasher.prepare_dut()
+        servo.save_state.assert_any_call("spi1_buf_on_flex_en")
+        servo.set.assert_any_call("spi1_buf_on_flex_en", "on")
+
+    def test_prepare_dut_flex_buffer_unsupported(self) -> None:
+        """Verify spi1_buf_on_flex_en is skipped when unsupported."""
+        servo = MagicMock()
+        servo.get.return_value = ""
+        servo.has_control.return_value = False
+        args = MagicMock(
+            board="other", chip="other", dry_run=False, raiden=False
+        )
+        flasher = FlashromFlasher(servo, args)
+        flasher.prepare_dut()
+        self.assertNotIn(
+            call("spi1_buf_on_flex_en"),
+            servo.save_state.call_args_list,
+        )
+        self.assertNotIn(
+            call("spi1_buf_on_flex_en", "on"),
+            servo.set.call_args_list,
+        )
+
+    def test_prepare_dut_spi_buffer_unconditional(self) -> None:
+        """Verify spi1_buf_en is enabled unconditionally (including servo_micro)."""
+        args = MagicMock(
+            board="other", chip="other", dry_run=False, raiden=False
+        )
+        for servo_type in ("servo_micro", "ccd_cr50", "servo_v2"):
+            with self.subTest(servo_type=servo_type):
+                servo = MagicMock()
+                servo.get.side_effect = (
+                    lambda ctrl, default="", st=servo_type: (
+                        st if ctrl == "servo_type" else default
+                    )
+                )
+                servo.has_control.return_value = False
+                FlashromFlasher(servo, args).prepare_dut()
+                servo.set.assert_any_call("spi1_buf_en", "on")
+
+
 class TestFlashromColdResetHold(unittest.TestCase):
     """Tests for holding cold_reset during debug-header SPI flashing."""
 

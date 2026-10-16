@@ -50,6 +50,18 @@ class FlashromFlasher(BaseEcFlasher):
             return True
         return bool(getattr(self.args, "raiden", False))
 
+    def _get_serial(self, servo_type: str) -> str:
+        """Return the SPI programmer's serial number, matching flash_ec."""
+        if re.match(r"servo_v4(p1)?_with_servo_micro", servo_type):
+            prefix = "servo_micro_"
+        elif re.match(r"servo_v4(p1)?_with_c2d2", servo_type):
+            prefix = "c2d2_"
+        elif "_with_ccd" in servo_type:
+            prefix = "ccd_"
+        else:
+            prefix = ""
+        return self.servo.get(f"{prefix}serialname", default="")
+
     def prepare_dut(self) -> None:
         """Configure SPI muxes, voltages, and resets prior to SPI flashing."""
         if not self.servo:
@@ -57,6 +69,8 @@ class FlashromFlasher(BaseEcFlasher):
 
         chip = getattr(self.args, "chip", "")
         board = getattr(self.args, "board", "")
+        servo_type = self.servo.get("servo_type", default="")
+        dbg_hdr = not self.on_raiden() or "servo_micro" in servo_type
 
         vref = "pp3300"
         if board in ("coral", "reef") or chip in (
@@ -69,25 +83,30 @@ class FlashromFlasher(BaseEcFlasher):
         ):
             vref = "pp1800"
 
-        for ctrl in ["spi1_vref", "spi1_buf_en", "spi1_buf_on_flex_en"]:
+        for ctrl in ["spi1_vref", "spi1_buf_en"]:
             self.servo.save_state(ctrl)
+        if self.servo.has_control("spi1_buf_on_flex_en"):
+            self.servo.save_state("spi1_buf_on_flex_en")
 
         try:
             self.servo.set("spi1_vref", vref)
         except ServoError:
             pass
 
-        if not self.on_raiden():
-            for ctrl in ["spi1_buf_en", "spi1_buf_on_flex_en"]:
-                try:
-                    self.servo.set(ctrl, "on")
-                except ServoError:
-                    pass
+        try:
+            self.servo.set("spi1_buf_en", "on")
+        except ServoError:
+            pass
 
-        servo_type = self.servo.get("servo_type", default="")
-        hold_reset = board in BOARDS_HOLD_COLD_RESET_DBG_HDR and (
-            not self.on_raiden() or "servo_micro" in servo_type
-        )
+        if not self.on_raiden() and self.servo.has_control(
+            "spi1_buf_on_flex_en"
+        ):
+            try:
+                self.servo.set("spi1_buf_on_flex_en", "on")
+            except ServoError:
+                pass
+
+        hold_reset = board in BOARDS_HOLD_COLD_RESET_DBG_HDR and dbg_hdr
 
         if chip in (
             "ite_spi",
@@ -137,7 +156,7 @@ class FlashromFlasher(BaseEcFlasher):
         servo_type = (
             self.servo.get("servo_type", default="") if self.servo else ""
         )
-        serial = self.servo.get("serialname", default="") if self.servo else ""
+        serial = self._get_serial(servo_type) if self.servo else ""
 
         if self.on_servov3():
             cmd.append("--programmer=linux_spi")
