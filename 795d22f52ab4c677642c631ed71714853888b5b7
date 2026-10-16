@@ -181,6 +181,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77a080d2_d48041a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-16T16:24:20Z",
+      "side": 1,
+      "message": "(Re-posting with formatted code names): Yes, `ec-legacy` will need the reverse shim support from https://crrev.com/c/8329799 (\"host_command: Unify handler struct and implement reverse shim\"). That change unifies the handler struct layout (`struct ec_host_cmd_handler_args` and `struct host_cmd_handler_args`) via anonymous unions and introduces reverse-shimming support so that upstream `EC_HOST_CMD` handlers can compile cleanly in legacy environments without littering `CONFIG_ZEPHYR` guards across shared files like `common/fpsensor/`.",
+      "parentUuid": "a7e661a0_eb02eab7",
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d6b55c4_f32595a6",
