@@ -37,56 +37,48 @@ int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size)
 
 	if (overflow_response) {
 		return buf_size + 1;
-	} else {
-		return fp_vendor_command_custom_ret;
 	}
+	return fp_vendor_command_custom_ret;
 }
 
 ZTEST(hc_fp_vendor, test_fp_vendor_ok)
 {
-	struct ec_params_fp_vendor params = {
+	ec_params_fp_vendor params{
 		.param1 = fp_vendor_param1,
 	};
-	int ret;
 
-	ret = ec_cmd_fp_vendor(NULL, &params);
-	zassert_equal(EC_RES_SUCCESS, ret);
+	zassert_equal(EC_RES_SUCCESS, ec_cmd_fp_vendor(nullptr, &params));
 }
 
 ZTEST(hc_fp_vendor, test_fp_vendor_custom_not_ok)
 {
-	struct ec_params_fp_vendor params = {
+	ec_params_fp_vendor params{
 		.param1 = fp_vendor_param1,
 	};
-	int ret;
 
 	fp_vendor_command_custom_ret = -1;
-	ret = ec_cmd_fp_vendor(NULL, &params);
-	zassert_equal(EC_RES_ERROR, ret);
+	zassert_equal(EC_RES_ERROR, ec_cmd_fp_vendor(nullptr, &params));
 }
 
 ZTEST(hc_fp_vendor, test_fp_vendor_locked)
 {
-	struct ec_params_fp_vendor params = {
+	ec_params_fp_vendor params{
 		.param1 = fp_vendor_param1,
 	};
-	int ret;
 
 	is_locked = 1;
-	ret = ec_cmd_fp_vendor(NULL, &params);
-	zassert_equal(EC_RES_ACCESS_DENIED, ret);
+	zassert_equal(EC_RES_ACCESS_DENIED, ec_cmd_fp_vendor(nullptr, &params));
 }
 
 ZTEST(hc_fp_vendor, test_fp_vendor_overflow)
 {
-	struct ec_params_fp_vendor params = {
+	ec_params_fp_vendor params{
 		.param1 = fp_vendor_param1,
 	};
-	int ret;
 
 	overflow_response = true;
-	ret = ec_cmd_fp_vendor(NULL, &params);
-	zassert_equal(EC_RES_RESPONSE_TOO_BIG, ret);
+	zassert_equal(EC_RES_RESPONSE_TOO_BIG,
+		      ec_cmd_fp_vendor(nullptr, &params));
 }
 
 static void reset(void *data)
@@ -98,4 +90,4 @@ static void reset(void *data)
 	fp_vendor_command_custom_ret = 0;
 }
 
-ZTEST_SUITE(hc_fp_vendor, NULL, NULL, reset, reset, NULL);
+ZTEST_SUITE(hc_fp_vendor, nullptr, nullptr, reset, reset, nullptr);
