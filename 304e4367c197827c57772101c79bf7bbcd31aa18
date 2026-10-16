@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c5a83ca_4a827b97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:19:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the commented-out code and copy-paste error in the Kconfig.\n\n### Review Summary\n\n*   **Functionality:** ✅ Looks good.\n*   **Architecture \u0026 Component Fit:** ✅ Follows existing Zephyr device tree and sensor shim integration patterns.\n*   **Code Simplicity:** ✅ Uses a `#define` macro in the DTS file to cleanly avoid duplicating the 6 frame properties across the 8 capture configs.\n*   **Idiomaticity \u0026 Readability:** ❌ The `Kconfig` file contains a copy-paste error with dead, commented-out code from another board (see inline comment).\n*   **Security:** ✅ No security implications.\n*   **Testing:** ✅ This CL consists entirely of declarative hardware configuration and compile-time preprocessor mappings, which falls under the hardware/physical exception for automated unit tests.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+77, -1). This CL represents a single, tightly focused logical change (integrating the `RTS5817MAA` sensor on the `realtekfp` board).\n*   **Commit Message:** ✅ Clear, concise, and properly formatted with `BUG` and `TEST` tags.\n\n[🔗](http://go/tj/a91310d3-425f-4965-9723-f7637423f0c5)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "304e4367c197827c57772101c79bf7bbcd31aa18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa7e6283_39bd45e6",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T03:19:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This looks like a copy-paste error from `BOARD_BLOONCHIPPER`. The comment references `bloonchipper` instead of `realtekfp`, and the `depends on` statements are commented out.\n\nIf the RSA parameters are also required for `realtekfp` (as they are for other boards like `et171` and `helipilot`), these lines should be uncommented and the comment updated. If they are not needed, please remove this block entirely to avoid leaving commented-out code behind.\n\n```kconfig\n\t# Make sure RSA parameters for realtekfp are correct.\n\tdepends on PLATFORM_EC_RSA_KEY_SIZE \u003d 3072\n\tdepends on PLATFORM_EC_RSA_EXPONENT_3\n```\n[🔗](http://go/tj/a91310d3-425f-4965-9723-f7637423f0c5)",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "304e4367c197827c57772101c79bf7bbcd31aa18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
