@@ -132,6 +132,7 @@
 /* Use CONFIG_ACCELGYRO_LSM6DSM for LSM6DSL, LSM6DSM, and/or LSM6DS3 */
 #undef CONFIG_ACCELGYRO_LSM6DSM
 #undef CONFIG_ACCELGYRO_LSM6DSO
+#undef CONFIG_ACCELGYRO_LSM6DSV
 
 /* Select the communication mode for the accelgyro ICM. Only one of these should
  * be set. To set the value manually, simply define one or the other. If neither

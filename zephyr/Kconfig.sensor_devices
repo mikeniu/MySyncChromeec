@@ -159,6 +159,14 @@ config PLATFORM_EC_ACCELGYRO_LSM6DSM
 	  The driver supports ST's LSM6DSM 3D digital accelerometer sensor.
 	  It allows measurements of acceleration in three perpendicular axes.
 
+config PLATFORM_EC_ACCELGYRO_LSM6DSV
+	bool "LSM6DSV Accelgyro Driver"
+	default y
+	depends on DT_HAS_CROS_EC_LSM6DSV_ACCEL_ENABLED
+	select PLATFORM_EC_STM_MEMS_COMMON
+	help
+	  The driver supports ST's LSM6DSV/LSM6DSVQ 3D digital accelerometer.
+
 config PLATFORM_EC_STM_MEMS_COMMON
 	bool
 	help

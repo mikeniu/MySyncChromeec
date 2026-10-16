@@ -5399,6 +5399,9 @@ static int cmd_motionsense(int argc, char **argv)
 			case MOTIONSENSE_CHIP_LSM6DSO:
 				printf("lsm6dso\n");
 				break;
+			case MOTIONSENSE_CHIP_LSM6DSV:
+				printf("lsm6dsv\n");
+				break;
 			case MOTIONSENSE_CHIP_LNG2DM:
 				printf("lng2dm\n");
 				break;
