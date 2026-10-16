@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5796dc9e_e3c1b9ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-16T07:25:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/99a83ffc-3ed7-4d9c-ae51-fbcbf571b30d)\n\n### Review Summary\n\n*   **Functionality:** ✅ The changes correctly update the AHB divider and SPI clock frequencies to reflect the increased CPU speed, and properly adjust the APB divider to maintain its original frequency.\n*   **Architecture \u0026 Component Fit:** ✅ The configuration changes are correctly placed in the specific device tree overlay (`soc.dtsi`) for the ET171 FPMCU.\n*   **Code Simplicity:** ✅ Device tree configuration is direct and minimal.\n*   **Idiomaticity \u0026 Readability:** ✅ Standard and idiomatic Zephyr Device Tree syntax.\n*   **Security:** ✅ No security concerns with this configuration change.\n*   **Testing:** ✅ Hardware/Physical Exception applies. The commit message details the manual testing performed on physical hardware (`srebrna` and `sanok`), which is appropriate for low-level CPU frequency changes that cannot be reliably mocked.\n*   **CL Size \u0026 Scope:** ✅ `Size: XS (+3, -3)`. This is a small, atomic CL making a single, focused logical change.\n*   **Commit Message:** ✅ The commit message clearly explains the *Why* (speeding up matching and enrollment time) and the *What* (increasing frequency and adjusting SPI), while adhering to ChromiumOS conventions (`BUG\u003db:...`, `TEST\u003d...`).",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c7ba8131c812ce6352a805e9da687a31c3a62076",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
