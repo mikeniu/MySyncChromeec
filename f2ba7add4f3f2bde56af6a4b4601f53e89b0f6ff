@@ -45,6 +45,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9567c047_fc24db46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-16T07:02:46Z",
+      "side": 1,
+      "message": "The CL is spilited into two CLs: 8593833 and 6904834",
+      "parentUuid": "f3b7e8af_caf0b9d3",
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad0c0693_4a6af2bc",
@@ -66,6 +84,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36708659_34dcf255",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-16T07:02:46Z",
+      "side": 1,
+      "message": "https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8593834 introdue the unit test",
+      "parentUuid": "ad0c0693_4a6af2bc",
+      "range": {
+        "startLine": 336,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 9999
+      },
       "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
