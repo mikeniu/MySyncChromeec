@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84ae86a7_1e7e80fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:26:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for required fixes.\n\n### Review Summary\n* **Functionality**: ✅ Looks good. The bounded polling correctly waits for the hard-off state before issuing the power-on pulse.\n* **Architecture \u0026 Component Fit**: ✅ Fits well with the existing watchdog and hang detection constraints.\n* **Code Simplicity**: ❌ **Changes Requested** — The `hang_detect_power_on` function uses `goto` and a `+ 1` hack for the retry counter. An inline snippet has been provided to flatten the control flow and decrement retries locally without `goto`.\n* **Idiomaticity \u0026 Readability**: ✅ Good. No magic values besides the required retry bound hack.\n* **Security**: ✅ No security issues identified.\n* **Testing**: ❌ **Changes Requested** — The unit test covers normal success and complete retry exhaustion, but misses boundary tests verifying the exact retry limit. Please see the inline comment for adding `N` and `N+1` bounds checks.\n* **CL Size \u0026 Scope**: ✅ Size: M (+118, -16). The CL adheres to the Single Logical Change rule by focusing specifically on the new cold reset polling.\n* **Commit Message**: ✅ The commit message is concise and accurately explains the *why* (chipsets with long S5 timeouts) and *what*.\n[🔗](http://go/tj/1444830d-b898-40a6-aad0-fdfc469dee73)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2cc0526212a7c4101e1285d1266bfbae0e509a60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2918d901_8c6b70af",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:26:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Code Simplicity \u0026 Idiomaticity**: This function uses `goto defer` to share the decrement and defer logic, and relies on an unidiomatic magic value hack (`+ 1`) to counteract the bottom-decrement when switching to the follow-up polling stage.\n\nWe can flatten the control flow, eliminate the `goto`, and remove the `+ 1` hack by decrementing `power_on_retries` locally in the branches that actually consume a retry:\n\n```c\nstatic void hang_detect_power_on(void)\n{\n\tif (cold_reset_pending) {\n\t\tif (chipset_in_state(CHIPSET_STATE_HARD_OFF)) {\n\t\t\tcold_reset_pending \u003d false;\n\t\t\tpower_on_retries \u003d HANG_DETECT_COLD_REBOOT_MAX_RETRIES;\n\t\t\tCPRINTS(\"Powering on AP after cold reset\");\n\t\t\t/*\n\t\t\t * Re-record CHIPSET_RESET_HANG_REBOOT after G3 is reached\n\t\t\t * because S0 -\u003e S5 -\u003e G3 forced shutdown transitions\n\t\t\t * overwrite the AP reset log with POWERFAIL / G3.\n\t\t\t */\n\t\t\treport_ap_reset(CHIPSET_RESET_HANG_REBOOT);\n\t\t\tchipset_power_on();\n\t\t} else if (power_on_retries \u003e 0) {\n\t\t\tpower_on_retries--;\n\t\t} else {\n\t\t\tcold_reset_pending \u003d false;\n\t\t\tCPRINTS(\"Failed to reach G3 for cold reboot\");\n\t\t\treturn;\n\t\t}\n\t} else {\n\t\tif (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {\n\t\t\tpower_on_retries \u003d 0;\n\t\t\treturn;\n\t\t}\n\n\t\tif (power_on_retries \u003d\u003d 0) {\n\t\t\tCPRINTS(\"Failed to power on AP after cold reboot\");\n\t\t\treturn;\n\t\t}\n\n\t\tpower_on_retries--;\n\n\t\t/*\n\t\t * Pulse power button only in settled S5 or G3; during G3S5/S5G3\n\t\t * transitions chipset_in_state(ANY_OFF) is true while\n\t\t * individual SOFT_OFF and HARD_OFF checks are false.\n\t\t */\n\t\tif (chipset_in_state(CHIPSET_STATE_SOFT_OFF) ||\n\t\t    chipset_in_state(CHIPSET_STATE_HARD_OFF)) {\n\t\t\tchipset_power_on();\n\t\t}\n\t}\n\n\thook_call_deferred(\u0026hang_detect_power_on_data,\n\t\t\t   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);\n}\n```\n[🔗](http://go/tj/1444830d-b898-40a6-aad0-fdfc469dee73)",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2cc0526212a7c4101e1285d1266bfbae0e509a60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25ea9aac_955165e6",
+        "filename": "zephyr/test/drivers/host_cmd/src/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:26:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Test Coverage / Boundary Value Analysis**: The test currently sleeps for `TEST_COLD_REBOOT_MAX_RETRIES + 2` to verify the retry limit is exhausted. To ensure the bounds are exactly correct (and catch off-by-one errors like `\u003e 0` vs `\u003e\u003d 0`), please add test coverage for the exact boundary values:\n1. Reaching `POWER_G3` on the *exact last* retry ($N$).\n2. Failing to reach `POWER_G3` after exactly the maximum number of retries plus one ($N + 1$).\n\nThis guarantees the loop performs exactly 20 retries, no more and no less.\n[🔗](http://go/tj/1444830d-b898-40a6-aad0-fdfc469dee73)",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2cc0526212a7c4101e1285d1266bfbae0e509a60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
