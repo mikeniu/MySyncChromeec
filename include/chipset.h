@@ -173,6 +173,9 @@ static inline void chipset_force_shutdown(enum chipset_shutdown_reason reason)
 {
 	(void)reason;
 }
+static inline void chipset_power_on(void)
+{
+}
 
 static inline void chipset_reset(enum chipset_shutdown_reason reason)
 {

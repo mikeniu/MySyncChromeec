@@ -5,6 +5,7 @@
 
 /* AP hang detect logic */
 
+#include "ap_reset_log.h"
 #include "chipset.h"
 #include "common.h"
 #include "console.h"
@@ -17,23 +18,127 @@
 /* Console output macro */
 #define CPRINTS(format, args...) cprints(CC_CHIPSET, "APHD: " format, ##args)
 
+/*
+ * Delay between forcing AP shutdown and polling for G3
+ * (CHIPSET_STATE_HARD_OFF), and maximum number of 1s polls to wait for G3 (some
+ * chipsets such as Skylake hold PWRBTN_L for 4s to reach S5 and then wait
+ * s5_inactivity_timeout = 10s before entering G3).
+ */
+#define HANG_DETECT_COLD_REBOOT_OFF_DELAY_US SECOND
+#define HANG_DETECT_COLD_REBOOT_MAX_RETRIES 20
+
 static uint16_t reboot_timeout_sec;
 static uint8_t bootstatus = EC_HANG_DETECT_AP_BOOT_NORMAL;
+static uint8_t power_on_retries;
+static uint8_t cold_reset_pending;
+
+static void hang_detect_power_on(void);
+DECLARE_DEFERRED(hang_detect_power_on);
+
+static void hang_detect_power_on(void)
+{
+	if (cold_reset_pending && !chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
+		if (power_on_retries > 0) {
+			power_on_retries--;
+			hook_call_deferred(
+				&hang_detect_power_on_data,
+				HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
+		} else {
+			cold_reset_pending = 0;
+			CPRINTS("Failed to reach G3 for cold reboot");
+		}
+		return;
+	}
+
+	if (cold_reset_pending) {
+		cold_reset_pending = 0;
+		power_on_retries = HANG_DETECT_COLD_REBOOT_MAX_RETRIES;
+		CPRINTS("Powering on AP after cold reset");
+		/*
+		 * Re-record CHIPSET_RESET_HANG_REBOOT after G3 is reached
+		 * because S0 -> S5 -> G3 forced shutdown transitions
+		 * overwrite the AP reset log with POWERFAIL / G3.
+		 */
+		report_ap_reset(CHIPSET_RESET_HANG_REBOOT);
+		chipset_power_on();
+		/*
+		 * Poll until the AP exits off states in case G3 -> S5 rail
+		 * ramp and RSMRST_L deassertion take longer than the initial
+		 * 200ms PWRBTN_L pulse from chipset_power_on().
+		 */
+		hook_call_deferred(&hang_detect_power_on_data,
+				   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
+		return;
+	}
+
+	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+		power_on_retries = 0;
+		return;
+	}
+
+	if (chipset_in_state(CHIPSET_STATE_SOFT_OFF) ||
+	    chipset_in_state(CHIPSET_STATE_HARD_OFF))
+		chipset_power_on();
+
+	if (power_on_retries > 0) {
+		power_on_retries--;
+		hook_call_deferred(&hang_detect_power_on_data,
+				   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
+	} else {
+		CPRINTS("Failed to power on AP after cold reboot");
+	}
+}
+
+static void hang_detect_cold_reboot(void)
+{
+	if (!cold_reset_pending)
+		return;
+
+	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+		cold_reset_pending = 0;
+		return;
+	}
+
+	CPRINTS("Warm reset failed; forcing cold reboot");
+	power_on_retries = HANG_DETECT_COLD_REBOOT_MAX_RETRIES;
+	chipset_force_shutdown(CHIPSET_RESET_HANG_REBOOT);
+	hook_call_deferred(&hang_detect_power_on_data,
+			   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
+}
+DECLARE_DEFERRED(hang_detect_cold_reboot);
 
 /**
  * hang detect handlers for reboot.
  */
 static void hang_detect_reboot(void)
 {
-	/* If we're rebooting the AP, stop hang detection */
+	uint16_t timeout_sec = reboot_timeout_sec;
+
+	if (chipset_in_state(CHIPSET_STATE_ANY_OFF) ||
+	    timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT)
+		return;
+
+	/*
+	 * Warm reset the AP first. If the AP fails to recover and clear
+	 * bootstatus (via cros_ec_wdt_probe() during early kernel boot) or
+	 * pet/cancel the watchdog (via daisydog) within another
+	 * reboot_timeout_sec window, escalate to a cold reboot (force
+	 * shutdown + power on).
+	 */
 	CPRINTS("Triggering reboot");
-	chipset_reset(CHIPSET_RESET_HANG_REBOOT);
+	cold_reset_pending = 1;
 	bootstatus = EC_HANG_DETECT_AP_BOOT_EC_WDT;
+	chipset_reset(CHIPSET_RESET_HANG_REBOOT);
+	hook_call_deferred(&hang_detect_cold_reboot_data, timeout_sec * SECOND);
 }
 DECLARE_DEFERRED(hang_detect_reboot);
 
 static void hang_detect_reload(void)
 {
+	cold_reset_pending = 0;
+	power_on_retries = 0;
+	hook_call_deferred(&hang_detect_cold_reboot_data, -1);
+	hook_call_deferred(&hang_detect_power_on_data, -1);
 	hook_call_deferred(&hang_detect_reboot_data,
 			   reboot_timeout_sec * SECOND);
 }
@@ -41,11 +146,35 @@ static void hang_detect_reload(void)
 static void hang_detect_cancel(void)
 {
 	CPRINTS("Stop on AP request");
+	cold_reset_pending = 0;
+	power_on_retries = 0;
+	hook_call_deferred(&hang_detect_reboot_data, -1);
+	hook_call_deferred(&hang_detect_cold_reboot_data, -1);
+	hook_call_deferred(&hang_detect_power_on_data, -1);
+}
+
+static void hang_detect_deferred_stop(void)
+{
+	if (cold_reset_pending)
+		return;
+
+	CPRINTS("Stop on AP shutdown");
 	hook_call_deferred(&hang_detect_reboot_data, -1);
 }
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, hang_detect_deferred_stop,
+	     HOOK_PRIO_DEFAULT);
 
 static void hang_detect_reset(void)
 {
+	/*
+	 * Do not stop hang detection on the chipset reset triggered by
+	 * Stage 1 (hang_detect_reboot); Stage 2 (hang_detect_cold_reboot)
+	 * must remain armed until the AP boots and clears/reloads/cancels
+	 * the watchdog.
+	 */
+	if (cold_reset_pending)
+		return;
+
 	CPRINTS("Stop on Chipset reset");
 	hook_call_deferred(&hang_detect_reboot_data, -1);
 }
@@ -125,6 +254,10 @@ hang_detect_host_command(struct ec_host_cmd_handler_args *args)
 	case EC_HANG_DETECT_CMD_CLEAR_STATUS:
 		CPRINTS("Clearing bootstatus");
 		bootstatus = EC_HANG_DETECT_AP_BOOT_NORMAL;
+		cold_reset_pending = 0;
+		power_on_retries = 0;
+		hook_call_deferred(&hang_detect_cold_reboot_data, -1);
+		hook_call_deferred(&hang_detect_power_on_data, -1);
 		break;
 
 	default:
