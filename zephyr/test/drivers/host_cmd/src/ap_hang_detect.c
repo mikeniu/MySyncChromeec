@@ -24,6 +24,7 @@
 #define TEST_COLD_REBOOT_MAX_RETRIES 20
 #define TEST_POLL_SUB_SECOND_OFFSET_MS 500
 #define TEST_POLL_REMAINING_DELAY_MS 1000
+#define TEST_MAX_REBOOT_TIMEOUT_SEC (INT32_MAX / USEC_PER_SEC)
 
 static void set_timeout(uint16_t timeout)
 {
@@ -40,6 +41,10 @@ static void set_timeout(uint16_t timeout)
 ZTEST_USER(ap_hang_detect, test_set_parms_good_timeout)
 {
 	set_timeout(EC_HANG_DETECT_MIN_TIMEOUT);
+	set_timeout(EC_HANG_DETECT_MIN_TIMEOUT + 1);
+
+	set_timeout(TEST_MAX_REBOOT_TIMEOUT_SEC - 1);
+	set_timeout(TEST_MAX_REBOOT_TIMEOUT_SEC);
 }
 
 ZTEST_USER(ap_hang_detect, test_set_parms_bad_timeout)
@@ -51,6 +56,10 @@ ZTEST_USER(ap_hang_detect, test_set_parms_bad_timeout)
 	struct ec_response_hang_detect resp;
 	struct host_cmd_handler_args args;
 
+	zassert_equal(ec_cmd_hang_detect(&args, &req, &resp),
+		      EC_RES_INVALID_PARAM);
+
+	req.reboot_timeout_sec = TEST_MAX_REBOOT_TIMEOUT_SEC + 1;
 	zassert_equal(ec_cmd_hang_detect(&args, &req, &resp),
 		      EC_RES_INVALID_PARAM);
 }

@@ -28,6 +28,7 @@
  */
 #define HANG_DETECT_COLD_REBOOT_OFF_DELAY_US SECOND
 #define HANG_DETECT_COLD_REBOOT_MAX_RETRIES 20
+#define MAX_REBOOT_TIMEOUT_SEC (INT32_MAX / SECOND)
 
 static uint16_t reboot_timeout_sec;
 static uint8_t bootstatus = EC_HANG_DETECT_AP_BOOT_NORMAL;
@@ -197,9 +198,10 @@ hang_detect_host_command(struct ec_host_cmd_handler_args *args)
 		break;
 
 	case EC_HANG_DETECT_CMD_SET_TIMEOUT:
-		if (p->reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT) {
-			CPRINTS("Reboot timeout has to be greater than %ds",
-				EC_HANG_DETECT_MIN_TIMEOUT);
+		if (p->reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT ||
+		    p->reboot_timeout_sec > MAX_REBOOT_TIMEOUT_SEC) {
+			CPRINTS("Invalid reboot timeout: %ds",
+				p->reboot_timeout_sec);
 			ret = EC_HOST_CMD_INVALID_PARAM;
 			break;
 		}
