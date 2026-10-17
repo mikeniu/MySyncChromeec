@@ -42,6 +42,10 @@ ZTEST_USER(ap_hang_detect, test_set_parms_bad_timeout)
 
 	zassert_equal(ec_cmd_hang_detect(&args, &req, &resp),
 		      EC_RES_INVALID_PARAM);
+
+	req.reboot_timeout_sec = (INT32_MAX / USEC_PER_SEC) + 1;
+	zassert_equal(ec_cmd_hang_detect(&args, &req, &resp),
+		      EC_RES_INVALID_PARAM);
 }
 
 ZTEST_USER(ap_hang_detect, test_cancel)
