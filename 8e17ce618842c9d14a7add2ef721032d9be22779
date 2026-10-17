@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00ef8575_defb2bfd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:18:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please extract the duplicated sleep mask condition into a central helper (see inline comment).\n\n### Review Summary\n\n**Functionality:** Looks good. Sleep mask logic correctly inhibits sleep when RDD, CCD, or AP UART are active.\n**Architecture \u0026 Component Fit:** Fits into the existing RDD state machine boundaries.\n**Code Simplicity:** Flagged a duplication of the sleep mask re-evaluation condition across three functions. Requested a unified `rdd_evaluate_sleep_mask` helper to enforce the invariant centrally.\n**Idiomaticity \u0026 Readability:** Good. The C macros and test scaffolding additions match standard repository patterns.\n**Security:** No security issues identified.\n**Testing:** The `host-ccd_sleep_inhibit` unit test comprehensively exercises the state transitions and mock USB suspend conditions.\n**CL Size \u0026 Scope:** Size: M (+244, -4). The CL has been successfully split to isolate the behavioral fix and its tests, adhering to the Single Logical Change rule.\n**Commit Message:** Clean and concise. Minutiae was removed in PS3. [🔗](http://go/tj/aa274f66-4c90-410a-bd54-13e4c58b57af)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8e17ce618842c9d14a7add2ef721032d9be22779",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64e74b3c_9d7fa74b",
+        "filename": "chip/g/rdd.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:18:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **[Code Simplicity / Single Source of Truth]** The condition to re-allow deep sleep (`!ccd_ext_is_enabled() \u0026\u0026 gpio_get_level(...) \u0026\u0026 !uartn_is_enabled(...)`) is duplicated across three different functions in `chip/g/rdd.c` and `board/cr50/rdd.c` (conditionally optimized in each place based on what is known).\n\nScattering this invariant makes it brittle if another condition is added later. Please extract a single helper function (e.g., `void rdd_evaluate_sleep_mask(void)` declared in `chip/g/rdd.h`) to enforce this policy centrally:\n\n```c\nvoid rdd_evaluate_sleep_mask(void)\n{\n\tif (ccd_ext_is_enabled() || !gpio_get_level(GPIO_CCD_MODE_L) ||\n\t    uartn_is_enabled(UART_AP)) {\n\t\tdisable_sleep(SLEEP_MASK_RDD);\n\t} else {\n\t\tenable_sleep(SLEEP_MASK_RDD);\n\t}\n}\n```\n\nThen, you can simply call `rdd_evaluate_sleep_mask();` immediately after the local state changes in each location (e.g., after `gpio_set_level()` in `rdd_connect()` and `rdd_disconnect()`, after updating `state` in `ccd_ext_detect()`, and after `uartn_enable()` / `uartn_disable()` in `ccd_state_change_hook()`) rather than duplicating the boolean logic and `disable_sleep` / `enable_sleep` calls. [🔗](http://go/tj/aa274f66-4c90-410a-bd54-13e4c58b57af)",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8e17ce618842c9d14a7add2ef721032d9be22779",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
