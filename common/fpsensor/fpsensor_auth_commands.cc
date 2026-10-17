@@ -51,10 +51,11 @@ __maybe_unused test_export_static void reset_session(void)
 		FP_CONTEXT_STATUS_SESSION_ESTABLISHED | FP_ENC_STATUS_SEED_SET);
 }
 
-static enum ec_status
-fp_command_generate_nonce(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_generate_nonce(struct ec_host_cmd_handler_args *args)
 {
-	auto *r = static_cast<ec_response_fp_generate_nonce *>(args->response);
+	auto *r =
+		static_cast<ec_response_fp_generate_nonce *>(args->output_buf);
 
 	ScopedFastCpu fast_cpu;
 
@@ -64,17 +65,18 @@ fp_command_generate_nonce(struct host_cmd_handler_args *args)
 
 	global_context.fp_encryption_status |= FP_CONTEXT_SESSION_NONCE_SET;
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_GENERATE_NONCE, fp_command_generate_nonce,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FP_GENERATE_NONCE,
+			      fp_command_generate_nonce, EC_VER_MASK(0),
+			      struct ec_response_fp_generate_nonce);
 
-static enum ec_status
-fp_command_establish_session(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_establish_session(struct ec_host_cmd_handler_args *args)
 {
 	const auto *p = static_cast<const ec_params_fp_establish_session *>(
-		args->params);
+		args->input_buf);
 	static constexpr uint8_t tpm_seed_aad[] = { 't', 'p', 'm', '_',
 						    's', 'e', 'e', 'd' };
 	constexpr auto aad = std::span{ tpm_seed_aad };
@@ -82,12 +84,12 @@ fp_command_establish_session(struct host_cmd_handler_args *args)
 	if (!(global_context.fp_encryption_status &
 	      FP_CONTEXT_SESSION_NONCE_SET)) {
 		CPRINTS("No existing session nonce");
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
 	/* Do not establish session if any operation on templates is running */
 	if (global_context.sensor_mode & FP_MODES_TEMPLATE_OPERATION) {
-		return EC_RES_BUSY;
+		return EC_HOST_CMD_BUSY;
 	}
 
 	ScopedFastCpu fast_cpu;
@@ -113,7 +115,7 @@ fp_command_establish_session(struct host_cmd_handler_args *args)
 	enum ec_error_list ret = generate_session_key_with_context(
 		session_nonce, p->peer_nonce, session_key);
 	if (ret != EC_SUCCESS) {
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	static_assert(sizeof(global_context.tpm_seed) ==
@@ -124,7 +126,7 @@ fp_command_establish_session(struct host_cmd_handler_args *args)
 	ret = decrypt_data_with_session_key(session_key, p->enc_tpm_seed,
 					    tpm_seed, p->nonce, p->tag, aad);
 	if (ret != EC_SUCCESS) {
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
 	/* Set the TPM Seed. */
@@ -134,21 +136,22 @@ fp_command_establish_session(struct host_cmd_handler_args *args)
 	global_context.fp_encryption_status |=
 		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_ESTABLISH_SESSION, fp_command_establish_session,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_ESTABLISH_SESSION,
+			     fp_command_establish_session, EC_VER_MASK(0),
+			     struct ec_params_fp_establish_session);
 
-static enum ec_status
-fp_cmd_generate_challenge(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_cmd_generate_challenge(struct ec_host_cmd_handler_args *args)
 {
 	auto *r = static_cast<ec_response_fp_generate_challenge *>(
-		args->response);
+		args->output_buf);
 
 	/* The Session Key is used to sign messages. Let's make sure
 	 * it's available. */
 	if (!fingerprint_auth_enabled()) {
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
 	ScopedFastCpu fast_cpu;
@@ -161,11 +164,12 @@ fp_cmd_generate_challenge(struct host_cmd_handler_args *args)
 
 	global_context.fp_encryption_status |= FP_AUTH_CHALLENGE_SET;
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_GENERATE_CHALLENGE, fp_cmd_generate_challenge,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FP_GENERATE_CHALLENGE,
+			      fp_cmd_generate_challenge, EC_VER_MASK(0),
+			      struct ec_response_fp_generate_challenge);
 
 test_mockable enum ec_error_list
 validate_request(std::span<const uint8_t> context,
@@ -232,11 +236,11 @@ sign_message(std::span<const uint8_t> context,
 }
 
 #ifdef CONFIG_PLATFORM_EC_WP_EXTERNAL
-static enum ec_status
-fp_command_unlock_dev_options(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_unlock_dev_options(struct ec_host_cmd_handler_args *args)
 {
 	const auto *p = static_cast<const ec_params_fp_unlock_dev_options *>(
-		args->params);
+		args->input_buf);
 
 	/* Define the empty context (no user_id) */
 	static constexpr std::span<const uint8_t> context;
@@ -248,14 +252,15 @@ fp_command_unlock_dev_options(struct host_cmd_handler_args *args)
 	static constexpr std::span operation = operation_str;
 
 	if (validate_request(context, operation, p->hmac) != EC_SUCCESS) {
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
 	/* Unlock the system */
 	disable_write_protect_external();
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_UNLOCK_DEV_OPTIONS,
-		     fp_command_unlock_dev_options, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_UNLOCK_DEV_OPTIONS,
+			     fp_command_unlock_dev_options, EC_VER_MASK(0),
+			     struct ec_params_fp_unlock_dev_options);
 #endif
