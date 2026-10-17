@@ -16,6 +16,29 @@
       "message": "Needs CTS verification.",
       "revId": "76243d0b3918f05175f377dc7137cc09198d9dc9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a00b3e4_2d75163b",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2408,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-10-17T00:17:49Z",
+      "side": 1,
+      "message": "There is a lot going on in this case statement. It might be cleaner to instead intercept this where the UCSI task is called and have that call a local function which both updates the source info message as well as queue the set_pdo UCSI task.\n\nWe also set source info in cmd_set_max_pdp so we should account for this potentially being overridden. Please update cmd_set_max_pdp as well.",
+      "range": {
+        "startLine": 2408,
+        "startChar": 0,
+        "endLine": 2408,
+        "endChar": 37
+      },
+      "revId": "76243d0b3918f05175f377dc7137cc09198d9dc9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
