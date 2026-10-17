@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "655a898e_37b6121c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:34:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Missing boundary tests**\n\nThank you for splitting the CL! The logic for bounding the G3 polling loop is much simpler and cleaner now. \n\n### Review Summary\n\n*   **Functionality:** ✅ The bounded polling behavior is correctly scoped and implemented.\n*   **Architecture \u0026 Component Fit:** ✅ Fits well within the existing `hang_detect` module.\n*   **Code Simplicity:** ✅ The removal of the `goto` and the magic `+ 1` offset greatly simplifies the control flow. \n*   **Idiomaticity \u0026 Readability:** ✅ Constant definition is clear and appropriately used.\n*   **Security:** ✅ No obvious security concerns.\n*   **Testing:** ❌ The current test correctly checks the success cases and the timeout case loosely, but misses the exact boundary values for the retry limit (`TEST_COLD_REBOOT_MAX_RETRIES`). See the inline comment for a concrete suggestion on how to cover the `N - 1` boundary case.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+56, -1). The CL now cleanly represents a Single Logical Change.\n*   **Commit Message:** ✅ The message is concise, well-formatted, and clearly explains both the \"Why\" and the \"What\" without narrating the diff.\n[🔗](http://go/tj/8014360a-9747-4ba4-8e89-7f88276cf4d6)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "375bb56a3feba50ad6381cb5c7ea34a4589c41de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0972be0_729a9e48",
+        "filename": "zephyr/test/drivers/host_cmd/src/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:34:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect (Missing Boundary Value Tests)**\n\nThis test validates that the retry loop exhausts by waiting `TEST_COLD_REBOOT_MAX_RETRIES + 2` seconds, which is safely beyond the limit. However, if the boundary logic in `hang_detect_power_on` were accidentally mutated (e.g., if `power_on_retries \u003d\u003d 0` was changed to `power_on_retries \u003c\u003d 1`), this test would still pass because it waits long enough for the smaller bounds to exhaust as well.\n\nAccording to the testing guidelines for boundary value analysis (BVA), we must verify the exact limits of the retry logic. Please add a test (or split this test) to cover the exact boundary cases (`N - 1` and `N + 1`):\n1. **Successful recovery on the exact last retry** (e.g. transitioning to G3 exactly when the retry limit is about to be exhausted).\n2. **Failure right as the limit is hit** (which this test almost covers, but it should ideally prove it fails *at* the limit, not just long after).\n\nHere is a snippet showing how you might test the \"success on the exact last retry\" case:\n\n```c\nZTEST_USER(ap_hang_detect, test_cold_reboot_g3_timeout_exact_boundary)\n{\n\tstruct ec_params_hang_detect req \u003d { 0 };\n\tstruct ec_response_hang_detect resp;\n\tstruct host_cmd_handler_args args;\n\n\ttest_set_chipset_to_s0();\n\treq.command \u003d EC_HANG_DETECT_CMD_CLEAR_STATUS;\n\tzassert_ok(ec_cmd_hang_detect(\u0026args, \u0026req, \u0026resp));\n\n\tset_timeout(EC_HANG_DETECT_MIN_TIMEOUT);\n\treq.command \u003d EC_HANG_DETECT_CMD_RELOAD;\n\tzassert_ok(ec_cmd_hang_detect(\u0026args, \u0026req, \u0026resp));\n\n\t/* Wait for Stage 1 (5s) + Stage 2 (5s) + 1s into POWER_S5 */\n\tk_sleep(K_SECONDS(2 * EC_HANG_DETECT_MIN_TIMEOUT + 1));\n\tzassert_equal(POWER_S5, power_get_state());\n\n\t/*\n\t * Prevent S5 -\u003e G3 transition during the retry window, but transition\n\t * exactly on the final possible retry to ensure it successfully powers on.\n\t */\n\tpower_set_state(POWER_S0);\n\tk_sleep(K_SECONDS(TEST_COLD_REBOOT_MAX_RETRIES - 1));\n\ttest_set_chipset_to_g3();\n\t\n\t/* The final poll should detect G3 and power on. Give it 2s to process. */\n\tk_sleep(K_SECONDS(2));\n\t\n\tzassert_equal(POWER_S0, power_get_state());\n\n\treq.command \u003d EC_HANG_DETECT_CMD_CLEAR_STATUS;\n\tzassert_ok(ec_cmd_hang_detect(\u0026args, \u0026req, \u0026resp));\n}\n```\n[🔗](http://go/tj/8014360a-9747-4ba4-8e89-7f88276cf4d6)",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "375bb56a3feba50ad6381cb5c7ea34a4589c41de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

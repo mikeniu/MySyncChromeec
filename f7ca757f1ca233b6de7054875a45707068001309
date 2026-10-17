@@ -121,6 +121,26 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79c2f215_27cffb6f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:34:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Resolved in latest patchset (CL successfully split).",
+      "parentUuid": "5cf32af1_d9b856af",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "340a36cf_6047a157",
