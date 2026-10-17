@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6eef2f7d_7d3d5ba4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:40:41Z",
+      "side": 1,
+      "message": "Done in PS2: updated the commit message to state the conceptual purpose concisely instead of narrating the diff.",
+      "parentUuid": "1e8f7074_7a412971",
+      "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d537fba0_2f4c8b38",
@@ -41,6 +59,42 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22d4e422_96db9910",
+        "filename": "chip/host/registers.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:40:41Z",
+      "side": 1,
+      "message": "Done in PS2: wrapped GWRITE_FIELD in a do { volatile uint32_t *__reg \u003d \u0026GREG32(mname, rname); ... } while (0) block so get_reg_addr() is only looked up once per field write.",
+      "parentUuid": "d537fba0_2f4c8b38",
+      "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0df89c0_4172b6c6",
+        "filename": "test/test_config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:40:41Z",
+      "side": 1,
+      "message": "Done in PS2 (and CL 8605169 PS5): removed test/test_config.h from this commit and moved enum device_state and mock prototypes into test/ccd_sleep_inhibit.h in CL 8605169.",
+      "parentUuid": "5a9eed77_898dd4f9",
       "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
