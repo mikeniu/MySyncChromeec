@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff004f96_ce9b6494",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T21:06:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n- **Functionality**: ✅ Looks good.\n- **Architecture \u0026 Component Fit**: ✅ Looks good.\n- **Code Simplicity**: ❌ Found an opportunity to flatten the state checks in `hang_detect_power_on` (see inline comment).\n- **Idiomaticity \u0026 Readability**: ❌ `cold_reset_pending` should use `bool` and `true`/`false` rather than `uint8_t` and `0`/`1` (see inline comment).\n- **Security**: ✅ No security issues found.\n- **Testing**: ✅ Test coverage looks thorough with boundary and branch cases covered.\n- **CL Size \u0026 Scope**: ❌ Size: L (+363, -5). The CL is too large and bundles multiple logical changes. Refactoring existing test mocks/fixtures (like adding `memset(\u0026req, 0, sizeof(req));`) is an independent test-refactoring task and must not be bundled with production code changes.\n  **Proposed Split Plan:**\n  - **CL 1:** Test cleanup (adding `memset` to existing tests).\n  - **CL 2:** Core behavioral fix (the new `hang_detect_cold_reboot` logic and its associated tests).\n- **Commit Message**: ✅ The commit message is clear and accurately reflects the diff.\n\n[🔗](http://go/tj/fee1c422-793f-4265-9a08-3f33e4167a98)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab91fe52_861685f6",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T21:06:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** `cold_reset_pending` is used strictly as a boolean flag. In modern C codebases, prefer using `\u003cstdbool.h\u003e` and explicitly declaring boolean flags as `bool` (and assigning `true`/`false`) rather than `uint8_t` (and `1`/`0`), unless matching a strict adjacent ABI requirement. Please update this declaration and the `0`/`1` assignments throughout the file.\n\n```c\nstatic bool cold_reset_pending;\n```\n[🔗](http://go/tj/fee1c422-793f-4265-9a08-3f33e4167a98)",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bf0594b_edfc6660",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T21:06:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity:** The two `if (cold_reset_pending)` checks can be unified to avoid evaluating `cold_reset_pending` twice and to make the state progression clearer.\n\n```c\n\tif (cold_reset_pending) {\n\t\tif (!chipset_in_state(CHIPSET_STATE_HARD_OFF)) {\n\t\t\tif (power_on_retries \u003e 0) {\n\t\t\t\tpower_on_retries--;\n\t\t\t\thook_call_deferred(\u0026hang_detect_power_on_data,\n\t\t\t\t\t\t   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);\n\t\t\t} else {\n\t\t\t\tcold_reset_pending \u003d 0;\n\t\t\t\tCPRINTS(\"Failed to reach G3 for cold reboot\");\n\t\t\t}\n\t\t\treturn;\n\t\t}\n\n\t\tcold_reset_pending \u003d 0;\n\t\tpower_on_retries \u003d HANG_DETECT_COLD_REBOOT_MAX_RETRIES;\n\t\tCPRINTS(\"Powering on AP after cold reset\");\n\t\t/*\n\t\t * Re-record CHIPSET_RESET_HANG_REBOOT after G3 is reached\n\t\t * because S0 -\u003e S5 -\u003e G3 forced shutdown transitions\n\t\t * overwrite the AP reset log with POWERFAIL / G3.\n\t\t */\n\t\treport_ap_reset(CHIPSET_RESET_HANG_REBOOT);\n\t\tchipset_power_on();\n\t\t/*\n\t\t * Poll until the AP exits off states in case G3 -\u003e S5 rail\n\t\t * ramp and RSMRST_L deassertion take longer than the initial\n\t\t * 200ms PWRBTN_L pulse from chipset_power_on().\n\t\t */\n\t\thook_call_deferred(\u0026hang_detect_power_on_data,\n\t\t\t\t   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);\n\t\treturn;\n\t}\n```\n[🔗](http://go/tj/fee1c422-793f-4265-9a08-3f33e4167a98)",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e10ffa00_ad47bd8e",
+        "filename": "zephyr/test/drivers/host_cmd/src/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T21:06:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **CL Scope**: Refactoring or cleaning up existing unit tests (such as adding this `memset` to fix uninitialized memory) must be done in an independent test-cleanup CL, separated from production code changes.\n\nSuggestion for a follow-up CL:\nInstead of `memset`, prefer designated initializers when declaring the struct: `struct ec_params_hang_detect req \u003d { 0 };`.\n[🔗](http://go/tj/fee1c422-793f-4265-9a08-3f33e4167a98)",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
