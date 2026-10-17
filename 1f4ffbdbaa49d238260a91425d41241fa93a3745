@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ec9e6f3_90dc42e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T21:33:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/273ef712-0a6a-4fb5-8312-66458cb120d7)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1f4ffbdbaa49d238260a91425d41241fa93a3745",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
