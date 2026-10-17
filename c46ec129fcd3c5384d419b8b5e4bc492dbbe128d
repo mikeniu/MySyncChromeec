@@ -105,6 +105,42 @@
       "isAi": true,
       "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ea69ee7_6c97b70a",
+        "filename": "board/cr50/rdd.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:40:47Z",
+      "side": 1,
+      "message": "Done in PS4/PS5: extracted rdd_evaluate_sleep_mask() in chip/g/rdd.c and invoked it from board/cr50/rdd.c and chip/g/rdd.c.",
+      "parentUuid": "b4738abf_13b5c1eb",
+      "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d3f35a0_1edba021",
+        "filename": "chip/g/rdd.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:40:47Z",
+      "side": 1,
+      "message": "Done in PS4/PS5: centralized sleep mask evaluation in rdd_evaluate_sleep_mask() in chip/g/rdd.c.",
+      "parentUuid": "8bdc9dac_80d37fbd",
+      "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
