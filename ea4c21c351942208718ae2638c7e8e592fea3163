@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6df9bacc_b2ef3694",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:05:06Z",
+      "side": 1,
+      "message": "Done. Split the bounded G3/S5 polling into https://crrev.com/c/8604055, removed out-of-scope existing-test changes, and changed `cold_reset_pending` to `bool`.",
+      "parentUuid": "ff004f96_ce9b6494",
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab91fe52_861685f6",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2bc5de9_9562938d",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:05:06Z",
+      "side": 1,
+      "message": "Done. Included `\u003cstdbool.h\u003e` and changed `cold_reset_pending` to `bool` (`true`/`false`).",
+      "parentUuid": "ab91fe52_861685f6",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 9999
+      },
       "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1637fca_f631afea",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:05:06Z",
+      "side": 1,
+      "message": "Done. Flattened `hang_detect_power_on()` with a single `defer:` block in https://crrev.com/c/8604055.",
+      "parentUuid": "4bf0594b_edfc6660",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9999
+      },
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e10ffa00_ad47bd8e",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94b44cf6_003a83ee",
+        "filename": "zephyr/test/drivers/host_cmd/src/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:05:06Z",
+      "side": 1,
+      "message": "Done. Removed out-of-scope `memset` in existing unit tests.",
+      "parentUuid": "e10ffa00_ad47bd8e",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 9999
+      },
       "revId": "ea4c21c351942208718ae2638c7e8e592fea3163",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
