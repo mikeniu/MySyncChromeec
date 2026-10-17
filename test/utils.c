@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "console.h"
+#include "registers.h"
 #include "shared_mem.h"
 #include "system.h"
 #include "test_util.h"
@@ -375,6 +376,30 @@ static int test_bytes_are_trivial(void)
 	return EC_SUCCESS;
 }
 
+#ifdef EMU_BUILD
+#define GC_PMU_PWRDN_SCRATCH20_TEST_LSB 4
+#define GC_PMU_PWRDN_SCRATCH20_TEST_MASK (0xf << 4)
+
+static int test_register_bitfield_macros(void)
+{
+	GWRITE(PMU, PWRDN_SCRATCH20, 0xa50f);
+	TEST_ASSERT(GREAD(PMU, PWRDN_SCRATCH20) == 0xa50f);
+
+	/* Write 4-bit field and verify surrounding bits are preserved. */
+	GWRITE_FIELD(PMU, PWRDN_SCRATCH20, TEST, 0xc);
+	TEST_ASSERT(GREAD_FIELD(PMU, PWRDN_SCRATCH20, TEST) == 0xc);
+	TEST_ASSERT(GREAD(PMU, PWRDN_SCRATCH20) == 0xa5cf);
+
+	/* Verify fval exceeding mask width is truncated to field mask. */
+	GWRITE_FIELD(PMU, PWRDN_SCRATCH20, TEST, 0xff);
+	TEST_ASSERT(GREAD_FIELD(PMU, PWRDN_SCRATCH20, TEST) == 0xf);
+	TEST_ASSERT(GREAD(PMU, PWRDN_SCRATCH20) == 0xa5ff);
+
+	GWRITE(PMU, PWRDN_SCRATCH20, 0);
+	return EC_SUCCESS;
+}
+#endif
+
 void run_test(void)
 {
 	test_reset();
@@ -391,6 +416,9 @@ void run_test(void)
 	RUN_TEST(test_scratchpad);
 	RUN_TEST(test_cond_t);
 	RUN_TEST(test_bytes_are_trivial);
+#ifdef EMU_BUILD
+	RUN_TEST(test_register_bitfield_macros);
+#endif
 
 	test_print_result();
 }
