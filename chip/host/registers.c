@@ -19,6 +19,33 @@ static struct faux_register_array {
 	{
 		.name = GNAME(PMU, PWRDN_SCRATCH20),
 	},
+	{
+		.name = GNAME(PINMUX, DIOA7_SEL),
+	},
+	{
+		.name = GNAME(PINMUX, DIOB5_SEL),
+	},
+	{
+		.name = GNAME(PINMUX, DIOB5_CTL),
+	},
+	{
+		.name = GNAME(RDD, INPUT_PIN_VALUES),
+	},
+	{
+		.name = GNAME(RDD, PROG_DEBUG_STATE_MAP),
+	},
+	{
+		.name = GNAME(RDD, INT_STATE),
+	},
+	{
+		.name = GNAME(RDD, POWER_DOWN_B),
+	},
+	{
+		.name = GNAME(RDD, REF_ADJ),
+	},
+	{
+		.name = GNAME(RDD, INT_ENABLE),
+	},
 
 	/* Define registers as needed. */
 };
