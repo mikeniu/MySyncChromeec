@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae14d3a1_a37642ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:52:57Z",
+      "side": 1,
+      "message": "Done in PS6: moved the mock definitions in test/ccd_sleep_inhibit.h into CL 8601877 so both CLs are Size M (+150/-1 and +159/-4).",
+      "parentUuid": "67b95511_ee28c7a1",
+      "revId": "747b2cd582bd30f2917f6118c7953d961e20d212",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51255ca5_2e1030f3",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "747b2cd582bd30f2917f6118c7953d961e20d212",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "173797dd_ec3f359c",
+        "filename": "test/ccd_sleep_inhibit.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:52:57Z",
+      "side": 1,
+      "message": "Done in PS6: extracted static const int STATE_UPDATE_DELAY_MS \u003d 10; and replaced all magic 10 values.",
+      "parentUuid": "51255ca5_2e1030f3",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 9999
+      },
       "revId": "747b2cd582bd30f2917f6118c7953d961e20d212",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
