@@ -12,6 +12,16 @@
 void init_rdd_state(void);
 
 /**
+ * Handle debug accessory connecting
+ */
+void rdd_connect(void);
+
+/**
+ * Handle debug accessory disconnecting
+ */
+void rdd_disconnect(void);
+
+/**
  * Print debug accessory detect state
  */
 void print_rdd_state(void);
