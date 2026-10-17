@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d7d1555_298f0543",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:07:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect (CL Size \u0026 Scope)**\n\nThe CL violates the **Single Logical Change** rule by bundling two independent behavior changes into a single patch:\n\n1. Delaying the initial power-on pulse with a retry loop until G3 is reached.\n2. Performing follow-up power-on pulses if the AP fails to boot and remains in S5/G3.\n\nThese are distinct fixes for different failure modes in the cold reboot cycle. They can and should be committed separately (each with its corresponding portion of the unit test) so they can be independently reviewed and reverted. \n\nPlease split this CL into two smaller, self-contained CLs.\n\nExample commit messages for the split CLs:\n\n**CL 1: Delay cold reboot power-on until G3**\n```\ncommon/ap_hang_detect: Delay cold reboot power-on until G3\n\nTo accommodate chipsets with long power-button holds, the EC now polls\nuntil the AP reaches the hard-off state before issuing the cold reboot\npower-on pulse.\n\nBUG\u003db:574387918\nTEST\u003d...\n```\n\n**CL 2: Add follow-up power-on pulses for slow S5 ramps**\n```\ncommon/ap_hang_detect: Add follow-up power-on pulses for slow S5 ramps\n\nTo accommodate chipsets with long S5 inactivity timeouts or slow rail\nramps that might miss the initial power-on pulse, the EC now performs\nfollow-up polls and power-on pulses if the AP remains in S5 or G3.\n\nBUG\u003db:574387918\nTEST\u003d...\n```\n[🔗](http://go/tj/4d411a4b-14b6-45dc-97b1-af8e808433d8)",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cf32af1_d9b856af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:07:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n*   **Functionality:** ✅ The bounded polling behavior and follow-up pulses correctly address the problem.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly placed within the `hang_detect` module and respects existing state checks.\n*   **Code Simplicity:** ❌ The control flow in `hang_detect_power_on` is unnecessarily complex, relying on a `goto` and shared `power_on_retries` counter logic. I\u0027ve left an inline snippet to simplify this using straightforward `if/else` logic.\n*   **Idiomaticity \u0026 Readability:** ✅ Variable names and comments are clear.\n*   **Security:** ✅ No obvious security concerns.\n*   **Testing:** ✅ The test cases cover both phase timeouts appropriately, and mock hardware states correctly.\n*   **CL Size \u0026 Scope:** ❌ Size: M (+118, -16). The CL violates the Single Logical Change rule by bundling two distinct behavioral modifications:\n    1. Delaying the initial power-on pulse until the AP reaches G3.\n    2. Adding follow-up power-on pulses if the AP remains in S5/G3.\n    Please split this into two separate CLs.\n*   **Commit Message:** ❌ The commit message accurately describes the changes but confirms the bundling of multiple logical changes. I have left a comment on `/COMMIT_MSG` with suggested subject lines and bodies for the split CLs.\n[🔗](http://go/tj/4d411a4b-14b6-45dc-97b1-af8e808433d8)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "340a36cf_6047a157",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:07:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect (Code Simplicity)**\n\nThis function has unnecessary control flow complexity introduced by the `goto defer;` and the shared fallthrough label. The `power_on_retries` counter is overloaded across two distinct phases with a magic `+ 1` adjustment (`HANG_DETECT_COLD_REBOOT_MAX_RETRIES + 1`).\n\nThis can be rewritten more idiomatically using standard `if`/`else` guard clauses to eliminate the `goto`, drop the magic `+ 1` offset, and cleanly separate the state updates from the common deferred callback:\n\n```c\nstatic void hang_detect_power_on(void)\n{\n\tif (cold_reset_pending) {\n\t\tif (chipset_in_state(CHIPSET_STATE_HARD_OFF)) {\n\t\t\tcold_reset_pending \u003d false;\n\t\t\tpower_on_retries \u003d HANG_DETECT_COLD_REBOOT_MAX_RETRIES;\n\t\t\tCPRINTS(\"Powering on AP after cold reset\");\n\t\t\t/*\n\t\t\t * Re-record CHIPSET_RESET_HANG_REBOOT after G3 is reached\n\t\t\t * because S0 -\u003e S5 -\u003e G3 forced shutdown transitions\n\t\t\t * overwrite the AP reset log with POWERFAIL / G3.\n\t\t\t */\n\t\t\treport_ap_reset(CHIPSET_RESET_HANG_REBOOT);\n\t\t\tchipset_power_on();\n\t\t} else if (power_on_retries \u003d\u003d 0) {\n\t\t\tcold_reset_pending \u003d false;\n\t\t\tCPRINTS(\"Failed to reach G3 for cold reboot\");\n\t\t\treturn;\n\t\t} else {\n\t\t\tpower_on_retries--;\n\t\t}\n\t} else {\n\t\tif (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {\n\t\t\tpower_on_retries \u003d 0;\n\t\t\treturn;\n\t\t}\n\n\t\tif (power_on_retries \u003d\u003d 0) {\n\t\t\tCPRINTS(\"Failed to power on AP after cold reboot\");\n\t\t\treturn;\n\t\t}\n\n\t\tpower_on_retries--;\n\n\t\t/*\n\t\t * Pulse power button only in settled S5 or G3; during G3S5/S5G3\n\t\t * transitions chipset_in_state(ANY_OFF) is true while\n\t\t * individual SOFT_OFF and HARD_OFF checks are false.\n\t\t */\n\t\tif (chipset_in_state(CHIPSET_STATE_SOFT_OFF) ||\n\t\t    chipset_in_state(CHIPSET_STATE_HARD_OFF)) {\n\t\t\tchipset_power_on();\n\t\t}\n\t}\n\n\thook_call_deferred(\u0026hang_detect_power_on_data,\n\t\t\t   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);\n}\n```\n[🔗](http://go/tj/4d411a4b-14b6-45dc-97b1-af8e808433d8)",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
