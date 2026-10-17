@@ -39,6 +39,7 @@ static void set_timeout(uint16_t timeout)
 ZTEST_USER(ap_hang_detect, test_set_parms_good_timeout)
 {
 	set_timeout(EC_HANG_DETECT_MIN_TIMEOUT);
+	set_timeout(INT32_MAX / USEC_PER_SEC);
 }
 
 ZTEST_USER(ap_hang_detect, test_set_parms_bad_timeout)
@@ -50,6 +51,10 @@ ZTEST_USER(ap_hang_detect, test_set_parms_bad_timeout)
 	struct ec_response_hang_detect resp;
 	struct host_cmd_handler_args args;
 
+	zassert_equal(ec_cmd_hang_detect(&args, &req, &resp),
+		      EC_RES_INVALID_PARAM);
+
+	req.reboot_timeout_sec = (INT32_MAX / USEC_PER_SEC) + 1;
 	zassert_equal(ec_cmd_hang_detect(&args, &req, &resp),
 		      EC_RES_INVALID_PARAM);
 }
