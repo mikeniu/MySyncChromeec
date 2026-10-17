@@ -1919,6 +1919,13 @@ function flash_ite_uart_common() {
 
 	info "Programming EC firmware using ITE UART interface"
 
+	if servo_is_ccd; then
+		if dut_has_control gsc_uart_cmd; then
+			servo_save_add "gsc_uart_cmd" "sysrst deassert"
+			dut_control "gsc_uart_cmd:sysrst assert" || true
+		fi
+	fi
+
 	# Force the EC to boot into an infinite loop.
 	ec_enable_boot0 "uut"
 	ec_reset
@@ -2840,6 +2847,13 @@ function read_chip_partially() {
 		print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
 			"${UUT_CUR_FMAP_RD[@]}" || die "${MSG_READ_FAIL}"
 
+		# ITE UART boot0 mode must be re-enabled after each operation
+		ec_enable_boot0 "uut"
+		ec_reset
+		print_or_run sleep 0.3
+		ec_disable_boot0 "uut"
+		print_or_run sleep 0.3
+
 	elif [ "${CHIP_TYPE}" == "spi" ]; then
 		local FLASHROM_FMAP_RD
 
@@ -2895,6 +2909,13 @@ function read_chip() {
 		UUT_CUR_RD=( "${CHIP_CMD_PREFIX[@]}" "-r" "${FILE_PATH}" )
 		print_or_run timeout -k 10 -s 9 "${FLAGS_timeout}" \
 					"${UUT_CUR_RD[@]}" || die "${MSG_READ_FAIL}"
+
+		# ITE UART boot0 mode must be re-enabled after each operation
+		ec_enable_boot0 "uut"
+		ec_reset
+		print_or_run sleep 0.3
+		ec_disable_boot0 "uut"
+		print_or_run sleep 0.3
 	elif [ "${CHIP_TYPE}" == "rtk_uart" ]; then
 		UUT_CUR_RD=( "${CHIP_CMD_PREFIX[@]}" \
 					"--method=read_bin" \
