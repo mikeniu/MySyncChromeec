@@ -23,6 +23,7 @@
 /* Mirrors HANG_DETECT_COLD_REBOOT_MAX_RETRIES in common/ap_hang_detect.c */
 #define TEST_COLD_REBOOT_MAX_RETRIES 20
 #define TEST_POLL_SUB_SECOND_OFFSET_MS 500
+#define TEST_POLL_REMAINING_DELAY_MS 1000
 
 static void set_timeout(uint16_t timeout)
 {
@@ -270,6 +271,77 @@ ZTEST_USER(ap_hang_detect, test_cold_reboot_g3_timeout)
 	power_set_state(POWER_G3);
 	k_sleep(K_SECONDS(2));
 	zassert_equal(POWER_G3, power_get_state());
+	test_set_chipset_to_s0();
+
+	req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+}
+
+ZTEST_USER(ap_hang_detect, test_cold_reboot_s5_followup)
+{
+	struct ec_params_hang_detect req = { 0 };
+	struct ec_response_hang_detect resp;
+	struct host_cmd_handler_args args;
+
+	/*
+	 * 1. If G3 -> S5 rail ramp stops in POWER_S5 after the initial
+	 * chipset_power_on() call in POWER_G3, the 1s follow-up check
+	 * calls chipset_power_on() in POWER_S5 to wake the AP to POWER_S0.
+	 */
+	test_set_chipset_to_s0();
+	req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+
+	set_timeout(EC_HANG_DETECT_MIN_TIMEOUT);
+	req.command = EC_HANG_DETECT_CMD_RELOAD;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+	/* Wait for Stage 1 (5s) + Stage 2 (5s) + sub-second offset */
+	k_sleep(K_MSEC(2 * EC_HANG_DETECT_MIN_TIMEOUT * MSEC_PER_SEC +
+		       TEST_POLL_SUB_SECOND_OFFSET_MS));
+	/* Reach POWER_G3 before the first 1s poll at T+11s */
+	power_set_state(POWER_G3);
+	k_sleep(K_MSEC(TEST_POLL_REMAINING_DELAY_MS));
+	/*
+	 * At T+11.5s, hang_detect_power_on() has seen POWER_G3, restored
+	 * CHIPSET_RESET_HANG_REBOOT, and armed the 1s follow-up for T+12s.
+	 * Force POWER_S5 (clearing any pending wake) to simulate a slow
+	 * G3 -> S5 ramp that missed the initial power-on pulse.
+	 */
+	zassert_equal(CHIPSET_RESET_HANG_REBOOT, chipset_get_shutdown_reason());
+	power_set_state(POWER_S5);
+	k_sleep(K_SECONDS(2));
+	zassert_equal(POWER_S0, power_get_state());
+
+	/*
+	 * 2. If the AP remains in an off state across all
+	 * TEST_COLD_REBOOT_MAX_RETRIES follow-up polls, hang_detect_power_on()
+	 * logs an error and stops polling once power_on_retries reaches 0.
+	 */
+	req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+
+	set_timeout(EC_HANG_DETECT_MIN_TIMEOUT);
+	req.command = EC_HANG_DETECT_CMD_RELOAD;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+	k_sleep(K_MSEC(2 * EC_HANG_DETECT_MIN_TIMEOUT * MSEC_PER_SEC +
+		       TEST_POLL_SUB_SECOND_OFFSET_MS));
+	power_set_state(POWER_G3);
+	k_sleep(K_MSEC(TEST_POLL_REMAINING_DELAY_MS));
+	/*
+	 * Exercise the settled POWER_G3 follow-up branch on the first poll,
+	 * then hold the chipset in transitional POWER_G3S5 across the
+	 * remaining polls until power_on_retries is exhausted.
+	 */
+	power_set_state(POWER_G3);
+	k_sleep(K_SECONDS(1));
+	zassert_equal(POWER_S0, power_get_state());
+	power_set_state(POWER_G3S5);
+	k_sleep(K_SECONDS(TEST_COLD_REBOOT_MAX_RETRIES));
+	zassert_equal(POWER_G3S5, power_get_state());
+	/* Entering POWER_S5 after retries are exhausted stays in S5 */
+	power_set_state(POWER_S5);
+	k_sleep(K_SECONDS(2));
+	zassert_equal(POWER_S5, power_get_state());
 	test_set_chipset_to_s0();
 
 	req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
