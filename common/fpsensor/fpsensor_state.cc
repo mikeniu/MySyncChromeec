@@ -338,14 +338,16 @@ static enum ec_host_cmd_status
 fp_command_mode(struct ec_host_cmd_handler_args *args)
 {
 	const auto *p = static_cast<const ec_params_fp_mode *>(args->input_buf);
-	const auto *p_1 =
-		static_cast<const ec_params_fp_mode_v1 *>(args->input_buf);
 	auto *r = static_cast<ec_response_fp_mode *>(args->output_buf);
 	std::optional<std::span<const uint8_t, FP_MAC_LENGTH> > mac =
 		std::nullopt;
 	uint32_t mode_out;
 
 	if (args->version == 1) {
+		const auto *p_1 = static_cast<const ec_params_fp_mode_v1 *>(
+			args->input_buf);
+		if (args->input_buf_size < sizeof(*p_1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 		mac = std::span{ p_1->mac };
 	}
 
