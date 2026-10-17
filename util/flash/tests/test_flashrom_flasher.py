@@ -541,6 +541,58 @@ class TestFlashromFlasher(unittest.TestCase):
         )
 
 
+class TestFlashromSerial(unittest.TestCase):
+    """Tests for selecting the SPI programmer serial number."""
+
+    @patch("flash.flashrom_flasher.locate_tool", return_value="flashrom")
+    @patch("subprocess.run")
+    def test_read_uses_programmer_serial(
+        self, mock_run: MagicMock, _mock_locate: MagicMock
+    ) -> None:
+        """Verify the serial matches flash_ec's get_serial() per servo type."""
+        serials = {
+            "serialname": "V4",
+            "servo_micro_serialname": "SM",
+            "c2d2_serialname": "C2D2",
+            "ccd_serialname": "CCD",
+        }
+        cases = (
+            (
+                "servo_v4_with_servo_micro_and_ccd_cr50",
+                "--programmer=raiden_debug_spi:serial=SM",
+            ),
+            (
+                "servo_v4p1_with_servo_micro",
+                "--programmer=raiden_debug_spi:serial=SM",
+            ),
+            (
+                "servo_v4_with_c2d2",
+                "--programmer=raiden_debug_spi:target=EC,serial=C2D2",
+            ),
+            (
+                "servo_v4_with_ccd_cr50",
+                "--programmer=raiden_debug_spi:target=EC,serial=CCD",
+            ),
+            ("servo_micro", "--programmer=raiden_debug_spi:serial=V4"),
+        )
+        for servo_type, programmer in cases:
+            with self.subTest(servo_type=servo_type):
+                servo = MagicMock()
+                servo.get.side_effect = (
+                    lambda ctrl, default="", st=servo_type: (
+                        st
+                        if ctrl == "servo_type"
+                        else serials.get(ctrl, default)
+                    )
+                )
+                args = MagicMock(read="out.bin", dry_run=False, raiden=False)
+                FlashromFlasher(servo, args).execute_flash()
+                mock_run.assert_called_with(
+                    ["sudo", "flashrom", programmer, "-r", "out.bin"],
+                    check=True,
+                )
+
+
 class TestFlashromColdResetHold(unittest.TestCase):
     """Tests for holding cold_reset during debug-header SPI flashing."""
 
