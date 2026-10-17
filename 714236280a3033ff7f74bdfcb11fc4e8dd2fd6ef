@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cad6447c_a0dff787",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T13:51:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n*   **Functionality:** The fix correctly changes the array type to `struct usb_mux_chain` and nests the inner `struct usb_mux` via a compound literal to prevent the `memcpy` overflow.\n*   **Architecture \u0026 Component Fit:** The array declaration aligns with the current board configuration conventions and properly maps the types.\n*   **Code Simplicity:** The use of an anonymous compound literal for `.mux \u003d \u0026(const struct usb_mux) {...}` is clean and avoids polluting the file with single-use named structs.\n*   **Idiomaticity \u0026 Readability:** The struct initialization is idiomatic C99 and clearly maintains the existing layout without unrelated changes.\n*   **Security:** No security issues introduced; fixing a buffer overflow improves memory safety.\n*   **Testing:** This fixes a hardware boot panic. I left a minor suggestion to add a `BUILD_ASSERT(sizeof(usb_muxes) \u003d\u003d sizeof(ampton_usb_muxes));` to enforce this layout constraint at compile time and prevent future regressions.\n*   **CL Size \u0026 Scope:** Size: S (+21, -17). The CL is atomic and follows the Single Logical Change rule.\n*   **Commit Message:** The description accurately captures the issue and the fix, maintaining appropriate altitude and formatting.\n\n[🔗](http://go/tj/26f94729-13a2-49b7-9c9d-95ebaeca28da)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "714236280a3033ff7f74bdfcb11fc4e8dd2fd6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5eff73ce_6dec3881",
+        "filename": "board/ampton/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T13:51:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion:** Since `ampton_usb_muxes` is copied directly into `usb_muxes` later in this file via `memcpy`, consider adding a compile-time size check near the declaration or the `memcpy` call to ensure the arrays remain in sync. This will prevent this memory corruption from regressing if the types ever diverge again:\n\n```c\nBUILD_ASSERT(sizeof(usb_muxes) \u003d\u003d sizeof(ampton_usb_muxes));\n```\n[🔗](http://go/tj/26f94729-13a2-49b7-9c9d-95ebaeca28da)",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "714236280a3033ff7f74bdfcb11fc4e8dd2fd6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
