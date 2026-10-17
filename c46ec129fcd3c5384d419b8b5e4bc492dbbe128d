@@ -50,6 +50,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f21c6327_43545494",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:52:51Z",
+      "side": 1,
+      "message": "Done in PS6: condensed the What paragraph into a concise conceptual summary.",
+      "parentUuid": "b4738abf_13b5c1eb",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 9999
+      },
+      "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bdc9dac_80d37fbd",
@@ -103,6 +127,24 @@
       "parentUuid": "8bdc9dac_80d37fbd",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e591bef_900be67a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:52:51Z",
+      "side": 1,
+      "message": "Done in PS6: split mock definitions into CL 8601877 so both CLs are Size M (\u003c 160 insertions).",
+      "parentUuid": "8bdc9dac_80d37fbd",
       "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
