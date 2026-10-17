@@ -12,6 +12,21 @@
 void init_rdd_state(void);
 
 /**
+ * Handle debug accessory connecting
+ */
+void rdd_connect(void);
+
+/**
+ * Handle debug accessory disconnecting
+ */
+void rdd_disconnect(void);
+
+/**
+ * Update SLEEP_MASK_RDD based on CCD, CCD_MODE_L, and AP UART state
+ */
+void rdd_evaluate_sleep_mask(void);
+
+/**
  * Print debug accessory detect state
  */
 void print_rdd_state(void);
