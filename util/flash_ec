@@ -1678,6 +1678,9 @@ function ite_dfu_mode() {
 		sleep 2
 		dut_control_or_die cr50_i2c_ctrl:ite_debugger_mode
 		sleep 3
+		if dut_has_control gsc_uart_cmd; then
+			dut_control "gsc_uart_cmd:sysrst assert" || true
+		fi
 	elif [[ "${SERVO_TYPE}" == "servo_v2" ]]; then
 		info "Closing servod connection to ftdi_i2c interface"
 		dut_control_or_die ftdii2c_cmd:close
@@ -1822,7 +1825,7 @@ function flash_it83xx() {
 		if [[ -n "${ITE_AP_RST_PIN}" && \
 		      "${ITE_AP_RST_PIN}" != *"Problem with"* ]]; then
 			ITEFLASH_ARGS+=( "--dbgr-preserve-pin=${ITE_AP_RST_PIN}" )
-		elif [[ "${BOARD}" == "corsola" || "${BOARD}" == "veluza" ]]; then
+		elif [[ "${BOARD}" =~ ^(corsola|krabby|tentacruel|magikarp|chinchou|skitty|veluza|staryu|wugtrio|starmie|wyrdeer)$ ]]; then
 			info "Falling back to G1 for ITE AP_RST preservation on ${BOARD}"
 			ITEFLASH_ARGS+=( "--dbgr-preserve-pin=G1" )
 		fi
