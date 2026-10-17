@@ -775,6 +775,9 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params = static_cast<const struct ec_params_fp_frame_v1 *>(
 		args->input_buf);
+	if (args->input_buf_size < sizeof(*params))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
 	void *out = args->output_buf;
 	uint32_t offset = params->offset;
 	uint32_t size = params->size;
@@ -1023,6 +1026,9 @@ fp_command_template_v1(struct ec_host_cmd_handler_args *args)
 		static_cast<const struct ec_params_fp_template_v1 *>(
 			args->input_buf);
 	enum ec_status status;
+
+	if (args->input_buf_size < sizeof(*params))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
 
 	switch (params->cmd) {
 	case FP_TEMPLATE_LOAD: {
