@@ -218,18 +218,15 @@ hang_detect_host_command(struct ec_host_cmd_handler_args *args)
 		args->output_buf_size = sizeof(*r);
 		/**
 		 * chipset_get_shutdown_reason() provides the last reason the EC
-		 * has rebooted AP. It is not aware of any AP-initiated reboot
-		 * or shutdown. For example, if EC-watchdog triggered the AP
-		 * reboot and later the AP was powered off or rebooted (e.g.
-		 * with reboot command or powered-off in UI) the
-		 * chipset_get_shutdown_reason() will still return the
+		 * has rebooted the AP. It is not aware of any AP-initiated
+		 * reboot or shutdown. For example, if the EC watchdog triggered
+		 * an AP reboot and later the AP was powered off or rebooted
+		 * normally, chipset_get_shutdown_reason() will still return
 		 * CHIPSET_RESET_HANG_REBOOT as the last reset reason. To
-		 * address this issue, the watchdog kernel module has a shutdown
-		 * callback that sends EC_CMD_HANG_DETECT with
-		 * EC_HANG_DETECT_CMD_CLEAR_STATUS set every time the AP is
-		 * shutting down or rebooting gracefully (gracefully here means
-		 * "not triggered by watchdog") to inform that AP is closing
-		 * normally.
+		 * prevent reporting a stale watchdog reset on subsequent boots,
+		 * the kernel watchdog driver (cros_ec_wdt_probe) sends
+		 * EC_HANG_DETECT_CMD_CLEAR_STATUS during probe immediately
+		 * after reading EC_HANG_DETECT_CMD_GET_STATUS.
 		 */
 		if (ec_reason == CHIPSET_RESET_HANG_REBOOT &&
 		    bootstatus == EC_HANG_DETECT_AP_BOOT_EC_WDT)
