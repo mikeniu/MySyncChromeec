@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e17ebf_8c93332f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T17:03:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/addb5bc3-1573-45e2-a280-733581575d74)]\n\n### Review Summary\n\n**Functionality:** The sleep mask logic correctly inhibits deep sleep when RDD, CCD, or AP UART are active.\n**Architecture \u0026 Component Fit:** The sleep mask invariant is cleanly enforced by the centralized `rdd_evaluate_sleep_mask` helper, preserving a single source of truth.\n**Code Simplicity:** Minimal and straightforward. No duplicated boilerplate or unnecessary control flow.\n**Idiomaticity \u0026 Readability:** Clean and idiomatic C usage. Magic numbers have been extracted into named constants with explicit units.\n**Security:** No security vulnerabilities identified.\n**Testing:** Comprehensive test coverage. The `host-ccd_sleep_inhibit` test isolates and verifies the boolean boundary conditions for sleep mask inhibition.\n**CL Size \u0026 Scope:** Size: M (+189, -4). The CL adheres to the Single Logical Change rule, containing only the sleep mask logic update and its associated test files.\n**Commit Message:** Excellent. Clearly states the \"Why\" and provides a succinct \"What\" conceptually without narrating the diff.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2c9764158ea18a51065841bc5eee492c8677105e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
