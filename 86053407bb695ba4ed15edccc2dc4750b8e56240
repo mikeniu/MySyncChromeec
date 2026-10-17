@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "973db0ad_3217fb7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T17:11:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n**Functionality:** N/A (Test scaffolding)\n**Architecture \u0026 Component Fit:** Good. The extraction of test declarations into `test/ccd_sleep_inhibit.h` keeps the global configuration space clean and well-encapsulated.\n**Code Simplicity:** Good, minimal test mock declarations.\n**Idiomaticity \u0026 Readability:** Good.\n**Security:** N/A\n**Testing:** N/A (Test scaffolding).\n**CL Size \u0026 Scope:** Size: M (+63, -0) — Single logical change providing test mocks and declarations for CCD. ✅\n**Commit Message:** Clear, concise, and accurately reflects the scope of the change. ✅\n\n[🔗](http://go/tj/fee997fb-36bc-4c05-a8bc-7be8e684cbbe)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "86053407bb695ba4ed15edccc2dc4750b8e56240",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
