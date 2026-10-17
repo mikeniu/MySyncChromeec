@@ -22,8 +22,12 @@
 #include "usb_i2c.h"
 #include "usb_spi.h"
 
+#ifndef TEST_BUILD
 /* Include the dazzlingly complex macro to instantiate the USB SPI config */
 USB_SPI_CONFIG(ccd_usb_spi, USB_IFACE_SPI, USB_EP_SPI);
+#else
+extern struct usb_spi_config const ccd_usb_spi;
+#endif
 
 #define CPRINTS(format, args...) cprints(CC_USB, format, ## args)
 #define CPRINTF(format, args...) cprintf(CC_USB, format, ## args)
@@ -350,8 +354,10 @@ static void ccd_state_change_hook(void)
 
 	/* Handle turning things off */
 	delta = flags_now & ~flags_want;
-	if (delta & CCD_ENABLE_UART_AP)
+	if (delta & CCD_ENABLE_UART_AP) {
 		uartn_disable(UART_AP);
+		rdd_evaluate_sleep_mask();
+	}
 	if (delta & CCD_ENABLE_UART_AP_TX)
 		uartn_tx_disconnect(UART_AP);
 	if (delta & CCD_ENABLE_UART_EC)
@@ -369,8 +375,10 @@ static void ccd_state_change_hook(void)
 
 	/* Handle turning things on */
 	delta = flags_want & ~flags_now;
-	if (delta & CCD_ENABLE_UART_AP)
+	if (delta & CCD_ENABLE_UART_AP) {
 		uartn_enable(UART_AP);
+		rdd_evaluate_sleep_mask();
+	}
 	if (delta & CCD_ENABLE_UART_AP_TX)
 		uartn_tx_connect(UART_AP);
 	if (delta & CCD_ENABLE_UART_EC)
@@ -442,6 +450,7 @@ static void ccd_ext_detect(void)
 		usb_console_enable(0, 0);
 	}
 
+	rdd_evaluate_sleep_mask();
 	ccd_update_state();
 }
 DECLARE_HOOK(HOOK_SECOND, ccd_ext_detect, HOOK_PRIO_DEFAULT);
