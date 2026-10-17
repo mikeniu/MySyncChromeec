@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4738abf_13b5c1eb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T14:59:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Suggestion — Non-Blocking]** The high-level summary clearly explains the motivation, but this paragraph repeats symbol-by-symbol implementation minutiae (like `rdd_connect()`, `ccd_ext_detect()`, and boolean expressions like `!ccd_ext_is_enabled() \u0026\u0026 gpio_get_level(...)`) evident from the diff. Per go/cl-descriptions#minutiae, consider condensing this into a concise conceptual summary of what changed (e.g., \"Assert `SLEEP_MASK_RDD` while CCD or AP UART are active and the debug cable is attached.\"). [🔗](http://go/tj/cdbb86e7-1b67-414d-8f05-7c6cb9bd3027)",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bdc9dac_80d37fbd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T14:59:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** Looks good. The sleep mask assertions align with the stated intent to prevent deep sleep in G3 while the debug cable is attached.\n**Architecture \u0026 Component Fit:** The logic fits within the existing RDD state machine boundaries.\n**Code Simplicity:** The changes are minimalistic and directly address the boolean state conditions required.\n**Idiomaticity \u0026 Readability:** The C macros and test scaffolding additions match standard repository patterns.\n**Security:** No security issues identified.\n**Testing:** The `host-ccd_sleep_inhibit` unit test comprehensively exercises the state transitions and mock USB suspend conditions.\n**Commit Message:** The commit message clearly explains the \"Why\" and the context. (See inline comment for a minor suggestion on the \"What\" paragraph altitude).\n**CL Size \u0026 Scope:** Size: L (+520, -5). This CL is categorized as Large (L) and must be split to adhere to the Small CLs guidelines (go/small-cls) and the Single Logical Change rule. \n\n**Proposed Split Plan:**\n*   **CL 1:** Test infrastructure additions (the mock macros and register additions in `chip/host/registers.c`, `chip/host/registers.h`, `test/test_config.h`, and `board/host/gpio.inc`).\n*   **CL 2:** The core behavioral fix (`board/cr50/rdd.c`, `chip/g/rdd.c`, `chip/g/rdd.h`, `include/system.h`) and its associated unit test suite (`test/ccd_sleep_inhibit.c`, `test/ccd_sleep_inhibit.tasklist`, `test/build.mk`). [🔗](http://go/tj/cdbb86e7-1b67-414d-8f05-7c6cb9bd3027)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c46ec129fcd3c5384d419b8b5e4bc492dbbe128d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
