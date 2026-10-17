@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67b95511_ee28c7a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:44:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** Looks good. The sleep mask assertions align with the stated intent to prevent deep sleep in G3 while the debug cable is attached.\n**Architecture \u0026 Component Fit:** The logic fits within the existing RDD state machine boundaries.\n**Code Simplicity:** The changes are minimalistic and directly address the boolean state conditions required.\n**Idiomaticity \u0026 Readability:** Flagged a magic number (`10`) used repeatedly in the test code for sleep duration.\n**Security:** No security issues identified.\n**Testing:** The `host-ccd_sleep_inhibit` unit test comprehensively exercises the state transitions and mock USB suspend conditions. (See inline comment for magic number extraction).\n**CL Size \u0026 Scope:** Size: L (+247, -4). This CL is categorized as Large (L) and must be split to adhere to the Small CLs guidelines (go/small-cls) and the Single Logical Change rule. \n\n**Proposed Split Plan:**\n*   **CL 1:** Test infrastructure additions and mock functions (e.g., the mock implementations and definitions in `test/ccd_sleep_inhibit.h` and the first half of `test/ccd_sleep_inhibit.c`).\n*   **CL 2:** The core behavioral fix (`board/cr50/rdd.c`, `chip/g/rdd.c`, `chip/g/rdd.h`, `include/system.h`) and its associated test cases leveraging the mocks.\n\n**Commit Message:** The commit message clearly explains the \"Why\" and the context. [🔗](http://go/tj/534b4d9c-ac47-4d86-8cc6-b12a5c8c2e64)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "747b2cd582bd30f2917f6118c7953d961e20d212",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51255ca5_2e1030f3",
+        "filename": "test/ccd_sleep_inhibit.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:44:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **[Magic Values / Test Readability]** The magic number `10` is used repeatedly as a sleep duration. Please extract this into a named constant with explicit units (e.g., `const int STATE_UPDATE_DELAY_MS \u003d 10;`) to clarify why this specific delay is needed.\n\nOther locations:\n* **Line 332**\n* **Line 347**\n* **Line 352**\n* **Line 358**\n* **Line 365**\n* **Line 371**\n\n[🔗](http://go/tj/534b4d9c-ac47-4d86-8cc6-b12a5c8c2e64)",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "747b2cd582bd30f2917f6118c7953d961e20d212",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
