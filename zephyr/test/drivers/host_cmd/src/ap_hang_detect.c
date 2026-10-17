@@ -19,6 +19,8 @@
  * inactivity timeout into POWER_G3 and transition back to POWER_S0.
  */
 #define TEST_COLD_REBOOT_G3_TRANSITION_SEC 14
+/* Mirrors HANG_DETECT_COLD_REBOOT_MAX_RETRIES in common/ap_hang_detect.c */
+#define TEST_COLD_REBOOT_MAX_RETRIES 20
 
 static void set_timeout(uint16_t timeout)
 {
@@ -196,6 +198,43 @@ ZTEST_USER(ap_hang_detect, test_stage1_recovery_cancels_cold_reboot)
 	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
 	k_sleep(K_SECONDS(EC_HANG_DETECT_MIN_TIMEOUT + 2));
 	zassert_equal(POWER_S0, power_get_state());
+	req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+}
+
+ZTEST_USER(ap_hang_detect, test_cold_reboot_g3_timeout)
+{
+	struct ec_params_hang_detect req = { 0 };
+	struct ec_response_hang_detect resp;
+	struct host_cmd_handler_args args;
+
+	/*
+	 * If chipset_force_shutdown fails to reach POWER_G3 within
+	 * TEST_COLD_REBOOT_MAX_RETRIES (20s), hang_detect_power_on
+	 * logs an error and gives up: entering POWER_G3 after the 20s retry
+	 * window must not power the AP back on.
+	 */
+	test_set_chipset_to_s0();
+	req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+
+	set_timeout(EC_HANG_DETECT_MIN_TIMEOUT);
+	req.command = EC_HANG_DETECT_CMD_RELOAD;
+	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
+	/* Wait for Stage 1 (5s) + Stage 2 (5s) + 1s into POWER_S5 */
+	k_sleep(K_SECONDS(2 * EC_HANG_DETECT_MIN_TIMEOUT + 1));
+	zassert_equal(POWER_S5, power_get_state());
+	/*
+	 * Prevent S5 -> G3 transition so hang_detect_power_on exhausts retries.
+	 */
+	power_set_state(POWER_S0);
+	k_sleep(K_SECONDS(TEST_COLD_REBOOT_MAX_RETRIES + 2));
+	/* Entering G3 after retries are exhausted must not trigger power-on */
+	test_set_chipset_to_g3();
+	k_sleep(K_SECONDS(2));
+	zassert_equal(POWER_G3, power_get_state());
+	test_set_chipset_to_s0();
+
 	req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
 	zassert_ok(ec_cmd_hang_detect(&args, &req, &resp));
 }
