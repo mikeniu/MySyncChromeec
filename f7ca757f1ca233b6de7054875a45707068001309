@@ -26,6 +26,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87eac5a6_a9a61e28",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:26:57Z",
+      "side": 1,
+      "message": "Done: split into CL 8604055 (\u0027common/ap_hang_detect: Bound cold reboot G3 polling retries\u0027) and child CL 8606886 (\u0027common/ap_hang_detect: Add follow-up power-on pulses for slow S5 ramps\u0027).",
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cf32af1_d9b856af",
@@ -41,6 +58,23 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n*   **Functionality:** ✅ The bounded polling behavior and follow-up pulses correctly address the problem.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly placed within the `hang_detect` module and respects existing state checks.\n*   **Code Simplicity:** ❌ The control flow in `hang_detect_power_on` is unnecessarily complex, relying on a `goto` and shared `power_on_retries` counter logic. I\u0027ve left an inline snippet to simplify this using straightforward `if/else` logic.\n*   **Idiomaticity \u0026 Readability:** ✅ Variable names and comments are clear.\n*   **Security:** ✅ No obvious security concerns.\n*   **Testing:** ✅ The test cases cover both phase timeouts appropriately, and mock hardware states correctly.\n*   **CL Size \u0026 Scope:** ❌ Size: M (+118, -16). The CL violates the Single Logical Change rule by bundling two distinct behavioral modifications:\n    1. Delaying the initial power-on pulse until the AP reaches G3.\n    2. Adding follow-up power-on pulses if the AP remains in S5/G3.\n    Please split this into two separate CLs.\n*   **Commit Message:** ❌ The commit message accurately describes the changes but confirms the bundling of multiple logical changes. I have left a comment on `/COMMIT_MSG` with suggested subject lines and bodies for the split CLs.\n[🔗](http://go/tj/4d411a4b-14b6-45dc-97b1-af8e808433d8)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55189e1e_f24049c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:26:57Z",
+      "side": 1,
+      "message": "Done: split into CL 8604055 and CL 8606886, and replaced goto defer with structured if/else guards in hang_detect_power_on().",
       "revId": "f7ca757f1ca233b6de7054875a45707068001309",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +100,23 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07472b28_81584824",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:26:57Z",
+      "side": 1,
+      "message": "Done: replaced goto defer and + 1 offset with structured if/else guards in hang_detect_power_on() in child CL 8606886.",
       "revId": "f7ca757f1ca233b6de7054875a45707068001309",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
