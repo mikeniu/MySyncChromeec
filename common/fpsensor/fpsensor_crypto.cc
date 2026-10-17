@@ -6,6 +6,7 @@
 #include "crypto/cleanse_wrapper.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
+#include "fpsensor/fpsensor_utils.h"
 #include "openssl/aead.h"
 #include "openssl/evp.h"
 #include "openssl/hkdf.h"
@@ -16,42 +17,47 @@
 #include "rollback.h"
 #include "util.h"
 
-#include <stdbool.h>
-
+#include <algorithm>
+#include <array>
+#include <bit>
 #include <span>
+#include <string_view>
 
 #if !defined(CONFIG_BORINGSSL_CRYPTO) || !defined(CONFIG_ROLLBACK_SECRET_SIZE)
 #error "fpsensor requires CONFIG_BORINGSSL_CRYPTO and ROLLBACK_SECRET_SIZE"
 #endif
 
-enum ec_error_list
+std::expected<std::array<uint8_t, SHA256_DIGEST_LENGTH>, ec_error_list>
 hmac_sha256(std::span<const uint8_t> key,
-	    std::span<const std::span<const uint8_t> > inputs,
-	    std::span<uint8_t, SHA256_DIGEST_LENGTH> output)
+	    std::span<const std::span<const uint8_t> > inputs)
 {
 	bssl::ScopedHMAC_CTX ctx;
+	std::array<uint8_t, SHA256_DIGEST_LENGTH> output{};
 
 	if (!HMAC_Init_ex(ctx.get(), key.data(), key.size(), EVP_sha256(),
 			  nullptr)) {
-		return EC_ERROR_INVAL;
+		return std::unexpected(EC_ERROR_INVAL);
 	}
 
 	for (const auto &input : inputs) {
 		if (!HMAC_Update(ctx.get(), input.data(), input.size())) {
-			return EC_ERROR_INVAL;
+			return std::unexpected(EC_ERROR_INVAL);
 		}
 	}
 
 	if (!HMAC_Final(ctx.get(), output.data(), nullptr)) {
-		return EC_ERROR_INVAL;
+		return std::unexpected(EC_ERROR_INVAL);
 	}
 
-	return EC_SUCCESS;
+	return output;
 }
 
-static enum ec_error_list
-hkdf_sha256_extract(std::span<uint8_t, SHA256_DIGEST_LENGTH> prk,
-		    std::span<const std::span<const uint8_t> > ikms,
+namespace
+{
+
+std::expected<CleanseWrapper<std::array<uint8_t, SHA256_DIGEST_LENGTH> >,
+	      ec_error_list>
+hkdf_sha256_extract(std::span<const std::span<const uint8_t> > ikms,
 		    std::span<const uint8_t> salt)
 {
 	/*
@@ -59,101 +65,105 @@ hkdf_sha256_extract(std::span<uint8_t, SHA256_DIGEST_LENGTH> prk,
 	 * (Input Key Material) with salt used as the key. The output of HMAC
 	 * is PRK (Pseudo Random Key).
 	 */
-	return hmac_sha256(salt, ikms, prk);
+	return hmac_sha256(salt, ikms).transform([](const auto &prk) {
+		return CleanseWrapper(prk);
+	});
 }
 
-bool hkdf_sha256_impl(std::span<uint8_t> out_key,
-		      std::span<const std::span<const uint8_t> > ikms,
-		      std::span<const uint8_t> salt,
-		      std::span<const uint8_t> info)
-{
-	CleanseWrapper<std::array<uint8_t, SHA256_DIGEST_LENGTH> > prk;
+} /* namespace */
 
-	if (hkdf_sha256_extract(prk, ikms, salt) != EC_SUCCESS) {
-		return false;
+std::expected<void, ec_error_list>
+hkdf_sha256_impl(std::span<uint8_t> out_key,
+		 std::span<const std::span<const uint8_t> > ikms,
+		 std::span<const uint8_t> salt, std::span<const uint8_t> info)
+{
+	const auto prk = hkdf_sha256_extract(ikms, salt);
+	if (!prk.has_value()) {
+		return std::unexpected(prk.error());
 	}
 
-	return HKDF_expand(out_key.data(), out_key.size(), EVP_sha256(),
-			   prk.data(), prk.size(), info.data(), info.size());
+	if (!HKDF_expand(out_key.data(), out_key.size(), EVP_sha256(),
+			 prk->data(), prk->size(), info.data(), info.size())) {
+		return std::unexpected(EC_ERROR_UNKNOWN);
+	}
+	return {};
 }
 
-test_mockable bool hkdf_sha256(std::span<uint8_t> out_key,
-			       std::span<const std::span<const uint8_t> > ikms,
-			       std::span<const uint8_t> salt,
-			       std::span<const uint8_t> info)
+test_mockable std::expected<void, ec_error_list>
+hkdf_sha256(std::span<uint8_t> out_key,
+	    std::span<const std::span<const uint8_t> > ikms,
+	    std::span<const uint8_t> salt, std::span<const uint8_t> info)
 {
 	return hkdf_sha256_impl(out_key, ikms, salt, info);
 }
 
-test_export_static enum ec_error_list
-get_rollback_entropy(std::span<uint8_t, CONFIG_ROLLBACK_SECRET_SIZE> output)
+namespace
 {
-	enum ec_error_list ret = rollback_get_secret(output.data());
+
+std::expected<CleanseWrapper<std::array<uint8_t, CONFIG_ROLLBACK_SECRET_SIZE> >,
+	      ec_error_list>
+get_rollback_entropy()
+{
+	CleanseWrapper<std::array<uint8_t, CONFIG_ROLLBACK_SECRET_SIZE> > output;
+	ec_error_list ret = rollback_get_secret(output.data());
 
 	if (ret != EC_SUCCESS) {
 		CPRINTS("Failed to read rollback secret: %d", ret);
-		return EC_ERROR_HW_INTERNAL;
+		return std::unexpected(EC_ERROR_HW_INTERNAL);
 	}
 
-	return EC_SUCCESS;
+	return output;
 }
 
 #ifdef CONFIG_OTP_KEY
-test_export_static enum ec_error_list
-get_otp_key(std::span<uint8_t, OTP_KEY_SIZE_BYTES> output)
+std::expected<CleanseWrapper<std::array<uint8_t, OTP_KEY_SIZE_BYTES> >,
+	      ec_error_list> get_otp_key()
 {
-	enum ec_error_list ret;
+	CleanseWrapper<std::array<uint8_t, OTP_KEY_SIZE_BYTES> > output;
 
 	otp_key_init();
-	ret = (enum ec_error_list)otp_key_read(output.data());
+	ec_error_list ret =
+		static_cast<ec_error_list>(otp_key_read(output.data()));
 	otp_key_exit();
 
 	if (ret != EC_SUCCESS) {
 		CPRINTS("Failed to read OTP key with ret=%d", ret);
-		return EC_ERROR_HW_INTERNAL;
+		return std::unexpected(EC_ERROR_HW_INTERNAL);
 	}
 
-	if (bytes_are_trivial(output.data(), output.size())) {
+	if (bytes_are_trivial(output)) {
 		CPRINTS("ERROR: bytes read from OTP are trivial!");
-		return EC_ERROR_HW_INTERNAL;
+		return std::unexpected(EC_ERROR_HW_INTERNAL);
 	}
 
-	return EC_SUCCESS;
+	return output;
 }
 #endif
 
-static enum ec_error_list derive_key(std::span<uint8_t> output,
-				     std::span<const uint8_t> salt,
-				     std::span<const uint8_t> tpm_seed,
-				     std::span<const uint8_t> info)
+template <size_t N>
+std::expected<CleanseWrapper<std::array<uint8_t, N> >, ec_error_list>
+derive_key(std::span<const uint8_t> salt, std::span<const uint8_t> tpm_seed,
+	   std::span<const uint8_t> info)
 {
-	CleanseWrapper<std::array<uint8_t, CONFIG_ROLLBACK_SECRET_SIZE> >
-		rollback_entropy;
-#ifdef CONFIG_OTP_KEY
-	CleanseWrapper<std::array<uint8_t, OTP_KEY_SIZE_BYTES> > otp_key;
-#endif
-	enum ec_error_list ret;
-
 	if (!tpm_seed.empty() && tpm_seed.size() != FP_CONTEXT_TPM_BYTES) {
-		return EC_ERROR_INVAL;
+		return std::unexpected(EC_ERROR_INVAL);
 	}
 
 	/* Make sure TPM Seed is set */
-	if (!tpm_seed.empty() &&
-	    bytes_are_trivial(tpm_seed.data(), tpm_seed.size_bytes())) {
+	if (!tpm_seed.empty() && bytes_are_trivial(tpm_seed)) {
 		CPRINTS("Seed hasn't been set.");
-		return EC_ERROR_ACCESS_DENIED;
+		return std::unexpected(EC_ERROR_ACCESS_DENIED);
 	}
 
-	ret = get_rollback_entropy(rollback_entropy);
-	if (ret != EC_SUCCESS) {
-		return ret;
+	const auto rollback_entropy = get_rollback_entropy();
+	if (!rollback_entropy.has_value()) {
+		return std::unexpected(rollback_entropy.error());
 	}
 
 #ifdef CONFIG_OTP_KEY
-	ret = get_otp_key(otp_key);
-	if (ret != EC_SUCCESS) {
-		return ret;
+	const auto otp_key = get_otp_key();
+	if (!otp_key.has_value()) {
+		return std::unexpected(otp_key.error());
 	}
 #endif
 
@@ -169,147 +179,156 @@ static enum ec_error_list derive_key(std::span<uint8_t> output,
 	 * explicitly). See C++ std::span deduction guide for more details.
 	 */
 	std::array ikms{
-		std::span<const uint8_t>{ rollback_entropy },
+		std::span<const uint8_t>{ *rollback_entropy },
 		tpm_seed,
 #ifdef CONFIG_OTP_KEY
-		std::span<const uint8_t>{ otp_key },
+		std::span<const uint8_t>{ *otp_key },
 #endif
 	};
 
-	if (!hkdf_sha256(output, ikms, salt, info)) {
+	CleanseWrapper<std::array<uint8_t, N> > output;
+	if (!hkdf_sha256(output, ikms, salt, info).has_value()) {
 		CPRINTS("Failed to perform HKDF");
-		return EC_ERROR_UNKNOWN;
+		return std::unexpected(EC_ERROR_UNKNOWN);
 	}
 
-	return EC_SUCCESS;
+	return output;
 }
 
-enum ec_error_list derive_positive_match_secret(
-	std::span<uint8_t> output,
-	std::span<const uint8_t> input_positive_match_salt,
+} /* namespace */
+
+std::expected<
+	CleanseWrapper<std::array<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES> >,
+	ec_error_list>
+derive_positive_match_secret(
+	std::span<const uint8_t, FP_POSITIVE_MATCH_SALT_BYTES>
+		input_positive_match_salt,
 	std::span<const uint8_t, FP_CONTEXT_USERID_BYTES> user_id,
 	std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed)
 {
-	static constexpr char info_prefix[] = "positive_match_secret for user ";
-	uint8_t info[sizeof(info_prefix) - 1 + user_id.size_bytes()];
+	static constexpr std::string_view info_prefix =
+		"positive_match_secret for user ";
+	std::array<uint8_t, info_prefix.size() + user_id.size_bytes()> info{};
 
-	if (bytes_are_trivial(input_positive_match_salt.data(),
-			      input_positive_match_salt.size())) {
+	if (bytes_are_trivial(input_positive_match_salt)) {
 		CPRINTS("Failed to derive positive match secret: "
 			"salt bytes are trivial.");
-		return EC_ERROR_INVAL;
+		return std::unexpected(EC_ERROR_INVAL);
 	}
 
-	memcpy(info, info_prefix, strlen(info_prefix));
-	memcpy(info + strlen(info_prefix), user_id.data(),
-	       user_id.size_bytes());
+	auto out = std::ranges::copy(info_prefix, info.begin()).out;
+	std::ranges::copy(user_id, out);
 
-	enum ec_error_list ret =
-		derive_key(output, input_positive_match_salt, tpm_seed, info);
-	if (ret != EC_SUCCESS) {
-		return ret;
+	const auto output = derive_key<FP_POSITIVE_MATCH_SECRET_BYTES>(
+		input_positive_match_salt, tpm_seed, info);
+	if (!output.has_value()) {
+		return std::unexpected(output.error());
 	}
 
 	/* Check that secret is not full of 0x00 or 0xff. */
-	if (bytes_are_trivial(output.data(), output.size())) {
+	if (bytes_are_trivial(*output)) {
 		CPRINTS("Failed to derive positive match secret: "
 			"derived secret bytes are trivial.");
-		ret = EC_ERROR_HW_INTERNAL;
+		return std::unexpected(EC_ERROR_HW_INTERNAL);
 	}
-	return ret;
+	return *output;
 }
 
-enum ec_error_list
-derive_encryption_key(std::span<uint8_t> out_key, std::span<const uint8_t> salt,
-		      std::span<const uint8_t> info,
-		      std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed)
+std::expected<FpEncryptionKey, ec_error_list> derive_encryption_key(
+	std::span<const uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> salt,
+	std::span<const uint8_t> info,
+	std::span<const uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed)
 {
 	if (info.size() != SHA256_DIGEST_LENGTH) {
 		CPRINTS("Invalid info size: %zu", info.size());
-		return EC_ERROR_INVAL;
+		return std::unexpected(EC_ERROR_INVAL);
 	}
 
-	return derive_key(out_key, salt, tpm_seed, info);
+	return derive_key<sizeof(FpEncryptionKey)>(salt, tpm_seed, info);
 }
 
-enum ec_error_list
-derive_pairing_key_encryption_key(std::span<uint8_t> output,
-				  std::span<const uint8_t> salt)
+std::expected<FpEncryptionKey, ec_error_list> derive_pairing_key_encryption_key(
+	std::span<const uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> salt)
 {
-	static constexpr uint8_t info[] = "FPMCU & FingerGuard pairing key";
+	static constexpr auto info = std::bit_cast<std::array<uint8_t, 32> >(
+		std::to_array("FPMCU & FingerGuard pairing key"));
 
-	return derive_key(output, salt, std::span<const uint8_t>{}, info);
+	return derive_key<sizeof(FpEncryptionKey)>(
+		salt, std::span<const uint8_t>{}, info);
 }
 
-enum ec_error_list aes_128_gcm_encrypt(std::span<const uint8_t> key,
-				       std::span<const uint8_t> plaintext,
-				       std::span<uint8_t> ciphertext,
-				       std::span<const uint8_t> nonce,
-				       std::span<uint8_t> tag)
+namespace
+{
+
+std::expected<void, ec_error_list>
+init_aes_128_gcm_context(bssl::ScopedEVP_AEAD_CTX &ctx,
+			 std::span<const uint8_t> key,
+			 std::span<const uint8_t> nonce, size_t tag_size)
 {
 	if (nonce.size() != FP_CONTEXT_NONCE_BYTES) {
 		CPRINTS("Invalid nonce size %zu bytes", nonce.size());
-		return EC_ERROR_INVAL;
+		return std::unexpected(EC_ERROR_INVAL);
 	}
 
-	bssl::ScopedEVP_AEAD_CTX ctx;
-	int ret = EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_128_gcm(),
-				    key.data(), key.size(), tag.size(),
-				    nullptr);
-	if (!ret) {
+	if (!EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_128_gcm(), key.data(),
+			       key.size(), tag_size, nullptr)) {
 		CPRINTS("Failed to initialize encryption context");
-		return EC_ERROR_UNKNOWN;
+		return std::unexpected(EC_ERROR_UNKNOWN);
+	}
+
+	return {};
+}
+
+} /* namespace */
+
+std::expected<void, ec_error_list>
+aes_128_gcm_encrypt(std::span<const uint8_t> key,
+		    std::span<const uint8_t> plaintext,
+		    std::span<uint8_t> ciphertext,
+		    std::span<const uint8_t> nonce, std::span<uint8_t> tag)
+{
+	bssl::ScopedEVP_AEAD_CTX ctx;
+	if (const auto init =
+		    init_aes_128_gcm_context(ctx, key, nonce, tag.size());
+	    !init.has_value()) {
+		return std::unexpected(init.error());
 	}
 
 	size_t out_tag_size = 0;
-	std::span<uint8_t> extra_input; /* no extra input */
-	std::span<uint8_t> additional_data; /* no additional data */
-	ret = EVP_AEAD_CTX_seal_scatter(
-		ctx.get(), ciphertext.data(), tag.data(), &out_tag_size,
-		tag.size(), nonce.data(), nonce.size(), plaintext.data(),
-		plaintext.size(), extra_input.data(), extra_input.size(),
-		additional_data.data(), additional_data.size());
-	if (!ret) {
+	if (!EVP_AEAD_CTX_seal_scatter(
+		    ctx.get(), ciphertext.data(), tag.data(), &out_tag_size,
+		    tag.size(), nonce.data(), nonce.size(), plaintext.data(),
+		    plaintext.size(), nullptr, 0, nullptr, 0)) {
 		CPRINTS("Failed to encrypt");
-		return EC_ERROR_UNKNOWN;
+		return std::unexpected(EC_ERROR_UNKNOWN);
 	}
 	if (out_tag_size != tag.size()) {
 		CPRINTS("Resulting tag size %zu does not match expected size: %zu",
 			out_tag_size, tag.size());
-		return EC_ERROR_UNKNOWN;
+		return std::unexpected(EC_ERROR_UNKNOWN);
 	}
-	return EC_SUCCESS;
+	return {};
 }
 
-enum ec_error_list aes_128_gcm_decrypt(std::span<const uint8_t> key,
-				       std::span<uint8_t> plaintext,
-				       std::span<const uint8_t> ciphertext,
-				       std::span<const uint8_t> nonce,
-				       std::span<const uint8_t> tag)
+std::expected<void, ec_error_list>
+aes_128_gcm_decrypt(std::span<const uint8_t> key, std::span<uint8_t> plaintext,
+		    std::span<const uint8_t> ciphertext,
+		    std::span<const uint8_t> nonce,
+		    std::span<const uint8_t> tag)
 {
-	if (nonce.size() != FP_CONTEXT_NONCE_BYTES) {
-		CPRINTS("Invalid nonce size %zu bytes", nonce.size());
-		return EC_ERROR_INVAL;
-	}
-
 	bssl::ScopedEVP_AEAD_CTX ctx;
-	int ret = EVP_AEAD_CTX_init(ctx.get(), EVP_aead_aes_128_gcm(),
-				    key.data(), key.size(), tag.size(),
-				    nullptr);
-	if (!ret) {
-		CPRINTS("Failed to initialize encryption context");
-		return EC_ERROR_UNKNOWN;
+	if (const auto init =
+		    init_aes_128_gcm_context(ctx, key, nonce, tag.size());
+	    !init.has_value()) {
+		return std::unexpected(init.error());
 	}
 
-	std::span<uint8_t> additional_data; /* no additional data */
-	ret = EVP_AEAD_CTX_open_gather(
-		ctx.get(), plaintext.data(), nonce.data(), nonce.size(),
-		ciphertext.data(), ciphertext.size(), tag.data(), tag.size(),
-		additional_data.data(), additional_data.size());
-	if (!ret) {
+	if (!EVP_AEAD_CTX_open_gather(ctx.get(), plaintext.data(), nonce.data(),
+				      nonce.size(), ciphertext.data(),
+				      ciphertext.size(), tag.data(), tag.size(),
+				      nullptr, 0)) {
 		CPRINTS("Failed to decrypt");
-		return EC_ERROR_UNKNOWN;
+		return std::unexpected(EC_ERROR_UNKNOWN);
 	}
-
-	return EC_SUCCESS;
+	return {};
 }

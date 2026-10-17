@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
 #include "mock_fingerprint_algorithm.h"
 
 #include <zephyr/device.h>
@@ -25,62 +26,59 @@
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
-#define fp_sim DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
-#define IMAGE_SIZE                                                 \
-	MAX_FROM_LIST(LISTIFY(NUM_IMAGE_CAPTURE_TYPES,             \
-			      FINGERPRINT_SENSOR_FRAME_SIZE, (, ), \
-			      DT_CHOSEN(cros_fp_fingerprint_sensor)))
-static uint8_t image_buffer[IMAGE_SIZE];
+static std::array<uint8_t, IMAGE_SIZE> image_buffer;
 
-static const size_t test_info_buffer_size =
-	sizeof(struct ec_response_fp_info_v3) +
-	sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
-static uint8_t buffer[test_info_buffer_size];
-static struct ec_response_fp_info_v3 *test_info_buffer =
-	(struct ec_response_fp_info_v3 *)buffer;
+static FpSensorInfoBuffer test_info_buffer;
 
 static int enroll_percent;
 static int enroll_step_return_val;
 static int custom_enroll_step(const struct fingerprint_algorithm *const alg,
 			      const uint8_t *const image, int *percent)
 {
-	zassert_mem_equal(image, image_buffer, IMAGE_SIZE);
+	zassert_true(std::ranges::equal(std::span(image, image_buffer.size()),
+					image_buffer));
 	*percent = enroll_percent;
 
 	return enroll_step_return_val;
 }
 
+static void start_enroll_session()
+{
+	zassert_true(
+		set_fp_mode(FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE) &
+		(FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
+}
+
+static void simulate_finger_touch(bool load_test_image = true)
+{
+	update_sim_state([](auto &s) {
+		s.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	});
+
+	if (load_test_image) {
+		image_buffer.fill(1);
+		fingerprint_load_image(fp_sim, image_buffer.data(),
+				       image_buffer.size());
+	}
+
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+}
+
 ZTEST_USER(fpsensor_enroll, test_enroll_start_stop)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-
 	/* Start enroll session. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
+	start_enroll_session();
 
 	/* Make sure the 'enroll_start' callback was called. */
 	zassert_equal(mock_alg_enroll_start_fake.call_count, 1);
 
 	/* Stop enroll session. */
-	params.mode = 0;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode &
+	zassert_false(set_fp_mode(0) &
 		      (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
 
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
 	/* Confirm that enroll session is not running. */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_ENROLL_SESSION);
+	zassert_false(get_fp_mode() & FP_MODE_ENROLL_SESSION);
 
 	/* Make sure the 'enroll_finish' callback was called. */
 	zassert_equal(mock_alg_enroll_finish_fake.call_count, 1);
@@ -88,26 +86,14 @@ ZTEST_USER(fpsensor_enroll, test_enroll_start_stop)
 
 ZTEST_USER(fpsensor_enroll, test_enroll_start_failure)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-
 	/* Return failure on attempt to start enroll session. */
 	mock_alg_enroll_start_fake.return_val = -EINVAL;
 
 	/* Try to start enroll session. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
+	start_enroll_session();
 
 	/* Confirm that enroll session is not running. */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_ENROLL_SESSION);
+	zassert_false(get_fp_mode() & FP_MODE_ENROLL_SESSION);
 
 	/* Make sure that 'enroll_finish' callback was NOT called. */
 	zassert_equal(mock_alg_enroll_finish_fake.call_count, 0);
@@ -115,32 +101,18 @@ ZTEST_USER(fpsensor_enroll, test_enroll_start_failure)
 
 ZTEST_USER(fpsensor_enroll, test_enroll_configure_detect)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
 	struct fingerprint_sensor_state state;
 
 	/* Start enroll session. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
+	start_enroll_session();
 
 	/* Confirm that detect mode was enabled. */
 	fingerprint_get_state(fp_sim, &state);
 	zassert_true(state.detect_mode);
 
 	/* Stop enroll session. */
-	params.mode = 0;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode &
+	zassert_false(set_fp_mode(0) &
 		      (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
 
 	/* Confirm that detect mode was disabled. */
 	fingerprint_get_state(fp_sim, &state);
@@ -154,31 +126,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_configure_detect)
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
-
-	/* Switch mode to enroll. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Prepare image. */
-	memset(image_buffer, 1, IMAGE_SIZE);
-
-	/* Load image to simulator. */
-	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
+	start_enroll_session();
 
 	/*
 	 * Use custom enroll step function to confirm that provided image is
@@ -187,18 +135,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step)
 	enroll_percent = 33;
 	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
 
-	/* Ping fpsensor task. */
-	fingerprint_run_callback(fp_sim);
-
-	/* Give opportunity for fpsensor task process event. */
-	k_msleep(1);
-
-	/* Confirm MKBP events were sent twice. */
-	zassert_equal(mkbp_send_event_fake.call_count, 2);
-	zassert_equal(mkbp_send_event_fake.arg0_history[0],
-		      EC_MKBP_EVENT_FINGERPRINT);
-	zassert_equal(mkbp_send_event_fake.arg0_history[1],
-		      EC_MKBP_EVENT_FINGERPRINT);
+	simulate_finger_touch();
 
 	/*
 	 * Confirm that:
@@ -206,11 +143,12 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step)
 	 * - No errors
 	 * - Reported enroll progress is correct
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
-	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
-	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), 0);
-	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_finger_down());
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(), 0);
+	zassert_equal(fp_events.enroll_progress(), enroll_percent);
 
 	/*
 	 * Confirm that a normal mid-enrollment step does not finish the
@@ -223,41 +161,12 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step)
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_failure)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
-
-	/* Switch mode to enroll. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
+	start_enroll_session();
 
 	/* Return critical error from enroll_step. */
 	mock_alg_enroll_step_fake.return_val = -EINVAL;
 
-	/* Ping fpsensor task. */
-	fingerprint_run_callback(fp_sim);
-
-	/* Give opportunity for fpsensor task process event. */
-	k_msleep(1);
-
-	/* Confirm MKBP events were sent twice. */
-	zassert_equal(mkbp_send_event_fake.call_count, 2);
-	zassert_equal(mkbp_send_event_fake.arg0_history[0],
-		      EC_MKBP_EVENT_FINGERPRINT);
-	zassert_equal(mkbp_send_event_fake.arg0_history[1],
-		      EC_MKBP_EVENT_FINGERPRINT);
+	simulate_finger_touch(/*load_test_image=*/false);
 
 	/*
 	 * Confirm that:
@@ -265,17 +174,15 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_failure)
 	 * - Internal error is reported
 	 * - No progress is reported
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
-	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
-	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
-		      EC_MKBP_FP_ERR_ENROLL_INTERNAL);
-	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), 0);
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_finger_down());
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(), EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	zassert_equal(fp_events.enroll_progress(), 0);
 
 	/* Confirm that enroll session is still running. */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode & FP_MODE_ENROLL_SESSION);
+	zassert_true(get_fp_mode() & FP_MODE_ENROLL_SESSION);
 
 	/*
 	 * Confirm that the underlying enrollment session wasn't prematurely
@@ -288,31 +195,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_failure)
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_low_quality_warning)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
-
-	/* Switch mode to enroll. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Prepare image. */
-	memset(image_buffer, 1, IMAGE_SIZE);
-
-	/* Load image to simulator. */
-	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
+	start_enroll_session();
 
 	/*
 	 * Use custom enroll step function to warn about low quality of the
@@ -322,18 +205,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_low_quality_warning)
 	enroll_step_return_val = FP_ENROLLMENT_RESULT_LOW_QUALITY;
 	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
 
-	/* Ping fpsensor task. */
-	fingerprint_run_callback(fp_sim);
-
-	/* Give opportunity for fpsensor task process event. */
-	k_msleep(1);
-
-	/* Confirm MKBP events were sent twice. */
-	zassert_equal(mkbp_send_event_fake.call_count, 2);
-	zassert_equal(mkbp_send_event_fake.arg0_history[0],
-		      EC_MKBP_EVENT_FINGERPRINT);
-	zassert_equal(mkbp_send_event_fake.arg0_history[1],
-		      EC_MKBP_EVENT_FINGERPRINT);
+	simulate_finger_touch();
 
 	/*
 	 * Confirm that:
@@ -341,17 +213,16 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_low_quality_warning)
 	 * - Low Quality warning is reported
 	 * - Correct progress is reported
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
-	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
-	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_finger_down());
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(),
 		      EC_MKBP_FP_ERR_ENROLL_LOW_QUALITY);
-	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
+	zassert_equal(fp_events.enroll_progress(), enroll_percent);
 
 	/* Confirm that enroll session is still running. */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode & FP_MODE_ENROLL_SESSION);
+	zassert_true(get_fp_mode() & FP_MODE_ENROLL_SESSION);
 
 	/*
 	 * Confirm that a low quality warning does not prematurely finish the
@@ -364,31 +235,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_low_quality_warning)
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_failed)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
-
-	/* Switch mode to enroll. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Prepare image. */
-	memset(image_buffer, 1, IMAGE_SIZE);
-
-	/* Load image to simulator. */
-	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
+	start_enroll_session();
 
 	/*
 	 * Use custom enroll step function to confirm that provided image is
@@ -400,18 +247,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_failed)
 	/* Return error on call to enroll_finish. */
 	mock_alg_enroll_finish_fake.return_val = -EINVAL;
 
-	/* Ping fpsensor task. */
-	fingerprint_run_callback(fp_sim);
-
-	/* Give opportunity for fpsensor task process event. */
-	k_msleep(1);
-
-	/* Confirm MKBP events were sent twice. */
-	zassert_equal(mkbp_send_event_fake.call_count, 2);
-	zassert_equal(mkbp_send_event_fake.arg0_history[0],
-		      EC_MKBP_EVENT_FINGERPRINT);
-	zassert_equal(mkbp_send_event_fake.arg0_history[1],
-		      EC_MKBP_EVENT_FINGERPRINT);
+	simulate_finger_touch();
 
 	/*
 	 * Confirm that:
@@ -419,17 +255,15 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_failed)
 	 * - Internal error was returned
 	 * - Reported enroll progress is correct
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
-	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
-	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
-		      EC_MKBP_FP_ERR_ENROLL_INTERNAL);
-	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_finger_down());
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(), EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	zassert_equal(fp_events.enroll_progress(), enroll_percent);
 
 	/* Confirm that enroll session is not running. */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_ENROLL_SESSION);
+	zassert_false(get_fp_mode() & FP_MODE_ENROLL_SESSION);
 
 	/*
 	 * Confirm that 'enroll_finish' was called after the conversion failure.
@@ -441,31 +275,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_failed)
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
-
-	/* Switch mode to enroll. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
-
-	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Prepare image. */
-	memset(image_buffer, 1, IMAGE_SIZE);
-
-	/* Load image to simulator. */
-	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
+	start_enroll_session();
 
 	/*
 	 * Use custom enroll step function to confirm that provided image is
@@ -474,21 +284,10 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
 	enroll_percent = 100;
 	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
 
-	/* Ping fpsensor task. */
-	fingerprint_run_callback(fp_sim);
-
-	/* Give opportunity for fpsensor task process event. */
-	k_msleep(1);
+	simulate_finger_touch();
 
 	/* Confirm that 'enroll_finish' was called. */
 	zassert_equal(mock_alg_enroll_finish_fake.call_count, 1);
-
-	/* Confirm MKBP events were sent twice. */
-	zassert_equal(mkbp_send_event_fake.call_count, 2);
-	zassert_equal(mkbp_send_event_fake.arg0_history[0],
-		      EC_MKBP_EVENT_FINGERPRINT);
-	zassert_equal(mkbp_send_event_fake.arg0_history[1],
-		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
@@ -496,86 +295,102 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
 	 * - No errors
 	 * - Reported enroll progress is correct
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
-	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
-	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), 0);
-	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_finger_down());
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(), 0);
+	zassert_equal(fp_events.enroll_progress(), enroll_percent);
 
 	/* Confirm that enroll session is not running. */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_ENROLL_SESSION);
+	zassert_false(get_fp_mode() & FP_MODE_ENROLL_SESSION);
 
 	/* Confirm that there is 1 valid template. */
-	zassert_ok(ec_cmd_fp_info_v3(NULL, test_info_buffer,
-				     test_info_buffer_size));
-	zassert_equal(test_info_buffer->template_info.template_valid, 1);
+	zassert_ok(get_fp_info_v3(test_info_buffer));
+	zassert_equal(test_info_buffer.header.template_info.template_valid, 1);
 	/* Don't forget that template_dirty is a bitmask. */
-	zassert_equal(test_info_buffer->template_info.template_dirty, 0x1);
+	zassert_equal(test_info_buffer.header.template_info.template_dirty,
+		      0x1);
 }
 
 ZTEST_USER(fpsensor_enroll, test_enroll_max_capacity_reached)
 {
-	struct ec_params_fp_mode params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-	struct fingerprint_sensor_state state;
-	uint32_t fp_events;
-
-	/* Successfully start an enrollment session. */
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_true(response.mode &
-		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
+	start_enroll_session();
 
 	/* Artificially simulate reaching full capacity mid-session. */
-	global_context.templ_valid = FP_MAX_FINGER_COUNT;
+	global_context.templates.templ_valid = FP_MAX_FINGER_COUNT;
 
-	/* Put finger on the sensor. */
-	fingerprint_get_state(fp_sim, &state);
-	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
-	fingerprint_set_state(fp_sim, &state);
-
-	/* Prepare image. */
-	memset(image_buffer, 1, IMAGE_SIZE);
-	fingerprint_load_image(fp_sim, image_buffer, IMAGE_SIZE);
-
-	/* Ping fpsensor task. */
-	fingerprint_run_callback(fp_sim);
-	k_msleep(1);
-
-	/* Confirm MKBP events were sent twice. */
-	zassert_equal(mkbp_send_event_fake.call_count, 2);
-	zassert_equal(mkbp_send_event_fake.arg0_history[0],
-		      EC_MKBP_EVENT_FINGERPRINT);
-	zassert_equal(mkbp_send_event_fake.arg0_history[1],
-		      EC_MKBP_EVENT_FINGERPRINT);
+	simulate_finger_touch();
 
 	/*
 	 * Confirm that:
 	 * - MKBP events are FINGER_DOWN and FP_ENROLL
 	 * - Internal error was returned
 	 */
-	fp_get_next_event((uint8_t *)&fp_events);
-	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
-	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
-	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
-		      EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_finger_down());
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(), EC_MKBP_FP_ERR_ENROLL_INTERNAL);
 
 	/*
 	 * Confirm that the enrollment session was automatically torn down and
 	 * the algorithm's state is properly cleaned up.
 	 */
-	params.mode = FP_MODE_DONT_CHANGE;
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_false(response.mode & FP_MODE_ENROLL_SESSION,
+	zassert_false(get_fp_mode() & FP_MODE_ENROLL_SESSION,
 		      "Enrollment session should have been deactivated");
 	zassert_equal(mock_alg_enroll_finish_fake.call_count, 1,
 		      "Algorithm enrollment state should be aborted");
+}
+
+ZTEST_USER(fpsensor_enroll, test_enroll_warning_when_previous_template_unread)
+{
+	/* Simulate a previously enrolled template that has not been read yet.
+	 */
+	global_context.templates.template_newly_enrolled =
+		*FpTemplateId::create(0);
+
+	start_enroll_session();
+
+	enroll_percent = 50;
+	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
+
+	simulate_finger_touch();
+
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(), 0);
+	zassert_equal(fp_events.enroll_progress(), enroll_percent);
+}
+
+ZTEST_USER(fpsensor_enroll,
+	   test_enroll_step_finish_with_fingerprint_auth_enabled)
+{
+	start_enroll_session();
+
+	/* Enable Fingerprint Auth session before enrollment finishes. */
+	global_context.crypto.set_auth_enabled(true);
+
+	enroll_percent = 100;
+	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
+
+	simulate_finger_touch();
+
+	const FpMkbpEvent fp_events =
+		take_mkbp_fp_events(mkbp_send_event_fake, 2);
+	zassert_true(fp_events.is_enroll());
+	zassert_equal(fp_events.error_code(), 0);
+	zassert_equal(fp_events.enroll_progress(), 100);
+	zassert_true(global_context.templates.template_newly_enrolled ==
+		     FpTemplateId::create(0));
+	/*
+	 * When auth is enabled, templ_valid is not incremented until
+	 * EC_CMD_FP_CONFIRM_TEMPLATE is called.
+	 */
+	zassert_equal(global_context.templates.templ_valid, 0);
+
+	global_context.crypto.set_auth_enabled(false);
 }
 
 static void *fpsensor_setup(void)
@@ -584,54 +399,26 @@ static void *fpsensor_setup(void)
 	start_ec_tasks();
 	k_msleep(100);
 
-	return NULL;
+	return nullptr;
 }
 
 static void fpsensor_before(void *f)
 {
-	struct fingerprint_sensor_state state = {
-		.bad_pixels = 0,
-		.maintenance_ran = false,
-		.detect_mode = false,
-		.low_power_mode = false,
-		.finger_state = FINGERPRINT_FINGER_STATE_NONE,
-		.init_result = 0,
-		.deinit_result = 0,
-		.config_result = 0,
-		.get_info_result = 0,
-		.acquire_image_result = FINGERPRINT_SENSOR_SCAN_GOOD,
-		.last_acquire_image_mode = -1,
-	};
-	struct ec_params_fp_mode params = {
-		.mode = 0,
-	};
-	struct ec_response_fp_mode response;
-	uint32_t fp_events;
-
 	/* Reset global context to a clean state. */
-	fp_reset_and_clear_context();
+	global_context.reset_and_clear_context();
 
-	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
-	zassert_equal(response.mode, 0);
-
-	/* Give opportunity for fpsensor task to change mode. */
-	k_msleep(1);
+	zassert_equal(set_fp_mode(0), 0);
 
 	enroll_percent = 0;
 	enroll_step_return_val = 0;
 
-	fingerprint_set_state(fp_sim, &state);
+	reset_sim_state();
 	RESET_FAKE(mkbp_send_event);
-
-	RESET_FAKE(mock_alg_init);
-	RESET_FAKE(mock_alg_exit);
-	RESET_FAKE(mock_alg_enroll_start);
-	RESET_FAKE(mock_alg_enroll_step);
-	RESET_FAKE(mock_alg_enroll_finish);
-	RESET_FAKE(mock_alg_match);
+	reset_mock_alg_fakes();
 
 	/* Clear MKBP events from previous tests. */
-	fp_get_next_event((uint8_t *)&fp_events);
+	(void)global_context.take_events();
 }
 
-ZTEST_SUITE(fpsensor_enroll, NULL, fpsensor_setup, fpsensor_before, NULL, NULL);
+ZTEST_SUITE(fpsensor_enroll, nullptr, fpsensor_setup, fpsensor_before, nullptr,
+	    nullptr);

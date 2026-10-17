@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor/fpsensor_led.h"
+#include "fpsensor/fpsensor_platform.h"
+
 #include <zephyr/device.h>
 #include <zephyr/drivers/led.h>
 #include <zephyr/init.h>
@@ -12,7 +15,8 @@
 #include <zephyr/pm/policy.h>
 #include <zephyr/sys/clock.h>
 
-#include <fpsensor/fpsensor_led.h>
+#include <algorithm>
+#include <chrono>
 #include <limits>
 
 LOG_MODULE_REGISTER(fp_led, LOG_LEVEL_INF);
@@ -21,7 +25,7 @@ namespace
 {
 
 #define LED_NODE DT_ALIAS(pwm_fp_led)
-const struct device *const led_dev = DEVICE_DT_GET(DT_PARENT(LED_NODE));
+const device *const led_dev = DEVICE_DT_GET(DT_PARENT(LED_NODE));
 constexpr uint32_t led_idx = DT_NODE_CHILD_IDX(LED_NODE);
 bool pm_locked = false;
 
@@ -59,20 +63,16 @@ int init()
 }
 SYS_INIT(init, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);
 
-}
+} /* namespace */
 
 #ifdef CONFIG_CROS_EC_RW
 namespace
 {
 
-consteval uint8_t perceivedToEmitted(float perceived, int gamma = 3)
+consteval uint8_t perceived_to_emitted(float perceived, int gamma = 3)
 {
-	/* Constrain input */
-	float p = (perceived < 0.0f) ?
-			  0.0f :
-			  ((perceived > 100.0f) ? 100.0f : perceived);
-	/* Normalize perceived brightness to a 0.0 - 1.0 range */
-	float normalized = p / 100.0f;
+	/* Normalize clamped perceived brightness to a 0.0 - 1.0 range */
+	float normalized = std::clamp(perceived, 0.0f, 100.0f) / 100.0f;
 	/* Apply the gamma power curve */
 	float curve_value = 1.0f;
 	for (int i = 0; i < gamma; ++i) {
@@ -82,22 +82,32 @@ consteval uint8_t perceivedToEmitted(float perceived, int gamma = 3)
 	return static_cast<uint8_t>(curve_value * 100 + 0.5f);
 }
 
-constexpr uint8_t BRIGHTNESS_ENROLL =
-	perceivedToEmitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_ENROLL);
-constexpr uint8_t BRIGHTNESS_MATCH =
-	perceivedToEmitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_MATCH);
-constexpr uint8_t BRIGHTNESS_MATCH_OK =
-	perceivedToEmitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_MATCH_OK);
-constexpr uint8_t BRIGHTNESS_MATCH_NOK =
-	perceivedToEmitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_MATCH_NOK);
-constexpr uint8_t BRIGHTNESS_OFF = perceivedToEmitted(0);
+constexpr uint8_t kBrightnessEnroll =
+	perceived_to_emitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_ENROLL);
+constexpr uint8_t kBrightnessMatch =
+	perceived_to_emitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_MATCH);
+constexpr uint8_t kBrightnessMatchOk =
+	perceived_to_emitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_MATCH_OK);
+constexpr uint8_t kBrightnessMatchNok =
+	perceived_to_emitted(CONFIG_PLATFORM_EC_FP_LED_BRIGHTNESS_MATCH_NOK);
+constexpr uint8_t kBrightnessOff = perceived_to_emitted(0);
+
+constexpr std::chrono::milliseconds kDurationMatch{
+	CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS
+};
+constexpr std::chrono::milliseconds kDurationMatchOk{
+	CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_OK_MS
+};
+constexpr std::chrono::milliseconds kDurationMatchNok{
+	CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_NOK_MS
+};
 
 enum class Mode {
-	OFF,
-	ENROLL,
-	MATCH,
-	MATCH_OK,
-	MATCH_NOK,
+	kOff,
+	kEnroll,
+	kMatch,
+	kMatchOk,
+	kMatchNok,
 };
 
 Mode led_mode;
@@ -105,26 +115,23 @@ int64_t timer_scheduled_at_ticks = 0;
 
 K_SEM_DEFINE(led_lock, 1, 1);
 
-bool ignore_off(Mode mode)
+[[nodiscard]] constexpr bool ignore_off(Mode mode) noexcept
 {
-	return mode == Mode::OFF || mode == Mode::MATCH_OK ||
-	       mode == Mode::MATCH_NOK;
+	return mode == Mode::kOff || mode == Mode::kMatchOk ||
+	       mode == Mode::kMatchNok;
 }
 
-void led_update_handler(struct k_work *work);
-
-K_WORK_DELAYABLE_DEFINE(led_update_dwork, led_update_handler);
-
-void led_update_handler(struct k_work *work)
+void led_update_handler(k_work *)
 {
-	k_sem_take(&led_lock, K_FOREVER);
+	fp_platform::ScopedSemLock lock(led_lock);
 	bool is_timer_expired = k_uptime_ticks() >= timer_scheduled_at_ticks;
 	if (is_timer_expired) {
-		led_mode = Mode::OFF;
-		set_led_brightness(BRIGHTNESS_OFF);
+		led_mode = Mode::kOff;
+		set_led_brightness(kBrightnessOff);
 	}
-	k_sem_give(&led_lock);
 }
+
+K_WORK_DELAYABLE_DEFINE(led_update_dwork, led_update_handler);
 
 void set_led(uint8_t brightness)
 {
@@ -139,81 +146,58 @@ void set_led(uint8_t brightness)
 	set_led_brightness(brightness);
 }
 
-void set_led_with_timeout(uint8_t brightness, int32_t delay_ms)
+void set_led_with_timeout(uint8_t brightness, std::chrono::milliseconds delay)
 {
 	/* Always called with led_lock taken */
 	set_led_brightness(brightness);
 	timer_scheduled_at_ticks =
-		k_uptime_ticks() + k_ms_to_ticks_floor64(delay_ms);
-	int ret = k_work_reschedule(&led_update_dwork, K_MSEC(delay_ms));
+		k_uptime_ticks() + k_ms_to_ticks_floor64(delay.count());
+	int ret = k_work_reschedule(&led_update_dwork, K_MSEC(delay.count()));
 	if (ret < 0) {
 		LOG_ERR("Failed to reschedule LED update work: %d", ret);
 		/* Fallback to turning LED off */
-		set_led_brightness(BRIGHTNESS_OFF);
+		set_led_brightness(kBrightnessOff);
 	}
 }
 
 void enroll()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	if (led_mode == Mode::ENROLL) {
-		k_sem_give(&led_lock);
-		return;
+	{
+		fp_platform::ScopedSemLock lock(led_lock);
+		if (led_mode == Mode::kEnroll) {
+			return;
+		}
+		led_mode = Mode::kEnroll;
+		set_led(kBrightnessEnroll);
 	}
-	led_mode = Mode::ENROLL;
-	set_led(BRIGHTNESS_ENROLL);
-	k_sem_give(&led_lock);
 
 	LOG_INF("Fingerprint led enroll.");
 }
 
 void match()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	if (led_mode == Mode::MATCH) {
-		k_sem_give(&led_lock);
-		return;
+	{
+		fp_platform::ScopedSemLock lock(led_lock);
+		if (led_mode == Mode::kMatch) {
+			return;
+		}
+		led_mode = Mode::kMatch;
+		set_led_with_timeout(kBrightnessMatch, kDurationMatch);
 	}
-	led_mode = Mode::MATCH;
-	set_led_with_timeout(BRIGHTNESS_MATCH,
-			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS);
-	k_sem_give(&led_lock);
 
 	LOG_INF("Fingerprint led match.");
 }
 
-void match_ok()
-{
-	k_sem_take(&led_lock, K_FOREVER);
-	led_mode = Mode::MATCH_OK;
-	set_led_with_timeout(BRIGHTNESS_MATCH_OK,
-			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_OK_MS);
-	k_sem_give(&led_lock);
-
-	LOG_INF("Fingerprint led match OK.");
-}
-
-void match_nok()
-{
-	k_sem_take(&led_lock, K_FOREVER);
-	led_mode = Mode::MATCH_NOK;
-	set_led_with_timeout(BRIGHTNESS_MATCH_NOK,
-			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_NOK_MS);
-	k_sem_give(&led_lock);
-
-	LOG_INF("Fingerprint led match NOK.");
-}
-
 void off()
 {
-	k_sem_take(&led_lock, K_FOREVER);
-	if (ignore_off(led_mode)) {
-		k_sem_give(&led_lock);
-		return;
+	{
+		fp_platform::ScopedSemLock lock(led_lock);
+		if (ignore_off(led_mode)) {
+			return;
+		}
+		set_led(kBrightnessOff);
+		led_mode = Mode::kOff;
 	}
-	set_led(BRIGHTNESS_OFF);
-	led_mode = Mode::OFF;
-	k_sem_give(&led_lock);
 
 	LOG_INF("Fingerprint led off.");
 }
@@ -223,22 +207,28 @@ void off()
 namespace fp_led
 {
 
-void update_mode(uint32_t sensor_mode)
+void update_mode(FpSensorMode sensor_mode)
 {
-	if (sensor_mode & FP_MODE_ENROLL_SESSION)
+	if (sensor_mode.has_any(FP_MODE_ENROLL_SESSION)) {
 		enroll();
-	else if (sensor_mode & FP_MODE_MATCH)
+	} else if (sensor_mode.has_any(FP_MODE_MATCH)) {
 		match();
-	else
+	} else {
 		off();
+	}
 }
 
 void update_match(bool success)
 {
-	if (success)
-		match_ok();
-	else
-		match_nok();
+	{
+		fp_platform::ScopedSemLock lock(led_lock);
+		led_mode = success ? Mode::kMatchOk : Mode::kMatchNok;
+		set_led_with_timeout(
+			success ? kBrightnessMatchOk : kBrightnessMatchNok,
+			success ? kDurationMatchOk : kDurationMatchNok);
+	}
+
+	LOG_INF("Fingerprint led match %s.", success ? "OK" : "NOK");
 }
 
 } /* namespace fp_led */
