@@ -43,6 +43,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee41df78_6c000dd4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:29:51Z",
+      "side": 1,
+      "message": "Done: split into CL 8604055 and CL 8606886.",
+      "parentUuid": "9d7d1555_298f0543",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cf32af1_d9b856af",
@@ -75,6 +99,24 @@
       "writtenOn": "2026-10-17T22:26:57Z",
       "side": 1,
       "message": "Done: split into CL 8604055 and CL 8606886, and replaced goto defer with structured if/else guards in hang_detect_power_on().",
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f201c8fa_4c5583d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:29:51Z",
+      "side": 1,
+      "message": "Done: split into CL 8604055 and CL 8606886, and replaced goto defer with structured if/else guards.",
+      "parentUuid": "5cf32af1_d9b856af",
       "revId": "f7ca757f1ca233b6de7054875a45707068001309",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -117,6 +159,30 @@
       "writtenOn": "2026-10-17T22:26:57Z",
       "side": 1,
       "message": "Done: replaced goto defer and + 1 offset with structured if/else guards in hang_detect_power_on() in child CL 8606886.",
+      "revId": "f7ca757f1ca233b6de7054875a45707068001309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bd74d09_e1c0b5c3",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T22:29:51Z",
+      "side": 1,
+      "message": "Done: replaced goto defer and + 1 offset with structured if/else guards in CL 8606886.",
+      "parentUuid": "340a36cf_6047a157",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
       "revId": "f7ca757f1ca233b6de7054875a45707068001309",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
