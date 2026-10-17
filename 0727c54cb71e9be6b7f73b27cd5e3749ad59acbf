@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afc273eb_35927fdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T16:16:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n**CL Size \u0026 Scope:** Size: M (+92, -1) — This CL violates the Single Logical Change rule by bundling independent categories of changes.\n\nUpdating the commit message to mention all bundled changes does not resolve the scope violation; the changes themselves must be submitted in separate CLs. The subject line still joins distinct components (`register bitfield macros and RDD/CCD host test declarations`), which is a strict blocking red flag for bundling.\n\nPlease decompose this into two independently reviewable CLs:\n1. **CL 1:** Add generic register access and bitfield macros to `chip/host/registers.h` (and fix the `GNAME` stringification macro).\n2. **CL 2:** Add CCD-specific mock registers to `chip/host/registers.c`, `board/host/gpio.inc`, and `test/ccd_sleep_inhibit.h`.\n\n[🔗](http://go/tj/3139d8cf-e0e4-483f-9416-b7feb88406e3)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0727c54cb71e9be6b7f73b27cd5e3749ad59acbf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

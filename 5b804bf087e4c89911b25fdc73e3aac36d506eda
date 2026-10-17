@@ -38,6 +38,26 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f715fd11_d37d23a3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T16:16:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Re-evaluating in latest patchset.",
+      "parentUuid": "96d9a118_87d9e2db",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57b05fc6_e7e60563",
@@ -71,6 +91,26 @@
       "side": 1,
       "message": "Done in PS4: updated the commit message to cover the host register bitfield macros and kept test/ccd_sleep_inhibit.h as a pure 35-line declaration header.",
       "parentUuid": "57b05fc6_e7e60563",
+      "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "178a806c_e54219b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T16:16:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Re-evaluating in latest patchset.",
+      "parentUuid": "57b05fc6_e7e60563",
+      "tag": "cl_review_agent",
+      "isAi": true,
       "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
