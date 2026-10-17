@@ -16,9 +16,8 @@ fpsensor_CFLAGS=-Wvla
 _fpsensor_state_obj:=$(_fpsensor_dir)fpsensor_state.o
 _fpsensor_crypto_obj:=$(_fpsensor_dir)fpsensor_crypto.o
 _fpsensor_obj:=$(_fpsensor_dir)fpsensor.o
-_fpsensor_detect_strings_obj:=$(_fpsensor_dir)fpsensor_detect_strings.o
+_fpsensor_platform_obj:=$(_fpsensor_dir)fpsensor_platform_legacy.o
 _fpsensor_debug_obj:=$(_fpsensor_dir)fpsensor_debug.o
-_fpsensor_utils_obj:=$(_fpsensor_dir)fpsensor_utils.o
 _fpsensor_auth_commands_obj:=$(_fpsensor_dir)fpsensor_auth_commands.o
 _fpsensor_auth_handshake_obj:=$(_fpsensor_dir)fpsensor_auth_handshake.o
 _fpsensor_auth_crypto_stateful_obj:=$(_fpsensor_dir)fpsensor_auth_crypto_stateful.o
@@ -28,9 +27,8 @@ _fpsensor_image_frame_params_obj:=$(_fpsensor_dir)fpsensor_image_frame_params.o
 $(out)/RW/$(_fpsensor_state_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_crypto_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_obj): CFLAGS+=$(fpsensor_CFLAGS)
-$(out)/RW/$(_fpsensor_detect_strings_obj): CFLAGS+=$(fpsensor_CFLAGS)
+$(out)/RW/$(_fpsensor_platform_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_debug_obj): CFLAGS+=$(fpsensor_CFLAGS)
-$(out)/RW/$(_fpsensor_utils_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_commands_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_handshake_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_crypto_stateful_obj): CFLAGS+=$(fpsensor_CFLAGS)
@@ -39,7 +37,7 @@ $(out)/RW/$(_fpsensor_image_frame_params_obj): CFLAGS+=$(fpsensor_CFLAGS)
 
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_state_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_obj)
-all-obj-$(HAS_TASK_CONSOLE)+=$(_fpsensor_detect_strings_obj)
+all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_platform_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_debug_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_auth_commands_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_auth_handshake_obj)
@@ -56,7 +54,6 @@ ifeq ($(TEST_BUILD),y)
 fpsensor_obj_image=y
 endif
 
-all-obj-$(fpsensor_obj_image)+=$(_fpsensor_utils_obj)
 all-obj-$(fpsensor_obj_image)+=$(_fpsensor_auth_crypto_stateless_obj)
 all-obj-$(fpsensor_obj_image)+=$(_fpsensor_crypto_obj)
 all-obj-$(fpsensor_obj_image)+=$(_fpsensor_auth_crypto_stateful_obj)

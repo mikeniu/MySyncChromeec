@@ -16,14 +16,40 @@
 #include "util.h"
 #include "watchdog.h"
 
-#include <vector>
-
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/shell/shell.h>
-#endif
+#include <algorithm>
+#include <charconv>
+#include <chrono>
+#include <expected>
+#include <optional>
+#include <span>
+#include <string_view>
 
 #ifdef CONFIG_CMD_FPSENSOR_DEBUG
 /* --- Debug console commands --- */
+
+using namespace std::chrono_literals;
+
+namespace
+{
+
+void sleep_for(std::chrono::microseconds d)
+{
+	crec_usleep(static_cast<unsigned int>(d.count()));
+}
+
+template <typename T>
+std::expected<T, ec_error_list> parse_int(std::string_view str, int base = 10)
+{
+	T value{};
+	const auto [ptr, ec] = std::from_chars(
+		str.data(), str.data() + str.size(), value, base);
+	if (ec != std::errc{} || ptr != str.data() + str.size()) {
+		return std::unexpected(EC_ERROR_PARAM1);
+	}
+	return value;
+}
+
+} /* namespace */
 
 /*
  * Send the current Fingerprint buffer to the host
@@ -64,133 +90,130 @@
  * sudo screen -c ${HOME}/.screenrc /dev/pts/NN 115200
  *
  */
-test_export_static enum ec_error_list
-upload_pgm_image(uint8_t *frame,
-		 const struct fp_image_frame_params_v2 &image_frame_params)
+test_export_static std::expected<void, ec_error_list>
+upload_pgm_image(std::span<const uint8_t> frame,
+		 const fp_image_frame_params_v2 &image_frame_params)
 {
-	uint8_t *ptr = frame;
-	uint8_t bytes_per_pixel = DIV_ROUND_UP(image_frame_params.bpp, 8);
+	const uint8_t bytes_per_pixel = DIV_ROUND_UP(image_frame_params.bpp, 8);
 
 	if (bytes_per_pixel != 1 && bytes_per_pixel != 2) {
-		return EC_ERROR_UNKNOWN;
+		return std::unexpected(EC_ERROR_UNKNOWN);
 	}
 
 	/* fake Z-modem ZRQINIT signature */
 	CPRINTF("#IGNORE for ZModem\r**\030B00");
-	crec_msleep(2000); /* let the download program start */
+	sleep_for(2s); /* let the download program start */
 
 	/* Print 8-bpp or 16-bpp PGM ASCII header */
 	CPRINTF("P2\n%d %d\n%d\n", image_frame_params.width,
 		image_frame_params.height,
 		(bytes_per_pixel == 2) ? 65535 : 255);
 
+	std::span<const uint8_t> remaining = frame;
 	for (int y = 0; y < image_frame_params.height; y++) {
 		watchdog_reload();
-		for (int x = 0; x < image_frame_params.width;
-		     x++, ptr += bytes_per_pixel) {
-			CPRINTF("%d ", (bytes_per_pixel == 2) ?
-					       *(uint16_t *)ptr :
-					       *ptr);
+		for (int x = 0; x < image_frame_params.width; x++) {
+			const uint16_t pixel =
+				(bytes_per_pixel == 2) ?
+					UINT16_FROM_BYTE_ARRAY_LE(remaining,
+								  0) :
+					remaining[0];
+			CPRINTF("%d ", pixel);
+			remaining = remaining.subspan(bytes_per_pixel);
 		}
 		CPRINTF("\n");
 		cflush();
 	}
 
 	CPRINTF("\x04"); /* End Of Transmission */
-	return EC_SUCCESS;
+	return {};
 }
 
-static enum ec_error_list fp_console_action(uint32_t mode)
+test_export_static std::expected<fp_image_frame_params_v2, ec_error_list>
+get_image_frame_params(std::optional<FpCaptureType> capture_type)
 {
-	if (!(global_context.sensor_mode & FP_MODE_RESET_SENSOR))
+	if (!capture_type.has_value()) {
+		return std::unexpected(EC_ERROR_INVAL);
+	}
+	FpSensorInfoBuffer info{};
+	const auto types = info.query();
+	if (!types.has_value()) {
+		return std::unexpected(types.error());
+	}
+	const auto it =
+		std::ranges::find(*types, capture_type->raw(),
+				  &fp_image_frame_params_v2::fp_capture_type);
+	if (it == types->end()) {
+		return std::unexpected(EC_ERROR_INVAL);
+	}
+	return *it;
+}
+
+namespace
+{
+
+std::expected<void, ec_error_list> fp_console_action(uint32_t mode)
+{
+	if (!global_context.has_any_mode(FP_MODE_RESET_SENSOR)) {
 		CPRINTS("Waiting for finger ...");
+	}
 
-	uint32_t mode_output = 0;
-	const int rc = fp_set_sensor_mode(mode, &mode_output, std::nullopt);
-
-	if (rc != EC_RES_SUCCESS) {
+	if (!fp_set_sensor_mode(mode).has_value()) {
 		/*
 		 * EC host command errors do not directly map to console command
 		 * errors.
 		 */
-		return EC_ERROR_UNKNOWN;
+		return std::unexpected(EC_ERROR_UNKNOWN);
 	}
 
 	int tries = 200;
 	while (tries--) {
-		if (!(global_context.sensor_mode & FP_MODE_ANY_CAPTURE)) {
+		if (!global_context.has_any_mode(FP_MODE_ANY_CAPTURE)) {
 			CPRINTS("done (events:%x)",
 				static_cast<int>(global_context.fp_events));
-			return EC_SUCCESS;
+			return {};
 		}
-		crec_usleep(100 * MSEC);
+		sleep_for(100ms);
 	}
-	return EC_ERROR_TIMEOUT;
+	return std::unexpected(EC_ERROR_TIMEOUT);
 }
 
-test_export_static int
-get_image_frame_params(struct fp_image_frame_params_v2 &image_frame_params,
-		       const enum fp_capture_type capture_type)
+std::expected<void, ec_error_list> upload_current_pgm_image()
 {
-#if defined(HAVE_FP_PRIVATE_DRIVER) || defined(BOARD_HOST)
-	size_t fp_sensor_get_info_v2_size =
-		sizeof(struct ec_response_fp_info_v3) +
-		sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
-	std::vector<uint8_t> buffer(fp_sensor_get_info_v2_size);
-	auto *info = reinterpret_cast<ec_response_fp_info_v3 *>(buffer.data());
-
-	if (fp_sensor_get_info(info, buffer.size()) < 0) {
-		return EC_ERROR_UNKNOWN;
+	const auto params = get_image_frame_params(
+		global_context.frame.current_capture_type);
+	if (!params.has_value()) {
+		CPRINTF("Failed to get image frame params, error: %d\n",
+			params.error());
+		return std::unexpected(params.error());
 	}
-
-	for (uint8_t i = 0; i < info->sensor_info.num_capture_types; ++i) {
-		if (info->image_frame_params[i].fp_capture_type ==
-		    capture_type) {
-			image_frame_params = info->image_frame_params[i];
-			return EC_RES_SUCCESS;
-		}
-	}
-	return EC_ERROR_INVAL;
-#else
-	return EC_ERROR_UNKNOWN;
-#endif
+	return upload_pgm_image(global_context.frame.image_data(), *params);
 }
 
-static int command_fpcapture(int argc, const char **argv)
+int command_fpcapture(int argc, const char **argv)
 {
-	if (system_is_locked())
+	if (system_is_locked()) {
 		return EC_ERROR_ACCESS_DENIED;
+	}
 
-	int capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	FpCaptureType capture_type{ *FpCaptureType::create(
+		FP_CAPTURE_SIMPLE_IMAGE) };
 
 	if (argc >= 2) {
-		char *e;
-
-		capture_type = strtoi(argv[1], &e, 0);
-		if (*e || capture_type < 0 ||
-		    capture_type >= FP_CAPTURE_TYPE_MAX)
+		const auto parsed = parse_int<int>(argv[1]).and_then(
+			&FpCaptureType::create<int>);
+		if (!parsed.has_value()) {
 			return EC_ERROR_PARAM1;
-	}
-	const uint32_t mode = FP_MODE_CAPTURE |
-			      ((capture_type << FP_MODE_CAPTURE_TYPE_SHIFT) &
-			       FP_MODE_CAPTURE_TYPE_MASK);
-
-	const enum ec_error_list rc = fp_console_action(mode);
-	if (rc == EC_SUCCESS) {
-		struct fp_image_frame_params_v2 image_frame_params{};
-		int ret = get_image_frame_params(
-			image_frame_params,
-			global_context.current_capture_type);
-		if (ret != EC_RES_SUCCESS) {
-			CPRINTF("Failed to get image frame params, error: %d\n",
-				ret);
-			return ret;
 		}
-		return upload_pgm_image(fp_buffer + FP_SENSOR_IMAGE_OFFSET,
-					image_frame_params);
+		capture_type = *parsed;
+	}
+	const uint32_t mode = FP_MODE_CAPTURE | capture_type.to_mode_bits();
+
+	if (const auto rc = fp_console_action(mode); !rc.has_value()) {
+		return rc.error();
 	}
 
-	return rc;
+	return upload_current_pgm_image().error_or(EC_SUCCESS);
 }
 DECLARE_CONSOLE_COMMAND(fpcapture, command_fpcapture, nullptr,
 			"Capture fingerprint in PGM format");
@@ -203,25 +226,30 @@ DECLARE_CONSOLE_COMMAND(fpcapture, command_fpcapture, nullptr,
  * To limit the size of the commands, only a chunk of the image is sent for
  * each command invocation.
  */
-static int command_fpupload(int argc, const char **argv)
+int command_fpupload(int argc, const char **argv)
 {
-	if (argc != 3)
+	if (argc != 3) {
 		return EC_ERROR_PARAM_COUNT;
-	if (system_is_locked())
+	}
+	if (system_is_locked()) {
 		return EC_ERROR_ACCESS_DENIED;
-	int offset = atoi(argv[1]);
-	if (offset < 0)
-		return EC_ERROR_PARAM1;
-	uint8_t *dest = fp_buffer + FP_SENSOR_IMAGE_OFFSET + offset;
+	}
+	const auto offset = parse_int<uint32_t>(argv[1]);
+	if (!offset.has_value()) {
+		return offset.error();
+	}
 
-	const char *pixels_str = argv[2];
-	while (*pixels_str) {
-		if (dest >= fp_buffer + FP_SENSOR_IMAGE_SIZE)
-			return EC_ERROR_PARAM1;
-		const char hex_str[] = { pixels_str[0], pixels_str[1], '\0' };
-		*dest = static_cast<uint8_t>(strtol(hex_str, nullptr, 16));
-		pixels_str += 2;
-		++dest;
+	std::string_view pixels_str(argv[2]);
+	auto dest = checked_subspan(global_context.frame.image_data(), *offset,
+				    DIV_ROUND_UP(pixels_str.size(), 2));
+	if (!dest.has_value()) {
+		return EC_ERROR_PARAM1;
+	}
+
+	for (uint8_t &byte : *dest) {
+		const std::string_view chunk = pixels_str.substr(0, 2);
+		byte = parse_int<uint8_t>(chunk, 16).value_or(0);
+		pixels_str.remove_prefix(chunk.size());
 	}
 
 	return EC_SUCCESS;
@@ -238,109 +266,98 @@ DECLARE_CONSOLE_COMMAND(fpupload, command_fpupload, nullptr,
  * requires the terminal to be configured as explained in the comment above
  * upload_pgm_image().
  */
-static int command_fpdownload(int argc, const char **argv)
+int command_fpdownload(int argc, const char **argv)
 {
-	if (system_is_locked())
+	if (system_is_locked()) {
 		return EC_ERROR_ACCESS_DENIED;
-
-	struct fp_image_frame_params_v2 image_frame_params{};
-	int ret = get_image_frame_params(image_frame_params,
-					 global_context.current_capture_type);
-	if (ret != EC_RES_SUCCESS) {
-		CPRINTF("Failed to get image frame params, error: %d\n", ret);
-		return ret;
 	}
-	return upload_pgm_image(fp_buffer + FP_SENSOR_IMAGE_OFFSET,
-				image_frame_params);
+
+	return upload_current_pgm_image().error_or(EC_SUCCESS);
 }
 DECLARE_CONSOLE_COMMAND(fpdownload, command_fpdownload, nullptr,
 			"Copy fp image from fpmcu fpsensor buffer");
 
-static int command_fpenroll(int argc, const char **argv)
+int command_fpenroll(int argc, const char **argv)
 {
-	enum ec_error_list rc;
+	std::expected<void, ec_error_list> rc{};
 	int percent = 0;
-	static const char *const enroll_str[] = { "OK", "Low Quality",
-						  "Immobile", "Low Coverage" };
+	static constexpr std::array<const char *, 4> kEnrollStr = {
+		"OK", "Low Quality", "Immobile", "Low Coverage"
+	};
 
-	if (system_is_locked())
+	if (system_is_locked()) {
 		return EC_ERROR_ACCESS_DENIED;
+	}
 
-	while (1) {
+	while (true) {
 		int tries = 1000;
 
 		rc = fp_console_action(FP_MODE_ENROLL_SESSION |
 				       FP_MODE_ENROLL_IMAGE);
-		if (rc != EC_SUCCESS)
+		if (!rc.has_value()) {
 			break;
-		const uint32_t event = atomic_clear(&global_context.fp_events);
-		percent = EC_MKBP_FP_ENROLL_PROGRESS(event);
+		}
+		const FpMkbpEvent event{ global_context.take_events() };
+		percent = event.enroll_progress();
 		CPRINTS("Enroll capture: %s (%d%%)",
-			enroll_str[EC_MKBP_FP_ERRCODE(event) & 3], percent);
+			kEnrollStr[event.error_code() % kEnrollStr.size()],
+			percent);
 		if (percent == 100) {
 			break;
 		}
 		/* wait for finger release between captures */
-		global_context.sensor_mode = FP_MODE_ENROLL_SESSION |
-					     FP_MODE_FINGER_UP;
-		task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
+		(void)fp_set_sensor_mode(FP_MODE_ENROLL_SESSION |
+					 FP_MODE_FINGER_UP);
 		while (tries-- &&
-		       global_context.sensor_mode & FP_MODE_FINGER_UP)
-			crec_usleep(20 * MSEC);
+		       global_context.has_any_mode(FP_MODE_FINGER_UP)) {
+			sleep_for(20ms);
+		}
 	}
-	global_context.sensor_mode = 0; /* reset FP_MODE_ENROLL_SESSION */
-	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
+	(void)fp_set_sensor_mode(0); /* reset FP_MODE_ENROLL_SESSION */
 
-	return rc;
+	return rc.error_or(EC_SUCCESS);
 }
 DECLARE_CONSOLE_COMMAND(fpenroll, command_fpenroll, nullptr,
 			"Enroll a new fingerprint");
 
-static int command_fpinfo(int argc, const char **argv)
+int command_fpinfo(int argc, const char **argv)
 {
 #if defined(HAVE_FP_PRIVATE_DRIVER) || defined(BOARD_HOST)
-	size_t fp_sensor_get_info_v2_size =
-		sizeof(struct ec_response_fp_info_v3) +
-		sizeof(struct fp_image_frame_params_v2) * FP_MAX_CAPTURE_TYPES;
-	std::vector<uint8_t> buffer(fp_sensor_get_info_v2_size);
-	auto *info = reinterpret_cast<ec_response_fp_info_v3 *>(buffer.data());
-
-	if (fp_sensor_get_info(info, buffer.size()) < 0) {
+	FpSensorInfoBuffer info{};
+	const auto types = info.query();
+	if (!types.has_value()) {
 		ccprintf("Failed to get fp_info_v2\n");
-		return EC_ERROR_UNKNOWN;
+		return types.error();
 	}
 
-	constexpr int align = 15;
+	constexpr int kAlign = 15;
 
-	ccprintf("%*s: 0x%X (%s)\n", align, "Vendor ID",
-		 info->sensor_info.vendor_id,
-		 fourcc_to_string(info->sensor_info.vendor_id).c_str());
-	ccprintf("%*s: 0x%X\n", align, "Product ID",
-		 info->sensor_info.product_id);
-	ccprintf("%*s: 0x%X\n", align, "Model ID", info->sensor_info.model_id);
-	ccprintf("%*s: 0x%X\n", align, "Version", info->sensor_info.version);
+	ccprintf("%*s: 0x%X (%s)\n", kAlign, "Vendor ID",
+		 info.header.sensor_info.vendor_id,
+		 fourcc_to_string(info.header.sensor_info.vendor_id).data());
+	ccprintf("%*s: 0x%X\n", kAlign, "Product ID",
+		 info.header.sensor_info.product_id);
+	ccprintf("%*s: 0x%X\n", kAlign, "Model ID",
+		 info.header.sensor_info.model_id);
+	ccprintf("%*s: 0x%X\n", kAlign, "Version",
+		 info.header.sensor_info.version);
 
-	ccprintf("%*s: 0x%X\n", align, "Error State", info->sensor_info.errors);
+	ccprintf("%*s: 0x%X\n", kAlign, "Error State",
+		 info.header.sensor_info.errors);
 
-	ccprintf("%*s: %s\n", align, "Sensor Strap",
+	ccprintf("%*s: %s\n", kAlign, "Sensor Strap",
 		 fp_sensor_type_to_str(fpsensor_detect_get_type()));
 
-	for (uint16_t i = 0; i < info->sensor_info.num_capture_types; ++i) {
-		ccprintf("FP Capture Type: %d\n",
-			 info->image_frame_params[i].fp_capture_type);
-		ccprintf("  %*s: %u x %u %ubpp\n", align, "Sensor (w x h)",
-			 info->image_frame_params[i].width,
-			 info->image_frame_params[i].height,
-			 info->image_frame_params[i].bpp);
-		ccprintf("  %*s: %u\n", align, "Frame Size",
-			 info->image_frame_params[i].frame_size);
-		ccprintf("  %*s: %u\n", align, "Image Data Offset (bytes)",
-			 info->image_frame_params[i].image_data_offset_bytes);
-		ccprintf("  %*s: 0x%X (%s)\n", align, "Pixel Format",
-			 info->image_frame_params[i].pixel_format,
-			 fourcc_to_string(
-				 info->image_frame_params[i].pixel_format)
-				 .c_str());
+	for (const auto &param : *types) {
+		ccprintf("FP Capture Type: %d\n", param.fp_capture_type);
+		ccprintf("  %*s: %u x %u %ubpp\n", kAlign, "Sensor (w x h)",
+			 param.width, param.height, param.bpp);
+		ccprintf("  %*s: %u\n", kAlign, "Frame Size", param.frame_size);
+		ccprintf("  %*s: %u\n", kAlign, "Image Data Offset (bytes)",
+			 param.image_data_offset_bytes);
+		ccprintf("  %*s: 0x%X (%s)\n", kAlign, "Pixel Format",
+			 param.pixel_format,
+			 fourcc_to_string(param.pixel_format).data());
 	}
 
 	return EC_SUCCESS;
@@ -352,53 +369,51 @@ static int command_fpinfo(int argc, const char **argv)
 DECLARE_SAFE_CONSOLE_COMMAND(fpinfo, command_fpinfo, nullptr,
 			     "Print fingerprint system info");
 
-static int command_fpmatch(int argc, const char **argv)
+int command_fpmatch(int argc, const char **argv)
 {
-	if (system_is_locked())
+	if (system_is_locked()) {
 		return EC_ERROR_ACCESS_DENIED;
+	}
 
-	const enum ec_error_list rc = fp_console_action(FP_MODE_MATCH);
-	const uint32_t event = atomic_clear(&global_context.fp_events);
+	const auto rc = fp_console_action(FP_MODE_MATCH);
+	const FpMkbpEvent event{ global_context.take_events() };
 
-	if (rc == EC_SUCCESS && event & EC_MKBP_FP_MATCH) {
-		const uint32_t match_errcode = EC_MKBP_FP_ERRCODE(event);
+	if (rc.has_value() && event.is_match()) {
+		const uint32_t match_errcode = event.error_code();
 
 		CPRINTS("Match: %s (%d)",
 			fp_match_success(match_errcode) ? "YES" : "NO",
 			match_errcode);
 	}
 
-	return rc;
+	return rc.error_or(EC_SUCCESS);
 }
 DECLARE_CONSOLE_COMMAND(fpmatch, command_fpmatch, nullptr,
 			"Run match algorithm against finger");
 
-static int command_fpclear(int argc, const char **argv)
+int command_fpclear(int argc, const char **argv)
 {
 	/*
 	 * We intentionally run this on the fp_task so that we use the
 	 * same code path as host commands.
 	 */
-	const enum ec_error_list rc = fp_console_action(FP_MODE_RESET_SENSOR);
+	const auto rc = fp_console_action(FP_MODE_RESET_SENSOR);
 
-	if (rc != EC_SUCCESS)
-		CPRINTS("Failed to clear fingerprint context: %d", rc);
+	if (!rc.has_value()) {
+		CPRINTS("Failed to clear fingerprint context: %d", rc.error());
+	}
 
-	atomic_clear(&global_context.fp_events);
+	(void)global_context.take_events();
 
-	return rc;
+	return rc.error_or(EC_SUCCESS);
 }
 DECLARE_CONSOLE_COMMAND(fpclear, command_fpclear, nullptr,
 			"Clear fingerprint sensor context");
 
-static int command_fpmaintenance(int argc, const char **argv)
+int command_fpmaintenance(int argc, const char **argv)
 {
 #ifdef HAVE_FP_PRIVATE_DRIVER
-	uint32_t mode_output = 0;
-	const int rc = fp_set_sensor_mode(FP_MODE_SENSOR_MAINTENANCE,
-					  &mode_output, std::nullopt);
-
-	if (rc != EC_RES_SUCCESS) {
+	if (!fp_set_sensor_mode(FP_MODE_SENSOR_MAINTENANCE).has_value()) {
 		/*
 		 * EC host command errors do not directly map to console command
 		 * errors.
@@ -407,8 +422,8 @@ static int command_fpmaintenance(int argc, const char **argv)
 	}
 
 	/* Block console until maintenance is finished. */
-	while (global_context.sensor_mode & FP_MODE_SENSOR_MAINTENANCE) {
-		crec_usleep(100 * MSEC);
+	while (global_context.has_any_mode(FP_MODE_SENSOR_MAINTENANCE)) {
+		sleep_for(100ms);
 	}
 #endif /* #ifdef HAVE_FP_PRIVATE_DRIVER */
 
@@ -416,5 +431,7 @@ static int command_fpmaintenance(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(fpmaintenance, command_fpmaintenance, nullptr,
 			"Run fingerprint sensor maintenance");
+
+} /* namespace */
 
 #endif /* CONFIG_CMD_FPSENSOR_DEBUG */
