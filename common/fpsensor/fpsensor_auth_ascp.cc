@@ -17,42 +17,44 @@
 /* The FPMCU pairing key. */
 test_export_static std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
 
-static ec_status fp_command_ascp_establish(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_ascp_establish(struct ec_host_cmd_handler_args *args)
 {
-	const auto *params =
-		static_cast<const ec_params_fp_ascp_establish *>(args->params);
+	const auto *params = static_cast<const ec_params_fp_ascp_establish *>(
+		args->input_buf);
 	if (params->pk_g[0] != 0x04) {
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 	bssl::UniquePtr<EC_KEY> public_key = create_ec_key_from_pubkey(
 		*reinterpret_cast<const fp_elliptic_curve_public_key *>(
 			&params->pk_g[1]));
 	if (public_key == nullptr) {
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	CleanseWrapper<std::array<uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> >
 		sk_f{};
 	auto ret = ascp_get_sk_f(sk_f.data(), sk_f.size());
 	if (ret != EC_SUCCESS) {
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 	bssl::UniquePtr<EC_KEY> private_key =
 		create_ec_key_from_privkey(sk_f.data(), sk_f.size());
 	if (private_key == nullptr) {
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
 	ret = generate_ecdh_shared_secret_without_kdf(*private_key, *public_key,
 						      pairing_key);
 	if (ret != EC_SUCCESS) {
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_ASCP_ESTABLISH, fp_command_ascp_establish,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_ASCP_ESTABLISH,
+			     fp_command_ascp_establish, EC_VER_MASK(0),
+			     struct ec_params_fp_ascp_establish);
 
 enum ec_error_list generate_session_key_with_context(
 	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> fpmcu_nonce,
