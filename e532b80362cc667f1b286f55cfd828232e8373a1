@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "408feb3e_43a3a1dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:22:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/532ca5fc-492d-4933-8991-a36ec4d56ae9)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e532b80362cc667f1b286f55cfd828232e8373a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e9e2823_b4f5655e",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T22:22:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion (Code Simplicity \u0026 Consistency):** There is duplicated timer cancellation logic across `hang_detect_cancel`, `hang_detect_reload`, `EC_HANG_DETECT_CMD_CLEAR_STATUS`, and `hang_detect_deferred_stop`. Additionally, `hang_detect_deferred_stop` cancels `hang_detect_power_on_data` but omits `hang_detect_cold_reboot_data`, which is asymmetrical.\n\nConsider extracting a helper to unify timer cancellation and ensure all stage 1 and stage 2 timers are consistently cleared:\n\n```c\nstatic void cancel_all_hang_detect_timers(void)\n{\n\thook_call_deferred(\u0026hang_detect_reboot_data, -1);\n\thook_call_deferred(\u0026hang_detect_cold_reboot_data, -1);\n\thook_call_deferred(\u0026hang_detect_power_on_data, -1);\n}\n```\n\nThen use this helper in `hang_detect_cancel`, `hang_detect_reload`, `hang_detect_deferred_stop`, and the `EC_HANG_DETECT_CMD_CLEAR_STATUS` case.\n\n[🔗](http://go/tj/532ca5fc-492d-4933-8991-a36ec4d56ae9)",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e532b80362cc667f1b286f55cfd828232e8373a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
