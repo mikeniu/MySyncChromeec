@@ -1,0 +1,42 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96d9a118_87d9e2db",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:49:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\nThis CL violates the Single Logical Change rule by bundling two independent categories of changes:\n1. Adding generic host bitfield access macros (`GREAD_FIELD`, `GWRITE_FIELD`, etc.) to `registers.h`.\n2. Adding specific CCD/RDD mock data to `registers.c` and `gpio.inc`.\n\nBecause these are bundled, the current commit message also fails Fidelity (R1) as it completely omits the `registers.h` macro additions.\n\nPlease split this into two separate CLs. Here are suggested commit messages for each:\n\n**CL 1: Generic register macros**\n```\nhost: Add bitfield access macros for register mocks\n\nAdd `GREAD_FIELD` and `GWRITE_FIELD` macros to the host emulator to enable reading and writing specific bitfields in mock registers during host tests.\n\nBUG\u003db:574267807\nTEST\u003dmake runhosttests -j16\nTEST\u003dmake BOARD\u003dcr50\n```\n\n**CL 2: CCD/RDD mocks**\n```\nhost: Add RDD and PINMUX register mocks for CCD host tests\n\nAdd RDD and PINMUX register mocks and CCD GPIO declarations to the host emulator to enable unit testing the Cr50 RDD and CCD modules.\n\nBUG\u003db:574267807\nTEST\u003dmake runhosttests -j16\nTEST\u003dmake BOARD\u003dcr50\n```\n[🔗](http://go/tj/75b241f4-6948-425b-94e6-9dc24068ba91)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57b05fc6_e7e60563",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:49:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n**Functionality:** Looks good. The bitfield macro implementations correctly mask and shift values without multiple evaluations.\n**Architecture \u0026 Component Fit:** Fits well within the emulator mock framework.\n**Code Simplicity:** Looks good. The `do { ... } while(0)` block correctly scopes the pointer in `GWRITE_FIELD`.\n**Idiomaticity \u0026 Readability:** Excellent. The pointer cast via `\u0026GREG32` is idiomatic C.\n**Security:** N/A\n**Testing:** N/A (Test scaffolding).\n**CL Size \u0026 Scope:** Size: M (+57, -1). ❌ This CL violates the Single Logical Change rule by bundling independent categories of changes. The addition of generic host bitfield access macros (`GREAD_FIELD`, `GWRITE_FIELD`, etc.) to `registers.h` is an independent utility change that could be committed and reviewed on its own, completely separate from the specific CCD/RDD mock data added to `registers.c` and `gpio.inc`. \nPlease split this into two CLs:\n1. **CL 1:** Add generic register access and bitfield macros to `chip/host/registers.h`.\n2. **CL 2:** Add CCD-specific mock registers to `chip/host/registers.c` and `board/host/gpio.inc`.\n\n**Commit Message:** ❌ Fails Fidelity (R1). The current commit message does not mention the addition of the generic bitfield macros in `registers.h`, which constitute a significant portion of the logic. Splitting the CL as requested above will naturally resolve this by allowing each CL to have a focused, accurate commit message. See inline comments on `/COMMIT_MSG` for suggested replacements.\n\n[🔗](http://go/tj/75b241f4-6948-425b-94e6-9dc24068ba91)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
