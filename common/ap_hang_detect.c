@@ -39,28 +39,52 @@ DECLARE_DEFERRED(hang_detect_power_on);
 
 static void hang_detect_power_on(void)
 {
-	if (!chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
-		if (power_on_retries == 0) {
+	if (cold_reset_pending) {
+		if (chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
+			cold_reset_pending = false;
+			power_on_retries = HANG_DETECT_COLD_REBOOT_MAX_RETRIES;
+			CPRINTS("Powering on AP after cold reset");
+			/*
+			 * Re-record CHIPSET_RESET_HANG_REBOOT after G3 is
+			 * reached because S0 -> S5 -> G3 forced shutdown
+			 * transitions overwrite the AP reset log with POWERFAIL
+			 * / G3.
+			 */
+			report_ap_reset(CHIPSET_RESET_HANG_REBOOT);
+			chipset_power_on();
+		} else if (power_on_retries == 0) {
 			cold_reset_pending = false;
 			CPRINTS("Failed to reach G3 for cold reboot");
 			return;
+		} else {
+			power_on_retries--;
 		}
+	} else {
+		if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+			power_on_retries = 0;
+			return;
+		}
+
+		if (power_on_retries == 0) {
+			CPRINTS("Failed to power on AP after cold reboot");
+			return;
+		}
+
 		power_on_retries--;
-		hook_call_deferred(&hang_detect_power_on_data,
-				   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
-		return;
+
+		/*
+		 * Pulse power button only in settled S5 or G3; during G3S5/S5G3
+		 * transitions chipset_in_state(ANY_OFF) is true while
+		 * individual SOFT_OFF and HARD_OFF checks are false.
+		 */
+		if (chipset_in_state(CHIPSET_STATE_SOFT_OFF) ||
+		    chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
+			chipset_power_on();
+		}
 	}
 
-	cold_reset_pending = false;
-	power_on_retries = 0;
-	CPRINTS("Powering on AP after cold reset");
-	/*
-	 * Re-record CHIPSET_RESET_HANG_REBOOT after G3 is reached
-	 * because S0 -> S5 -> G3 forced shutdown transitions
-	 * overwrite the AP reset log with POWERFAIL / G3.
-	 */
-	report_ap_reset(CHIPSET_RESET_HANG_REBOOT);
-	chipset_power_on();
+	hook_call_deferred(&hang_detect_power_on_data,
+			   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
 }
 
 static void hang_detect_cold_reboot(void)
