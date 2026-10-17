@@ -218,9 +218,10 @@ hang_detect_host_command(struct ec_host_cmd_handler_args *args)
 		break;
 
 	case EC_HANG_DETECT_CMD_SET_TIMEOUT:
-		if (p->reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT) {
-			CPRINTS("Reboot timeout has to be greater than %ds",
-				EC_HANG_DETECT_MIN_TIMEOUT);
+		if (p->reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT ||
+		    p->reboot_timeout_sec > INT32_MAX / SECOND) {
+			CPRINTS("Invalid reboot timeout: %ds",
+				p->reboot_timeout_sec);
 			ret = EC_HOST_CMD_INVALID_PARAM;
 			break;
 		}
