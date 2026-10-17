@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9e32a72_9e30c874",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T16:08:18Z",
+      "side": 1,
+      "message": "Done in PS4: updated the commit subject and description to explicitly cover the GNAME stringification fix and GREAD/GWRITE/GREAD_FIELD/GWRITE_FIELD bitfield macros in chip/host/registers.h alongside the RDD/PINMUX register mocks and CCD test declarations.",
+      "parentUuid": "96d9a118_87d9e2db",
+      "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57b05fc6_e7e60563",
@@ -35,6 +53,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n**Functionality:** Looks good. The bitfield macro implementations correctly mask and shift values without multiple evaluations.\n**Architecture \u0026 Component Fit:** Fits well within the emulator mock framework.\n**Code Simplicity:** Looks good. The `do { ... } while(0)` block correctly scopes the pointer in `GWRITE_FIELD`.\n**Idiomaticity \u0026 Readability:** Excellent. The pointer cast via `\u0026GREG32` is idiomatic C.\n**Security:** N/A\n**Testing:** N/A (Test scaffolding).\n**CL Size \u0026 Scope:** Size: M (+57, -1). ❌ This CL violates the Single Logical Change rule by bundling independent categories of changes. The addition of generic host bitfield access macros (`GREAD_FIELD`, `GWRITE_FIELD`, etc.) to `registers.h` is an independent utility change that could be committed and reviewed on its own, completely separate from the specific CCD/RDD mock data added to `registers.c` and `gpio.inc`. \nPlease split this into two CLs:\n1. **CL 1:** Add generic register access and bitfield macros to `chip/host/registers.h`.\n2. **CL 2:** Add CCD-specific mock registers to `chip/host/registers.c` and `board/host/gpio.inc`.\n\n**Commit Message:** ❌ Fails Fidelity (R1). The current commit message does not mention the addition of the generic bitfield macros in `registers.h`, which constitute a significant portion of the logic. Splitting the CL as requested above will naturally resolve this by allowing each CL to have a focused, accurate commit message. See inline comments on `/COMMIT_MSG` for suggested replacements.\n\n[🔗](http://go/tj/75b241f4-6948-425b-94e6-9dc24068ba91)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ae721c5_7ef69134",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T16:08:18Z",
+      "side": 1,
+      "message": "Done in PS4: updated the commit message to cover the host register bitfield macros and kept test/ccd_sleep_inhibit.h as a pure 35-line declaration header.",
+      "parentUuid": "57b05fc6_e7e60563",
       "revId": "5b804bf087e4c89911b25fdc73e3aac36d506eda",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
