@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e8f7074_7a412971",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:23:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please address commit message issues**\n\n**CL Size \u0026 Scope:** Size: M (+93, -1) — This CL represents a single logical change (adding test scaffolding for CCD). ✅\n\n**Commit Message:** The commit message narrates the diff statement-by-statement rather than explaining the conceptual change.\n*   **Rule R3 (Anti-Narration) Violation:** The message states exact variable names and paths (e.g., `Add GPIO_CCD_MODE_L to board/host/gpio.inc, GREAD/GWRITE... to chip/host/registers.h`).\n*   **Suggestion:** Replace the diff narration with a brief explanation of *why* these mocks are needed and *what* they conceptually enable. For example: `\"host: Add RDD and PINMUX register mocks and CCD state machine declarations to the host emulator to enable unit testing the Cr50 RDD and CCD modules.\"`\n\nPlease see the inline comments for architectural and code simplicity improvements. [🔗](http://go/tj/58a79ec6-5c5e-41e5-aecf-3b4302fdbeff)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d537fba0_2f4c8b38",
+        "filename": "chip/host/registers.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:23:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity \u0026 Idiomaticity:** `GWRITE_FIELD` evaluates `GREG32(mname, rname)` three times. Since `GREG32` expands to `REG32(get_reg_addr(...))` and `get_reg_addr` performs a linear string search (`strcmp`), this will result in three linear lookups per field write.\n\nConsider using a `do { ... } while(0)` block to evaluate the register address exactly once, assuming this macro is only used as a statement:\n```c\n#define GWRITE_FIELD(mname, rname, fname, fval) \\\n\tdo { \\\n\t\tvolatile uint32_t *__reg \u003d (volatile uint32_t *)get_reg_addr(GNAME(mname, rname)); \\\n\t\t*__reg \u003d (*__reg \u0026 (~GFIELD_MASK(mname, rname, fname))) | \\\n\t\t\t (((fval) \u003c\u003c GFIELD_LSB(mname, rname, fname)) \u0026 GFIELD_MASK(mname, rname, fname)); \\\n\t} while (0)\n```\n*(If `GWRITE_FIELD` is required to yield a value as an expression, consider adding a static inline helper function instead).* [🔗](http://go/tj/58a79ec6-5c5e-41e5-aecf-3b4302fdbeff)",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a9eed77_898dd4f9",
+        "filename": "test/test_config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-17T15:23:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Architecture \u0026 Component Fit:** `test_config.h` is intended for preprocessor configuration flags (e.g., `#define CONFIG_*`) across tests. Placing C `enum` definitions and a large number of function prototypes here violates layering and pollutes the global test configuration space.\n\nThese prototypes and state enumerations should be extracted into a dedicated header specific to the test or mock (e.g., `test/ccd_sleep_inhibit.h`) and included only where needed. [🔗](http://go/tj/58a79ec6-5c5e-41e5-aecf-3b4302fdbeff)",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
