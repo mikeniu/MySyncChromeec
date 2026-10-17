@@ -4964,15 +4964,15 @@ enum ec_hang_detect_cmds {
 	EC_HANG_DETECT_CMD_CANCEL = 0x1,
 
 	/* Configure watchdog with given reboot timeout and
-	 * cancel currently running AP hand detect timer.
+	 * cancel currently running AP hang detect timer.
 	 */
 	EC_HANG_DETECT_CMD_SET_TIMEOUT = 0x2,
 
 	/* Get last hang status - whether the AP boot was clear or not */
 	EC_HANG_DETECT_CMD_GET_STATUS = 0x3,
 
-	/* Clear last hang status. Called when AP is rebooting/shutting down
-	 * gracefully.
+	/* Clear last hang status after reading EC_HANG_DETECT_CMD_GET_STATUS
+	 * during watchdog probe.
 	 */
 	EC_HANG_DETECT_CMD_CLEAR_STATUS = 0x4
 };
