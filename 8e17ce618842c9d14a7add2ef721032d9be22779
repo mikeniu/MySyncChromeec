@@ -20,6 +20,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38020806_ff2f3e4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T15:40:51Z",
+      "side": 1,
+      "message": "Done in PS4/PS5: split out hosttest build fixes into CL 8605168 and host register mocks into CL 8601877.",
+      "parentUuid": "64e74b3c_9d7fa74b",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 9999
+      },
+      "revId": "8e17ce618842c9d14a7add2ef721032d9be22779",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64e74b3c_9d7fa74b",
