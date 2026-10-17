@@ -18,6 +18,24 @@
       "isAi": true,
       "revId": "0727c54cb71e9be6b7f73b27cd5e3749ad59acbf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c26a139_edadbc42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-17T16:27:18Z",
+      "side": 1,
+      "message": "Done in PS5: split the generic register bitfield macros (chip/host/registers.h) into standalone CL 8605307 (crrev.com/c/8605307).",
+      "parentUuid": "afc273eb_35927fdb",
+      "revId": "0727c54cb71e9be6b7f73b27cd5e3749ad59acbf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
