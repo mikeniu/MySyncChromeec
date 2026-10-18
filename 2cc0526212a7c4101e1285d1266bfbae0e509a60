@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca84bbe0_ff755eba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-18T13:55:00Z",
+      "side": 1,
+      "message": "Done: Split into crrev.com/c/8603350 (Bound cold reboot G3 polling retries) and crrev.com/c/8606567 (Add follow-up power-on pulses for slow S5 ramps).",
+      "parentUuid": "84ae86a7_1e7e80fa",
+      "revId": "2cc0526212a7c4101e1285d1266bfbae0e509a60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2918d901_8c6b70af",
@@ -45,6 +63,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bc65d64_21cff58d",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-18T13:55:00Z",
+      "side": 1,
+      "message": "Done: Replaced goto defer and the + 1 offset with structured if/else blocks in crrev.com/c/8606567.",
+      "parentUuid": "2918d901_8c6b70af",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 9999
+      },
+      "revId": "2cc0526212a7c4101e1285d1266bfbae0e509a60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25ea9aac_955165e6",
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "2cc0526212a7c4101e1285d1266bfbae0e509a60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a654c4b5_50edc5ae",
+        "filename": "zephyr/test/drivers/host_cmd/src/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-18T13:55:00Z",
+      "side": 1,
+      "message": "Done: Updated test_cold_reboot_g3_timeout to test both exact boundary N \u003d TEST_COLD_REBOOT_MAX_RETRIES (reaching POWER_G3 just before the final poll at T+31s still powers on to POWER_S0) and N + 1 (failing to reach POWER_G3 by T+31s exhausts retries and stays in POWER_G3).",
+      "parentUuid": "25ea9aac_955165e6",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 9999
+      },
       "revId": "2cc0526212a7c4101e1285d1266bfbae0e509a60",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
