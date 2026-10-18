@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "375bb56a3feba50ad6381cb5c7ea34a4589c41de",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a047c8a1_99b39eb5",
+        "filename": "zephyr/test/drivers/host_cmd/src/ap_hang_detect.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-18T13:55:11Z",
+      "side": 1,
+      "message": "Done: Updated test_cold_reboot_g3_timeout to test both exact boundary N \u003d TEST_COLD_REBOOT_MAX_RETRIES (reaching POWER_G3 just before the final poll at T+31s still powers on to POWER_S0) and N + 1 (failing to reach POWER_G3 by T+31s exhausts retries and stays in POWER_G3).",
+      "parentUuid": "d0972be0_729a9e48",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 9999
+      },
+      "revId": "375bb56a3feba50ad6381cb5c7ea34a4589c41de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
