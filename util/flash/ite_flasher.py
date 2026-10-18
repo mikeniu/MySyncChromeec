@@ -183,6 +183,9 @@ class IteI2cFlasher(_IteBaseFlasher):
             "wyrdeer",
         ):
             cmd.append("--dbgr-preserve-pin=G1")
+        elif board_lower in ("rauru", "navi", "hylia"):
+            # IT82202 on rauru/navi/hylia uses GPIOG4 for KGD rail enable.
+            cmd.append("--dbgr-preserve-pin=G4")
 
         if self.args.verbose:
             cmd.append("--debug")
