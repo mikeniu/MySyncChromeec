@@ -163,7 +163,7 @@
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 				color-0 {
-					led-color = <&power_led_white>;
+					led-color = <&power_led_white_suspend>;
 					period-ms = <1000>;
 				};
 				color-1 {
