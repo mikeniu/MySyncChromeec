@@ -199,7 +199,7 @@ class TestIteI2cFlasher(unittest.TestCase):
         _mock_locate: MagicMock,
         _mock_exists: MagicMock,
     ) -> None:
-        """Verify --block-write-size=256 and --dbgr-preserve-pin=G1 on corsola/staryu."""
+        """Verify --block-write-size and --dbgr-preserve-pin fallback."""
 
         def mock_get(key: str, default: str = "") -> str:
             if key == "servo_type":
@@ -211,7 +211,15 @@ class TestIteI2cFlasher(unittest.TestCase):
         self.servo.get.side_effect = mock_get
         self.servo.has_control.return_value = False
 
-        for board in ("veluza", "staryu", "wugtrio"):
+        cases = (
+            ("veluza", "G1"),
+            ("staryu", "G1"),
+            ("wugtrio", "G1"),
+            ("rauru", "G4"),
+            ("navi", "G4"),
+            ("hylia", "G4"),
+        )
+        for board, pin in cases:
             with self.subTest(board=board):
                 mock_run.reset_mock()
                 self.args.board = board
@@ -225,7 +233,7 @@ class TestIteI2cFlasher(unittest.TestCase):
                         "-s",
                         "CCD123",
                         "--block-write-size=256",
-                        "--dbgr-preserve-pin=G1",
+                        f"--dbgr-preserve-pin={pin}",
                         "--erase",
                         "--write=/tmp/image.bin",
                     ],

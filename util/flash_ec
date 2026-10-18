@@ -1828,6 +1828,10 @@ function flash_it83xx() {
 		elif [[ "${BOARD}" =~ ^(corsola|krabby|tentacruel|magikarp|chinchou|skitty|veluza|staryu|wugtrio|starmie|wyrdeer)$ ]]; then
 			info "Falling back to G1 for ITE AP_RST preservation on ${BOARD}"
 			ITEFLASH_ARGS+=( "--dbgr-preserve-pin=G1" )
+		elif [[ "${BOARD}" =~ ^(rauru|navi|hylia)$ ]]; then
+			# IT82202 uses GPIOG4 for KGD rail enable on rauru/navi/hylia.
+			info "Falling back to G4 for KGD rail enable on ${BOARD}"
+			ITEFLASH_ARGS+=( "--dbgr-preserve-pin=G4" )
 		fi
 	fi
 
