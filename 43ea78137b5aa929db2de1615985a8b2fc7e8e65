@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70ca1107_34a1101f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-18T14:23:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/3507636f-39e7-400b-bf2c-7076c3bc0b32)]\n\n### Review Summary\n\n*   **Functionality:** ✅ The bounds limit prevents the EC from polling indefinitely if the AP fails to power down, gracefully halting the cold reboot sequence.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated within the existing `hang_detect_power_on` deferred state machine.\n*   **Code Simplicity:** ✅ The retry loop is implemented with minimal state (`power_on_retries` counter) and straightforward early-return guard clauses, avoiding deep nesting.\n*   **Idiomaticity \u0026 Readability:** ✅ Variables are well-named, initialized and reset correctly across all early abort paths, and magic values are avoided via `#define` constants.\n*   **Security:** ✅ No security boundaries are crossed.\n*   **Testing:** ✅ The boundary testing is exceptionally thorough. The test uses precise mock manipulation to verify both the exact boundary limit (N \u003d 20) and the first off-by-one failure (N + 1), validating the edge cases mathematically.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+78, -1). The CL accurately represents a single logical change (bounding the G3 poll logic) with its corresponding unit tests.\n*   **Commit Message:** ✅ The commit message is concise, explaining both the why and the what in a single readable paragraph without narrating the diff.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "43ea78137b5aa929db2de1615985a8b2fc7e8e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
