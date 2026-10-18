@@ -679,8 +679,20 @@ static int check_flashid(struct common_hnd *chnd)
 				   { 0x08, 0x00 }, { 0x05, 0xfd },
 				   { 0x08, 0x9f } };
 
+	/*
+	 * Retry command sequence up to 5 times to let the I2C bridge recover
+	 * after dbgr_reset_gpio(), safely preserving CBI and flash state.
+	 */
 	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-		ret = i2c_write_byte(chnd, commands[i].addr, commands[i].cmd);
+		int retry;
+
+		for (retry = 0; retry < 5; retry++) {
+			ret = i2c_write_byte(chnd, commands[i].addr,
+					     commands[i].cmd);
+			if (!ret)
+				break;
+			usleep(2000);
+		}
 		if (ret) {
 			fprintf(stderr, "Flash ID Failed : cmd %x ,data %x\n",
 				commands[i].addr, commands[i].cmd);
