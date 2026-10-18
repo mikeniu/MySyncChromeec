@@ -232,6 +232,48 @@ class TestIteI2cFlasher(unittest.TestCase):
                     check=True,
                 )
 
+    @patch("os.path.exists", return_value=True)
+    @patch("flash.ite_flasher.locate_tool", return_value="/mock/iteflash")
+    @patch("subprocess.run")
+    def test_execute_flash_ccd_preserve_pin_fallback_rauru(
+        self,
+        mock_run: MagicMock,
+        _mock_locate: MagicMock,
+        _mock_exists: MagicMock,
+    ) -> None:
+        """Verify --block-write-size=256 and --dbgr-preserve-pin=G4 on rauru/navi/hylia."""
+
+        def mock_get(key: str, default: str = "") -> str:
+            if key == "servo_type":
+                return "servo_v4_with_ccd_cr50"
+            if key == "ccd_serialname":
+                return "CCD123"
+            return default
+
+        self.servo.get.side_effect = mock_get
+        self.servo.has_control.return_value = False
+
+        for board in ("rauru", "navi", "hylia"):
+            with self.subTest(board=board):
+                mock_run.reset_mock()
+                self.args.board = board
+                self.flasher.execute_flash()
+
+                mock_run.assert_called_once_with(
+                    [
+                        "/mock/iteflash",
+                        "--send-waveform=0",
+                        "--i2c-interface=usb",
+                        "-s",
+                        "CCD123",
+                        "--block-write-size=256",
+                        "--dbgr-preserve-pin=G4",
+                        "--erase",
+                        "--write=/tmp/image.bin",
+                    ],
+                    check=True,
+                )
+
     @patch("flash.ite_flasher.parse_fmap_areas", return_value={})
     @patch("time.sleep")
     @patch("shutil.copyfile")
