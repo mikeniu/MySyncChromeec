@@ -101,6 +101,10 @@
 #define EFLASH_TYPE_KGD 0x02
 #define EFLASH_TYPE_NONE 0xFF
 
+/* Flash ID command sequence retry parameters */
+#define CHECK_FLASHID_MAX_RETRIES 5
+#define CHECK_FLASHID_RETRY_DELAY_US 2000
+
 uint8_t eflash_type;
 uint8_t spi_cmd_sector_erase;
 
@@ -674,18 +678,34 @@ static int check_flashid(struct common_hnd *chnd)
 {
 	int ret = 0;
 	uint8_t id[16], i;
+	int retry;
 	struct cmds commands[] = { { 0x07, 0x7f }, { 0x06, 0xff },
 				   { 0x04, 0x00 }, { 0x05, 0xfe },
 				   { 0x08, 0x00 }, { 0x05, 0xfd },
 				   { 0x08, 0x9f } };
 
-	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-		ret = i2c_write_byte(chnd, commands[i].addr, commands[i].cmd);
-		if (ret) {
-			fprintf(stderr, "Flash ID Failed : cmd %x ,data %x\n",
-				commands[i].addr, commands[i].cmd);
-			return ret;
+	/*
+	 * Retry command sequence up to CHECK_FLASHID_MAX_RETRIES times to let
+	 * the I2C bridge recover after dbgr_reset_gpio(), safely preserving CBI
+	 * and flash state.
+	 */
+	for (retry = 0; retry < CHECK_FLASHID_MAX_RETRIES; retry++) {
+		if (retry > 0)
+			usleep(CHECK_FLASHID_RETRY_DELAY_US);
+		ret = 0;
+		for (i = 0; i < ARRAY_SIZE(commands); i++) {
+			ret = i2c_write_byte(chnd, commands[i].addr,
+					     commands[i].cmd);
+			if (ret)
+				break;
 		}
+		if (!ret)
+			break;
+	}
+	if (ret) {
+		fprintf(stderr, "Flash ID Failed : cmd %x ,data %x\n",
+			commands[i].addr, commands[i].cmd);
+		return ret;
 	}
 
 	ret = i2c_byte_transfer(chnd, I2C_DATA_ADDR, id, 0, 16);
