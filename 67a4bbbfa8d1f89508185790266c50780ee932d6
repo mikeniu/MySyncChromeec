@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83e1a9d8_a63f8b5b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-18T14:06:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/ed66e992-c97e-4346-84ec-b90448aa2986)]\n\n### Review Summary\n* **Functionality**: ✅ Looks good. The bounded polling correctly waits for the hard-off state before issuing the power-on pulse and cleanly gives up when retries are exhausted.\n* **Architecture \u0026 Component Fit**: ✅ Fits well with the existing watchdog and hang detection constraints.\n* **Code Simplicity**: ✅ Good. The previous `goto` and retry hack have been removed in favor of a clean guard-clause structure.\n* **Idiomaticity \u0026 Readability**: ✅ Good. Magic values have been extracted to descriptive constants like `HANG_DETECT_COLD_REBOOT_MAX_RETRIES`.\n* **Security**: ✅ No security issues identified.\n* **Testing**: ✅ Excellent. Boundary tests for `N` and `N+1` have been successfully added to verify the exact retry limit.\n* **CL Size \u0026 Scope**: ✅ Size: M (+78, -1). Atomic and focused on a single logical change.\n* **Commit Message**: ✅ Concise and accurately explains the rationale and changes without diff narration.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "67a4bbbfa8d1f89508185790266c50780ee932d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
