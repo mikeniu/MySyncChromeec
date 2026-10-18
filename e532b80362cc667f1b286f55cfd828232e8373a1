@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "e532b80362cc667f1b286f55cfd828232e8373a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ee99843_4c2d192e",
+        "filename": "common/ap_hang_detect.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-18T13:55:21Z",
+      "side": 1,
+      "message": "Done: Addressed in the child CL crrev.com/c/8604055 (common/ap_hang_detect: Bound cold reboot G3 polling retries), which bounds G3 polling to HANG_DETECT_COLD_REBOOT_MAX_RETRIES (20) 1-second attempts.",
+      "parentUuid": "5e9e2823_b4f5655e",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 9999
+      },
+      "revId": "e532b80362cc667f1b286f55cfd828232e8373a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
