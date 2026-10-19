@@ -36,6 +36,26 @@
       "parentUuid": "412d2a35_797ad1f9",
       "revId": "d9542846ca1ed9ca2b88bd485530268595c98bc8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a922d4c9_929d2dd7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T11:06:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Resolved in latest patchset.",
+      "parentUuid": "412d2a35_797ad1f9",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d9542846ca1ed9ca2b88bd485530268595c98bc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

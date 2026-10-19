@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a285353_c2532fc2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T11:06:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/ce0ec729-3bbf-4cd9-8a06-638ed00fca6b)]\n\n### Review Summary\n*   **CL Size \u0026 Scope:** Size: S (+35, -0). The CL correctly focuses on a single logical change (adding the GD25Q16 flash configuration for RTS5817) after the requested split.\n*   **Commit Message:** The commit message clearly explains the *Why* and the *What* in concise prose, without narrating the diff.\n*   **Functionality:** The GD25Q16 flash protection settings and Kconfigs are correctly aligned for the RTS5817 board.\n*   **Architecture \u0026 Component Fit:** The definitions match the established pattern for SPI flash configurations and cleanly use `DT_PROP` for the block sizes.\n*   **Code Simplicity:** The added configurations are minimal and straightforward.\n*   **Idiomaticity \u0026 Readability:** Excellent cleanup by reusing Zephyr devicetree properties for sizes.\n*   **Security:** No issues identified.\n*   **Testing:** Exempt from automated tests as this is a declarative hardware configuration map.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0124c7f1ba063ccdac01115c342a46d9b7c57165",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
