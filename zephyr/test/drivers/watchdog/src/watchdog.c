@@ -140,6 +140,8 @@ ZTEST(watchdog, test_wdt_warning_handler)
 	zassert_equal((uint8_t)(uintptr_t)k_current_get(),
 		      panic_get_exception_reg(pdata),
 		      "Panic exception should match current thread id");
+	zassert_equal(0, panic_get_info_reg(pdata),
+		      "Panic info should match exception address (0 on posix)");
 }
 
 /**
