@@ -93,6 +93,21 @@ size_t console_buf_notify_chars(const char *s, size_t len);
  */
 k_tid_t get_shell_thread(void);
 
+/**
+ * zephyr_print() - Write a pre-formatted string to the console outputs
+ * (panic log, Zephyr shell TX stream, and AP console buffer).
+ *
+ * @buff:		Pointer to the string buffer (must be NUL-terminated).
+ * @size:		Length of the string in bytes (excluding NUL).
+ */
+void zephyr_print(const char *buff, size_t size);
+
+/**
+ * zephyr_console_panic() - Switch the Zephyr shell transport to blocking
+ * mode during a panic so output drains synchronously.
+ */
+void zephyr_console_panic(void);
+
 #ifdef __cplusplus
 }
 #endif

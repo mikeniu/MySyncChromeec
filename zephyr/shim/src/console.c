@@ -536,7 +536,18 @@ static void shell_write_str(const struct shell *sh, const char *buff,
 	z_shell_unlock(sh);
 }
 
-static void zephyr_print(const char *buff, size_t size)
+void zephyr_console_panic(void)
+{
+	/* Switch the shell to blocking mode in case it is used during panic. */
+	if (shell_zephyr != NULL && shell_zephyr->iface != NULL &&
+	    shell_zephyr->iface->api != NULL &&
+	    shell_zephyr->iface->api->enable != NULL) {
+		(void)shell_zephyr->iface->api->enable(shell_zephyr->iface,
+						       true);
+	}
+}
+
+void zephyr_print(const char *buff, size_t size)
 {
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LOG)) {
 		panic_log_write_str(buff, size);
@@ -545,20 +556,32 @@ static void zephyr_print(const char *buff, size_t size)
 	bool in_isr = k_is_in_isr();
 
 	/* shell_* functions can not be used in ISRs so optionally use
-	 * printk instead.
+	 * printk_unlocked instead. Use printk_unlocked() rather than printk()
+	 * because printk() redirects to the logging subsystem when
+	 * CONFIG_LOG_PRINTK=y, which would cause an infinite loop when
+	 * zephyr_print() is called from a logging backend.
 	 */
 	if (in_isr) {
 		if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT)) {
-			printk("[ISR]%s", buff);
+			printk_unlocked("[ISR]%s", buff);
 		}
 		return;
 	}
 
-	/* If the shell is about to be (or is) stopped, use printk, since the
-	 * output may be stalled and the shell mutex held.
+	/* If the shell is about to be (or is) stopped, or if the caller cannot
+	 * yield, use printk_unlocked since shell_write_str() may block on the
+	 * shell operations.
+	 *
+	 * When CONFIG_LOG_MODE_MINIMAL is enabled, printk_unlocked() routes
+	 * through zephyr_shim_console_out(), which already notifies the AP
+	 * console buffer. For other logging modes, notify it explicitly here.
 	 */
-	if (shell_stopped || !shell_is_active()) {
-		printk("%s", buff);
+	if (shell_stopped || !shell_is_active() || !k_can_yield()) {
+		if (!IS_ENABLED(CONFIG_LOG_MODE_MINIMAL) &&
+		    IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE)) {
+			console_buf_notify_chars(buff, size);
+		}
+		printk_unlocked("%s", buff);
 		return;
 	}
 
@@ -575,7 +598,7 @@ static void zephyr_print(const char *buff, size_t size)
 	}
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_DEBUG)) {
-		printk("%s", buff);
+		printk_unlocked("%s", buff);
 	}
 }
 #endif /* CONFIG_PIGWEED_LOG_TOKENIZED_LIB */
