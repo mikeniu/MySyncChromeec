@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "974f4d2a_b464e11b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:17:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ The added tests correctly simulate RTS5817 driver error states (`SRP0`/`SRP1` inconsistent state, undecodable `CMP` configuration, and SPI ex-op write failures) and verify the expected error codes are propagated.\n*   **Architecture \u0026 Component Fit:** ✅ The tests integrate cleanly with the existing Zephyr `ZTEST` suite and correctly leverage the `fake_flash_ex_op` driver mock.\n*   **Code Simplicity:** ✅ Test logic is minimal, direct, and avoids unnecessary control flow or boilerplate setup.\n*   **Idiomaticity \u0026 Readability:** ✅ The C code follows idiomatic Zephyr testing conventions and correctly clears/sets status register bits using established domain constants (`SPI_FLASH_SR1_SRP0`, etc.).\n*   **Security:** ✅ N/A (Test-only change).\n*   **Testing:** ✅ Excellent coverage of the error paths. The tests successfully isolate compound conditions (testing `SRP0` and `SRP1` independently) and verify the system state remains correctly unchanged upon simulated write failures.\n*   **CL Size \u0026 Scope:** ✅ `Size: S (+39, -0)`. The CL is small, atomic, and strictly focused on a single logical change (adding error path test coverage for the RTKFP driver).\n*   **Commit Message:** ✅ The commit message is concise and clearly explains the tested error scenarios without unnecessary diff narration.\n\n[[trajectory](https://goto.corp.google.com/traj/5a38d98b-9b0d-4640-ab95-8a7ad2d6442f)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2de1b429f4b85c058daf37f949f1d135aec4d19c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
