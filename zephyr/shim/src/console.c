@@ -345,8 +345,9 @@ static int zephyr_shim_console_out(int c)
 	 * console command can be used to turn Zephyr logging on and off.
 	 *
 	 * Other logging modes (LOG_MODE_IMMEDIATE, LOG_MODE_DEFERRED)
-	 * should enable CONFIG_PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER to
-	 * capture Zephyr log messages into the console buffer.
+	 * should enable CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC or
+	 * CONFIG_PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER to capture Zephyr
+	 * log messages into the console buffer.
 	 */
 	if (console_channel_is_disabled(CC_ZEPHYR_LOG)) {
 		return c;
@@ -371,7 +372,8 @@ static int init_ec_shell(void)
 	 * allows us to capture all character output and copy into the
 	 * AP console buffer.
 	 *
-	 * For other other logging modes, projects should enable
+	 * For other logging modes, projects should enable
+	 * CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC or
 	 * CONFIG_PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER to capture log
 	 * output into the AP console buffer.
 	 */

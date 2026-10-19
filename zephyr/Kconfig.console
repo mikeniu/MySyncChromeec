@@ -92,11 +92,39 @@ menuconfig PLATFORM_EC_CONSOLE_DEBUG
 	  outside of tests.
 
 
+# Note: This backend is incompatible with PIGWEED_LOG_TOKENIZED_LIB, which is
+# enforced via BUILD_ASSERT in log_backend_cros_ec.c rather than Kconfig
+# `depends on !PIGWEED_LOG_TOKENIZED_LIB` to avoid a Kconfig dependency cycle
+# through SHELL_LOG_BACKEND -> CONSOLE -> UART_CONSOLE -> <choice PIGWEED_LOG>.
+config PLATFORM_EC_LOG_BACKEND_CROS_EC
+	bool "ChromeOS EC console logging backend"
+	depends on LOG
+	depends on !LOG_MODE_MINIMAL
+	depends on SHELL
+	select LOG_OUTPUT
+	help
+	  Enable the ChromeOS EC logging backend.
+
+	  This formats Zephyr log messages into a line buffer and passes
+	  them to zephyr_print(), routing logs to the Zephyr shell TX
+	  stream, the AP console buffer (timberslide), and the panic log.
+
+configdefault SHELL_LOG_BACKEND
+	default n if PLATFORM_EC_LOG_BACKEND_CROS_EC
+
+config PLATFORM_EC_LOG_BACKEND_CROS_EC_REDUCED
+	bool "Reduce size of the ChromeOS EC log format"
+	depends on PLATFORM_EC_LOG_BACKEND_CROS_EC
+	help
+	  Skip logging the logging level and the source module name when
+	  formatting log messages in the ChromeOS EC logging backend.
+
 config PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER
 	bool "Logging backend for the console buffer"
 	default y if PLATFORM_EC_HOST_INTERFACE_HECI
 	depends on PLATFORM_EC_HOSTCMD_CONSOLE
 	depends on !LOG_MODE_MINIMAL
+	depends on !PLATFORM_EC_LOG_BACKEND_CROS_EC
 	select LOG_OUTPUT
 	help
 	  Enable the logging backend for the console buffer.
