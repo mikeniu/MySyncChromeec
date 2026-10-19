@@ -192,6 +192,63 @@ DEVICE_DT_DEFINE(DT_CHOSEN(zephyr_flash_controller), fake_flash_init, NULL,
 		 NULL, NULL, POST_KERNEL, CONFIG_FLASH_INIT_PRIORITY,
 		 &fake_flash_api);
 
+static void fake_set_sr(uint8_t sr1, uint8_t sr2)
+{
+	fake_sr1 = sr1;
+	fake_sr2 = sr2;
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_baseline_no_protection)
+{
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      0);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 0);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
+		      0);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_init_clears_srp_preserves_other_bits)
+{
+	uint8_t sr1, sr2;
+
+	/* SRP bits are HW-WP related and must be cleared at init. */
+	fake_set_sr(SPI_FLASH_SR1_SRP0 | SPI_FLASH_SR1_WEL,
+		    SPI_FLASH_SR2_SRP1 | SPI_FLASH_SR2_QE);
+
+	zassert_equal(cros_flash_init(cros_flash_dev), EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_status(cros_flash_dev, &sr1,
+						     &sr2),
+		      EC_SUCCESS);
+	zassert_false(sr1 & SPI_FLASH_SR1_SRP0);
+	zassert_false(sr2 & SPI_FLASH_SR2_SRP1);
+	/* Non-protection bits must survive the status register rewrite. */
+	zassert_true(sr1 & SPI_FLASH_SR1_WEL);
+	zassert_true(sr2 & SPI_FLASH_SR2_QE);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      0);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_write_erase_roundtrip)
+{
+	uint32_t value = 42;
+	uint32_t read_value = 0;
+
+	zassert_equal(cros_flash_physical_write(cros_flash_dev, 0,
+						sizeof(value),
+						(const char *)&value),
+		      EC_SUCCESS);
+	crec_flash_physical_read(0, sizeof(read_value), (char *)&read_value);
+	zassert_equal(value, read_value);
+
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 0,
+						CONFIG_FLASH_ERASE_SIZE),
+		      EC_SUCCESS);
+	crec_flash_physical_read(0, sizeof(read_value), (char *)&read_value);
+	zassert_equal(read_value, 0xffffffff);
+}
+
 static void cros_flash_rtkfp_before(void *fixture)
 {
 	/*
