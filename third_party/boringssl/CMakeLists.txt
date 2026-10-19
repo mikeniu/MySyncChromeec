@@ -82,7 +82,7 @@ add_dependencies(crypto zephyr_generated_headers)
 # Recommended by BoringSSL.
 set(BORINGSSL_COMPILE_OPTIONS
 	-D_POSIX_C_SOURCE=200809L
-	-Wno-implicit-function-declaration
+	$<$<COMPILE_LANGUAGE:C>:-Wno-implicit-function-declaration>
 	-fno-common
 )
 
