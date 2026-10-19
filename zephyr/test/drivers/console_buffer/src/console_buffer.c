@@ -114,6 +114,7 @@ ZTEST_USER(console, test_buf_dropped_logs)
 }
 
 extern struct k_mutex console_write_lock;
+extern atomic_t dropped_logs_isr;
 
 static void isr_notify_wrapper(const void *arg)
 {
@@ -165,6 +166,29 @@ ZTEST(console, test_buf_dropped_logs_isr)
 		      drops_overflow);
 	zassert_equal(total_drops, 2, "expected total_drops == 2, got %u",
 		      total_drops);
+}
+
+ZTEST(console, test_buf_dropped_logs_irq_lock)
+{
+	const char *msg = "test_log\n";
+	size_t consumed_count;
+	unsigned int key;
+
+	atomic_clear(&dropped_logs_isr);
+
+	/* Simulate non-yielding thread context (interrupts disabled) */
+	key = irq_lock();
+	zassert_false(k_is_in_isr());
+	zassert_false(k_can_yield());
+	consumed_count = console_buf_notify_chars(msg, strlen(msg));
+	irq_unlock(key);
+
+	zassert_equal(consumed_count, 0,
+		      "expected consumed_count == 0, got %zu", consumed_count);
+	zassert_equal(atomic_get(&dropped_logs_isr), 1,
+		      "expected dropped_logs_isr == 1, got %ld",
+		      atomic_get(&dropped_logs_isr));
+	atomic_clear(&dropped_logs_isr);
 }
 
 static K_SEM_DEFINE(mutex_held_sem, 0, 1);

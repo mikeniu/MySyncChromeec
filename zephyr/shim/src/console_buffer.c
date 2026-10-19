@@ -40,7 +40,7 @@ static uint32_t read_next_idx;
 static uint32_t head_idx;
 static uint32_t tail_idx;
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
-static atomic_t dropped_logs_isr;
+test_export_static atomic_t dropped_logs_isr;
 static atomic_t dropped_logs_mutex;
 static atomic_t dropped_logs_overflow;
 #endif
@@ -118,9 +118,10 @@ size_t console_buf_notify_chars(const char *s, size_t len)
 	 * This is just notifying of console characters for debugging
 	 * output, so if we are unable to lock the mutex immediately,
 	 * then just drop the string. Mutexes cannot be locked from an
-	 * isr, so also drop the string in this case too.
+	 * ISR or other non-yielding context, so also drop the string in
+	 * this case too.
 	 */
-	if (k_is_in_isr()) {
+	if (!k_can_yield()) {
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
 		atomic_inc(&dropped_logs_isr);
 #endif
