@@ -230,19 +230,12 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 {
 	uint32_t exception_address = 0;
 	const char *thread_name;
-	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
-		thread_name = k_thread_name_get(k_current_get());
-	} else {
-		thread_name = "unknown";
-	}
 	struct k_thread *thread = k_current_get();
 
 #ifdef CONFIG_RISCV
 	struct arch_esf *esf = (struct arch_esf *)get_stack_ptr(thread);
 
 	exception_address = esf->mepc;
-	printk("WDT pre-warning MEPC:%p RA:%p THREAD:%p THREAD_NAME:%s\n",
-	       (void *)esf->mepc, (void *)esf->ra, (void *)thread, thread_name);
 #elif CONFIG_CPU_CORTEX_M
 	struct arch_esf *esf;
 	/*
@@ -250,10 +243,30 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * context, thus PSP will point to esf.
 	 */
 	__asm__ volatile("mrs %0, psp" : "=r"(esf));
+	exception_address = esf->basic.pc;
+#endif
+
+	/* Save the current task id in panic info before any printk or thread
+	 * dumping calls, ensuring panic info is recorded even if subsequent
+	 * logging or thread dumping fails or gets interrupted by reset.
+	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
+	 * PANIC_SW_WATCHDOG in panic_data_init if a watchdog reset occurs.
+	 */
+	panic_data_write_watchdog_warning(exception_address, thread);
+
+	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
+		thread_name = k_thread_name_get(thread);
+	} else {
+		thread_name = "unknown";
+	}
+
+#ifdef CONFIG_RISCV
+	printk("WDT pre-warning MEPC:%p RA:%p THREAD:%p THREAD_NAME:%s\n",
+	       (void *)esf->mepc, (void *)esf->ra, (void *)thread, thread_name);
+#elif CONFIG_CPU_CORTEX_M
 	printk("WDT pre-warning PC:%p LR:%p THREAD:%p THREAD_NAME:%s\n",
 	       (void *)esf->basic.pc, (void *)esf->basic.lr, (void *)thread,
 	       thread_name);
-	exception_address = esf->basic.pc;
 #else
 	/* TODO(b/176523207): watchdog warning message */
 	printk("Watchdog deadline is close! THREAD:%p THREAD_NAME:%s\n",
@@ -271,13 +284,6 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	if (IS_ENABLED(CONFIG_THREAD_MONITOR)) {
 		k_thread_foreach_unlocked(log_thread_info, NULL);
 	}
-
-	/* Save the current task id in panic info.
-	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
-	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
-	 * occurs.
-	 */
-	panic_data_write_watchdog_warning(exception_address, thread);
 }
 
 __maybe_unused static void
