@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d6191f7_70dbafa5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T19:54:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n**Functionality:** Looks good. The RDD and PINMUX register mocks and device state declarations provide the correct scaffolding for CCD host tests.\n**Architecture \u0026 Component Fit:** Test declarations are properly encapsulated in `test/ccd_sleep_inhibit.h`.\n**Code Simplicity:** The code is minimal and direct.\n**Idiomaticity \u0026 Readability:** Uses standard C idioms, including the correct use of `(void)` for parameterless function signatures.\n**Security:** N/A\n**Testing:** N/A (Test scaffolding).\n**CL Size \u0026 Scope:** Size: M (+63, -0) — Represents a single logical change focused on providing test mocks for the CCD emulator.\n**Commit Message:** Accurately describes the changes and provides clear rationale.\n\n[🔗](http://go/tj/bcf4477b-c7fd-43cb-a738-d9343f45edc1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b974a691a2be914f39220aa7be55e2a9118ab7d2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
