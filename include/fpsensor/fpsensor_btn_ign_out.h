@@ -7,20 +7,32 @@
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H_
 
 #include "ec_commands.h"
-
-#include <cstdint>
+#include "fpsensor/fpsensor_modes.h"
 
 namespace fp_btn_ign_out
 {
 
 #if defined(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT)
-void update(std::uint32_t sensor_mode);
+class FpButtonIgnoreController {
+    public:
+	int init();
+	void update(FpSensorMode sensor_mode);
+	void on_deactivation_timeout();
+
+    private:
+	void activate();
+	void deactivate();
+
+	bool is_active_ = false;
+};
+
+void update(FpSensorMode sensor_mode);
 #else
-inline void update(std::uint32_t sensor_mode)
+inline void update(FpSensorMode sensor_mode)
 {
 }
 #endif
 
-} // namespace btn_ign_out
+} /* namespace fp_btn_ign_out */
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H_ */
