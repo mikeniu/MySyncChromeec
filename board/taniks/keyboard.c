@@ -15,9 +15,15 @@ __override struct keyboard_scan_config keyscan_config = {
 	.output_settle_us = 50,
 	.debounce_down_us = 9 * MSEC,
 	.debounce_up_us = 30 * MSEC,
-	.scan_period_us = 3 * MSEC,
-	.stable_scan_period_us = 9 * MSEC,
-	.min_post_scan_delay_us = 1000,
+	/*
+	 * Taniks uses ADC-based keyboard matrix scanning
+	 * (CONFIG_KEYBOARD_SCAN_ADC) which takes ~4.8ms per scan. Increase
+	 * scan periods and post-scan delay to prevent CPU starvation and
+	 * watchdog timeouts during concurrent stress tests (b/564527095).
+	 */
+	.scan_period_us = 10 * MSEC,
+	.stable_scan_period_us = 20 * MSEC,
+	.min_post_scan_delay_us = 5 * MSEC,
 	.poll_timeout_us = 100 * MSEC,
 	.actual_key_mask = {
 		0x1c, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
