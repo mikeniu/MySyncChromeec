@@ -33,6 +33,43 @@
       "message": "Nit: Have we considered using Zephyr\u0027s ring buffer for this? https://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/third_party/zephyrproject/zephyr/include/zephyr/sys/ring_buffer.h",
       "revId": "c02af5d6c1f1ef976db072372d58f735d55983d7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58a303ef_288f9541",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-19T15:29:54Z",
+      "side": 1,
+      "message": "Keeping the existing FIFO implementation here so the bug fix stays in sync with ec-legacy (crrev.com/c/7594711) and preserves the 8-byte UNIT_SIZE entry alignment. We can look at migrating main to struct ring_buf in a follow-up cleanup.",
+      "parentUuid": "1f0f90a1_d6fa6978",
+      "isAi": true,
+      "revId": "c02af5d6c1f1ef976db072372d58f735d55983d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95266856_3839cec8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-19T15:29:54Z",
+      "side": 1,
+      "message": "Agree, a Zephyr ring buffer would be better. However I\u0027d like to keep it as so it applies to ec-legacy cleanly. Can convert to a zephyr ring buffer in main as a follow up.",
+      "parentUuid": "1f0f90a1_d6fa6978",
+      "revId": "c02af5d6c1f1ef976db072372d58f735d55983d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
