@@ -452,6 +452,47 @@ ZTEST_USER(cros_flash_rtkfp, test_protect_now_all)
 		      EC_ERROR_ACCESS_DENIED);
 }
 
+ZTEST_USER(cros_flash_rtkfp, test_protect_flags_srp_inconsistent)
+{
+	fake_sr1 |= SPI_FLASH_SR1_SRP0;
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ERROR_INCONSISTENT);
+
+	fake_sr1 &= ~SPI_FLASH_SR1_SRP0;
+	fake_sr2 |= SPI_FLASH_SR2_SRP1;
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ERROR_INCONSISTENT);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_flags_undecodable_unknown)
+{
+	/*
+	 * CMP=1 with these BP bits has no entry in the GD25Q16 protection
+	 * table, so the status registers cannot be decoded.
+	 */
+	fake_sr2 |= SPI_FLASH_SR2_CMP;
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ERROR_UNKNOWN);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_status_register_write_failure)
+{
+	fake_ex_op_fail = true;
+
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_RO_AT_BOOT),
+		      -EIO);
+	zassert_equal(cros_flash_physical_protect_now(cros_flash_dev, false),
+		      -EIO);
+	zassert_equal(cros_flash_physical_protect_now(cros_flash_dev, true),
+		      -EIO);
+
+	/* No protection state change happened, including ALL_NOW. */
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      0);
+}
+
 static void cros_flash_rtkfp_before(void *fixture)
 {
 	/*
