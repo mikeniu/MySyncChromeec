@@ -291,6 +291,7 @@ ZTEST(uart_hostcmd, test_uart_hc_isr)
 ZTEST(uart_hostcmd, test_uart_hc_no_yield)
 {
 	char response[CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE + 1];
+	char long_msg[CONFIG_SHELL_PRINTF_BUFF_SIZE + 16];
 	struct ec_params_console_read_v1 params = {
 		.subcmd = CONSOLE_READ_RECENT,
 	};
@@ -322,6 +323,34 @@ ZTEST(uart_hostcmd, test_uart_hc_no_yield)
 	zassert_mem_equal(msg3, response + MSG_LEN(msg1), MSG_LEN(msg3),
 			  "expected \"%s\", got \"%.*s\"", msg3, MSG_LEN(msg3),
 			  response + MSG_LEN(msg1));
+
+	/*
+	 * Exercise both an empty flush and a multi-chunk line-buffer flush
+	 * (> CONFIG_SHELL_PRINTF_BUFF_SIZE - 1).
+	 */
+	LOG_RAW("");
+	memset(long_msg, 'A', sizeof(long_msg) - 1);
+	long_msg[sizeof(long_msg) - 1] = '\0';
+	LOG_RAW("%s", long_msg);
+
+	zassert_equal(EC_RES_SUCCESS, ec_cmd_console_snapshot(NULL));
+	read_args.response_size = 0;
+	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
+	zassert_equal(sizeof(long_msg), read_args.response_size);
+	zassert_mem_equal(long_msg, response, sizeof(long_msg) - 1);
+
+	/*
+	 * Exercise '\r' stripping when LOG_PRINTK routes through cr_out_func
+	 * in log_output.c.
+	 */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC)) {
+		LOG_PRINTK("cr\n");
+		zassert_equal(EC_RES_SUCCESS, ec_cmd_console_snapshot(NULL));
+		read_args.response_size = 0;
+		zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
+		zassert_equal(sizeof("cr\n"), read_args.response_size);
+		zassert_mem_equal("cr\n", response, sizeof("cr\n"));
+	}
 }
 
 ZTEST_SUITE(uart_hostcmd, predicate_post_main, NULL,
