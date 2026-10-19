@@ -135,17 +135,15 @@ uint32_t __hw_clock_event_get(void)
 		return EVT_MAX_EXPIRED_US;
 }
 
+static uint16_t read_itcnt_event(void)
+{
+	return NPCX_ITCNT(ITIM_EVENT_NO);
+}
+
 /* Get current counter value of event timer */
 uint16_t __hw_clock_event_count(void)
 {
-	uint16_t cnt, cnt2;
-
-	cnt = NPCX_ITCNT(ITIM_EVENT_NO);
-	/* Wait for two consecutive equal values are read */
-	while ((cnt2 = NPCX_ITCNT(ITIM_EVENT_NO)) != cnt)
-		cnt = cnt2;
-
-	return cnt;
+	return npcx_itim_read_stable16(read_itcnt_event);
 }
 
 /* Returns time delay cause of deep idle */
@@ -232,18 +230,15 @@ void hw_clock_source_set_preload(uint32_t ts, uint8_t clear)
 	SET_BIT(NPCX_ITCTS(ITIM_SYSTEM_NO), NPCX_ITCTS_ITEN);
 }
 
+static uint32_t read_itcnt_system(void)
+{
+	return NPCX_ITCNT_SYSTEM;
+}
+
 /* Returns the value of the free-running counter used as clock. */
 uint32_t __hw_clock_source_read(void)
 {
-	uint32_t cnt, cnt2;
-
-	cnt = NPCX_ITCNT_SYSTEM;
-	/*
-	 * Wait for two consecutive equal values are read no matter
-	 * ITIM's source clock is APB2 or 32K since mux's delay.
-	 */
-	while ((cnt2 = NPCX_ITCNT_SYSTEM) != cnt)
-		cnt = cnt2;
+	uint32_t cnt = npcx_itim_read_stable32(read_itcnt_system);
 
 #if DEBUG_TMR
 	cur_cnt_us_dbg = TICK_ITIM32_MAX_CNT - cnt;

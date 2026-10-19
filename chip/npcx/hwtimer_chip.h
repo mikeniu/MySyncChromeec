@@ -8,10 +8,38 @@
 #ifndef __CROS_EC_HWTIMER_CHIP_H
 #define __CROS_EC_HWTIMER_CHIP_H
 
+#include <stdint.h>
+
 /* Use ITIM32 as main hardware timer */
 #define TICK_ITIM32_MAX_CNT 0xFFFFFFFF
 /* Maximum deadline of event */
 #define EVT_MAX_EXPIRED_US TICK_ITIM32_MAX_CNT
+/* Max consecutive-read retries for 32.768 kHz clock-domain sync stability */
+#define NPCX_HWTIMER_MAX_RETRIES 8
+
+static inline uint16_t npcx_itim_read_stable16(uint16_t (*read_reg)(void))
+{
+	uint16_t cnt = read_reg();
+	uint16_t cnt2;
+
+	for (int i = 0;
+	     i < NPCX_HWTIMER_MAX_RETRIES && (cnt2 = read_reg()) != cnt; i++)
+		cnt = cnt2;
+
+	return cnt;
+}
+
+static inline uint32_t npcx_itim_read_stable32(uint32_t (*read_reg)(void))
+{
+	uint32_t cnt = read_reg();
+	uint32_t cnt2;
+
+	for (int i = 0;
+	     i < NPCX_HWTIMER_MAX_RETRIES && (cnt2 = read_reg()) != cnt; i++)
+		cnt = cnt2;
+
+	return cnt;
+}
 
 /* Clock source for ITIM16 */
 enum ITIM_SOURCE_CLOCK_T {
