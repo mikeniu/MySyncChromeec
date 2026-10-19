@@ -197,7 +197,9 @@ static enum ec_status hc_bt_command(struct host_cmd_handler_args *args)
 	 * Large messages from the AP will arrive in 240-byte chunks using the
 	 * 'offset' and 'total_size' fields (to be added to the struct above).
 	 */
-	if (req->size == 0 || req->size > BT_MAX_COMMAND_SIZE) {
+	if (args->params_size < sizeof(req->size) || req->size == 0 ||
+	    req->size > BT_MAX_COMMAND_SIZE ||
+	    args->params_size < sizeof(req->size) + req->size) {
 		return EC_RES_INVALID_PARAM;
 	}
 
