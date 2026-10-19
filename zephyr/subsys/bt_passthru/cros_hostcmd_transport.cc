@@ -223,12 +223,10 @@ static enum ec_status hc_bt_read_event(struct host_cmd_handler_args *args)
 		chre::CrosHostcmdTransport::GetPendingEvents(
 			rsp->events, BT_MAX_EVENT_SIZE, &events_packed);
 
-	if (events_packed == 0) {
-		return EC_RES_UNAVAILABLE;
+	if (events_packed > 0) {
+		LOG_DBG("AP polled events: %u items packed (%zu bytes)",
+			events_packed, total_payload_size);
 	}
-
-	LOG_DBG("AP polled events: %u items packed (%zu bytes)", events_packed,
-		total_payload_size);
 
 	rsp->num_events = events_packed;
 	args->response_size = sizeof(rsp->num_events) + total_payload_size;
