@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5345f9a7_7f4eb83f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-10-19T02:24:27Z",
+      "side": 1,
+      "message": "I used cmd `repo upload .` to upload the CL, and it looks like it checks the formatting.",
+      "parentUuid": "a61e9b84_07ff8a9b",
+      "revId": "13f251b151dd1b2ba7cbe561f89179be85ea6ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e3214af_e0f09563",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-10-16T12:58:06Z",
       "side": 1,
       "message": "move this to Kconfig.powerseq, under PLATFORM_EC_POWERSEQ_MT8186",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 31
+      },
+      "revId": "13f251b151dd1b2ba7cbe561f89179be85ea6ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0748d7c6_6941237e",
+        "filename": "zephyr/Kconfig.pmic",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1395690
+      },
+      "writtenOn": "2026-10-19T02:24:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e3214af_e0f09563",
       "range": {
         "startLine": 28,
         "startChar": 0,
