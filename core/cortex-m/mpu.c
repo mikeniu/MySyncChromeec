@@ -8,11 +8,14 @@
 #include "builtin/assert.h"
 #include "console.h"
 #include "cpu.h"
+#include "hooks.h"
 #include "mpu.h"
+#include "mpu_private.h"
 #ifdef CONFIG_RAM_LOCK
 #include "ram_lock.h"
 #endif
 #include "registers.h"
+#include "system.h"
 #include "task.h"
 #include "util.h"
 
@@ -43,6 +46,7 @@ bool mpu_is_unified(void)
 	return (mpu_get_type() & MPU_TYPE_UNIFIED_MASK) == 0;
 }
 
+#ifndef HAS_MOCK_MPU
 /**
  * Update a memory region.
  *
@@ -55,8 +59,9 @@ bool mpu_is_unified(void)
  *
  * Based on 3.1.4.1 'Updating an MPU Region' of Stellaris LM4F232H5QC Datasheet
  */
-int mpu_update_region(uint8_t region, uint32_t addr, uint8_t size_bit,
-		      uint16_t attr, uint8_t enable, uint8_t srd)
+test_mockable int mpu_update_region(uint8_t region, uint32_t addr,
+				    uint8_t size_bit, uint16_t attr,
+				    uint8_t enable, uint8_t srd)
 {
 	/*
 	 * Note that on the Cortex-M3, Cortex-M4, and Cortex-M7, the base
@@ -98,6 +103,7 @@ int mpu_update_region(uint8_t region, uint32_t addr, uint8_t size_bit,
 
 	return EC_SUCCESS;
 }
+#endif /* !HAS_MOCK_MPU */
 
 /*
  * Align address to a maximum of 31 bits
@@ -243,30 +249,35 @@ static int mpu_unlock_region(uint8_t region, uint32_t addr, uint32_t size,
 				 1);
 }
 
-void mpu_enable(void)
+#ifndef HAS_MOCK_MPU
+test_mockable void mpu_enable(void)
 {
 	MPU_CTRL |= MPU_CTRL_PRIVDEFEN | MPU_CTRL_HFNMIENA | MPU_CTRL_ENABLE;
 }
 
-void mpu_disable(void)
+test_mockable void mpu_disable(void)
 {
 	MPU_CTRL &= ~(MPU_CTRL_PRIVDEFEN | MPU_CTRL_HFNMIENA | MPU_CTRL_ENABLE);
 }
 
-uint32_t mpu_get_type(void)
+test_mockable uint32_t mpu_get_type(void)
 {
 	return MPU_TYPE;
 }
+#endif /* !HAS_MOCK_MPU */
+DECLARE_HOOK(HOOK_SYSJUMP, mpu_disable, HOOK_PRIO_LAST);
 
 int mpu_protect_data_ram(void)
 {
 	int ret;
 
 #ifdef CONFIG_RAM_LOCK
-	ret = ram_lock_config_lock_region(REGION_DATA_RAM, CONFIG_RAM_BASE,
-					  CONFIG_DATA_RAM_SIZE);
-	if (ret != EC_SUCCESS)
-		return ret;
+	if (system_is_locked()) {
+		ret = ram_lock_config_lock_region(
+			REGION_DATA_RAM, CONFIG_RAM_BASE, CONFIG_DATA_RAM_SIZE);
+		if (ret != EC_SUCCESS)
+			return ret;
+	}
 #endif
 
 	/* Prevent code execution from data RAM */
@@ -278,7 +289,7 @@ int mpu_protect_data_ram(void)
 
 	/* Exempt the __iram_text section */
 	return mpu_unlock_region(
-		REGION_DATA_RAM_TEXT, (uint32_t)&__iram_text_start,
+		REGION_DATA_RAM_TEXT, (uintptr_t)&__iram_text_start,
 		(uint32_t)(&__iram_text_end - &__iram_text_start),
 		MPU_ATTR_INTERNAL_SRAM);
 }
@@ -287,13 +298,14 @@ int mpu_protect_data_ram(void)
 int mpu_protect_code_ram(void)
 {
 #ifdef CONFIG_RAM_LOCK
-	int ret;
-
-	ret = ram_lock_config_lock_region(
-		REGION_STORAGE, CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF,
-		CONFIG_CODE_RAM_SIZE);
-	if (ret != EC_SUCCESS)
-		return ret;
+	if (system_is_locked()) {
+		int ret = ram_lock_config_lock_region(
+			REGION_STORAGE,
+			CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF,
+			CONFIG_CODE_RAM_SIZE);
+		if (ret != EC_SUCCESS)
+			return ret;
+	}
 #endif
 
 	/* Prevent write access to code RAM */

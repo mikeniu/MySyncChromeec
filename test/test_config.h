@@ -651,6 +651,24 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_CONSOLE_CMD_WATCHDOG_INFO
 #endif
 
+#if defined(TEST_SYSTEM) && defined(BOARD_HOST)
+#define CONFIG_MPU
+#define CONFIG_EXTERNAL_STORAGE
+#define CONFIG_RAM_LOCK
+#undef CONFIG_RAM_BASE
+#define CONFIG_RAM_BASE 0x200b0000
+#undef CONFIG_DATA_RAM_SIZE
+#define CONFIG_DATA_RAM_SIZE 0x00020000
+#undef CONFIG_CODE_RAM_SIZE
+#define CONFIG_CODE_RAM_SIZE 0x00040000
+#ifdef TEST_MPU_MEMORY_LAYOUT
+#undef CONFIG_PROGRAM_MEMORY_BASE
+#define CONFIG_PROGRAM_MEMORY_BASE 0x10070000
+#undef CONFIG_RO_MEM_OFF
+#define CONFIG_RO_MEM_OFF 0
+#endif
+#endif
+
 #ifdef HAVE_PRIVATE
 #include "private_test_config.h"
 #endif /* HAVE_PRIVATE */
