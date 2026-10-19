@@ -449,6 +449,74 @@ ZTEST_USER(fpsensor_template, test_fp_frame_v0_busy)
 	k_sleep(K_SECONDS(1));
 }
 
+ZTEST_USER(fpsensor_template, test_fp_frame_v0_busy_enroll)
+{
+	struct ec_params_fp_frame params_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 0,
+	};
+
+	/* Simulate active enrollment session in progress. */
+	global_context.sensor_mode |= FP_MODE_ENROLL_SESSION;
+
+	/* v0 command should return BUSY during active enrollment. */
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_frame(NULL, &params_v0, frame_buffer));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_frame_v0_not_busy_match)
+{
+	struct ec_params_fp_frame params_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 0,
+	};
+
+	/* Simulate match mode being active. */
+	global_context.sensor_mode |= FP_MODE_MATCH;
+
+	/*
+	 * Confirm that template frame read is NOT blocked by match mode.
+	 * It returns EC_RES_UNAVAILABLE because no template is valid,
+	 * proving it passed the EC_RES_BUSY guard.
+	 */
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_frame(NULL, &params_v0, frame_buffer));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_frame_v1_encrypt_template_busy_enroll)
+{
+	struct ec_params_fp_frame_v1 encrypt_request = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+
+	/* Simulate active enrollment session in progress. */
+	global_context.sensor_mode |= FP_MODE_ENROLL_SESSION;
+
+	/* v1 encrypt template should return BUSY during active enrollment. */
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_frame_v1(NULL, &encrypt_request, NULL));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_frame_v1_encrypt_template_not_busy_match)
+{
+	struct ec_params_fp_frame_v1 encrypt_request = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+
+	/* Simulate match mode being active. */
+	global_context.sensor_mode |= FP_MODE_MATCH;
+
+	/*
+	 * Confirm that template encryption is NOT blocked by match mode.
+	 * It returns EC_RES_UNAVAILABLE because no template is valid,
+	 * proving it passed the EC_RES_BUSY guard.
+	 */
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_frame_v1(NULL, &encrypt_request, NULL));
+}
+
 ZTEST_USER(fpsensor_template, test_fp_frame_v0_raw_image_not_busy)
 {
 	struct ec_params_fp_template_v1 params_v1 = {
