@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5591b99_5e319b1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:30:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** [[trajectory](https://goto.corp.google.com/traj/e7287dba-31f7-41ef-9b0d-0bf0c5d2d910)]\n\n### Review Summary\n**Functionality**: Found a logical bug where `data-\u003eall_protected \u003d 1` is set unconditionally even if `cros_flash_rtkfp_protect_at_boot` fails, and the return value of `flash_set_status` is ignored during initialization.\n**Architecture \u0026 Component Fit**: The driver matches the existing `cros_flash` abstraction correctly.\n**Code Simplicity**: Identified several opportunities to simplify control flow (e.g. returning `spi_flash_reg_to_protect` directly, removing unnecessary intermediate variables).\n**Idiomaticity \u0026 Readability**: Good, though the suggested simplifications will improve clarity.\n**Security**: Software protection bounds check enforcement relies heavily on correct status register updates, so propagating error values instead of ignoring them is critical.\n**Testing**: ❌ **Missing Tests**. Automated test coverage is mandatory for all new logic. While the hardware interactions are challenging to test, the translation logic (e.g., `spi_flash_reg_to_protect`, bounds checking) must be tested (e.g., via mocks or direct function tests) in the same CL.\n**CL Size \u0026 Scope**: `Size: L (+617, -0)`. This CL is too large and bundles multiple components (DTS bindings, build configs, driver implementation) without tests. Please split this CL into:\n1. CL 1: Add the devicetree bindings (`realtek,rtkfp-cros-flash.yaml`) and Kconfig/CMake build system boilerplate.\n2. CL 2: Introduce the core `cros_flash_rtkfp` driver implementation (`cros_flash_rtkfp.c`) and its corresponding unit tests.\n**Commit Message**: ✅ The commit message is concise, accurately reflects the diff, and uses the correct `BUG\u003db:...` formatting for ChromiumOS.\n\nTAG\u003dagy\nCONV\u003df4ba1001-64ca-4695-8fe5-bc64e78343b4",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc73cecf_41267aef",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:30:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — This control flow can be simplified. Instead of checking `rv !\u003d EC_SUCCESS` and returning it, you can return the result of `spi_flash_reg_to_protect` directly:\n\n```c\n\trv \u003d flash_set_status(dev, sr1, sr2);\n\tif (rv) {\n\t\treturn rv;\n\t}\n\n\treturn spi_flash_reg_to_protect(sr1, sr2, \u0026data-\u003eaddr_prot_start,\n\t\t\t\t\t\u0026data-\u003eaddr_prot_length);\n```\n[🔗](http://go/tj/e7287dba-31f7-41ef-9b0d-0bf0c5d2d910)",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aefa4403_236ee3b5",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:30:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — This intermediate variable assignment is unnecessary. You can return the constant directly:\n\n```c\n\tif ((sr1 \u0026 SPI_FLASH_SR1_SRP0) || (sr2 \u0026 SPI_FLASH_SR2_SRP1)) {\n\t\treturn EC_FLASH_PROTECT_ERROR_INCONSISTENT;\n\t}\n```\n[🔗](http://go/tj/e7287dba-31f7-41ef-9b0d-0bf0c5d2d910)",
+      "range": {
+        "startLine": 352,
+        "startChar": 0,
+        "endLine": 355,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b7b98ff_830115f6",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:30:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — `data-\u003eall_protected` is set to `1` unconditionally, even if `cros_flash_rtkfp_protect_at_boot` fails. It should only be set on success:\n\n```c\n\tif (all) {\n\t\tret \u003d cros_flash_rtkfp_protect_at_boot(\n\t\t\tdev, EC_FLASH_PROTECT_ALL_AT_BOOT);\n\t\tif (!ret) {\n\t\t\tdata-\u003eall_protected \u003d 1;\n\t\t}\n\t} else {\n```\n[🔗](http://go/tj/e7287dba-31f7-41ef-9b0d-0bf0c5d2d910)",
+      "range": {
+        "startLine": 505,
+        "startChar": 0,
+        "endLine": 509,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49445e5b_b4621e35",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:30:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The return value of `flash_set_status` is ignored. If clearing the SRP bits fails, the device might remain locked or in an unexpected state. Please propagate or handle the error:\n\n```c\n\tret \u003d flash_set_status(dev, sr1, sr2);\n\tif (ret) {\n\t\treturn ret;\n\t}\n```\n[🔗](http://go/tj/e7287dba-31f7-41ef-9b0d-0bf0c5d2d910)",
+      "range": {
+        "startLine": 548,
+        "startChar": 0,
+        "endLine": 548,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
