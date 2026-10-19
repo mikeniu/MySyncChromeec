@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa3c2689_7b931ddc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T07:11:52Z",
+      "side": 1,
+      "message": "This CL is spilited into https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8609868 and https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8609869",
+      "parentUuid": "11fb5497_c697bc9b",
+      "revId": "50fd7f51d7d986dcc4c7163d57063d3a3a433912",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8632ee81_8b3d8a02",
@@ -45,6 +63,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "830414c7_b0610f05",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T07:11:52Z",
+      "side": 1,
+      "message": "Moved to https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8593834",
+      "parentUuid": "8632ee81_8b3d8a02",
+      "range": {
+        "startLine": 259,
+        "startChar": 0,
+        "endLine": 262,
+        "endChar": 9999
+      },
+      "revId": "50fd7f51d7d986dcc4c7163d57063d3a3a433912",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68855952_4b5125d7",
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "50fd7f51d7d986dcc4c7163d57063d3a3a433912",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "728a4975_c5ebe046",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T07:11:52Z",
+      "side": 1,
+      "message": "Moved to https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8609868",
+      "parentUuid": "68855952_4b5125d7",
+      "range": {
+        "startLine": 379,
+        "startChar": 0,
+        "endLine": 389,
+        "endChar": 9999
+      },
       "revId": "50fd7f51d7d986dcc4c7163d57063d3a3a433912",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
