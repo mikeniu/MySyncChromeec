@@ -12,6 +12,7 @@
 #include "test/drivers/utils.h"
 
 #include <zephyr/fff.h>
+#include <zephyr/irq.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/minmax.h>
 #include <zephyr/ztest.h>
@@ -146,6 +147,19 @@ ZTEST_USER(panic_log, test_write_str)
 	unfreeze_panic_log();
 	panic_log_write_str(test_str, strlen(test_str));
 	freeze_panic_log();
+	zassert_true(panic_log_contains(test_str));
+}
+
+ZTEST(panic_log, test_write_under_irq_lock)
+{
+	const char *test_str = __func__;
+
+	unfreeze_panic_log();
+	unsigned int key = irq_lock();
+	panic_log_write_str(test_str, strlen(test_str));
+	irq_unlock(key);
+	freeze_panic_log();
+	zassert_true(panic_log_is_valid());
 	zassert_true(panic_log_contains(test_str));
 }
 

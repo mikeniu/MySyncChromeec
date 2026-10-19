@@ -9,6 +9,8 @@
 #include "preserved_ring_buf.h"
 #include "util.h"
 
+#include <zephyr/irq.h>
+
 /* Panic log defaults to frozen */
 test_export_static bool panic_log_frozen = true;
 test_export_static bool panic_log_initialized = false;
@@ -94,19 +96,26 @@ DECLARE_HOOK(HOOK_INIT_EARLY, panic_log_init, HOOK_PRIO_DEFAULT - 1);
  * frozen. */
 void panic_log_write_char(const char c)
 {
-	if (panic_log_frozen)
-		return;
-	preserved_ring_buf_write(panic_log, c);
+	unsigned int key = irq_lock();
+
+	if (!panic_log_frozen)
+		preserved_ring_buf_write(panic_log, c);
+
+	irq_unlock(key);
 }
 
 /* Write a string to the panic log. String will be dropped if panic log is
  * frozen. */
 void panic_log_write_str(const char *str, const size_t size)
 {
-	if (panic_log_frozen)
-		return;
-	for (int i = 0; i < size; i++)
-		preserved_ring_buf_write(panic_log, str[i]);
+	unsigned int key = irq_lock();
+
+	if (!panic_log_frozen) {
+		for (size_t i = 0; i < size; i++)
+			preserved_ring_buf_write(panic_log, str[i]);
+	}
+
+	irq_unlock(key);
 }
 
 /* Returns the current state of panic log, before applying any requested changes
