@@ -7,3 +7,11 @@ tests:
     tags:
       - spi
     type: unit
+    extra_args:
+      - SPI_FLASH_CHIP=W25Q64
+  spi.flash_reg.gd25q16:
+    tags:
+      - spi
+    type: unit
+    extra_args:
+      - SPI_FLASH_CHIP=GD25Q16

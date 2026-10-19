@@ -26,11 +26,25 @@ target_include_directories(testbinary
     ${CMAKE_BINARY_DIR}/include include/
 )
 
-# W25Q64 has 0x400000 bytes as the first section, setting
-# CONFIG_FLASH_SIZE_BYTES to that allows us to test every branch of
-# spi_flash_reg.c
+# SPI_FLASH_CHIP selects which protect range table of spi_flash_reg.c is
+# built and tested. It is set by the scenario's extra_args in testcase.yaml.
+if(NOT DEFINED SPI_FLASH_CHIP)
+  set(SPI_FLASH_CHIP W25Q64)
+endif()
+
+if(SPI_FLASH_CHIP STREQUAL "W25Q64")
+  # W25Q64 has 0x400000 bytes as the first section, setting
+  # CONFIG_FLASH_SIZE_BYTES to that allows us to test every branch of
+  # spi_flash_reg.c
+  set(SPI_FLASH_SIZE_BYTES 4194304)
+elseif(SPI_FLASH_CHIP STREQUAL "GD25Q16")
+  set(SPI_FLASH_SIZE_BYTES 2097152)
+else()
+  message(FATAL_ERROR "Unsupported SPI_FLASH_CHIP: ${SPI_FLASH_CHIP}")
+endif()
+
 target_compile_definitions(testbinary
   PUBLIC
-    CONFIG_SPI_FLASH_W25Q64
-    CONFIG_FLASH_SIZE_BYTES=4194304
+    CONFIG_SPI_FLASH_${SPI_FLASH_CHIP}
+    CONFIG_FLASH_SIZE_BYTES=${SPI_FLASH_SIZE_BYTES}
 )
