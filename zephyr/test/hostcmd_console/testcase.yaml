@@ -9,6 +9,12 @@ tests:
     - CONFIG_LOG_MODE_IMMEDIATE=y
     - CONFIG_LOG_MODE_MINIMAL=n
     - CONFIG_PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER=y
+  hostcmd_console.log_cros_ec:
+    extra_configs:
+    - CONFIG_LOG_MODE_IMMEDIATE=y
+    - CONFIG_LOG_MODE_MINIMAL=n
+    - CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC=y
+    - CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC_REDUCED=y
   hostcmd_console.log_minimal:
     extra_configs:
     - CONFIG_LOG_MODE_IMMEDIATE=n
