@@ -282,8 +282,10 @@ ZTEST_F(cros_hostcmd_transport, test_host_command_bt_read_event)
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_RESPONSE(EC_CMD_BT_READ_EVENT, 0, rsp);
 
-	/* Empty ring buffer returns EC_RES_UNAVAILABLE */
-	zassert_equal(host_command_process(&args), EC_RES_UNAVAILABLE);
+	/* Empty ring buffer returns EC_RES_SUCCESS with num_events = 0 */
+	zassert_equal(host_command_process(&args), EC_RES_SUCCESS);
+	zassert_equal(rsp.num_events, 0);
+	zassert_equal(args.response_size, sizeof(rsp.num_events));
 
 	/* Write an event */
 	uint8_t evt[] = { 0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00 };
@@ -297,6 +299,8 @@ ZTEST_F(cros_hostcmd_transport, test_host_command_bt_read_event)
 	zassert_equal(args.response_size,
 		      sizeof(rsp.num_events) + 1 + sizeof(evt));
 
-	/* Second read returns UNAVAILABLE because buffer was drained */
-	zassert_equal(host_command_process(&args), EC_RES_UNAVAILABLE);
+	/* Second read returns num_events = 0 because buffer was drained */
+	zassert_equal(host_command_process(&args), EC_RES_SUCCESS);
+	zassert_equal(rsp.num_events, 0);
+	zassert_equal(args.response_size, sizeof(rsp.num_events));
 }
