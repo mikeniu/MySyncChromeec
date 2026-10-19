@@ -6,7 +6,21 @@
 #ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_FPSENSOR_DRIVER_H_
 #define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_FPSENSOR_DRIVER_H_
 
+#include <zephyr/linker/devicetree_regions.h>
+
 #include <drivers/fingerprint.h>
+
+#if DT_NODE_EXISTS(DT_CHOSEN(cros_fp_fingerprint_memory_frame))
+#define FP_FRAME_SECTION                                       \
+	__attribute__((__section__(LINKER_DT_NODE_REGION_NAME( \
+		DT_CHOSEN(cros_fp_fingerprint_memory_frame)))))
+#endif
+
+#if DT_NODE_EXISTS(DT_CHOSEN(cros_fp_fingerprint_memory_template))
+#define FP_TEMPLATE_SECTION                                    \
+	__attribute__((__section__(LINKER_DT_NODE_REGION_NAME( \
+		DT_CHOSEN(cros_fp_fingerprint_memory_template)))))
+#endif
 
 #ifdef __cplusplus
 extern "C" {
