@@ -9502,8 +9502,14 @@ struct ec_response_pwrmon {
 /* BT Passthrough */
 #define EC_CMD_BT_COMMAND 0x0609
 
-/* ChromeOS Host Command limit is strictly <256 bytes */
-#define BT_MAX_COMMAND_SIZE 240
+/*
+ * ChromeOS host commands normally keep their params and response within
+ * the 248 bytes that fit in a 256-byte LPC/eSPI packet. The BT passthrough
+ * commands are only served by the ISH, whose HECI transport buffers are
+ * sized for them (see host_command_heci.c). 260 bytes holds the largest
+ * H:4 HCI packet, a command with 255 bytes of parameters (1 + 3 + 255).
+ */
+#define BT_MAX_COMMAND_SIZE 260
 struct ec_param_bt_command {
 	uint32_t size;
 	uint8_t data[BT_MAX_COMMAND_SIZE];
@@ -9511,7 +9517,11 @@ struct ec_param_bt_command {
 
 #define EC_CMD_BT_READ_EVENT 0x060A
 
-#define BT_MAX_EVENT_SIZE 240
+/*
+ * Events are packed back to back, each prefixed by a 1-byte length, so a
+ * single event is at most 255 bytes.
+ */
+#define BT_MAX_EVENT_SIZE 260
 struct ec_response_bt_read_event {
 	uint32_t num_events;
 	uint8_t events[BT_MAX_EVENT_SIZE];
