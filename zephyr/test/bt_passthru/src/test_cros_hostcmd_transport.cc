@@ -245,6 +245,17 @@ ZTEST_F(cros_hostcmd_transport, test_host_command_bt_command)
 	args = BUILD_HOST_COMMAND_PARAMS(EC_CMD_BT_COMMAND, 0, req);
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
 
+	/* Invalid param: request shorter than the size field */
+	req.size = 3;
+	args = BUILD_HOST_COMMAND_PARAMS(EC_CMD_BT_COMMAND, 0, req);
+	args.params_size = sizeof(req.size) - 1;
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+
+	/* Invalid param: request shorter than the declared payload */
+	args = BUILD_HOST_COMMAND_PARAMS(EC_CMD_BT_COMMAND, 0, req);
+	args.params_size = sizeof(req.size) + req.size - 1;
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+
 	/* Valid command */
 	req.size = 3;
 	req.data[0] = 0x03;
