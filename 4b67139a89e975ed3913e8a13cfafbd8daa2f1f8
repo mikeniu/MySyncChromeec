@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32ad6639_75972464",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:07:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/9ffbe43b-1441-4aac-bbca-00c5a4855262)]\n\n### Review Summary\n*   **Functionality:** Correctly adds ARMv8-M MPU support for Cortex-M33 chips like RTS5817, utilizing the single region optimization for consecutive rollback regions. The logic to identify and lock the rollback regions is sound.\n*   **Architecture \u0026 Component Fit:** The new configuration (`mpu_regions.c`) cleanly integrates with Zephyr\u0027s device tree and existing ARM CMSE MPU API. The `#ifdef` blocks cleanly separate M33 code from ARMv7-M code.\n*   **Code Simplicity:** The implementation is minimal and direct. The `arm_cmse_mpu_region_get` logic handles the dynamic region lookup effectively without extra loops.\n*   **Idiomaticity \u0026 Readability:** The C and Zephyr idioms are followed well. The newly added comments (especially regarding the `CONFIG_MPU_DISABLE_BACKGROUND_MAP` behavior) greatly clarify the hardware-specific design decisions.\n*   **Security:** Properly secures the rollback regions. Disabling the MPU region to deny privileged access effectively utilizes the `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` behavior inherent to ARMv8-M without `P_NA` support.\n*   **Testing:** `TEST\u003dnone` is justified here under the Hardware/Physical Exception, as MPU register mutations (`MPU-\u003eRLAR` / `MPU-\u003eRNR`) and CMSE configurations are inherently hardware-dependent and cannot be easily mocked in generic software unit tests.\n*   **CL Size \u0026 Scope:** Size: M (+120, -2). The CL is appropriately scoped to adding Cortex-M33 MPU support. It represents a single logical change.\n*   **Commit Message:** The commit message clearly and concisely explains both the *why* (RTS5817 requirement) and *what* (ARMv8-M support). The required `BUG\u003d` and `TEST\u003d` footers are present.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4b67139a89e975ed3913e8a13cfafbd8daa2f1f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
