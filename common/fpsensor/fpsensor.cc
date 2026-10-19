@@ -714,8 +714,12 @@ fp_command_frame_v0(struct ec_host_cmd_handler_args *args)
 
 	/* The host requested a template. */
 
-	/* Encryption or decryption is in progress. */
-	if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+	/*
+	 * Reject template operations if a cryptographic operation or an
+	 * enrollment session is in progress.
+	 */
+	if (global_context.sensor_mode &
+	    (FP_MODES_CRYPTO_IN_PROGRESS | FP_MODE_ENROLL_SESSION)) {
 		return EC_HOST_CMD_BUSY;
 	}
 

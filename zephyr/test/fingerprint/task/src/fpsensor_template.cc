@@ -449,6 +449,35 @@ ZTEST_USER(fpsensor_template, test_fp_frame_v0_busy)
 	k_sleep(K_SECONDS(1));
 }
 
+ZTEST_USER(fpsensor_template, test_fp_frame_v0_busy_enroll)
+{
+	struct ec_params_fp_frame params_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 0,
+	};
+
+	/* Simulate active enrollment session in progress. */
+	global_context.sensor_mode |= FP_MODE_ENROLL_SESSION;
+
+	/* v0 command should return BUSY during active enrollment. */
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_frame(NULL, &params_v0, frame_buffer));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_frame_v0_not_busy_match)
+{
+	struct ec_params_fp_frame params_v0 = {
+		.offset = FP_FRAME_INDEX_TEMPLATE << FP_FRAME_INDEX_SHIFT,
+		.size = 0,
+	};
+
+	/* Simulate match mode being active. */
+	global_context.sensor_mode |= FP_MODE_MATCH;
+
+	zassert_not_equal(EC_RES_BUSY,
+			  ec_cmd_fp_frame(NULL, &params_v0, frame_buffer));
+}
+
 ZTEST_USER(fpsensor_template, test_fp_frame_v1_encrypt_template_busy_enroll)
 {
 	struct ec_params_fp_frame_v1 encrypt_request = {
