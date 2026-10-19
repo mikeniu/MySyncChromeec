@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c40c130_1cd77629",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:55:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** ✅ The fake flash device effectively simulates the required behavior for test purposes.\n**Architecture \u0026 Component Fit:** ✅ The test scaffolding integrates appropriately with the Zephyr test environment.\n**Code Simplicity:** ✅ The fake device implementation is straightforward and minimal.\n**Idiomaticity \u0026 Readability:** ✅ The C code is idiomatic and follows established patterns.\n**Security:** ✅ No security vulnerabilities.\n**Testing:** ✅ Test scaffolding is set up correctly (actual tests are added in follow-ups).\n**CL Size \u0026 Scope:** ❌ `Size: L (+278, -0)`. This CL is too large and exceeds the maximum for a single atomic change. Even though this is unit test scaffolding and has been split previously, it must be further decomposed to meet the strictly enforced CL size limits (CLs must be `S` or `M`).\n\nPlease split this CL into smaller, logical chunks, such as:\n1. CL 1: Add the build files (`CMakeLists.txt`, `Kconfig`, `testcase.yaml`, `native_sim.overlay`) and a stub `fake_flash` device that compiles (e.g., providing only `fake_flash_init` and dummy implementations for the API).\n2. CL 2: Add the fake NOR flash storage implementation (`fake_flash_read`, `fake_flash_write`, `fake_flash_erase`) and layout.\n3. CL 3: Add the `fake_flash_ex_op` implementation and the baseline `cros_flash_rtkfp_before` test suite setup.\n\n**Commit Message:** ✅ Accurate, concise, and provides the necessary test command. [🔗](http://go/tj/445f267f-7339-48d0-a322-41d7cce4e095)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2e2198fc04e80d97bf1a8d6ba3b6df1b6a7b5e78",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
