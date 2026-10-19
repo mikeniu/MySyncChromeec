@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "765f4b7d_ddfd72fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T09:54:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe55deac_263afb0b",
+      "revId": "0f6d69d2621adcbcaa2c3f764c72ebfcf7f706b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95a7b1cf_0fea2418",
@@ -35,6 +53,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please update the commit message. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl7851857_36aedbd9-4fa8-49a8-9dc7-ac6615d10094.pb)]\n\n### Review Summary\n*   **Functionality \u0026 Security:** Cortex-M33 (ARMv8-M) MPU support is correctly added. The mechanism to lock the rollback region by disabling the MPU region (relying on `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` for protection) is logically sound and well-documented.\n*   **Architecture \u0026 Component Fit:** The changes fit well within the existing Zephyr shim architecture for Cortex-M processors.\n*   **Code Simplicity:** The code is as simple as possible. The `BUILD_ASSERT` effectively checks for contiguous rollback regions without adding runtime overhead.\n*   **Idiomaticity \u0026 Readability:** Code aligns with Zephyr configuration patterns and macro conventions. Left a minor inline suggestion to explicitly sum the sizes of the rollback regions for better robustness.\n*   **Testing:** As previously discussed, MPU faults in privileged mode tests on ARMv8-M are a known limitation when relying on the disabled background map. Hardware/manual validation is acceptable in this case.\n*   **CL Size \u0026 Scope:** Size: M (+119, -2). The CL is appropriately scoped to adding Cortex-M33 MPU support and follows the Single Logical Change rule.\n*   **Commit Message:** ❌ **Missing `TEST\u003d` footer.** ChromiumOS commit messages require a `TEST\u003d` footer explaining how the change was verified (e.g., `TEST\u003dzmake build ...` or `TEST\u003dnone`).",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "0f6d69d2621adcbcaa2c3f764c72ebfcf7f706b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "679b1d42_b5613202",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T09:54:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95a7b1cf_0fea2418",
       "revId": "0f6d69d2621adcbcaa2c3f764c72ebfcf7f706b6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
