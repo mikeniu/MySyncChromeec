@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad1c894f_fcbba4fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T20:15:02Z",
+      "side": 1,
+      "message": "The `#ifdef HOST` stuff in ARM production code is a little funky, although I\u0027m not sure how easy it would be to test this some other way.",
+      "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b82d5d3_e750e07f",
+        "filename": "common/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T20:15:02Z",
+      "side": 1,
+      "message": "Nit: The double `#ifdef CONFIG_MPU` is a little cluttered. `copy` is already `unused`. If you added `unused` to `ret`, would the compiler shut up about these variables, and you could drop this `#ifdef`?",
+      "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea9fb280_24394267",
+        "filename": "core/cortex-m/include/mpu.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T20:15:02Z",
+      "side": 1,
+      "message": "Nit: Could these alternatively be `test_mockable`, so the production header doesn\u0027t need to do this?",
+      "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "717ee904_34885a15",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T20:15:02Z",
+      "side": 1,
+      "message": "The commit message says this is conditional on unlocked, but it looks unconditional here.",
+      "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
