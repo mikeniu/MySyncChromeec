@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "9fc6ca34a540fe51339d066c11fd20b278a01623",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e93c678a_f7b23046",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.rts5817maa",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T09:55:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d6a5c02_3d0e40cc",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "revId": "9fc6ca34a540fe51339d066c11fd20b278a01623",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
