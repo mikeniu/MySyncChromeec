@@ -88,6 +88,7 @@
 		&adc0_chan1_gp44
 		&adc0_chan2_gp43
 		&adc0_chan3_gp42
-		&adc0_chan4_gp41>;
+		&adc0_chan4_gp41
+		&adc0_chan11_gpc7>;
 	pinctrl-names = "default";
 };
