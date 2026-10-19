@@ -466,6 +466,7 @@ static void pd_update_dual_role_config(int port);
 /* Forward declare common, private functions */
 static void set_state_tc(const int port, const enum usb_tc_state new_state);
 test_export_static enum usb_tc_state get_state_tc(const int port);
+static bool tc_state_is_attached(enum usb_tc_state state);
 static bool in_ct_state(int port);
 
 /* Enable variable for Try.SRC states */
@@ -1156,13 +1157,15 @@ void pd_vbus_low(int port)
 	TC_CLR_FLAG(port, TC_FLAGS_VBUS_NEVER_LOW);
 }
 
+static bool tc_state_is_attached(enum usb_tc_state state)
+{
+	return state == TC_ATTACHED_SRC || state == TC_ATTACHED_SNK ||
+	       state == TC_CT_UNATTACHED_SNK || state == TC_CT_ATTACHED_SNK;
+}
+
 int pd_is_connected(int port)
 {
-	return (IS_ATTACHED_SRC(port) ||
-		(IS_ENABLED(CONFIG_USB_PE_SM) &&
-		 ((get_state_tc(port) == TC_CT_UNATTACHED_SNK) ||
-		  (get_state_tc(port) == TC_CT_ATTACHED_SNK))) ||
-		IS_ATTACHED_SNK(port));
+	return tc_state_is_attached(get_state_tc(port));
 }
 
 bool pd_is_disconnected(int port)
@@ -1701,7 +1704,11 @@ test_export_static enum usb_tc_state get_state_tc(const int port)
 /* Get the previous TypeC state. */
 static enum usb_tc_state get_last_state_tc(const int port)
 {
-	return tc[port].ctx.previous - &tc_states[0];
+	/* Default to returning TC_STATE_COUNT if no state has been set */
+	if (tc[port].ctx.previous == NULL)
+		return TC_STATE_COUNT;
+	else
+		return tc[port].ctx.previous - &tc_states[0];
 }
 
 static void print_current_state(const int port)
@@ -2202,7 +2209,13 @@ static void tc_unattached_snk_entry(const int port)
 	enum pd_data_role prev_data_role;
 
 	if (get_last_state_tc(port) != TC_UNATTACHED_SRC) {
-		tc_detached(port);
+		/*
+		 * Only run detach cleanup on initial entry or if a partner was
+		 * previously attached.
+		 */
+		if (get_last_state_tc(port) == TC_STATE_COUNT ||
+		    tc_state_is_attached(get_last_state_tc(port)))
+			tc_detached(port);
 		print_current_state(port);
 	}
 
@@ -2781,7 +2794,13 @@ static void tc_unattached_src_entry(const int port)
 	enum pd_data_role prev_data_role;
 
 	if (get_last_state_tc(port) != TC_UNATTACHED_SNK) {
-		tc_detached(port);
+		/*
+		 * Only run detach cleanup on initial entry or if a partner was
+		 * previously attached.
+		 */
+		if (get_last_state_tc(port) == TC_STATE_COUNT ||
+		    tc_state_is_attached(get_last_state_tc(port)))
+			tc_detached(port);
 		print_current_state(port);
 	}
 
@@ -3605,6 +3624,15 @@ static void tc_try_src_exit(const int port)
  */
 static void tc_try_wait_snk_entry(const int port)
 {
+	/*
+	 * TryWait.SNK can be entered from Try.SRC (unattached) or on a Sink
+	 * detach from Attached.SRC when Try.SRC is enabled. Run detach cleanup
+	 * when transitioning from an attached state because the subsequent
+	 * transition to Unattached.SNK will see TryWait.SNK as the last state.
+	 */
+	if (tc_state_is_attached(get_last_state_tc(port)))
+		tc_detached(port);
+
 	print_current_state(port);
 
 	tc_enable_pd(port, 0);
