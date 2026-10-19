@@ -85,6 +85,21 @@ ZTEST_F(zephyr_bt_sender, test_send_command_with_parameters)
 	zassert_mem_equal(tx_packet.data(), scan_cmd, sizeof(scan_cmd));
 }
 
+/* Test trimming trailing bytes past declared HCI command parameter length */
+ZTEST_F(zephyr_bt_sender, test_send_command_trims_trailing_bytes)
+{
+	/* HCI Reset (param_len = 0) with 2 trailing padding bytes */
+	uint8_t padded_cmd[] = { BT_HCI_H4_CMD, 0x03, 0x0c, 0x00, 0x00, 0xff };
+	fixture->sender.sendH4HciPacketToController(padded_cmd,
+						    sizeof(padded_cmd));
+
+	zassert_equal(mock_hci_driver_get_tx_count(), 1);
+
+	auto tx_packet = mock_hci_driver_get_last_tx_packet_vec();
+	zassert_equal(tx_packet.size(), 4);
+	zassert_mem_equal(tx_packet.data(), padded_cmd, 4);
+}
+
 /* Test driver error handling during send */
 ZTEST_F(zephyr_bt_sender, test_send_driver_failure)
 {
@@ -97,4 +112,31 @@ ZTEST_F(zephyr_bt_sender, test_send_driver_failure)
 
 	/* Since mock driver returned error before recording, TX count is 0 */
 	zassert_equal(mock_hci_driver_get_tx_count(), 0);
+}
+
+/* Test TX buffer allocation failure when the command pool runs dry */
+ZTEST_F(zephyr_bt_sender, test_send_tx_pool_exhausted)
+{
+	uint8_t reset_cmd[] = { BT_HCI_H4_CMD, 0x03, 0x0c, 0x00 };
+	size_t sent = 0;
+
+	/*
+	 * The mock driver keeps every buffer it gets, so the pool drains
+	 * after a few commands. The pool is far smaller than the 32 packets
+	 * the mock driver can record.
+	 */
+	mock_hci_driver_set_hold_tx_bufs(true);
+	for (int i = 0; i < 32; i++) {
+		fixture->sender.sendH4HciPacketToController(reset_cmd,
+							    sizeof(reset_cmd));
+		if (mock_hci_driver_get_tx_count() == sent) {
+			break;
+		}
+		sent = mock_hci_driver_get_tx_count();
+	}
+
+	/* Some commands went out, then one was dropped without a buffer */
+	zassert_true(sent > 0);
+	zassert_true(sent < 32);
+	zassert_equal(mock_hci_driver_get_tx_count(), sent);
 }

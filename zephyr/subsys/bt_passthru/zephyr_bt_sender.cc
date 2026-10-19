@@ -10,6 +10,8 @@
 #include <zephyr/bluetooth/hci_types.h>
 #include <zephyr/logging/log.h>
 
+#include <cstddef>
+
 LOG_MODULE_DECLARE(bt_passthru, CONFIG_BT_PASSTHRU_LOG_LEVEL);
 
 namespace chre
@@ -41,23 +43,28 @@ void ZephyrBtSender::sendH4HciPacketToController(const uint8_t *h4Buf,
 		return;
 	}
 
-	const auto *cmd_hdr =
-		reinterpret_cast<const struct bt_hci_cmd_hdr *>(&h4Buf[1]);
-	if (bytes < (1 + sizeof(struct bt_hci_cmd_hdr) + cmd_hdr->param_len)) {
+	const uint8_t param_len =
+		h4Buf[1 + offsetof(struct bt_hci_cmd_hdr, param_len)];
+	const size_t cmd_len = sizeof(struct bt_hci_cmd_hdr) + param_len;
+	const size_t expected_bytes = 1 + cmd_len;
+	if (bytes < expected_bytes) {
 		LOG_WRN("Truncated HCI command: expected %zu, got %zu",
-			1 + sizeof(struct bt_hci_cmd_hdr) + cmd_hdr->param_len,
-			bytes);
+			expected_bytes, bytes);
 		return;
 	}
+	if (bytes > expected_bytes) {
+		LOG_WRN("Trimming %zu trailing bytes from HCI command",
+			bytes - expected_bytes);
+	}
 
-	LOG_HEXDUMP_DBG(h4Buf, bytes, "CHRE -> Controller");
+	LOG_HEXDUMP_DBG(h4Buf, expected_bytes, "CHRE -> Controller");
 
 	/* Skip h4Buf[0] as Zephyr's bt_buf_get_tx automatically prepends it */
 	struct net_buf *buf =
-		bt_buf_get_tx(type, K_NO_WAIT, h4Buf + 1, bytes - 1);
+		bt_buf_get_tx(type, K_NO_WAIT, h4Buf + 1, cmd_len);
 	if (!buf) {
 		LOG_ERR("Failed to allocate Zephyr TX buffer (type %d, size %zu)",
-			type, bytes - 1);
+			type, cmd_len);
 		return;
 	}
 

@@ -6,6 +6,7 @@
 #ifndef ZEPHYR_TEST_BT_PASSTHRU_MOCK_HCI_DRIVER_H_
 #define ZEPHYR_TEST_BT_PASSTHRU_MOCK_HCI_DRIVER_H_
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -20,6 +21,8 @@ size_t mock_hci_driver_get_last_tx_packet(uint8_t *out_buf, size_t max_len);
 size_t mock_hci_driver_get_tx_packet(size_t index, uint8_t *out_buf,
 				     size_t max_len);
 void mock_hci_driver_set_send_result(int res);
+/* Hold on to sent TX buffers instead of freeing them to starve the pool */
+void mock_hci_driver_set_hold_tx_bufs(bool hold);
 int mock_hci_driver_inject_rx(const uint8_t *data, size_t len);
 int mock_hci_driver_inject_empty_rx(void);
 
