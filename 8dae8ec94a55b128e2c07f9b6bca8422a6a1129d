@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80a62c1a_1efd9db7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T21:04:54Z",
+      "side": 1,
+      "message": "This is a weird CL to review, because we\u0027re getting into implementation details, but I can\u0027t see yet how any of the code added here is used. As I noted earlier, splitting CLs up to go deep along functional lines, as opposed to broad along layer lines, might make for easier reviews.",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3cda64b_34404dff",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T21:04:54Z",
+      "side": 1,
+      "message": "Why 10? If it failed once, what are the chances that it works on any subsequent try? If the chance is very low, i.e. the failure was almost certainly due to a programming error, I wouldn\u0027t bother retrying. If the chance is not very low, can the failures be debugged?",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "555ec9d2_a86a3764",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T21:04:54Z",
+      "side": 1,
+      "message": "Same question as for I2C retries.",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b6638ae_c8ede8b2",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T21:04:54Z",
+      "side": 1,
+      "message": "Doesn\u0027t the smf library already contain a notion of the previous state?",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
