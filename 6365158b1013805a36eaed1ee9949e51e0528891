@@ -18,6 +18,80 @@
       "isAi": true,
       "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87d25db0_f79f222f",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T18:46:36Z",
+      "side": 1,
+      "message": "[`k_can_yield()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/kernel/thread.c;l\u003d1897-1901;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) also returns false during `PRE_KERNEL_1` and `PRE_KERNEL_2` (both `k_is_pre_kernel()` and `!arch_cpu_irqs_are_enabled()` are true in [`z_cstart()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/kernel/init.c;l\u003d535-588;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745)).\n\nHowever, [`init_ec_console()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console.c;l\u003d306-314;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) and [`init_ec_shell()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console.c;l\u003d352-379;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) run at `PRE_KERNEL_1` specifically so `PRE_KERNEL_2` init functions can log. For example, [`panic_data_init()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/panic.c;l\u003d372-442;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) runs at `PRE_KERNEL_2` with `/* Initialize panic data after reset flags and console are ready. */` and logs `\"Watchdog Reset Detected\"` and `\"New Panic Detected: ...\"`.\n\nChecking `!k_can_yield()` here will cause all `PRE_KERNEL` console output (such as `LOG_*` under `CONFIG_LOG_MODE_MINIMAL\u003dy` or direct [`cprints()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console.c;l\u003d662;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745)/[`cputs()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console.c;l\u003d588;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) calls) to be dropped from the AP console buffer and counted under `dropped_logs_isr` (and under `CONFIG_LOG_MODE_MINIMAL\u003dy`, [`zephyr_shim_console_out()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console.c;l\u003d322-332;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) calls `console_buf_notify_chars()` 1 byte at a time, incrementing `dropped_logs_isr` once per character).\n\n(Unit tests don\u0027t catch this because [`zephyr/test/drivers/panic`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/drivers/panic/src/panic.c;l\u003d75-76;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) and [`zephyr/test/jump_data`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/jump_data/src/main.c;l\u003d423-435;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) populate reset flags/panic data and call `panic_data_init()` directly from a post-kernel Ztest thread where `k_can_yield()` is true—and don\u0027t inspect [`uart_console_read_buffer()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console_buffer.c;l\u003d286;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745)—while [`zephyr/test/drivers/console_buffer`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/drivers/console_buffer/src/console_buffer.c;l\u003d131-135;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) has no `PRE_KERNEL` producer and flushes the buffer at the start of each test.)",
+      "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb33caac_6939dc5c",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T18:46:36Z",
+      "side": 1,
+      "message": "[`pw_log_tokenized_HandleLog()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/pw_log_zephyr_tokenized.cc;l\u003d88-133;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) acquires [`k_spin_lock(\u0026lock)`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/pw_log_zephyr_tokenized.cc;l\u003d108;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) before calling [`console_buf_notify_chars()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/pw_log_zephyr_tokenized.cc;l\u003d131-132;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745). Since [`k_spin_lock()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/include/zephyr/spinlock.h;l\u003d194-228;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) masks CPU interrupts via [`arch_irq_lock()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/include/zephyr/spinlock.h;l\u003d203;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745), `arch_cpu_irqs_are_enabled()` is false and [`k_can_yield()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/kernel/thread.c;l\u003d1897-1901;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) will always return false there.\n\nWith this change, 100% of tokenized logs on boards using `pw-tokenize` (`CONFIG_PIGWEED_LOG_TOKENIZED_LIB\u003dy`, e.g., `fatcat`, `trulo`, `atria`, `dougie`) will be dropped from `console_buf` and counted as `dropped_logs_isr`. ([`test_pw_log_tokenized.cc`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/console/src/test_pw_log_tokenized.cc;l\u003d61-70;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) doesn\u0027t currently check [`uart_console_read_buffer()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console_buffer.c;l\u003d286;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745), so CQ doesn\u0027t catch this.)",
+      "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "321d4bce_6bd2c3b2",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T18:46:36Z",
+      "side": 1,
+      "message": "In the next CL in the stack (https://crrev.com/c/8607950), [`zephyr_print()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console.c;l\u003d539-580;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) adds:\n```c\nif (shell_stopped || !shell_is_active() || !k_can_yield()) {\n\tif (!IS_ENABLED(CONFIG_LOG_MODE_MINIMAL) \u0026\u0026\n\t    IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE)) {\n\t\tconsole_buf_notify_chars(buff, size);\n\t}\n\tprintk_unlocked(\"%s\", buff);\n\treturn;\n}\n```\nAnd in https://crrev.com/c/8607951 (`log_backend_cros_ec.c`), the `!k_can_yield()` path holds `k_spin_lock(\u0026isr_log_lock)` while calling `flush_line_buf()` -\u003e `zephyr_print()`.\n\nBecause [`console_buf_notify_chars()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console_buffer.c;l\u003d115;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) drops whenever [`k_can_yield()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/kernel/thread.c;l\u003d1897-1901;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) returns false, any call entering that branch due to `!k_can_yield()` (including the `!k_can_yield()` path in `log_backend_cros_ec.c` or `PRE_KERNEL` calls when `!shell_is_active()`) will never write to `console_buf` and will only increment `dropped_logs_isr`. And when `CONFIG_LOG_MODE_MINIMAL\u003dy`, `printk_unlocked(\"%s\", buff)` invokes [`zephyr_shim_console_out()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console.c;l\u003d322-332;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) -\u003e `console_buf_notify_chars(\u0026console_char, 1)` for every byte, incrementing `dropped_logs_isr` once per character.",
+      "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3061bced_8d104f98",
+        "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T18:46:36Z",
+      "side": 1,
+      "message": "Exporting `dropped_logs_isr` via `test_export_static` isn\u0027t needed here. Please follow the same pattern as [`test_buf_dropped_logs_isr`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/drivers/console_buffer/src/console_buffer.c;l\u003d125-168;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) above and [`test_buf_dropped_logs_mutex`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/drivers/console_buffer/src/console_buffer.c;l\u003d184-242;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) below by reading the buffer via [`uart_console_read_buffer_init()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console_buffer.c;l\u003d173;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) / [`uart_console_read_buffer()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/console_buffer.c;l\u003d286;drc\u003d686b61c7c2fa3f6706c02a53762ba25f0bf69745) and parsing `\"Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)\"`. That avoids exposing internal static state and also verifies end-to-end that no characters were written to `console_buf`.",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 1
+      },
+      "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
