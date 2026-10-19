@@ -52,6 +52,24 @@
       "parentUuid": "e0c2ee2e_a04a3b3a",
       "revId": "c7db732804ef3893aa793782ed94260ab0989ec3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44632887_372ff577",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 3692199
+      },
+      "writtenOn": "2026-10-19T16:54:16Z",
+      "side": 1,
+      "message": "Ok, moved to upstream https://github.com/zephyrproject-rtos/zephyr/pull/122711",
+      "parentUuid": "6e8f4abd_0d242b99",
+      "revId": "c7db732804ef3893aa793782ed94260ab0989ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
