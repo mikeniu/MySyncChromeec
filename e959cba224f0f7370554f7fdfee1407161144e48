@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86e422f2_db80b859",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:45:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n*   **Functionality:** ⚠️ **Changes Requested** — The `crec_flash_physical_read` calls ignore their return values, which can mask test failures if the read fails but the buffer matches the expected value. Additionally, this API usage is asymmetric with the `cros_flash_physical_write` calls.\n*   **Architecture \u0026 Component Fit:** ✅\n*   **Code Simplicity:** ✅\n*   **Idiomaticity \u0026 Readability:** ✅\n*   **Security:** ✅\n*   **Testing:** ⚠️ **Changes Requested** — The `test_init_clears_srp_preserves_other_bits` uses a weak boolean oracle instead of verifying the exact expected post-state of the registers, leaving it blind to accidental bit flips elsewhere in the register.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+57, -0). The CL represents a single, focused logical change adding baseline tests.\n*   **Commit Message:** ✅\n\nPlease see the inline comments for the required fixes.\n[🔗](http://go/tj/b796b5c2-47f2-48d8-b2ae-7038c5c312a6)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e959cba224f0f7370554f7fdfee1407161144e48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faecaa93_2fde8122",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:45:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Test Oracle Integrity:** These boolean assertions form a weak oracle that only verifies specific bits while ignoring the rest of the register\u0027s state. To ensure `cros_flash_init` doesn\u0027t accidentally set or corrupt other bits, assert the exact expected post-state of the registers.\n\n```c\n\t/* SRP bits are cleared and non-protection bits must survive the status register rewrite. */\n\tzassert_equal(sr1, SPI_FLASH_SR1_WEL);\n\tzassert_equal(sr2, SPI_FLASH_SR2_QE);\n```\n[🔗](http://go/tj/b796b5c2-47f2-48d8-b2ae-7038c5c312a6)",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e959cba224f0f7370554f7fdfee1407161144e48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de43ff7d_0bd47b21",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:45:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Ignored Return Value \u0026 API Inconsistency:** The return value of `crec_flash_physical_read` is ignored. If the read fails, the test might silently pass if `read_value` happens to match the expected value. The return value must be asserted.\n\nAdditionally, this call uses the `crec_` prefix and omits the `cros_flash_dev` parameter, making it asymmetric with the `cros_flash_physical_write` and `cros_flash_physical_erase` calls above. Please use the consistent `cros_flash_physical_read` API if available, and assert its result.\n\n```c\n\tzassert_equal(cros_flash_physical_read(cros_flash_dev, 0,\n\t\t\t\t\t       sizeof(read_value),\n\t\t\t\t\t       (char *)\u0026read_value),\n\t\t      EC_SUCCESS);\n```\n(Apply this to the other `crec_flash_physical_read` call below as well).\n[🔗](http://go/tj/b796b5c2-47f2-48d8-b2ae-7038c5c312a6)",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e959cba224f0f7370554f7fdfee1407161144e48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
