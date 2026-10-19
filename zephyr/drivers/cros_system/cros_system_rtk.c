@@ -11,6 +11,7 @@
 #include "reg/reg_wdt.h"
 #include "stdint.h"
 #include "system.h"
+#include "watchdog.h"
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/bbram.h>
@@ -343,6 +344,14 @@ int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 uint64_t cros_system_deep_sleep_ticks(void)
 {
 	return rts5912_clock_get_sleep_ticks();
+}
+
+void before_rts5912_sleep(void)
+{
+	watchdog_reload();
+	__disable_irq();
+	__set_BASEPRI(0);
+	__ISB();
 }
 #endif
 
