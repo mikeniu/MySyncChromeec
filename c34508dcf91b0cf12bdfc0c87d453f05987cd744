@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe75c508_00a7bb24",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:59:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n**Functionality**: Found a critical bug where the driver\u0027s shadow protection range (`data-\u003eaddr_prot_start` and `length`) is initialized to `0` and never synchronized with hardware during boot, which incorrectly allows writes/erases to protected regions if the chip boots in a protected state. \n**Architecture \u0026 Component Fit**: The driver integrates well with the `cros_flash` subsystem, but the shadow state for the protection range is unnecessary and error-prone. It should read from the hardware directly like `flash_check_prot_reg` does.\n**Code Simplicity**: Identified a further simplification to flatten the success/error path in `cros_flash_rtkfp_protect_now`.\n**Idiomaticity \u0026 Readability**: Follows Zephyr and EC conventions well.\n**Testing**: The CL lacks automated unit tests for the new driver. While the commit message links to tests in another CL (`twister -T ...`), unit tests that validate the CL\u0027s own new production behavior MUST be included in the same CL (or the split CLs) to ensure atomicity.\n**CL Size \u0026 Scope**: Size: L (+598, -0). This CL is too large for a single atomic change and must be split into independent, reviewable pieces. Please split this CL into smaller logical changes.\n**Commit Message**: Clear and concise, adhering to the 1-3 short prose paragraphs rule.\n\n**Recommended Split Plan:**\n- **CL 1**: Add the initial `cros_flash_rtkfp.c` driver with boilerplate, basic initialization (`init`, `get_status`), and its corresponding unit test fixtures.\n- **CL 2**: Implement the read, write, and erase operations (`physical_write`, `physical_erase`), utilizing `flash_check_prot_reg`. Add unit tests validating write/erase constraints.\n- **CL 3**: Implement the software protection logic (`physical_protect_at_boot`, `physical_protect_now`, `sw_protect` helpers, and flag translations) along with their boundary unit tests.\n\n[🔗](http://go/tj/20e38d34-27ca-44a0-a808-baee6ac45590)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c34508dcf91b0cf12bdfc0c87d453f05987cd744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27dce192_6e7edb5e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:59:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `data-\u003eaddr_prot_start` and `data-\u003eaddr_prot_length` are initialized to 0 and are never updated during boot (e.g. in `cros_flash_rtkfp_init`). If the device boots with protection already enabled, this shadow state will incorrectly allow writes/erases until `flash_set_status_for_prot` happens to be called.\n\nSince SPI write and erase operations are already slow, maintaining a shadow copy of the protection range is unnecessary and error-prone. Please delete `flash_check_prot_range`, remove `addr_prot_start` and `addr_prot_length` from `struct cros_flash_rtkfp_data`, and call `flash_check_prot_reg` directly in `cros_flash_rtkfp_write` and `cros_flash_rtkfp_erase` to always evaluate protection against the true hardware state.\n[🔗](http://go/tj/20e38d34-27ca-44a0-a808-baee6ac45590)",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 214,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c34508dcf91b0cf12bdfc0c87d453f05987cd744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d924ab9d_bf678736",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T10:59:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This control flow can be further flattened to avoid duplicating the `data-\u003eall_protected` assignment logic inside the condition. Since `ret` is checked immediately after, we can make the success path completely linear:\n\n```c\n\t/* Set flash protection and enable SW protect. */\n\tif (all) {\n\t\tret \u003d cros_flash_rtkfp_protect_at_boot(\n\t\t\tdev, EC_FLASH_PROTECT_ALL_AT_BOOT);\n\t} else {\n\t\tret \u003d cros_flash_rtkfp_protect_at_boot(\n\t\t\tdev, EC_FLASH_PROTECT_RO_AT_BOOT);\n\t}\n\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tif (all) {\n\t\tdata-\u003eall_protected \u003d 1;\n\t}\n\n\tret \u003d cros_flash_rtkfp_sw_protect(dev, true);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tdata-\u003esw_protected \u003d 1;\n\treturn EC_SUCCESS;\n```\n[🔗](http://go/tj/20e38d34-27ca-44a0-a808-baee6ac45590)",
+      "range": {
+        "startLine": 493,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c34508dcf91b0cf12bdfc0c87d453f05987cd744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
