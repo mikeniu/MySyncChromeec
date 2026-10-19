@@ -22,12 +22,16 @@
 
 /*
  * Delay between forcing AP shutdown and polling for G3
- * (CHIPSET_STATE_HARD_OFF).
+ * (CHIPSET_STATE_HARD_OFF), and maximum number of 1s polls to wait for G3 (some
+ * chipsets such as Skylake hold PWRBTN_L for 4s to reach S5 and then wait
+ * s5_inactivity_timeout = 10s before entering G3).
  */
 #define HANG_DETECT_COLD_REBOOT_OFF_DELAY_US SECOND
+#define HANG_DETECT_COLD_REBOOT_MAX_RETRIES 20
 
 static uint16_t reboot_timeout_sec;
 static uint8_t bootstatus = EC_HANG_DETECT_AP_BOOT_NORMAL;
+static uint8_t power_on_retries;
 static bool cold_reset_pending;
 
 static void hang_detect_power_on(void);
@@ -36,12 +40,19 @@ DECLARE_DEFERRED(hang_detect_power_on);
 static void hang_detect_power_on(void)
 {
 	if (!chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
+		if (power_on_retries == 0) {
+			cold_reset_pending = false;
+			CPRINTS("Failed to reach G3 for cold reboot");
+			return;
+		}
+		power_on_retries--;
 		hook_call_deferred(&hang_detect_power_on_data,
 				   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
 		return;
 	}
 
 	cold_reset_pending = false;
+	power_on_retries = 0;
 	CPRINTS("Powering on AP after cold reset");
 	/*
 	 * Re-record CHIPSET_RESET_HANG_REBOOT after G3 is reached
@@ -59,6 +70,7 @@ static void hang_detect_cold_reboot(void)
 
 	CPRINTS("Warm reset failed; forcing cold reboot");
 	cold_reset_pending = true;
+	power_on_retries = HANG_DETECT_COLD_REBOOT_MAX_RETRIES;
 	chipset_force_shutdown(CHIPSET_RESET_HANG_REBOOT);
 	hook_call_deferred(&hang_detect_power_on_data,
 			   HANG_DETECT_COLD_REBOOT_OFF_DELAY_US);
@@ -91,6 +103,7 @@ DECLARE_DEFERRED(hang_detect_reboot);
 static void hang_detect_reload(void)
 {
 	cold_reset_pending = false;
+	power_on_retries = 0;
 	hook_call_deferred(&hang_detect_cold_reboot_data, -1);
 	hook_call_deferred(&hang_detect_power_on_data, -1);
 	hook_call_deferred(&hang_detect_reboot_data,
@@ -101,6 +114,7 @@ static void hang_detect_cancel(void)
 {
 	CPRINTS("Stop on AP request");
 	cold_reset_pending = false;
+	power_on_retries = 0;
 	hook_call_deferred(&hang_detect_reboot_data, -1);
 	hook_call_deferred(&hang_detect_cold_reboot_data, -1);
 	hook_call_deferred(&hang_detect_power_on_data, -1);
@@ -112,6 +126,7 @@ static void hang_detect_deferred_stop(void)
 		return;
 
 	CPRINTS("Stop on AP shutdown");
+	power_on_retries = 0;
 	hook_call_deferred(&hang_detect_reboot_data, -1);
 	hook_call_deferred(&hang_detect_cold_reboot_data, -1);
 	hook_call_deferred(&hang_detect_power_on_data, -1);
@@ -202,6 +217,7 @@ hang_detect_host_command(struct host_cmd_handler_args *args)
 		CPRINTS("Clearing bootstatus");
 		bootstatus = EC_HANG_DETECT_AP_BOOT_NORMAL;
 		cold_reset_pending = false;
+		power_on_retries = 0;
 		hook_call_deferred(&hang_detect_cold_reboot_data, -1);
 		hook_call_deferred(&hang_detect_power_on_data, -1);
 		break;
