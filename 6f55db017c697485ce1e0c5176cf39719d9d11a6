@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0e2d071_b3303628",
+        "filename": "zephyr/subsys/chre/chre.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-19T15:20:36Z",
+      "side": 1,
+      "message": "Please add a TODO with a bug number to follow up this workaround.",
+      "range": {
+        "startLine": 26,
+        "startChar": 3,
+        "endLine": 28,
+        "endChar": 61
+      },
+      "revId": "6f55db017c697485ce1e0c5176cf39719d9d11a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
