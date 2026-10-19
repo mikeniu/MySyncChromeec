@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d19c69c1_913167f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:55:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Missing test coverage for driver error paths, including one that masks a state corruption bug.\n\n### Review Summary\n\n*   **Functionality:** ❌ The CL adds test coverage for three error paths but misses two important ones. Most critically, the failure test for `cros_flash_physical_protect_now` masks an underlying driver bug by omitting the `all\u003dtrue` case. \n*   **Architecture \u0026 Component Fit:** ✅ The new test cases correctly simulate failures by injecting states into the mock SPI variables. \n*   **Code Simplicity:** ✅ Test control flow is minimal and clean.\n*   **Idiomaticity \u0026 Readability:** ✅ The tests use standard `ztest` conventions correctly.\n*   **Security:** ✅ N/A (test additions only).\n*   **Testing:** ❌ Missing required test coverage:\n    1.  `cros_flash_physical_protect_now(..., true)` failure path (which will expose a driver bug).\n    2.  `prot_start !\u003d FLASH_PROTECTION_START` path in `cros_flash_rtkfp_get_protect_flags()` (e.g. from top-down protection).\n*   **CL Size \u0026 Scope:** ✅ `Size: S (+39, -0)`. The CL contains a single logical change: adding tests for the protection error mappings.\n*   **Commit Message:** ✅ The description clearly identifies the specific driver and the three specific error paths being added. \n\n[🔗](http://go/tj/e19ef43e-d24a-477a-b05a-91146923d2b0)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c87ea00a8da6180d51787166f6cbad9dea942c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8977eb4_b9711def",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:55:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \nThere is one more error path in `cros_flash_rtkfp_get_protect_flags()` that lacks test coverage: when `spi_flash_reg_to_protect()` succeeds but `prot_start !\u003d FLASH_PROTECTION_START` (e.g. top-down protection with `TB\u003d0`), the driver returns `EC_FLASH_PROTECT_ERROR_INCONSISTENT`. \n\nPlease add a test case to cover this boundary condition:\n\n```c\nZTEST_USER(cros_flash_rtkfp, test_protect_flags_inconsistent_start)\n{\n\t/* Assuming TB\u003d0 (default), setting BP0 protects the top of the flash, \n\t * which sets prot_start !\u003d FLASH_PROTECTION_START (0).\n\t */\n\tfake_sr1 |\u003d SPI_FLASH_SR1_BP0;\n\n\tzassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),\n\t\t      EC_FLASH_PROTECT_ERROR_INCONSISTENT);\n}\n```\n[🔗](http://go/tj/e19ef43e-d24a-477a-b05a-91146923d2b0)",
+      "range": {
+        "startLine": 461,
+        "startChar": 0,
+        "endLine": 473,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c87ea00a8da6180d51787166f6cbad9dea942c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfbe5bef_88506c7d",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:55:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \nThis test verifies the failure path for `cros_flash_physical_protect_now(..., false)`, but omits the `all\u003dtrue` branch. \n\nTesting the `true` branch is critical here to enforce **Test Oracle Integrity** and prevent masking bugs. There is currently a state-corruption bug in `cros_flash_rtkfp_protect_now()` where `data-\u003eall_protected \u003d 1;` is executed *unconditionally* before checking the return value of `cros_flash_rtkfp_protect_at_boot()`. \n\nIf you add the `true` case, the test will correctly fail (since `get_protect_flags` will erroneously return `EC_FLASH_PROTECT_ALL_NOW` instead of `0` due to the corrupted state). \n\nPlease add test cases for both `true` and `false` to ensure all branches are isolated, and fix the underlying driver bug in a prerequisite CL.\n\n```c\n\tzassert_equal(cros_flash_physical_protect_now(cros_flash_dev, true),\n\t\t      -EIO);\n```\n[🔗](http://go/tj/e19ef43e-d24a-477a-b05a-91146923d2b0)",
+      "range": {
+        "startLine": 485,
+        "startChar": 0,
+        "endLine": 498,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c87ea00a8da6180d51787166f6cbad9dea942c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
