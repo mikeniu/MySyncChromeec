@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 /* Macro to access 32-bit registers */
-#define CPUREG(addr) (*(volatile uint32_t *)(addr))
+#define CPUREG(addr) (*(volatile uint32_t *)(uintptr_t)(addr))
 
 #define CPU_NVIC_ST_CTRL CPUREG(0xE000E010)
 #define ST_ENABLE BIT(0)

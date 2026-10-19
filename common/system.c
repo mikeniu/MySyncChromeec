@@ -436,69 +436,65 @@ test_mockable const uint8_t *system_get_jump_tag(uint16_t tag, int *version,
 
 test_mockable void system_disable_jump(void)
 {
+	int ret __maybe_unused;
+	enum ec_image __maybe_unused copy;
+
 	disable_jump = 1;
 
 #ifdef CONFIG_MPU
-	if (system_is_locked()) {
-		int ret;
-		enum ec_image __attribute__((unused)) copy;
-
-		CPRINTS("MPU type: %08x", mpu_get_type());
-		/*
-		 * Protect data RAM from code execution
-		 */
-		ret = mpu_protect_data_ram();
-		if (ret == EC_SUCCESS) {
-			CPRINTS("data RAM locked. Exclusion %p-%p",
-				&__iram_text_start, &__iram_text_end);
-		} else {
-			CPRINTS("Failed to lock data RAM (%d)", ret);
-			return;
-		}
+	CPRINTS("MPU type: %08x", mpu_get_type());
+	/*
+	 * Protect data RAM from code execution
+	 */
+	ret = mpu_protect_data_ram();
+	if (ret == EC_SUCCESS) {
+		CPRINTS("data RAM locked. Exclusion %p-%p", &__iram_text_start,
+			&__iram_text_end);
+	} else {
+		CPRINTS("Failed to lock data RAM (%d)", ret);
+		return;
+	}
 
 #if defined(CONFIG_EXTERNAL_STORAGE) || !defined(CONFIG_FLASH_PHYSICAL)
-		/*
-		 * Protect code RAM from being overwritten
-		 */
-		ret = mpu_protect_code_ram();
-		if (ret == EC_SUCCESS) {
-			CPRINTS("code RAM locked.");
-		} else {
-			CPRINTS("Failed to lock code RAM (%d)", ret);
-			return;
-		}
+	/*
+	 * Protect code RAM from being overwritten
+	 */
+	ret = mpu_protect_code_ram();
+	if (ret == EC_SUCCESS) {
+		CPRINTS("code RAM locked.");
+	} else {
+		CPRINTS("Failed to lock code RAM (%d)", ret);
+		return;
+	}
 #else
-		/*
-		 * Protect inactive image (ie. RO if running RW, vice versa)
-		 * from code execution.
-		 */
-		switch (system_get_image_copy()) {
-		case EC_IMAGE_RO:
-			ret = mpu_lock_rw_flash();
-			copy = EC_IMAGE_RW;
-			break;
-		case EC_IMAGE_RW:
-			ret = mpu_lock_ro_flash();
-			copy = EC_IMAGE_RO;
-			break;
-		default:
-			copy = EC_IMAGE_UNKNOWN;
-			ret = !EC_SUCCESS;
-		}
-		if (ret == EC_SUCCESS) {
-			CPRINTS("%s image locked", ec_image_to_string(copy));
-		} else {
-			CPRINTS("Failed to lock %s image (%d)",
-				ec_image_to_string(copy), ret);
-			return;
-		}
+	/*
+	 * Protect inactive image (ie. RO if running RW, vice versa)
+	 * from code execution.
+	 */
+	switch (system_get_image_copy()) {
+	case EC_IMAGE_RO:
+		ret = mpu_lock_rw_flash();
+		copy = EC_IMAGE_RW;
+		break;
+	case EC_IMAGE_RW:
+		ret = mpu_lock_ro_flash();
+		copy = EC_IMAGE_RO;
+		break;
+	default:
+		copy = EC_IMAGE_UNKNOWN;
+		ret = !EC_SUCCESS;
+	}
+	if (ret == EC_SUCCESS) {
+		CPRINTS("%s image locked", ec_image_to_string(copy));
+	} else {
+		CPRINTS("Failed to lock %s image (%d)",
+			ec_image_to_string(copy), ret);
+		return;
+	}
 #endif /* !CONFIG_EXTERNAL_STORAGE */
 
-		/* All regions were configured successfully, enable MPU */
-		mpu_enable();
-	} else {
-		CPRINTS("System is unlocked. Skip MPU configuration");
-	}
+	/* All regions were configured successfully, enable MPU */
+	mpu_enable();
 #endif /* CONFIG_MPU */
 }
 
@@ -647,6 +643,10 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	/* Disable all DMA channels to avoid memory corruption */
 	dma_disable_all();
 #endif /* CONFIG_DMA_CROS */
+
+#ifdef CONFIG_MPU
+	mpu_pre_sysjump();
+#endif
 
 	/* Jump to the reset vector */
 	resetvec = (void (*)(void))init_addr;

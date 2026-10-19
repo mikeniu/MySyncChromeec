@@ -147,5 +147,6 @@ test_mockable int mpu_lock_rollback(bool lock);
  * EC_ERROR_UNIMPLEMENTED.
  */
 int mpu_pre_init(void);
+void mpu_pre_sysjump(void);
 
 #endif /* __CROS_EC_MPU_H */
