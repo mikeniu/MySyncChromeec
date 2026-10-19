@@ -42,12 +42,26 @@ enum mpu_region {
 	REGION_ROLLBACK = 10, /* For rollback */
 };
 
+#ifdef BOARD_HOST
+extern uint32_t mock_mpu_type;
+extern uint32_t mock_mpu_ctrl;
+extern uint32_t mock_mpu_number;
+extern uint32_t mock_mpu_base[16];
+extern uint32_t mock_mpu_size_attr[16];
+#define MPU_TYPE mock_mpu_type
+#define MPU_CTRL mock_mpu_ctrl
+#define MPU_NUMBER mock_mpu_number
+#define MPU_BASE (mock_mpu_base[mock_mpu_number & 0xf])
+#define MPU_SIZE (*((uint16_t *)&mock_mpu_size_attr[mock_mpu_number & 0xf]))
+#define MPU_ATTR (*((uint16_t *)&mock_mpu_size_attr[mock_mpu_number & 0xf] + 1))
+#else
 #define MPU_TYPE REG32(0xe000ed90)
 #define MPU_CTRL REG32(0xe000ed94)
 #define MPU_NUMBER REG32(0xe000ed98)
 #define MPU_BASE REG32(0xe000ed9c)
 #define MPU_SIZE REG16(0xe000eda0)
 #define MPU_ATTR REG16(0xe000eda2)
+#endif
 
 /*
  * See ARM v7-M Architecture Reference Manual

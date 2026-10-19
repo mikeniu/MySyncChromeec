@@ -7,12 +7,16 @@
 
 #include "builtin/assert.h"
 #include "console.h"
+#ifndef BOARD_HOST
 #include "cpu.h"
+#endif
+#include "hooks.h"
 #include "mpu.h"
 #ifdef CONFIG_RAM_LOCK
 #include "ram_lock.h"
 #endif
 #include "registers.h"
+#include "system.h"
 #include "task.h"
 #include "util.h"
 
@@ -76,7 +80,9 @@ int mpu_update_region(uint8_t region, uint32_t addr, uint8_t size_bit,
 	if (size_bit < MPU_SIZE_BITS_MIN)
 		return -EC_ERROR_INVAL;
 
+#ifndef BOARD_HOST
 	asm volatile("isb; dsb;");
+#endif
 
 	MPU_NUMBER = region;
 	MPU_SIZE &= ~1; /* Disable */
@@ -94,7 +100,9 @@ int mpu_update_region(uint8_t region, uint32_t addr, uint8_t size_bit,
 				   ((size_bit - 1) << 1) | 1;
 	}
 
+#ifndef BOARD_HOST
 	asm volatile("isb; dsb;");
+#endif
 
 	return EC_SUCCESS;
 }
@@ -252,6 +260,7 @@ void mpu_disable(void)
 {
 	MPU_CTRL &= ~(MPU_CTRL_PRIVDEFEN | MPU_CTRL_HFNMIENA | MPU_CTRL_ENABLE);
 }
+DECLARE_HOOK(HOOK_SYSJUMP, mpu_disable, HOOK_PRIO_LAST);
 
 uint32_t mpu_get_type(void)
 {
@@ -263,10 +272,12 @@ int mpu_protect_data_ram(void)
 	int ret;
 
 #ifdef CONFIG_RAM_LOCK
-	ret = ram_lock_config_lock_region(REGION_DATA_RAM, CONFIG_RAM_BASE,
-					  CONFIG_DATA_RAM_SIZE);
-	if (ret != EC_SUCCESS)
-		return ret;
+	if (system_is_locked()) {
+		ret = ram_lock_config_lock_region(
+			REGION_DATA_RAM, CONFIG_RAM_BASE, CONFIG_DATA_RAM_SIZE);
+		if (ret != EC_SUCCESS)
+			return ret;
+	}
 #endif
 
 	/* Prevent code execution from data RAM */
@@ -278,7 +289,7 @@ int mpu_protect_data_ram(void)
 
 	/* Exempt the __iram_text section */
 	return mpu_unlock_region(
-		REGION_DATA_RAM_TEXT, (uint32_t)&__iram_text_start,
+		REGION_DATA_RAM_TEXT, (uintptr_t)&__iram_text_start,
 		(uint32_t)(&__iram_text_end - &__iram_text_start),
 		MPU_ATTR_INTERNAL_SRAM);
 }
@@ -286,12 +297,32 @@ int mpu_protect_data_ram(void)
 #if defined(CONFIG_EXTERNAL_STORAGE) || !defined(CONFIG_FLASH_PHYSICAL)
 int mpu_protect_code_ram(void)
 {
-#ifdef CONFIG_RAM_LOCK
 	int ret;
 
-	ret = ram_lock_config_lock_region(
-		REGION_STORAGE, CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF,
-		CONFIG_CODE_RAM_SIZE);
+#ifdef CONFIG_RAM_LOCK
+	if (system_is_locked()) {
+		ret = ram_lock_config_lock_region(REGION_STORAGE,
+						  CONFIG_PROGRAM_MEMORY_BASE +
+							  CONFIG_RO_MEM_OFF,
+						  CONFIG_CODE_RAM_SIZE);
+		if (ret != EC_SUCCESS)
+			return ret;
+	}
+#endif
+
+#ifdef CONFIG_EXTERNAL_STORAGE
+	/*
+	 * Mark unused SRAM in the code RAM aperture execute-never and
+	 * inaccessible. Active code RAM is exempted below by higher-priority
+	 * REGION_STORAGE. When CONFIG_ROLLBACK_MPU_PROTECT is enabled on an
+	 * 8-region MPU, REGION_CODE_RAM is used for rollback protection, so use
+	 * REGION_CODE_RAM2 instead.
+	 */
+	ret = mpu_update_region(
+		IS_ENABLED(CONFIG_ROLLBACK_MPU_PROTECT) ? REGION_CODE_RAM2 :
+							  REGION_CODE_RAM,
+		align_down_to_bits(CONFIG_PROGRAM_MEMORY_BASE, 28), 28,
+		MPU_ATTR_XN | MPU_ATTR_NO_NO | MPU_ATTR_INTERNAL_SRAM, 1, 0);
 	if (ret != EC_SUCCESS)
 		return ret;
 #endif
@@ -476,8 +507,9 @@ int mpu_pre_init(void)
 
 	mpu_enable();
 
-	if (IS_ENABLED(CONFIG_ARMV7M_CACHE))
-		cpu_enable_caches();
+#ifdef CONFIG_ARMV7M_CACHE
+	cpu_enable_caches();
+#endif
 
 	return EC_SUCCESS;
 }
