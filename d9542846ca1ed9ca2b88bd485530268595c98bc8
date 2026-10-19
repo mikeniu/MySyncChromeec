@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "412d2a35_797ad1f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:34:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n*   **CL Size \u0026 Scope:** Size: S (+49, -0). The CL violates the Single Logical Change rule by bundling two distinct categories of changes that should be stacked: (1) adding the GD25Q16 protection table to the common SPI flash registry, and (2) configuring the RTS5817 board to use it alongside Zephyr mapped flash operations. These must be split into separate CLs.\n*   **Commit Message:** The commit message narratively transcribes the file changes (e.g. explicitly listing what `flash_chip.h` does and which properties it selects in `spi_flash_reg.c`) and joins independent configurations with \"Also...\". This should be rewritten to explain the conceptual *what* and *why* in 1-2 short prose paragraphs without transcribing the exact files and macros modified.\n*   **Functionality:** The GD25Q16 protection range mappings and Kconfig selections are correctly aligned with the chip specifications.\n*   **Architecture \u0026 Component Fit:** The declarative macros and struct table match the established pattern for SPI flash configurations.\n*   **Code Simplicity:** The added definitions are minimal and straightforward.\n*   **Idiomaticity \u0026 Readability:** The previous suggestion to reuse `DT_PROP` for the block sizes has been cleanly addressed.\n*   **Security:** No issues identified.\n*   **Testing:** Exempt from automated tests as this is a declarative hardware configuration map.\n\n**Required Action - Split Plan:**\nPlease split this CL into two sequential CLs:\n1. **CL 1 (Prerequisite):** Add the GD25Q16 protection table definitions to `common/spi_flash_reg.c` (this is a common chip definition independent of any specific board).\n2. **CL 2 (Dependent):** Enable the Zephyr flash storage configurations, define `CONFIG_SPI_FLASH_GD25Q16`, and enable extended operations for the RTS5817 board (`zephyr/Kconfig.flash`, `zephyr/program/fpmcu/realtekfp/prj.conf`, `zephyr/shim/chip/rtkfp/include/flash_chip.h`). [🔗](http://go/tj/3cccf70f-a016-4dfc-80b5-c58df99977af)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d9542846ca1ed9ca2b88bd485530268595c98bc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
