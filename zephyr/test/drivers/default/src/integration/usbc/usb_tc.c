@@ -10,6 +10,7 @@
 #include "emul/tcpc/emul_tcpci_partner_drp.h"
 #include "emul/tcpc/emul_tcpci_partner_snk.h"
 #include "emul/tcpc/emul_tcpci_partner_src.h"
+#include "hooks.h"
 #include "task.h"
 #include "tcpm/tcpci.h"
 #include "test/drivers/stubs.h"
@@ -68,6 +69,7 @@ static void usb_tc_after(void *fixture_data)
 	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
 	tcpci_emul_set_vbus_level(fixture->tcpci_emul, VBUS_SAFE0V);
 	tc_try_src_override(TRY_SRC_NO_OVERRIDE);
+	pd_set_dual_role(TEST_PORT, PD_DRP_TOGGLE_ON);
 	pd_set_suspend(TEST_PORT, false);
 	k_sleep(K_MSEC(100));
 }
@@ -226,6 +228,80 @@ ZTEST_F(usb_tc, test_tc_attach_as_sink)
 	zassert_false(tc_is_attached_snk(TEST_PORT));
 	zassert_false(tc_get_pd_enabled(TEST_PORT));
 	zassert_false(pd_alt_mode_capable(TEST_PORT));
+}
+
+static int tc_disconnect_hook_count;
+
+static void tc_disconnect_hook_handler(void)
+{
+	if (TASK_ID_TO_PD_PORT(task_get_current()) == TEST_PORT)
+		tc_disconnect_hook_count++;
+}
+DECLARE_HOOK(HOOK_USB_PD_DISCONNECT, tc_disconnect_hook_handler,
+	     HOOK_PRIO_DEFAULT);
+
+ZTEST_F(usb_tc, test_tc_attach_wait_bounce_no_disconnect_hook)
+{
+	/*
+	 * Connect a Source partner with Rp asserted but VBUS at 0 mV so the
+	 * port enters AttachWait.SNK without attaching, then disconnect.
+	 * Verify no HOOK_USB_PD_DISCONNECT fires on the unattached bounce,
+	 * both when bouncing to Unattached.SRC (DRP toggle) and Unattached.SNK
+	 * (forced sink).
+	 */
+	tcpci_partner_init(&fixture->partner_emul, PD_REV20);
+	fixture->partner_emul.extensions = tcpci_src_emul_init(
+		&fixture->src_ext, &fixture->partner_emul, NULL);
+
+	tc_disconnect_hook_count = 0;
+	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
+
+	/* 1. Bounce AttachWait.SNK -> Unattached.SRC (DRP toggle) */
+	zassert_ok(tcpci_partner_connect_to_tcpci(&fixture->partner_emul,
+						  fixture->tcpci_emul));
+	zassert_ok(tcpci_emul_set_vbus_level(fixture->tcpci_emul, VBUS_SAFE0V));
+	k_sleep(K_MSEC(250));
+	zassert_equal(0, strcmp(tc_get_current_state(TEST_PORT),
+				"AttachWait.SNK"));
+	zassert_false(tc_is_attached_snk(TEST_PORT));
+
+	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
+	k_sleep(K_MSEC(250));
+	zassert_false(tc_is_attached_snk(TEST_PORT));
+	zassert_equal(0, tc_disconnect_hook_count);
+
+	/* 2. Bounce AttachWait.SNK -> Unattached.SNK (PD_DRP_FORCE_SINK) */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SINK);
+	k_sleep(K_MSEC(100));
+	zassert_ok(tcpci_partner_connect_to_tcpci(&fixture->partner_emul,
+						  fixture->tcpci_emul));
+	zassert_ok(tcpci_emul_set_vbus_level(fixture->tcpci_emul, VBUS_SAFE0V));
+	k_sleep(K_MSEC(250));
+	zassert_equal(0, strcmp(tc_get_current_state(TEST_PORT),
+				"AttachWait.SNK"));
+
+	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
+	k_sleep(K_MSEC(250));
+	pd_set_dual_role(TEST_PORT, PD_DRP_TOGGLE_ON);
+	k_sleep(K_MSEC(100));
+	zassert_false(tc_is_attached_snk(TEST_PORT));
+	zassert_equal(0, tc_disconnect_hook_count);
+
+	/* 3. Real attach followed by detach fires HOOK_USB_PD_DISCONNECT once
+	 */
+	isl923x_emul_set_adc_vbus(fixture->charger_emul, DEFAULT_VBUS_MV);
+	zassert_ok(tcpci_partner_connect_to_tcpci(&fixture->partner_emul,
+						  fixture->tcpci_emul));
+	k_sleep(K_SECONDS(1));
+	zassert_true(tc_is_attached_snk(TEST_PORT));
+	zassert_equal(0, tc_disconnect_hook_count);
+
+	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
+	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
+	zassert_ok(tcpci_emul_set_vbus_level(fixture->tcpci_emul, VBUS_SAFE0V));
+	k_sleep(K_SECONDS(1));
+	zassert_false(tc_is_attached_snk(TEST_PORT));
+	zassert_equal(1, tc_disconnect_hook_count);
 }
 
 ZTEST_F(usb_tc, test_tc_dts_debug_accessory_cc1)
@@ -390,6 +466,7 @@ ZTEST_F(usb_tc, test_tc_attach_as_source)
 ZTEST_F(usb_tc, test_tc_try_src_flow)
 {
 	tc_try_src_override(TRY_SRC_OVERRIDE_ON);
+	tc_disconnect_hook_count = 0;
 
 	/* Connect source partner with Rp */
 	tcpci_partner_init(&fixture->partner_emul, PD_REV20);
@@ -405,6 +482,7 @@ ZTEST_F(usb_tc, test_tc_try_src_flow)
 	zassert_true(tc_is_attached_snk(TEST_PORT));
 	zassert_false(tc_is_attached_src(TEST_PORT));
 	zassert_equal(PD_ROLE_SINK, pd_get_power_role(TEST_PORT));
+	zassert_equal(0, tc_disconnect_hook_count);
 
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
@@ -465,10 +543,12 @@ ZTEST_F(usb_tc, test_tc_attached_src_try_src_detach)
 	zassert_equal(PD_ROLE_SOURCE, pd_get_power_role(TEST_PORT));
 
 	/* Disconnect partner while Try.SRC is active (Attached.SRC ->
-	 * Unattached.SNK) */
+	 * TryWait.SNK -> Unattached.SNK) */
+	tc_disconnect_hook_count = 0;
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	k_sleep(K_SECONDS(1));
 	zassert_false(tc_is_attached_src(TEST_PORT));
+	zassert_equal(1, tc_disconnect_hook_count);
 
 	tc_try_src_override(TRY_SRC_NO_OVERRIDE);
 }
