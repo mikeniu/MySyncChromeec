@@ -664,6 +664,10 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.cros_system_rtkfp:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_CROS_SYSTEM_RTKFP=y
+    - CONFIG_CROS_SYSTEM_REALTEKFP=y
   drivers.dps:
     tags:
     - host_cmd
