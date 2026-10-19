@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "612a2951_42b6b3a8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T10:08:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a5591b99_5e319b1b",
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc73cecf_41267aef",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c980573b_cd8dd075",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T10:08:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc73cecf_41267aef",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 9999
+      },
       "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a2793b2_672e78ee",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T10:08:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aefa4403_236ee3b5",
+      "range": {
+        "startLine": 352,
+        "startChar": 0,
+        "endLine": 355,
+        "endChar": 9999
+      },
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b7b98ff_830115f6",
@@ -95,6 +161,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a518b715_925b467a",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T10:08:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b7b98ff_830115f6",
+      "range": {
+        "startLine": 505,
+        "startChar": 0,
+        "endLine": 509,
+        "endChar": 9999
+      },
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49445e5b_b4621e35",
@@ -116,6 +206,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5252312c_275e0cf2",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T10:08:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49445e5b_b4621e35",
+      "range": {
+        "startLine": 548,
+        "startChar": 0,
+        "endLine": 548,
+        "endChar": 9999
+      },
       "revId": "018236af78a6f6bc016e587aa575ce5b0f19f7f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
