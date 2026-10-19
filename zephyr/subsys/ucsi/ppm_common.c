@@ -22,6 +22,8 @@
 
 LOG_MODULE_REGISTER(ppm_common, LOG_LEVEL_INF);
 
+#define PPM_CC_ACK_TIMEOUT_MS 5000
+
 enum last_error_type {
 	/* Error came from LPM; GET_ERROR_STATUS should query the LPM for a
 	 * value.
@@ -638,9 +640,22 @@ static void ppm_common_taskloop(struct ucsi_ppm_device *dev)
 	 */
 	if (dev->ppm_state != PPM_STATE_PROCESSING_COMMAND &&
 	    !is_pending_command(dev) && !handle_async_event) {
+		k_timeout_t timeout =
+			(dev->ppm_state == PPM_STATE_WAITING_CC_ACK) ?
+				K_MSEC(PPM_CC_ACK_TIMEOUT_MS) :
+				K_FOREVER;
+
 		LOG_DBG("Waiting for next command at state %d (%s)...",
 			dev->ppm_state, ppm_state_to_string(dev->ppm_state));
-		k_condvar_wait(&dev->ppm_condvar, &dev->ppm_lock, K_FOREVER);
+		if (k_condvar_wait(&dev->ppm_condvar, &dev->ppm_lock,
+				   timeout) == -EAGAIN &&
+		    dev->ppm_state == PPM_STATE_WAITING_CC_ACK &&
+		    !is_pending_command(dev)) {
+			LOG_WRN("Timed out waiting for CC ACK; resetting to IDLE_NOTIFY");
+			clear_cci_except_connector(dev);
+			dev->ppm_state = PPM_STATE_IDLE_NOTIFY;
+			ppm_common_opm_notify(dev);
+		}
 	}
 
 	LOG_DBG("Handling next task at state %d (%s)", dev->ppm_state,
