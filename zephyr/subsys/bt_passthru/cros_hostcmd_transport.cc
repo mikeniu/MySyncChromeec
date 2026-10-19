@@ -118,6 +118,8 @@ size_t CrosHostcmdTransport::GetPendingEvents(uint8_t *out_buffer,
 		/* Deadlock Protection: Discard events that can never fit in the
 		 * MTU */
 		if (static_cast<size_t>(event_len + 1) > max_size) {
+			LOG_WRN("Dropping oversized BT event (%u bytes > MTU %zu)",
+				event_len, max_size);
 			ring_buf_consume(
 				&bt_events_ring_buf_,
 				MIN(static_cast<uint32_t>(event_len + 1),
@@ -192,11 +194,6 @@ static enum ec_status hc_bt_command(struct host_cmd_handler_args *args)
 	const auto *req =
 		static_cast<const struct ec_param_bt_command *>(args->params);
 
-	/*
-	 * TODO: Implement a reassembly buffer here.
-	 * Large messages from the AP will arrive in 240-byte chunks using the
-	 * 'offset' and 'total_size' fields (to be added to the struct above).
-	 */
 	if (args->params_size < sizeof(req->size) || req->size == 0 ||
 	    req->size > BT_MAX_COMMAND_SIZE ||
 	    args->params_size < sizeof(req->size) + req->size) {

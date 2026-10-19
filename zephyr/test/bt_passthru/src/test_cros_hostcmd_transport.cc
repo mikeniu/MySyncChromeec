@@ -272,6 +272,21 @@ ZTEST_F(cros_hostcmd_transport, test_host_command_bt_command)
 	zassert_equal(fixture->last_inbound_cmd[1], 0x0c);
 	zassert_equal(fixture->last_inbound_cmd[2], 0x00);
 
+	/* Largest H:4 command: 255 parameter bytes (1 + 3 + 255 = 259) */
+	req.size = 1 + 3 + 255;
+	req.data[0] = 0x01;
+	req.data[1] = 0x37;
+	req.data[2] = 0x20;
+	req.data[3] = 0xff;
+	for (size_t i = 4; i < req.size; i++) {
+		req.data[i] = static_cast<uint8_t>(i);
+	}
+	args = BUILD_HOST_COMMAND_PARAMS(EC_CMD_BT_COMMAND, 0, req);
+	zassert_equal(host_command_process(&args), EC_RES_SUCCESS);
+
+	zassert_equal(fixture->last_inbound_cmd.size(), req.size);
+	zassert_mem_equal(fixture->last_inbound_cmd.data(), req.data, req.size);
+
 	/* Error from inbound handler */
 	fixture->inbound_status = pw::Status::Internal();
 	args = BUILD_HOST_COMMAND_PARAMS(EC_CMD_BT_COMMAND, 0, req);
@@ -306,4 +321,22 @@ ZTEST_F(cros_hostcmd_transport, test_host_command_bt_read_event)
 	zassert_equal(host_command_process(&args), EC_RES_SUCCESS);
 	zassert_equal(rsp.num_events, 0);
 	zassert_equal(args.response_size, sizeof(rsp.num_events));
+
+	/* Max-size 255-byte H:4 event fits in a single response (1 + 255 =
+	 * 256) */
+	uint8_t max_evt[255];
+	for (size_t i = 0; i < sizeof(max_evt); i++) {
+		max_evt[i] = static_cast<uint8_t>(i);
+	}
+	zassert_equal(fixture->transport.Write(0, max_evt, false),
+		      pw::OkStatus());
+
+	memset(&rsp, 0, sizeof(rsp));
+	args = BUILD_HOST_COMMAND_RESPONSE(EC_CMD_BT_READ_EVENT, 0, rsp);
+	zassert_equal(host_command_process(&args), EC_RES_SUCCESS);
+	zassert_equal(rsp.num_events, 1);
+	zassert_equal(rsp.events[0], sizeof(max_evt));
+	zassert_mem_equal(&rsp.events[1], max_evt, sizeof(max_evt));
+	zassert_equal(args.response_size,
+		      sizeof(rsp.num_events) + 1 + sizeof(max_evt));
 }
