@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "706a1d5e_1d26e087",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 1098,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-19T19:49:26Z",
+      "side": 1,
+      "message": "Nice",
+      "revId": "bdf2ec908d82020e31f7065e6363d3870f8bc852",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
