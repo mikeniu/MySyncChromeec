@@ -8,6 +8,7 @@
 #include "console.h"
 #include "drivers/pdc.h"
 #include "drivers/ucsi_v3.h"
+#include "emul/emul_common_i2c.h"
 #include "emul/emul_pdc.h"
 #include "emul/emul_realtek_rts54xx_public.h"
 #include "i2c.h"
@@ -254,6 +255,54 @@ ZTEST_USER(rts54xx, test_irq)
 	zassert_true(TEST_WAIT_FOR((port_interrupt(EMUL_PORT) &&
 				    port_interrupt(EMUL2_PORT)),
 				   IRQ_TEST_TIMEOUT_MS));
+}
+
+#define STUCK_IRQ_MAX_ARA_READS 50
+#define STUCK_IRQ_EXPECTED_LIMIT 10
+
+static int stuck_ara_read_cb(const struct emul *target, int reg, uint8_t *val,
+			     int bytes, void *data)
+{
+	int *read_count = data;
+	struct i2c_dt_spec i2c_spec = I2C_DT_SPEC_GET(RTS5453P_NODE);
+
+	ARG_UNUSED(target);
+	ARG_UNUSED(reg);
+	ARG_UNUSED(bytes);
+
+	if (*read_count < STUCK_IRQ_MAX_ARA_READS) {
+		(*read_count)++;
+		*val = i2c_spec.addr << 1;
+		return 0;
+	}
+
+	return -EIO;
+}
+
+ZTEST_USER(rts54xx, test_handle_irqs_limit)
+{
+	const struct emul *ara_emul = EMUL_DT_GET(DT_NODELABEL(smbus_ara_emul));
+	struct i2c_common_emul_data *ara_common = ara_emul->data;
+	int ara_read_count = 0;
+
+	i2c_common_emul_set_read_func(ara_common, stuck_ara_read_cb,
+				      &ara_read_count);
+
+	/* Pulse IRQ (leaves active-low GPIO asserted) while ARA keeps
+	 * responding. Verify handle_irqs() bounds the loop to 10 iterations
+	 * instead of spinning indefinitely and starving lower-priority threads.
+	 */
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	k_msleep(TEST_WAIT_FOR_INTERVAL_MS);
+
+	/* Restore normal ARA read handler and clear the asserted IRQ line. */
+	i2c_common_emul_set_read_func(ara_common, NULL, NULL);
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	zassert_equal(ara_read_count, STUCK_IRQ_EXPECTED_LIMIT,
+		      "handle_irqs looped %d times without yielding",
+		      ara_read_count);
 }
 
 ZTEST_USER(rts54xx, test_emul_vdo_set_bounds)
