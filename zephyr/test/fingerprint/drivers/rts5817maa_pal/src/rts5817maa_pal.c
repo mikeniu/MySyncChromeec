@@ -16,22 +16,11 @@
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_error_hook.h>
 
-#include <fingerprint_rts5817maa.h>
 #include <fingerprint_rts5817maa_pal.h>
 
 #define RTS5817MAA_NODE DT_NODELABEL(rts5817maa)
 
 #define PAL_TEST_HEAP_SIZE CONFIG_FINGERPRINT_SENSOR_RTS5817MAA_HEAP_SIZE
-
-static const struct rts5817maa_cfg pal_test_cfg = {
-	.spi = SPI_DT_SPEC_GET(RTS5817MAA_NODE,
-			       SPI_OP_MODE_MASTER | SPI_WORD_SET(8), 0),
-	.interrupt = GPIO_DT_SPEC_GET(RTS5817MAA_NODE, irq_gpios),
-	.reset_pin = GPIO_DT_SPEC_GET(RTS5817MAA_NODE, reset_gpios),
-};
-
-DEVICE_DT_DEFINE(RTS5817MAA_NODE, NULL, NULL, NULL, &pal_test_cfg, POST_KERNEL,
-		 CONFIG_FINGERPRINT_SENSOR_INIT_PRIORITY, NULL);
 
 /* State of the minimal SPI peripheral emulator. */
 static uint8_t emul_last_tx[16];
