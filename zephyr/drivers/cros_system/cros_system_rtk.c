@@ -11,11 +11,13 @@
 #include "reg/reg_wdt.h"
 #include "stdint.h"
 #include "system.h"
+#include "watchdog.h"
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/bbram.h>
 #include <zephyr/drivers/watchdog.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/pm/pm.h>
 #include <zephyr/sys/poweroff.h>
 #include <zephyr/sys/reboot.h>
 #include <zephyr/sys/util.h>
@@ -189,6 +191,19 @@ int cros_system_get_reset_cause(void)
 	return reset_cause;
 }
 
+#ifdef CONFIG_PM
+static void cros_system_rtk_pm_state_entry(enum pm_state state)
+{
+	if (state == PM_STATE_SUSPEND_TO_IDLE) {
+		watchdog_reload();
+	}
+}
+
+static struct pm_notifier cros_system_rtk_pm_notifier = {
+	.state_entry = cros_system_rtk_pm_state_entry,
+};
+#endif
+
 static int cros_system_rtk_init(void)
 {
 	WDT_Type *wdt_reg = RTK_WDT_REG_BASE;
@@ -277,6 +292,10 @@ static int cros_system_rtk_init(void)
 			system_set_reset_flags(EC_RESET_FLAG_RESET_PIN);
 		}
 	}
+
+#ifdef CONFIG_PM
+	pm_notifier_register(&cros_system_rtk_pm_notifier);
+#endif
 
 	return 0;
 }
