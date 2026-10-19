@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ceaca5e_523567e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T07:06:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6634580_39145158",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3b7e8af_caf0b9d3",
@@ -133,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e53beac6_47109d42",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T07:06:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e3282fd_59b6b3f2",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 9999
+      },
       "revId": "f2ba7add4f3f2bde56af6a4b4601f53e89b0f6ff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
