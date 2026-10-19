@@ -73,6 +73,42 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e49dec1_dc4ee6c2",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T18:47:17Z",
+      "side": 1,
+      "message": "\u003e test_pw_log_tokenized.cc doesn\u0027t currently check uart_console_read_buffer(), so CQ doesn\u0027t catch this.\n\nCan you update the test?",
+      "parentUuid": "fb33caac_6939dc5c",
+      "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "819c43ab_f3bd2d40",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T18:47:17Z",
+      "side": 1,
+      "message": "\u003e Unit tests don\u0027t catch this...\n\nCan you add those unit tests?",
+      "parentUuid": "87d25db0_f79f222f",
+      "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3061bced_8d104f98",
         "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
         "patchSetId": 1
