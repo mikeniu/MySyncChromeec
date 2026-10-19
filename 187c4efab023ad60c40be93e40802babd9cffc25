@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "377d5f50_37731518",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T20:22:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the weak inequality test oracles in the new tests. [🔗](http://go/tj/d1ab5cf0-6362-4b54-9498-c27ae615bb28)\n\n### Review Summary\n* **CL Size \u0026 Scope:** Size: M (+68, -5). ✅ Single logical change (bug fix + targeted tests).\n* **Commit Message:** ✅ Accurate, concise, and explains the rationale clearly without narrating the diff.\n* **Architecture \u0026 Component Fit:** ✅\n* **Code Simplicity:** ✅\n* **Idiomaticity \u0026 Readability:** ✅\n* **Security:** ✅\n* **Testing:** ❌ The new `not_busy_match` tests use weak inequality assertions (`zassert_not_equal`) instead of asserting the exact expected return code. See inline comments.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "187c4efab023ad60c40be93e40802babd9cffc25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "465bb98b_5347240c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T20:22:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \n**Weak Inequality Test Oracle:**\nAvoid using negative assertions (`zassert_not_equal`) for deterministic outputs, as they can silently pass if the function fails with an unexpected or corrupted error code. \n\nSince `global_context.templ_valid` is `0` in this test, `ec_cmd_fp_frame` deterministically returns `EC_HOST_CMD_UNAVAILABLE` (which maps to `EC_RES_UNAVAILABLE`). Assert this exact expected value to prevent masking.\n\n```c++\n\tzassert_equal(EC_RES_UNAVAILABLE,\n\t\t\t  ec_cmd_fp_frame(NULL, \u0026params_v0, frame_buffer));\n```\n[🔗](http://go/tj/d1ab5cf0-6362-4b54-9498-c27ae615bb28)",
+      "range": {
+        "startLine": 477,
+        "startChar": 0,
+        "endLine": 478,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "187c4efab023ad60c40be93e40802babd9cffc25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba3797be_2e363f8d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T20:22:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \n**Weak Inequality Test Oracle:**\nSimilarly here, since `global_context.templ_valid` is `0`, this request will deterministically return `EC_HOST_CMD_UNAVAILABLE` (i.e., `EC_RES_UNAVAILABLE`). Assert the exact expected return value rather than just checking that it doesn\u0027t return `EC_RES_BUSY`.\n\n```c++\n\tzassert_equal(EC_RES_UNAVAILABLE,\n\t\t\t  ec_cmd_fp_frame_v1(NULL, \u0026encrypt_request, NULL));\n```\n[🔗](http://go/tj/d1ab5cf0-6362-4b54-9498-c27ae615bb28)",
+      "range": {
+        "startLine": 506,
+        "startChar": 0,
+        "endLine": 507,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "187c4efab023ad60c40be93e40802babd9cffc25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
