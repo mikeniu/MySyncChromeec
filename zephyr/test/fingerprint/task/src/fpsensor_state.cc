@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
 #include "mock_fingerprint_algorithm.h"
 
 #include <zephyr/fff.h>
@@ -12,12 +13,14 @@
 #include <cstdint>
 #include <ec_commands.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <span>
 
 /* Define the missing FFF mocks for the linker */
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
-constexpr size_t TARGET_SHA256_DIGEST_LENGTH = 32;
+namespace
+{
 
 /*
  * Manual mock state variables.
@@ -26,47 +29,76 @@ constexpr size_t TARGET_SHA256_DIGEST_LENGTH = 32;
  * std::span types lack a default constructor, we must implement this mock
  * manually rather than using FFF macros.
  */
-static int validate_request_call_count = 0;
-static enum ec_error_list validate_request_return_val = EC_SUCCESS;
+int validate_request_call_count = 0;
+ec_error_list validate_request_return_val = EC_SUCCESS;
+
+int set_fp_mode_v1(uint32_t mode, std::array<uint8_t, FP_MAC_LENGTH> mac = {})
+{
+	ec_params_fp_mode_v1 params{
+		.mode = mode,
+	};
+	std::ranges::copy(mac, params.mac);
+	ec_response_fp_mode response{};
+	return ec_cmd_fp_mode_v1(nullptr, &params, &response);
+}
+
+void *fpsensor_setup()
+{
+	/* Start shimmed tasks. */
+	start_ec_tasks();
+	k_msleep(100);
+
+	return nullptr;
+}
+
+void fpsensor_state_before(void *f)
+{
+	/* Reset context before each test case. */
+	global_context.reset_and_clear_context();
+
+	/* Reset manual mock states. */
+	validate_request_call_count = 0;
+	validate_request_return_val = EC_SUCCESS;
+
+	/* Reset remaining FFF mocks. */
+	RESET_FAKE(mkbp_send_event);
+}
+
+} /* namespace */
 
 /*
  * Production symbol override.
  *
- * The production instance of validate_request() in the firmware source is
- * annotated with `test_mockable` (which expands to a weak attribute during test
- * builds). This normal (strong) definition cleanly overrides it for this test
- * suite.
+ * The production instance of FpCryptoContext::validate_request() in the
+ * firmware source is annotated with `test_mockable` (which expands to a weak
+ * attribute during test builds). This normal (strong) definition cleanly
+ * overrides it for this test suite.
  *
  * Note: A manual mock is implemented here instead of using the Fake Function
  * Framework (FFF) because FFF requires mock arguments to be
  * default-constructible to track call history. Fixed-size std::span types do
  * not possess a default constructor.
  */
-enum ec_error_list
-validate_request(std::span<const uint8_t> context,
-		 std::span<const uint8_t> operation,
-		 std::span<const uint8_t, TARGET_SHA256_DIGEST_LENGTH> mac)
+std::expected<void, ec_error_list>
+FpCryptoContext::validate_request(std::span<const uint8_t> context,
+				  std::string_view operation,
+				  std::span<const uint8_t, FP_MAC_LENGTH> mac)
 {
 	validate_request_call_count++;
-	return validate_request_return_val;
+	if (validate_request_return_val != EC_SUCCESS) {
+		return std::unexpected(validate_request_return_val);
+	}
+	return {};
 }
 
 ZTEST_USER(fpsensor_state, test_single_fp_mode_auth_accepted)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_MATCH,
-		.mac = { 0xa5 }, /* Provide MAC payload to satisfy verification
-				    check. */
-	};
-	struct ec_response_fp_mode response;
-
 	/* Setup authenticating state context. */
-	global_context.fp_encryption_status |=
-		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	global_context.crypto.set_auth_enabled(true);
 	validate_request_return_val = EC_SUCCESS;
 
 	/* Submit standard single-mode transition request. */
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_MATCH, { 0xa5 });
 
 	/* Verify request is accepted with EC_RES_SUCCESS. */
 	zassert_equal(rv, EC_RES_SUCCESS,
@@ -80,17 +112,11 @@ ZTEST_USER(fpsensor_state, test_single_fp_mode_auth_accepted)
 
 ZTEST_USER(fpsensor_state, test_compound_fp_mode_auth_bypass_rejected)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_MATCH,
-		.mac = { 0xa5 },
-	};
-	struct ec_response_fp_mode response;
-
-	global_context.fp_encryption_status |=
-		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	global_context.crypto.set_auth_enabled(true);
 	validate_request_return_val = EC_SUCCESS;
 
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_ENROLL_SESSION | FP_MODE_MATCH,
+				{ 0xa5 });
 
 	zassert_equal(
 		rv, EC_RES_ACCESS_DENIED,
@@ -104,17 +130,13 @@ ZTEST_USER(fpsensor_state, test_compound_fp_mode_auth_bypass_rejected)
 
 ZTEST_USER(fpsensor_state, test_two_step_bypass_mitigation)
 {
-	struct ec_params_fp_mode_v1 params = {};
-	struct ec_response_fp_mode response;
-
-	global_context.fp_encryption_status |=
-		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	global_context.crypto.set_auth_enabled(true);
 
 	/*
 	 * STEP 1: Simulate the system already being in a non-auth-gated mode
 	 * safely.
 	 */
-	global_context.sensor_mode = FP_MODE_DEEPSLEEP;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_DEEPSLEEP);
 
 	/*
 	 * STEP 2: Attacker attempts to leverage the current state delta to
@@ -123,10 +145,9 @@ ZTEST_USER(fpsensor_state, test_two_step_bypass_mitigation)
 	 * 32-byte zeroed array token. We instruct our mock cryptoprocessor to
 	 * reject this invalid signature layout.
 	 */
-	params.mode = FP_MODE_DEEPSLEEP | FP_MODE_MATCH;
 	validate_request_return_val = EC_ERROR_ACCESS_DENIED;
 
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_DEEPSLEEP | FP_MODE_MATCH);
 
 	/*
 	 * Verify that because a token validation path was triggered by the
@@ -149,13 +170,9 @@ ZTEST_USER(fpsensor_state, test_two_step_bypass_mitigation)
 
 ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_capture_type)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_CAPTURE |
-			(FP_CAPTURE_TYPE_MAX << FP_MODE_CAPTURE_TYPE_SHIFT)
-	};
-	struct ec_response_fp_mode response;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(
+		FP_MODE_CAPTURE |
+		(FP_CAPTURE_TYPE_MAX << FP_MODE_CAPTURE_TYPE_SHIFT));
 
 	zassert_equal(
 		rv, EC_RES_INVALID_PARAM,
@@ -169,12 +186,7 @@ ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_capture_type)
 
 ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_algo_bits)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = ~FP_VALID_MODES & ~FP_MODE_CAPTURE_TYPE_MASK,
-	};
-	struct ec_response_fp_mode response;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(~FP_VALID_MODES & ~FP_MODE_CAPTURE_TYPE_MASK);
 
 	zassert_equal(
 		rv, EC_RES_INVALID_PARAM,
@@ -188,14 +200,9 @@ ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_algo_bits)
 
 ZTEST_USER(fpsensor_state, test_validate_fp_mode_max_templates_exceeded)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_ENROLL_SESSION,
-	};
-	struct ec_response_fp_mode response;
+	global_context.templates.templ_valid = FP_MAX_FINGER_COUNT;
 
-	global_context.templ_valid = FP_MAX_FINGER_COUNT;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_ENROLL_SESSION);
 
 	zassert_equal(
 		rv, EC_RES_INVALID_PARAM,
@@ -210,14 +217,9 @@ ZTEST_USER(fpsensor_state, test_validate_fp_mode_max_templates_exceeded)
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_reset_sensor_while_active_fails)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_RESET_SENSOR,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_MATCH);
 
-	global_context.sensor_mode = FP_MODE_MATCH;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_RESET_SENSOR);
 
 	zassert_equal(
 		rv, EC_RES_INVALID_PARAM,
@@ -232,14 +234,9 @@ ZTEST_USER(fpsensor_state,
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_reset_sensor_while_idle_succeeds)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_RESET_SENSOR,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode{};
 
-	global_context.sensor_mode = 0;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_RESET_SENSOR);
 
 	zassert_equal(rv, EC_RES_SUCCESS,
 		      "Expected RESET_SENSOR while idle to succeed, got %d",
@@ -253,14 +250,9 @@ ZTEST_USER(fpsensor_state,
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_reject_mode_clearing_during_crypto)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = 0,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_ENCRYPT_TEMPLATE);
 
-	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(0);
 
 	zassert_equal(
 		rv, EC_RES_INVALID_PARAM,
@@ -268,22 +260,17 @@ ZTEST_USER(fpsensor_state,
 		rv);
 
 	zassert_equal(
-		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		global_context.sensor_mode.raw(), FP_MODE_ENCRYPT_TEMPLATE,
 		"Expected sensor_mode to retain FP_MODE_ENCRYPT_TEMPLATE, "
 		"got 0x%x",
-		global_context.sensor_mode);
+		global_context.sensor_mode.raw());
 }
 
 ZTEST_USER(fpsensor_state, test_validate_fp_mode_reject_mode_swap_during_crypto)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_DECRYPT_TEMPLATE,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_ENCRYPT_TEMPLATE);
 
-	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_DECRYPT_TEMPLATE);
 
 	zassert_equal(
 		rv, EC_RES_INVALID_PARAM,
@@ -292,23 +279,18 @@ ZTEST_USER(fpsensor_state, test_validate_fp_mode_reject_mode_swap_during_crypto)
 		rv);
 
 	zassert_equal(
-		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		global_context.sensor_mode.raw(), FP_MODE_ENCRYPT_TEMPLATE,
 		"Expected sensor_mode to remain FP_MODE_ENCRYPT_TEMPLATE, "
 		"got 0x%x",
-		global_context.sensor_mode);
+		global_context.sensor_mode.raw());
 }
 
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_allow_dont_change_during_crypto)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_DONT_CHANGE,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_ENCRYPT_TEMPLATE);
 
-	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_DONT_CHANGE);
 
 	zassert_equal(
 		rv, EC_RES_SUCCESS,
@@ -316,22 +298,17 @@ ZTEST_USER(fpsensor_state,
 		rv);
 
 	zassert_equal(
-		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		global_context.sensor_mode.raw(), FP_MODE_ENCRYPT_TEMPLATE,
 		"Expected sensor_mode to retain FP_MODE_ENCRYPT_TEMPLATE, got 0x%x",
-		global_context.sensor_mode);
+		global_context.sensor_mode.raw());
 }
 
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_reject_identical_mode_during_crypto)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_ENCRYPT_TEMPLATE,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_ENCRYPT_TEMPLATE);
 
-	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_ENCRYPT_TEMPLATE);
 
 	zassert_equal(rv, EC_RES_INVALID_PARAM,
 		      "Expected submitting mode during crypto to be rejected, "
@@ -342,18 +319,13 @@ ZTEST_USER(fpsensor_state,
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_enroll_image_without_session_in_mode_fails)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_ENROLL_IMAGE,
-	};
-	struct ec_response_fp_mode response;
-
 	/*
 	 * Even if cur_mode has FP_MODE_ENROLL_SESSION set, params.mode missing
 	 * FP_MODE_ENROLL_SESSION must be rejected to prevent session clearing.
 	 */
-	global_context.sensor_mode = FP_MODE_ENROLL_SESSION;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_ENROLL_SESSION);
 
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_ENROLL_IMAGE);
 
 	zassert_equal(rv, EC_RES_INVALID_PARAM,
 		      "Expected ENROLL_IMAGE without ENROLL_SESSION in mode to "
@@ -364,36 +336,25 @@ ZTEST_USER(fpsensor_state,
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_enroll_image_with_active_session_succeeds)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode(FP_MODE_ENROLL_SESSION);
 
-	global_context.sensor_mode = FP_MODE_ENROLL_SESSION;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION);
 
 	zassert_equal(
 		rv, EC_RES_SUCCESS,
 		"Expected ENROLL_IMAGE with active session to succeed, got %d",
 		rv);
-	zassert_equal(
-		global_context.sensor_mode & FP_MODE_ENROLL_SESSION,
-		FP_MODE_ENROLL_SESSION,
+	zassert_true(
+		global_context.sensor_mode.is_enroll_session(),
 		"Expected ENROLL_SESSION bit to remain set in sensor_mode");
 }
 
 ZTEST_USER(fpsensor_state,
 	   test_validate_fp_mode_enroll_image_concurrent_session_succeeds)
 {
-	struct ec_params_fp_mode_v1 params = {
-		.mode = FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
-	};
-	struct ec_response_fp_mode response;
+	global_context.sensor_mode = FpSensorMode{};
 
-	global_context.sensor_mode = 0;
-
-	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+	int rv = set_fp_mode_v1(FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION);
 
 	zassert_equal(
 		rv, EC_RES_SUCCESS,
@@ -401,33 +362,187 @@ ZTEST_USER(fpsensor_state,
 		"succeed, got %d",
 		rv);
 	zassert_equal(
-		global_context.sensor_mode,
+		global_context.sensor_mode.raw(),
 		FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
 		"Expected sensor_mode to be ENROLL_IMAGE | ENROLL_SESSION, got 0x%x",
-		global_context.sensor_mode);
+		global_context.sensor_mode.raw());
 }
 
-static void *fpsensor_setup(void)
+ZTEST_USER(fpsensor_state, test_state_machine_encrypt_template_no_such_template)
 {
-	/* Start shimmed tasks. */
-	start_ec_tasks();
-	k_msleep(100);
+	FpSensorContext ctx = {
+		.templates = {
+			.template_encrypted_id = std::nullopt,
+		},
+		.crypto = {
+			.encrypted_template_ready = true,
+		},
+		.sensor_mode = FpSensorMode(FP_MODE_ENCRYPT_TEMPLATE),
+	};
+	FpSensorStateMachine sm(ctx);
 
-	return NULL;
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_false(ctx.sensor_mode.is_encrypt_template());
+	zassert_false(ctx.crypto.encrypted_template_ready);
 }
 
-static void fpsensor_state_before(void *f)
+ZTEST_USER(fpsensor_state, test_state_machine_unhandled_and_idle_irq_events)
 {
-	/* Reset context before each test case. */
-	fp_reset_and_clear_context();
+	const FpSensorMode deepsleep_mode(FP_MODE_DEEPSLEEP);
+	FpSensorContext ctx = {
+		.sensor_mode = deepsleep_mode,
+	};
+	FpSensorStateMachine sm(ctx);
 
-	/* Reset manual mock states. */
-	validate_request_call_count = 0;
-	validate_request_return_val = EC_SUCCESS;
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_true(ctx.sensor_mode == deepsleep_mode);
 
-	/* Reset remaining FFF mocks. */
-	RESET_FAKE(mkbp_send_event);
+	/* Unhandled event (0) leaves state and sensor_mode unchanged. */
+	sm.handle_event(0);
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_true(ctx.sensor_mode == deepsleep_mode);
+
+	/* Sensor IRQ while in IdleState transitions cleanly to low power. */
+	sm.handle_event(TASK_EVENT_SENSOR_IRQ);
+	zassert_true(std::holds_alternative<FpSensorStateMachine::IdleState>(
+		sm.state()));
+	zassert_true(ctx.sensor_mode == deepsleep_mode);
 }
 
-ZTEST_SUITE(fpsensor_state, NULL, fpsensor_setup, fpsensor_state_before, NULL,
-	    NULL);
+ZTEST_USER(fpsensor_state, test_state_machine_parse_commands_and_timeout)
+{
+	using SM = FpSensorStateMachine;
+
+	static_assert(FpSensorMode::create(0).has_value());
+	static_assert(!FpSensorMode::create(FP_MODE_ENROLL_IMAGE).has_value());
+	static_assert(FpSensorMode::create(FP_MODE_ENROLL_IMAGE |
+					   FP_MODE_ENROLL_SESSION)
+			      .has_value());
+
+	zassert_true(std::holds_alternative<SM::IdleCommand>(
+		SM::parse_command(FpSensorMode{})));
+	zassert_true(std::holds_alternative<SM::ImmediateCaptureCommand>(
+		SM::parse_command(*FpSensorMode::create(
+			FP_MODE_CAPTURE |
+			(FP_CAPTURE_PATTERN0 << FP_MODE_CAPTURE_TYPE_SHIFT)))));
+	zassert_true(std::holds_alternative<SM::DetectFingerCommand>(
+		SM::parse_command(*FpSensorMode::create(FP_MODE_FINGER_DOWN))));
+	zassert_true(std::holds_alternative<SM::ResetSensorCommand>(
+		SM::parse_command(*FpSensorMode::create(FP_MODE_RESET_SENSOR))));
+	zassert_true(std::holds_alternative<SM::MaintenanceCommand>(
+		SM::parse_command(
+			*FpSensorMode::create(FP_MODE_SENSOR_MAINTENANCE))));
+	zassert_true(std::holds_alternative<SM::EncryptTemplateCommand>(
+		SM::parse_command(
+			*FpSensorMode::create(FP_MODE_ENCRYPT_TEMPLATE))));
+	zassert_true(std::holds_alternative<SM::DecryptTemplateCommand>(
+		SM::parse_command(
+			*FpSensorMode::create(FP_MODE_DECRYPT_TEMPLATE))));
+
+	FpSensorContext ctx = {
+		.sensor_mode = FpSensorMode(FP_MODE_FINGER_DOWN),
+	};
+	SM sm(ctx);
+	zassert_false(sm.timeout().has_value());
+
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_true(std::holds_alternative<SM::DetectFingerState>(sm.state()));
+	zassert_false(sm.timeout().has_value());
+
+	ctx.sensor_mode = FpSensorMode(FP_MODE_FINGER_UP);
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_true(std::holds_alternative<SM::DetectFingerState>(sm.state()));
+	zassert_equal(sm.timeout(), SM::kFingerPollingDelay);
+}
+
+ZTEST_USER(fpsensor_state, test_positive_match_secret_state)
+{
+	const auto fgr0 = *FpTemplateId::create(0);
+	const auto fgr1 = *FpTemplateId::create(1);
+
+	FpPositiveMatchSecretState state{};
+	zassert_false(state.has_any_match());
+	zassert_false(state.is_matched(fgr0));
+
+	/* First enable succeeds; second enable while readable fails and resets.
+	 */
+	zassert_true(state.enable(fgr0).has_value());
+	zassert_true(state.has_any_match());
+	zassert_true(state.is_matched(fgr0));
+	zassert_false(state.is_matched(fgr1));
+	zassert_equal(state.enable(fgr0).error(), EC_ERROR_UNKNOWN);
+	zassert_false(state.has_any_match());
+
+	/* Invalid finger indices are rejected by read_match_secret. */
+	FpSensorContext ctx{};
+	zassert_equal(ctx.read_match_secret(-1).error(), EC_RES_INVALID_PARAM);
+	zassert_equal(ctx.read_match_secret(FP_MAX_FINGER_COUNT).error(),
+		      EC_RES_INVALID_PARAM);
+
+	/* Reading when not readable or for a non-matching finger is denied. */
+	ctx.templates.positive_match_secret_state.deadline =
+		FpClock::now() + FpPositiveMatchSecretState::kValidityWindow;
+	zassert_equal(ctx.read_match_secret(0).error(), EC_RES_ACCESS_DENIED);
+
+	zassert_true(ctx.templates.positive_match_secret_state.enable(fgr1)
+			     .has_value());
+	zassert_equal(ctx.read_match_secret(0).error(), EC_RES_ACCESS_DENIED);
+}
+
+ZTEST_USER(fpsensor_state, test_hermetic_local_context_isolation)
+{
+	std::array<uint8_t, FP_SENSOR_IMAGE_SIZE> local_image{};
+	std::array<FpTemplate, FP_MAX_FINGER_COUNT> local_templates{};
+	FpEncryptedTemplateBuffer local_enc_buf{};
+	FpSensorContext local_ctx{
+		.templates = {
+			.templates = local_templates,
+			.enc_buf = &local_enc_buf,
+		},
+		.frame = {
+			.image_buffer = local_image,
+		},
+	};
+	FpSensorStateMachine sm(local_ctx);
+
+	/* Mutate global_context to verify local_ctx is completely isolated. */
+	global_context.templates.templ_valid = 3;
+
+	local_templates[0].fill(0xAA);
+	local_ctx.templates.fp_positive_match_salt[0].fill(0xBB);
+	local_ctx.templates.clear_finger(*FpTemplateId::create(0));
+	zassert_true(std::ranges::none_of(local_templates[0], std::identity{}));
+	zassert_true(std::ranges::none_of(
+		local_ctx.templates.fp_positive_match_salt[0],
+		std::identity{}));
+
+	/* ResetSensorCommand on sm resets only local_ctx, not global_context.
+	 */
+	local_ctx.templates.templ_valid = 2;
+	local_image.fill(0xCC);
+	local_ctx.sensor_mode = FpSensorMode(FP_MODE_RESET_SENSOR);
+	sm.handle_event(TASK_EVENT_UPDATE_CONFIG);
+	zassert_equal(local_ctx.templates.templ_valid, 0);
+	zassert_true(std::ranges::none_of(local_image, std::identity{}));
+	zassert_equal(global_context.templates.templ_valid, 3);
+
+	/* Verify FpMkbpEvents add, peek, and take on local_ctx. */
+	zassert_equal(local_ctx.events.peek().raw, 0u);
+	local_ctx.events.add(FpMkbpEvent::finger_down());
+	local_ctx.events.add(FpMkbpEvent::image_ready());
+	zassert_true(local_ctx.events.peek().is_finger_down());
+	zassert_true(local_ctx.events.peek().is_image_ready());
+	const FpMkbpEvent taken = local_ctx.events.take();
+	zassert_true(taken.is_finger_down());
+	zassert_true(taken.is_image_ready());
+	zassert_equal(local_ctx.events.peek().raw, 0u);
+}
+
+ZTEST_SUITE(fpsensor_state, nullptr, fpsensor_setup, fpsensor_state_before,
+	    nullptr, nullptr);

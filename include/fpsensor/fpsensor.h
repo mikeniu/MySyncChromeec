@@ -24,10 +24,21 @@ extern "C" {
 #define SPI_FP_DEVICE (&spi_devices[0])
 #endif
 
+#ifdef __cplusplus
+consteval uint32_t fourcc(char a, char b, char c, char d) noexcept
+{
+	return static_cast<uint8_t>(a) |
+	       (static_cast<uint32_t>(static_cast<uint8_t>(b)) << 8) |
+	       (static_cast<uint32_t>(static_cast<uint8_t>(c)) << 16) |
+	       (static_cast<uint32_t>(static_cast<uint8_t>(d)) << 24);
+}
+#define FOURCC(a, b, c, d) fourcc(a, b, c, d)
+#else
 /*  Four-character-code */
 #define FOURCC(a, b, c, d)                                              \
 	((uint32_t)(a) | ((uint32_t)(b) << 8) | ((uint32_t)(c) << 16) | \
 	 ((uint32_t)(d) << 24))
+#endif
 
 /* 8-bit greyscale pixel format as defined by V4L2 headers */
 #define V4L2_PIX_FMT_GREY FOURCC('G', 'R', 'E', 'Y')
@@ -188,7 +199,6 @@ int fp_maintenance(void);
  */
 int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size);
 
-#ifdef CONFIG_ZEPHYR
 /**
  * Put the sensor into idle state
  *
@@ -199,8 +209,6 @@ int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size);
  * @return negative value on error
  */
 int fp_idle(void);
-
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }
