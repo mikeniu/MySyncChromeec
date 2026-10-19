@@ -294,6 +294,9 @@ stdlib-y=stdlib.o
 std_vector-y=std_vector.o
 stress-y=stress.o
 system-y=system.o
+ifeq ($(BOARD)-$(PROJECT),host-system)
+includes-y += core/cortex-m/include chip/npcx
+endif
 system_is_locked-y=system_is_locked.o
 tablet_broken_sensor-y=tablet_broken_sensor.o
 tablet_no_sensor-y=tablet_no_sensor.o
