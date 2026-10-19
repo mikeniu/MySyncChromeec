@@ -17,6 +17,9 @@
  */
 #define RTS54XX_BLOCK_READ_CMD 0x80
 
+/** Maximum number of back-to-back ARA reads in a single handle_irqs() pass */
+#define RTS54XX_MAX_IRQ_LOOP_COUNT 10
+
 /**
  * @brief Offsets of data fields in the GET_IC_STATUS response
  *

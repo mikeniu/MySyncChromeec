@@ -8,6 +8,8 @@
 #include "console.h"
 #include "drivers/pdc.h"
 #include "drivers/ucsi_v3.h"
+#include "drivers/usbc/pdc_rts54xx.h"
+#include "emul/emul_common_i2c.h"
 #include "emul/emul_pdc.h"
 #include "emul/emul_realtek_rts54xx_public.h"
 #include "i2c.h"
@@ -20,6 +22,8 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/emul.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
@@ -254,6 +258,67 @@ ZTEST_USER(rts54xx, test_irq)
 	zassert_true(TEST_WAIT_FOR((port_interrupt(EMUL_PORT) &&
 				    port_interrupt(EMUL2_PORT)),
 				   IRQ_TEST_TIMEOUT_MS));
+}
+
+struct stuck_ara_ctx {
+	int read_count;
+	int deassert_after_reads;
+};
+
+static int stuck_ara_read_cb(const struct emul *target, int reg, uint8_t *val,
+			     int bytes, void *data)
+{
+	struct stuck_ara_ctx *ctx = data;
+	const struct i2c_dt_spec i2c_spec = I2C_DT_SPEC_GET(RTS5453P_NODE);
+	const struct gpio_dt_spec irq_gpio =
+		GPIO_DT_SPEC_GET(RTS5453P_NODE, irq_gpios);
+
+	ARG_UNUSED(target);
+	ARG_UNUSED(reg);
+	ARG_UNUSED(bytes);
+
+	ctx->read_count++;
+	*val = i2c_spec.addr << 1;
+	if (ctx->read_count == ctx->deassert_after_reads) {
+		gpio_emul_input_set(irq_gpio.port, irq_gpio.pin, 1);
+	}
+	return 0;
+}
+
+ZTEST_USER(rts54xx, test_handle_irqs_limit)
+{
+	const struct emul *ara_emul = EMUL_DT_GET(DT_NODELABEL(smbus_ara_emul));
+	struct i2c_common_emul_data *ara_common = ara_emul->data;
+	struct stuck_ara_ctx ctx = {
+		.read_count = 0,
+		.deassert_after_reads = RTS54XX_MAX_IRQ_LOOP_COUNT + 1,
+	};
+
+	i2c_common_emul_set_read_func(ara_common, stuck_ara_read_cb, &ctx);
+
+	/* Pulse IRQ (leaves active-low GPIO asserted) while ARA keeps
+	 * responding. Verify handle_irqs() bounds the loop to
+	 * RTS54XX_MAX_IRQ_LOOP_COUNT iterations.
+	 */
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	k_msleep(TEST_WAIT_FOR_INTERVAL_MS);
+	zassert_equal(ctx.read_count, RTS54XX_MAX_IRQ_LOOP_COUNT,
+		      "handle_irqs looped %d times without yielding",
+		      ctx.read_count);
+
+	/* Verify handle_irqs() stops early as soon as the IRQ GPIO deasserts
+	 * before reaching RTS54XX_MAX_IRQ_LOOP_COUNT.
+	 */
+	ctx.read_count = 0;
+	ctx.deassert_after_reads = RTS54XX_MAX_IRQ_LOOP_COUNT - 1;
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	k_msleep(TEST_WAIT_FOR_INTERVAL_MS);
+	zassert_equal(ctx.read_count, RTS54XX_MAX_IRQ_LOOP_COUNT - 1);
+
+	/* Restore normal ARA read handler and drain the queued ARA entry. */
+	i2c_common_emul_set_read_func(ara_common, NULL, NULL);
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	zassert_ok(emul_pdc_idle_wait(emul));
 }
 
 ZTEST_USER(rts54xx, test_emul_vdo_set_bounds)
