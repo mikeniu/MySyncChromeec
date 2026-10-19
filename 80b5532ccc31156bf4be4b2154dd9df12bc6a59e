@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6af4dbd_e1795670",
+        "filename": "board/servo_v4p1/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-19T18:40:42Z",
+      "side": 1,
+      "message": "Retracting and resolving after live hardware verification: `servo_v4p1` runs out of `RO` (`stay-in-ro`) during normal operation, so gating `USB_IFACE_MSC` and `USB_EP_MSC` under `SECTION_IS_RO` works cleanly.",
+      "parentUuid": "ed7e2eae_d7a5ebca",
+      "revId": "80b5532ccc31156bf4be4b2154dd9df12bc6a59e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "697243a4_ada11dac",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "842c8bd5_734ae6cf",
+        "filename": "board/servo_v4p1/servo_usb_bridge_frame.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 605,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-19T18:40:42Z",
+      "side": 1,
+      "message": "Update from live hardware testing: we measured `22.0 KB/s` on random data (`95.28s` for 2 MB, 100% SHA-256 match) and `97.7 KB/s` on sparse/`ext2` data (`21.46s` for 2 MB).\n\nTracing `board/servo_v4p1/usb_bridge.c` shows why random-data throughput is `22.0 KB/s` rather than ~`78 KB/s`: `bridge_to_usart4` has `QUEUE_SIZE \u003d 128` (`usb_bridge.c:42`), while each 64-byte USB chunk encodes to a `68-byte` COBS wire frame (`0x00` + header + 64B + CRC8 + `0x00`). Because `2 * 68 \u003d 136 \u003e 128`, only ONE 68-byte frame fits in `bridge_to_usart4` at a time, so every second 64B USB packet hits `cobs_TryQueuePacket() \u003d\u003d 0` and waits on `hook_call_deferred(\u0026usb_bridge_process_data, 1 * MSEC)`. Since `RO` still has `240 bytes` of free RAM, bumping `bridge_to_usart4` from `128` to `192` bytes (using 64 B of the 240 B free RAM) will allow two 68-byte frames to queue back-to-back without waiting on the 1ms deferred timer. Resolving this thread as non-blocking!",
+      "parentUuid": "697243a4_ada11dac",
+      "revId": "80b5532ccc31156bf4be4b2154dd9df12bc6a59e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8dd7097f_04e6cd1d",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "Using `.bInterfaceClass \u003d USB_CLASS_VENDOR_SPEC (0xFF)`, `.bInterfaceSubClass \u003d 0x50 (`USB_SUBCLASS_GOOGLE_SERIAL`)`, `.bInterfaceProtocol \u003d 0x01 (`USB_PROTOCOL_GOOGLE_SERIAL`)` causes the Linux kernel `usb_simple_serial` driver on the host labstation to automatically match Google VID `0x18d1` + `0xFF/0x50/0x01` and bind to Interface 1 as a `/dev/ttyUSBx` serial port.\n\nIf `udev`, `ModemManager`, or `servod`\u0027s serial port discovery opens that `/dev/ttyUSBx` node, the kernel submits Bulk IN URBs on `EP2 IN` (`0x82`) and steals `SERVO_FRAME_MSC_REQ` packets from `UsbMscInterface`. Notice that `USB_IFACE_BRIDGE` right below (lines 104-106) uses `0xFF / 0x00 / 0x00` specifically to prevent `usb_simple_serial` from binding—`USB_IFACE_MSC` should also avoid `0x50 / 0x01` (e.g. use `0xFF / 0x00 / 0x00` or a dedicated non-serial vendor subclass).",
       "isAi": true,
+      "revId": "80b5532ccc31156bf4be4b2154dd9df12bc6a59e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c262407a_f135e1e2",
+        "filename": "board/servo_v4p1/usb_bridge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-19T18:40:42Z",
+      "side": 1,
+      "message": "Confirmed on live hardware that although `usb_serial_simple` initially binds to `Interface 1` on the labstation, `stm32usb.Susb._find_device()` calls `dev.detach_kernel_driver()` when `servod` initializes `UsbMsc`, so `usb_image` works out-of-the-box. (Changing subclass/protocol to `0x00/0x00` is still a nice optional cleanup to avoid creating an unused `/dev/ttyUSBx` before `servod` starts, but resolving as non-blocking.)",
+      "parentUuid": "8dd7097f_04e6cd1d",
       "revId": "80b5532ccc31156bf4be4b2154dd9df12bc6a59e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
