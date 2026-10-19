@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "16a1a3153a5c865794f919e97db56801d570a4e5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5660662a_bb070de8",
+        "filename": "zephyr/shim/chip/rtkfp/include/flash_chip.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-19T07:05:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c624a9c4_c1bf4a39",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "16a1a3153a5c865794f919e97db56801d570a4e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
