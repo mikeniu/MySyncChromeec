@@ -7,6 +7,11 @@
 
 #include <zephyr/ztest.h>
 
+#include <array>
+
+namespace
+{
+
 #ifdef CONFIG_CROS_EC_RW
 #define fp_sensor_dev DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
 
@@ -20,14 +25,16 @@
 #define FP_SENSOR_HWID_EXPECTED 0x0000
 #endif /* CONFIG_FINGERPRINT_SENSOR_FPC1025 */
 
-static const uint32_t fp_sensor_hwid = FP_SENSOR_HWID_EXPECTED;
+constexpr uint32_t kFpSensorHwid = FP_SENSOR_HWID_EXPECTED;
 #else
-static const uint32_t fp_sensor_hwid = UINT32_MAX;
+constexpr uint32_t kFpSensorHwid = UINT32_MAX;
 #endif /* CONFIG_CROS_EC_RW */
+
+} /* namespace */
 
 int fpc_get_hwid(uint16_t *id);
 
-ZTEST_SUITE(fpsensor_hw, NULL, NULL, NULL, NULL, NULL);
+ZTEST_SUITE(fpsensor_hw, nullptr, nullptr, nullptr, nullptr, nullptr);
 
 /* Hardware-dependent smoke test that makes a SPI transaction with the
  * fingerprint sensor.
@@ -35,13 +42,14 @@ ZTEST_SUITE(fpsensor_hw, NULL, NULL, NULL, NULL, NULL);
 ZTEST(fpsensor_hw, test_fp_check_hwid)
 {
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		struct fingerprint_sensor_info sensor_info{};
-		struct fingerprint_image_frame_params
-			image_frame_params_array[NUM_IMAGE_CAPTURE_TYPES] = {};
-		uint8_t num_params = NUM_IMAGE_CAPTURE_TYPES;
+		fingerprint_sensor_info sensor_info{};
+		std::array<fingerprint_image_frame_params,
+			   NUM_IMAGE_CAPTURE_TYPES>
+			image_frame_params_array{};
+		uint8_t num_params = image_frame_params_array.size();
 
 		zassert_ok(fingerprint_get_info(fp_sensor_dev, &sensor_info,
-						image_frame_params_array,
+						image_frame_params_array.data(),
 						&num_params));
 
 		uint32_t actual_hwid = sensor_info.model_id;
@@ -53,8 +61,8 @@ ZTEST(fpsensor_hw, test_fp_check_hwid)
 			actual_hwid >>= 4;
 		}
 
-		zassert_equal(fp_sensor_hwid, actual_hwid,
-			      "Expected HWID 0x%x, got 0x%x", fp_sensor_hwid,
+		zassert_equal(kFpSensorHwid, actual_hwid,
+			      "Expected HWID 0x%x, got 0x%x", kFpSensorHwid,
 			      actual_hwid);
-	};
+	}
 }
