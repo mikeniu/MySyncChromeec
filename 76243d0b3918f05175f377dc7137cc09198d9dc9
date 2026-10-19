@@ -39,6 +39,30 @@
       },
       "revId": "76243d0b3918f05175f377dc7137cc09198d9dc9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ce1848c_78db0677",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2408,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-10-19T10:59:44Z",
+      "side": 1,
+      "message": "1 Done \n\n2 in cmd_set_max_pdp we only touch source_info.maximum_pdp, maximum_pdp_2, port_managed_garunteed. Not present_pdp and reported_pdp, there should be no conflict.",
+      "parentUuid": "3a00b3e4_2d75163b",
+      "range": {
+        "startLine": 2408,
+        "startChar": 0,
+        "endLine": 2408,
+        "endChar": 37
+      },
+      "revId": "76243d0b3918f05175f377dc7137cc09198d9dc9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
