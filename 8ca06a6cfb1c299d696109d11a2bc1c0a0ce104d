@@ -18,6 +18,23 @@
       "isAi": true,
       "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9c9516b_8adef9b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-19T07:33:48Z",
+      "side": 1,
+      "message": "@patrykd@google.com @tomhughes@chromium.org friendly ping.",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
