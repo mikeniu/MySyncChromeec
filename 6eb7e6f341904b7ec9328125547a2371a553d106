@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "894a2884_46ced934",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:22:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — There are a few test precision and exact oracle match issues. See inline comments. [[trajectory](https://goto.corp.google.com/traj/09badf69-f667-4fc0-b352-7c2269a55c98)]\n\n### Review Summary\n*   **Functionality:** ✅ No functional issues in test behavior.\n*   **Architecture \u0026 Component Fit:** ✅ Tests are correctly placed in the `cros_flash_rtkfp` test suite.\n*   **Code Simplicity:** ❌ The status register bit checks use multiple verbose boolean bitwise ANDs instead of a simpler exact equality byte match.\n*   **Idiomaticity \u0026 Readability:** ✅ The tests use `ztest` appropriately.\n*   **Security:** ✅ N/A (Test only).\n*   **Testing \u0026 Test Coverage:** ❌ Boundary testing writes a 4-byte value inside the region instead of strictly targeting the off-by-one $N-1$ offset (the exact last byte). The oracle check for status registers leaves non-protection bits unverified.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+213, -0). Represents a single logical change (adding protection range tests).\n*   **Commit Message:** ✅ Message is concise, explains the testing approach, and correctly uses `BUG\u003d` and `TEST\u003d`.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6eb7e6f341904b7ec9328125547a2371a553d106",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ed1fbac_3cc5f4e4",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:22:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect (Testing \u0026 Test Coverage - Test Oracle Integrity):** Instead of making 9 separate assertions to check individual bits via bitwise AND (which is verbose and leaves other bits like `SPI_FLASH_SR1_SRP0` unchecked in other tests), check the exact expected byte value for the status registers. This provides a stronger anti-masking test oracle.\n\n```c\n\tzassert_equal(sr1, SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP0);\n\tzassert_equal(sr2, SPI_FLASH_SR2_QE);\n```\n\n*Note: Please apply the same simplification to `test_protect_at_boot_all` below.*\n\n[🔗](http://go/tj/09badf69-f667-4fc0-b352-7c2269a55c98)",
+      "range": {
+        "startLine": 268,
+        "startChar": 0,
+        "endLine": 276,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6eb7e6f341904b7ec9328125547a2371a553d106",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "633a4f72_9d6cbe28",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:22:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect (Testing \u0026 Test Coverage - Boundary Values):** The comment says \"The last byte of the protected region is rejected...\", but the code writes 4 bytes starting at `CONFIG_WP_STORAGE_SIZE - 4`. To strictly test the boundary condition (the $N-1$ offset), test a 1-byte write exactly at `CONFIG_WP_STORAGE_SIZE - 1`.\n\n```c\n\tuint8_t byte_val \u003d 42;\n\tuint8_t read_byte \u003d 0;\n\tzassert_equal(cros_flash_physical_write(cros_flash_dev,\n\t\t\t\t\t\tCONFIG_WP_STORAGE_SIZE - 1,\n\t\t\t\t\t\tsizeof(byte_val),\n\t\t\t\t\t\t(const char *)\u0026byte_val),\n\t\t      EC_ERROR_ACCESS_DENIED);\n\n\t/* ...the first byte after it is writable. */\n\tzassert_equal(cros_flash_physical_write(cros_flash_dev,\n\t\t\t\t\t\tCONFIG_WP_STORAGE_SIZE,\n\t\t\t\t\t\tsizeof(byte_val),\n\t\t\t\t\t\t(const char *)\u0026byte_val),\n\t\t      EC_SUCCESS);\n\tcrec_flash_physical_read(CONFIG_WP_STORAGE_SIZE, sizeof(read_byte),\n\t\t\t\t (char *)\u0026read_byte);\n\tzassert_equal(byte_val, read_byte);\n```\n\n*Note: Please also update `test_protect_now_all` to target `FAKE_FLASH_SIZE - 1` with a 1-byte write.*\n\n[🔗](http://go/tj/09badf69-f667-4fc0-b352-7c2269a55c98)",
+      "range": {
+        "startLine": 413,
+        "startChar": 0,
+        "endLine": 428,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6eb7e6f341904b7ec9328125547a2371a553d106",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
