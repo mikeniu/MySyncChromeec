@@ -65,16 +65,21 @@ if(CONFIG_ISH_CHRE)
     endif()
     if(CONFIG_CHRE_DYNAMIC_NANOAPPS)
       set(NANOAPP_OUTPUT_DIR "${CMAKE_BINARY_DIR}/../output/nanoapps")
+      set(NANOAPP_BUILD_DIR "${CMAKE_BINARY_DIR}/nanoapps")
       add_custom_target(chre_dynamic_nanoapps ALL
         COMMAND ${CMAKE_COMMAND} -E make_directory "${NANOAPP_OUTPUT_DIR}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
           $<TARGET_FILE:chre.apps.hello_world_dyn>
+          "${NANOAPP_BUILD_DIR}/hello_world.napp"
+          "${NANOAPP_BUILD_DIR}/hello_world.napp_header"
           $<TARGET_FILE:chre.apps.timer_world_dyn>
+          "${NANOAPP_BUILD_DIR}/timer_world.napp"
+          "${NANOAPP_BUILD_DIR}/timer_world.napp_header"
           "${NANOAPP_OUTPUT_DIR}/"
         DEPENDS
           chre.apps.hello_world_dyn
           chre.apps.timer_world_dyn
-        COMMENT "Copying dynamic nanoapps to output directory"
+        COMMENT "Copying dynamic nanoapps and headers to output directory"
       )
       add_dependencies(app chre_dynamic_nanoapps)
     endif()
