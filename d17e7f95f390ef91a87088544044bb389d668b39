@@ -105,6 +105,43 @@
       "parentUuid": "23863890_e412c60a",
       "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a1188b2_fc2c6c8d",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 2177,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-19T17:33:47Z",
+      "side": 1,
+      "message": "Done. Added `tc_state_is_attached()` (also used in `pd_is_connected()`) and used `tc_state_is_attached(get_last_state_tc(port))` in `tc_unattached_snk_entry()`, `tc_unattached_src_entry()`, and `tc_try_wait_snk_entry()` (to cover the `Attached.SRC -\u003e TryWait.SNK -\u003e Unattached.SNK` detach path when `Try.SRC` is enabled).",
+      "parentUuid": "235b20ee_e7e6d778",
+      "isAi": true,
+      "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e629b28e_adb82c09",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 2177,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-19T17:33:47Z",
+      "side": 1,
+      "message": "get_last_state_tc(port) only tracks the immediate previous state, which isn\u0027t sufficient when detaching from TC_ATTACHED_SRC: \n* TC_ATTACHED_SRC -\u003e TC_TRY_WAIT_SNK\n* If no partner attaches, TC_TRY_WAIT_SNK -\u003e TC_UNATTACHED_SNK (so get_last_state_tc(port) is TC_TRY_WAIT_SNK)\n* TC_TRY_WAIT_SNK -\u003e TC_UNATTACHED_SNK is also reached without ever attaching via TC_ATTACH_WAIT_SNK -\u003e TC_TRY_SRC -\u003e TC_TRY_WAIT_SNK -\u003e TC_UNATTACHED_SNK",
+      "parentUuid": "235b20ee_e7e6d778",
+      "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
