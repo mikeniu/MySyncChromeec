@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b727e8e_6701c765",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-19T21:35:41Z",
+      "side": 1,
+      "message": "Since this function marks the sensor as not initialized, should it also clear the sensor bit from sensor_setup_mask to avoid the motion_sense_task trying to initialize it if it was previously pending? (Though SENSOR_ACTIVE checks in the task make this safe currently).",
+      "range": {
+        "startLine": 367,
+        "startChar": 0,
+        "endLine": 367,
+        "endChar": 0
+      },
+      "revId": "4a813af2a7276cf2db1f705b31a7aff348532b14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "031a24f6_d2b92186",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-19T21:35:41Z",
+      "side": 1,
+      "message": "Consider adding sensor_active \u003d SENSOR_ACTIVE_S3; here as well to ensure motion_sense_stop_inactive_sensors() uses the correct state mask. Although startup handles the S5-\u003eS3 transition, the S0-\u003eS3 transition (suspend) would benefit from this for consistency.",
+      "range": {
+        "startLine": 577,
+        "startChar": 0,
+        "endLine": 577,
+        "endChar": 0
+      },
+      "revId": "4a813af2a7276cf2db1f705b31a7aff348532b14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
