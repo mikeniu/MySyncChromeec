@@ -29,6 +29,8 @@ LOG_MODULE_REGISTER(tpm_seed_clear_hw_test, LOG_LEVEL_INF);
 #include <string.h>
 
 #ifdef CONFIG_CROS_EC_RW
+extern FpSensorContext global_context;
+
 static const uint8_t default_fake_tpm_seed[] = {
 	0xd9, 0x71, 0xaf, 0xc4, 0xcd, 0x36, 0xe3, 0x60, 0xf8, 0x5a, 0xa0,
 	0xa6, 0x2c, 0xb3, 0xf5, 0xe2, 0xeb, 0xb9, 0xd8, 0x2f, 0xb5, 0x78,
@@ -46,12 +48,11 @@ void test_tpm_seed_before_reboot(void)
 	LOG_INF("Step 1: tpm_seed_clear");
 	cflush();
 
-	zassert_mem_equal(global_context.tpm_seed.data(), zero_fake_tpm_seed,
-			  FP_CONTEXT_TPM_BYTES);
-	std::ranges::copy(default_fake_tpm_seed,
-			  global_context.tpm_seed.begin());
-	zassert_mem_equal(global_context.tpm_seed.data(), default_fake_tpm_seed,
-			  FP_CONTEXT_TPM_BYTES);
+	zassert_mem_equal(global_context.crypto.tpm_seed.bytes().data(),
+			  zero_fake_tpm_seed, FP_CONTEXT_TPM_BYTES);
+	global_context.crypto.tpm_seed.set(default_fake_tpm_seed);
+	zassert_mem_equal(global_context.crypto.tpm_seed.bytes().data(),
+			  default_fake_tpm_seed, FP_CONTEXT_TPM_BYTES);
 	system_reset(SYSTEM_RESET_HARD);
 }
 
@@ -60,8 +61,8 @@ void test_tpm_seed_after_reboot(void)
 	LOG_INF("Step 2: tpm_seed_clear");
 	cflush();
 
-	zassert_mem_equal(global_context.tpm_seed.data(), zero_fake_tpm_seed,
-			  FP_CONTEXT_TPM_BYTES);
+	zassert_mem_equal(global_context.crypto.tpm_seed.bytes().data(),
+			  zero_fake_tpm_seed, FP_CONTEXT_TPM_BYTES);
 }
 
 static void (*test_steps[])(void) = { test_tpm_seed_before_reboot,
