@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ce753e1_8c068b10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T13:03:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ Correctly drops logs from any non-yielding context by checking `!k_can_yield()`, preventing mutex lock attempts in restricted contexts (e.g., idle thread, IRQ-disabled blocks).\n*   **Architecture \u0026 Component Fit:** ✅ Idiomatically delegates non-yielding context detection to the Zephyr kernel (`k_can_yield()`).\n*   **Code Simplicity:** ✅ Minimal and direct early return.\n*   **Idiomaticity \u0026 Readability:** ✅ Uses clean standard Zephyr APIs (`irq_lock`, `irq_unlock`, `k_can_yield`) and straightforward assertions.\n*   **Security:** ✅ No new security implications.\n*   **Testing:** ✅ Adds a comprehensive unit test (`test_buf_dropped_logs_irq_lock`) simulating a non-yielding context with `irq_lock()` and validating that the payload is dropped and the `dropped_logs_isr` counter increments correctly.\n*   **CL Size \u0026 Scope:** ✅ Size: S (+28, -3). The CL is a small, single logical change focused exclusively on preventing non-yielding contexts from acquiring the console mutex.\n*   **Commit Message:** ✅ The commit message accurately reflects the behavioral change, provides clear rationale, and strictly adheres to ChromiumOS formatting styles (`BUG\u003db:...` and `TEST\u003d...`).\n\n[[trajectory](https://goto.corp.google.com/traj/7d85e8f3-11ef-4872-aab0-ed8a9165af26)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6365158b1013805a36eaed1ee9949e51e0528891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
