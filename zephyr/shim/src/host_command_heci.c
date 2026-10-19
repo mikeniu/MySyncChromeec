@@ -41,22 +41,27 @@ struct cros_ec_ishtp_msg_hdr {
 } __ec_align4;
 
 #define CROS_EC_ISHTP_MSG_HDR_SIZE sizeof(struct cros_ec_ishtp_msg_hdr)
-#define CROS_EC_ISHTP_RX_BUF_SIZE 260
+/*
+ * Increase request and response buffer size
+ * Most host command messages fit in 256 bytes in total, on par with EC.
+ * The BT passthrough commands carry a full-size HCI packet, so their
+ * params and response structs are 264 bytes (see BT_MAX_COMMAND_SIZE and
+ * BT_MAX_EVENT_SIZE in ec_commands.h). Each buffer has to fit the 4-byte
+ * ISHTP header, the 8-byte host packet header and the 264-byte struct,
+ * which is 276 bytes. Here 280 bytes is chosen.
+ */
+#define CROS_EC_ISHTP_RX_BUF_SIZE 280
 #define HECI_CROS_EC_REQUEST_MAX \
 	(CROS_EC_ISHTP_RX_BUF_SIZE - CROS_EC_ISHTP_MSG_HDR_SIZE)
-/*
- * Increase response_buffer size
- * some host command response messages use bigger space; so increase
- * the buffer size on par with EC, which is 256 bytes in total.
- * The size has to meet
- * HECI_CROS_EC_RESPONSE_BUF_SIZE >= CROS_EC_ISHTP_MSG_HDR_SIZE + 256.
- * Here 260 bytes is chosen.
- */
-#define HECI_CROS_EC_RESPONSE_BUF_SIZE 260
+#define HECI_CROS_EC_RESPONSE_BUF_SIZE 280
 #define HECI_CROS_EC_RESPONSE_MAX \
 	(HECI_CROS_EC_RESPONSE_BUF_SIZE - CROS_EC_ISHTP_MSG_HDR_SIZE)
-BUILD_ASSERT(HECI_CROS_EC_RESPONSE_BUF_SIZE >=
-	     CROS_EC_ISHTP_MSG_HDR_SIZE + 256);
+BUILD_ASSERT(HECI_CROS_EC_REQUEST_MAX >=
+	     sizeof(struct ec_host_request) +
+		     sizeof(struct ec_param_bt_command));
+BUILD_ASSERT(HECI_CROS_EC_RESPONSE_MAX >=
+	     sizeof(struct ec_host_response) +
+		     sizeof(struct ec_response_bt_read_event));
 struct cros_ec_ishtp_msg {
 	struct cros_ec_ishtp_msg_hdr hdr;
 	uint8_t data[0];
