@@ -29,6 +29,8 @@ static const struct device *g_mock_dev;
 static struct tx_packet g_tx_packets[MAX_TX_PACKETS];
 static size_t g_tx_packet_count;
 static int g_send_result;
+static bool g_hold_tx_bufs;
+static K_FIFO_DEFINE(g_held_tx_bufs);
 
 static int mock_open(const struct device *dev)
 {
@@ -56,7 +58,13 @@ static int mock_send(const struct device *dev, struct net_buf *buf)
 	}
 
 	LOG_HEXDUMP_DBG(buf->data, buf->len, "Mock Controller RX <- Zephyr");
-	net_buf_unref(buf);
+
+	/* Keep the buffer to starve the TX pool when requested */
+	if (g_hold_tx_bufs) {
+		k_fifo_put(&g_held_tx_bufs, buf);
+	} else {
+		net_buf_unref(buf);
+	}
 	return 0;
 }
 
@@ -78,8 +86,14 @@ DT_INST_FOREACH_STATUS_OKAY(MOCK_DEVICE_INIT)
 
 void mock_hci_driver_reset(void)
 {
+	struct net_buf *buf;
+
 	g_tx_packet_count = 0;
 	g_send_result = 0;
+	g_hold_tx_bufs = false;
+	while ((buf = k_fifo_get(&g_held_tx_bufs, K_NO_WAIT)) != NULL) {
+		net_buf_unref(buf);
+	}
 }
 
 size_t mock_hci_driver_get_tx_count(void)
@@ -112,6 +126,11 @@ size_t mock_hci_driver_get_tx_packet(size_t index, uint8_t *out_buf,
 void mock_hci_driver_set_send_result(int res)
 {
 	g_send_result = res;
+}
+
+void mock_hci_driver_set_hold_tx_bufs(bool hold)
+{
+	g_hold_tx_bufs = hold;
 }
 
 int mock_hci_driver_inject_rx(const uint8_t *data, size_t len)
