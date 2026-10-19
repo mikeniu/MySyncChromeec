@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d433cc15_0dc32d31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:26:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** ✅ The fake flash device effectively simulates the required behavior for test purposes.\n**Architecture \u0026 Component Fit:** ✅ The test scaffolding integrates appropriately with the Zephyr test environment.\n**Code Simplicity:** ✅ The fake device implementation and baseline tests are straightforward.\n**Idiomaticity \u0026 Readability:** ✅ The C code is generally idiomatic, though a minor bounds-checking robustness suggestion was made inline.\n**Security:** ✅ No security vulnerabilities.\n**Testing:** ✅ Baseline tests provide adequate coverage for the scaffolding introduced here.\n**CL Size \u0026 Scope:** ❌ `Size: L (+332, -0)`. This CL is too large and exceeds the maximum for a single atomic change. Even though this is unit test code and has been split previously, it must be further decomposed to meet the strictly enforced CL size limits (CLs must be S or M).\nPlease split this CL into smaller, logical chunks, such as:\n1. CL 1: Add the `fake_flash` device emulation scaffolding (`fake_flash_read`, `fake_flash_write`, `fake_flash_ex_op`, etc.) and the Devicetree overlays, without the ztest cases.\n2. CL 2: Add the baseline ztest cases (`test_baseline_no_protection`, `test_init_clears_srp_preserves_other_bits`, `test_write_erase_roundtrip`).\n**Commit Message:** ✅ Accurate, concise, and provides the necessary test command. [🔗](http://go/tj/57a767ad-d7a5-4550-bc27-540c1aafa711)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2e5fa01cf9b592bd2bb2e131ea69afd629e0d884",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f515c13a_f4667047",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:26:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Security / Robustness - Integer Overflow in Bounds Check:**\n\n`offset + len` can overflow if `len` is sufficiently large, potentially bypassing the bounds check. While this is a test double, it is best practice to use overflow-safe bounds checks.\n\nConsider rewriting this to prevent overflow:\n```c\n\tif (offset \u003c 0 || len \u003e FAKE_FLASH_SIZE || offset \u003e FAKE_FLASH_SIZE - len)\n```\n\n*(This also applies to `fake_flash_write` at line 201 and `fake_flash_erase` at line 214)* [🔗](http://go/tj/57a767ad-d7a5-4550-bc27-540c1aafa711)",
+      "range": {
+        "startLine": 187,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2e5fa01cf9b592bd2bb2e131ea69afd629e0d884",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
