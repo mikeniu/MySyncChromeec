@@ -205,19 +205,22 @@ ZTEST_F(cros_hostcmd_transport, test_ring_buf_overflow)
 {
 	uint8_t pkt[200] = {};
 	int successful_writes = 0;
+	bool overflowed = false;
 
-	for (int i = 0; i < 30; i++) {
+	for (int i = 0; i < 60; i++) {
 		pkt[0] = static_cast<uint8_t>(i);
 		pw::Status status = fixture->transport.Write(0, pkt, false);
 		if (status.ok()) {
 			successful_writes++;
 		} else {
 			zassert_equal(status, pw::Status::ResourceExhausted());
+			overflowed = true;
 			break;
 		}
 	}
 
 	zassert_true(successful_writes > 0);
+	zassert_true(overflowed);
 
 	/* Verify queued data can be drained correctly */
 	uint8_t out_buf[512] = {};
