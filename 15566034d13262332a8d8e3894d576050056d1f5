@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "511d1346_55c66d31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:50:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for required improvements.\n\n### Review Summary\n* **Functionality:** ✅ Looks good. The mock configurations properly capture the intended outcomes of initialization.\n* **Architecture \u0026 Component Fit:** ✅ Fits well within the Zephyr ztest framework.\n* **Code Simplicity:** ❌ One issue found. The `if (res \u003d\u003d 0)` branch in `fixture_alg_init` must be flattened to a direct boolean assignment. See inline comment.\n* **Idiomaticity \u0026 Readability:** ✅ FFF mock setup is idiomatic.\n* **Security:** ✅ N/A (test-only).\n* **Testing:** ✅ Thorough test setup for the algorithm\u0027s lifecycle (init/exit) and template bounds checking.\n* **CL Size \u0026 Scope:** ✅ Size: M (+176, -0). This CL adheres to the Single Logical Change rule by specifically addressing test scaffolding for the RTS5817MAA module.\n* **Commit Message:** ✅ Accurate and concise. Avoids diff narration and explains the rationale clearly. [[trajectory](https://goto.corp.google.com/traj/8aa9aa73-2076-45a0-8add-40666a6a3fb2)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "15566034d13262332a8d8e3894d576050056d1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc3afd95_be6ecd8f",
+        "filename": "zephyr/test/fingerprint/algorithm/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T08:50:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This branch can be flattened to a direct boolean assignment to eliminate control-flow complexity:\n```c\n\tfixture-\u003eis_initialized \u003d (res \u003d\u003d 0);\n```\n[🔗](http://go/tj/8aa9aa73-2076-45a0-8add-40666a6a3fb2)",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "15566034d13262332a8d8e3894d576050056d1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
