@@ -107,6 +107,12 @@ config LINK_TEST_SUITE_CROS_FLASH_RTKFP
 	  Include the test suite exercising the REALTEK RTS5817 cros-flash
 	  driver in the binary.
 
+config LINK_TEST_SUITE_CROS_SYSTEM_RTKFP
+	bool "Link and execute the rtkfp cros-system driver tests"
+	help
+	  Include the test suite exercising the REALTEK RTS5817 cros-system
+	  driver in the binary.
+
 config LINK_TEST_SUITE_FLASH
 	bool "Link and execute the common/flash.c tests"
 	help
