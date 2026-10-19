@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2827460a_ba509243",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 52
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T18:04:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/a6e5c159-417c-47b9-ac80-9811c2fbb95b)]\n\n**Review Summary**\n* **Functionality:** The patch correctly blocks legacy v0 template commits when fingerprint authentication is enabled by returning `EC_RES_ACCESS_DENIED`. This successfully forces the use of the authenticated v1 channel.\n* **Security:** This introduces a solid security invariant that prevents arbitrary template injection via unauthenticated paths when the device is in a secure state.\n* **Style:** The code style is clean, and the inline comment clearly explains the security rationale.\n* **Testing \u0026 Test Coverage:** The two new tests added in this CL (`test_fp_command_template_v0_disabled_under_auth` and `test_fp_template_v0_disabled_under_auth`) provide excellent coverage for the new access denial logic. The previous issues regarding the unintended short-circuiting of existing tests have been successfully resolved by the prerequisite CL.\n* **CL Size \u0026 Scope:** Size: M (+51, -0). The CL is appropriately sized and focuses tightly on a single security enhancement.\n* **Conclusion:** The core functional and security changes are excellent, and the test suite is correctly aligned with the new security model. Great work!\n\nTAG\u003dagy\nCONV\u003da6e5c159-417c-47b9-ac80-9811c2fbb95b",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "464867528729c6e1490522f2a0efac7b37c8d70a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
