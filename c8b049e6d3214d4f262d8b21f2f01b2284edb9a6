@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "529bf516_d0a68abc",
+        "filename": "zephyr/subsys/chre/chre_host_cmd.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-19T17:58:55Z",
+      "side": 1,
+      "message": "Perform a size check `if (args-\u003einput_buf_size \u003c sizeof(*params)` before reading `params-\u003eapp_id`?",
+      "range": {
+        "startLine": 270,
+        "startChar": 22,
+        "endLine": 270,
+        "endChar": 36
+      },
+      "revId": "c8b049e6d3214d4f262d8b21f2f01b2284edb9a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
