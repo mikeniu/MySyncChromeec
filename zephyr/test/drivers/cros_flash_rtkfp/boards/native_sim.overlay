@@ -1,0 +1,32 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "../../boards/native_sim.overlay"
+
+/delete-node/ &cros_flash;
+
+/ {
+	chosen {
+		cros-ec,flash-controller = &rtkfp_flash;
+		zephyr,flash-controller = &fake_flash;
+	};
+
+	soc {
+		rtkfp_flash: cros-flash {
+			compatible = "realtek,rtkfp-cros-flash";
+		};
+	};
+
+	/*
+	 * Bare node emulating the RTS5817 status registers and storage
+	 * through flash_ex_op()/flash_read()/flash_write()/flash_erase().
+	 * It intentionally has no compatible: it is only the chosen
+	 * zephyr,flash-controller target of the driver under test, not a
+	 * devicetree-bound Zephyr driver.
+	 */
+	fake_flash: rts5817-flash-emul {
+		status = "okay";
+	};
+};
