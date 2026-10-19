@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f55c4fe4_3952d049",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-19T20:47:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **CL Size \u0026 Scope:** Size: M (+78, -5). ✅ Single logical change (bug fix + targeted tests).\n* **Commit Message:** ✅ Accurate, concise, and explains the rationale clearly without narrating the diff.\n* **Architecture \u0026 Component Fit:** ✅ Cleanly integrated into the command handlers.\n* **Code Simplicity:** ✅ The added check unifies the flags efficiently.\n* **Idiomaticity \u0026 Readability:** ✅ Standard C/Zephyr idioms used.\n* **Security:** ✅\n* **Testing:** ✅ Excellent unit test coverage for the new states. Thank you for fixing the assertions to check for exactly `EC_RES_UNAVAILABLE`! [🔗](http://go/tj/925ea977-600f-40d4-9ad1-2ac9bec13734)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "40020a8cdffa02a7289bc03323f082a6f138f2db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
