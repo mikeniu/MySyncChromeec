@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3133af46_4e6f34f9",
+        "filename": "zephyr/test/chre/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-19T17:32:58Z",
+      "side": 1,
+      "message": "Since `CONFIG_ISH_CHRE\u003dy` is enabled in prj.conf, `zephyr/subsys/chre/CMakeLists.txt` already adds `-fno-threadsafe-statics`. We can drop these lines, right?",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 74
+      },
+      "revId": "2ee481cf81de99525320a7f403eac1bb59f8df7a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "715bc3cf_38635f13",
+        "filename": "zephyr/test/chre/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-19T17:32:58Z",
+      "side": 1,
+      "message": "Similarly here, `CONFIG_ISH_CHRE\u003dy` implies them?",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 47
+      },
+      "revId": "2ee481cf81de99525320a7f403eac1bb59f8df7a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b0ffcfc_67397501",
+        "filename": "zephyr/test/chre/Kconfig",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-19T17:32:58Z",
+      "side": 1,
+      "message": "Do we need this Kconfig file? The test already pulls in `zephyr/subsys/chre/Kconfig`, right?",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 15
+      },
+      "revId": "2ee481cf81de99525320a7f403eac1bb59f8df7a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
