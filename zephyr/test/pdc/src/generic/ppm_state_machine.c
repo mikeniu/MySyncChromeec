@@ -858,6 +858,44 @@ ZTEST_USER_F(ppm_test, test_CCACK_fail_if_no_ack)
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
 }
 
+/*
+ * If the OPM fails to send ACK_CC_CI (for example, if the interrupt was missed
+ * during boot or the kernel cancelled its UCSI work on S0ix suspend), the PPM
+ * must time out of PPM_STATE_WAITING_CC_ACK, recover to PPM_STATE_IDLE_NOTIFY,
+ * and accept subsequent commands such as SET_NOTIFICATION_ENABLE on resume.
+ */
+ZTEST_USER_F(ppm_test, test_CCACK_timeout_recovers_to_idle_notify)
+{
+	initialize_fake_to_idle_notify(fixture);
+	int notified_count = fixture->notified_count;
+
+	struct ucsi_control_t control = {
+		.command = UCSI_GET_CONNECTOR_CAPABILITY, .data_length = 0
+	};
+	queue_command_for_fake_driver(fixture, UCSI_GET_CONNECTOR_CAPABILITY,
+				      /*result=*/0, /*lpm_data=*/NULL);
+
+	zassert_false(write_command(fixture, &control) < 0);
+	notified_count++;
+	zassert_true(wait_for_notification(fixture, notified_count));
+	zassert_true(check_cci_matches(fixture, &cci_cmd_complete));
+	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
+
+	/* Do not send ACK_CC_CI. Wait past the 5s CC ACK timeout. */
+	k_msleep(5500);
+
+	zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE_NOTIFY);
+
+	/* Verify subsequent SET_NOTIFICATION_ENABLE (sent by OPM on resume)
+	 * succeeds instead of failing with CCI error in state 4.
+	 */
+	struct ucsi_control_t notify_ctrl;
+	memcpy(&notify_ctrl, &enable_all_notifications, sizeof(notify_ctrl));
+	zassert_false(write_command(fixture, &notify_ctrl) < 0);
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
+	zassert_true(check_cci_matches(fixture, &cci_cmd_complete));
+}
+
 /* When waiting for a Connection Indicator Ack, we accept an immediate ACK_CC_CI
  * to switch the state back to Idle with Notifications. Trying to use command
  * complete in that state should also fail.
