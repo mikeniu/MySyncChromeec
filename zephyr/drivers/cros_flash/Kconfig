@@ -66,6 +66,7 @@ config CROS_FLASH_RTK
 config CROS_FLASH_RTKFP
 	bool "REALTEK RTS5817 flash driver for the Zephyr shim"
 	depends on DT_HAS_REALTEK_RTKFP_CROS_FLASH_ENABLED
+	default y if PLATFORM_EC
 	select PLATFORM_EC_FLASH_CROS
 	select PLATFORM_EC_SPI_FLASH_REGS
 	help
