@@ -55,6 +55,7 @@ if(CONFIG_ISH_CHRE)
     add_subdirectory(${CHRE_ROOT} chre)
     target_link_libraries(app PRIVATE
       chre
+      chre.platform.shared.nanoapp_load_manager
       pw_allocator_zephyr.synchronized_heap_allocator
     )
     if(CONFIG_CHRE_TIMER_WORLD)

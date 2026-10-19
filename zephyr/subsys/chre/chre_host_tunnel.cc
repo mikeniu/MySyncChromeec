@@ -4,8 +4,11 @@
  */
 
 #include "chre/core/event_loop_manager.h"
+#include "chre/core/multi_threading_api_mutex.h"
 #include "chre/core/nanoapp.h"
 #include "chre/platform/shared/fbs/host_messages_generated.h"
+#include "chre/platform/shared/host_protocol_chre.h"
+#include "chre/platform/shared/nanoapp_load_manager.h"
 #include "chre/platform/system_time.h"
 #include "chre/util/dynamic_vector.h"
 #include "chre/util/flatbuffers/helpers.h"
@@ -127,6 +130,214 @@ bool enqueueMessageToHost(const uint8_t *data, size_t size)
 
 namespace
 {
+
+chre::NanoappLoadManager s_load_manager;
+
+void send_fragment_response(uint16_t host_client_id, uint32_t transaction_id,
+			    uint32_t fragment_id, bool success)
+{
+	chre::ChreFlatBufferBuilder builder(64);
+	auto resp = chre::fbs::CreateLoadNanoappResponse(
+		builder, transaction_id, success, fragment_id);
+	chre::fbs::HostAddress host_addr(host_client_id);
+	auto container = chre::fbs::CreateMessageContainer(
+		builder, chre::fbs::ChreMessage::LoadNanoappResponse,
+		resp.Union(), &host_addr);
+	builder.Finish(container);
+	chre::enqueueMessageToHost(builder.GetBufferPointer(),
+				   builder.GetSize());
+}
+
+struct LoadNanoappCallbackData {
+	uint64_t app_id;
+	uint32_t transaction_id;
+	uint16_t host_client_id;
+	uint32_t fragment_id;
+	chre::UniquePtr<chre::Nanoapp> nanoapp;
+	bool send_fragment_response;
+};
+
+void start_nanoapp_callback(uint16_t /*type*/, void *data, void * /*extraData*/)
+{
+	auto *cb_data = static_cast<LoadNanoappCallbackData *>(data);
+	auto *event_loop =
+		&chre::EventLoopManagerSingleton::get()->getEventLoop();
+
+	auto *mutex = chre::getMultiThreadingApiMutex();
+	mutex->unlock();
+	bool success = event_loop->startNanoapp(std::move(cb_data->nanoapp));
+	mutex->lock();
+
+	if (cb_data->send_fragment_response) {
+		send_fragment_response(cb_data->host_client_id,
+				       cb_data->transaction_id,
+				       cb_data->fragment_id, success);
+	}
+	chre::memoryFree(cb_data);
+}
+
+void finish_loading_nanoapp_callback(uint16_t type, void *data,
+				     void *extra_data)
+{
+	auto *cb_data = static_cast<LoadNanoappCallbackData *>(data);
+	if (!cb_data->nanoapp->isLoaded() || !cb_data->nanoapp->isOpen()) {
+		LOG_ERR("Nanoapp is not loaded or open");
+		if (cb_data->send_fragment_response) {
+			send_fragment_response(cb_data->host_client_id,
+					       cb_data->transaction_id,
+					       cb_data->fragment_id, false);
+		}
+		chre::memoryFree(cb_data);
+	} else {
+		start_nanoapp_callback(type, data, extra_data);
+	}
+}
+
+void handle_load_nanoapp_request(uint16_t host_client_id,
+				 const chre::fbs::LoadNanoappRequest *req)
+{
+	if (req == nullptr || req->app_binary() == nullptr) {
+		LOG_ERR("Invalid LoadNanoappRequest");
+		send_fragment_response(host_client_id,
+				       req ? req->transaction_id() : 0,
+				       req ? req->fragment_id() : 0, false);
+		return;
+	}
+
+	const auto *app_binary = req->app_binary();
+	uint32_t fragment_id = req->fragment_id();
+	uint32_t transaction_id = req->transaction_id();
+	uint64_t app_id = req->app_id();
+	size_t buffer_len = app_binary->size();
+	const void *buffer = app_binary->data();
+	bool success = true;
+
+	if (fragment_id == 0 || fragment_id == 1) {
+		size_t total_app_binary_len =
+			(fragment_id == 0) ? buffer_len : req->total_app_size();
+		LOG_INF("Load nanoapp request for app ID 0x%016llx ver 0x%x"
+			" flags 0x%x target API 0x%x size %zu (txnId %u client %u)",
+			static_cast<unsigned long long>(app_id),
+			req->app_version(), req->app_flags(),
+			req->target_api_version(), total_app_binary_len,
+			transaction_id, host_client_id);
+
+		if (s_load_manager.hasPendingLoadTransaction()) {
+			auto info = s_load_manager.getTransactionInfo();
+			LOG_WRN("Pending load transaction exists "
+				"(clientId=%u, txnId=%u, nextFragmentId=%u). "
+				"Overriding it",
+				info.hostClientId, info.transactionId,
+				info.nextFragmentId);
+			send_fragment_response(info.hostClientId,
+					       info.transactionId,
+					       info.nextFragmentId, false);
+			s_load_manager.markFailure();
+		}
+
+		success = s_load_manager.prepareForLoad(
+			host_client_id, transaction_id, app_id,
+			req->app_version(), req->app_flags(),
+			total_app_binary_len, req->target_api_version());
+	}
+
+	if (success) {
+		success = s_load_manager.copyNanoappFragment(
+			host_client_id, transaction_id,
+			(fragment_id == 0) ? 1 : fragment_id, buffer,
+			buffer_len);
+	} else {
+		LOG_ERR("Failed to prepare for load");
+	}
+
+	if (s_load_manager.isLoadComplete()) {
+		LOG_INF("Nanoapp load complete, opening and starting...");
+		auto *cb_data = chre::memoryAlloc<LoadNanoappCallbackData>();
+		if (cb_data == nullptr) {
+			LOG_ERR("OOM for LoadNanoappCallbackData");
+			send_fragment_response(host_client_id, transaction_id,
+					       fragment_id, false);
+			return;
+		}
+		cb_data->transaction_id = transaction_id;
+		cb_data->host_client_id = host_client_id;
+		cb_data->app_id = app_id;
+		cb_data->fragment_id = fragment_id;
+		cb_data->nanoapp = s_load_manager.releaseNanoapp();
+		cb_data->send_fragment_response = !req->respond_before_start();
+
+		bool open_success = cb_data->nanoapp->openNanoapp();
+		if (!open_success) {
+			LOG_ERR("Failed to open nanoapp");
+			send_fragment_response(host_client_id, transaction_id,
+					       fragment_id, false);
+			chre::memoryFree(cb_data);
+		} else {
+			chre::EventLoopManagerSingleton::get()->deferCallback(
+				chre::SystemCallbackType::FinishLoadingNanoapp,
+				cb_data, finish_loading_nanoapp_callback);
+			if (req->respond_before_start()) {
+				send_fragment_response(host_client_id,
+						       transaction_id,
+						       fragment_id, true);
+			}
+		}
+	} else {
+		send_fragment_response(host_client_id, transaction_id,
+				       fragment_id, success);
+	}
+}
+
+void handle_unload_nanoapp_request(uint16_t host_client_id,
+				   const chre::fbs::UnloadNanoappRequest *req)
+{
+	if (req == nullptr) {
+		return;
+	}
+	struct UnloadNanoappCallbackData {
+		uint16_t host_client_id;
+		uint32_t transaction_id;
+		uint64_t app_id;
+		bool allow_system;
+	};
+	auto *cb_data = chre::memoryAlloc<UnloadNanoappCallbackData>();
+	if (cb_data == nullptr) {
+		LOG_ERR("OOM for unload nanoapp callback");
+		return;
+	}
+	cb_data->host_client_id = host_client_id;
+	cb_data->transaction_id = req->transaction_id();
+	cb_data->app_id = req->app_id();
+	cb_data->allow_system = req->allow_system_nanoapp_unload();
+
+	auto cb = [](uint16_t /*type*/, void *data, void * /*extraData*/) {
+		auto *d = static_cast<UnloadNanoappCallbackData *>(data);
+		bool success = false;
+		uint16_t instance_id;
+		auto &el =
+			chre::EventLoopManagerSingleton::get()->getEventLoop();
+		if (!el.findNanoappInstanceIdByAppId(d->app_id, &instance_id)) {
+			LOG_ERR("Could not find app ID 0x%016llx to unload",
+				static_cast<unsigned long long>(d->app_id));
+		} else {
+			success =
+				el.unloadNanoapp(instance_id, d->allow_system);
+		}
+		chre::ChreFlatBufferBuilder builder(64);
+		auto resp = chre::fbs::CreateUnloadNanoappResponse(
+			builder, d->transaction_id, success);
+		chre::fbs::HostAddress host_addr(d->host_client_id);
+		auto container = chre::fbs::CreateMessageContainer(
+			builder, chre::fbs::ChreMessage::UnloadNanoappResponse,
+			resp.Union(), &host_addr);
+		builder.Finish(container);
+		chre::enqueueMessageToHost(builder.GetBufferPointer(),
+					   builder.GetSize());
+		chre::memoryFree(d);
+	};
+	chre::EventLoopManagerSingleton::get()->deferCallback(
+		chre::SystemCallbackType::HandleUnloadNanoapp, cb_data, cb);
+}
 
 void handle_hub_info_request(uint16_t host_client_id)
 {
@@ -295,18 +506,7 @@ bool decode_message_from_host(const void *message, size_t message_len)
 		const auto *req =
 			static_cast<const chre::fbs::LoadNanoappRequest *>(
 				container->message());
-		LOG_WRN("Dynamic nanoapp load not yet supported on ISH");
-		chre::ChreFlatBufferBuilder builder(64);
-		auto resp = chre::fbs::CreateLoadNanoappResponse(
-			builder, req ? req->transaction_id() : 0, false,
-			req ? req->fragment_id() : 0);
-		chre::fbs::HostAddress host_addr(host_client_id);
-		auto c = chre::fbs::CreateMessageContainer(
-			builder, chre::fbs::ChreMessage::LoadNanoappResponse,
-			resp.Union(), &host_addr);
-		builder.Finish(c);
-		chre::enqueueMessageToHost(builder.GetBufferPointer(),
-					   builder.GetSize());
+		handle_load_nanoapp_request(host_client_id, req);
 		break;
 	}
 
@@ -314,17 +514,7 @@ bool decode_message_from_host(const void *message, size_t message_len)
 		const auto *req =
 			static_cast<const chre::fbs::UnloadNanoappRequest *>(
 				container->message());
-		LOG_WRN("Dynamic nanoapp unload not yet supported on ISH");
-		chre::ChreFlatBufferBuilder builder(64);
-		auto resp = chre::fbs::CreateUnloadNanoappResponse(
-			builder, req ? req->transaction_id() : 0, false);
-		chre::fbs::HostAddress host_addr(host_client_id);
-		auto c = chre::fbs::CreateMessageContainer(
-			builder, chre::fbs::ChreMessage::UnloadNanoappResponse,
-			resp.Union(), &host_addr);
-		builder.Finish(c);
-		chre::enqueueMessageToHost(builder.GetBufferPointer(),
-					   builder.GetSize());
+		handle_unload_nanoapp_request(host_client_id, req);
 		break;
 	}
 
