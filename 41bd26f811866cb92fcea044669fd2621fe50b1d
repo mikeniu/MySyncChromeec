@@ -1,0 +1,92 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3093effb_10c87ec1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:11:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\nThis CL bundles two independent abstractions into a single patch:\n1. Extracting `FpFrameStorage` (and updating its tests).\n2. Extracting `FpCryptoContext`.\n\nPer the Single Logical Change rule, because these two abstractions govern orthogonal concerns and can be committed independently, they MUST be split into separate CLs. \n\nAdditionally, the commit message currently uses a multi-bullet outline that narratively lists the diff (\"Extract raw frame storage...\", \"Extract cryptographic session state...\", \"Update zephyr/test...\"). Once split, each CL should use 1-3 concise prose paragraphs explaining *why* the abstraction is being introduced, rather than bulleting what files changed.\n\n**Example Commit Message for CL 1 (`FpFrameStorage`):**\n```text\nfpsensor: Extract FpFrameStorage\n\nExtracts the raw frame buffer and frame parameter caching into a dedicated `FpFrameStorage` abstraction. This encapsulates the global `fp_buffer` array and provides bounds-checked slice access for fingerprint frame reads.\n\nBUG\u003db:286119221\nTEST\u003d./twister -T zephyr/test/fingerprint/task -s fingerprint.task.get_frame\nTEST\u003dmake runhosttests BOARD\u003dbloonchipper\n``` [🔗](http://go/tj/54d959f0-0355-4eef-860e-58844e980b86)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcc74afa_77b59706",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:11:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL and address security defects. [[trajectory](https://goto.corp.google.com/traj/54d959f0-0355-4eef-860e-58844e980b86)]\n\n### Review Summary\n* **Functionality \u0026 Security:** ❌ `RAND_bytes` return values are ignored, which can lead to predictable cryptographic nonces/challenges if the RNG fails. See inline comments.\n* **Architecture \u0026 Component Fit:** ⚠️ The CL introduces `FpCryptoContext` without any callers or integration in this patch.\n* **Code Simplicity:** ✅ Code is generally clean and uses early returns and `std::expected`.\n* **Idiomaticity \u0026 Readability:** ✅ Uses modern C++20 `std::ranges` and `std::span` nicely.\n* **Testing:** ❌ `FpCryptoContext` has no unit tests. All new or modified logic must have automated test coverage.\n* **CL Size \u0026 Scope:** ❌ `Size: L (+672, -198)`. The CL bundles two independent changes (Extract `FpFrameStorage` and Extract `FpCryptoContext`). This violates the Single Logical Change rule and must be split.\n* **Commit Message:** ❌ The commit message uses a multi-bullet diff narration and joins distinct noun categories with \"and\". It should be split and rewritten as concise prose.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "093bb368_71883d60",
+        "filename": "common/fpsensor/fpsensor_crypto_context.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:11:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Security / Functionality Defect:** `RAND_bytes` can fail (returning `0` or `-1`), leaving the buffer with zeros or uninitialized data. Its return value MUST be checked to ensure cryptographic security.\n\nIf `RAND_bytes` fails, this function should return an error (e.g., by changing the return type to `std::expected\u003cFpSessionNonce, ec_error_list\u003e`) rather than proceeding with a predictable nonce. [🔗](http://go/tj/54d959f0-0355-4eef-860e-58844e980b86)",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "352de82b_c61a36be",
+        "filename": "common/fpsensor/fpsensor_crypto_context.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:11:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Security / Functionality Defect:** Similar to the nonce generation above, the return value of `RAND_bytes` MUST be checked here. Failing to do so can result in a predictable authentication challenge. [🔗](http://go/tj/54d959f0-0355-4eef-860e-58844e980b86)",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
