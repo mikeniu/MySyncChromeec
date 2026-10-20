@@ -5,6 +5,6 @@
 
 /dts-v1/;
 
-#include <cros/nuvoton/npcx9.dtsi>
 #include <nuvoton/npcx9m7fb.dtsi>
+#include <cros/nuvoton/npcx9.dtsi>
 #include "npcx9.dtsi"
