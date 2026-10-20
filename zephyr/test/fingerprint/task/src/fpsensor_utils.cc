@@ -129,3 +129,16 @@ ZTEST(fpsensor_utils, test_mode_and_capture_type_wrappers)
 	zassert_true(pattern_mode.has_value());
 	zassert_false(pattern_mode->is_finger_needed());
 }
+
+ZTEST(fpsensor_utils, test_checked_subspan_boundaries)
+{
+	std::array<uint8_t, 4> buf{ 10, 20, 30, 40 };
+	const auto sub = checked_subspan(std::span(buf), 1, 3);
+	zassert_true(sub.has_value());
+	zassert_equal(sub->size(), 3u);
+	zassert_equal((*sub)[0], 20);
+	zassert_equal(checked_subspan(std::span(buf), 2, 3).error(),
+		      EC_ERROR_INVAL);
+	zassert_equal(checked_subspan(std::span(buf), UINT32_MAX, 1).error(),
+		      EC_ERROR_OVERFLOW);
+}
