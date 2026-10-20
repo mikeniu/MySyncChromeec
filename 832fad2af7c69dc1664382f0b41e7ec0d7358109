@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05fffe5f_a69a5662",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:13:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The commit message states that `fpsensor_vendor_command.cc` was modernized \"using ScopedSemLock\", but `ScopedSemLock` does not appear in the patch diff (it appears `ec_status` and `DECLARE_HOST_COMMAND` were used instead).\n\nAdditionally, this bullet represents an independent logical change (modernizing the vendor command) from the rest of the CL (extracting platform hooks). Please separate this modernization into its own CL to adhere to the Single Logical Change rule.\n\nWhen updating the commit messages for the split CLs, prefer 1-3 short prose paragraphs over multi-bullet lists.\n\nFor the platform hooks CL, consider a description like:\n```text\nfpsensor: Extract platform hooks for Zephyr and legacy EC\n\nThe fingerprint sensor implementation previously relied on inline `#ifdef CONFIG_ZEPHYR` blocks for power management, SPI flushing, and interrupt handling, which hindered readability and testing.\n\nThis change abstracts these operations into a new `fp_platform` namespace with dedicated Zephyr and legacy EC implementations, simplifying the core sensor state machine.\n```\n\nFor the vendor command modernization CL, consider:\n```text\nfpsensor: Modernize vendor host command implementation\n\nThis change updates the fingerprint vendor command to use the modern `ec_status` return types and `DECLARE_HOST_COMMAND` macros. The associated unit tests are also simplified to use a common helper function to reduce boilerplate.\n```\n\n[🔗](http://go/tj/09a7da7c-aff5-44f7-a6ee-b5b8eedf3ef3)",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "832fad2af7c69dc1664382f0b41e7ec0d7358109",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "498ada97_6999e84f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:13:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n*   **Functionality:** Looks good. The extraction of platform hooks preserves existing behavior and correctly maps `#ifdef` blocks to platform-specific implementations.\n*   **Architecture \u0026 Component Fit:** `✅`. The `fp_platform` abstraction cleanly encapsulates platform differences between Zephyr and legacy EC, improving layering.\n*   **Code Simplicity:** `✅`. The modernization of the `fpsensor_vendor_command.cc` test using `run_vendor_cmd` successfully reduces setup boilerplate.\n*   **Idiomaticity \u0026 Readability:** `✅`. The use of `ec_status` and `DECLARE_HOST_COMMAND` brings the vendor command into alignment with modern host command idioms.\n*   **Security:** `✅`. No issues identified.\n*   **Testing:** `✅`. The existing unit tests were correctly updated for the modernized vendor command API.\n*   **CL Size \u0026 Scope:** `❌` **Size: L (+224, -167)**. This CL bundles multiple independent logical changes. According to the Single Logical Change rule, the modernization of `fpsensor_vendor_command.cc` and its unit tests can be committed independently from the extraction of platform hooks for `fpsensor.cc`. Please split this into two smaller, self-contained CLs:\n    1.  CL 1: Modernize `fpsensor_vendor_command.cc` and its unit tests to use `ec_status` and `DECLARE_HOST_COMMAND`.\n    2.  CL 2: Extract platform hooks for `fpsensor.cc` into `fpsensor_platform_legacy.cc` and `fpsensor_platform_zephyr.cc`.\n*   **Commit Message:** `❌`. The commit message bullet mentions \"using ScopedSemLock\", but this class is not used anywhere in the patch diff. Additionally, the commit message joins distinct independent changes into a multi-bullet outline. When splitting the CLs, please use 1-3 short prose paragraphs for each describing the *why* and *what* without diff narration or bulleted lists.\n\n[🔗](http://go/tj/09a7da7c-aff5-44f7-a6ee-b5b8eedf3ef3)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "832fad2af7c69dc1664382f0b41e7ec0d7358109",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
