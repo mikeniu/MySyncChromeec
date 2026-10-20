@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "007de71f_da53a912",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:48:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa318b42_56dfbd64",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 122,
+        "endChar": 9999
+      },
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "735e3d64_ac9150ef",
@@ -66,6 +90,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62cd760f_01c091ca",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:48:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "735e3d64_ac9150ef",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 9999
+      },
       "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -95,6 +143,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71103f77_8db361c9",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:48:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ad7a0e2_7b65ab68",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 9999
+      },
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd87a1d8_e608ef33",
@@ -116,6 +188,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e1ec50_693df028",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:48:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd87a1d8_e608ef33",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9999
+      },
       "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -145,6 +241,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e1d4659_ed352d87",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:48:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d31bbba_73eeb4dd",
+      "range": {
+        "startLine": 344,
+        "startChar": 0,
+        "endLine": 352,
+        "endChar": 9999
+      },
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c7d4a5e_d77e5bd1",
@@ -166,6 +286,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcf6edcc_d5736ddd",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:48:46Z",
+      "side": 1,
+      "message": "The erase with a negative size now expects EC_ERROR_INVAL. This test lives in test_write_erase_invalid_args, so the expectation changed together with the out-of-range test.",
+      "parentUuid": "2c7d4a5e_d77e5bd1",
+      "range": {
+        "startLine": 364,
+        "startChar": 0,
+        "endLine": 366,
+        "endChar": 9999
+      },
       "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
