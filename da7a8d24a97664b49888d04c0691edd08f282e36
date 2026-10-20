@@ -16,6 +16,24 @@
       "message": "[FAILED] chromiumos/platform/ec: cros lint\n    Hook script \"cros lint --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      00:17:03: WARNING: zephyr/program/bluey/pic/src/fan.c: file needs a trailing newline\n      00:17:32: NOTICE: Install staticcheck for additional go linting.\n      00:17:32: NOTICE: Install staticcheck for additional go linting.\n      00:17:37: ERROR: Found lint errors in 1 files in 43.178s.",
       "revId": "da7a8d24a97664b49888d04c0691edd08f282e36",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b046aa59_70a91bba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-20T08:10:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0db2185_71042f42",
+      "revId": "da7a8d24a97664b49888d04c0691edd08f282e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
