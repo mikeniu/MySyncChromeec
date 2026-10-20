@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1b5ea14_50cd8c51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:14:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for blocking issues.\n\n### Review Summary\n\n**Functionality:** ✅ The test harness correctly initializes mocks and fakes.\n**Architecture \u0026 Component Fit:** ✅ Fits well within Zephyr ztest patterns.\n**Code Simplicity:** ❌ **Changes Requested.** A manual loop is used to assert equality of an array, which should be simplified using `zassert_mem_equal`. See inline comments.\n**Idiomaticity \u0026 Readability:** ✅ Uses Zephyr zassert macros appropriately.\n**Security:** ✅ N/A\n**Testing:** ❌ **Changes Requested.** The `test_get_info_small_capacity` test uses `0` instead of the off-by-one boundary `NUM_IMAGE_CAPTURE_TYPES - 1`, leaving an unkilled `ROR` mutation. See inline comments.\n**CL Size \u0026 Scope:** ✅ Size: L (+360, -0). The production diff is 0 lines, and the test suite represents a single logical change (test harness and basic driver initializations tests).\n**Commit Message:** ✅ Clear and concise, adhering to Chromium OS guidelines.\n\n[🔗](http://go/tj/68d3bc87-f23d-4461-af4c-169233b0a9c5)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ba9c229845cac57cd44182247d02354d48e9f680",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3ab2c6b_3501020a",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:14:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity (Zero Control Flow in Tests)**\n\nYou can eliminate this `for` loop entirely by comparing the full array at once with `zassert_mem_equal`. This adheres to the principle of minimal test setup and zero control flow inside test bodies, and `zassert_mem_equal` provides better hex-dump diagnostics on failure than `zassert_equal` on `memcmp`.\n\n```c\n\tzassert_mem_equal(image_frame_params_array, expected_image_frame_params_array,\n\t\t\t  sizeof(expected_image_frame_params_array),\n\t\t\t  \"Image frame params array mismatch\");\n```\n\n[🔗](http://go/tj/68d3bc87-f23d-4461-af4c-169233b0a9c5)",
+      "range": {
+        "startLine": 200,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ba9c229845cac57cd44182247d02354d48e9f680",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fb9c4b5_1ac3210e",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:14:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Boundary Value Analysis**\n\nTo ensure the underlying capacity check strictly enforces `\u003e\u003d NUM_IMAGE_CAPTURE_TYPES` (and not just `\u003e 0`), test the exact off-by-one boundary rather than `0`.\n\n```c\n\tuint8_t num_params \u003d NUM_IMAGE_CAPTURE_TYPES - 1;\n```\n\n[🔗](http://go/tj/68d3bc87-f23d-4461-af4c-169233b0a9c5)",
+      "range": {
+        "startLine": 234,
+        "startChar": 0,
+        "endLine": 234,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ba9c229845cac57cd44182247d02354d48e9f680",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
