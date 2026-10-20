@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9abab6b_c0bb167b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-10-20T08:37:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fff9c818_8924be0f",
+      "revId": "709629f0d4cccbb557e785132b67276eb54b7d04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a67257a5_53984296",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-10-20T00:03:01Z",
       "side": 1,
       "message": "Please fix this WARNING reported by Spellchecker: \"intenally\" is a possible misspelling of \"internally\".\n\nTo bypass Spellchecker, ...\n\n\"intenally\" is a possible misspelling of \"internally\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 11,
+        "startChar": 25,
+        "endLine": 11,
+        "endChar": 34
+      },
+      "revId": "709629f0d4cccbb557e785132b67276eb54b7d04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a19b786_99acb899",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-10-20T08:37:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a67257a5_53984296",
       "range": {
         "startLine": 11,
         "startChar": 25,
