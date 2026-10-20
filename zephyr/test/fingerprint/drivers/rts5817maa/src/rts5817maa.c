@@ -353,3 +353,24 @@ ZTEST_F(rts5817maa, test_maintenance)
 					      sizeof(buffer)),
 		      0);
 }
+
+ZTEST_F(rts5817maa, test_finger_status_present)
+{
+	rts5817maa_sensor_finger_status_fake.return_val = RTS_FINGER_PRESENT;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_PRESENT);
+}
+
+ZTEST_F(rts5817maa, test_finger_status_none)
+{
+	rts5817maa_sensor_finger_status_fake.return_val = RTS_FINGER_NONE;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_NONE);
+}
+
+ZTEST_F(rts5817maa, test_finger_status_unmapped)
+{
+	rts5817maa_sensor_finger_status_fake.return_val = (rts_finger_sts_t)42;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_NONE);
+}
