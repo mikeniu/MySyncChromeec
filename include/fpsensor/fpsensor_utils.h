@@ -244,6 +244,8 @@ class FpFourCc {
 	return FpFourCc(value);
 }
 
+#ifndef CONFIG_ZEPHYR
 #include "fpsensor/fpsensor_modes.h"
+#endif
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_UTILS_H_ */

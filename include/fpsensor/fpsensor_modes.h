@@ -103,9 +103,6 @@ inline constexpr uint32_t FP_MODE_ANY_CAPTURE =
 inline constexpr uint32_t FP_MODE_ANY_DETECT_FINGER =
 	(FP_MODE_FINGER_DOWN | FP_MODE_FINGER_UP | FP_MODE_ANY_CAPTURE);
 
-inline constexpr uint32_t FP_MODE_ANY_WAIT_IRQ =
-	(FP_MODE_FINGER_DOWN | FP_MODE_ANY_CAPTURE);
-
 class FpSensorMode {
     public:
 	constexpr FpSensorMode() noexcept = default;
@@ -471,6 +468,7 @@ struct FpTemplateV0Size {
 	}
 };
 
+#ifndef CONFIG_ZEPHYR
 [[nodiscard]] inline constexpr bool is_finger_needed(uint32_t mode) noexcept
 {
 	return FpSensorMode::create(mode)
@@ -485,5 +483,6 @@ skip_image_offset(enum fp_capture_type type) noexcept
 		.transform(&FpCaptureType::skip_image_offset)
 		.value_or(true);
 }
+#endif
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_MODES_H_ */

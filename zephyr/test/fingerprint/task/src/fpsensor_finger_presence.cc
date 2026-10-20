@@ -20,6 +20,7 @@
 #include <ec_commands.h>
 #include <ec_tasks.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <host_command.h>
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
@@ -29,9 +30,12 @@ namespace
 
 /*
  * Time we wait for fpsensor task to check if the finger was removed.
- * This must be greater or equal to FINGER_POLLING_DELAY.
+ * Derived directly from FpSensorStateMachine::kFingerPollingDelay.
  */
-constexpr int kPollingDelayMs = 100;
+constexpr auto kPollingDelayMs =
+	std::chrono::duration_cast<std::chrono::milliseconds>(
+		FpSensorStateMachine::kFingerPollingDelay)
+		.count();
 
 void set_finger_state(fingerprint_finger_state finger_state,
 		      bool trigger_irq = false)
