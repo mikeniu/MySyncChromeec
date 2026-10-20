@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc6ccc05_29234d2c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested (Weak Oracle \u0026 Missing Coverage)**\n\n**1. Weak Test Oracle (Vacuous Assertions):**\nThe `std::holds_alternative` checks only verify the *type* of the returned command, not the *value* inside it. For example, if `parse_command` accidentally mapped a mode to `DetectFingerCommand{ 0 }` instead of the actual `mode.raw()`, this test would still pass. To enforce strict oracle integrity, we need to extract the variant and assert the exact expected properties.\n\n**2. Missing Branch Coverage for State Transitions:**\nThe commit message notes this refactor enables task transitions to be \"verified hermetically in unit tests.\" However, the runtime dispatch test only covers the `FP_MODE_FINGER_UP` transition path. We should explicitly assert the other newly extracted state transitions (such as `ResetSensorCommand` and `MaintenanceCommand` clearing their respective flags) to ensure the state machine behaves identically to the old loop.\n\n**Suggestion:**\n```cpp\nZTEST_USER(fpsensor_state, test_state_machine_command_parsing)\n{\n\t{\n\t\tconstexpr auto cmd \u003d FpSensorStateMachine::parse_command(FpSensorMode(0));\n\t\tstatic_assert(std::holds_alternative\u003cFpSensorStateMachine::IdleCommand\u003e(cmd));\n\t}\n\t{\n\t\tconstexpr auto cmd \u003d FpSensorStateMachine::parse_command(FpSensorMode(FP_MODE_MATCH));\n\t\tstatic_assert(std::holds_alternative\u003cFpSensorStateMachine::DetectFingerCommand\u003e(cmd));\n\t\tstatic_assert(std::get\u003cFpSensorStateMachine::DetectFingerCommand\u003e(cmd).mode \u003d\u003d FP_MODE_MATCH);\n\t}\n\t{\n\t\tconstexpr auto cmd \u003d FpSensorStateMachine::parse_command(FpSensorMode(\n\t\t\tFP_MODE_CAPTURE | (FP_CAPTURE_PATTERN0 \u003c\u003c FP_MODE_CAPTURE_TYPE_SHIFT)));\n\t\tstatic_assert(std::holds_alternative\u003cFpSensorStateMachine::ImmediateCaptureCommand\u003e(cmd));\n\t\tstatic_assert(std::get\u003cFpSensorStateMachine::ImmediateCaptureCommand\u003e(cmd).capture_type.raw() \u003d\u003d FP_CAPTURE_PATTERN0);\n\t}\n\t{\n\t\tconstexpr auto cmd \u003d FpSensorStateMachine::parse_command(FpSensorMode(FP_MODE_RESET_SENSOR));\n\t\tstatic_assert(std::holds_alternative\u003cFpSensorStateMachine::ResetSensorCommand\u003e(cmd));\n\t}\n\t{\n\t\tconstexpr auto cmd \u003d FpSensorStateMachine::parse_command(FpSensorMode(FP_MODE_SENSOR_MAINTENANCE));\n\t\tstatic_assert(std::holds_alternative\u003cFpSensorStateMachine::MaintenanceCommand\u003e(cmd));\n\t}\n}\n\nZTEST_USER(fpsensor_state, test_state_machine_dispatch_finger_up)\n{\n\tFpSensorContext local_ctx{};\n\tFpSensorStateMachine sm{ local_ctx };\n\tlocal_ctx.sensor_mode \u003d FP_MODE_FINGER_UP;\n\tsm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });\n\tzassert_equal(sm.timeout_us(),\n\t\t      FpSensorStateMachine::kFingerPollingDelayUs);\n}\n\nZTEST_USER(fpsensor_state, test_state_machine_dispatch_reset)\n{\n\tFpSensorContext local_ctx{};\n\tFpSensorStateMachine sm{ local_ctx };\n\tlocal_ctx.sensor_mode \u003d FP_MODE_RESET_SENSOR;\n\tsm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });\n\tzassert_equal(local_ctx.sensor_mode \u0026 FP_MODE_RESET_SENSOR, 0);\n}\n\nZTEST_USER(fpsensor_state, test_state_machine_dispatch_maintenance)\n{\n\tFpSensorContext local_ctx{};\n\tFpSensorStateMachine sm{ local_ctx };\n\tlocal_ctx.sensor_mode \u003d FP_MODE_SENSOR_MAINTENANCE;\n\tsm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });\n\tzassert_equal(local_ctx.sensor_mode \u0026 FP_MODE_SENSOR_MAINTENANCE, 0);\n}\n```\n[🔗](http://go/tj/845db0c7-e228-4196-abd6-68bca82c6b3a)",
+      "range": {
+        "startLine": 446,
+        "startChar": 0,
+        "endLine": 482,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "93d2bb5391530b50bc4d9282409ade053d7fdb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
