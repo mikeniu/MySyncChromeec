@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b70dddc3_a5a2dce8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:03Z",
+      "side": 1,
+      "message": "Simplified FpTemplateStore::consume_secret to check readability first and added test_template_store_secret_lifecycle covering all secret lifecycle transitions and timeout boundaries.",
+      "parentUuid": "da42270f_cb73da31",
+      "isAi": true,
+      "revId": "fea782f0a9437903e61f8c74bdf25477a792a610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e22a97c6_ff6b05bc",
@@ -45,6 +64,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "785fb900_9cc19c6a",
+        "filename": "include/fpsensor/fpsensor_template_store.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:03Z",
+      "side": 1,
+      "message": "Simplified FpTemplateStore::consume_secret to check readability first, then expiration, then expected_fgr.",
+      "parentUuid": "e22a97c6_ff6b05bc",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "fea782f0a9437903e61f8c74bdf25477a792a610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d831663b_7468a357",
@@ -65,6 +109,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fea782f0a9437903e61f8c74bdf25477a792a610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "014ae495_565030ef",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:03Z",
+      "side": 1,
+      "message": "Added ZTEST(fpsensor_utils, test_template_store_secret_lifecycle) covering enable_secret, double-enable, unreadable consume, mismatched finger ID, and N / N-1 timeout boundaries.",
+      "parentUuid": "d831663b_7468a357",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "fea782f0a9437903e61f8c74bdf25477a792a610",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
