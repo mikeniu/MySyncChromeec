@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "523837e6_a8e9ca45",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:14:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n*   **Functionality:** The `FpP256Key` and `FpPairingKey` wrappers correctly encapsulate key lifecycles and operations.\n*   **Architecture \u0026 Component Fit:** The use of RAII effectively prevents memory leaks and ensures safe secret handling across the authentication handshakes.\n*   **Code Simplicity:** The changes elegantly simplify pointer management and error handling in the command handlers.\n*   **Idiomaticity \u0026 Readability:** Excellent use of C++20 features (`std::span`, `std::ranges::copy`, `std::expected`) makes the code safe and readable. However, there are a few lingering magic values that should be named constants.\n*   **Security:** Cryptographic secrets are securely cleansed using `CleanseWrapper`, and `bssl::UniquePtr` handles ECDH key deallocation cleanly.\n*   **Testing:** Thorough boundary and error path coverage has been added. The newly added tests successfully trigger the boundary conditions, but they use hardcoded magic numbers rather than deriving off-by-one values from the named constants.\n*   **CL Size \u0026 Scope:** Size: L (+212, -51). The production diff is well under 250 lines and introduces a single cohesive logical change (RAII for authentication keys). The remaining delta is entirely unit tests, which satisfies the test-heavy Size: L exception (`✅`).\n*   **Commit Message:** The commit message clearly explains the *Why* and *What* in concise prose, and the prior inaccuracy has been corrected.\n\nPlease address the minor magic value issues noted in the inline comments.\n[🔗](http://go/tj/2f3bd9f8-1952-43d2-9dd0-77fadbc20d83)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5be4b90435dfb8081ef7cede6b3940ddcd9e1121",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e49bc47_beb39f7a",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:14:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Magic Values**\n\nPlease use the standard named constant `POINT_CONVERSION_UNCOMPRESSED` (defined in `openssl/ec.h` which is already included) instead of the raw magic value `0x04`.\n\n```cpp\n\t\tif (point[0] !\u003d POINT_CONVERSION_UNCOMPRESSED) {\n\t\t\treturn std::unexpected(EC_ERROR_INVAL);\n\t\t}\n```\n[🔗](http://go/tj/2f3bd9f8-1952-43d2-9dd0-77fadbc20d83)",
+      "range": {
+        "startLine": 306,
+        "startChar": 0,
+        "endLine": 308,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5be4b90435dfb8081ef7cede6b3940ddcd9e1121",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d59bfed_43cb0eee",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 1808,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:14:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Magic Values in Boundary Tests**\n\nBoundary test cases should derive from the named constant under test rather than hardcoding raw numbers (so that the test remains correct and self-explanatory if the underlying constant changes).\n\nPlease use `POINT_CONVERSION_UNCOMPRESSED` and `FP_AES_KEY_ENC_METADATA_VERSION` with off-by-one arithmetic instead of `0x03`, `0x05`, `0`, and `2`.\n\n```cpp\n\tstd::array\u003cuint8_t, FP_ASCP_KEY_SIZE\u003e bad_point{};\n\tbad_point[0] \u003d POINT_CONVERSION_UNCOMPRESSED - 1;\n\tzassert_equal(FpP256Key::from_uncompressed_point(bad_point).error(),\n\t\t      EC_ERROR_INVAL);\n\tbad_point[0] \u003d POINT_CONVERSION_UNCOMPRESSED + 1;\n\tzassert_equal(FpP256Key::from_uncompressed_point(bad_point).error(),\n\t\t      EC_ERROR_INVAL);\n\n\tzassert_equal(FpPairingKey::establish_and_wrap(\n\t\t\t      *key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION - 1)\n\t\t\t      .error(),\n\t\t      EC_ERROR_INVAL);\n\tzassert_equal(FpPairingKey::establish_and_wrap(\n\t\t\t      *key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION + 1)\n\t\t\t      .error(),\n\t\t      EC_ERROR_INVAL);\n\n\tconst auto wrapped \u003d FpPairingKey::establish_and_wrap(\n\t\t*key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION);\n\tzassert_true(wrapped.has_value());\n\n\tFpPairingKey::Bytes unwrapped{};\n\tzassert_true(\n\t\tFpPairingKey::unwrap_into(*wrapped, unwrapped).has_value());\n\n\tec_fp_encrypted_pairing_key corrupted \u003d *wrapped;\n\tcorrupted.info.struct_version \u003d FP_AES_KEY_ENC_METADATA_VERSION - 1;\n\tzassert_equal(FpPairingKey::unwrap_into(corrupted, unwrapped).error(),\n\t\t      EC_ERROR_INVAL);\n}\n```\n[🔗](http://go/tj/2f3bd9f8-1952-43d2-9dd0-77fadbc20d83)",
+      "range": {
+        "startLine": 1784,
+        "startChar": 0,
+        "endLine": 1808,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5be4b90435dfb8081ef7cede6b3940ddcd9e1121",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
