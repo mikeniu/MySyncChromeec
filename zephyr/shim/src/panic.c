@@ -315,6 +315,8 @@ FUNC_NORETURN
 #endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
+	static bool in_assert;
+
 	/*
 	 * Upstream Zephyr calls zassert_post_action() with interrupts unlocked
 	 * because assertions can be configured as recoverable. On EC, asserts
@@ -322,6 +324,18 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	 * force synchronous console/log output.
 	 */
 	unsigned int key = irq_lock();
+
+	if (in_assert) {
+		panic_puts("Recursive assert\n");
+		panic_reboot();
+#ifdef CONFIG_ASSERT_TEST
+		irq_unlock(key);
+		return;
+#else
+		CODE_UNREACHABLE;
+#endif
+	}
+	in_assert = true;
 
 	/* Save assert panic data first before logging or stack walking. */
 	panic_data_write_assert(path, line);
@@ -342,8 +356,10 @@ __override void zassert_post_action(const char *path, unsigned int line)
 
 	panic_reboot();
 
-	if (IS_ENABLED(CONFIG_ZTEST))
+	if (IS_ENABLED(CONFIG_ZTEST)) {
+		in_assert = false;
 		irq_unlock(key);
+	}
 
 #ifndef CONFIG_ASSERT_TEST
 	CODE_UNREACHABLE;
