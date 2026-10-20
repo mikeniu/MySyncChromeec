@@ -222,6 +222,7 @@ aes_128_gcm_decrypt(std::span<const uint8_t> key, std::span<uint8_t> plaintext,
 		    std::span<const uint8_t> nonce,
 		    std::span<const uint8_t> tag);
 
+#ifndef CONFIG_ZEPHYR
 [[nodiscard]] inline enum ec_error_list
 derive_encryption_key(std::span<uint8_t> out_key, std::span<const uint8_t> salt,
 		      std::span<const uint8_t> info,
@@ -282,5 +283,6 @@ derive_pairing_key_encryption_key(std::span<uint8_t> output,
 	std::copy(key->bytes().begin(), key->bytes().end(), output.begin());
 	return EC_SUCCESS;
 }
+#endif
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_CRYPTO_H_ */

@@ -9,7 +9,6 @@
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto_context.h"
-#include "openssl/rand.h"
 #include "scoped_fast_cpu.h"
 
 #include <array>
@@ -25,7 +24,7 @@
 #endif
 
 #if !defined(CONFIG_ZEPHYR) && defined(TEST_BUILD)
-extern timestamp_t challenge_ctime;
+timestamp_t challenge_ctime;
 #endif
 
 std::expected<void, ec_status>
@@ -140,40 +139,4 @@ FpCryptoContext::sign_message(
 	}
 
 	return session_key.sign(context, "fpmcu", operation, peer_challenge);
-}
-
-FpSessionNonce
-FpSessionNonce::generate(std::span<uint8_t, FP_CK_SESSION_NONCE_LEN> out)
-{
-	FpSessionNonce nonce{};
-	RAND_bytes(nonce.value.data(), nonce.value.size());
-	std::ranges::copy(nonce.value, out.begin());
-	return nonce;
-}
-
-FpAuthChallenge
-FpAuthChallenge::generate(std::span<uint8_t, FP_CHALLENGE_SIZE> out,
-			  FpTimestamp now)
-{
-	FpAuthChallenge challenge{
-		.value = {},
-		.deadline = now + kValidityWindow,
-	};
-	RAND_bytes(challenge.value.data(), challenge.value.size());
-	std::ranges::copy(challenge.value, out.begin());
-	return challenge;
-}
-
-std::expected<FpAuthChallenge, ec_error_list>
-FpAuthChallenge::consume(std::optional<FpAuthChallenge> &active,
-			 FpTimestamp now) noexcept
-{
-	const auto challenge = std::exchange(active, std::nullopt);
-	if (!challenge.has_value()) {
-		return std::unexpected(EC_ERROR_ACCESS_DENIED);
-	}
-	if (challenge->is_expired(now)) {
-		return std::unexpected(EC_ERROR_TIMEOUT);
-	}
-	return *challenge;
 }

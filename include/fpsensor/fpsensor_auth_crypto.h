@@ -242,6 +242,7 @@ class FpSessionKey {
 	CleanseWrapper<Bytes> key_{};
 };
 
+#ifndef CONFIG_ZEPHYR
 #include "openssl/ecdh.h"
 
 #include <algorithm>
@@ -447,5 +448,6 @@ generate_ecdh_shared_secret_without_kdf(const EC_KEY &private_key,
 	std::copy(sig->begin(), sig->end(), signature.begin());
 	return EC_SUCCESS;
 }
+#endif
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H_ */

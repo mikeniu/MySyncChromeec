@@ -10,7 +10,6 @@
 #include <zephyr/ztest.h>
 
 #include <ec_commands.h>
-#include <fpsensor/fpsensor_frame_storage.h>
 #include <fpsensor/fpsensor_image_frame_params.h>
 #include <fpsensor/fpsensor_state.h>
 #include <fpsensor/fpsensor_utils.h>

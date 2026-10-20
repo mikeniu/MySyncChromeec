@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-/* Fingerprint sensor interface */
+/* Fingerprint sensor context and telemetry state */
 
 #ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_
@@ -11,155 +11,281 @@
 #include "atomic.h"
 #include "common.h"
 #include "ec_commands.h"
+#include "fpsensor/fpsensor_crypto.h"
+#include "fpsensor/fpsensor_crypto_context.h"
+#include "fpsensor/fpsensor_frame_storage.h"
+#include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_template_store.h"
-#include "fpsensor_driver.h"
-#include "fpsensor_image_frame_params.h"
-#include "fpsensor_matcher.h"
-#include "fpsensor_state_driver.h"
-#include "link_defs.h"
-#include "timer.h"
-
-#include <stdbool.h>
-#include <stdint.h>
+#include "fpsensor/fpsensor_utils.h"
 
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <expected>
 #include <optional>
 #include <span>
 
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/linker/devicetree_regions.h>
+struct FpSensorStats {
+	using Duration = std::chrono::duration<uint32_t, std::micro>;
 
-#if DT_NODE_EXISTS(DT_CHOSEN(cros_fp_fingerprint_memory_frame))
-#define FP_FRAME_SECTION                                       \
-	__attribute__((__section__(LINKER_DT_NODE_REGION_NAME( \
-		DT_CHOSEN(cros_fp_fingerprint_memory_frame)))))
-#endif
-
-#if DT_NODE_EXISTS(DT_CHOSEN(cros_fp_fingerprint_memory_template))
-#define FP_TEMPLATE_SECTION                                    \
-	__attribute__((__section__(LINKER_DT_NODE_REGION_NAME( \
-		DT_CHOSEN(cros_fp_fingerprint_memory_template)))))
-#endif
-#endif /* CONFIG_ZEPHYR */
-
-/* if no special memory regions are defined, fallback on regular SRAM */
-#ifndef FP_FRAME_SECTION
-#define FP_FRAME_SECTION
-#endif
-#ifndef FP_TEMPLATE_SECTION
-#define FP_TEMPLATE_SECTION
-#endif
-
-#define FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE                         \
-	(FP_ALGORITHM_TEMPLATE_SIZE + FP_POSITIVE_MATCH_SALT_BYTES + \
-	 sizeof(struct ec_fp_template_encryption_metadata))
-
-struct fpsensor_context {
-	/** Index of the last enrolled but not retrieved template. */
-	uint16_t template_newly_enrolled;
-	/** Number of used templates */
-	uint16_t templ_valid;
-	/** Bitmap of the templates with local modifications */
-	uint32_t templ_dirty;
-	/** Status of the FP encryption engine & context. */
-	uint32_t fp_encryption_status;
-	atomic_t fp_events;
-	uint32_t sensor_mode;
-	/** Type of the image captured from the fingerprint sensor in the
-	 * most recent successful capture.
+	Duration capture_time{};
+	Duration matching_time{};
+	Duration overall_time{};
+	FpTimestamp overall_t0{};
+	bool capture_invalid = false;
+	bool matching_invalid = false;
+	/*
+	 * Last matched template index, persisted for telemetry
+	 * (EC_CMD_FP_STATS). Unlike positive_match_secret_state, this is not
+	 * cleared when the secret is read.
 	 */
-	enum fp_capture_type current_capture_type;
-	/** Map of the capture type to frame parameters. */
-	FpImageFrameParamsCache fp_image_frame_params_cache;
-	/** Part of the IKM used to derive encryption keys received from the
-	 * TPM.
-	 */
-	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed;
-	/** Current user ID */
-	std::array<uint8_t, FP_CONTEXT_USERID_BYTES> user_id;
-	struct positive_match_secret_state positive_match_secret_state;
-	/** Salt used in derivation of positive match secret. */
-	uint8_t fp_positive_match_salt[FP_MAX_FINGER_COUNT]
-				      [FP_POSITIVE_MATCH_SALT_BYTES];
-	/** ID of encrypted template in 'fp_enc_buffer'.
-	 *  The template is available if 'fp_encryption_status' has
-	 *  FP_ENCRYPTED_TEMPLATE_READY bit set.
-	 */
-	uint16_t template_encrypted_id;
-	/** Template decryption result. */
-	atomic_t template_decryption_result;
+	std::optional<FpTemplateId> template_matched = std::nullopt;
+
+	[[nodiscard]] static Duration
+	elapsed_since(FpTimestamp start,
+		      FpTimestamp now = FpClock::now()) noexcept
+	{
+		return std::chrono::duration_cast<Duration>(now - start);
+	}
+
+	void start_overall(FpTimestamp now = FpClock::now()) noexcept
+	{
+		overall_t0 = now;
+	}
+
+	void finish_overall(FpTimestamp now = FpClock::now()) noexcept
+	{
+		overall_time = elapsed_since(overall_t0, now);
+	}
+
+	void record_capture(FpTimestamp start, bool success) noexcept
+	{
+		capture_time = elapsed_since(start);
+		if (!success) {
+			capture_invalid = true;
+		}
+	}
+
+	void record_match(FpTimestamp start,
+			  std::optional<FpTemplateId> matched,
+			  bool valid) noexcept
+	{
+		capture_invalid = false;
+		matching_invalid = !valid;
+		template_matched = matched;
+		matching_time = elapsed_since(start);
+	}
+
+	[[nodiscard]] constexpr ec_response_fp_stats to_response() const noexcept
+	{
+		const uint64_t t0_us = static_cast<uint64_t>(
+			overall_t0.time_since_epoch().count());
+		const uint8_t timestamps_invalid =
+			(capture_invalid ? FPSTATS_CAPTURE_INV : 0) |
+			(matching_invalid ? FPSTATS_MATCHING_INV : 0);
+		return {
+        .capture_time_us = capture_time.count(),
+        .matching_time_us = matching_time.count(),
+        .overall_time_us = overall_time.count(),
+        .overall_t0 =
+            {
+                .lo = static_cast<uint32_t>(t0_us),
+                .hi = static_cast<uint32_t>(t0_us >> 32),
+            },
+        .timestamps_invalid = timestamps_invalid,
+        .template_matched =
+            static_cast<int8_t>(template_matched.transform(&FpTemplateId::raw)
+                                    .value_or(kFpNoSuchTemplate)),
+    };
+	}
 };
 
-extern struct fpsensor_context global_context;
+class FpMkbpEvents {
+    public:
+	void add(FpMkbpEvent evt) noexcept
+	{
+		atomic_or(&raw_, evt.raw);
+	}
 
-/*
- * Check if FP TPM seed has been set.
- *
- * @return 1 if the seed has been set, 0 otherwise.
- */
-int fp_tpm_seed_is_set(void);
+	[[nodiscard]] FpMkbpEvent take() noexcept
+	{
+		return FpMkbpEvent{ static_cast<uint32_t>(
+			atomic_clear(&raw_)) };
+	}
+
+	[[nodiscard]] FpMkbpEvent peek() const noexcept
+	{
+		return FpMkbpEvent{ static_cast<uint32_t>(atomic_get(&raw_)) };
+	}
+
+    private:
+	atomic_t raw_ = 0;
+};
+
+struct FpSensorContext {
+	FpTemplateStore templates{};
+	FpCryptoContext crypto{};
+	FpFrameStorage frame{};
+	FpSensorStats stats{};
+	FpMkbpEvents events{};
+	FpSensorMode sensor_mode{};
+
+	constexpr void request_template_encryption(FpTemplateId id) noexcept
+	{
+		crypto.encrypted_template_ready = false;
+		templates.template_encrypted_id = id;
+	}
+
+	constexpr void clear_encrypted_template() noexcept
+	{
+		crypto.encrypted_template_ready = false;
+		templates.template_encrypted_id.reset();
+	}
+
+	void reset_context() noexcept;
+	void clear_context() noexcept;
+	void reset_and_clear_context();
+	void encrypt_requested_template();
+	[[nodiscard]] std::expected<void, ec_host_cmd_status>
+	get_encrypted_template_v0(uint16_t idx, uint32_t offset,
+				  std::span<uint8_t> output);
+	[[nodiscard]] std::expected<void, ec_host_cmd_status>
+	get_frame_v0(FpFrameV0Offset loc, std::span<uint8_t> output);
+	[[nodiscard]] std::expected<void, ec_host_cmd_status>
+	start_template_encryption(uint16_t idx);
+	[[nodiscard]] std::expected<void, ec_host_cmd_status>
+	get_encrypted_template_chunk(uint32_t offset,
+				     std::span<uint8_t> output) const;
+	[[nodiscard]] std::expected<void, ec_host_cmd_status>
+	handle_frame_v1(const ec_params_fp_frame_v1 &params,
+			std::span<uint8_t> output, uint16_t &output_buf_size);
+	[[nodiscard]] std::expected<void, ec_status>
+	load_template_chunk(uint32_t offset, std::span<const uint8_t> chunk,
+			    bool commit = false);
+	[[nodiscard]] std::expected<void, ec_status> commit_template();
+	[[nodiscard]] std::expected<void, ec_status>
+	start_template_decryption();
+	[[nodiscard]] ec_status get_template_decryption_result() const noexcept;
+	[[nodiscard]] std::expected<void, ec_status>
+	handle_template_v1(const ec_params_fp_template_v1 &params,
+			   uint32_t params_size);
+	void decrypt_and_commit_template();
+	[[nodiscard]] std::expected<void, ec_status>
+	confirm_template(std::span<const uint8_t, FP_MAC_LENGTH> mac);
+	[[nodiscard]] std::expected<FpSensorMode, ec_status> set_sensor_mode(
+		uint32_t mode,
+		std::optional<std::span<const uint8_t, FP_MAC_LENGTH> > mac =
+			std::nullopt);
+	[[nodiscard]] std::expected<void, ec_status>
+	set_context(const ec_params_fp_context_v1 &p);
+	[[nodiscard]] std::expected<void, ec_status>
+	establish_session(const ec_params_fp_establish_session &p);
+	[[nodiscard]] std::expected<std::array<uint8_t, FP_MAC_LENGTH>,
+				    ec_status>
+	sign_match(std::span<const uint8_t, FP_CHALLENGE_SIZE> challenge);
+	[[nodiscard]] std::expected<FpPositiveMatchSecret, ec_status>
+	read_match_secret(int8_t fgr);
+	[[nodiscard]] std::expected<void, ec_error_list>
+	wait_for_mode_clear(uint32_t mask,
+			    std::chrono::microseconds poll_interval,
+			    int max_tries) const;
+	[[nodiscard]] std::expected<void, ec_error_list>
+	run_console_capture(uint32_t mode);
+	[[nodiscard]] std::expected<void, ec_error_list>
+	console_capture(FpCaptureType capture_type);
+	[[nodiscard]] std::expected<void, ec_error_list> console_enroll();
+	[[nodiscard]] std::expected<void, ec_error_list> console_match();
+	[[nodiscard]] std::expected<void, ec_error_list> console_clear();
+	[[nodiscard]] std::expected<void, ec_error_list> console_maintenance();
+
+#if !defined(CONFIG_ZEPHYR) && defined(TEST_BUILD)
+	struct LegacyTemplateNewlyEnrolledProxy {
+		std::optional<FpTemplateId> *target;
+
+		constexpr LegacyTemplateNewlyEnrolledProxy &
+		operator=(int32_t val) noexcept
+		{
+			if (const auto id = FpTemplateId::create(val);
+			    id.has_value()) {
+				*target = *id;
+			} else {
+				target->reset();
+			}
+			return *this;
+		}
+
+		constexpr operator uint16_t() const noexcept
+		{
+			return target->has_value() ? (*target)->raw() :
+						     kFpNoSuchTemplate;
+		}
+	};
+
+	struct LegacyEncryptionStatusProxy {
+		FpCryptoContext *crypto;
+
+		constexpr operator uint32_t() const noexcept
+		{
+			return crypto->encryption_status();
+		}
+
+		constexpr LegacyEncryptionStatusProxy &
+		operator|=(uint32_t flags) noexcept
+		{
+			if ((flags & FP_CONTEXT_SESSION_NONCE_SET) &&
+			    !crypto->session_nonce.has_value()) {
+				crypto->session_nonce.emplace();
+			}
+			if (flags & FP_CONTEXT_STATUS_SESSION_ESTABLISHED) {
+				crypto->set_auth_enabled(true);
+			}
+			if (flags & FP_ENCRYPTED_TEMPLATE_READY) {
+				crypto->encrypted_template_ready = true;
+			}
+			return *this;
+		}
+	};
+
+	using LegacyPositiveMatchSaltArray =
+		uint8_t[FP_MAX_FINGER_COUNT][FP_POSITIVE_MATCH_SALT_BYTES];
+
+	uint16_t &templ_valid = templates.templ_valid;
+	FpPositiveMatchSecretState &positive_match_secret_state =
+		templates.positive_match_secret_state;
+	LegacyPositiveMatchSaltArray &fp_positive_match_salt =
+		*reinterpret_cast<LegacyPositiveMatchSaltArray *>(
+			templates.fp_positive_match_salt.data());
+	std::array<uint8_t, FP_CONTEXT_USERID_BYTES> &user_id =
+		crypto.user_id.value;
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> &tpm_seed =
+		crypto.tpm_seed.value;
+	LegacyTemplateNewlyEnrolledProxy template_newly_enrolled{
+		&templates.template_newly_enrolled
+	};
+	LegacyEncryptionStatusProxy fp_encryption_status{ &crypto };
+#endif
+};
+
+#if !defined(CONFIG_ZEPHYR) && defined(TEST_BUILD)
+using fpsensor_context = FpSensorContext;
+extern FpSensorContext global_context;
+
+int fp_tpm_seed_is_set();
+void fp_reset_context();
+void fp_reset_and_clear_context();
+enum ec_status
+fp_set_sensor_mode(uint32_t mode, uint32_t *mode_output,
+		   std::optional<std::span<const uint8_t, FP_MAC_LENGTH> > mac);
+#endif
 
 /* Simulation for unit tests. */
-#ifdef __cplusplus
-extern "C" {
-#endif
-__test_only void fp_task_simulate(void);
-#ifdef __cplusplus
-}
-#endif
-
-/*
- * Clear one fingerprint template.
- *
- * @param idx the index of the template to clear.
- */
-void fp_clear_finger_context(uint16_t idx);
-
-/**
- * Reset the current user id associated.
- */
-void fp_reset_context(void);
-
-/**
- * Clear all fingerprint templates associated with the current user id and
- * reset the sensor.
- */
-void fp_reset_and_clear_context(void);
+extern "C" __test_only void fp_task_simulate();
 
 /*
  * Get the next FP event.
  *
  * @param out the pointer to the output event.
  */
-#ifdef __cplusplus
-extern "C" {
-#endif
-int fp_get_next_event(uint8_t *out);
-#ifdef __cplusplus
-}
-#endif
-
-/**
- * Change the sensor mode.
- *
- * @param mode          new mode to change to
- * @param mode_output   resulting mode
- * @param mac           the MAC, required for authenticated modes
- * @return EC_RES_SUCCESS on success. Error code on failure.
- */
-enum ec_status
-fp_set_sensor_mode(uint32_t mode, uint32_t *mode_output,
-		   std::optional<std::span<const uint8_t, FP_MAC_LENGTH> > mac);
-
-/**
- * Read the match secret from the positive match salt.
- *
- * @param fgr the index of positive match salt.
- * @param positive_match_secret the match secret that derived from the salt.
- */
-enum ec_status
-fp_read_match_secret(int8_t fgr,
-		     std::span<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES>
-			     positive_match_secret);
+extern "C" int fp_get_next_event(uint8_t *out);
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_ */

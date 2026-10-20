@@ -184,24 +184,46 @@ extern std::array<FpTemplate, FP_MAX_FINGER_COUNT> fp_template;
  */
 extern FpEncryptedTemplateBuffer fp_enc_buffer;
 
-#ifndef FP_NO_SUCH_TEMPLATE
+#ifndef CONFIG_ZEPHYR
 #define FP_NO_SUCH_TEMPLATE (UINT16_MAX)
-#endif
 struct positive_match_secret_state {
+#else
+struct FpPositiveMatchSecretState {
+#endif
 	/* b/478160541 */
 	static constexpr std::chrono::seconds kValidityWindow{ 15 };
 
+#ifdef CONFIG_ZEPHYR
+	/* Index of the most recently matched template, if readable. */
+	std::optional<FpTemplateId> template_matched = std::nullopt;
+	/* Deadline to read positive match secret. */
+	FpTimestamp deadline{};
+#else
 	uint16_t template_matched = FP_NO_SUCH_TEMPLATE;
 	bool readable = false;
 	timestamp_t deadline{};
+#endif
 
+	/**
+	 * Allow reading positive match secret for |fgr| in the next 15 seconds.
+	 *
+	 * @param fgr the index of template to enable positive match secret.
+	 * @return {} if the request is valid, error code otherwise.
+	 */
 	std::expected<void, ec_error_list> enable(FpTemplateId fgr);
 
+	/**
+	 * Disallow positive match secret for any finger to be read.
+	 */
 	void disable() noexcept
 	{
 		*this = {};
 	}
 
+	/**
+	 * Atomically take, clear, and validate the positive match secret state
+	 * so it can only be used once.
+	 */
 	[[nodiscard]] std::expected<FpTemplateId, ec_status>
 	consume(std::optional<FpTemplateId> expected_fgr = std::nullopt,
 		FpTimestamp now = FpClock::now())
@@ -217,27 +239,44 @@ struct positive_match_secret_state {
 		    !state.is_matched(*expected_fgr)) {
 			return std::unexpected(EC_RES_ACCESS_DENIED);
 		}
+#ifdef CONFIG_ZEPHYR
+		return *state.template_matched;
+#else
 		return *FpTemplateId::create(state.template_matched);
+#endif
 	}
 
 	[[nodiscard]] constexpr bool is_matched(FpTemplateId fgr) const noexcept
 	{
+#ifdef CONFIG_ZEPHYR
+		return template_matched == fgr;
+#else
 		return readable && template_matched == fgr.raw();
+#endif
 	}
 
 	[[nodiscard]] constexpr bool has_any_match() const noexcept
 	{
+#ifdef CONFIG_ZEPHYR
+		return template_matched.has_value();
+#else
 		return readable &&
 		       FpTemplateId::create(template_matched).has_value();
+#endif
 	}
 
 	[[nodiscard]] constexpr bool
 	is_expired(FpTimestamp now = FpClock::now()) const noexcept
 	{
+#ifdef CONFIG_ZEPHYR
+		return now >= deadline;
+#else
 		return now >= FpTimestamp(FpClock::duration(deadline.val));
+#endif
 	}
 };
 
+#ifndef CONFIG_ZEPHYR
 using FpPositiveMatchSecretState = positive_match_secret_state;
 
 inline enum ec_error_list
@@ -256,6 +295,7 @@ fp_disable_positive_match_secret(FpPositiveMatchSecretState *state) noexcept
 {
 	state->disable();
 }
+#endif
 
 struct FpMatchResult {
 	FpMkbpEvent event{};

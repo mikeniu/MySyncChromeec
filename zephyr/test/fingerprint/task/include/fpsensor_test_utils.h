@@ -20,6 +20,7 @@
 #include <fpsensor/fpsensor.h>
 #include <fpsensor/fpsensor_image_frame_params.h>
 #include <fpsensor/fpsensor_modes.h>
+#include <fpsensor/fpsensor_state.h>
 #include <host_command.h>
 #include <rollback.h>
 #include <rollback_private.h>
@@ -130,6 +131,52 @@ inline void init_test_rollback(PreEntropyFn &&pre_entropy = {})
 	rollback_add_entropy(reinterpret_cast<const uint8_t *>(kEntropy.data()),
 			     kEntropy.size());
 }
+
+extern FpSensorContext global_context;
+
+template <typename Fake>
+inline FpMkbpEvent take_mkbp_fp_events(const Fake &fake,
+				       uint32_t expected_count = 1)
+{
+	zassert_equal(fake.call_count, expected_count);
+	for (uint32_t i = 0; i < expected_count; ++i) {
+		zassert_equal(fake.arg0_history[i], EC_MKBP_EVENT_FINGERPRINT);
+	}
+	return global_context.events.take();
+}
+
+template <typename Header, size_t BufferSize> struct FpTemplatePacket {
+	static constexpr size_t kHeaderSize = offsetof(Header, data);
+	static_assert(BufferSize > kHeaderSize);
+	static constexpr size_t kDataSize = BufferSize - kHeaderSize;
+
+	alignas(Header) std::array<uint8_t, BufferSize> buffer {};
+
+	Header *header()
+	{
+		return reinterpret_cast<Header *>(buffer.data());
+	}
+	std::span<uint8_t, kDataSize> data()
+	{
+		return std::span<uint8_t, kDataSize>(
+			buffer.data() + kHeaderSize, kDataSize);
+	}
+	FpEncryptedTemplateBuffer *enc()
+		requires(kDataSize >= sizeof(FpEncryptedTemplateBuffer))
+	{
+		return reinterpret_cast<FpEncryptedTemplateBuffer *>(
+			data().data());
+	}
+	constexpr size_t packet_size(size_t chunk_size) const
+	{
+		return kHeaderSize + chunk_size;
+	}
+};
+
+template <typename Header>
+using FpFullTemplatePacket =
+	FpTemplatePacket<Header, offsetof(Header, data) +
+					 sizeof(FpEncryptedTemplateBuffer)>;
 
 inline uint32_t get_fp_mode()
 {

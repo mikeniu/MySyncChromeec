@@ -174,10 +174,15 @@ FpPositiveMatchSecretState::enable(FpTemplateId fgr)
 		return std::unexpected(EC_ERROR_UNKNOWN);
 	}
 
+#ifdef CONFIG_ZEPHYR
+	template_matched = fgr;
+	deadline = FpClock::now() + kValidityWindow;
+#else
 	template_matched = fgr.raw();
 	readable = true;
 	deadline.val = static_cast<uint64_t>(
 		(FpClock::now() + kValidityWindow).time_since_epoch().count());
+#endif
 	return {};
 }
 
