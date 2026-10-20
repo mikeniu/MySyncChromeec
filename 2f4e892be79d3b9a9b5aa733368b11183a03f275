@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0a2981c_3d9f31f1",
+        "filename": "util/find_unused.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T16:19:59Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: `is_header_included` iterates over the entire `full_includes` set (which could hold thousands of items) for every header file in `all_headers`. Consider precomputing a lookup dictionary `full_includes_by_basename: dict[str, set[str]]` at the start of the headers check to avoid O(N*M) linear scanning and make the check O(1) in average practice.",
+      "range": {
+        "startLine": 716,
+        "startChar": 0,
+        "endLine": 716,
+        "endChar": 0
+      },
+      "revId": "2f4e892be79d3b9a9b5aa733368b11183a03f275",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
