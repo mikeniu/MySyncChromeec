@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69fbf176_14ed27fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T09:42:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [🔗](http://go/tj/1a379564-3db1-4b7b-9122-c442557e04c0)\n\n**Review Summary:**\n*   **Functionality \u0026 Security:** Cortex-M33 (ARMv8-M) MPU support is correctly added. The mechanism to lock the rollback region by disabling the MPU region (relying on `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` for protection) is logically sound and well-documented.\n*   **Architecture \u0026 Component Fit:** The implementation integrates well into Zephyr\u0027s ARM CMSE MPU API.\n*   **Code Simplicity:** Clean use of `arm_cmse_mpu_region_get` avoiding redundant loops.\n*   **Idiomaticity \u0026 Readability:** Code adheres to Zephyr configuration patterns. Hardware-specific design choices are well-documented inline. Left a minor suggestion to use devicetree for SRAM base and size.\n*   **Testing:** `TEST\u003dnone` is justified under the Hardware/Physical Exception since MPU register mutations are hardware-dependent and cannot be generically tested in software.\n*   **CL Size \u0026 Scope:** Size: M (+120, -2). The CL is appropriately scoped to adding Cortex-M33 MPU support.\n*   **Commit Message:** The message concisely explains the why and what, and includes required `BUG` and `TEST` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d06393d4bfd1b0270ab1b263adb780cbc980ee47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e2e9433_48357a5c",
+        "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T09:42:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:**\nFor better robustness and flexibility across different board configurations, consider extracting the SRAM base and size from the devicetree (e.g., using `DT_REG_ADDR(DT_NODELABEL(sram0))` and `DT_REG_SIZE(DT_NODELABEL(sram0))`) instead of hardcoding `0x20000000` and `0x40000`. This is similar to how the flash regions (like `wp_ro`) are defined above and ensures the MPU configuration automatically adapts if the SRAM specifications change in the future.\n\n[🔗](http://go/tj/1a379564-3db1-4b7b-9122-c442557e04c0)",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d06393d4bfd1b0270ab1b263adb780cbc980ee47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
