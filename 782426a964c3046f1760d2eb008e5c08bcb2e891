@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82a56b3d_3c757662",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-20T10:28:06Z",
+      "side": 1,
+      "message": "The test looks much better now. Have you been able to run it on dev-board now?",
+      "revId": "782426a964c3046f1760d2eb008e5c08bcb2e891",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
