@@ -30,6 +30,7 @@
 		gpio-wp = &gpio_wp_l;
 		gpio-cbi-wp = &gpio_ec_cbi_wp;
 		gpio-kbd-kso2 = &gpio_ec_kso_02_inv;
+		gpio-pb-suppress-en = &gpio_soc_edp_bl_en;
 		/*
 		 * Use LIS2DW12 accelerometer for on-body sensor.
 		 * The base_accel is currently using bma255. However, that
@@ -323,6 +324,9 @@
 			gpios = <&gpio1 21 GPIO_OUTPUT_HIGH>;
 			enum-name = "GPIO_PCH_PWRBTN_L";
 		};
+		gpio_soc_edp_bl_en: soc_edp_bl_en {
+			gpios = <&gpio1 22 (GPIO_INPUT | GPIO_PULL_UP)>;
+		};
 	};
 
 	gpio1: gpio@101 {
@@ -335,7 +339,7 @@
 		low-level;
 		gpio-controller;
 		#gpio-cells = <2>;
-		ngpios = <22>;
+		ngpios = <23>;
 	};
 
 	gpio-interrupts {

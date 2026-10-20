@@ -233,6 +233,7 @@ test_export_static void power_button_change_deferred(void)
 	int new_pressed = raw_power_button_pressed();
 
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+	update_pb_suppress_state();
 	if (pb_suppress_active) {
 		/*
 		 * S0 Tablet Mode active:
@@ -477,6 +478,11 @@ static void update_pb_suppress_state(void)
 {
 	bool new_state = chipset_in_state(CHIPSET_STATE_ON) &&
 			 tablet_get_mode();
+
+#if DT_NODE_EXISTS(DT_ALIAS(gpio_pb_suppress_en))
+	new_state = new_state &&
+		    gpio_pin_get_dt(GPIO_DT_FROM_ALIAS(gpio_pb_suppress_en));
+#endif
 
 	if (eat_next_release && !power_button_signal_asserted()) {
 		CPRINTS("PB release missed during suspend, clearing eat_next_release");

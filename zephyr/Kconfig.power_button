@@ -17,3 +17,9 @@ config PLATFORM_EC_POWER_BUTTON_KEYBOARD
 	  Enable this option if the power button is located on the keyboard matrix.
 	  This enables logic to suppress power button events in S0 tablet mode
 	  to prevent accidental activation.
+
+	  A board may optionally define the devicetree alias
+	  "gpio-pb-suppress-en" (e.g. mapped to the eDP backlight enable
+	  signal) to gate S0 tablet mode suppression on that GPIO being
+	  asserted, allowing the power button to wake the display when the
+	  screen is off in S0.

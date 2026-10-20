@@ -7,6 +7,7 @@
 	aliases {
 		gpio-wp = &gpio_ec_wp_od;
 		gpio-btn-ign-in = &gpio_fp_btn_ign;
+		gpio-pb-suppress-en = &gpio_soc_edp_bl_en;
 	};
 
 	named-adc-channels {

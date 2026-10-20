@@ -48,6 +48,7 @@ static char *button_debug_state_strings[] = {
 	} while (false)
 
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+#include <zephyr/drivers/gpio/gpio_emul.h>
 static int mock_pb_asserted = -1;
 #endif
 static int mock_eating_release = -1;
@@ -79,6 +80,9 @@ static void button_before(void *f)
 	button_init();
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
 	tablet_reset();
+	const struct gpio_dt_spec *pb_suppress_en =
+		GPIO_DT_FROM_ALIAS(gpio_pb_suppress_en);
+	gpio_emul_input_set(pb_suppress_en->port, pb_suppress_en->pin, 1);
 	hook_notify(HOOK_TABLET_MODE_CHANGE);
 #endif
 	/* Sleep for 30s to flush any pending tasks */
@@ -658,6 +662,23 @@ ZTEST(button, test_keyboard_pb_suppression_tablet)
 		      "Expected power button change to be suppressed");
 }
 
+ZTEST(button, test_keyboard_pb_suppression_tablet_backlight_off)
+{
+	const struct gpio_dt_spec *pb_suppress_en =
+		GPIO_DT_FROM_ALIAS(gpio_pb_suppress_en);
+
+	tablet_set_mode(1, TABLET_TRIGGER_LID);
+	gpio_emul_input_set(pb_suppress_en->port, pb_suppress_en->pin, 0);
+	pb_change_count = 0;
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "powerbtn 100"));
+	pass_time(150);
+
+	zassert_true(
+		pb_change_count >= 1,
+		"Expected power button change to NOT be suppressed when backlight is off");
+}
+
 ZTEST(button, test_keyboard_pb_suppress_inactive_on_suspend)
 {
 	/* Enable tablet mode to activate suppression */
@@ -671,6 +692,7 @@ ZTEST(button, test_keyboard_pb_suppress_inactive_on_suspend)
 		      "Expected power button change to be suppressed");
 
 	/* Trigger suspend, which should deactivate suppression */
+	power_set_state(POWER_S3);
 	hook_notify(HOOK_CHIPSET_SUSPEND);
 
 	/* Press again, should NOT be suppressed */
@@ -681,6 +703,7 @@ ZTEST(button, test_keyboard_pb_suppress_inactive_on_suspend)
 		     "Expected power button change to NOT be suppressed");
 
 	/* Cleanup */
+	power_set_state(POWER_S0);
 	tablet_set_mode(0, TABLET_TRIGGER_LID);
 }
 
