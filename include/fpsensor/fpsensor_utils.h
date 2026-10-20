@@ -10,9 +10,153 @@
 
 #include "common.h"
 #include "ec_commands.h"
+#include "host_command.h"
+#include "overflow.h"
+#include "timer.h"
+#include "util.h"
 
+/*
+ * overflow.h defines an `is_negative(a)` macro that collides with libstdc++'s
+ * internal `std::chrono::duration_values::is_negative` identifier in <chrono>.
+ */
+#ifdef is_negative
+#undef is_negative
+#endif
+
+#include <algorithm>
+#include <array>
+#include <bit>
+#include <chrono>
 #include <cstdint>
-#include <string>
+#include <expected>
+#include <limits>
+#include <span>
+#include <string_view>
+#include <type_traits>
+
+#if !defined(CONFIG_ZEPHYR) && !defined(EC_HOST_CMD_HANDLER)
+#include "atomic_bit.h"
+
+struct ec_host_cmd_handler_args {
+	const void *send_response;
+	uint16_t command;
+	uint8_t version;
+	union {
+		const void *params;
+		const void *input_buf;
+	};
+	union {
+		uint16_t params_size;
+		uint16_t input_buf_size;
+	};
+	union {
+		void *response;
+		void *output_buf;
+	};
+	union {
+		uint16_t response_max;
+		uint16_t output_buf_max;
+	};
+	union {
+		uint16_t response_size;
+		uint16_t output_buf_size;
+	};
+	enum ec_status result;
+};
+
+#define ec_host_cmd_status ec_status
+#define EC_HOST_CMD_SUCCESS EC_RES_SUCCESS
+#define EC_HOST_CMD_INVALID_COMMAND EC_RES_INVALID_COMMAND
+#define EC_HOST_CMD_ERROR EC_RES_ERROR
+#define EC_HOST_CMD_INVALID_PARAM EC_RES_INVALID_PARAM
+#define EC_HOST_CMD_ACCESS_DENIED EC_RES_ACCESS_DENIED
+#define EC_HOST_CMD_INVALID_RESPONSE EC_RES_INVALID_RESPONSE
+#define EC_HOST_CMD_INVALID_VERSION EC_RES_INVALID_VERSION
+#define EC_HOST_CMD_INVALID_CHECKSUM EC_RES_INVALID_CHECKSUM
+#define EC_HOST_CMD_IN_PROGRESS EC_RES_IN_PROGRESS
+#define EC_HOST_CMD_UNAVAILABLE EC_RES_UNAVAILABLE
+#define EC_HOST_CMD_TIMEOUT EC_RES_TIMEOUT
+#define EC_HOST_CMD_OVERFLOW EC_RES_OVERFLOW
+#define EC_HOST_CMD_INVALID_HEADER EC_RES_INVALID_HEADER
+#define EC_HOST_CMD_REQUEST_TRUNCATED EC_RES_REQUEST_TRUNCATED
+#define EC_HOST_CMD_RESPONSE_TOO_BIG EC_RES_RESPONSE_TOO_BIG
+#define EC_HOST_CMD_BUS_ERROR EC_RES_BUS_ERROR
+#define EC_HOST_CMD_BUSY EC_RES_BUSY
+
+#define EC_HOST_CMD_HANDLER_UNBOUND(command, function, version_mask)         \
+	static enum ec_status _host_cmd_shim_##function(                     \
+		struct host_cmd_handler_args *args)                          \
+	{                                                                    \
+		return function(                                             \
+			reinterpret_cast<ec_host_cmd_handler_args *>(args)); \
+	}                                                                    \
+	DECLARE_HOST_COMMAND(command, _host_cmd_shim_##function, version_mask)
+
+#define EC_HOST_CMD_HANDLER(command, function, version_mask, request_type, \
+			    response_type)                                 \
+	EC_HOST_CMD_HANDLER_UNBOUND(command, function, version_mask)
+
+#define EC_HOST_CMD_HANDLER_REQ_ONLY(command, function, version_mask, \
+				     request_type)                    \
+	EC_HOST_CMD_HANDLER_UNBOUND(command, function, version_mask)
+
+#define EC_HOST_CMD_HANDLER_RESP_ONLY(command, function, version_mask, \
+				      response_type)                   \
+	EC_HOST_CMD_HANDLER_UNBOUND(command, function, version_mask)
+#endif
+
+#ifndef SMALLEST_TYPE
+#define SMALLEST_TYPE(T1, T2) \
+	std::conditional_t<sizeof(T1) < sizeof(T2), T1, T2>
+#endif
+
+struct FpClock {
+	using rep = int64_t;
+	using period = std::micro;
+	using duration = std::chrono::microseconds;
+	using time_point = std::chrono::time_point<FpClock>;
+	static constexpr bool is_steady = true;
+
+	[[nodiscard]] static time_point now() noexcept
+	{
+		return time_point{ duration{ get_time().val } };
+	}
+};
+
+using FpTimestamp = FpClock::time_point;
+
+/**
+ * Rate limiter enforcing a minimum cooldown interval between operations
+ * (e.g., at most 1 template encryption per second, see b/114160734).
+ */
+struct FpRateLimiter {
+	FpClock::duration cooldown = std::chrono::seconds(1);
+	FpTimestamp deadline{};
+
+	[[nodiscard]] constexpr std::expected<void, ec_host_cmd_status>
+	try_acquire(FpTimestamp now = FpClock::now()) noexcept
+	{
+		if (now < deadline) {
+			return std::unexpected(EC_HOST_CMD_BUSY);
+		}
+		deadline = now + cooldown;
+		return {};
+	}
+};
+
+/**
+ * Securely zero out all bytes in |bytes|.
+ */
+void cleanse(std::span<uint8_t> bytes) noexcept;
+
+/**
+ * Return true if all bytes in |bytes| are 0x00 or all bytes are 0xff.
+ */
+[[nodiscard]] inline bool
+bytes_are_trivial(std::span<const uint8_t> bytes) noexcept
+{
+	return ::bytes_are_trivial(bytes.data(), bytes.size());
+}
 
 /**
  * Test that size+offset does not exceed buffer_size
@@ -22,33 +166,102 @@
  *   EC_ERROR_INVAL: if size+offset > buffer_size
  *   EC_SUCCESS: otherwise
  */
-enum ec_error_list validate_fp_buffer_offset(uint32_t buffer_size,
-					     uint32_t offset, uint32_t size);
+[[nodiscard]] constexpr ec_error_list validate_fp_buffer_offset(
+	uint32_t buffer_size, uint32_t offset, uint32_t size) noexcept
+{
+	uint32_t bytes_requested = 0;
 
-bool fp_match_success(int match_result);
+	if (check_add_overflow(size, offset, &bytes_requested)) {
+		return EC_ERROR_OVERFLOW;
+	}
 
-/**
- * @param mode sensor mode
- * @return true if the mode is a test capture that requires finger touch.
- */
-bool is_finger_needed(uint32_t mode);
+	if (bytes_requested > buffer_size) {
+		return EC_ERROR_INVAL;
+	}
 
-/**
- * @param capture_type current capture type
- * @return true if the capture type is the one where we only care about the
- * embedded/offset image bytes to be returned over EC_CMD_FRAME.
- * Some capture types (simple, pattern0, pattern1, and reset_test) are only
- * interested in the height*width*bpp image bytes that are offset inside the
- * frame. Other modes require the full frame.
- */
-bool skip_image_offset(enum fp_capture_type capture_type);
+	return EC_SUCCESS;
+}
 
 /**
- * Format an unsigned int FOURCC value as a printable string.
- *
- * If the character is unprintable, we will print '.', instead.
- * This is similar to hexdump's behavior.
+ * Return a bounds-checked subspan [offset, offset + size) of |buffer|, or
+ * EC_ERROR_OVERFLOW / EC_ERROR_INVAL if offset + size overflows or exceeds
+ * buffer.size().
  */
-const std::string fourcc_to_string(uint32_t value);
+template <typename T, size_t Extent>
+[[nodiscard]] constexpr std::expected<std::span<T>, ec_error_list>
+checked_subspan(std::span<T, Extent> buffer, uint32_t offset,
+		uint32_t size) noexcept
+{
+	if (const ec_error_list err =
+		    validate_fp_buffer_offset(buffer.size(), offset, size);
+	    err != EC_SUCCESS) {
+		return std::unexpected(err);
+	}
+	return buffer.subspan(offset, size);
+}
+
+[[nodiscard]] constexpr bool fp_match_success(int match_result) noexcept
+{
+	return match_result == EC_MKBP_FP_ERR_MATCH_YES ||
+	       match_result == EC_MKBP_FP_ERR_MATCH_YES_UPDATED ||
+	       match_result == EC_MKBP_FP_ERR_MATCH_YES_UPDATE_FAILED;
+}
+
+/**
+ * Printable 4-character FOURCC identifier (non-printable bytes replaced with
+ * '.', similar to hexdump).
+ */
+class FpFourCc {
+    public:
+	explicit constexpr FpFourCc(uint32_t value) noexcept : chars_{}
+	{
+		const auto bytes =
+			std::bit_cast<std::array<uint8_t, sizeof(value)> >(
+				value);
+		std::ranges::transform(bytes, chars_.begin(), [](uint8_t ch) {
+			return (ch >= 0x20 && ch <= 0x7e) ?
+				       static_cast<char>(ch) :
+				       '.';
+		});
+	}
+
+	[[nodiscard]] constexpr const char *c_str() const noexcept
+	{
+		return chars_.data();
+	}
+
+	[[nodiscard]] constexpr std::string_view view() const noexcept
+	{
+		return { chars_.data(), sizeof(uint32_t) };
+	}
+
+    private:
+	std::array<char, sizeof(uint32_t) + 1> chars_;
+};
+
+[[nodiscard]] constexpr FpFourCc fourcc_to_string(uint32_t value) noexcept
+{
+	return FpFourCc(value);
+}
+
+[[nodiscard]] constexpr bool is_finger_needed(uint32_t mode) noexcept
+{
+	const fp_capture_type capture_type = FP_CAPTURE_TYPE(mode);
+	return !((mode & FP_MODE_CAPTURE) &&
+		 (capture_type == FP_CAPTURE_DEFECT_PXL_TEST ||
+		  capture_type == FP_CAPTURE_ABNORMAL_TEST ||
+		  capture_type == FP_CAPTURE_NOISE_TEST ||
+		  capture_type == FP_CAPTURE_PATTERN0 ||
+		  capture_type == FP_CAPTURE_PATTERN1 ||
+		  capture_type == FP_CAPTURE_RESET_TEST ||
+		  capture_type == FP_CAPTURE_PATTERN2));
+}
+
+[[nodiscard]] constexpr bool
+skip_image_offset(enum fp_capture_type capture_type) noexcept
+{
+	return !(capture_type == FP_CAPTURE_VENDOR_FORMAT ||
+		 capture_type == FP_CAPTURE_QUALITY_TEST);
+}
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_UTILS_H_ */
