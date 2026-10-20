@@ -8,6 +8,7 @@
 
 #include <ec_commands.h>
 #include <fpsensor/fpsensor.h>
+#include <fpsensor/fpsensor_template_store.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <mkbp_event.h>
 #include <rollback.h>
@@ -141,4 +142,27 @@ ZTEST(fpsensor_utils, test_checked_subspan_boundaries)
 		      EC_ERROR_INVAL);
 	zassert_equal(checked_subspan(std::span(buf), UINT32_MAX, 1).error(),
 		      EC_ERROR_OVERFLOW);
+}
+
+ZTEST(fpsensor_utils, test_rate_limiter_and_template_id_boundaries)
+{
+	FpRateLimiter limiter{};
+	const FpTimestamp t0{ std::chrono::seconds(10) };
+	zassert_true(limiter.try_acquire(t0).has_value());
+	zassert_equal(limiter.try_acquire(t0 + std::chrono::seconds(1) -
+					  std::chrono::microseconds(1))
+			      .error(),
+		      EC_HOST_CMD_BUSY);
+	zassert_true(
+		limiter.try_acquire(t0 + std::chrono::seconds(1)).has_value());
+	zassert_true(
+		limiter.try_acquire(t0 + std::chrono::seconds(3)).has_value());
+
+	zassert_false(FpTemplateId::create(-1).has_value());
+	zassert_false(FpTemplateId::create(FP_MAX_FINGER_COUNT).has_value());
+	zassert_true(FpTemplateId::create(0).has_value());
+	zassert_true(FpTemplateId::create(FP_MAX_FINGER_COUNT - 1).has_value());
+	zassert_equal(FpTemplateId::create_enrolled(1, 1).error(),
+		      EC_RES_UNAVAILABLE);
+	zassert_true(FpTemplateId::create_enrolled(0, 1).has_value());
 }

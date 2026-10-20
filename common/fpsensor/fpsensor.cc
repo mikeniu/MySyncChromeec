@@ -21,6 +21,7 @@
 #include "fpsensor/fpsensor_led.h"
 #include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
+#include "fpsensor/fpsensor_template_store.h"
 #include "fpsensor/fpsensor_utils.h"
 #include "gpio.h"
 #include "host_command.h"
@@ -55,7 +56,7 @@
 #endif
 
 /* Ready to encrypt a template. */
-static timestamp_t encryption_deadline;
+static FpRateLimiter encryption_rate_limiter{};
 
 /* Delay between 2 s of the sensor to detect finger removal */
 #define FINGER_POLLING_DELAY (100 * MSEC)
@@ -693,12 +694,10 @@ fp_command_frame_v0(struct ec_host_cmd_handler_args *args)
 
 	if (!offset) {
 		/* Host has requested the first chunk, do the encryption. */
-		timestamp_t now = get_time();
-
-		/* b/114160734: Not more than 1 encrypted message per second. */
-		if (!timestamp_expired(encryption_deadline, &now))
-			return EC_HOST_CMD_BUSY;
-		encryption_deadline.val = now.val + (1 * SECOND);
+		if (const auto slot = encryption_rate_limiter.try_acquire();
+		    !slot.has_value()) {
+			return slot.error();
+		}
 
 		ScopedFastCpu fast_cpu;
 
@@ -759,7 +758,6 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 		args->output_buf_size = size;
 		return EC_HOST_CMD_SUCCESS;
 	case FP_FRAME_ENCRYPT_TEMPLATE: {
-		timestamp_t now;
 		uint32_t mode_output;
 
 		/*
@@ -775,12 +773,10 @@ fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 		if (params->index >= global_context.templ_valid)
 			return EC_HOST_CMD_UNAVAILABLE;
 
-		now = get_time();
-
-		/* b/114160734: Not more than 1 encrypted message per second. */
-		if (!timestamp_expired(encryption_deadline, &now))
-			return EC_HOST_CMD_BUSY;
-		encryption_deadline.val = now.val + (1 * SECOND);
+		if (const auto slot = encryption_rate_limiter.try_acquire();
+		    !slot.has_value()) {
+			return slot.error();
+		}
 
 		global_context.fp_encryption_status &=
 			~FP_ENCRYPTED_TEMPLATE_READY;
@@ -924,8 +920,7 @@ fp_commit_template(std::span<const uint8_t> context)
 		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
-	if (bytes_are_trivial(positive_match_salt.data(),
-			      positive_match_salt.size_bytes())) {
+	if (bytes_are_trivial(positive_match_salt)) {
 		/* Don't leave decrypted data in the buffer! */
 		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 		CPRINTS("fgr%d: Trivial positive match salt.", idx);
