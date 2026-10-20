@@ -4,6 +4,7 @@
  */
 
 #include "debug/mutex_history.h"
+#include "ec_tasks.h"
 
 #include <zephyr/spinlock.h>
 #include <zephyr/sys/ring_buffer.h>
@@ -19,7 +20,7 @@ void mutex_history_log(struct ring_buf *rb, const struct k_mutex *mutex,
 	mutex_event_log_t event = {
 		.timestamp = k_cyc_to_us_near32(k_cycle_get_32()),
 		.mutex = mutex,
-		.thread_id = k_current_get(),
+		.thread_id = get_current_thread(),
 		.event_type = type,
 		.func = func,
 	};
@@ -51,8 +52,9 @@ void mutex_history_dump(struct ring_buf *rb)
 	       MUTEX_EVENT_TYPE_SIZE) {
 		printk("  TS: %8u us, Mutex: %p, Thread: %s, Func: %s, Type: %u\n",
 		       event.timestamp, event.mutex,
-		       k_thread_name_get(event.thread_id), event.func,
-		       event.event_type);
+		       event.thread_id ? k_thread_name_get(event.thread_id) :
+					 "unknown",
+		       event.func, event.event_type);
 	}
 
 	k_spin_unlock(&rb_lock, key);
