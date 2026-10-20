@@ -40,6 +40,9 @@ static int gpio_wp_l_set(int value)
 
 #define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))
 
+/* First bank outside of the RO/WP region [0, CONFIG_WP_STORAGE_SIZE). */
+#define WP_BANK (CONFIG_WP_STORAGE_SIZE / CONFIG_FLASH_BANK_SIZE)
+
 #define FAKE_FLASH_SIZE DT_REG_SIZE(DT_CHOSEN(zephyr_flash))
 #define FAKE_PAGE_SIZE CONFIG_FLASH_ERASE_SIZE
 
@@ -198,6 +201,15 @@ static void fake_set_sr(uint8_t sr1, uint8_t sr2)
 	fake_sr2 = sr2;
 }
 
+ZTEST_USER(cros_flash_rtkfp, test_baseline_no_protection)
+{
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      0);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 0);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
+		      0);
+}
+
 ZTEST_USER(cros_flash_rtkfp, test_init_clears_srp_preserves_other_bits)
 {
 	uint8_t sr1, sr2;
@@ -216,6 +228,9 @@ ZTEST_USER(cros_flash_rtkfp, test_init_clears_srp_preserves_other_bits)
 	/* Non-protection bits must survive the status register rewrite. */
 	zassert_true(sr1 & SPI_FLASH_SR1_WEL);
 	zassert_true(sr2 & SPI_FLASH_SR2_QE);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      0);
 }
 
 ZTEST_USER(cros_flash_rtkfp, test_init_wp_deasserted_no_sw_protect)
@@ -373,6 +388,86 @@ ZTEST_USER(cros_flash_rtkfp, test_erase_flash_failure)
 	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 1,
 						CONFIG_FLASH_ERASE_SIZE),
 		      -EINVAL);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_flags_ro_range)
+{
+	/* Range [0, 0x40000) is encoded as {TB=1, BP1=1, BP0=1}. */
+	fake_set_sr(SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP0,
+		    0);
+	/* WP asserted at init enables the software protect lock. */
+	gpio_wp_l_set(0);
+	zassert_equal(cros_flash_init(cros_flash_dev), EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_RO_AT_BOOT |
+			      EC_FLASH_PROTECT_RO_NOW);
+
+	/* Check both sides of the boundary of the protected region. */
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev,
+						      WP_BANK - 1),
+		      1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
+		      0);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_flags_all_range)
+{
+	/* Range [0, 0x80000) is encoded as {TB=1, BP2=1}. */
+	fake_set_sr(SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP2, 0);
+	gpio_wp_l_set(0);
+	zassert_equal(cros_flash_init(cros_flash_dev), EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ALL_AT_BOOT |
+			      EC_FLASH_PROTECT_RO_AT_BOOT |
+			      EC_FLASH_PROTECT_ALL_NOW |
+			      EC_FLASH_PROTECT_RO_NOW);
+
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev,
+						      WP_BANK - 1),
+		      1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
+		      1);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_only_without_sw_lock)
+{
+	/* The range is programmed but the software lock is not engaged. */
+	fake_set_sr(SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP0,
+		    0);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_RO_AT_BOOT);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
+		      0);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_flags_srp_inconsistent)
+{
+	fake_sr1 |= SPI_FLASH_SR1_SRP0;
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ERROR_INCONSISTENT);
+
+	fake_sr1 &= ~SPI_FLASH_SR1_SRP0;
+	fake_sr2 |= SPI_FLASH_SR2_SRP1;
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ERROR_INCONSISTENT);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_flags_undecodable_unknown)
+{
+	/*
+	 * CMP=1 with these BP bits has no entry in the GD25Q16 protection
+	 * table, so the status registers cannot be decoded.
+	 */
+	fake_sr2 |= SPI_FLASH_SR2_CMP;
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ERROR_UNKNOWN);
 }
 
 static void cros_flash_rtkfp_before(void *fixture)
