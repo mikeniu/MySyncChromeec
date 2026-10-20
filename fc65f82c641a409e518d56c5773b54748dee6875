@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b20bb8e_44a56de6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:17:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **CL Scope \u0026 Atomicity**: While this commit message is nicely formatted as concise prose rather than a bulleted list, it still reveals that the CL bundles multiple independent logical changes (`FpRateLimiter` vs. `FpTemplateStore`).\n\nAs noted in the top-level review, please split this CL. Here are suggested commit messages for the resulting smaller CLs:\n\nFor the Rate Limiter CL:\n```text\nfpsensor: Extract FpRateLimiter for encryption throttling\n\nEncryption cooldown rate limiting is duplicated across state and task command handlers.\n\nThis CL introduces `FpRateLimiter` to centralize template encryption throttling into a reusable, testable abstraction.\n```\n\nFor the Template Store CL:\n```text\nfpsensor: Extract FpTemplateStore for secret state management\n\nTemplate index validation and positive match secret expiration checks are loosely managed across command handlers.\n\nThis CL introduces `FpTemplateId` and `FpTemplateStore` to encapsulate template bounds checking and positive match secret consumption.\n```\n[🔗](http://go/tj/7818a7c6-91bd-460a-a15e-26732ebbaa29)",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fc65f82c641a409e518d56c5773b54748dee6875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e14949f_38095fc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:17:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope**: Size: L (+227, -43). Although the production diff is \u003c 250 lines, this CL violates the Single Logical Change rule by bundling multiple independent architectural abstractions. Extracting `FpRateLimiter` for encryption throttling is conceptually orthogonal to extracting `FpTemplateId`/`FpTemplateStore` for secret state management. These can and should be committed independently. Please split this into:\n1. `FpRateLimiter` and its usage in `fpsensor.cc`.\n2. `FpTemplateId` and `FpTemplateStore` and their usages.\n\n**Functionality**: Code logic appears correct. The `consume_secret` timeouts and bounds checking are well-handled.\n**Architecture \u0026 Component Fit**: Clean RAII and value-type encapsulation for the extracted abstractions.\n**Code Simplicity**: The `this auto \u0026self` template pattern was successfully removed, making the code much simpler. Found one remaining minor issue: an unnecessary cast in `fp_read_match_secret` returning an error.\n**Idiomaticity \u0026 Readability**: Excellent use of modern C++20 idioms (`std::expected`, `std::span`, `std::cmp_less`).\n**Security**: Encrypted template buffers are cleansed appropriately on failure.\n**Testing**: Comprehensive boundary tests are provided for all three abstractions, fully satisfying the testing requirements.\n**Commit Message**: The description is now written in concise prose paragraphs, which is great. However, it still lists multiple independent abstractions joined by \"and\", reflecting the bundled nature of the CL. I have provided suggested replacement commit messages for the split CLs inline.\n\n[🔗](http://go/tj/7818a7c6-91bd-460a-a15e-26732ebbaa29)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fc65f82c641a409e518d56c5773b54748dee6875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "016c77d4_6cac63ea",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:17:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity**: This explicit cast to `enum ec_host_cmd_status` is unnecessary because `matched.error()` is already of type `ec_status` and this `fp_read_match_secret` function returns `enum ec_status`.\n\nYou can simplify this to:\n```cpp\n\t\treturn matched.error();\n```\n[🔗](http://go/tj/7818a7c6-91bd-460a-a15e-26732ebbaa29)",
+      "range": {
+        "startLine": 518,
+        "startChar": 0,
+        "endLine": 522,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fc65f82c641a409e518d56c5773b54748dee6875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
