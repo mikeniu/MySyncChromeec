@@ -4,6 +4,7 @@
  */
 
 #include "ec_tasks.h"
+#include "host_command.h"
 #include "task.h"
 #include "timer.h"
 
@@ -283,6 +284,7 @@ static int pre_kernel(void)
 {
 	zassert_false(pre_kernel_ran);
 	zassert_true(k_is_pre_kernel());
+	zassert_is_null(get_current_thread());
 	zassert_equal(TASK_ID_INVALID, task_get_current());
 	pre_kernel_ran = true;
 	return 0;
@@ -299,6 +301,7 @@ static int post_kernel(void)
 {
 	zassert_false(post_kernel_ran);
 	zassert_false(k_is_pre_kernel());
+	zassert_equal(get_main_thread(), get_current_thread());
 	zassert_equal(TASK_ID_MAIN, task_get_current());
 	post_kernel_ran = true;
 	return 0;
@@ -308,6 +311,20 @@ SYS_INIT(post_kernel, POST_KERNEL, 0);
 ZTEST(test_task_shim, test_task_get_current_post_kernel)
 {
 	zassert_true(post_kernel_ran);
+}
+
+ZTEST(test_task_shim, test_get_current_thread_dummy)
+{
+	k_tid_t thread = k_current_get();
+
+	zassert_equal(thread, get_current_thread());
+
+	thread->base.thread_state |= _THREAD_DUMMY;
+	zassert_is_null(get_current_thread());
+	zassert_equal(TASK_ID_INVALID, task_get_current());
+	thread->base.thread_state &= ~_THREAD_DUMMY;
+
+	zassert_equal(thread, get_current_thread());
 }
 
 ZTEST_SUITE(test_task_shim, NULL, tasks_setup, NULL, NULL, NULL);

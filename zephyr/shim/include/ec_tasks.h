@@ -14,6 +14,26 @@
 extern "C" {
 #endif
 
+/**
+ * Return the current thread ID, or NULL if called pre-kernel or when the
+ * current thread is a dummy thread.
+ */
+static inline k_tid_t get_current_thread(void)
+{
+	if (k_is_pre_kernel()) {
+		return NULL;
+	}
+
+	k_tid_t thread = k_current_get();
+
+	if (thread != NULL &&
+	    (thread->base.thread_state & _THREAD_DUMMY) != 0U) {
+		return NULL;
+	}
+
+	return thread;
+}
+
 /** Starts all of the shimmed EC tasks. Requires CONFIG_SHIMMED_TASKS=y. */
 void start_ec_tasks(void);
 

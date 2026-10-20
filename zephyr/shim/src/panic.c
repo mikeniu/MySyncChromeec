@@ -5,6 +5,7 @@
 
 #include "builtin/assert.h"
 #include "common.h"
+#include "ec_tasks.h"
 #include "hooks.h"
 #include "host_command.h"
 #include "panic.h"
@@ -232,7 +233,8 @@ void panic_data_write_assert(const char *path, unsigned int line)
 
 	panic_set_reason_reg(pdata, PANIC_SW_ASSERT);
 	panic_set_info_reg(pdata, info);
-	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)k_current_get());
+	panic_set_exception_reg(pdata,
+				(uint8_t)(uintptr_t)get_current_thread());
 
 	panic_data_finalize(pdata);
 }
@@ -291,7 +293,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 		/* If an esf structure is empty, store just the reason provided
 		 * by Zephyr. It can be caused e.g. by a spurious interrupt.
 		 */
-		panic_data_write_fatal(reason, k_current_get());
+		panic_data_write_fatal(reason, get_current_thread());
 	}
 
 	LOG_PANIC();
@@ -322,7 +324,7 @@ __override void zassert_post_action(const char *path, unsigned int line)
 
 	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO) &&
 	    IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
-		print_stack_trace(k_current_get());
+		print_stack_trace(get_current_thread());
 	}
 
 	panic_reboot();
