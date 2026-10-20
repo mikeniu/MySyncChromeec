@@ -8,6 +8,7 @@
 
 #include <ec_commands.h>
 #include <fpsensor/fpsensor.h>
+#include <fpsensor/fpsensor_platform.h>
 #include <fpsensor/fpsensor_template_store.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <mkbp_event.h>
@@ -165,4 +166,19 @@ ZTEST(fpsensor_utils, test_rate_limiter_and_template_id_boundaries)
 	zassert_equal(FpTemplateId::create_enrolled(1, 1).error(),
 		      EC_RES_UNAVAILABLE);
 	zassert_true(FpTemplateId::create_enrolled(0, 1).has_value());
+}
+
+ZTEST(fpsensor_utils, test_task_event_wrapper)
+{
+	constexpr FpTaskEvent kCfg{ TASK_EVENT_UPDATE_CONFIG };
+	static_assert(kCfg.is_update_config());
+	static_assert(!kCfg.is_sensor_or_timer());
+
+	constexpr FpTaskEvent kIrq{ TASK_EVENT_SENSOR_IRQ };
+	static_assert(kIrq.is_sensor_irq());
+	static_assert(kIrq.is_sensor_or_timer());
+
+	constexpr FpTaskEvent kTimer{ TASK_EVENT_TIMER };
+	static_assert(kTimer.is_timer());
+	static_assert(kTimer.is_sensor_or_timer());
 }
