@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16b5584d_bccadaec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe commit message narrates routine test additions (\"The unit tests cover the AT_BOOT...\"), which should be avoided according to the commitment descriptions style guide. Also, the CL is larger than 250 lines (approx 298 non-test production lines) and bundles multiple logical changes together, violating the Single Logical Change rule and `Size: L` constraint.\n\nPlease remove the test enumeration paragraph. Since the CL is too large, you must split it. Below are copy-pasteable replacement options depending on how you split:\n\n**Option 1 (For the split CL that adds queries):**\n```\nrts5817: cros_flash: add software flash protection state queries\n\nImplement flash protection state queries for the RTS5817 cros_flash\ndriver in software only. The BP bits in the status register define the\nregion reported through the AT_BOOT flags, and the controller\u0027s\nsoftware protect lock determines the _NOW flags. The GPIO WP signal\nstill acts as a system-level write protect indicator.\n\nBUG\u003db:478707578\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.cros_flash_rtkfp \\\n     -s drivers.cros_flash -p native_sim\n```\n\n**Option 2 (For the split CL that implements protection modification):**\n```\nrts5817: cros_flash: implement software flash protection operations\n\nImplement flash protection state modification and enforcement for the\nRTS5817 cros_flash driver. This translates protection ranges using\nshared SPI flash register helpers to preserve non-protection status\nbits (like QE) when status registers are updated. \n\nBUG\u003db:478707578\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.cros_flash_rtkfp \\\n     -s drivers.cros_flash -p native_sim\n```\n[🔗](http://go/tj/e7e3ee12-8177-4718-aeb4-84841200af5b)",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8320d55f_8e7c9f9c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL.**\n\n### Review Summary\n\n*   **Functionality:** ❌ **Changes Requested.** `cros_flash_rtkfp_get_protect` fails to check `data-\u003eall_protected`, returning `0` (writable) for banks beyond the status register range even when the entire flash is locked in software. See inline comment for the fix.\n*   **Architecture \u0026 Component Fit:** ✅ The logic properly implements the flash protection API and correctly translates software states into the shared SPI flash registers.\n*   **Code Simplicity:** ❌ **Changes Requested.** The `cros_flash_rtkfp_protect_now` implementation uses an unnecessary `if/else` block to call `protect_at_boot`. This can be unified into a single call with a ternary operator. See inline comment.\n*   **Idiomaticity \u0026 Readability:** ✅ Standard types and language constructs are used cleanly. Previous `int` to `bool` suggestions were successfully adopted.\n*   **Security:** ✅ Status register parsing explicitly rejects inconsistent SRP bit settings, and write operations properly gate on both hardware and software locks.\n*   **Testing:** ✅ Comprehensive coverage is provided for the new protection API, including correct testing of off-by-one boundary cases (e.g. `CONFIG_WP_STORAGE_SIZE - 1`) and hardware lock enforcement.\n*   **CL Size \u0026 Scope:** ❌ **Changes Requested.** `Size: L (+566, -5)`. The production (non-test) diff is approximately 298 lines, which exceeds the 250-line limit for a cohesive change. The CL also bundles multiple logical changes together (protection queries vs. protection mutations). Please split this into smaller CLs:\n    1.  **CL 1**: Add protection state queries (`get_protect`, `get_protect_flags`, `flash_get_prot_range`) and their unit tests.\n    2.  **CL 2**: Implement protection modification operations (`protect_at_boot`, `protect_now`, `flash_write_prot_reg`) and enforcement hooks in `write` and `erase`, and their unit tests.\n*   **Commit Message:** ❌ **Changes Requested.** The message unnecessarily narrates the unit tests. See inline comment on `/COMMIT_MSG` for replacement text covering the split options.\n\n[🔗](http://go/tj/e7e3ee12-8177-4718-aeb4-84841200af5b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa1bdd10_37556d30",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n`data-\u003eall_protected` acts as an absolute software lock that rejects writes to the entire flash. However, `get_protect` omits this check and only evaluates the status register coverage (`flash_check_prot_reg`).\n\nThis creates a state inconsistency: if a bank falls outside the status register range but `all_protected \u003d\u003d true`, `get_protect` incorrectly reports `0` (writable), even though a `write` call to that bank will be rejected with `EC_ERROR_ACCESS_DENIED`.\n\nReturn `1` when `all_protected` is enabled:\n```c\n\tif (data-\u003eall_protected) {\n\t\treturn 1;\n\t}\n\n\tif (flash_check_prot_reg(dev, addr_start, CONFIG_FLASH_BANK_SIZE) \u003d\u003d\n\t    EC_ERROR_ACCESS_DENIED) {\n\t\treturn 1;\n\t}\n```\n[🔗](http://go/tj/e7e3ee12-8177-4718-aeb4-84841200af5b)",
+      "range": {
+        "startLine": 286,
+        "startChar": 0,
+        "endLine": 308,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1209d09b_ac051b41",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe repeated call to `cros_flash_rtkfp_protect_at_boot` inside the `if/else` block can be unified into a single call with a ternary operator, which reduces boilerplate and control flow branching.\n\n```c\nstatic int cros_flash_rtkfp_protect_now(const struct device *dev, bool all)\n{\n\tstruct cros_flash_rtkfp_data *data \u003d DRV_DATA(dev);\n\tint ret;\n\n\t/* Set flash protection and enable SW protect. */\n\tret \u003d cros_flash_rtkfp_protect_at_boot(\n\t\tdev, all ? EC_FLASH_PROTECT_ALL_AT_BOOT : EC_FLASH_PROTECT_RO_AT_BOOT);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tret \u003d cros_flash_rtkfp_sw_protect(dev, true);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tif (all) {\n\t\tdata-\u003eall_protected \u003d true;\n\t}\n\n\tdata-\u003esw_protected \u003d true;\n\treturn EC_SUCCESS;\n}\n```\n[🔗](http://go/tj/e7e3ee12-8177-4718-aeb4-84841200af5b)",
+      "range": {
+        "startLine": 474,
+        "startChar": 0,
+        "endLine": 503,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
