@@ -2279,6 +2279,7 @@ tests:
     - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
     - CONFIG_ZTEST_THREAD_PRIORITY=1
+    - CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO=n
     extra_conf_files:
     - prj.conf
     - watchdog/prj.conf
@@ -2289,6 +2290,7 @@ tests:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
     - CONFIG_ZTEST_THREAD_PRIORITY=1
+    - CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO=y
     extra_conf_files:
     - prj.conf
     - watchdog/prj.conf

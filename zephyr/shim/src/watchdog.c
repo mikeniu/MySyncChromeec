@@ -10,6 +10,7 @@
 #include "panic.h"
 #include "panic_utils.h"
 #include "task.h"
+#include "threadinfo.h"
 #include "watchdog.h"
 
 #include <stdio.h>
@@ -219,7 +220,10 @@ static void print_sp_pc(const struct k_thread *thread)
 
 static void log_thread_info(const struct k_thread *thread, void *user_data)
 {
-	print_sp_pc(thread);
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_THREADINFO) &&
+	    !IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO)) {
+		print_sp_pc(thread);
+	}
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_WATCHDOG_DUMP_THREADS_CALL_STACK)) {
 		print_stack_trace(thread);
 	}
@@ -270,6 +274,11 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 
 	if (IS_ENABLED(CONFIG_THREAD_MONITOR)) {
 		k_thread_foreach_unlocked(log_thread_info, NULL);
+	}
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_THREADINFO) ||
+	    IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO)) {
+		threadinfo_dump(NULL);
 	}
 
 	/* Save the current task id in panic info.
