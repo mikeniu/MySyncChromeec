@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a444e75b_12623c55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:20:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n**CL Size \u0026 Scope:** Size: L (+262, -70). The production (non-test) diff is \u003c 250 lines and implements a single cohesive logical change (extracting `FpSensorStateMachine`). The size is acceptable. ✅\n\n**Commit Message:** The description accurately explains why `fp_task` was refactored into `FpSensorStateMachine` and how it enables unit testing, meeting the `R1`, `R2`, and `R3` standards. ✅\n\n**Architecture \u0026 Component Fit:** The `std::variant` dispatch combined with `std::visit` simplifies the monolithic event loop drastically, creating a clean typestate boundary that natively models mutually exclusive configurations. ✅\n\n**Code Simplicity:** The extraction of `parse_command` and runtime command handling eliminates heavily-nested and duplicate control-flow paths. ✅\n\n**Idiomaticity \u0026 Readability:** The state machine cleanly translates bit-flags into strongly typed commands. ✅\n\n**Testing:** ❌ The `static_assert` changes successfully verify the inner values for `DetectFingerCommand` and `ImmediateCaptureCommand`. However, the new dispatch tests for `ResetSensorCommand` and `MaintenanceCommand` use negative bitwise masking rather than asserting the exact literal state, and the `EncryptTemplate` and `DecryptTemplate` commands are missing transition coverage. See the inline comment in `fpsensor_state.cc` for a drop-in replacement snippet.\n[🔗](http://go/tj/8182afcb-af07-44eb-9527-8b222550abc1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bca815e6598157fd06466cdae456028fe62ba7b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40e0d2ce_1102a4dc",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:20:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Test Oracle Integrity \u0026 Missing Branch Coverage:**\n\n1. **Weak Oracles (Negative Checks):** Using a bitwise masking check (`\u0026 FP_MODE_RESET_SENSOR \u003d\u003d 0`) only verifies the flag is no longer present; it will still pass if the state machine accidentally corrupts the value or leaves behind unexpected bits. Always assert the exact literal expected state (`zassert_equal(local_ctx.sensor_mode, 0)`).\n2. **Missing Branches:** The test suite covers reset and maintenance, but misses the `EncryptTemplate` and `DecryptTemplate` runtime transitions which also manipulate the `sensor_mode` state.\n\n```cpp\nZTEST_USER(fpsensor_state, test_state_machine_dispatch_reset)\n{\n\tFpSensorContext local_ctx{};\n\tFpSensorStateMachine sm{ local_ctx };\n\tlocal_ctx.sensor_mode \u003d FP_MODE_RESET_SENSOR;\n\tsm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });\n\tzassert_equal(local_ctx.sensor_mode, 0);\n}\n\nZTEST_USER(fpsensor_state, test_state_machine_dispatch_maintenance)\n{\n\tFpSensorContext local_ctx{};\n\tFpSensorStateMachine sm{ local_ctx };\n\tlocal_ctx.sensor_mode \u003d FP_MODE_SENSOR_MAINTENANCE;\n\tsm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });\n\tzassert_equal(local_ctx.sensor_mode, 0);\n}\n\nZTEST_USER(fpsensor_state, test_state_machine_dispatch_encrypt)\n{\n\tFpSensorContext local_ctx{};\n\tFpSensorStateMachine sm{ local_ctx };\n\tlocal_ctx.sensor_mode \u003d FP_MODE_ENCRYPT_TEMPLATE;\n\tsm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });\n\tzassert_equal(local_ctx.sensor_mode, 0);\n}\n\nZTEST_USER(fpsensor_state, test_state_machine_dispatch_decrypt)\n{\n\tFpSensorContext local_ctx{};\n\tFpSensorStateMachine sm{ local_ctx };\n\tlocal_ctx.sensor_mode \u003d FP_MODE_DECRYPT_TEMPLATE;\n\tsm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });\n\tzassert_equal(local_ctx.sensor_mode, 0);\n}\n```\n[🔗](http://go/tj/8182afcb-af07-44eb-9527-8b222550abc1)",
+      "range": {
+        "startLine": 552,
+        "startChar": 0,
+        "endLine": 569,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bca815e6598157fd06466cdae456028fe62ba7b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

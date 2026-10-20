@@ -19,6 +19,26 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b44324d_0654537f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:20:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Re-evaluated in latest patchset.",
+      "parentUuid": "882951da_60ca9138",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "93d2bb5391530b50bc4d9282409ade053d7fdb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc6ccc05_29234d2c",
