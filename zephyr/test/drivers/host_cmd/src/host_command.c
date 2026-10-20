@@ -7,6 +7,7 @@
 #include "ec_commands.h"
 #include "host_command.h"
 #include "test/drivers/test_state.h"
+#include "threadinfo.h"
 #include "uart.h"
 
 #include <zephyr/shell/shell_dummy.h>
@@ -314,6 +315,12 @@ ZTEST(host_cmd_host_commands, test_thread_info)
 
 	/* Clean up thread */
 	k_thread_abort(tid);
+
+#ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_THREADINFO
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "threadinfo"),
+		   "threadinfo console command failed");
+#endif
+	threadinfo_dump(NULL);
 }
 
 ZTEST_SUITE(host_cmd_host_commands, drivers_predicate_post_main, NULL, NULL,

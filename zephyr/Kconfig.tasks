@@ -140,6 +140,17 @@ config PLATFORM_EC_HOSTCMD_THREAD_INFO
 	  Enable host commands for retrieving thread information.
 	  This includes EC_CMD_THREAD_INFO_LIST and EC_CMD_THREAD_INFO_DETAIL.
 
+config PLATFORM_EC_CONSOLE_CMD_THREADINFO
+	bool "Console command: threadinfo"
+	depends on THREAD_MONITOR
+	depends on SHELL
+	default y
+	help
+	  Enable the 'threadinfo' console command.
+
+configdefault KERNEL_THREAD_SHELL_LIST
+	default n if PLATFORM_EC_CONSOLE_CMD_THREADINFO
+
 config HAS_TASK_KEYPROTO
 	bool
 	depends on PLATFORM_EC_KEYBOARD_PROTOCOL_8042
