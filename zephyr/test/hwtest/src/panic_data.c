@@ -9,18 +9,10 @@
 #include "system.h"
 
 #include <zephyr/logging/log.h>
-#include <zephyr/sys/__assert.h>
 
 LOG_MODULE_REGISTER(panic_data, LOG_LEVEL_INF);
 
-static void test_crash(void);
-static void crash_system(void);
-
-#ifdef CONFIG_LTO
-static const uint32_t crash_addr = (uint32_t)test_crash;
-#else
-static const uint32_t crash_addr = (uint32_t)crash_system;
-#endif
+#define EXPECTED_LR_VAL 0xecec000e
 
 /*
  * This is the index of RA in the panic_data.riscv.regs array, not the
@@ -28,19 +20,22 @@ static const uint32_t crash_addr = (uint32_t)crash_system;
  * https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/panic.c;l=79;drc=f66d5f641b3a9aa8a715fb29bd0ce6b2bb96ac8a
  */
 static const uint32_t RISCV_PANIC_REG_RA = 29;
-
-/* Estimated end of the crash function. */
-static const uint32_t crash_end = crash_addr + 0x20;
+static const uint32_t EXPECTED_LR = EXPECTED_LR_VAL;
 
 static void crash_system(void)
 {
-	/* TODO(b/423904871): We should be able to use __ASSERT_NO_MSG when LTO
-	 * is enabled; we should prevent __ASSERT_NO_MSG from being outlined. */
-	if (IS_ENABLED(CONFIG_LTO)) {
-		__builtin_trap();
-	} else {
-		__ASSERT_NO_MSG(0);
+	if (IS_ENABLED(CONFIG_CPU_CORTEX_M)) {
+		__asm__ volatile("mov lr, %0\n"
+				 "udf #0\n"
+				 :
+				 : "r"(EXPECTED_LR));
+	} else if (IS_ENABLED(CONFIG_RISCV)) {
+		__asm__ volatile("mv ra, %0\n"
+				 "unimp\n"
+				 :
+				 : "r"(EXPECTED_LR));
 	}
+	zassert_unreachable();
 }
 
 static void check_panic_data(void)
@@ -74,9 +69,8 @@ static void check_panic_data(void)
 		zassert_true(false, "Unsupported architecture");
 	}
 
-	/* Make sure Link Register is stored correctly and points at the
-	 * crash_system function. */
-	zassert_true((crash_addr <= lr) && (crash_end >= lr));
+	/* Make sure Link Register is stored correctly. */
+	zassert_equal(lr, EXPECTED_LR);
 
 	/* Check panic flags. */
 	zassert_equal(pdata->flags, expected_flags);
