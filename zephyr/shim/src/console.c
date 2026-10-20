@@ -496,7 +496,8 @@ static void handle_sprintf_rv(int rv, size_t *len)
 
 static bool shell_is_active(void)
 {
-	return shell_zephyr != NULL && shell_ready(shell_zephyr);
+	return !shell_stopped && shell_zephyr != NULL &&
+	       shell_ready(shell_zephyr);
 }
 
 /*
@@ -558,23 +559,19 @@ void zephyr_print(const char *buff, size_t size)
 		panic_log_write_str(buff, size);
 	}
 
-	bool in_isr = k_is_in_isr();
-
-	/* shell_* functions can not be used in ISRs so optionally use
-	 * printk instead.
+	/* If the shell is about to be (or is) stopped, or if the caller cannot
+	 * yield (including in ISRs), use printk since shell_write_str() may
+	 * block on the shell operations.
 	 */
-	if (in_isr) {
-		if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT)) {
-			printk("[ISR]%s", buff);
+	if (!shell_is_active() || !k_can_yield()) {
+		bool in_isr = k_is_in_isr();
+
+		if (in_isr &&
+		    !IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT)) {
+			return;
 		}
-		return;
-	}
 
-	/* If the shell is about to be (or is) stopped, use printk, since the
-	 * output may be stalled and the shell mutex held.
-	 */
-	if (shell_stopped || !shell_is_active()) {
-		printk("%s", buff);
+		printk(in_isr ? "[ISR]%s" : "%s", buff);
 		return;
 	}
 

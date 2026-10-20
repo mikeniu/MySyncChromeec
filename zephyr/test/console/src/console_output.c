@@ -453,6 +453,26 @@ ZTEST_F(console_output, test_console_panic)
 	(void)ec_sh->iface->api->enable(ec_sh->iface, false);
 }
 
+ZTEST_F(console_output, test_no_yield_output)
+{
+	uint8_t tx_content[SAMPLE_DATA_SIZE] = { 0 };
+	uint32_t tx_bytes;
+	unsigned int key;
+
+	uart_emul_flush_tx_data(fixture->dev);
+
+	key = irq_lock();
+	zassert_false(k_is_in_isr());
+	zassert_false(k_can_yield());
+	cputs(CC_SYSTEM, cputs_message);
+	irq_unlock(key);
+
+	tx_bytes = uart_emul_get_tx_data(fixture->dev, tx_content,
+					 sizeof(tx_content));
+	zassert_true(tx_bytes >= strlen(cputs_message));
+	zassert_not_null(strstr((char *)tx_content, cputs_message));
+}
+
 void test_main(void)
 {
 	ec_app_main();
