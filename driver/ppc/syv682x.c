@@ -20,6 +20,7 @@
 #include "usbc_ppc.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
 
 #define SYV682X_FLAGS_SOURCE_ENABLED BIT(0)
@@ -281,21 +282,21 @@ static bool syv682x_interrupt_filter(int port, int regval, int regmask,
  */
 static int check_cc_rp_timeout(int port, int timeout)
 {
-#ifdef CONFIG_ZTEST
-	return EC_SUCCESS;
-#endif
 	enum tcpc_cc_voltage_status cc1, cc2;
+	timestamp_t deadline;
 
-	tcpm_get_cc(port, &cc1, &cc2);
+	deadline.val = get_time().val + timeout;
 
-	while (((cc_is_rp(cc1)) || (cc_is_rp(cc2))) != true) {
-		if (task_wait_event(timeout) == TASK_EVENT_TIMER) {
-			return EC_ERROR_TIMEOUT;
-		}
+	do {
 		tcpm_get_cc(port, &cc1, &cc2);
-	}
+		if (cc_is_rp(cc1) || cc_is_rp(cc2))
+			return EC_SUCCESS;
 
-	return EC_SUCCESS;
+		if (timestamp_expired(deadline, NULL))
+			return EC_ERROR_TIMEOUT;
+
+		k_usleep(100);
+	} while (1);
 }
 #endif
 

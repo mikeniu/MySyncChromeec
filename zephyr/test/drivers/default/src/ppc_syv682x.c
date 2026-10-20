@@ -5,7 +5,9 @@
 
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_syv682x.h"
+#include "emul/tcpc/emul_tcpci.h"
 #include "syv682x.h"
+#include "tcpm/tcpci.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -26,6 +28,7 @@
 
 struct ppc_syv682x_fixture {
 	const struct emul *ppc_emul;
+	const struct emul *tcpci_emul;
 	struct i2c_common_emul_data *common_data;
 	const struct device *frs_en_gpio_port;
 	int frs_en_gpio_pin;
@@ -47,6 +50,8 @@ static void *syv682x_test_setup(void)
 	fixture.common_data =
 		emul_syv682x_get_i2c_common_data(fixture.ppc_emul);
 	zassert_not_null(fixture.ppc_emul, NULL);
+	fixture.tcpci_emul = EMUL_GET_USBC_BINDING(1, tcpc);
+	zassert_not_null(fixture.tcpci_emul, NULL);
 	fixture.frs_en_gpio_port =
 		DEVICE_DT_GET(DT_GPIO_CTLR(GPIO_USB_C1_FRS_EN_PATH, gpios));
 	zassert_not_null(fixture.frs_en_gpio_port, NULL);
@@ -85,6 +90,9 @@ static void syv682x_test_after(void *data)
 					  I2C_COMMON_EMUL_NO_FAIL_REG);
 	i2c_common_emul_set_write_fail_reg(common_data,
 					   I2C_COMMON_EMUL_NO_FAIL_REG);
+
+	/* Reset TCPC emulator state */
+	tcpci_emul_reset(fixture->tcpci_emul);
 }
 
 ZTEST_SUITE(ppc_syv682x, drivers_predicate_post_main, syv682x_test_setup,
@@ -452,8 +460,20 @@ ZTEST_F(ppc_syv682x, test_syv682x_frs_trigger)
 {
 	/*
 	 * An FRS event when the PPC is Sink should cause the PPC to switch from
-	 * Sink to Source.
+	 * Sink to Source when CC is Rp.
 	 */
+	zassert_ok(ppc_init(syv682x_port));
+	ppc_vbus_sink_enable(syv682x_port, true);
+	ppc_set_polarity(syv682x_port, 0 /* CC1 */);
+	ppc_set_frs_enable(syv682x_port, true);
+
+	tcpci_emul_set_reg(fixture->tcpci_emul, TCPC_REG_ROLE_CTRL,
+			   TCPC_REG_ROLE_CTRL_SET(TYPEC_NO_DRP, 0, TYPEC_CC_RD,
+						  TYPEC_CC_RD));
+	tcpci_emul_set_reg(fixture->tcpci_emul, TCPC_REG_CC_STATUS,
+			   TCPC_REG_CC_STATUS_SET(true, TYPEC_CC_VOLT_RP_DEF,
+						  TYPEC_CC_VOLT_OPEN));
+
 	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_FRS,
 				   SYV682X_CONTROL_4_NONE);
 	k_msleep(2);
@@ -461,6 +481,39 @@ ZTEST_F(ppc_syv682x, test_syv682x_frs_trigger)
 		     "PPC is not sourcing VBUS after FRS signal handled");
 	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_NONE,
 				   SYV682X_CONTROL_4_NONE);
+	ppc_set_frs_enable(syv682x_port, false);
+	ppc_vbus_source_enable(syv682x_port, false);
+	k_msleep(250);
+}
+
+ZTEST_F(ppc_syv682x, test_syv682x_frs_trigger_cc_timeout)
+{
+	/*
+	 * An FRS event when CC is not Rp should time out waiting for Rp
+	 * and not enable the source path.
+	 */
+	zassert_ok(ppc_init(syv682x_port));
+	ppc_vbus_sink_enable(syv682x_port, true);
+	ppc_set_polarity(syv682x_port, 0 /* CC1 */);
+	ppc_set_frs_enable(syv682x_port, true);
+
+	tcpci_emul_set_reg(fixture->tcpci_emul, TCPC_REG_ROLE_CTRL,
+			   TCPC_REG_ROLE_CTRL_SET(TYPEC_NO_DRP, 0, TYPEC_CC_RD,
+						  TYPEC_CC_RD));
+	tcpci_emul_set_reg(fixture->tcpci_emul, TCPC_REG_CC_STATUS,
+			   TCPC_REG_CC_STATUS_SET(false, TYPEC_CC_VOLT_OPEN,
+						  TYPEC_CC_VOLT_OPEN));
+
+	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_FRS,
+				   SYV682X_CONTROL_4_NONE);
+	/* Wait for CC_RP_DEBOUNCE (1 ms) timeout and interrupt handling */
+	k_msleep(5);
+	zassert_false(ppc_is_sourcing_vbus(syv682x_port),
+		      "PPC is sourcing VBUS after CC Rp timeout");
+	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_NONE,
+				   SYV682X_CONTROL_4_NONE);
+	ppc_set_frs_enable(syv682x_port, false);
+	k_msleep(250);
 }
 
 ZTEST_F(ppc_syv682x, test_syv682x_source_current_limit_usb_default)
