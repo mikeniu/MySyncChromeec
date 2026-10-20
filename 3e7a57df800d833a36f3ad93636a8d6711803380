@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1908bb2_4ec3f096",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:14:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n**Functionality:** The extraction of the frame slicing logic works as intended and provides safe bounds checking.\n**Architecture \u0026 Component Fit:** Clean encapsulation of the frame calculations.\n**Code Simplicity:** Good. A minor redundancy in bounds checking can be removed (see inline comment).\n**Idiomaticity \u0026 Readability:** Excellent use of modern C++ features (`std::span`, `std::expected`, `std::ranges::copy`).\n**Security:** Replaced manual arithmetic and `memcpy` with safe span utilities, improving memory safety.\n**Testing:** Thorough boundary tests cover the new helpers and error paths.\n**CL Size \u0026 Scope:** `Size: M (+155, -43)`. Scope is atomic and properly addresses the single logical change.\n**Commit Message:** Concise, clear, and accurately explains the *Why* and *What*.\n\n[🔗](http://go/tj/98bab8ae-9473-4c61-b47a-a529855a7852)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3e7a57df800d833a36f3ad93636a8d6711803380",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9153254_e5c31488",
+        "filename": "include/fpsensor/fpsensor_frame_storage.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:14:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:** `checked_subspan` already verifies that `offset + size \u003c\u003d buffer.size()` and handles integer overflow safely. You can simplify this validation by removing the redundant `frame_size \u003e image_buffer.size()` check and relying purely on the subspan helper to catch out-of-bounds sizes.\n\n```cpp\n\tif (frame_size \u003d\u003d 0) {\n\t\treturn std::unexpected(EC_RES_INVALID_PARAM);\n\t}\n```\n[🔗](http://go/tj/98bab8ae-9473-4c61-b47a-a529855a7852)",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3e7a57df800d833a36f3ad93636a8d6711803380",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
