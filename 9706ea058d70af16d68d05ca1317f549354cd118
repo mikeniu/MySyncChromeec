@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf489cca_cacd150f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T05:47:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:**\nThe new `rts5817maa` sensor scaffolding correctly defines the required CMake build targets, Kconfig properties (including default sizes), and Devicetree bindings.\n\n**Architecture \u0026 Component Fit:**\nThe configuration matches the established pattern for other fingerprint drivers in this component (e.g., `egis` and `elan`), cleanly separating the private driver selection switch and heap allocation size parameters.\n\n**Code Simplicity:**\nThe additions are minimal and declarative.\n\n**Idiomaticity \u0026 Readability:**\nThe Kconfig format and YAML devicetree schema conform to Zephyr standards and match local file conventions.\n\n**Security:**\nNo security implications.\n\n**Testing:**\nThis CL adds pure configuration (Kconfig, CMake, DTS bindings) with no runtime logic, so automated unit testing is not applicable here.\n\n**CL Size \u0026 Scope:**\n`Size: M (+67, -0)`. This CL represents a single logical change: adding the configuration scaffolding for the RTS5817MAA driver.\n\n**Commit Message:**\nThe commit message accurately describes the changes, is concise without narrating the diff, and includes the required `BUG\u003d` and `TEST\u003d` footers for ChromiumOS.\n\n[🔗](http://go/tj/b7cbcfdd-f9ae-478b-9808-33140e02870b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9706ea058d70af16d68d05ca1317f549354cd118",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
