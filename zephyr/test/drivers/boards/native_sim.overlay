@@ -323,6 +323,14 @@
 			gpios = <&gpio1 21 GPIO_OUTPUT_HIGH>;
 			enum-name = "GPIO_PCH_PWRBTN_L";
 		};
+		gpio_soc_edp_bl_en: soc_edp_bl_en {
+			gpios = <&gpio1 22 (GPIO_INPUT | GPIO_PULL_UP)>;
+		};
+	};
+
+	power-button-keyboard {
+		compatible = "cros-ec,power-button-keyboard";
+		suppress-enable-pin = <&gpio_soc_edp_bl_en>;
 	};
 
 	gpio1: gpio@101 {
@@ -335,7 +343,7 @@
 		low-level;
 		gpio-controller;
 		#gpio-cells = <2>;
-		ngpios = <22>;
+		ngpios = <23>;
 	};
 
 	gpio-interrupts {

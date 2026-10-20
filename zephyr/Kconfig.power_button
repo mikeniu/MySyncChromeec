@@ -12,8 +12,15 @@ config PLATFORM_EC_HOSTCMD_POWER_BUTTON_PRESS
 
 config PLATFORM_EC_POWER_BUTTON_KEYBOARD
 	bool "Power button is on the keyboard matrix"
+	depends on DT_HAS_CROS_EC_POWER_BUTTON_KEYBOARD_ENABLED
 	depends on PLATFORM_EC_TABLET_MODE
 	help
 	  Enable this option if the power button is located on the keyboard matrix.
 	  This enables logic to suppress power button events in S0 tablet mode
 	  to prevent accidental activation.
+
+	  Requires a "cros-ec,power-button-keyboard" devicetree node with the
+	  "suppress-enable-pin" property (e.g. mapped to the eDP backlight
+	  enable signal) to gate S0 tablet mode suppression on that GPIO being
+	  asserted, allowing the power button to wake the display when the
+	  screen is off in S0.
