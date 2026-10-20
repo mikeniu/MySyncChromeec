@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62164d3e_09a79d2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:49:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n*   **Functionality:** The `FpP256Key` and `FpPairingKey` wrappers correctly encapsulate key lifecycle and secret cleansing using `std::expected` to enforce error handling.\n*   **Architecture \u0026 Component Fit:** Using RAII classes to manage BoringSSL keys and cleansed memory correctly models the resource lifetime and bounds.\n*   **Code Simplicity:** The implementation avoids unnecessary control flow and keeps logic minimal.\n*   **Idiomaticity \u0026 Readability:** Excellent use of C++20 features. However, there is an unused `#include \u003cstring_view\u003e` in `fpsensor_auth_crypto.h`.\n*   **Security:** Cryptographic primitives are properly wrapped with types that cleanse secrets on destruction.\n*   **Testing:** Thorough test coverage, including error propagations and boundary tests using `POINT_CONVERSION_UNCOMPRESSED - 1` and `FP_AES_KEY_ENC_METADATA_VERSION - 1`.\n*   **CL Size \u0026 Scope:** `Size: L (+217, -51)`. While the production diff is under 250 lines, this CL violates the **Single Logical Change** rule regarding \"New Abstractions vs. Integration\":\n    *   *Rule:* \"Introducing a new standalone module/file, reusable class/struct/trait, or shared exported utility (with its unit tests) in the same CL that integrates it across existing callers or layers ... MUST be in a separate prerequisite CL from the higher-level callers or state-machine changes that consume it.\"\n    *   *Split Plan:*\n        1.  **CL 1**: Introduce the `FpP256Key` and `FpPairingKey` wrappers in `fpsensor_auth_crypto.h` along with their unit tests in `fpsensor_auth_commands.cc`.\n        2.  **CL 2**: Update the existing callers in `fpsensor_auth_ascp.cc` and `fpsensor_auth_handshake.cc` to use the new wrappers.\n*   **Commit Message:** The commit message clearly explains the problem and the conceptual approach in two paragraphs.\n\nPlease split the CL to proceed. See the inline comment regarding the unused `#include`.\n[🔗](http://go/tj/a83567e0-ed72-4bd1-9821-dfe130e22337)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "847d3d435dceadd3dc907a2596fb473859800d3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e8bbb54_5cc1fc41",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:49:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Unused Import**\n\n`#include \u003cstring_view\u003e` is unused in this header. Please remove it.\n[🔗](http://go/tj/a83567e0-ed72-4bd1-9821-dfe130e22337)",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "847d3d435dceadd3dc907a2596fb473859800d3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
