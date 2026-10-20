@@ -45,6 +45,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90cd3802_bcf37dc2",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:45:59Z",
+      "side": 1,
+      "message": "Restored the explanatory comment above send_mkbp_event(EC_MKBP_FP_FINGER_DOWN) in FpSensorContext::poll_finger_and_capture.",
+      "parentUuid": "5012526a_d492dc2e",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7651865d09584c86b55382bc652d9484bb0f576a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19346a66_9c134894",
@@ -65,6 +90,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7651865d09584c86b55382bc652d9484bb0f576a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9372906d_fb2c7492",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:45:59Z",
+      "side": 1,
+      "message": "Acknowledged; kept this extraction CL focused on moving the context member functions and added EncryptTemplate/DecryptTemplate dispatch tests in the state machine CL.",
+      "parentUuid": "19346a66_9c134894",
+      "range": {
+        "startLine": 457,
+        "startChar": 0,
+        "endLine": 480,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "7651865d09584c86b55382bc652d9484bb0f576a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
