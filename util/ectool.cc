@@ -7094,21 +7094,17 @@ int cmd_panic_log(int argc, char *argv[])
 			return rv;
 		}
 		while (read_params.offset < info_response.length) {
-			/* Limit response size by one byte for null terminator
-			 */
-			int response_size =
-				ec_command(EC_CMD_PANIC_LOG_READ, 0,
-					   &read_params, sizeof(read_params),
-					   response, response_max - 1);
-			if (response_size < 0) {
+			rv = ec_command(EC_CMD_PANIC_LOG_READ, 0, &read_params,
+					sizeof(read_params), response,
+					response_max);
+			if (rv < 0) {
 				fprintf(stderr, "Error reading panic log\n");
 				return rv;
 			}
-			if (response_size == 0 || response_size >= response_max)
+			int response_size = rv;
+			if (response_size == 0 || response_size > response_max)
 				break;
-			/* Ensure null terminated */
-			response[response_size] = '\0';
-			fputs(response, stdout);
+			fwrite(response, 1, response_size, stdout);
 			read_params.offset += response_size;
 		}
 		fputs("\n", stdout);
