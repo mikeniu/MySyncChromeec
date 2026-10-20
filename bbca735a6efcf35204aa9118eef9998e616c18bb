@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9faa7ec9_fe8a0c04",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:01Z",
+      "side": 1,
+      "message": "Unit tests for this driver are provided by the follow-up test CLs in this stack (driver test harness, mode/IRQ tests, image acquisition tests).",
+      "parentUuid": "7a6c1ba0_93761b3d",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 9999
+      },
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18df0718_e8b0fa9f",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL and add tests**\n\n### Review Summary\n\n*   **Functionality:** Found a bug in `rts5817maa_init` where initialization failures are masked by a `return 0;` fallback despite non-zero `ret`.\n*   **Architecture \u0026 Component Fit:** The driver encapsulates sensor interactions correctly and maps well to Cros EC fingerprint APIs.\n*   **Code Simplicity:** `rts5817_spi_xfer` contains redundant branching that can be simplified.\n*   **Idiomaticity \u0026 Readability:** `rts5817maa_get_info` uses unidiomatic `memcpy` for struct assignments rather than native C assignments.\n*   **Security:** No obvious vulnerabilities or memory leaks. `rts5817maa_irq` handles GPIO callbacks safely.\n*   **Testing \u0026 Test Coverage:** Missing automated test coverage. A driver of this size must include unit tests using standard fakes/mocks, following the established conventions seen in `zephyr/test/fingerprint/drivers/`. Updating the commit message to `TEST\u003dzmake build realtekfp` is not an acceptable substitute.\n*   **CL Size \u0026 Scope:** Size: L (+835, -0). This CL is still too large and must be split. While earlier integrations were removed, adding the core driver alongside its Platform Abstraction Layer (PAL) without unit tests is still too large. Please split this into smaller CLs:\n    *   **CL 1:** Platform Abstraction Layer (PAL) and private headers (`fingerprint_rts5817maa_pal.c`, `_pal.h`, `_private.h`).\n    *   **CL 2:** Core sensor driver (`fingerprint_rts5817maa.c`) along with its unit tests in `zephyr/test/fingerprint/drivers/rts5817maa/`.\n*   **Commit Message:** The `TEST\u003d` tag only documents building; it must be updated with the automated test command once tests are added.\n\n[🔗](http://go/tj/ab2cabf5-a54f-4771-8b8a-326801cda675)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6418090_3e34bb67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:01Z",
+      "side": 1,
+      "message": "The init-failure and simplification items are fixed. Unit tests are in the follow-up test CLs of this stack. Not splitting the driver from the PAL for now.",
+      "parentUuid": "18df0718_e8b0fa9f",
       "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a94549a_1ced63e7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:01Z",
+      "side": 1,
+      "message": "Done in ps14: rts5817maa_init returns ret when sensor init fails.",
+      "parentUuid": "22a981e6_8a882023",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 9999
+      },
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f9b1137_77e4c4aa",
@@ -95,6 +161,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5f8da83_5d0246f0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:01Z",
+      "side": 1,
+      "message": "Done: get_info already uses a native struct assignment (*sensor_info \u003d cfg-\u003esensor_info;).",
+      "parentUuid": "1f9b1137_77e4c4aa",
+      "range": {
+        "startLine": 190,
+        "startChar": 0,
+        "endLine": 191,
+        "endChar": 9999
+      },
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bdae4958_5ecbeeca",
@@ -116,6 +206,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7939c68f_20009dca",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_pal.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:01Z",
+      "side": 1,
+      "message": "Done: rts5817_spi_xfer already returns spi_transceive_dt() directly.",
+      "parentUuid": "bdae4958_5ecbeeca",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 9999
+      },
       "revId": "bbca735a6efcf35204aa9118eef9998e616c18bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
