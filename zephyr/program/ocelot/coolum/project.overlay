@@ -15,7 +15,6 @@
 
 #include <cros/integrated_fwid.dtsi>
 #include "../ite_hibernate.dtsi"
-#include "../rvp_battery.dtsi"
 #include "../rvp_usba.dtsi"
 
 /* coolum project DTS includes */
@@ -29,6 +28,7 @@
 #include "power_signals.dtsi"
 #include "temp_sensor.dtsi"
 #include "usbc.dtsi"
+#include "battery.dtsi"
 
 /*
  * Map GPIOs used for interrupts to common names
