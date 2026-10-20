@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f7239d0_9204c194",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Blocker — Action Required]** The subject line joins two independent action categories with \"and\" (\"Enable C++23 and modernize leaf utilities\"), indicating that this CL bundles multiple logical changes.\n\nPer the Single Logical Change rule, please split this CL and provide a focused commit message for each. For example, for the utility modernization CL:\n\n```\nfpsensor: Modernize leaf utilities with C++23 constexpr\n\nMigrate the fingerprint sensor core validation and logging utilities to type-safe C++23 `constexpr` functions.\n\nReplace legacy C-style macros and out-of-line buffer validation routines with `constexpr` helpers and the value-returning `FpFourCc` class to eliminate dynamic string allocations and ensure safer buffer handling at compile-time.\n```\n\n(See the `PATCHSET_LEVEL` comment for the full split plan).\n[🔗](http://go/tj/33dbfb1a-9f17-4544-8e6c-45f7c4884ca8)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5fffa93479ffc7b92fc3185d7f3fd18d5b3425f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1141d0e6_695677ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n**CL Size \u0026 Scope:** Size: L (+177, -118). While the non-test production diff is \u003c 250 lines, this CL violates the Single Logical Change rule by bundling multiple independent categories of work: enabling C++23, adding C++ host command macros, migrating leaf utilities to `constexpr`, and refactoring existing test arrays. Furthermore, the subject line joins two independent actions with \"and\". Please split this into smaller, self-contained CLs:\n1. Enable C++23 in the build configuration (`build.mk`, `prj.conf`).\n2. Add the generic C++ host command wrapper macros to a core EC header (not `fpsensor_utils.h`).\n3. Migrate `fpsensor_utils` to `constexpr` and `FpFourCc`.\n4. Modernize `fpsensor_hw.cc` test arrays and hardware IDs.\n\n### Review Summary\n* **Functionality:** ✅ The `FpFourCc` endianness bug has been resolved with bitwise shifts.\n* **Architecture \u0026 Component Fit:** ❌ The `EC_HOST_CMD_HANDLER` macros for C++ are generic EC framework utilities and represent a layering violation when placed in the leaf-level `fpsensor_utils.h`. They should be moved to a core framework header.\n* **Code Simplicity:** ✅ Removed obsolete C-style utilities and simplified string formatting.\n* **Idiomaticity \u0026 Readability:** ✅ Good use of modern C++ features (`std::array`, `constexpr`, `std::string_view`).\n* **Security:** ✅ N/A\n* **Testing:** ✅ Good use of boundary testing for `FpFourCc`.\n* **Commit Message:** ❌ The subject line joins multiple actions with \"and\". See inline comment on `/COMMIT_MSG` for a split-friendly rewrite.\n\n[🔗](http://go/tj/33dbfb1a-9f17-4544-8e6c-45f7c4884ca8)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5fffa93479ffc7b92fc3185d7f3fd18d5b3425f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa5cfb5b_361bceac",
+        "filename": "include/fpsensor/fpsensor_utils.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Architecture \u0026 Component Fit (Layering Violation)**: These C++ host command wrapper macros (`ec_host_cmd_handler_args`, `EC_HOST_CMD_HANDLER_UNBOUND`, etc.) are generic framework utilities that apply to any EC host command written in C++. They do not belong in a leaf-level sensor utility header (`fpsensor_utils.h`).\n\nPlease move this block into a core EC framework header (such as `include/host_command_cxx.h` or directly integrated into `include/host_command.h` if appropriate) so that other C++ EC modules can use it without depending on fingerprint-specific code.\n\n*Suggestion for a follow-up CL (to keep this move CL pure):* Extract these macros into a separate prerequisite CL.\n[🔗](http://go/tj/33dbfb1a-9f17-4544-8e6c-45f7c4884ca8)",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5fffa93479ffc7b92fc3185d7f3fd18d5b3425f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38f77542_cd614f2d",
+        "filename": "zephyr/test/hwtest/src/fpsensor_hw.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Single Logical Change (Test Refactoring)**: Modernizing `fpsensor_hw.cc` to use `std::array` and `constexpr` hardware ID constants is a valuable test/fixture refactoring, but per `go/small-cls`, refactoring existing test code must not be bundled with production code changes.\n\nPlease extract this test modernization into a separate, independent CL.\n[🔗](http://go/tj/33dbfb1a-9f17-4544-8e6c-45f7c4884ca8)",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5fffa93479ffc7b92fc3185d7f3fd18d5b3425f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
