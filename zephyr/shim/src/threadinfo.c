@@ -4,6 +4,7 @@
  */
 
 #include "ec_commands.h"
+#include "ec_tasks.h"
 #include "host_command.h"
 #include "panic_utils.h"
 
@@ -45,7 +46,7 @@ static void get_thread_registers(const struct k_thread *thread, uint32_t *pc,
 	*pc = 0;
 	*lr = 0;
 
-	if (thread == k_current_get() && !k_is_in_isr())
+	if (thread == get_current_thread() && !k_is_in_isr())
 		return;
 
 #if defined(CONFIG_ARCH_STACKWALK)
@@ -153,7 +154,7 @@ hc_thread_info_detail(struct ec_host_cmd_handler_args *args)
 	}
 
 	const struct k_thread *thread = d.found;
-	const k_tid_t current = k_current_get();
+	const k_tid_t current = get_current_thread();
 
 	memset(r, 0, sizeof(*r));
 

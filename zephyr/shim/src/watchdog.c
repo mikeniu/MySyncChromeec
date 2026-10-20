@@ -229,8 +229,8 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
 	uint32_t exception_address = 0;
-	const char *thread_name;
-	struct k_thread *thread = k_current_get();
+	const char *thread_name = NULL;
+	struct k_thread *thread = get_current_thread();
 
 #ifdef CONFIG_RISCV
 	struct arch_esf *esf = (struct arch_esf *)get_stack_ptr(thread);
@@ -254,9 +254,10 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 */
 	panic_data_write_watchdog_warning(exception_address, thread);
 
-	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
+	if (IS_ENABLED(CONFIG_THREAD_NAME) && thread != NULL) {
 		thread_name = k_thread_name_get(thread);
-	} else {
+	}
+	if (thread_name == NULL) {
 		thread_name = "unknown";
 	}
 
