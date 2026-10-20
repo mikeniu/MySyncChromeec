@@ -99,7 +99,6 @@ pujjo = register_nissa_project(
 pujjoga = register_nissa_project(
     project_name="pujjoga",
     chip="npcx9/npcx9m3f",
-    snippets=["npcx-45mhz"],
 )
 
 pujjogatwin = register_nissa_project(
