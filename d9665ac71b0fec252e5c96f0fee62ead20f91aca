@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "d9665ac71b0fec252e5c96f0fee62ead20f91aca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "069fa83a_454bc545",
+        "filename": "zephyr/test/fingerprint/algorithm/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:07:51Z",
+      "side": 1,
+      "message": "Done. Unused mocks moved to the enroll/match test CLs.",
+      "parentUuid": "b005dc78_a352be8a",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 9999
+      },
+      "revId": "d9665ac71b0fec252e5c96f0fee62ead20f91aca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
