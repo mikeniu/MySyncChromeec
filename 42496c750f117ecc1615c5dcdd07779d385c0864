@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffe7f0d3_28417cc4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:17:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/aeea63ea-2b15-4b23-bc72-451d4a53a4ed)]\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n`Size: M (+85, -30)`\nThis CL is appropriately sized and implements a single cohesive logical change (encapsulating telemetry statistics in `FpSensorStats`).\n\n**Functionality:**\nThe behavioral extraction into `FpSensorStats` is mechanically correct and preserves existing logic exactly.\n\n**Architecture \u0026 Component Fit:**\nExcellent use of encapsulation to group related telemetry fields and their operations into a single cohesive struct (`FpSensorStats`), improving the organization of the sensor context.\n\n**Code Simplicity:**\nThe new `FpSensorStats` member functions (`start_overall`, `finish_overall`, `record_capture`) simplify the caller logic and eliminate redundant error-flagging branches on the capture path.\n\n**Idiomaticity \u0026 Readability:**\nThe C++ structs and methods are clean, use `constexpr`/`noexcept` appropriately, and follow idiomatic practices.\n\n**Security:**\nNo security vulnerabilities identified.\n\n**Testing:**\nThorough automated test coverage is present for the new `FpSensorStats` operations, including both error and success paths for `record_capture`, satisfying the testing requirements.\n\n**Commit Message:**\nThe commit message accurately describes the *why* and *what* of the change in concise prose, free of diff-narration, and the subject line is well-formed.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "42496c750f117ecc1615c5dcdd07779d385c0864",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
