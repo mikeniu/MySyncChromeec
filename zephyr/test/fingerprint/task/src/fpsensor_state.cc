@@ -424,6 +424,36 @@ ZTEST_USER(fpsensor_state, test_fp_mode_v1_truncated)
 		      rv);
 }
 
+ZTEST_USER(fpsensor_state, test_fp_sensor_stats_response)
+{
+	FpSensorStats stats{};
+	timestamp_t t0{};
+	t0.val = 0x100000002ULL;
+	stats.start_overall(t0);
+	stats.record_capture(t0, false);
+	stats.matching_time_us = 42;
+	stats.template_matched = 3;
+
+	const ec_response_fp_stats resp = stats.to_response();
+	zassert_equal(resp.overall_t0.lo, 2u);
+	zassert_equal(resp.overall_t0.hi, 1u);
+	zassert_equal(resp.matching_time_us, 42u);
+	zassert_equal(resp.timestamps_invalid, FPSTATS_CAPTURE_INV);
+	zassert_equal(resp.template_matched, 3);
+}
+
+ZTEST_USER(fpsensor_state, test_fp_sensor_stats_capture_success)
+{
+	FpSensorStats stats{};
+	timestamp_t t0{};
+	t0.val = 0x100000002ULL;
+
+	stats.record_capture(t0, true);
+
+	const ec_response_fp_stats resp = stats.to_response();
+	zassert_equal(resp.timestamps_invalid, 0);
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
