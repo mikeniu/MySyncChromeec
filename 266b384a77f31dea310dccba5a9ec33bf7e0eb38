@@ -50,6 +50,24 @@
       "message": "Hi @alevkoy@chromium.org,\n\nI checked the result in the CQ link, it shows:\n0 test variants: status\u003dFAILED\n332 test variants: status\u003dPASSED or SKIPPED\n\nI didn\u0027t find any fail items, so could you please help to confirm the reason for the failure?",
       "revId": "266b384a77f31dea310dccba5a9ec33bf7e0eb38",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4247efa5_1691fa7c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 45
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-20T16:27:30Z",
+      "side": 1,
+      "message": "This shows up as an \"info\" line for me. I\u0027m not sure why it\u0027s not listed as an error.\n\u003e The following line is too long (limit: 72 chars):\nAdd the minimal IT52XX PDC driver wiring and stub each required PDC API.... (76 chars)\n\nConventionally, commit bodies are max 72 character lines. Commit headlines are conventionally 50 characters, although I don\u0027t know that we have a checker for that.",
+      "parentUuid": "3e273c9f_987068e5",
+      "revId": "266b384a77f31dea310dccba5a9ec33bf7e0eb38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
