@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7f2f4a1_19549623",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Blocker — Action Required]** The commit message still violates the Single Logical Change rule by joining two independent change categories with \"and\" in both the subject and body.\n\nWhen you split the CL, please ensure each commit message describes only its specific atomic change. Here are suggested descriptions for the split CLs:\n\n**CL 1 (Telemetry Stats):**\n```text\nfpsensor: Encapsulate telemetry statistics in FpSensorStats\n\nFile-scope mutable variables for capture timing and matching statistics fragment state outside the sensor context. Move these statistics into an `FpSensorStats` struct to improve encapsulation.\n\nBUG\u003db:286119221\nTEST\u003d./twister -T zephyr/test/fingerprint/task -s fingerprint.task.state\n```\n\n**CL 2 (Task Loop Operations):**\n```text\nfpsensor: Extract task loop operations into FpSensorContext\n\nConsolidate finger polling, enrollment session synchronization, and template crypto actions from the main task loop into `FpSensorContext` member functions.\n\nBUG\u003db:286119221\nTEST\u003d./twister -T zephyr/test/fingerprint/task -s fingerprint.task.state\n```\n[🔗](http://go/tj/fd0dca27-b060-4ea6-bbec-163aaf26a56f)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9626589_09dfbcbe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n`Size: L (+144, -115)`\nThis CL bundles two independent, orthogonal refactorings into a single commit, which violates the Single Logical Change rule. Please split this CL to allow each set of changes to be reviewed and tested independently:\n1. **CL 1:** Encapsulate telemetry statistics into `FpSensorStats` (and add missing unit test coverage for success paths).\n2. **CL 2:** Extract task loop operations into `FpSensorContext` member functions (`poll_finger_and_capture`, `sync_enroll_session`, etc.).\n\n**Functionality:**\nThe behavioral extractions appear mechanically correct.\n\n**Architecture \u0026 Component Fit:**\nGood use of encapsulation to move state closer to where it is used.\n\n**Code Simplicity:**\nControl flow in `poll_finger_and_capture` contains redundant branching that could be unified, though this is pre-existing.\n\n**Idiomaticity \u0026 Readability:**\nNo major concerns.\n\n**Testing:**\nMissing test coverage for `stats.record_capture(..., true)`. Unit tests for the relocated `FpSensorContext` member functions should be added in a follow-up CL to keep the extraction pure.\n\n**Commit Message:**\nSee inline comment on `/COMMIT_MSG` to address the multi-bullet subject/body and diff-narration.\n[🔗](http://go/tj/fd0dca27-b060-4ea6-bbec-163aaf26a56f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e6030c9_1c915736",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[Suggestion for a follow-up CL (pre-existing code)]** The control flow in this extracted method has redundant state checks that can be simplified. Since this is a pure move, please apply this simplification in a follow-up CL.\n\n```cpp\nvoid fpsensor_context::poll_finger_and_capture(int \u0026timeout_us)\n{\n\tif (!(sensor_mode \u0026 FP_MODE_ANY_DETECT_FINGER)) {\n\t\treturn;\n\t}\n\n\tconst enum finger_state st \u003d fp_finger_status();\n\tif (st \u003d\u003d FINGER_PRESENT) {\n\t\tif (sensor_mode \u0026 FP_MODE_FINGER_DOWN) {\n\t\t\tCPRINTS(\"Finger!\");\n\t\t\tsensor_mode \u0026\u003d ~FP_MODE_FINGER_DOWN;\n\t\t\tsend_mkbp_event(EC_MKBP_FP_FINGER_DOWN);\n\t\t}\n\t\tif (sensor_mode \u0026 FP_MODE_ANY_CAPTURE) {\n\t\t\tCPRINTS(\"Finger down (capture mode)!\");\n\t\t\tsend_mkbp_event(EC_MKBP_FP_FINGER_DOWN);\n\t\t\tfp_process_finger();\n\t\t}\n\t} else if (sensor_mode \u0026 FP_MODE_FINGER_UP) {\n\t\tsensor_mode \u0026\u003d ~FP_MODE_FINGER_UP;\n\t\ttimeout_us \u003d -1;\n\t\tsend_mkbp_event(EC_MKBP_FP_FINGER_UP);\n\t}\n}\n```\n[🔗](http://go/tj/fd0dca27-b060-4ea6-bbec-163aaf26a56f)",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 265,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aa3b461_2c6eeb89",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[Suggestion for a follow-up CL (to keep this move CL pure)]** These newly extracted member functions (`poll_finger_and_capture`, `sync_enroll_session`, `encrypt_requested_template`, `decrypt_and_commit_template`) have no unit test coverage. Since this is a pure move/extraction of existing logic, I am not blocking this CL on tests, but please add unit tests for these state transitions in a follow-up CL.\n[🔗](http://go/tj/fd0dca27-b060-4ea6-bbec-163aaf26a56f)",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c9fdd31_e62eea12",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[Testing Blocker — Missing Coverage]** This test only exercises the error path (`success \u003d false`) for `record_capture`. Per testing guidelines, you must cover all touched branches. Please add a test case verifying the success path (`success \u003d true`) where `FPSTATS_CAPTURE_INV` is not set.\n\n**Suggestion for CL 1:**\n```cpp\nZTEST_USER(fpsensor_state, test_fp_sensor_stats_capture_success)\n{\n\tFpSensorStats stats{};\n\ttimestamp_t t0{};\n\tt0.val \u003d 0x100000002ULL;\n\t\n\tstats.record_capture(t0, true);\n\t\n\tconst ec_response_fp_stats resp \u003d stats.to_response();\n\tzassert_equal(resp.timestamps_invalid, 0);\n}\n```\n[🔗](http://go/tj/fd0dca27-b060-4ea6-bbec-163aaf26a56f)",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 443,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
