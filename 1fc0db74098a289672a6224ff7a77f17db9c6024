@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "1fc0db74098a289672a6224ff7a77f17db9c6024",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7abc358a_66474dad",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 1838,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:45:40Z",
+      "side": 1,
+      "message": "Added an explicit assertion that a second FpAuthChallenge::consume_and_verify call immediately returns EC_ERROR_ACCESS_DENIED before re-setting FP_AUTH_CHALLENGE_SET.",
+      "parentUuid": "29c23b3f_83516e9a",
+      "range": {
+        "startLine": 1838,
+        "startChar": 0,
+        "endLine": 1838,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "1fc0db74098a289672a6224ff7a77f17db9c6024",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
