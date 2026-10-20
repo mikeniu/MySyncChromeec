@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7623149_63a1c63e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T11:01:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/6aaf0590-7176-4e9f-bbc7-ac673fa7d59d)]\n\n### Review Summary\n\n*   **Functionality:** ✅ The flash protection state queries correctly interpret the hardware status registers and software latch to evaluate RO, ROLLBACK, and RW protection regions across `_AT_BOOT` and `_NOW` states.\n*   **Architecture \u0026 Component Fit:** ✅ The driver properly abstracts the status register parsing and translates it into standard `EC_FLASH_PROTECT_*` flags using the shared `spi_flash_reg_to_protect` utility, avoiding redundant parsing logic.\n*   **Code Simplicity:** ✅ A minor inline suggestion was provided to remove a redundant variable assignment in `cros_flash_rtkfp_get_protect_flags`, but the code is otherwise straightforward and minimal.\n*   **Idiomaticity \u0026 Readability:** ✅ The use of `\u003cstdbool.h\u003e` and `bool` for `sw_protected` is correct, and the control flow uses declarative checks without deeply nested `else if` chains.\n*   **Security:** ✅ Status register parsing explicitly rejects inconsistent SRP bit settings or undecodable configurations by failing closed with `EC_FLASH_PROTECT_ERROR_INCONSISTENT` and `EC_FLASH_PROTECT_ERROR_UNKNOWN`.\n*   **Testing:** ✅ Comprehensive coverage is provided for the protection query API, including exact hardware boundary checks (`WP_BANK - 1`, `WP_BANK`), hardware initialization dependencies, and error handling paths.\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+198, -3)`. The non-test production delta is very small (~75 lines). The CL correctly complies with the Single Logical Change rule by isolating the state queries and moving the modification operations to a separate CL.\n*   **Commit Message:** ✅ The message is concise, avoids diff narration, focuses on the core intent of mapping BP bits/software locks to the `cros_flash` API flags, and includes the proper issue and test verification tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a512c0f5041d3aa62ef23dcbf1d09e779f251bb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddfab375_11d510e5",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T11:01:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\n**Minor Suggestion:** You can simplify this by returning the error constant directly, avoiding the redundant `flags` assignment.\n\n```c\n\tif (prot_start !\u003d FLASH_PROTECTION_START) {\n\t\treturn EC_FLASH_PROTECT_ERROR_INCONSISTENT;\n\t}\n```\n[🔗](http://go/tj/6aaf0590-7176-4e9f-bbc7-ac673fa7d59d)",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 265,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a512c0f5041d3aa62ef23dcbf1d09e779f251bb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
