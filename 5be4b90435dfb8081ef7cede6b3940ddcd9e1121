@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bcc9503_9a08b6b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:45:20Z",
+      "side": 1,
+      "message": "Replaced raw magic numbers with POINT_CONVERSION_UNCOMPRESSED in include/fpsensor/fpsensor_auth_crypto.h and derived boundary test inputs using POINT_CONVERSION_UNCOMPRESSED -/+ 1 and FP_AES_KEY_ENC_METADATA_VERSION -/+ 1 in zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc.",
+      "parentUuid": "523837e6_a8e9ca45",
+      "isAi": true,
+      "revId": "5be4b90435dfb8081ef7cede6b3940ddcd9e1121",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e49bc47_beb39f7a",
@@ -45,6 +64,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad4eb8ce_99096ef4",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:45:20Z",
+      "side": 1,
+      "message": "Replaced 0x04 with POINT_CONVERSION_UNCOMPRESSED in FpP256Key::from_uncompressed_point.",
+      "parentUuid": "0e49bc47_beb39f7a",
+      "range": {
+        "startLine": 306,
+        "startChar": 0,
+        "endLine": 308,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5be4b90435dfb8081ef7cede6b3940ddcd9e1121",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d59bfed_43cb0eee",
@@ -65,6 +109,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5be4b90435dfb8081ef7cede6b3940ddcd9e1121",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21618592_9e3a14bf",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 1808,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:45:20Z",
+      "side": 1,
+      "message": "Updated test_fp_auth_key_wrappers to use POINT_CONVERSION_UNCOMPRESSED -/+ 1 and FP_AES_KEY_ENC_METADATA_VERSION -/+ 1.",
+      "parentUuid": "7d59bfed_43cb0eee",
+      "range": {
+        "startLine": 1784,
+        "startChar": 0,
+        "endLine": 1808,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "5be4b90435dfb8081ef7cede6b3940ddcd9e1121",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
