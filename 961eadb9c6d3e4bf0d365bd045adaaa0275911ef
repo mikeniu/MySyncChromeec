@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e04727d_c6afacce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:02:29Z",
+      "side": 1,
+      "message": "Done. Split into two CLs and dropped the test paragraph.",
+      "parentUuid": "16b5584d_bccadaec",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 9999
+      },
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8320d55f_8e7c9f9c",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL.**\n\n### Review Summary\n\n*   **Functionality:** ❌ **Changes Requested.** `cros_flash_rtkfp_get_protect` fails to check `data-\u003eall_protected`, returning `0` (writable) for banks beyond the status register range even when the entire flash is locked in software. See inline comment for the fix.\n*   **Architecture \u0026 Component Fit:** ✅ The logic properly implements the flash protection API and correctly translates software states into the shared SPI flash registers.\n*   **Code Simplicity:** ❌ **Changes Requested.** The `cros_flash_rtkfp_protect_now` implementation uses an unnecessary `if/else` block to call `protect_at_boot`. This can be unified into a single call with a ternary operator. See inline comment.\n*   **Idiomaticity \u0026 Readability:** ✅ Standard types and language constructs are used cleanly. Previous `int` to `bool` suggestions were successfully adopted.\n*   **Security:** ✅ Status register parsing explicitly rejects inconsistent SRP bit settings, and write operations properly gate on both hardware and software locks.\n*   **Testing:** ✅ Comprehensive coverage is provided for the new protection API, including correct testing of off-by-one boundary cases (e.g. `CONFIG_WP_STORAGE_SIZE - 1`) and hardware lock enforcement.\n*   **CL Size \u0026 Scope:** ❌ **Changes Requested.** `Size: L (+566, -5)`. The production (non-test) diff is approximately 298 lines, which exceeds the 250-line limit for a cohesive change. The CL also bundles multiple logical changes together (protection queries vs. protection mutations). Please split this into smaller CLs:\n    1.  **CL 1**: Add protection state queries (`get_protect`, `get_protect_flags`, `flash_get_prot_range`) and their unit tests.\n    2.  **CL 2**: Implement protection modification operations (`protect_at_boot`, `protect_now`, `flash_write_prot_reg`) and enforcement hooks in `write` and `erase`, and their unit tests.\n*   **Commit Message:** ❌ **Changes Requested.** The message unnecessarily narrates the unit tests. See inline comment on `/COMMIT_MSG` for replacement text covering the split options.\n\n[🔗](http://go/tj/e7e3ee12-8177-4718-aeb4-84841200af5b)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2835e80_21098f44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:02:29Z",
+      "side": 1,
+      "message": "Done. Queries stay here; modifications are in 8617738.",
+      "parentUuid": "8320d55f_8e7c9f9c",
       "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fed3e6f_15e41ef4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:02:29Z",
+      "side": 1,
+      "message": "Done. all_protected is introduced in 8617738, where get_protect now returns 1 for it.",
+      "parentUuid": "fa1bdd10_37556d30",
+      "range": {
+        "startLine": 286,
+        "startChar": 0,
+        "endLine": 308,
+        "endChar": 9999
+      },
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1209d09b_ac051b41",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c91fcee0_c35578e5",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:02:29Z",
+      "side": 1,
+      "message": "Done in 8617738.",
+      "parentUuid": "1209d09b_ac051b41",
+      "range": {
+        "startLine": 474,
+        "startChar": 0,
+        "endLine": 503,
+        "endChar": 9999
+      },
       "revId": "961eadb9c6d3e4bf0d365bd045adaaa0275911ef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
