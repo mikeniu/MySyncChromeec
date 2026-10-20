@@ -9,6 +9,7 @@ import collections
 import logging
 import os
 import pathlib
+import re
 import site
 import sys
 import tempfile
@@ -45,6 +46,56 @@ import zephyr_module
 
 # Known configuration file extensions.
 CONF_FILE_EXT = (".conf", ".overlay", "_defconfig")
+# Known devicetree file extensions.
+DTS_FILE_EXT = (".dts", ".dtsi", ".overlay")
+
+# ChromeOS SoC devicetree include prefixes.
+CROS_SOC_INCLUDE_PREFIXES = (
+    "cros/nuvoton/",
+    "cros/ite/",
+    "cros/realtek/",
+    "cros/microchip/",
+    "cros/st/",
+    "cros/egis/",
+    "cros/elan/",
+    "cros/ft/",
+)
+
+# Upstream SoC/chip devicetree include prefixes.
+UPSTREAM_SOC_INCLUDE_PREFIXES = (
+    "nuvoton/",
+    "ite/",
+    "realtek/",
+    "microchip/",
+    "st/",
+    "egis/",
+    "elan/",
+    "ft/",
+    "focaltech/",
+)
+
+INCLUDE_RE = re.compile(r"^\s*#\s*include\s*[<\"]([^>\"]+)[>\"]")
+
+
+def _is_cros_soc_include(inc):
+    """Return True if inc is a ChromeOS SoC devicetree include."""
+    return any(inc.startswith(p) for p in CROS_SOC_INCLUDE_PREFIXES) and (
+        inc.endswith(".dtsi") or inc.endswith(".dts")
+    )
+
+
+def _is_upstream_soc_include(inc):
+    """Return True if inc is an upstream SoC/chip devicetree include."""
+    if not (
+        any(inc.startswith(p) for p in UPSTREAM_SOC_INCLUDE_PREFIXES)
+        and (inc.endswith(".dtsi") or inc.endswith(".dts"))
+    ):
+        return False
+    basename = inc.split("/")[-1]
+    # Pinctrl mappings and peripheral expanders (e.g. it8801) are not SoC chips.
+    if "pinctrl" in basename or "it8801" in basename:
+        return False
+    return True
 
 
 def _parse_args(argv):
@@ -404,8 +455,70 @@ class KconfigCheck:
                             dep,
                         )
 
+    def _filter_dts_files(self, files):
+        """Yield devicetree files (.dts, .dtsi, .overlay) from the command line."""
+        for file in files:
+            if not file.exists():
+                self.log.info("Ignoring %s: file has been removed", file)
+                continue
+
+            if not file.name.endswith(DTS_FILE_EXT):
+                self.log.info("Ignoring %s: not a devicetree file", file)
+                continue
+
+            yield file
+
+    def _check_dts_includes(self, file_name):
+        """Check file_name for devicetree include ordering and clean headers.
+
+        Checks:
+        1. Upstream SoC/chip .dtsi must not appear after a ChromeOS SoC DTSI include.
+        2. ChromeOS DTSI headers under zephyr/include/cros must not re-include
+           upstream SoC/chip .dtsi files.
+        """
+        self.log.info("Checking devicetree includes in %s", file_name)
+
+        file_path = pathlib.Path(file_name).resolve()
+        under_cros_include = "zephyr/include/cros" in file_path.as_posix()
+
+        first_cros_soc_line = None
+        first_cros_soc_name = None
+        with open(file_name, "r", encoding="utf-8", errors="ignore") as file:
+            for line_num, line in enumerate(file.readlines(), start=1):
+                match = INCLUDE_RE.match(line)
+                if not match:
+                    continue
+                inc = match.group(1)
+
+                if under_cros_include and _is_upstream_soc_include(inc):
+                    self._fail(
+                        "%s:%d: ChromeOS DTSI header must not re-include"
+                        " upstream SoC DTSI <%s>",
+                        file_name,
+                        line_num,
+                        inc,
+                    )
+
+                if _is_cros_soc_include(inc):
+                    if first_cros_soc_line is None:
+                        first_cros_soc_line = line_num
+                        first_cros_soc_name = inc
+                elif _is_upstream_soc_include(inc):
+                    if first_cros_soc_line is not None:
+                        self._fail(
+                            "%s:%d: Upstream SoC DTSI <%s> must be included"
+                            " before ChromeOS SoC DTSI <%s> (included at"
+                            " line %d)",
+                            file_name,
+                            line_num,
+                            inc,
+                            first_cros_soc_name,
+                            first_cros_soc_line,
+                        )
+
     def run_checks(self, files, dt_has):
         """Run all config checks."""
+        files = list(files)
         config_files = self._filter_config_files(files)
 
         for file in config_files:
@@ -416,6 +529,11 @@ class KconfigCheck:
 
         for file in kconfig_files:
             self._check_kconfig_defaults(file)
+
+        dts_files = self._filter_dts_files(files)
+
+        for file in dts_files:
+            self._check_dts_includes(file)
 
         return self.fail_count
 

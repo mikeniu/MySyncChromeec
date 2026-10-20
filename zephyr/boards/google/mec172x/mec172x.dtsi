@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include <microchip/mec/mec172xnsz.dtsi>
+#include <microchip/mec/mec172x/mec172xnsz-pinctrl.dtsi>
 #include <cros/microchip/mec172x.dtsi>
 #include <cros/thermistor/thermistor.dtsi>
 #include <dt-bindings/gpio_defines.h>

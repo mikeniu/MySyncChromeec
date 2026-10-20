@@ -437,6 +437,31 @@ CONFIG_DT_BUT_EMUL=y
             [mock.call("Kconfig"), mock.call("Kconfig.tcpm")],
         )
 
+    @mock.patch("check_zephyr_project_config.KconfigCheck._check_dts_includes")
+    @mock.patch("check_zephyr_project_config.KconfigCheck._filter_dts_files")
+    @mock.patch(
+        "check_zephyr_project_config.KconfigCheck._filter_kconfig_files"
+    )
+    @mock.patch("check_zephyr_project_config.KconfigCheck._filter_config_files")
+    def test_run_checks_dts(
+        self,
+        filter_config_files_mock,
+        filter_kconfig_files_mock,
+        filter_dts_files_mock,
+        check_dts_includes_mock,
+    ):
+        """Test run_checks invokes _check_dts_includes on devicetree files."""
+        filter_config_files_mock.return_value = []
+        filter_kconfig_files_mock.return_value = []
+        filter_dts_files_mock.return_value = ["board.dts", "chip.dtsi"]
+
+        self.kcheck.run_checks([], False)
+
+        self.assertListEqual(
+            check_dts_includes_mock.call_args_list,
+            [mock.call("board.dts"), mock.call("chip.dtsi")],
+        )
+
 
 class TestKconfigSymbolChecks(unittest.TestCase):
     """Tests for symbol checks."""
@@ -605,6 +630,135 @@ class TestKconfigSymbolChecks(unittest.TestCase):
                 fake_kconf, sym_prog, ec_base, prog_base
             ),
             [],
+        )
+
+
+class TestDtsIncludeChecks(unittest.TestCase):
+    """Tests for devicetree include checks."""
+
+    @mock.patch("check_zephyr_project_config.KconfigCheck._init_kconfig")
+    def setUp(self, init_kconfig_mock):  # pylint:disable=arguments-differ
+        mock_kconfig = mock.Mock()
+        init_kconfig_mock.return_value = mock_kconfig
+        self.kcheck = check_zephyr_project_config.KconfigCheck(True)
+
+    def test_filter_dts_files(self):
+        """Test filtering devicetree files by extension."""
+        files = [
+            pathlib.Path("board.dts"),
+            pathlib.Path("soc.dtsi"),
+            pathlib.Path("app.overlay"),
+            pathlib.Path("prj.conf"),
+            pathlib.Path("main.c"),
+        ]
+        with mock.patch("pathlib.Path.exists", return_value=True):
+            filtered = list(self.kcheck._filter_dts_files(files))
+        self.assertEqual(
+            filtered,
+            [
+                pathlib.Path("board.dts"),
+                pathlib.Path("soc.dtsi"),
+                pathlib.Path("app.overlay"),
+            ],
+        )
+
+    def test_is_cros_soc_include(self):
+        """Test detection of ChromeOS SoC includes."""
+        self.assertTrue(
+            check_zephyr_project_config._is_cros_soc_include(
+                "cros/nuvoton/npcx7.dtsi"
+            )
+        )
+        self.assertTrue(
+            check_zephyr_project_config._is_cros_soc_include(
+                "cros/microchip/mec172x.dtsi"
+            )
+        )
+        self.assertFalse(
+            check_zephyr_project_config._is_cros_soc_include("cros/binman.dtsi")
+        )
+        self.assertFalse(
+            check_zephyr_project_config._is_cros_soc_include(
+                "cros/integrated_fwid.dtsi"
+            )
+        )
+
+    def test_is_upstream_soc_include(self):
+        """Test detection of upstream SoC includes."""
+        self.assertTrue(
+            check_zephyr_project_config._is_upstream_soc_include(
+                "nuvoton/npcx7m7fc.dtsi"
+            )
+        )
+        self.assertTrue(
+            check_zephyr_project_config._is_upstream_soc_include(
+                "microchip/mec/mec172xnsz.dtsi"
+            )
+        )
+        self.assertFalse(
+            check_zephyr_project_config._is_upstream_soc_include(
+                "nuvoton/npcx/npcx7/npcx7-pinctrl.dtsi"
+            )
+        )
+        self.assertFalse(
+            check_zephyr_project_config._is_upstream_soc_include(
+                "ite/it8xxx2-pinctrl-map.dtsi"
+            )
+        )
+        self.assertFalse(
+            check_zephyr_project_config._is_upstream_soc_include(
+                "ite/it8801-common-cfg.dtsi"
+            )
+        )
+
+    def test_dts_includes_valid(self):
+        """Test valid include ordering passes without errors."""
+        content = """
+#include <nuvoton/npcx7m7fc.dtsi>
+#include <cros/nuvoton/npcx7.dtsi>
+#include <nuvoton/npcx/npcx7/npcx7-pinctrl.dtsi>
+"""
+        with mock.patch("builtins.open", mock.mock_open(read_data=content)):
+            self.kcheck._check_dts_includes("board.dts")
+        self.assertEqual(self.kcheck.fail_count, 0)
+
+    @mock.patch("logging.Logger.error")
+    def test_dts_includes_out_of_order(self, log_mock):
+        """Test out-of-order includes fail with error."""
+        content = """
+#include <cros/nuvoton/npcx7.dtsi>
+#include <nuvoton/npcx7m7fc.dtsi>
+"""
+        with mock.patch("builtins.open", mock.mock_open(read_data=content)):
+            self.kcheck._check_dts_includes("board.dts")
+        self.assertEqual(self.kcheck.fail_count, 1)
+        log_mock.assert_called_once_with(
+            "%s:%d: Upstream SoC DTSI <%s> must be included before ChromeOS"
+            " SoC DTSI <%s> (included at line %d)",
+            "board.dts",
+            3,
+            "nuvoton/npcx7m7fc.dtsi",
+            "cros/nuvoton/npcx7.dtsi",
+            2,
+        )
+
+    @mock.patch("logging.Logger.error")
+    def test_dts_cros_header_reincludes_upstream(self, log_mock):
+        """Test ChromeOS header re-including upstream SoC DTSI fails."""
+        content = """
+#include <cros/binman.dtsi>
+#include <microchip/mec/mec172xnsz.dtsi>
+"""
+        cros_header = "/path/to/zephyr/include/cros/microchip/mec172x.dtsi"
+        with mock.patch("builtins.open", mock.mock_open(read_data=content)):
+            self.kcheck._check_dts_includes(cros_header)
+        self.assertEqual(self.kcheck.fail_count, 1)
+        log_mock.assert_called_once_with(
+            "%s:%d: ChromeOS DTSI header must not re-include upstream SoC DTSI"
+            " <%s>",
+            cros_header,
+            3,
+            "microchip/mec/mec172xnsz.dtsi",
         )
 
 
