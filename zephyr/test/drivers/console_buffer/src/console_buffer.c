@@ -378,6 +378,40 @@ ZTEST_USER(console, test_buf_notify_event)
 	/* Make sure console event is cleared. */
 	zassert_false(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
 }
+
+/*
+ * Setting the host event may block, so a log from an ISR must not set it.
+ * The next log from a thread must still set it.
+ */
+ZTEST_USER(console, test_buf_notify_event_isr)
+{
+#ifdef CONFIG_HOSTCMD_X86
+	lpc_set_host_event_mask(
+		LPC_HOST_EVENT_ALWAYS_REPORT,
+		lpc_override_always_report_mask() |
+			EC_HOST_EVENT_MASK(EC_HOST_EVENT_CONSOLE_LOGS));
+#endif
+
+#ifdef CONFIG_AP_POWER_CONTROL
+	/* Force power state S0 */
+	power_set_state(POWER_S0);
+	test_power_common_state();
+	zassert_equal(POWER_S0, power_get_state());
+#endif /* CONFIG_AP_POWER_CONTROL */
+
+	/* Flush the console buffer before we start. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
+
+	irq_offload(isr_notify_wrapper, (void *)"isr\n");
+	zassert_false(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
+
+	console_buf_notify_chars("thread\n", 7);
+	zassert_true(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
+
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
+}
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
 
 ZTEST_USER(console, test_console_read_buffer_invalid_type)

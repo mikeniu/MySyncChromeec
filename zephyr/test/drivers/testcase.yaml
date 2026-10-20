@@ -623,6 +623,16 @@ tests:
     - default/prj.conf
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
+  drivers.console_buffer.event:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_CONSOLE_BUFFER=y
+    - CONFIG_IRQ_OFFLOAD=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT=y
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
 
   drivers.cros_flash:
     tags:
