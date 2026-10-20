@@ -53,25 +53,25 @@ typedef struct {
 
 typedef struct {
 	const preserved_ring_buf_const_t constants;
-	volatile preserved_ring_buf_properties_t *properties;
+	preserved_ring_buf_properties_t *properties;
 	union {
-		volatile uint8_t *as_uint8;
-		volatile uint16_t *as_uint16;
-		volatile uint32_t *as_uint32;
+		uint8_t *as_uint8;
+		uint16_t *as_uint16;
+		uint32_t *as_uint32;
 	} buffer;
 } preserved_ring_buf_t;
 
 #define DECLARE_PRESERVED_RING_BUF(word_type, name, _capacity, _version)          \
-	/* Buffer capacity must be a factor of 2 */                               \
+	/* Buffer capacity must be a power of 2 */                                \
 	BUILD_ASSERT((_capacity & (_capacity - 1)) == 0);                         \
 	/* Word size must be 1, 2, or 4 */                                        \
 	BUILD_ASSERT((sizeof(word_type) == 1) || (sizeof(word_type) == 2) ||      \
 		     (sizeof(word_type) == 4));                                   \
-	static volatile uint8_t _preserved_ring_buf_##name##_buffer               \
+	static uint8_t _preserved_ring_buf_##name##_buffer                        \
 		[_capacity * sizeof(word_type)] __uncached __aligned(4)           \
 			__noinit_end_of_ram(                                      \
 				_preserved_ring_buf_##name##_buffer);             \
-	static volatile preserved_ring_buf_properties_t                           \
+	static preserved_ring_buf_properties_t                                    \
 		_preserved_ring_buf_##name##_properties __uncached __aligned(     \
 			4)                                                        \
 			__noinit_end_of_ram(                                      \
@@ -87,7 +87,7 @@ typedef struct {
 				.word_size = sizeof(word_type), \
 			}, \
     	}; \
-	static const preserved_ring_buf_t *name =                                 \
+	static const preserved_ring_buf_t *const name =                           \
 		&_preserved_ring_buf_##name##_data
 /*
  * Zero the buffer and set all preserved properties to the constant
@@ -119,8 +119,32 @@ uint32_t preserved_ring_buf_capacity(const preserved_ring_buf_t *buf);
 /*
  * Write a word to the buffer and increment head.
  */
-void preserved_ring_buf_write(const preserved_ring_buf_t *buf,
-			      const uint32_t word);
+static inline void preserved_ring_buf_write(const preserved_ring_buf_t *buf,
+					    const uint32_t word)
+{
+	/* Capacity is a power of 2, so bitmask replaces modulo. */
+	const uint32_t index =
+		(buf->properties->head++ & (buf->constants.capacity - 1));
+	switch (buf->constants.word_size) {
+	case 1:
+		buf->properties->checksum +=
+			(word & 0xff) - buf->buffer.as_uint8[index];
+		buf->buffer.as_uint8[index] = word;
+		break;
+	case 2:
+		buf->properties->checksum +=
+			(word & 0xffff) - buf->buffer.as_uint16[index];
+		buf->buffer.as_uint16[index] = word;
+		break;
+	case 4:
+		buf->properties->checksum +=
+			word - buf->buffer.as_uint32[index];
+		buf->buffer.as_uint32[index] = word;
+		break;
+	default:
+		__builtin_unreachable();
+	}
+}
 
 /*
  * Returns the word at the offset from the tail.
