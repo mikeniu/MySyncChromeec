@@ -129,6 +129,7 @@ static void push_fifo_data(struct motion_sensor_t *main_s, uint8_t *fifo,
 	int id;
 	int *axis;
 	uint8_t *ptr;
+	uint8_t raw_tag;
 	uint8_t ag_maps[] = {
 		MOTIONSENSE_TYPE_GYRO,
 		MOTIONSENSE_TYPE_ACCEL,
@@ -145,8 +146,12 @@ static void push_fifo_data(struct motion_sensor_t *main_s, uint8_t *fifo,
 	 * Data pattern len is fixed for each sample.
 	 * FIFO threshold is related to sample data (7 byte).
 	 */
+	raw_tag = *fifo >> LSM6DSO_FIFO_TAG_SHIFT;
+	if (raw_tag != LSM6DSO_GYRO_TAG && raw_tag != LSM6DSO_ACC_TAG)
+		return;
+
 	ptr = fifo + LSM6DSO_TAG_SIZE;
-	tag = (*fifo >> 3) - LSM6DSO_GYRO_TAG;
+	tag = raw_tag - LSM6DSO_GYRO_TAG;
 	id = ag_maps[tag];
 
 	/* Discard samples every ODR changes. */
