@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee34c7eb_356f197b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:27:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nIn Zephyr C code, prefer `\u003cstdbool.h\u003e` and `bool` over `int` for boolean flags like `all_protected` and `sw_protected`. This improves clarity and idiomaticity.\n\n```c\nstruct cros_flash_rtkfp_data {\n\tbool all_protected;\n\tbool sw_protected;\n};\n```\n[🔗](http://go/tj/71f17ada-46ae-46aa-9023-1b355efebfa8)",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0254327d43aef05ad948fd33f7bd3c2cb4f77ea5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7430d9a4_51f1943f",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:27:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThere is a potential bug here: `data-\u003eall_protected \u003d 0;` is cleared unconditionally before verifying that `flash_set_status(dev, sr1, sr2)` successfully applies the hardware state. If the status write fails, this leaves the software state incorrectly downgraded without the hardware state actually changing. Clear `all_protected` only upon success. \n\nAdditionally, consider using `uint8_t` for `reg1` and `reg2` to match the types of `sr1` and `sr2` and the arguments provided by callers.\n\n```c\nstatic int flash_set_status_for_prot(const struct device *dev, uint8_t reg1,\n\t\t\t\t     uint8_t reg2)\n{\n\tstruct cros_flash_rtkfp_data *data \u003d DRV_DATA(dev);\n\tuint8_t sr1, sr2;\n\tint ret;\n\n\tflash_get_status(dev, \u0026sr1, \u0026sr2);\n\n\tsr1 \u0026\u003d ~(SPI_FLASH_SR1_BP0 | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP2 |\n\t\t SPI_FLASH_SR1_TB | SPI_FLASH_SR1_SEC);\n\tsr2 \u0026\u003d ~SPI_FLASH_SR2_CMP;\n\n\tsr1 |\u003d reg1;\n\tsr2 |\u003d reg2;\n\n\tret \u003d flash_set_status(dev, sr1, sr2);\n\tif (ret \u003d\u003d EC_SUCCESS) {\n\t\tdata-\u003eall_protected \u003d 0;\n\t}\n\treturn ret;\n}\n```\n[🔗](http://go/tj/71f17ada-46ae-46aa-9023-1b355efebfa8)",
+      "range": {
+        "startLine": 118,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0254327d43aef05ad948fd33f7bd3c2cb4f77ea5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb1c7d3c_3ebc91ae",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:27:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe `#ifdef` blocks splitting `} else if {` chains are brittle and increase cognitive load. Since the flash layout is strictly layered (`WP_STORAGE` -\u003e `ROLLBACK` -\u003e `RW_MEM`), any region ending beyond a higher boundary inherently covers the lower boundaries. You can eliminate the `else if` chains completely by evaluating each boundary independently, making the code more robust and declarative without preprocessor token-stitching.\n\n```c\n\t/* Check if ranges fully overlap. This logic assumes a certain flash\n\t * layout: RO -\u003e ROLLBACKS -\u003e RW.\n\t */\n\tif (prot_end \u003e\u003d (CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE)) {\n\t\tflags |\u003d EC_FLASH_PROTECT_RO_AT_BOOT;\n\t}\n#ifdef CONFIG_ROLLBACK\n\tif (prot_end \u003e\u003d (CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE)) {\n\t\tflags |\u003d EC_FLASH_PROTECT_ROLLBACK_AT_BOOT;\n\t}\n#endif /* CONFIG_ROLLBACK */\n\tif (prot_end \u003e\u003d (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)) {\n\t\tflags |\u003d EC_FLASH_PROTECT_ALL_AT_BOOT;\n\t}\n\n\t/* Software protection is enabled. Add proper _NOW flags. */\n\tif (data-\u003esw_protected) {\n\t\tif (flags \u0026 EC_FLASH_PROTECT_RO_AT_BOOT) {\n\t\t\tflags |\u003d EC_FLASH_PROTECT_RO_NOW;\n\t\t}\n#ifdef CONFIG_ROLLBACK\n\t\tif (flags \u0026 EC_FLASH_PROTECT_ROLLBACK_AT_BOOT) {\n\t\t\tflags |\u003d EC_FLASH_PROTECT_ROLLBACK_NOW;\n\t\t}\n#endif /* CONFIG_ROLLBACK */\n\t\tif (flags \u0026 EC_FLASH_PROTECT_ALL_AT_BOOT) {\n\t\t\tflags |\u003d EC_FLASH_PROTECT_ALL_NOW;\n\t\t}\n\t}\n```\n[🔗](http://go/tj/71f17ada-46ae-46aa-9023-1b355efebfa8)",
+      "range": {
+        "startLine": 339,
+        "startChar": 0,
+        "endLine": 367,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0254327d43aef05ad948fd33f7bd3c2cb4f77ea5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27a36d92_9f70daff",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:27:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nSimilar to the above, avoid splitting brace blocks across preprocessor directives. Place the `#ifdef` around the `else if` block cleanly rather than splitting the closing brace and `else if`.\n\n```c\n\tif (new_flags \u0026 EC_FLASH_PROTECT_ALL_AT_BOOT) {\n\t\tnew_prot_end \u003d CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE;\n\t}\n#ifdef CONFIG_ROLLBACK\n\telse if (new_flags \u0026 EC_FLASH_PROTECT_ROLLBACK_AT_BOOT) {\n\t\tnew_prot_end \u003d CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE;\n\t}\n#endif /* CONFIG_ROLLBACK */\n\telse if (new_flags \u0026 EC_FLASH_PROTECT_RO_AT_BOOT) {\n\t\tnew_prot_end \u003d CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;\n\t} else {\n\t\t/* Disable protection of WP section, but do not disable\n\t\t * protection of the flash header. */\n\t\tnew_prot_end \u003d CONFIG_WP_STORAGE_OFF;\n\t}\n```\n[🔗](http://go/tj/71f17ada-46ae-46aa-9023-1b355efebfa8)",
+      "range": {
+        "startLine": 404,
+        "startChar": 0,
+        "endLine": 416,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0254327d43aef05ad948fd33f7bd3c2cb4f77ea5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e672542_116c7125",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:27:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThere is a state inconsistency bug here: `data-\u003eall_protected \u003d 1` is set before verifying that `cros_flash_rtkfp_sw_protect(dev, true)` succeeds. If `sw_protect` fails and returns an error, the driver software state is incorrectly left as `all_protected \u003d\u003d 1`, which will erroneously deny subsequent flash writes.\n\nMove the assignment after the error check:\n```c\n\tret \u003d cros_flash_rtkfp_sw_protect(dev, true);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tif (all) {\n\t\tdata-\u003eall_protected \u003d 1;\n\t}\n```\n[🔗](http://go/tj/71f17ada-46ae-46aa-9023-1b355efebfa8)",
+      "range": {
+        "startLine": 484,
+        "startChar": 0,
+        "endLine": 491,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0254327d43aef05ad948fd33f7bd3c2cb4f77ea5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
