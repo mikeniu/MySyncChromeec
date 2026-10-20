@@ -11,6 +11,7 @@
 #include <ec_commands.h>
 #include <fpsensor/fpsensor.h>
 #include <fpsensor/fpsensor_frame_storage.h>
+#include <fpsensor/fpsensor_template_store.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <mkbp_event.h>
 #include <rollback.h>
@@ -191,4 +192,71 @@ ZTEST(fpsensor_utils, test_fp_frame_storage_slicing)
 		buf, FP_CAPTURE_SIMPLE_IMAGE, cache);
 	zassert_true(simple_slice.has_value());
 	zassert_equal((*simple_slice)[0], buf[FP_SENSOR_IMAGE_OFFSET]);
+}
+
+ZTEST(fpsensor_utils, test_rate_limiter_and_template_id_boundaries)
+{
+	FpRateLimiter limiter{};
+	const FpTimestamp t0{ std::chrono::seconds(10) };
+	zassert_true(limiter.try_acquire(t0).has_value());
+	zassert_equal(limiter.try_acquire(t0 + std::chrono::seconds(1) -
+					  std::chrono::microseconds(1))
+			      .error(),
+		      EC_HOST_CMD_BUSY);
+	zassert_true(
+		limiter.try_acquire(t0 + std::chrono::seconds(1)).has_value());
+	zassert_true(
+		limiter.try_acquire(t0 + std::chrono::seconds(3)).has_value());
+
+	zassert_false(FpTemplateId::create(-1).has_value());
+	zassert_false(FpTemplateId::create(FP_MAX_FINGER_COUNT).has_value());
+	zassert_true(FpTemplateId::create(0).has_value());
+	zassert_true(FpTemplateId::create(FP_MAX_FINGER_COUNT - 1).has_value());
+	zassert_equal(FpTemplateId::create_enrolled(1, 1).error(),
+		      EC_RES_UNAVAILABLE);
+	zassert_true(FpTemplateId::create_enrolled(0, 1).has_value());
+}
+
+ZTEST(fpsensor_utils, test_template_store_secret_lifecycle)
+{
+	positive_match_secret_state state{};
+	FpTemplateStore::disable_secret(state);
+	zassert_equal(state.template_matched, FP_NO_SUCH_TEMPLATE);
+	zassert_false(state.readable);
+	zassert_equal(state.deadline.val, 0);
+
+	const FpTimestamp t0{ std::chrono::seconds(10) };
+	const auto window = FpTemplateStore::kSecretValidityWindow;
+
+	zassert_true(FpTemplateStore::enable_secret(1, state, t0).has_value());
+	zassert_equal(state.template_matched, 1);
+	zassert_true(state.readable);
+
+	zassert_equal(FpTemplateStore::enable_secret(2, state, t0).error(),
+		      EC_ERROR_UNKNOWN);
+	zassert_false(state.readable);
+
+	zassert_equal(
+		FpTemplateStore::consume_secret(state, std::nullopt, t0).error(),
+		EC_RES_ACCESS_DENIED);
+
+	zassert_true(FpTemplateStore::enable_secret(2, state, t0).has_value());
+	zassert_equal(FpTemplateStore::consume_secret(
+			      state, *FpTemplateId::create(1), t0)
+			      .error(),
+		      EC_RES_ACCESS_DENIED);
+	zassert_false(state.readable);
+
+	zassert_true(FpTemplateStore::enable_secret(2, state, t0).has_value());
+	zassert_equal(FpTemplateStore::consume_secret(state, std::nullopt,
+						      t0 + window)
+			      .error(),
+		      EC_RES_TIMEOUT);
+
+	zassert_true(FpTemplateStore::enable_secret(2, state, t0).has_value());
+	const auto matched = FpTemplateStore::consume_secret(
+		state, std::nullopt,
+		t0 + window - std::chrono::microseconds(1));
+	zassert_true(matched.has_value());
+	zassert_equal(matched->raw(), 2);
 }
