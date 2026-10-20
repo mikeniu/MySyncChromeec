@@ -552,8 +552,15 @@ void zephyr_print(const char *buff, size_t size)
 	}
 
 	/* If the shell is about to be (or is) stopped, or if the caller cannot
-	 * yield (including in ISRs), use printk since shell_write_str() may
-	 * block on the shell operations.
+	 * yield (including in ISRs), use printk_unlocked() since
+	 * shell_write_str() may block on shell operations. Use
+	 * printk_unlocked() rather than printk() because printk() redirects to
+	 * the logging subsystem when CONFIG_LOG_PRINTK=y, which would cause an
+	 * infinite loop when zephyr_print() is called from a logging backend.
+	 *
+	 * When CONFIG_LOG_MODE_MINIMAL is enabled, printk_unlocked() routes
+	 * through zephyr_shim_console_out(), which already notifies the AP
+	 * console buffer. For other logging modes, notify it explicitly here.
 	 */
 	if (shell_stopped || !shell_is_active() || !k_can_yield()) {
 		bool in_isr = k_is_in_isr();
@@ -563,7 +570,11 @@ void zephyr_print(const char *buff, size_t size)
 			return;
 		}
 
-		printk(in_isr ? "[ISR]%s" : "%s", buff);
+		printk_unlocked(in_isr ? "[ISR]%s" : "%s", buff);
+		if (!IS_ENABLED(CONFIG_LOG_MODE_MINIMAL) &&
+		    IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE)) {
+			console_buf_notify_chars(buff, size);
+		}
 		return;
 	}
 
@@ -580,7 +591,7 @@ void zephyr_print(const char *buff, size_t size)
 	}
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_DEBUG)) {
-		printk("%s", buff);
+		printk_unlocked("%s", buff);
 	}
 }
 #endif /* CONFIG_PIGWEED_LOG_TOKENIZED_LIB */
