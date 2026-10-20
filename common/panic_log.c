@@ -19,8 +19,7 @@ test_export_static bool panic_log_initialized = false;
 #define PANIC_LOG_VERSION 1
 
 /* Declare preserved ring buffer */
-DECLARE_PRESERVED_RING_BUF(uint8_t, panic_log, CONFIG_PANIC_LOG_SIZE,
-			   PANIC_LOG_VERSION);
+DECLARE_PRESERVED_RING_BUF(panic_log, CONFIG_PANIC_LOG_SIZE, PANIC_LOG_VERSION);
 
 /* Basic access functions */
 test_export_static uint32_t panic_log_len(void)
