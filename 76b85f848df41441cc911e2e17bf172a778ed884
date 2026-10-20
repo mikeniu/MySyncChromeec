@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b57881c_8324aa07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T09:37:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/1a3a2742-76fd-421e-a297-edd46f8ba42e)]\n\n### Review Summary\n**Functionality**: The skeleton logic correctly initializes the flash device and clears hardware-bound protection bits while setting the software protection lock when the WP pin is asserted.\n**Architecture \u0026 Component Fit**: Fits seamlessly into the Zephyr `cros_flash` driver model.\n**Code Simplicity**: The implementation is straightforward and minimal. Error paths are cleanly handled with early returns.\n**Idiomaticity \u0026 Readability**: Follows standard Zephyr device driver patterns and C idioms.\n**Security**: Enforcing the software write-protect lock when the physical WP pin is asserted maintains the expected platform security boundaries without relying on unused hardware pins.\n**Testing**: Comprehensive unit tests (`main.c`) correctly mock the SPI commands and verify status bit handling and error propagation paths.\n**CL Size \u0026 Scope**: Size: L (+521, -0). The production delta is \u003c 200 lines, with the remaining lines comprising unit tests and configurations for the new driver. This is a single logical change and perfectly scoped.\n**Commit Message**: Concise and accurate, explaining the motivation and split.\n\nTAG\u003dagy\nCONV\u003d15346cbf-4616-445b-835e-527da57320cc",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "76b85f848df41441cc911e2e17bf172a778ed884",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
