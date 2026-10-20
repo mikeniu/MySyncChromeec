@@ -255,6 +255,9 @@ hc_typec_status(struct ec_host_cmd_handler_args *args)
 	struct ec_response_typec_status_v0 *r0 = args->output_buf;
 	struct cros_ec_typec_status *cs = &r1->typec_status;
 	const char *tc_state_name;
+	void *src_pdos;
+	void *snk_pdos;
+	uint8_t max_pdos;
 
 	if (!board_pd_port_num_is_valid(p->port))
 		return EC_HOST_CMD_INVALID_PARAM;
@@ -306,25 +309,26 @@ hc_typec_status(struct ec_host_cmd_handler_args *args)
 				pd_get_rev(p->port, TCPCI_MSG_SOP_PRIME)) :
 			0;
 
+	/*
+	 * Each version's source and sink PDO arrays are the same size, which
+	 * ec_commands.h asserts.
+	 */
 	if (args->version == 0) {
-		cs->source_cap_count = min(pd_get_src_cap_cnt(p->port),
-					   ARRAY_SIZE(r0->source_cap_pdos));
-		memcpy(r0->source_cap_pdos, pd_get_src_caps(p->port),
-		       cs->source_cap_count * sizeof(uint32_t));
-		cs->sink_cap_count = min(pd_get_snk_cap_cnt(p->port),
-					 ARRAY_SIZE(r0->sink_cap_pdos));
-		memcpy(r0->sink_cap_pdos, pd_get_snk_caps(p->port),
-		       cs->sink_cap_count * sizeof(uint32_t));
+		src_pdos = r0->source_cap_pdos;
+		snk_pdos = r0->sink_cap_pdos;
+		max_pdos = ARRAY_SIZE(r0->source_cap_pdos);
 	} else {
-		cs->source_cap_count = min(pd_get_src_cap_cnt(p->port),
-					   ARRAY_SIZE(r1->source_cap_pdos));
-		memcpy(r1->source_cap_pdos, pd_get_src_caps(p->port),
-		       cs->source_cap_count * sizeof(uint32_t));
-		cs->sink_cap_count = min(pd_get_snk_cap_cnt(p->port),
-					 ARRAY_SIZE(r1->sink_cap_pdos));
-		memcpy(r1->sink_cap_pdos, pd_get_snk_caps(p->port),
-		       cs->sink_cap_count * sizeof(uint32_t));
+		src_pdos = r1->source_cap_pdos;
+		snk_pdos = r1->sink_cap_pdos;
+		max_pdos = ARRAY_SIZE(r1->source_cap_pdos);
 	}
+
+	cs->source_cap_count = min(pd_get_src_cap_cnt(p->port), max_pdos);
+	memcpy(src_pdos, pd_get_src_caps(p->port),
+	       cs->source_cap_count * sizeof(uint32_t));
+	cs->sink_cap_count = min(pd_get_snk_cap_cnt(p->port), max_pdos);
+	memcpy(snk_pdos, pd_get_snk_caps(p->port),
+	       cs->sink_cap_count * sizeof(uint32_t));
 
 	return EC_HOST_CMD_SUCCESS;
 }
