@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "618b94ca_16fbbccb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:56:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n*   **Functionality:** The logic correctly enforces protection range checks and overlaps, translating EC flags into SPI flash status register boundaries.\n*   **Architecture \u0026 Component Fit:** Cleanly implements the `cros_flash_driver_api`.\n*   **Code Simplicity:** ❌ **Changes Requested**. The `all_protected` shadow state is redundant and adds unnecessary synchronization overhead, as `flash_check_prot_reg` already perfectly enforces the physical boundaries. See inline comments to remove it. Additionally, a nested `if` block can be flattened into a guard clause.\n*   **Idiomaticity \u0026 Readability:** Excellent. The code is highly readable, uses clear variable names, and follows Zephyr C idioms.\n*   **Security:** Handles I/O failure securely (panics if it cannot re-enable software protection after a temporary disable). Fails closed on undecodable status.\n*   **Testing:** Thorough test suite with exact on-boundary and off-by-one (`ROR`) tests for the protected ranges, as well as error path validation for status register writes.\n*   **CL Size \u0026 Scope:** Size: L (+396, -26). The non-test delta is ~250 lines and implements a single cohesive protection feature, which is acceptable.\n*   **Commit Message:** Clear, concise, follows the R1/R2/R3 rules and includes required `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/2a75968d-0ab6-44f1-a97f-80863591d9d6)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "64a9383a8dd3dda20f80933dbd8b7aaf0ae6cde6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "647f9ff3_ce215080",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:56:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \nThe `all_protected` shadow state is entirely redundant and should be removed to simplify the driver and eliminate synchronization bugs (e.g., `flash_set_status_for_prot` currently clears it on any write).\n\nWhen `cros_flash_rtkfp_protect_now(true)` is called, it already calls `cros_flash_rtkfp_protect_at_boot(EC_FLASH_PROTECT_ALL_AT_BOOT)`, which programs the physical status register to cover the entire EC flash (`CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE`). \n\nBecause the physical register is correctly programmed:\n1. `flash_check_prot_reg()` already perfectly enforces this block for `write()`, `erase()`, and `get_protect()`.\n2. `get_protect_flags()` already derives `ALL_NOW` directly from `ALL_AT_BOOT` + `sw_protected`.\n\nPlease delete `bool all_protected;` here, and remove all references and `if (data-\u003eall_protected)` checks throughout `cros_flash_rtkfp_write`, `cros_flash_rtkfp_erase`, `cros_flash_rtkfp_get_protect`, `cros_flash_rtkfp_get_protect_flags`, `cros_flash_rtkfp_protect_now`, `flash_set_status_for_prot`, and `init`.\n\n[🔗](http://go/tj/2a75968d-0ab6-44f1-a97f-80863591d9d6)",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "64a9383a8dd3dda20f80933dbd8b7aaf0ae6cde6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f133db5c_c2d9f87a",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:56:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] \nFlatten this nested condition into an early-return guard clause. This separates the error check from the subsequent teardown logic, keeping the primary path unindented.\n\n```c\n\tif (was_sw_protected \u0026\u0026 write_protect_is_asserted() \u0026\u0026 new_prot_end \u003c curr_prot_end) {\n\t\t/* In case of SW protect enabled and WP asserted,\n\t\t * allow changing protection range only if it is\n\t\t * extending the range. */\n\t\treturn EC_ERROR_ACCESS_DENIED;\n\t}\n\n\tif (was_sw_protected) {\n\t\tret \u003d cros_flash_rtkfp_sw_protect(dev, false);\n```\n\n[🔗](http://go/tj/2a75968d-0ab6-44f1-a97f-80863591d9d6)",
+      "range": {
+        "startLine": 441,
+        "startChar": 0,
+        "endLine": 451,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "64a9383a8dd3dda20f80933dbd8b7aaf0ae6cde6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
