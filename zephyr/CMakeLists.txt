@@ -503,12 +503,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWER_BUTTON
                                                 "${PLATFORM_EC}/common/power_button.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ
                                                 "${PLATFORM_EC}/power/common.c")
-zephyr_library_sources_ifdef(CONFIG_CHIPSET_ALDERLAKE_SLG4BD44540
-                                                "${PLATFORM_EC}/power/alderlake_slg4bd44540.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_AMD
                                                 "${PLATFORM_EC}/power/amd_x86.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_COMETLAKE
-                                                "${PLATFORM_EC}/power/cometlake.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_ICELAKE
                                                 "${PLATFORM_EC}/power/icelake.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_INTEL
@@ -524,8 +520,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_MT8189
                                                 "${PLATFORM_EC}/power/mt8186.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_MT8196
                                                 "${PLATFORM_EC}/power/mt8186.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_MT8192
-                                                "${PLATFORM_EC}/power/mt8192.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_SC7180
                                                 "${PLATFORM_EC}/power/qcom.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_POWERSEQ_SC7280

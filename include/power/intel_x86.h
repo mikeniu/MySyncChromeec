@@ -12,25 +12,19 @@
 #include "power.h"
 
 /* Chipset specific header files */
-#if defined(CONFIG_CHIPSET_ALDERLAKE_SLG4BD44540)
-#include "alderlake_slg4bd44540.h"
 /* Geminilake and apollolake use same power sequencing. */
-#elif defined(CONFIG_CHIPSET_APL_GLK)
+#if defined(CONFIG_CHIPSET_APL_GLK)
 #include "apollolake.h"
 #elif defined(CONFIG_CHIPSET_CANNONLAKE)
 #include "cannonlake.h"
-#elif defined(CONFIG_CHIPSET_COMETLAKE)
-#include "cometlake.h"
-#elif defined(CONFIG_CHIPSET_COMETLAKE_DISCRETE)
-#include "cometlake-discrete.h"
 #elif defined(CONFIG_CHIPSET_ICELAKE)
 #include "icelake.h"
 #elif defined(CONFIG_CHIPSET_SKYLAKE)
 #include "skylake.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
-#endif
 #endif
 
 /* GPIO for power signal */
