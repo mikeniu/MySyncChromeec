@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9e687aa_96d71783",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:07:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\nThis commit message violates the **Single Logical Change** and **Anti-Narration/Conciseness** rules:\n1. **Multiple Bullets / Independent Changes:** The bulleted list joins multiple independent class introductions (`FpEncryptionKey`, `FpP256Key`, etc.) that can compile and be tested on their own.\n2. **CL Size:** The overall CL is `Size: XL`, which is too large for a single atomic review.\n3. **Format:** Please use 1–3 concise prose paragraphs instead of a bulleted diff narration.\n\nPlease split this into smaller, self-contained CLs (e.g., one CL for `FpEncryptionKey`/`FpPositiveMatchSecret` and another for the asymmetric/session keys). \n\nFor the split CLs, use a concise prose format like:\n```text\nfpsensor: Encapsulate symmetric crypto primitives\n\nReplace plain array types and C-style functions for symmetric fingerprint crypto with `std::expected`-returning C++ classes (`FpEncryptionKey` and `FpPositiveMatchSecret`) to improve type safety and ensure errors are handled by callers.\n\nBUG\u003db:286119221\nTEST\u003d./twister -T zephyr/test/fingerprint/task\n```\n[🔗](http://go/tj/ec081742-1248-4a4b-806e-1fb48f3f853c)",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f36dc0c2553c1226680b4949905a8a4e322b9a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30d9569a_f3884b5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:07:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n*   **Functionality:** Overall logic is well-encapsulated into distinct types (`FpEncryptionKey`, `FpPositiveMatchSecret`, `FpP256Key`, etc.) that improve error handling using `std::expected`.\n*   **Architecture \u0026 Component Fit:** The encapsulation of raw key bytes into specific strongly-typed classes is a robust architectural improvement.\n*   **Code Simplicity:** The introduction of RAII (e.g., `ScopedOtpKey`, `CleanseWrapper`) is clean and significantly simplifies resource handling. The logic to compute `hmac_sha256` correctly employs scoped wrappers.\n*   **Idiomaticity \u0026 Readability:** Excellent use of modern C++ features (`std::span`, `std::expected`, `std::ranges`, `std::array`). The implementation of `as_operation_span` and range-based operations enhances clarity.\n*   **Security:** Cryptographic primitives are being wrapped with types that cleanse secrets on destruction. Parameter validations and error mapping correctly abort early on malformed inputs.\n*   **Testing:** Test coverage is reasonably comprehensive with both expected success and specific `EC_ERROR_*` failures tested. However, a couple of boundaries are missing test coverage (e.g., `version !\u003d kSupportedVersion` and invalid uncompressed point headers).\n*   **CL Size \u0026 Scope:** `Size: XL (+1921, -1353)`. This CL is too large and violates the Single Logical Change rule by bundling multiple independent class introductions and tests into a single patch.\n    *   **Split Plan:**\n        *   CL 1: Introduce `FpEncryptionKey` and `FpPositiveMatchSecret` + unit tests.\n        *   CL 2: Introduce `FpP256Key`, `FpPairingKey`, `FpSessionKey` + unit tests.\n        *   CL 3: Introduce `FpAuthCommandCipher` + unit tests.\n        *   CL 4: Update the legacy wrappers to use the new classes.\n*   **Commit Message:** The commit message currently enumerates multiple separate changes in a bulleted list. It should be rewritten to use 1–3 concise prose paragraphs detailing the `Why` and the `What` for each logically separated CL.\n\nPlease split the CL to proceed. See the inline comments for more details on boundary tests and the commit message formatting.\n[🔗](http://go/tj/ec081742-1248-4a4b-806e-1fb48f3f853c)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f36dc0c2553c1226680b4949905a8a4e322b9a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2abd7d7_b4688551",
+        "filename": "common/fpsensor/fpsensor_auth_crypto_stateful.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:07:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Missing Boundary Tests**\n\nThere are no tests verifying this boundary condition (`version !\u003d kSupportedVersion`). \nPer the boundary value analysis rules, please add distinct test cases for off-by-one values (e.g., `kSupportedVersion - 1` and `kSupportedVersion + 1`) to ensure unsupported versions are properly rejected.\n[🔗](http://go/tj/ec081742-1248-4a4b-806e-1fb48f3f853c)",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f36dc0c2553c1226680b4949905a8a4e322b9a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d030c6a1_a2d6f089",
+        "filename": "common/fpsensor/fpsensor_auth_crypto_stateless.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:07:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Missing Test Coverage**\n\nThis error path is lacking test coverage. Please add a unit test that verifies `parse_uncompressed_point` correctly returns `EC_ERROR_INVAL` when the first byte of `point` is mutated to a value other than `POINT_CONVERSION_UNCOMPRESSED` (e.g., `0x03` or `0x05`).\n[🔗](http://go/tj/ec081742-1248-4a4b-806e-1fb48f3f853c)",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f36dc0c2553c1226680b4949905a8a4e322b9a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
