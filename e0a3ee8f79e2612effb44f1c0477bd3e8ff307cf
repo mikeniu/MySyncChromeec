@@ -18,6 +18,24 @@
       "isAi": true,
       "revId": "e0a3ee8f79e2612effb44f1c0477bd3e8ff307cf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2442645f_10f7b8d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:04:02Z",
+      "side": 1,
+      "message": "Done. The private API header is now in 8617739.",
+      "parentUuid": "052aaf8b_861b9441",
+      "revId": "e0a3ee8f79e2612effb44f1c0477bd3e8ff307cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

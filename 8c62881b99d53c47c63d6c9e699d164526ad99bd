@@ -38,6 +38,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c38aaa2_8dced19f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:04:02Z",
+      "side": 1,
+      "message": "Done. The private API header is now in 8617739.",
+      "parentUuid": "d6efc8be_492b4304",
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57f7bf06_6650bfc0",
