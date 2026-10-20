@@ -100,6 +100,65 @@ ZTEST(lsm6dso, test_disable_interrupt)
 		       1);
 }
 
+ZTEST(lsm6dso, test_invalid_fifo_tag)
+{
+	static struct ec_response_motion_sensor_data data[2];
+	int count;
+	uint16_t read_byte_count;
+
+	/* Configure ODR and burn discard samples */
+	acc->config[SENSOR_CONFIG_AP].odr = LSM6DSO_ODR_MIN_VAL;
+	acc->drv->set_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 1);
+	k_msleep(100);
+	for (int i = 0; i < LSM6DSO_DISCARD_SAMPLES; ++i) {
+		emul_lsm6dso_append_sample(emul, MOTIONSENSE_TYPE_ACCEL, 0.0f,
+					   0.0f, 0.0f);
+	}
+	k_msleep(100);
+	motion_sense_fifo_reset();
+
+	/* Enable interrupts */
+	acc->drv->enable_interrupt(acc, true);
+
+	/* Append invalid FIFO tags:
+	 * Tag 0x00: Reserved/Invalid
+	 * Tag 0x03: Temperature sensor tag
+	 * Tag 0x04: Timestamp tag
+	 * Tag 0x0F: Maximum 4-bit tag
+	 * Tag 0x1F: Out-of-bounds 5-bit tag
+	 */
+	emul_lsm6dso_append_raw_tag(emul, 0x00, 100, 200, 300);
+	emul_lsm6dso_append_raw_tag(emul, 0x03, 100, 200, 300);
+	emul_lsm6dso_append_raw_tag(emul, 0x04, 100, 200, 300);
+	emul_lsm6dso_append_raw_tag(emul, 0x0F, 100, 200, 300);
+	emul_lsm6dso_append_raw_tag(emul, 0x1F, 100, 200, 300);
+
+	/* Append one valid Accel tag (LSM6DSO_ACC_TAG = 0x02) */
+	emul_lsm6dso_append_raw_tag(emul, LSM6DSO_ACC_TAG,
+				    INT16_MAX / acc->current_range,
+				    INT16_MAX / (2 * acc->current_range),
+				    -INT16_MAX / (4 * acc->current_range));
+
+	/* Motion sense loop processes the FIFO */
+	k_msleep(100);
+
+	/* Verify only the 1 valid sample made it to the FIFO */
+	count = motion_sense_fifo_read(sizeof(data), ARRAY_SIZE(data), data,
+				       &read_byte_count);
+	zassert_equal(2, count, "Expected 2 entries, got %d", count);
+	zassert_equal(sizeof(data), read_byte_count, "FIFO read %u bytes",
+		      read_byte_count);
+	zassert_equal(MOTIONSENSE_SENSOR_FLAG_TIMESTAMP, data[0].flags);
+	zassert_equal(ACC_SENSOR_ID, data[0].sensor_num);
+	zassert_equal(0, data[1].flags);
+	zassert_equal(ACC_SENSOR_ID, data[1].sensor_num);
+	zassert_within(INT16_MAX / acc->current_range, data[1].data[X], 1);
+	zassert_within(INT16_MAX / (2 * acc->current_range), data[1].data[Y],
+		       1);
+	zassert_within(-INT16_MAX / (4 * acc->current_range), data[1].data[Z],
+		       1);
+}
+
 ZTEST(lsm6dso, test_gyro_sample)
 {
 	static struct ec_response_motion_sensor_data data[2];
