@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc929e04_91b08a3d",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:33:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Boundary Value Analysis (`ROR` Mutation Check)**\n\nThis tests the `N - 1` boundary (`capacity \u003c num_defined_configs`). To complete the boundary value analysis and kill the `!\u003d` mutation (which would incorrectly fail when given a larger buffer), you must also test the `N + 1` boundary where `capacity \u003e num_defined_configs`.\n\nPlease add a test verifying that `fingerprint_get_info` successfully writes to the buffer and updates `num_params` to the actual count when given a capacity larger than `NUM_IMAGE_CAPTURE_TYPES`.\n\n```c\nZTEST_F(rts5817maa, test_get_info_large_capacity)\n{\n\tstruct fingerprint_sensor_info sensor_info;\n\tstruct fingerprint_image_frame_params\n\t\timage_frame_params_array[NUM_IMAGE_CAPTURE_TYPES + 1];\n\tuint8_t num_params \u003d NUM_IMAGE_CAPTURE_TYPES + 1;\n\n\tzassert_ok(fingerprint_init(fixture-\u003edev));\n\tzassert_ok(fingerprint_get_info(fixture-\u003edev, \u0026sensor_info,\n\t\t\t\t\timage_frame_params_array,\n\t\t\t\t\t\u0026num_params));\n\tzassert_equal(num_params, NUM_IMAGE_CAPTURE_TYPES,\n\t\t      \"fingerprint_get_info did not update num_params to actual count\");\n}\n```\n[🔗](http://go/tj/ff58865b-3538-45c6-8428-4b85191955ef)",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 238,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4c018bc6e54f3a7bdd37ce463327efc14b27b350",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
