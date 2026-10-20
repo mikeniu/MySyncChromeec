@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16f7a390_2cca8e92",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:16Z",
+      "side": 1,
+      "message": "Restored the explanatory SPI cleanup comment in include/fpsensor/fpsensor_platform.h.",
+      "parentUuid": "af58eea9_8ce88aed",
+      "isAi": true,
+      "revId": "febe3fe30bfde179184064d322d1150203e23611",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71bce788_193f0419",
@@ -40,6 +59,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "febe3fe30bfde179184064d322d1150203e23611",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84e1c798_204c1fdb",
+        "filename": "include/fpsensor/fpsensor_platform.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:16Z",
+      "side": 1,
+      "message": "Restored the explanatory comment (including b/112781659) above spi_transaction_flush in include/fpsensor/fpsensor_platform.h.",
+      "parentUuid": "71bce788_193f0419",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "febe3fe30bfde179184064d322d1150203e23611",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
