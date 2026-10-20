@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0a42cf1_854215fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:49:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/63558d50-7065-48a6-bc90-945292c342e6)]\n\n### Review Summary\n* **Functionality \u0026 Security:** ✅ `RAND_bytes` errors are checked, and challenge reuse/expiry is verified.\n* **Architecture \u0026 Component Fit:** ✅ `FpSessionNonce` and `FpAuthChallenge` cleanly encapsulate the protocol state.\n* **Code Simplicity:** ✅ Cleanly uses early returns and avoids ad-hoc bitmasking in the handlers.\n* **Idiomaticity \u0026 Readability:** ✅ Uses standard C++ `\u003cexpected\u003e` and `\u003cchrono\u003e` constructs correctly.\n* **Testing:** ✅ Added comprehensive boundary testing for the expiration window. Added a minor inline suggestion to also test the $N - 1$ boundary and the MAC validation failure path.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+170, -39)`. Cleanly focused on a single logical change.\n* **Commit Message:** ✅ Concise prose that clearly explains the *why* and *what*.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5fe718505826edd9a23614ac09d5b3fbed60d0eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "836d1186_e680a2c6",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 1856,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:49:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:** To be strictly complete on boundary values for the timeout condition (`now \u003e issued + kValidityWindow`), consider adding a check for the $N - 1$ boundary (`exact_expiry - std::chrono::microseconds(1)`), which should return success just like the exact boundary.\n\nAdditionally, since this test focuses on `consume_and_verify`, it could be valuable to add a quick case that mutates the `mac` buffer (e.g., `mac[0] ^\u003d 1;`) to verify the signature comparison failure path returns `EC_ERROR_ACCESS_DENIED`.\n\n[🔗](http://go/tj/63558d50-7065-48a6-bc90-945292c342e6)",
+      "range": {
+        "startLine": 1816,
+        "startChar": 0,
+        "endLine": 1856,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5fe718505826edd9a23614ac09d5b3fbed60d0eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
