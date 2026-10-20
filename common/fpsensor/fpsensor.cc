@@ -134,7 +134,7 @@ static uint32_t fp_process_enroll(void)
 	global_context.templ_dirty |= BIT(global_context.templ_valid);
 	if (percent == 100) {
 		res = fp_enrollment_finish(
-			fp_template[global_context.templ_valid]);
+			fp_template[global_context.templ_valid].data());
 		if (res) {
 			res = EC_MKBP_FP_ERR_ENROLL_INTERNAL;
 		} else {
@@ -180,7 +180,7 @@ static uint32_t fp_process_match(void)
 
 	CPRINTS("Matching/%d ...", global_context.templ_valid);
 	if (global_context.templ_valid) {
-		res = fp_finger_match(fp_template[0],
+		res = fp_finger_match(fp_template[0].data(),
 				      global_context.templ_valid, fp_buffer,
 				      !(global_context.sensor_mode &
 					FP_MODE_MATCH_NO_TEMPLATE_UPDATE),
@@ -973,7 +973,7 @@ fp_commit_template(std::span<const uint8_t> context)
 		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
-	std::ranges::copy(templ, fp_template[idx]);
+	std::ranges::copy(templ, fp_template[idx].begin());
 	std::ranges::copy(positive_match_salt,
 			  global_context.fp_positive_match_salt[idx]);
 

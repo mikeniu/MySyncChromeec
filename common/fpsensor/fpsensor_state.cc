@@ -31,23 +31,6 @@
 #include <variant>
 
 /* Last acquired frame (aligned as it is used by arbitrary binary libraries) */
-/* Fingers templates for the current user */
-test_mockable
-	uint8_t fp_template[FP_MAX_FINGER_COUNT]
-			   [FP_ALGORITHM_TEMPLATE_SIZE] FP_TEMPLATE_SECTION
-				   __aligned(4);
-static_assert(
-	sizeof(fp_template[0]) % 4 == 0,
-	"The size of each template must be a multiple of 4 to ensure that the next "
-	"template will still be aligned by 4.");
-
-/* Encryption/decryption buffer */
-/* TODO: On-the-fly encryption/decryption without a dedicated buffer */
-/*
- * Store the encryption metadata at the beginning of the buffer containing the
- * ciphered data.
- */
-struct enc_buffer fp_enc_buffer FP_TEMPLATE_SECTION;
 
 struct fpsensor_context global_context = {
 	.template_newly_enrolled = FP_NO_SUCH_TEMPLATE,
@@ -86,7 +69,7 @@ __test_only void fp_task_simulate(void)
 
 void fp_clear_finger_context(uint16_t idx)
 {
-	OPENSSL_cleanse(fp_template[idx], sizeof(fp_template[0]));
+	OPENSSL_cleanse(fp_template[idx].data(), sizeof(fp_template[0]));
 	OPENSSL_cleanse(global_context.fp_positive_match_salt[idx],
 			sizeof(global_context.fp_positive_match_salt[0]));
 }
@@ -410,29 +393,6 @@ fp_command_context(struct ec_host_cmd_handler_args *args)
 }
 EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_CONTEXT, fp_command_context,
 			     EC_VER_MASK(1), struct ec_params_fp_context_v1);
-
-int fp_enable_positive_match_secret(uint16_t fgr,
-				    struct positive_match_secret_state *state)
-{
-	if (state->readable) {
-		CPRINTS("Error: positive match secret already readable.");
-		fp_disable_positive_match_secret(state);
-		return EC_ERROR_UNKNOWN;
-	}
-
-	timestamp_t now = get_time();
-	state->template_matched = fgr;
-	state->readable = true;
-	state->deadline.val = now.val + (15 * SECOND); /* b/478160541 */
-	return EC_SUCCESS;
-}
-
-void fp_disable_positive_match_secret(struct positive_match_secret_state *state)
-{
-	state->template_matched = FP_NO_SUCH_TEMPLATE;
-	state->readable = false;
-	state->deadline.val = 0;
-}
 
 enum ec_status fp_read_match_secret(
 	int8_t fgr,

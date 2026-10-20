@@ -11,6 +11,7 @@
 #include "atomic.h"
 #include "common.h"
 #include "ec_commands.h"
+#include "fpsensor/fpsensor_template_store.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_image_frame_params.h"
 #include "fpsensor_matcher.h"
@@ -52,36 +53,6 @@
 #define FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE                         \
 	(FP_ALGORITHM_TEMPLATE_SIZE + FP_POSITIVE_MATCH_SALT_BYTES + \
 	 sizeof(struct ec_fp_template_encryption_metadata))
-
-struct enc_buffer {
-	struct ec_fp_template_encryption_metadata metadata{};
-	std::array<uint8_t, FP_ALGORITHM_TEMPLATE_SIZE> fp_template{};
-	std::array<uint8_t, FP_POSITIVE_MATCH_SALT_BYTES> positive_match_salt{};
-};
-BUILD_ASSERT(sizeof(enc_buffer) == FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE);
-
-#define FP_NO_SUCH_TEMPLATE (UINT16_MAX)
-
-/* --- Global variables defined in fpsensor_state.c --- */
-
-/* Fingers templates for the current user */
-extern uint8_t fp_template[FP_MAX_FINGER_COUNT][FP_ALGORITHM_TEMPLATE_SIZE];
-/* Encryption/decryption buffer */
-/* TODO: On-the-fly encryption/decryption without a dedicated buffer */
-/*
- * Store the encryption metadata at the beginning of the buffer containing the
- * ciphered data.
- */
-extern struct enc_buffer fp_enc_buffer;
-
-struct positive_match_secret_state {
-	/* Index of the most recently matched template. */
-	uint16_t template_matched;
-	/* Flag indicating positive match secret can be read. */
-	bool readable;
-	/* Deadline to read positive match secret. */
-	timestamp_t deadline;
-};
 
 struct fpsensor_context {
 	/** Index of the last enrolled but not retrieved template. */
@@ -179,23 +150,6 @@ int fp_get_next_event(uint8_t *out);
 enum ec_status
 fp_set_sensor_mode(uint32_t mode, uint32_t *mode_output,
 		   std::optional<std::span<const uint8_t, FP_MAC_LENGTH> > mac);
-
-/**
- * Allow reading positive match secret for |fgr| in the next 5 seconds.
- *
- * @param fgr the index of template to enable positive match secret.
- * @param state the state of positive match secret, e.g. readable or not.
- * @return EC_SUCCESS if the request is valid, error code otherwise.
- */
-int fp_enable_positive_match_secret(uint16_t fgr,
-				    struct positive_match_secret_state *state);
-
-/**
- * Disallow positive match secret for any finger to be read.
- *
- * @param state the state of positive match secret, e.g. readable or not.
- */
-void fp_disable_positive_match_secret(struct positive_match_secret_state *state);
 
 /**
  * Read the match secret from the positive match salt.

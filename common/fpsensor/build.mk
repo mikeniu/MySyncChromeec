@@ -15,6 +15,7 @@ _fpsensor_dir:=$(dir $(lastword $(MAKEFILE_LIST)))
 fpsensor_CFLAGS=-Wvla
 
 _fpsensor_state_obj:=$(_fpsensor_dir)fpsensor_state.o
+_fpsensor_template_store_obj:=$(_fpsensor_dir)fpsensor_template_store.o
 _fpsensor_crypto_context_obj:=$(_fpsensor_dir)fpsensor_crypto_context.o
 _fpsensor_frame_storage_obj:=$(_fpsensor_dir)fpsensor_frame_storage.o
 _fpsensor_crypto_obj:=$(_fpsensor_dir)fpsensor_crypto.o
@@ -27,6 +28,7 @@ _fpsensor_auth_crypto_stateless_obj:=$(_fpsensor_dir)fpsensor_auth_crypto_statel
 _fpsensor_image_frame_params_obj:=$(_fpsensor_dir)fpsensor_image_frame_params.o
 
 $(out)/RW/$(_fpsensor_state_obj): CFLAGS+=$(fpsensor_CFLAGS)
+$(out)/RW/$(_fpsensor_template_store_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_crypto_context_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_frame_storage_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_crypto_obj): CFLAGS+=$(fpsensor_CFLAGS)
@@ -39,6 +41,7 @@ $(out)/RW/$(_fpsensor_auth_crypto_stateless_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_image_frame_params_obj): CFLAGS+=$(fpsensor_CFLAGS)
 
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_state_obj)
+all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_template_store_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_crypto_context_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_frame_storage_obj)
 all-obj-$(HAS_TASK_FPSENSOR)+=$(_fpsensor_obj)

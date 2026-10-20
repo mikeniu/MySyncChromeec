@@ -6,12 +6,6 @@
 #include "common.h"
 #include "ec_commands.h"
 #include "fpsensor/fpsensor_frame_storage.h"
-#include "openssl/mem.h"
-
-void cleanse(std::span<uint8_t> bytes) noexcept
-{
-	OPENSSL_cleanse(bytes.data(), bytes.size_bytes());
-}
 #include "fpsensor/fpsensor_utils.h"
 #include "fpsensor_driver.h"
 #include "link_defs.h"

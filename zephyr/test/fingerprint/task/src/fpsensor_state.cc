@@ -408,6 +408,36 @@ ZTEST_USER(fpsensor_state,
 		global_context.sensor_mode);
 }
 
+ZTEST_USER(fpsensor_state, test_positive_match_secret_state)
+{
+	const auto fgr0 = *FpTemplateId::create(0);
+	const auto fgr1 = *FpTemplateId::create(1);
+
+	FpPositiveMatchSecretState state{};
+	zassert_false(state.has_any_match());
+	zassert_false(state.is_matched(fgr0));
+
+	zassert_true(state.enable(fgr0).has_value());
+	zassert_true(state.has_any_match());
+	zassert_true(state.is_matched(fgr0));
+	zassert_false(state.is_matched(fgr1));
+	zassert_equal(state.enable(fgr0).error(), EC_ERROR_UNKNOWN);
+	zassert_false(state.has_any_match());
+
+	std::array<FpTemplate, FP_MAX_FINGER_COUNT> local_templates{};
+	FpEncryptedTemplateBuffer local_enc_buf{};
+	FpTemplateStore store{
+		.templates = local_templates,
+		.enc_buf = &local_enc_buf,
+	};
+	local_templates[0].fill(0xAA);
+	store.fp_positive_match_salt[0].fill(0xBB);
+	store.clear_finger(fgr0);
+	zassert_true(std::ranges::none_of(local_templates[0], std::identity{}));
+	zassert_true(std::ranges::none_of(store.fp_positive_match_salt[0],
+					  std::identity{}));
+}
+
 ZTEST_USER(fpsensor_state, test_fp_mode_v1_truncated)
 {
 	struct ec_params_fp_mode_v1 params = {

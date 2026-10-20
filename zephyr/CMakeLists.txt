@@ -408,6 +408,7 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FLASH_CROS
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_state.cc"
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_template_store.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_crypto_context.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_frame_storage.cc"
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_crypto.cc"

@@ -1173,7 +1173,7 @@ ZTEST_USER(fpsensor_template, test_fp_template_load_template_invalid_tag)
 	zassert_equal(test_info_buffer->template_info.template_valid, 0);
 }
 
-static const struct enc_buffer zero_enc_buffer = {};
+static const FpEncryptedTemplateBuffer zero_enc_buffer = {};
 
 ZTEST_USER(fpsensor_template, test_fp_template_v1_cleans_buffer)
 {
