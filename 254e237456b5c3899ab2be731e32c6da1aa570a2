@@ -26,6 +26,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d8bd8df_b41edec2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:35Z",
+      "side": 1,
+      "message": "Updated the commit message to remove the reference to FpEncryptedKeyBlob and describe only FpP256Key and FpPairingKey.",
+      "parentUuid": "d9f3cd7d_cbeba1f2",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fec201d_9afeca5a",
@@ -40,6 +65,25 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n*   **Functionality:** The wrappers `FpP256Key` and `FpPairingKey` correctly encapsulate P-256 keys and pairing key operations.\n*   **Architecture \u0026 Component Fit:** Using RAII to manage BoringSSL key lifecycles and secret memory is a strong architectural improvement that prevents memory leaks and duplicate cleanup logic.\n*   **Code Simplicity:** The abstraction cleanly simplifies the `fpsensor_auth_ascp` and `fpsensor_auth_handshake` commands by eliminating manual pointer and error-handling boilerplate.\n*   **Idiomaticity \u0026 Readability:** Excellent use of modern C++ idioms (`std::expected`, `std::span`, `std::optional`, `std::ranges::copy`, and `CleanseWrapper`).\n*   **Security:** Cryptographic primitives properly leverage `CleanseWrapper` and `bssl::UniquePtr` to ensure secrets are cleansed and memory is freed immediately upon exiting scope.\n*   **Testing:** Boundary conditions (such as invalid version tags and bad uncompressed point headers) are well tested. However, several error paths (e.g., `key \u003d\u003d nullptr` branches during private key parsing, default-constructed key shared secret computation, and `decrypt_pairing_key` failures) lack automated test coverage.\n*   **CL Size \u0026 Scope:** Size: M (+196, -51). The CL is appropriately scoped to introducing RAII for authentication keys and represents a single logical change.\n*   **Commit Message:** The commit message effectively provides the *Why* and *What* in concise prose, but it inaccurately mentions introducing `FpEncryptedKeyBlob`, which is absent from the patchset.\n\nPlease address the missing test coverage and the commit message inaccuracy noted in the inline comments.\n[🔗](http://go/tj/9e33ab0e-2da8-4690-9da0-e5ee6e427dc4)",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1b79e35_496cbaa6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:35Z",
+      "side": 1,
+      "message": "Updated the commit message and added unit tests covering invalid private key bytes in FpP256Key::from_private_key, default-constructed FpP256Key::compute_shared_secret, and corrupted ciphertext in FpPairingKey::unwrap_into.",
+      "parentUuid": "5fec201d_9afeca5a",
       "isAi": true,
       "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -70,6 +114,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ff7571b_33708303",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:35Z",
+      "side": 1,
+      "message": "Added unit test coverage in test_fp_auth_key_wrappers verifying FpP256Key::from_private_key returns EC_ERROR_INVAL for invalid private key bytes.",
+      "parentUuid": "a9e33bbc_4e2d087e",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 328,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6abec48d_331dcfd7",
@@ -95,6 +164,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8d1ebb0_15b7c3bd",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:35Z",
+      "side": 1,
+      "message": "Added unit test coverage verifying compute_shared_secret returns EC_ERROR_INVAL when called on or with a default-constructed FpP256Key.",
+      "parentUuid": "6abec48d_331dcfd7",
+      "range": {
+        "startLine": 343,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68780438_c18aab71",
@@ -115,6 +209,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc51a1a5_8411c810",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:35Z",
+      "side": 1,
+      "message": "Added unit test coverage verifying FpPairingKey::unwrap_into propagates the decryption error when passed a corrupted ciphertext blob.",
+      "parentUuid": "68780438_c18aab71",
+      "range": {
+        "startLine": 393,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
