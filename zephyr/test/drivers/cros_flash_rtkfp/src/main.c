@@ -390,20 +390,36 @@ ZTEST_USER(cros_flash_rtkfp, test_erase_flash_failure)
 		      -EINVAL);
 }
 
-ZTEST_USER(cros_flash_rtkfp, test_protect_flags_ro_range)
+ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_ro)
 {
-	/* Range [0, 0x40000) is encoded as {TB=1, BP1=1, BP0=1}. */
-	fake_set_sr(SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP0,
-		    0);
-	/* WP asserted at init enables the software protect lock. */
-	gpio_wp_l_set(0);
-	zassert_equal(cros_flash_init(cros_flash_dev), EC_SUCCESS);
+	uint8_t sr1, sr2;
+
+	/* A non-protection bit (QE) must be preserved by range changes. */
+	fake_sr2 |= SPI_FLASH_SR2_QE;
+
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_RO_AT_BOOT),
+		      EC_SUCCESS);
 
 	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
 		      EC_FLASH_PROTECT_RO_AT_BOOT |
 			      EC_FLASH_PROTECT_RO_NOW);
 
-	/* Check both sides of the boundary of the protected region. */
+	zassert_equal(cros_flash_physical_get_status(cros_flash_dev, &sr1,
+						     &sr2),
+		      EC_SUCCESS);
+	/*
+	 * Range [0, 0x40000) is encoded as {TB=1, BP1=1, BP0=1}; QE is the
+	 * only other bit set and must survive.
+	 */
+	zassert_equal(sr1, SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP1 |
+				   SPI_FLASH_SR1_BP0);
+	zassert_equal(sr2, SPI_FLASH_SR2_QE);
+
+	/*
+	 * Protection covers RO, not RW. Check both sides of the boundary:
+	 * the first protected bank and the first bank after the region.
+	 */
 	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1);
 	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev,
 						      WP_BANK - 1),
@@ -412,12 +428,146 @@ ZTEST_USER(cros_flash_rtkfp, test_protect_flags_ro_range)
 		      0);
 }
 
-ZTEST_USER(cros_flash_rtkfp, test_protect_flags_all_range)
+ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_all)
 {
-	/* Range [0, 0x80000) is encoded as {TB=1, BP2=1}. */
-	fake_set_sr(SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP2, 0);
+	uint8_t sr1, sr2;
+
+	fake_sr2 |= SPI_FLASH_SR2_QE;
+
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_ALL_AT_BOOT),
+		      EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ALL_AT_BOOT |
+			      EC_FLASH_PROTECT_RO_AT_BOOT |
+			      EC_FLASH_PROTECT_ALL_NOW |
+			      EC_FLASH_PROTECT_RO_NOW);
+
+	zassert_equal(cros_flash_physical_get_status(cros_flash_dev, &sr1,
+						     &sr2),
+		      EC_SUCCESS);
+	/*
+	 * Range [0, 0x80000) is encoded as {TB=1, BP2=1}; QE is the only
+	 * other bit set and must survive.
+	 */
+	zassert_equal(sr1, SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP2);
+	zassert_equal(sr2, SPI_FLASH_SR2_QE);
+
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev,
+						      WP_BANK - 1),
+		      1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
+		      1);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_zero_disables)
+{
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_ALL_AT_BOOT),
+		      EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_protect_at_boot(cros_flash_dev, 0),
+		      EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      0);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 0);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_idempotent_wp_asserted)
+{
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_RO_AT_BOOT),
+		      EC_SUCCESS);
+
+	/* Re-requesting the same range must succeed even with WP asserted. */
 	gpio_wp_l_set(0);
-	zassert_equal(cros_flash_init(cros_flash_dev), EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_RO_AT_BOOT),
+		      EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_RO_AT_BOOT |
+			      EC_FLASH_PROTECT_RO_NOW);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_shrink_wp_asserted_denied)
+{
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_ALL_AT_BOOT),
+		      EC_SUCCESS);
+
+	gpio_wp_l_set(0);
+
+	zassert_equal(cros_flash_physical_protect_at_boot(cros_flash_dev, 0),
+		      EC_ERROR_ACCESS_DENIED);
+
+	/* The range must be unchanged. */
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_ALL_AT_BOOT |
+			      EC_FLASH_PROTECT_RO_AT_BOOT |
+			      EC_FLASH_PROTECT_ALL_NOW |
+			      EC_FLASH_PROTECT_RO_NOW);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_extend_wp_asserted_allowed)
+{
+	gpio_wp_l_set(0);
+
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_RO_AT_BOOT),
+		      EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_RO_AT_BOOT |
+			      EC_FLASH_PROTECT_RO_NOW);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_now_ro)
+{
+	uint8_t value = 42;
+	uint8_t read_value = 0;
+
+	zassert_equal(cros_flash_physical_protect_now(cros_flash_dev, false),
+		      EC_SUCCESS);
+
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      EC_FLASH_PROTECT_RO_AT_BOOT | EC_FLASH_PROTECT_RO_NOW);
+	zassert_false(cros_flash_physical_get_protect_flags(cros_flash_dev) &
+		      EC_FLASH_PROTECT_ALL_NOW);
+
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev,
+						      WP_BANK - 1),
+		      1);
+	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
+		      0);
+
+	/* The last byte of the protected region is rejected... */
+	zassert_equal(cros_flash_physical_write(cros_flash_dev,
+						CONFIG_WP_STORAGE_SIZE - 1,
+						sizeof(value),
+						(const char *)&value),
+		      EC_ERROR_ACCESS_DENIED);
+
+	/* ...the first byte after it is writable. */
+	zassert_equal(cros_flash_physical_write(cros_flash_dev,
+						CONFIG_WP_STORAGE_SIZE,
+						sizeof(value),
+						(const char *)&value),
+		      EC_SUCCESS);
+	crec_flash_physical_read(CONFIG_WP_STORAGE_SIZE, sizeof(read_value),
+				 (char *)&read_value);
+	zassert_equal(value, read_value);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_protect_now_all)
+{
+	zassert_equal(cros_flash_physical_protect_now(cros_flash_dev, true),
+		      EC_SUCCESS);
 
 	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
 		      EC_FLASH_PROTECT_ALL_AT_BOOT |
@@ -431,19 +581,20 @@ ZTEST_USER(cros_flash_rtkfp, test_protect_flags_all_range)
 		      1);
 	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
 		      1);
-}
+	zassert_equal(cros_flash_physical_get_protect(
+			      cros_flash_dev,
+			      FAKE_FLASH_SIZE / CONFIG_FLASH_BANK_SIZE - 1),
+		      1);
 
-ZTEST_USER(cros_flash_rtkfp, test_protect_at_boot_only_without_sw_lock)
-{
-	/* The range is programmed but the software lock is not engaged. */
-	fake_set_sr(SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP0,
-		    0);
-
-	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
-		      EC_FLASH_PROTECT_RO_AT_BOOT);
-	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1);
-	zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, WP_BANK),
-		      0);
+	/* Everything is write protected now, up to the last flash byte. */
+	zassert_equal(cros_flash_physical_write(cros_flash_dev,
+						FAKE_FLASH_SIZE - 1, 1, "\xff"),
+		      EC_ERROR_ACCESS_DENIED);
+	zassert_equal(cros_flash_physical_erase(
+			      cros_flash_dev,
+			      FAKE_FLASH_SIZE - CONFIG_FLASH_ERASE_SIZE,
+			      CONFIG_FLASH_ERASE_SIZE),
+		      EC_ERROR_ACCESS_DENIED);
 }
 
 ZTEST_USER(cros_flash_rtkfp, test_protect_flags_srp_inconsistent)
@@ -470,15 +621,39 @@ ZTEST_USER(cros_flash_rtkfp, test_protect_flags_undecodable_unknown)
 		      EC_FLASH_PROTECT_ERROR_UNKNOWN);
 }
 
+ZTEST_USER(cros_flash_rtkfp, test_status_register_write_failure)
+{
+	fake_ex_op_fail = true;
+
+	zassert_equal(cros_flash_physical_protect_at_boot(
+			      cros_flash_dev, EC_FLASH_PROTECT_RO_AT_BOOT),
+		      -EIO);
+	zassert_equal(cros_flash_physical_protect_now(cros_flash_dev, false),
+		      -EIO);
+	zassert_equal(cros_flash_physical_protect_now(cros_flash_dev, true),
+		      -EIO);
+
+	/* No protection state change happened, including ALL_NOW. */
+	zassert_equal(cros_flash_physical_get_protect_flags(cros_flash_dev),
+		      0);
+}
+
 static void cros_flash_rtkfp_before(void *fixture)
 {
 	/*
-	 * Establish a deterministic baseline: HW WP deasserted, fake flash
-	 * fully erased with zeroed status registers.
+	 * Establish a deterministic baseline:
+	 *  - HW WP deasserted,
+	 *  - no protection range,
+	 *  - software protection latch enabled (sw_protected),
+	 *  - fake flash fully erased with zeroed status registers.
 	 */
 	gpio_wp_l_set(1);
 	fake_flash_reset();
 
+	zassert_equal(cros_flash_physical_protect_now(cros_flash_dev, false),
+		      EC_SUCCESS);
+	zassert_equal(cros_flash_physical_protect_at_boot(cros_flash_dev, 0),
+		      EC_SUCCESS);
 	zassert_equal(cros_flash_init(cros_flash_dev), EC_SUCCESS);
 }
 

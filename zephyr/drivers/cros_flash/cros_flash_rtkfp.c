@@ -104,6 +104,27 @@ static int flash_set_status(const struct device *dev, uint8_t sr1, uint8_t sr2)
 	return rv;
 }
 
+static int flash_set_status_for_prot(const struct device *dev, uint8_t reg1,
+				     uint8_t reg2)
+{
+	uint8_t sr1, sr2;
+	int ret;
+
+	ret = flash_get_status(dev, &sr1, &sr2);
+	if (ret) {
+		return ret;
+	}
+
+	sr1 &= ~(SPI_FLASH_SR1_BP0 | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP2 |
+		 SPI_FLASH_SR1_TB | SPI_FLASH_SR1_SEC);
+	sr2 &= ~SPI_FLASH_SR2_CMP;
+
+	sr1 |= reg1;
+	sr2 |= reg2;
+
+	return flash_set_status(dev, sr1, sr2);
+}
+
 static int flash_check_prot_reg(const struct device *dev, unsigned int offset,
 				unsigned int bytes)
 {
@@ -138,13 +159,32 @@ static int flash_check_prot_reg(const struct device *dev, unsigned int offset,
 	return EC_SUCCESS;
 }
 
+/* set new protect range by writing status regs */
+static int flash_write_prot_reg(const struct device *dev, unsigned int offset,
+				unsigned int bytes)
+{
+	uint8_t sr1, sr2;
+	int rv;
+
+	/* Invalid values */
+	if (offset + bytes > CONFIG_FLASH_SIZE_BYTES)
+		return EC_ERROR_INVAL;
+
+	/* Compute desired protect range */
+	rv = spi_flash_protect_to_reg(offset, bytes, &sr1, &sr2);
+	if (rv) {
+		return rv;
+	}
+
+	return flash_set_status_for_prot(dev, sr1, sr2);
+}
+
 static int cros_flash_rtkfp_write(const struct device *dev, int offset,
 				  int size, const char *data)
 {
 	const struct cros_flash_rtkfp_config *cfg = DRV_CONFIG(dev);
 	int ret;
 
-	/* check protection */
 	ret = flash_check_prot_reg(dev, offset, size);
 	if (ret) {
 		return ret;
@@ -203,6 +243,26 @@ static int cros_flash_rtkfp_erase(const struct device *dev, int offset,
 		LOG_DBG("Erase success.");
 	}
 	return ret;
+}
+
+static int flash_get_prot_range(const struct device *dev, uint32_t *start,
+				uint32_t *end)
+{
+	unsigned int len;
+	uint8_t sr1, sr2;
+	int ret;
+
+	ret = flash_get_status(dev, &sr1, &sr2);
+	if (ret) {
+		return ret;
+	}
+	ret = spi_flash_reg_to_protect(sr1, sr2, start, &len);
+	if (ret) {
+		return ret;
+	}
+	*end = *start + len;
+
+	return EC_SUCCESS;
 }
 
 static int cros_flash_rtkfp_get_protect(const struct device *dev, int bank)
@@ -301,6 +361,107 @@ static int cros_flash_rtkfp_sw_protect(const struct device *dev, bool enable)
 	return rv;
 }
 
+static int cros_flash_rtkfp_protect_at_boot(const struct device *dev,
+					    uint32_t new_flags)
+{
+	struct cros_flash_rtkfp_data *data = DRV_DATA(dev);
+	int ret;
+	bool was_sw_protected;
+	uint32_t new_prot_end;
+	uint32_t curr_prot_start;
+	uint32_t curr_prot_end;
+
+	was_sw_protected = data->sw_protected;
+
+	/* There is no independent protection of each section. Protection of WP
+	 * is within protection ranges of Rollbacks */
+	if (new_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
+		new_prot_end = CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE;
+	}
+#ifdef CONFIG_ROLLBACK
+	else if (new_flags & EC_FLASH_PROTECT_ROLLBACK_AT_BOOT) {
+		new_prot_end = CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE;
+	}
+#endif /* CONFIG_ROLLBACK */
+	else if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
+		new_prot_end = CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;
+	} else {
+		/* Disable protection of WP section, but do not disable
+		 * protection of the flash header. */
+		new_prot_end = CONFIG_WP_STORAGE_OFF;
+	}
+
+	ret = flash_get_prot_range(dev, &curr_prot_start, &curr_prot_end);
+	if (ret) {
+		return ret;
+	}
+
+	/* Just exit if the protection range matches new values. */
+	if ((curr_prot_start == FLASH_PROTECTION_START) &&
+	    (curr_prot_end == new_prot_end)) {
+		return EC_SUCCESS;
+	}
+
+	if (was_sw_protected && write_protect_is_asserted() &&
+	    new_prot_end < curr_prot_end) {
+		/* In case of SW protect enabled and WP asserted,
+		 * allow changing protection range only if it is
+		 * extending the range. */
+		return EC_ERROR_ACCESS_DENIED;
+	}
+
+	if (was_sw_protected) {
+		/* Allow modifying status registers in case deasserted WP, but
+		 * restore the SW protect in case WP is asserted again. */
+		ret = cros_flash_rtkfp_sw_protect(dev, false);
+		if (ret) {
+			return ret;
+		}
+		data->sw_protected = false;
+	}
+
+	ret = flash_write_prot_reg(dev, FLASH_PROTECTION_START, new_prot_end);
+
+	/* Always re-enable SW protect if it was enabled before. */
+	if (was_sw_protected) {
+		if (cros_flash_rtkfp_sw_protect(dev, true)) {
+			LOG_ERR("Failed to restore SW protect");
+			/* Panic due to security related issue. Flash protection
+			 * state is unknown. */
+			k_panic();
+		}
+		data->sw_protected = true;
+	}
+
+	if (!ret) {
+		LOG_DBG("set AT_BOOT");
+	}
+	return ret;
+}
+
+static int cros_flash_rtkfp_protect_now(const struct device *dev, bool all)
+{
+	struct cros_flash_rtkfp_data *data = DRV_DATA(dev);
+	int ret;
+
+	/* Set flash protection and enable SW protect. */
+	ret = cros_flash_rtkfp_protect_at_boot(
+		dev, all ? EC_FLASH_PROTECT_ALL_AT_BOOT :
+			   EC_FLASH_PROTECT_RO_AT_BOOT);
+
+	if (ret) {
+		return ret;
+	}
+
+	ret = cros_flash_rtkfp_sw_protect(dev, true);
+	if (ret) {
+		return ret;
+	}
+
+	data->sw_protected = true;
+	return EC_SUCCESS;
+}
+
 static int cros_flash_rtkfp_init(const struct device *dev)
 {
 	struct cros_flash_rtkfp_data *data = DRV_DATA(dev);
@@ -345,6 +506,8 @@ static const struct cros_flash_driver_api cros_flash_rtkfp_driver_api = {
 	.physical_erase = cros_flash_rtkfp_erase,
 	.physical_get_protect = cros_flash_rtkfp_get_protect,
 	.physical_get_protect_flags = cros_flash_rtkfp_get_protect_flags,
+	.physical_protect_at_boot = cros_flash_rtkfp_protect_at_boot,
+	.physical_protect_now = cros_flash_rtkfp_protect_now,
 	.physical_get_status = flash_get_status,
 };
 
