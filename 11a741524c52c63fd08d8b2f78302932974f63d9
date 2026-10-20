@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec87f928_397a0ee1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:12:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Commit Message**: This description narrates line-by-line code syntax changes (\"Extract X\", \"Move Y\", \"Add unit tests\") but omits the high-level functional intent and motivation for *why* this preparatory refactoring is happening. \n\nPer go/cl-descriptions#llm-prompts and go/cl-descriptions#informative, please replace the bullets with a brief prose paragraph explaining the problem and conceptual solution, and explicitly state the prospective goal this code supports.\n\nSuggested replacement options:\nIf keeping as a single CL:\n```text\nfpsensor: Extract FpTemplateStore and FpPositiveMatchSecretState\n\nTo support [insert upcoming feature/capability here], we need to decouple the fingerprint template management from the global state.\n\nThis CL introduces `FpTemplateStore`, `FpPositiveMatchSecretState`, and related encapsulation classes. This isolates the template storage, encryption buffer, and positive match secrets into dedicated, testable abstractions.\n```\n\nIf splitting into smaller CLs (recommended):\n```text\nfpsensor: Extract FpTemplateId and FpPositiveMatchSecretState\n\nTo support [insert upcoming feature/capability here], we need to decouple the fingerprint template management from the global state.\n\nThis CL extracts `FpTemplateId` and `FpPositiveMatchSecretState` into a dedicated module with unit tests as a first step towards full encapsulation.\n```\n[🔗](http://go/tj/45ece242-a413-4f73-9e18-8d3f3d7e97d0)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c4e92c0_3e65f677",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:12:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality**: Code logic appears correct for the extracted classes.\n**Architecture \u0026 Component Fit**: `FpTemplateStore` correctly groups related state into a dedicated object, but its integration into the main codebase is not complete in this CL.\n**Code Simplicity**: Found an over-engineered C++23 template deduction pattern for `as_bytes()` and `payload()` that should be simplified to standard `const`/non-`const` overloads.\n**Idiomaticity \u0026 Readability**: Good use of modern C++ features (`std::expected`, `std::span`) for the new classes.\n**Security**: Encrypted template buffers correctly clear their contents on failure.\n**Testing**: Unit tests are added for the newly extracted states.\n**CL Size \u0026 Scope**: Size: L (+795, -98). The non-test production diff is approximately 760 lines, which exceeds the 250-line limit for a single logical change. Please split this CL to ease review and enforce single logical changes. A suggested split plan:\n1. Introduce `FpTemplateId` and `FpPositiveMatchSecretState` with their unit tests.\n2. Introduce `FpEncryptedTemplateBuffer` and its associated methods.\n3. Introduce `FpTemplateStore` and adapt the `fp_template` global references.\n\n**Commit Message**: **[CL Description Blocker — Action Required]** The description narrates the syntax changes (\"Extract X into Y\", \"Move Z\") but omits the high-level functional intent and motivation for *why* this extraction is happening now (e.g., what prospective capability this preparatory refactoring supports). Per go/cl-descriptions#llm-prompts and go/cl-descriptions#informative, please add a brief prose paragraph at the top explaining the problem and conceptual solution.\n\n[🔗](http://go/tj/45ece242-a413-4f73-9e18-8d3f3d7e97d0)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e882f20c_6a93a5d0",
+        "filename": "include/fpsensor/fpsensor_template_store.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:12:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity**: The use of C++23 deducing `this` (`this auto \u0026self`) combined with `std::conditional_t` and `std::remove_reference_t` is significantly over-engineered for a simple `const`/non-`const` accessor.\n\nPlease replace this with two direct overloads to improve readability and avoid unnecessary template metaprogramming:\n\n```cpp\n\t[[nodiscard]] std::span\u003cuint8_t, kFpAlgorithmEncryptedTemplateSize\u003e as_bytes() noexcept\n\t{\n\t\treturn std::span\u003cuint8_t, kFpAlgorithmEncryptedTemplateSize\u003e(\n\t\t\treinterpret_cast\u003cuint8_t *\u003e(this), sizeof(*this));\n\t}\n\n\t[[nodiscard]] std::span\u003cconst uint8_t, kFpAlgorithmEncryptedTemplateSize\u003e as_bytes() const noexcept\n\t{\n\t\treturn std::span\u003cconst uint8_t, kFpAlgorithmEncryptedTemplateSize\u003e(\n\t\t\treinterpret_cast\u003cconst uint8_t *\u003e(this), sizeof(*this));\n\t}\n\n\t[[nodiscard]] std::span\u003cuint8_t, FP_ALGORITHM_TEMPLATE_SIZE + FP_POSITIVE_MATCH_SALT_BYTES\u003e payload() noexcept\n\t{\n\t\treturn as_bytes().subspan\u003csizeof(metadata), FP_ALGORITHM_TEMPLATE_SIZE + FP_POSITIVE_MATCH_SALT_BYTES\u003e();\n\t}\n\n\t[[nodiscard]] std::span\u003cconst uint8_t, FP_ALGORITHM_TEMPLATE_SIZE + FP_POSITIVE_MATCH_SALT_BYTES\u003e payload() const noexcept\n\t{\n\t\treturn as_bytes().subspan\u003csizeof(metadata), FP_ALGORITHM_TEMPLATE_SIZE + FP_POSITIVE_MATCH_SALT_BYTES\u003e();\n\t}\n```\n[🔗](http://go/tj/45ece242-a413-4f73-9e18-8d3f3d7e97d0)",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
