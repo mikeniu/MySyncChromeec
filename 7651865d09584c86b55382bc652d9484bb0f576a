@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4021997_da698017",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:18:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n**Functionality:** ✅ The extraction accurately preserves the original `fp_task` loop behavior and transitions.\n**Architecture \u0026 Component Fit:** ✅ Operations were correctly shifted to `fpsensor_context` methods, which improves encapsulation and testability for state transitions. \n**Code Simplicity:** ✅ Simplifies `fp_task` by replacing deep inline blocks with appropriately named member function calls.\n**Idiomaticity \u0026 Readability:** ✅ The new context methods are cleaner to read. (Note the inline comment about a dropped comment block to restore documentation).\n**Security:** ✅ No issues found.\n**Testing:** ✅ Introduces baseline unit tests for the extracted context operations. (See inline comment for follow-up suggestions to expand coverage).\n**CL Size \u0026 Scope:** ✅ `Size: M (+97, -85)`. This is a clean, single-purpose structural refactoring (Pure Move) to enable testing.\n**Commit Message:** ✅ Clear and concise summary following Chromium conventions.\n\n[🔗](http://go/tj/5af1dabd-4802-457f-be33-ca32566d17dc)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7651865d09584c86b55382bc652d9484bb0f576a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5012526a_d492dc2e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:18:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Missing Documentation**\n\nThe original code included a helpful explanatory comment here that was dropped during the extraction. To preserve documentation integrity, please restore it:\n\n```cpp\n\t\tif (sensor_mode \u0026 FP_MODE_ANY_CAPTURE) {\n\t\t\tCPRINTS(\"Finger down (capture mode)!\");\n\t\t\t/*\n\t\t\t * Send FINGER_DOWN immediately upon detection\n\t\t\t * during a capture session so the host can\n\t\t\t * accurately measure interaction latency.\n\t\t\t */\n\t\t\tsend_mkbp_event(EC_MKBP_FP_FINGER_DOWN);\n\t\t\tfp_process_finger();\n\t\t}\n```\n[🔗](http://go/tj/5af1dabd-4802-457f-be33-ca32566d17dc)",
+      "range": {
+        "startLine": 256,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7651865d09584c86b55382bc652d9484bb0f576a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19346a66_9c134894",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:18:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nThe new test provides good baseline coverage for the extracted context operations, but it omits `poll_finger_and_capture()`. Since the goal of the refactor is to make the task loop testable, consider adding coverage for it in a follow-up CL.\n\nAdditionally, the `encrypt_requested_template()` test only covers the early return when `template_encrypted_id \u003d\u003d FP_NO_SUCH_TEMPLATE`. It would be great to also test the path where `encrypt_template(template_encrypted_id) \u003d\u003d EC_SUCCESS` and `FP_ENCRYPTED_TEMPLATE_READY` is set.\n[🔗](http://go/tj/5af1dabd-4802-457f-be33-ca32566d17dc)",
+      "range": {
+        "startLine": 457,
+        "startChar": 0,
+        "endLine": 480,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7651865d09584c86b55382bc652d9484bb0f576a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
