@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc2c211c_d96c8f17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:53:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/e96c6e29-0967-4b35-b65a-0582cfb14374)]\n\n### Review Summary\n\n**CL Size \u0026 Scope:** Size: L (+280, -70). The production (non-test) diff is \u003c 250 lines and implements a single cohesive logical change (extracting `FpSensorStateMachine`). The size is acceptable. ✅\n\n**Commit Message:** The description accurately explains why `fp_task` was refactored into `FpSensorStateMachine` and how it enables unit testing, meeting the `R1`, `R2`, and `R3` standards. ✅\n\n**Architecture \u0026 Component Fit:** The `std::variant` dispatch combined with `std::visit` simplifies the monolithic event loop drastically, creating a clean typestate boundary that natively models mutually exclusive configurations. ✅\n\n**Code Simplicity:** The extraction of `parse_command` and command structures significantly reduces the control-flow complexity of the original `fp_task()` loop, replacing nested branches with clear guard clauses and polymorphic execution. ✅\n\n**Idiomaticity \u0026 Readability:** The use of `constexpr`, `std::variant`, and `std::span` brings modern C++ safety to the state machine implementation. ✅\n\n**Security:** No security issues found. ✅\n\n**Testing:** Excellent addition of hermetic unit tests in `fpsensor_state.cc`. The missing coverage for runtime state transitions and weak oracles were addressed perfectly in the latest patchset. ✅",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "01b964c255c18c6d6ad4f8ceab44544229855db4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
