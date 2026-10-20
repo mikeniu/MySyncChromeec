@@ -330,7 +330,9 @@ def build(opts):
 
     platform_ec = ZEPHYR_DIR.parent
 
-    if not opts.code_coverage:
+    if not opts.code_coverage and (
+        not opts.shard_index or opts.shard_index == 1
+    ):
         # Build the host utils first
         build_host_utils(opts, platform_ec, env, {})
         build_host_utils(opts, platform_ec, env, {"TEST_ASAN": "y"})
