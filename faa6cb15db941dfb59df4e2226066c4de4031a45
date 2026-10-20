@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "016e8190_b448b901",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:52:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please update remaining call sites**\n\n### Review Summary\n\n**CL Size \u0026 Scope**: Size: M (+186, -29). The CL is now appropriately split and focused strictly on `FpTemplateStore`.\n**Functionality**: Code logic is solid, but one of the handlers (`fp_read_match_secret`) was missed during the extraction, leaving duplicated and buggy logic behind.\n**Code Simplicity**: `FpTemplateStore` API is clean and uses idiomatic standard C++ expected/span types. The removal of the deducing-this template pattern greatly improved readability.\n**Testing**: Comprehensive boundary tests are now included for the secret lifecycle and template IDs.\n\nPlease address the inline comment to finish plumbing `FpTemplateStore::consume_secret` through the state module.\n[🔗](http://go/tj/ba724d23-c725-482d-b7d1-d39924d3419b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "faa6cb15db941dfb59df4e2226066c4de4031a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba75d805_015f161d",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:52:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity \u0026 Control Flow:** While `fp_command_sign_match` was correctly updated to use `FpTemplateStore::consume_secret`, this function (`fp_read_match_secret`) still manually duplicates the deadline and readability checks via `state_copy`.\n\nNot only does this miss out on the encapsulation of `consume_secret`, it also leaves behind the old loosely ordered bug where an unreadable secret (with `deadline \u003d 0`) accidentally triggers the `EC_RES_TIMEOUT` error path because `now \u003e\u003d 0` is true. `consume_secret` was specifically fixed to check readability first.\n\nPlease replace these manual checks with `FpTemplateStore::consume_secret`:\n\n```cpp\n\tconst auto template_id \u003d FpTemplateId::create(fgr);\n\tif (!template_id.has_value()) {\n\t\tCPRINTS(\"Invalid finger number %d\", fgr);\n\t\treturn template_id.error();\n\t}\n\n\tconst auto matched \u003d FpTemplateStore::consume_secret(\n\t\tglobal_context.positive_match_secret_state, *template_id);\n\tif (!matched.has_value()) {\n\t\tif (matched.error() \u003d\u003d EC_RES_TIMEOUT) {\n\t\t\tCPRINTS(\"Reading positive match secret disallowed: \"\n\t\t\t\t\"deadline has passed.\");\n\t\t} else {\n\t\t\tCPRINTS(\"Positive match secret for finger %d is not meant to \"\n\t\t\t\t\"be read now.\",\n\t\t\t\tfgr);\n\t\t}\n\t\treturn matched.error();\n\t}\n```\n[🔗](http://go/tj/ba724d23-c725-482d-b7d1-d39924d3419b)",
+      "range": {
+        "startLine": 426,
+        "startChar": 0,
+        "endLine": 448,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "faa6cb15db941dfb59df4e2226066c4de4031a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

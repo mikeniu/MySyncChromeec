@@ -89,6 +89,26 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bee5587d_d0236a17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:52:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Resolved in latest patchset. Thanks for splitting the CL and rewriting the commit message.",
+      "parentUuid": "9c4e92c0_3e65f677",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e882f20c_6a93a5d0",
