@@ -1,0 +1,148 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e8bfacc_686f9c28",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T01:33:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL.**\n\n### Review Summary\n\n* **CL Size \u0026 Scope:** `Size: L (+250, -0)`. The production (non-test) diff is exactly 250 lines. Per the CL Size \u0026 Scope guidelines, any CL with a production diff of 250 lines or more MUST be split into smaller, independently reviewable CLs. Even though this CL consists only of headers, please split it:\n  1. CL 1: Add the generic driver configuration and data header (`zephyr/drivers/fingerprint/fingerprint_rts5817maa.h`).\n  2. CL 2: Add the vendor-specific private API header (`zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h`).\n* **Functionality:** Looks good. The headers properly declare the hardware structures and error codes.\n* **Architecture \u0026 Component Fit:** The separation of the driver config/data header from the private vendor API header aligns well with clean abstraction layers.\n* **Code Simplicity:** Minimal declarations.\n* **Idiomaticity \u0026 Readability:** Several typos and inconsistent Doxygen syntax (`/*` instead of `/**`) have been flagged in inline comments. An unidiomatic boolean parameter is also noted, with an exception if it is a fixed vendor API.\n* **Security:** N/A. No implementation logic introduced.\n* **Testing:** N/A. Since this CL only introduces declarative headers (structs, enums, function signatures) with no executable logic, automated test coverage is not required here.\n* **Commit Message:** The commit message clearly explains the purpose of the two headers and properly includes `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/1ea02bdc-d4d3-4382-ae77-f405549a4b55)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57f7bf06_6650bfc0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T01:33:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** To be consistent with the other docstrings in this file (e.g., line 151) and standard Doxygen conventions, use `/**` instead of `/*` for these documentation blocks.\n\nOther locations to update:\n* **Lines 135-136**\n* **Line 143**\n* **Line 174**\n* **Line 185**\n\n[🔗](http://go/tj/1ea02bdc-d4d3-4382-ae77-f405549a4b55)",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b16d3a5b_af0111d0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T01:33:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** \"Once\" seems to be a typo here. Consider rephrasing for clarity, such as \"Add fingerprint image...\" or \"Process fingerprint image...\".\n\n```suggestion\n/**\n * @brief Adds fingerprint image to the current enrollment session.\n```\n\n[🔗](http://go/tj/1ea02bdc-d4d3-4382-ae77-f405549a4b55)",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cb3be1d_c14072d6",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T01:33:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** Typo: `effecive` -\u003e `effective`.\n\nAlso update the identical typos in the `rts_bio_match` docstring on **lines 205-212**.\n\n```suggestion\n * @return RTS_FP_TOO_HIGH direction information, effective part of image is only\n * on the up side.\n * @return RTS_FP_TOO_LOW direction information, effective part of image is only\n * on the down side.\n * @return RTS_FP_TOO_LEFT direction information, effective part of image is only\n * on the left side.\n * @return RTS_FP_TOO_RIGHT direction information, effective part of image is only\n * on the right side.\n```\n\n[🔗](http://go/tj/1ea02bdc-d4d3-4382-ae77-f405549a4b55)",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 169,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81c97595_0910dabc",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T01:33:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** There are a few typos in this documentation block:\n* Line 197: `shouldbe` -\u003e `should be`\n* Line 201: `donnot` -\u003e `does not`\n\n```suggestion\n * @param template_update Whether the template should be updated after successful match.\n * @param match_index Pointer to variable where index of matched template will be stored.\n * @param update_bitmap Pointer to variable where bitmap of update templates.\n *\n * @return RTS_FP_SUCCESS Match success and does not need to update template.\n```\n\n[🔗](http://go/tj/1ea02bdc-d4d3-4382-ae77-f405549a4b55)",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6de5e913_f642b922",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T01:33:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (vendor API):** If this API is under your control (and not a pre-compiled fixed vendor blob interface), consider replacing the `bool template_update` parameter with an explicit `enum` (e.g., `RTS_TEMPLATE_UPDATE_ENABLED` vs `_DISABLED`) or a flags bitmask. Boolean parameters in public APIs make the call sites ambiguous (e.g., `rts_bio_match(..., true, ...)` does not explain what `true` does).\n\nIf this is a fixed vendor library interface that cannot be changed, you can ignore this suggestion.\n\n[🔗](http://go/tj/1ea02bdc-d4d3-4382-ae77-f405549a4b55)",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 218,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
