@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e45d2397_13e1aebd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T05:50:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](http://go/tj/f81d731e-cf41-49aa-a1ab-0b589e15710d)]\n\n### Review Summary\n**Functionality**: The skeleton driver correctly initializes and provides status register access.\n**Architecture \u0026 Component Fit**: The `cros_flash` driver integrates seamlessly with Zephyr`s flash APIs.\n**Code Simplicity**: I left a minor suggestion to remove the unnecessary `cros_flash_rtkfp_get_status` wrapper and assign `flash_get_status` directly to the API struct.\n**Idiomaticity \u0026 Readability**: Follows Zephyr EC C idioms effectively.\n**Security**: Clearing the hardware-dependent SRP bits to rely entirely on software write protection is implemented correctly.\n**Testing**: Thank you for splitting this CL and adding the mock Zephyr unit tests! The test coverage is solid and directly tests the initialization logic. I left a small suggestion on avoiding unconditional status register writes during init, along with the corresponding test update.\n**CL Size \u0026 Scope**: `Size: L (+524, -0)`. This CL satisfies the Single Logical Change rule and the \"Thorough Unit Tests Exception\" for Size: L: the production logic is only ~180 lines, while the remaining delta is entirely dedicated to the fake flash test setup and unit tests directly validating this change. This is perfectly scoped!\n**Commit Message**: Clear, detailed, and includes the actual test command used.\n\nTAG\u003dagy\nCONV\u003da05d55cb-63fc-4d37-90ce-aae1447fd720",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f47d67b28c89dc1c19c91d101a1fa75fa2b2a6f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01f44305_4a2f7de4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T05:50:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This wrapper function is unnecessary and can be removed. You can assign `flash_get_status` directly to `.physical_get_status` in `cros_flash_rtkfp_driver_api`.\n\n```c\nstatic const struct cros_flash_driver_api cros_flash_rtkfp_driver_api \u003d {\n\t.init \u003d cros_flash_rtkfp_init,\n\t.physical_get_status \u003d flash_get_status,\n};\n```\n[🔗](http://go/tj/f81d731e-cf41-49aa-a1ab-0b589e15710d)",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 118,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f47d67b28c89dc1c19c91d101a1fa75fa2b2a6f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e706d63f_a4cb7677",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T05:50:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Suggestion: Writing to the SPI flash status registers unconditionally on every boot adds unnecessary overhead (SPI transactions) and could potentially wear out non-volatile bits on the flash chip. It is safer to only write back to the status register if the SRP bits were actually set.\n\n```c\n\tret \u003d flash_get_status(dev, \u0026sr1, \u0026sr2);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tif ((sr1 \u0026 SPI_FLASH_SR1_SRP0) || (sr2 \u0026 SPI_FLASH_SR2_SRP1)) {\n\t\tsr1 \u0026\u003d ~SPI_FLASH_SR1_SRP0;\n\t\tsr2 \u0026\u003d ~SPI_FLASH_SR2_SRP1;\n\n\t\tret \u003d flash_set_status(dev, sr1, sr2);\n\t\tif (ret) {\n\t\t\treturn ret;\n\t\t}\n\t}\n```\n\nNote: If you apply this change, you will also need to update `test_init_status_register_write_failure` in `main.c` to pre-set an SRP bit so that the write path is actually triggered:\n```c\nZTEST_USER(cros_flash_rtkfp, test_init_status_register_write_failure)\n{\n\tfake_set_sr(SPI_FLASH_SR1_SRP0, 0);\n\tfake_ex_op_fail \u003d true;\n\tzassert_equal(cros_flash_init(cros_flash_dev), -EIO);\n}\n```\n[🔗](http://go/tj/f81d731e-cf41-49aa-a1ab-0b589e15710d)",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f47d67b28c89dc1c19c91d101a1fa75fa2b2a6f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
