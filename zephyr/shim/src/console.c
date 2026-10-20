@@ -536,7 +536,16 @@ static void shell_write_str(const struct shell *sh, const char *buff,
 	z_shell_unlock(sh);
 }
 
-static void zephyr_print(const char *buff, size_t size)
+void zephyr_console_panic(void)
+{
+	/* Switch the shell to blocking mode in case it is used during panic. */
+	if (shell_is_active()) {
+		(void)shell_zephyr->iface->api->enable(shell_zephyr->iface,
+						       true);
+	}
+}
+
+void zephyr_print(const char *buff, size_t size)
 {
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LOG)) {
 		panic_log_write_str(buff, size);

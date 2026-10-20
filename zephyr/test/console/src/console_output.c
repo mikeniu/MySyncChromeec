@@ -440,6 +440,19 @@ ZTEST_F(console_output, test_isr_output)
 	}
 }
 
+ZTEST_F(console_output, test_console_panic)
+{
+	const struct shell *ec_sh = get_ec_shell();
+	struct shell_uart_common *sh_uart =
+		(struct shell_uart_common *)ec_sh->iface->ctx;
+
+	zassert_false(sh_uart->blocking_tx);
+	zephyr_console_panic();
+	zassert_true(sh_uart->blocking_tx);
+
+	(void)ec_sh->iface->api->enable(ec_sh->iface, false);
+}
+
 void test_main(void)
 {
 	ec_app_main();
