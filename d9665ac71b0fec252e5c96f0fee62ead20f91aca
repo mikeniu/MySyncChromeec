@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73ec7ad9_00e76ca3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:03:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for required improvements.\n\n### Review Summary\n* **Functionality:** ❌ One issue found. The test fixture includes dangerously undersized template buffers (`TEST_TEMPL_SIZE` 64 vs 20372) which would cause buffer overflows if actually used.\n* **Architecture \u0026 Component Fit:** ✅ Fits well within the Zephyr ztest framework.\n* **Code Simplicity:** ❌ One issue found. The test fixture introduces mock function setups and arrays that are entirely unused dead code in this CL (YAGNI). See inline comment.\n* **Idiomaticity \u0026 Readability:** ✅ Code is otherwise readable.\n* **Security:** ✅ N/A (test-only).\n* **Testing:** ✅ Thorough test setup for the algorithm\u0027s lifecycle (init/exit).\n* **CL Size \u0026 Scope:** ✅ Size: M (+174, -0). The CL adheres to the Single Logical Change rule by focusing specifically on test scaffolding and lifecycle testing.\n* **Commit Message:** ✅ Accurate and concise.\n[🔗](http://go/tj/726da1f3-3ac5-4953-a95c-dc80c427f692)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d9665ac71b0fec252e5c96f0fee62ead20f91aca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b005dc78_a352be8a",
+        "filename": "zephyr/test/fingerprint/algorithm/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:03:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity \u0026 Minimalism:** This CL introduces `image` and `templ` arrays (and their related mock functions) which are entirely unused by the `init` and `exit` test cases here. Furthermore, `TEST_TEMPL_SIZE` is dangerously hardcoded to `64` while `CONFIG_FP_ALGORITHM_TEMPLATE_SIZE` is `20372`, which would cause buffer overflows if actually used.\n\nTo keep test code minimal and idiomatic (YAGNI), please remove the unused state and mock declarations from this CL, and introduce them only in the follow-up CLs that actually test `enroll` and `match`.\n\nPlease remove:\n* **Line 6**: Unused `#include \u003cstring.h\u003e` (once `memset` is removed).\n* **Lines 20-34**: Unused `enroll` and `match` FFF declarations.\n* **Lines 36-37**: Unused size constants.\n* **Lines 44-45**: Unused `image` and `templ` arrays.\n* **Lines 79-82, 85-87**: Unused mock `RESET` and `return_val` setups.\n* **Lines 89-90**: Unused `memset`s.\n[🔗](http://go/tj/726da1f3-3ac5-4953-a95c-dc80c427f692)",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d9665ac71b0fec252e5c96f0fee62ead20f91aca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
