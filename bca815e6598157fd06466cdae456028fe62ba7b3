@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "bca815e6598157fd06466cdae456028fe62ba7b3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a99d1b3_85e0bee9",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:46:20Z",
+      "side": 1,
+      "message": "Updated test_state_machine_dispatch_reset and test_state_machine_dispatch_maintenance to assert zassert_equal(local_ctx.sensor_mode, 0), and added test_state_machine_dispatch_encrypt and test_state_machine_dispatch_decrypt.",
+      "parentUuid": "40e0d2ce_1102a4dc",
+      "range": {
+        "startLine": 552,
+        "startChar": 0,
+        "endLine": 569,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "bca815e6598157fd06466cdae456028fe62ba7b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
