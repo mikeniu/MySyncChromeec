@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2862912_a310626b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:12:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Blocker — Action Required]** The commit message lists multiple independent change categories joined by \"and\" in the subject and as separate bullets in the body, which violates the Single Logical Change rule (and the diff is Size: XL). Per `go/small-cls` and `go/cl-descriptions`, this CL must be split. \n\nWhen you split the CL, please ensure each commit message describes only its specific atomic change without diff-narration. Here are suggested descriptions for the split CLs:\n\n**CL 1 (State Wrapper):**\n```text\nfpsensor: Wrap context struct into FpSensorContext\n\nReplace the plain `fpsensor_context` struct with an `FpSensorContext` wrapper composing individual functional states (crypto, frames, stats, modes) to improve encapsulation and prepare for extracting host commands.\n\nBUG\u003db:286119221\n```\n\n**CL 2 (Host Commands):**\n```text\nfpsensor: Extract host command handlers\n\nMove `EC_CMD_FP_*` host command handlers into a dedicated module and poison direct `global_context` access outside entry points to strictly enforce the context boundary.\n\nBUG\u003db:286119221\n```\n\n**CL 3 (Migrate Callers):**\n```text\nfpsensor: Migrate subsystems to FpSensorContext methods\n\nUpdate authentication commands, handshakes, ASCP, and debug console commands to operate directly on `FpSensorContext` methods instead of accessing the global context struct.\n\nBUG\u003db:286119221\n```\n[🔗](http://go/tj/b7d210e7-18b8-4f37-9134-0eab9c041ee8)",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "43660c4d825b875d48382f1c59924fea1e3afb90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8102e150_ada84033",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:12:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n`Size: XL (+4143, -6225)`\nThis CL is too large and bundles multiple independent logical changes, violating the Single Logical Change rule. Please split this CL into smaller, self-contained CLs to enable effective review.\n\nProposed split plan:\n1. **CL 1:** Replace `fpsensor_context` with `FpSensorContext` wrapper.\n2. **CL 2:** Extract `EC_CMD_FP_*` host command handlers into `fpsensor_host_commands.cc`.\n3. **CL 3:** Migrate callers (auth commands, handshake, ASCP, console) to use the new `FpSensorContext` methods.\n\n**Functionality:**\nNot thoroughly reviewed due to the need to split the CL.\n\n**Architecture \u0026 Component Fit:**\nThe extraction and encapsulation steps appear to be positive architectural improvements, but they must be evaluated in isolated CLs.\n\n**Code Simplicity:**\nNot fully evaluated due to the size of the CL.\n\n**Idiomaticity \u0026 Readability:**\nNot fully evaluated due to the size of the CL.\n\n**Security:**\nNo obvious new vulnerabilities noticed in a high-level scan.\n\n**Testing:**\nTests are modified alongside the refactoring, which is good, but test refactorings should accompany their respective split CLs.\n\n**Commit Message:**\nSee inline comment on `/COMMIT_MSG` for feedback and suggested commit descriptions for the split CLs.\n\n[🔗](http://go/tj/b7d210e7-18b8-4f37-9134-0eab9c041ee8)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "43660c4d825b875d48382f1c59924fea1e3afb90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
