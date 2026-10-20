@@ -39,9 +39,21 @@ static uint32_t current_snapshot_idx;
 static uint32_t read_next_idx;
 static uint32_t head_idx;
 static uint32_t tail_idx;
+
+/*
+ * Protects console_buf and the indices above.
+ *
+ * console_buf_notify_chars() is reached from the printk hook and the log
+ * backends, so it can run in any context: threads, ISRs, pre-kernel, or
+ * with interrupts locked (e.g. an assertion raised inside a kernel
+ * spinlock). A spinlock is safe in all of these, while a k_mutex is not:
+ * all k_mutex operations share one kernel spinlock, so calling
+ * k_mutex_lock() from printk inside a k_mutex critical section re-enters
+ * it (b/566306568). All critical sections here are short and bounded.
+ */
+static struct k_spinlock console_lock;
+
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
-static atomic_t dropped_logs_isr;
-static atomic_t dropped_logs_mutex;
 static atomic_t dropped_logs_overflow;
 #endif
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
@@ -114,30 +126,10 @@ static uint32_t next_log(uint32_t start_idx)
 	return idx;
 }
 
-K_MUTEX_DEFINE(console_write_lock);
-
 size_t console_buf_notify_chars(const char *s, size_t len)
 {
-	/*
-	 * This is just notifying of console characters for debugging
-	 * output, so if we are unable to lock the mutex immediately,
-	 * then just drop the string. Mutexes cannot be locked from an
-	 * isr, so also drop the string in this case too.
-	 */
-	if (k_is_in_isr()) {
-#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
-		atomic_inc(&dropped_logs_isr);
-#endif
-		return 0;
-	}
-	if (k_mutex_lock(&console_write_lock, K_NO_WAIT)) {
-#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
-		atomic_inc(&dropped_logs_mutex);
-#endif
-		return 0;
-	}
-	/* We got the mutex. */
 	bool new_line = false;
+	k_spinlock_key_t key = k_spin_lock(&console_lock);
 
 	for (size_t i = 0; i < len; i++) {
 		/* Don't copy null byte into buffer */
@@ -171,7 +163,7 @@ size_t console_buf_notify_chars(const char *s, size_t len)
 		console_buf[tail_idx] = *s++;
 		tail_idx = new_tail;
 	}
-	k_mutex_unlock(&console_write_lock);
+	k_spin_unlock(&console_lock, key);
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
 	if (new_line)
@@ -193,9 +185,7 @@ enum ec_status uart_console_read_buffer_init(void)
 	host_clear_events(EC_HOST_EVENT_MASK(EC_HOST_EVENT_CONSOLE_LOGS));
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
 
-	if (k_mutex_lock(&console_write_lock, K_MSEC(100)))
-		/* Failed to acquire console buffer mutex */
-		return EC_RES_TIMEOUT;
+	k_spinlock_key_t key = k_spin_lock(&console_lock);
 
 	/* For read next, start reading at the beginning of the buffer */
 	read_next_idx = head_idx;
@@ -214,7 +204,7 @@ enum ec_status uart_console_read_buffer_init(void)
 	atomic_clear(&new_console_log);
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
 
-	k_mutex_unlock(&console_write_lock);
+	k_spin_unlock(&console_lock, key);
 
 	return EC_RES_SUCCESS;
 }
@@ -253,41 +243,36 @@ static inline bool is_log_entry_boundary(char c)
 	return false;
 }
 
-static uint16_t handle_dropped_logs(char *dest, size_t dest_size)
+/*
+ * Format the dropped logs message, if any. This is done before taking
+ * console_lock since format_dropped_logs_msg() may be overridden, e.g. by
+ * the tokenized logging backend, which takes its own lock.
+ *
+ * The ISR and Mutex counts are kept in the message for compatibility with
+ * existing parsers. Logs are no longer dropped for those reasons.
+ */
+static int format_dropped_logs(char *msg, size_t msg_size, uint32_t *drops)
 {
-	uint32_t drops_isr = atomic_get(&dropped_logs_isr);
-	uint32_t drops_mutex = atomic_get(&dropped_logs_mutex);
-	uint32_t drops_overflow = atomic_get(&dropped_logs_overflow);
-
-	if ((drops_isr | drops_mutex | drops_overflow) == 0)
+	*drops = atomic_get(&dropped_logs_overflow);
+	if (*drops == 0)
 		return 0;
 
-	if (dest_size == 0)
-		return 0;
+	int len = format_dropped_logs_msg(msg, msg_size, 0, 0, *drops);
 
-	char msg[128];
-	int len = format_dropped_logs_msg(msg, sizeof(msg), drops_isr,
-					  drops_mutex, drops_overflow);
-	if (len <= 0 || (size_t)len >= dest_size)
-		return 0;
-
-	atomic_sub(&dropped_logs_isr, drops_isr);
-	atomic_sub(&dropped_logs_mutex, drops_mutex);
-	atomic_sub(&dropped_logs_overflow, drops_overflow);
-
-	memcpy(dest, msg, len);
-	return len;
+	/* Skip the message if formatting failed or was truncated. */
+	return (len > 0 && (size_t)len < msg_size) ? len : 0;
 }
 
+/* Called with console_lock held. */
 static void process_dropped_logs(uint32_t *head, uint32_t snapshot_idx,
 				 char *dest, uint16_t *write_count,
-				 uint16_t dest_size)
+				 uint16_t dest_size, const char *msg,
+				 int msg_len, uint32_t drops)
 {
-	bool has_dropped = (atomic_get(&dropped_logs_isr) |
-			    atomic_get(&dropped_logs_mutex) |
-			    atomic_get(&dropped_logs_overflow)) != 0;
+	if (msg_len == 0)
+		return;
 
-	if (has_dropped && *head != snapshot_idx) {
+	if (*head != snapshot_idx) {
 		/* If *head is mid-token/line, flush remainder of current log
 		 * entry first */
 		if (!is_log_entry_boundary(console_buf[*head])) {
@@ -298,8 +283,12 @@ static void process_dropped_logs(uint32_t *head, uint32_t snapshot_idx,
 		}
 	}
 
-	*write_count += handle_dropped_logs(dest + *write_count,
-					    dest_size - *write_count);
+	if ((size_t)msg_len >= (size_t)(dest_size - *write_count))
+		return;
+
+	atomic_sub(&dropped_logs_overflow, drops);
+	memcpy(dest + *write_count, msg, msg_len);
+	*write_count += msg_len;
 }
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS */
 
@@ -329,18 +318,22 @@ int uart_console_read_buffer(uint8_t type, char *dest, uint16_t dest_size,
 	if (dest_size == 0)
 		return EC_RES_INVALID_PARAM;
 
-	if (k_mutex_lock(&console_write_lock, K_MSEC(100)))
-		/* Failed to acquire console buffer mutex */
-		return EC_RES_TIMEOUT;
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
+	char msg[128];
+	uint32_t drops = 0;
+	int msg_len = format_dropped_logs(msg, sizeof(msg), &drops);
+#endif
+
+	k_spinlock_key_t key = k_spin_lock(&console_lock);
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
 	process_dropped_logs(head, current_snapshot_idx, dest, &write_count,
-			     dest_size);
+			     dest_size, msg, msg_len, drops);
 #endif
 
 	if (*head == current_snapshot_idx && write_count == 0) {
 		/* No new data, return empty response */
-		k_mutex_unlock(&console_write_lock);
+		k_spin_unlock(&console_lock, key);
 		*write_count_out = 0;
 		return EC_RES_SUCCESS;
 	}
@@ -352,7 +345,7 @@ int uart_console_read_buffer(uint8_t type, char *dest, uint16_t dest_size,
 	write_count++;
 
 	*write_count_out = write_count;
-	k_mutex_unlock(&console_write_lock);
+	k_spin_unlock(&console_lock, key);
 
 	return EC_RES_SUCCESS;
 }
