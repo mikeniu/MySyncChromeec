@@ -32,6 +32,8 @@ uint32_t panic_log_version(void);
 extern bool panic_log_initialized;
 extern bool panic_log_frozen;
 
+extern struct panic_log_storage panic_log;
+
 /* Reset the panic log before each test. Panic log will begin frozen. */
 static void before_panic_log_test(void *state)
 {
@@ -161,6 +163,85 @@ ZTEST(panic_log, test_write_under_irq_lock)
 	freeze_panic_log();
 	zassert_true(panic_log_is_valid());
 	zassert_true(panic_log_contains(test_str));
+}
+
+ZTEST_USER(panic_log, test_write_larger_than_capacity)
+{
+	static char large_buf[CONFIG_PLATFORM_EC_PANIC_LOG_SIZE + 64];
+
+	for (size_t i = 0; i < sizeof(large_buf); i++)
+		large_buf[i] = 'A' + (i % 26);
+
+	unfreeze_panic_log();
+	panic_log_write_str(large_buf, sizeof(large_buf));
+	freeze_panic_log();
+
+	zassert_equal(panic_log_len(), CONFIG_PLATFORM_EC_PANIC_LOG_SIZE);
+	const char *expected_tail = large_buf + sizeof(large_buf) -
+				    CONFIG_PLATFORM_EC_PANIC_LOG_SIZE;
+	static char read_buf[CONFIG_PLATFORM_EC_PANIC_LOG_SIZE];
+	for (size_t i = 0; i < CONFIG_PLATFORM_EC_PANIC_LOG_SIZE; i++)
+		read_buf[i] = panic_log_read(i);
+	zassert_mem_equal(read_buf, expected_tail,
+			  CONFIG_PLATFORM_EC_PANIC_LOG_SIZE);
+}
+
+ZTEST_USER(panic_log, test_write_wrap_around)
+{
+	unfreeze_panic_log();
+	for (size_t i = 0; i < CONFIG_PLATFORM_EC_PANIC_LOG_SIZE / 2; i++)
+		panic_log_write_char('0');
+	zassert_equal(panic_log_len(), CONFIG_PLATFORM_EC_PANIC_LOG_SIZE / 2);
+
+	static char wrap_buf[CONFIG_PLATFORM_EC_PANIC_LOG_SIZE * 3 / 4];
+	memset(wrap_buf, '1', sizeof(wrap_buf));
+	panic_log_write_str(wrap_buf, sizeof(wrap_buf));
+	freeze_panic_log();
+
+	zassert_equal(panic_log_len(), CONFIG_PLATFORM_EC_PANIC_LOG_SIZE);
+	size_t remaining_zeros =
+		CONFIG_PLATFORM_EC_PANIC_LOG_SIZE - sizeof(wrap_buf);
+	for (size_t i = 0; i < remaining_zeros; i++)
+		zassert_equal(panic_log_read(i), '0');
+	for (size_t i = remaining_zeros; i < CONFIG_PLATFORM_EC_PANIC_LOG_SIZE;
+	     i++)
+		zassert_equal(panic_log_read(i), '1');
+}
+
+ZTEST_USER(panic_log, test_corrupt_fields)
+{
+	panic_log_reset();
+	zassert_true(panic_log_is_valid());
+
+	/* Corrupt start_magic */
+	panic_log.start_magic = 0;
+	zassert_false(panic_log_is_valid());
+	panic_log.start_magic = PANIC_LOG_START_MAGIC;
+	zassert_true(panic_log_is_valid());
+
+	/* Corrupt end_magic */
+	panic_log.end_magic = 0;
+	zassert_false(panic_log_is_valid());
+	panic_log.end_magic = PANIC_LOG_END_MAGIC;
+	zassert_true(panic_log_is_valid());
+
+	/* Corrupt version */
+	panic_log.version = 0;
+	zassert_false(panic_log_is_valid());
+	panic_log.version = PANIC_LOG_VERSION;
+	zassert_true(panic_log_is_valid());
+
+	/* Corrupt rb.size */
+	panic_log.rb.size = 0;
+	zassert_false(panic_log_is_valid());
+	panic_log.rb.size = CONFIG_PLATFORM_EC_PANIC_LOG_SIZE;
+	zassert_true(panic_log_is_valid());
+
+	/* Corrupt rb.buffer */
+	panic_log.rb.buffer = NULL;
+	zassert_false(panic_log_is_valid());
+	panic_log.rb.buffer = panic_log.buffer;
+	zassert_true(panic_log_is_valid());
 }
 
 ZTEST_USER(panic_log, test_printk)
@@ -555,6 +636,7 @@ ZTEST_USER(panic_log, test_console_corrupt)
 
 ZTEST_USER(panic_log, test_console_dump)
 {
+	write_str_to_panic_log("dump test line\n");
 	/* Can't verify output because dump goes to panic_printf */
 	CHECK_CONSOLE_CMD("paniclog dump", "", EC_SUCCESS);
 }

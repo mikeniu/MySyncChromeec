@@ -4,48 +4,52 @@
  */
 
 #include "console.h"
+#include "link_defs.h"
 #include "panic.h"
 #include "panic_log.h"
-#include "preserved_ring_buf.h"
 #include "util.h"
 
 #include <zephyr/irq.h>
+#include <zephyr/sys/ring_buffer.h>
 
 /* Panic log defaults to frozen */
 test_export_static bool panic_log_frozen = true;
 test_export_static bool panic_log_initialized = false;
 
-/* Update if the schema of the panic log changes */
-#define PANIC_LOG_VERSION 1
-
-/* Declare preserved ring buffer */
-DECLARE_PRESERVED_RING_BUF(uint8_t, panic_log, CONFIG_PANIC_LOG_SIZE,
-			   PANIC_LOG_VERSION);
+test_export_static struct panic_log_storage panic_log __uncached __aligned(4)
+	__noinit_end_of_ram(panic_log);
 
 /* Basic access functions */
 test_export_static uint32_t panic_log_len(void)
 {
-	return preserved_ring_buf_len(panic_log);
+	return ring_buf_size_get(&panic_log.rb);
 }
 
 test_export_static uint32_t panic_log_capacity(void)
 {
-	return preserved_ring_buf_capacity(panic_log);
+	return ring_buf_capacity_get(&panic_log.rb);
 }
 
 test_export_static uint32_t panic_log_version(void)
 {
-	return preserved_ring_buf_version(panic_log);
+	return panic_log.version;
 }
 
 test_export_static bool panic_log_is_valid(void)
 {
-	return preserved_ring_buf_verify(panic_log);
+	return (panic_log.start_magic == PANIC_LOG_START_MAGIC &&
+		panic_log.end_magic == PANIC_LOG_END_MAGIC &&
+		panic_log.version == PANIC_LOG_VERSION &&
+		panic_log.rb.size == CONFIG_PANIC_LOG_SIZE &&
+		panic_log.rb.buffer == panic_log.buffer);
 }
 
 test_export_static char panic_log_read(uint32_t offset)
 {
-	return preserved_ring_buf_read(panic_log, offset);
+	uint8_t *data;
+
+	ring_buf_get_ptr(&panic_log.rb, &data, offset);
+	return *data;
 }
 
 /* Returns the panic log freeze state before applying the requested freeze state
@@ -61,7 +65,10 @@ test_export_static bool panic_log_freeze(bool freeze)
 test_export_static void panic_log_reset(void)
 {
 	panic_log_frozen = true;
-	preserved_ring_buf_reset(panic_log);
+	panic_log.start_magic = PANIC_LOG_START_MAGIC;
+	panic_log.end_magic = PANIC_LOG_END_MAGIC;
+	panic_log.version = PANIC_LOG_VERSION;
+	ring_buf_init(&panic_log.rb, CONFIG_PANIC_LOG_SIZE, panic_log.buffer);
 }
 
 test_export_static void panic_log_init(void)
@@ -92,30 +99,35 @@ test_export_static void panic_log_init(void)
 }
 DECLARE_HOOK(HOOK_INIT_EARLY, panic_log_init, HOOK_PRIO_DEFAULT - 1);
 
-/* Write a character to the panic log. Character will be dropped if panic log is
- * frozen. */
-void panic_log_write_char(const char c)
-{
-	unsigned int key = irq_lock();
-
-	if (!panic_log_frozen)
-		preserved_ring_buf_write(panic_log, c);
-
-	irq_unlock(key);
-}
-
-/* Write a string to the panic log. String will be dropped if panic log is
- * frozen. */
-void panic_log_write_str(const char *str, const size_t size)
+static void panic_log_write_bytes(const uint8_t *data, size_t size)
 {
 	unsigned int key = irq_lock();
 
 	if (!panic_log_frozen) {
-		for (size_t i = 0; i < size; i++)
-			preserved_ring_buf_write(panic_log, str[i]);
+		if (size > CONFIG_PANIC_LOG_SIZE) {
+			data += size - CONFIG_PANIC_LOG_SIZE;
+			size = CONFIG_PANIC_LOG_SIZE;
+		}
+
+		uint32_t space = ring_buf_space_get(&panic_log.rb);
+
+		if (size > space)
+			ring_buf_consume(&panic_log.rb, size - space);
+
+		ring_buf_put(&panic_log.rb, data, size);
 	}
 
 	irq_unlock(key);
+}
+
+void panic_log_write_char(const char c)
+{
+	panic_log_write_bytes((const uint8_t *)&c, 1);
+}
+
+void panic_log_write_str(const char *str, const size_t size)
+{
+	panic_log_write_bytes((const uint8_t *)str, size);
 }
 
 /* Returns the current state of panic log, before applying any requested changes
@@ -180,7 +192,7 @@ EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_PANIC_LOG_READ, host_command_read_panic_log,
 
 test_export_static void panic_log_corrupt(void)
 {
-	panic_log->properties->checksum = -1;
+	panic_log.start_magic = 0;
 }
 
 static int command_panic_log(int argc, const char **argv)
