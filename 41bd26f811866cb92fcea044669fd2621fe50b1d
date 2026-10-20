@@ -22,6 +22,25 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "cd4dcd01_13458617",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:04Z",
+      "side": 1,
+      "message": "Moved FpFrameStorage to CL 8618794 so this CL focuses solely on authentication session nonce and challenge helpers (\u003c 250 non-test lines), and rewrote the commit message in concise prose.",
+      "parentUuid": "3093effb_10c87ec1",
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "fcc74afa_77b59706",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -34,6 +53,25 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL and address security defects. [[trajectory](https://goto.corp.google.com/traj/54d959f0-0355-4eef-860e-58844e980b86)]\n\n### Review Summary\n* **Functionality \u0026 Security:** ❌ `RAND_bytes` return values are ignored, which can lead to predictable cryptographic nonces/challenges if the RNG fails. See inline comments.\n* **Architecture \u0026 Component Fit:** ⚠️ The CL introduces `FpCryptoContext` without any callers or integration in this patch.\n* **Code Simplicity:** ✅ Code is generally clean and uses early returns and `std::expected`.\n* **Idiomaticity \u0026 Readability:** ✅ Uses modern C++20 `std::ranges` and `std::span` nicely.\n* **Testing:** ❌ `FpCryptoContext` has no unit tests. All new or modified logic must have automated test coverage.\n* **CL Size \u0026 Scope:** ❌ `Size: L (+672, -198)`. The CL bundles two independent changes (Extract `FpFrameStorage` and Extract `FpCryptoContext`). This violates the Single Logical Change rule and must be split.\n* **Commit Message:** ❌ The commit message uses a multi-bullet diff narration and joins distinct noun categories with \"and\". It should be split and rewritten as concise prose.",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76f46ef9_31e7fe9e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:04Z",
+      "side": 1,
+      "message": "Separated FpFrameStorage into CL 8618794, checked RAND_bytes return values in both FpSessionNonce::generate and FpAuthChallenge::generate, wired callers in fpsensor_auth_commands.cc, and added boundary unit tests.",
+      "parentUuid": "fcc74afa_77b59706",
       "isAi": true,
       "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -64,6 +102,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b540c94_0c83c5e0",
+        "filename": "common/fpsensor/fpsensor_crypto_context.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:04Z",
+      "side": 1,
+      "message": "Checked RAND_bytes() !\u003d 1 in FpSessionNonce::generate and returned std::unexpected(EC_ERROR_HW_INTERNAL).",
+      "parentUuid": "093bb368_71883d60",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "352de82b_c61a36be",
@@ -84,6 +147,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95bdf0a8_89f92c17",
+        "filename": "common/fpsensor/fpsensor_crypto_context.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:04Z",
+      "side": 1,
+      "message": "Checked RAND_bytes() !\u003d 1 in FpAuthChallenge::generate and returned std::unexpected(EC_ERROR_HW_INTERNAL).",
+      "parentUuid": "352de82b_c61a36be",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "41bd26f811866cb92fcea044669fd2621fe50b1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
