@@ -774,17 +774,6 @@ config PLATFORM_EC_POWER_BUTTON_DEBOUNCE_AP_OFF
 	  Configure the button debounce time in us per project requirement when
 	  the AP is off (S5 and below).
 
-config PLATFORM_EC_PRESERVED_RING_BUF
-	bool "Preserved ring buffer"
-	default n
-	depends on PLATFORM_EC_NOINIT_END_OF_RAM_SECTION
-	help
-	  Preserved ring buffers exist in noinit memory at the end of used ram.
-	  Preserved ring buffer designed to be preserved across reboots and sysjumps,
-	  but curruption may occur for various reasons. Preserved ring buffers are
-	  designed to be low overhead and fast, especially for writes. This makes
-	  these ring buffers well suited for tracing and logging use cases.
-
 config PLATFORM_EC_PSE_LTC4291
 	bool "power sourcing equipment (PSE)  support"
 	help
