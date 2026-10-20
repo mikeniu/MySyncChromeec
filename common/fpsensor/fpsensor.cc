@@ -495,8 +495,9 @@ extern "C" void fp_task(void)
 				fp_sensor_low_power();
 			}
 		}
-		fp_btn_ign_out::update(global_context.sensor_mode);
-		fp_led::update_mode(global_context.sensor_mode);
+		fp_btn_ign_out::update(
+			FpSensorMode(global_context.sensor_mode));
+		fp_led::update_mode(FpSensorMode(global_context.sensor_mode));
 	}
 #else /* !HAVE_FP_PRIVATE_DRIVER */
 	while (1) {
@@ -647,8 +648,9 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	}
 
 	uint32_t current_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
-			global_context.current_capture_type);
+		global_context.fp_image_frame_params_cache
+			.get_frame_size(global_context.current_capture_type)
+			.value_or(0);
 
 	if (current_frame_size > sizeof(fp_buffer)) {
 		return EC_RES_INVALID_PARAM;

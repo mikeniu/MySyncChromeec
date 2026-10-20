@@ -270,7 +270,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 
 	/* Get the active real frame size limit dynamically from the cache. */
 	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+		*global_context.fp_image_frame_params_cache.get_frame_size(
 			FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
@@ -311,7 +311,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
 	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+		*global_context.fp_image_frame_params_cache.get_frame_size(
 			FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*

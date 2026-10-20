@@ -379,7 +379,7 @@ ZTEST_USER(fpsensor_capture,
 	frame_params_cache.populate_cache(IMAGE_SIZE);
 	constexpr enum fp_capture_type kCaptureType = FP_CAPTURE_SIMPLE_IMAGE;
 	const uint32_t image_size =
-		frame_params_cache.get_frame_size(kCaptureType);
+		*frame_params_cache.get_frame_size(kCaptureType);
 	struct ec_params_fp_mode params = {
 		.mode = FP_MODE_CAPTURE |
 			(kCaptureType << FP_MODE_CAPTURE_TYPE_SHIFT),
@@ -428,7 +428,7 @@ ZTEST_USER(fpsensor_capture,
 	frame_params_cache.populate_cache(IMAGE_SIZE);
 	constexpr enum fp_capture_type kCaptureType = FP_CAPTURE_SIMPLE_IMAGE;
 	const uint32_t image_size =
-		frame_params_cache.get_frame_size(kCaptureType);
+		*frame_params_cache.get_frame_size(kCaptureType);
 	struct ec_params_fp_mode params = {
 		.mode = FP_MODE_CAPTURE |
 			(kCaptureType << FP_MODE_CAPTURE_TYPE_SHIFT),
