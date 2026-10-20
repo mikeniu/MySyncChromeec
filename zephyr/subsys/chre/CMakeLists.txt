@@ -76,10 +76,14 @@ if(CONFIG_ISH_CHRE)
           $<TARGET_FILE:chre.apps.timer_world_dyn>
           "${NANOAPP_BUILD_DIR}/timer_world.napp"
           "${NANOAPP_BUILD_DIR}/timer_world.napp_header"
+          $<TARGET_FILE:chre.apps.message_world_dyn>
+          "${NANOAPP_BUILD_DIR}/message_world.napp"
+          "${NANOAPP_BUILD_DIR}/message_world.napp_header"
           "${NANOAPP_OUTPUT_DIR}/"
         DEPENDS
           chre.apps.hello_world_dyn
           chre.apps.timer_world_dyn
+          chre.apps.message_world_dyn
         COMMENT "Copying dynamic nanoapps and headers to output directory"
       )
       add_dependencies(app chre_dynamic_nanoapps)

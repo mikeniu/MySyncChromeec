@@ -4,8 +4,10 @@
  */
 
 #include "chre/core/event_loop_manager.h"
+#include "chre/core/host_comms_manager.h"
 #include "chre/core/multi_threading_api_mutex.h"
 #include "chre/core/nanoapp.h"
+#include "chre/platform/host_link.h"
 #include "chre/platform/shared/fbs/host_messages_generated.h"
 #include "chre/platform/shared/host_protocol_chre.h"
 #include "chre/platform/shared/nanoapp_load_manager.h"
@@ -124,6 +126,60 @@ bool enqueueMessageToHost(const uint8_t *data, size_t size)
 	// Signal the host via MKBP interrupt
 	mkbp_send_event(EC_MKBP_EVENT_CHRE);
 	return true;
+}
+
+void sendDebugDumpResultToHost(uint16_t /*hostClientId*/,
+			       const char * /*debugStr*/,
+			       size_t /*debugStrSize*/, bool /*complete*/,
+			       uint32_t /*dataCount*/)
+{
+}
+
+void HostLink::flushMessagesSentByNanoapp(uint64_t /*appId*/)
+{
+}
+
+bool HostLink::sendMessage(const MessageToHost *message)
+{
+	if (message == nullptr) {
+		return false;
+	}
+
+	LOG_INF("Sending message from nanoapp 0x%016llx to host endpoint 0x%x "
+		"(size %zu)",
+		static_cast<unsigned long long>(message->appId),
+		message->toHostData.hostEndpoint, message->message.size());
+
+	ChreFlatBufferBuilder builder(128 + message->message.size());
+	auto msg_data = builder.CreateVector(message->message.data(),
+					     message->message.size());
+	auto nanoapp_msg = fbs::CreateNanoappMessage(
+		builder, message->appId, message->toHostData.messageType,
+		message->toHostData.hostEndpoint, msg_data,
+		message->toHostData.messagePermissions,
+		message->toHostData.appPermissions,
+		message->toHostData.wokeHost, message->isReliable,
+		message->messageSequenceNumber);
+	fbs::HostAddress host_addr(kHostClientIdUnspecified);
+	auto container = fbs::CreateMessageContainer(
+		builder, fbs::ChreMessage::NanoappMessage, nanoapp_msg.Union(),
+		&host_addr);
+	builder.Finish(container);
+
+	bool success = enqueueMessageToHost(builder.GetBufferPointer(),
+					    builder.GetSize());
+	if (message->isReliable) {
+		EventLoopManagerSingleton::get()
+			->getHostCommsManager()
+			.completeTransaction(message->messageSequenceNumber,
+					     success ? CHRE_ERROR_NONE :
+						       CHRE_ERROR);
+	} else {
+		EventLoopManagerSingleton::get()
+			->getHostCommsManager()
+			.onMessageToHostComplete(message);
+	}
+	return success;
 }
 
 } // namespace chre
