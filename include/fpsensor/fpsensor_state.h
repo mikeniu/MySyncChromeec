@@ -83,6 +83,43 @@ struct positive_match_secret_state {
 	timestamp_t deadline;
 };
 
+struct FpSensorStats {
+	uint32_t capture_time_us = 0;
+	uint32_t matching_time_us = 0;
+	uint32_t overall_time_us = 0;
+	timestamp_t overall_t0{};
+	uint8_t timestamps_invalid = 0;
+	int8_t template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
+
+	void start_overall(timestamp_t now = get_time()) noexcept
+	{
+		overall_t0 = now;
+	}
+	void finish_overall() noexcept
+	{
+		overall_time_us = time_since32(overall_t0);
+	}
+	void record_capture(timestamp_t t0, bool success) noexcept
+	{
+		capture_time_us = time_since32(t0);
+		if (!success) {
+			timestamps_invalid |= FPSTATS_CAPTURE_INV;
+		}
+	}
+	[[nodiscard]] constexpr ec_response_fp_stats to_response() const noexcept
+	{
+		return {
+			.capture_time_us = capture_time_us,
+			.matching_time_us = matching_time_us,
+			.overall_time_us = overall_time_us,
+			.overall_t0 = { .lo = overall_t0.le.lo,
+					.hi = overall_t0.le.hi },
+			.timestamps_invalid = timestamps_invalid,
+			.template_matched = template_matched,
+		};
+	}
+};
+
 struct fpsensor_context {
 	/** Index of the last enrolled but not retrieved template. */
 	uint16_t template_newly_enrolled;
@@ -117,7 +154,18 @@ struct fpsensor_context {
 	uint16_t template_encrypted_id;
 	/** Template decryption result. */
 	atomic_t template_decryption_result;
+	/** Active enrollment session flag in algorithm driver. */
+	uint32_t enroll_session;
+	/** Capture and matching telemetry statistics. */
+	FpSensorStats stats;
+
+	void poll_finger_and_capture(int &timeout_us);
+	void sync_enroll_session(uint32_t mode);
+	void encrypt_requested_template();
+	void decrypt_and_commit_template();
 };
+
+using FpSensorContext = fpsensor_context;
 
 extern struct fpsensor_context global_context;
 
