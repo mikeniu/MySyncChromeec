@@ -1,0 +1,173 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c07b837_986075c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:33:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n*   **Functionality / Security:** ❌ **Changes Requested** — Integer overflow vulnerability in `offset + bytes` bounds check inside `flash_check_prot_reg` allows out-of-bounds writes to bypass validation. See inline comments for the fix.\n*   **Architecture \u0026 Component Fit:** ✅\n*   **Code Simplicity:** ✅\n*   **Idiomaticity \u0026 Readability:** ❌ **Changes Requested** — Error code masking. `cros_flash_rtkfp_write` and `erase` discard `flash_check_prot_reg`\u0027s error code and unconditionally return `EC_ERROR_ACCESS_DENIED`, hiding legitimate `EC_ERROR_INVAL` bounds failures. Propagate the error directly.\n*   **No Magic Values:** ✅\n*   **Testing:** ❌ **Changes Requested** — Update `test_write_erase_out_of_range` and `test_write_erase_invalid_args` to expect `EC_ERROR_INVAL` once the error propagation fix is applied.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+209, -0). The CL focuses on a single logical change (adding write/erase support and their unit tests) and passes the decomposition test.\n*   **Commit Message:** ✅ Truthful, high-signal summary of what changed and why, free of diff narration.\n\n[[trajectory](https://goto.corp.google.com/traj/2db4616b-922f-4478-98e7-dbe7e3c5b67e)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa318b42_56dfbd64",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:33:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Functionality / Security (Integer Overflow):** `offset + bytes` can overflow if `bytes` is very large (e.g., when a caller passes a negative `int size`). If it wraps around to a value smaller than `CONFIG_FLASH_SIZE_BYTES`, this out-of-bounds check is bypassed, potentially returning `EC_SUCCESS` for an invalid write.\n\nSuggestion:\n```c\n\t/* Invalid value */\n\tif (bytes \u003e CONFIG_FLASH_SIZE_BYTES || offset \u003e CONFIG_FLASH_SIZE_BYTES - bytes) {\n\t\treturn EC_ERROR_INVAL;\n\t}\n```\n[🔗](http://go/tj/2db4616b-922f-4478-98e7-dbe7e3c5b67e)",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 122,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "735e3d64_ac9150ef",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:33:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Architecture / Error Handling:** If `spi_flash_reg_to_protect` fails (e.g., due to an undecodable status), it returns an error code here. However, the callers currently discard this specific return value and hardcode `EC_ERROR_ACCESS_DENIED`.\n\nIt is cleaner to explicitly map undecodable statuses to `EC_ERROR_ACCESS_DENIED` here (fulfilling the fail-closed policy) and then let callers propagate the returned error code. This ensures `EC_ERROR_INVAL` from the bounds check above isn\u0027t incorrectly masked as `EC_ERROR_ACCESS_DENIED`.\n\nSuggestion:\n```c\n\trv \u003d spi_flash_reg_to_protect(sr1, sr2, \u0026start, \u0026len);\n\n\tif (rv) {\n\t\t/* Fail closed on undecodable status */\n\t\treturn EC_ERROR_ACCESS_DENIED;\n\t}\n```\n[🔗](http://go/tj/2db4616b-922f-4478-98e7-dbe7e3c5b67e)",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ad7a0e2_7b65ab68",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:33:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Code Simplicity:** This discards the specific error code returned by `flash_check_prot_reg` (which returns `EC_ERROR_INVAL` for out-of-bounds). Propagate the error directly so bounds errors remain `EC_ERROR_INVAL`.\n\nSuggestion:\n```c\n\t/* check protection */\n\tret \u003d flash_check_prot_reg(dev, offset, size);\n\tif (ret) {\n\t\treturn ret;\n\t}\n```\n[🔗](http://go/tj/2db4616b-922f-4478-98e7-dbe7e3c5b67e)",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd87a1d8_e608ef33",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:33:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Code Simplicity:** Similarly, propagate the specific error code returned by `flash_check_prot_reg`.\n\nSuggestion:\n```c\n\tret \u003d flash_check_prot_reg(dev, offset, size);\n\tif (ret) {\n\t\treturn ret;\n\t}\n```\n[🔗](http://go/tj/2db4616b-922f-4478-98e7-dbe7e3c5b67e)",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d31bbba_73eeb4dd",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:33:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing:** With the error propagation fixed in the driver, out-of-range bounds checks will correctly return `EC_ERROR_INVAL` instead of `EC_ERROR_ACCESS_DENIED`.\n\nSuggestion:\n```c\n\tzassert_equal(cros_flash_physical_write(cros_flash_dev,\n\t\t\t\t\t\tCONFIG_FLASH_SIZE_BYTES - 1, 2,\n\t\t\t\t\t\t(const char *)\u0026value),\n\t\t      EC_ERROR_INVAL);\n\tzassert_equal(cros_flash_physical_erase(\n\t\t\t      cros_flash_dev,\n\t\t\t      CONFIG_FLASH_SIZE_BYTES - CONFIG_FLASH_ERASE_SIZE,\n\t\t\t      2 * CONFIG_FLASH_ERASE_SIZE),\n\t\t      EC_ERROR_INVAL);\n```\n[🔗](http://go/tj/2db4616b-922f-4478-98e7-dbe7e3c5b67e)",
+      "range": {
+        "startLine": 344,
+        "startChar": 0,
+        "endLine": 352,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c7d4a5e_d77e5bd1",
+        "filename": "zephyr/test/drivers/cros_flash_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:33:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing:** Similarly, expect `EC_ERROR_INVAL` for a negative size.\n\nSuggestion:\n```c\n\t/* A negative size wraps in the range check and is rejected there. */\n\tzassert_equal(cros_flash_physical_erase(cros_flash_dev, 0, -1),\n\t\t      EC_ERROR_INVAL);\n```\n[🔗](http://go/tj/2db4616b-922f-4478-98e7-dbe7e3c5b67e)",
+      "range": {
+        "startLine": 364,
+        "startChar": 0,
+        "endLine": 366,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "03bdda8f994ba2d549728ad96a03e32945811571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
