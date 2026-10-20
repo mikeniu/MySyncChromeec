@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "7748bbe78a4c71ad5f08278dc09cc6e611863ad2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f7a7e74_a1bf9021",
+        "filename": "common/power_button.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-10-20T19:56:30Z",
+      "side": 1,
+      "message": "let\u0027s not hard code GPIO names here. these are typically derived from\nthe schematics and can vary per board. it\u0027s also not clear to me\nthat this signal is guaranteed to be implemented.\n\neven though this policy is consistent with the\n`Moonstone Power Button Behavior` referenced in the bug,\ni\u0027m not sure this spec applies to all similar tablets.\n\nwe\u0027ll want to define+document a well-known label/alias for a signal that can\noverride the default power button suppress policy and make its\nimplementation optional.",
+      "range": {
+        "startLine": 481,
+        "startChar": 41,
+        "endLine": 481,
+        "endChar": 59
+      },
+      "revId": "7748bbe78a4c71ad5f08278dc09cc6e611863ad2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
