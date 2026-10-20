@@ -5,6 +5,7 @@
 
 #include "builtin/assert.h"
 #include "common.h"
+#include "cros_version.h"
 #include "hooks.h"
 #include "host_command.h"
 #include "panic.h"
@@ -149,8 +150,39 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_PRINT_REGS(esf_field, pdata_field, human_name) \
 	panic_printf("  %-8s = 0x%08X\n", #human_name, pdata->pdata_field);
 
+#define WD_PRINT_HEX(field) \
+	panic_printf("  %-13s = 0x%08X\n", #field, wd->field)
+
+static void watchdog_panic_data_print(const struct watchdog_panic_data *wd)
+{
+	bool supported = wd->struct_major_version ==
+			 WATCHDOG_PANIC_DATA_MAJOR_VERSION;
+
+	panic_printf("  watchdog panic (v%u.%u)%s\n", wd->struct_major_version,
+		     wd->struct_minor_version,
+		     supported ? ":" : " unsupported");
+	if (!supported) {
+		return;
+	}
+	panic_printf("  %-13s = 0x%04X%s\n", "struct_flags", wd->struct_flags,
+		     (wd->struct_flags & WATCHDOG_PANIC_DATA_FLAG_WARNING) ?
+			     " warning" :
+			     "");
+	WD_PRINT_HEX(thread_id);
+	WD_PRINT_HEX(pc);
+	WD_PRINT_HEX(lr);
+	WD_PRINT_HEX(sp);
+	panic_printf("  image_version = %.16s\n", wd->image_version);
+	panic_printf("  uptime        = %u ms\n", wd->uptime);
+	WD_PRINT_HEX(reset_flags);
+}
+
 void panic_data_print(const struct panic_data *pdata)
 {
+	if (pdata->arch == PANIC_ARCH_WATCHDOG) {
+		watchdog_panic_data_print(&pdata->wd);
+		return;
+	}
 	PANIC_REG_LIST(PANIC_PRINT_REGS, PANIC_PRINT_REGS);
 #if defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
 	PANIC_PRINT_REGS(NULL, riscv.regs[10], S1);
@@ -237,14 +269,38 @@ void panic_data_write_assert(const char *path, unsigned int line)
 	panic_data_finalize(pdata);
 }
 
-void panic_data_write_watchdog_warning(uintptr_t pc,
-				       const struct k_thread *thread)
+void panic_data_write_watchdog_warning(uint32_t pc, uint32_t lr, uint32_t sp)
 {
 	struct panic_data *const pdata = panic_data_reset(NULL);
+	const struct k_thread *const thread = k_current_get();
 
-	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
-	panic_set_info_reg(pdata, (uint32_t)pc);
-	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_WATCHDOG_PANIC_DATA)) {
+		struct watchdog_panic_data *const wd = &pdata->wd;
+		const char *const ver = current_image_data.version;
+		size_t ver_len = strlen(ver);
+		size_t copy_len = MIN(ver_len, sizeof(wd->image_version));
+
+		pdata->arch = PANIC_ARCH_WATCHDOG;
+		/* Set every arch's reason slot so older images see a watchdog.
+		 */
+		wd->reason_x86 = PANIC_SW_WATCHDOG;
+		wd->reason_cm = PANIC_SW_WATCHDOG;
+		wd->reason_riscv = PANIC_SW_WATCHDOG;
+		wd->struct_major_version = WATCHDOG_PANIC_DATA_MAJOR_VERSION;
+		wd->struct_minor_version = WATCHDOG_PANIC_DATA_MINOR_VERSION;
+		wd->struct_flags = WATCHDOG_PANIC_DATA_FLAG_WARNING;
+		wd->thread_id = (uint32_t)(uintptr_t)thread;
+		wd->pc = pc;
+		wd->lr = lr;
+		wd->sp = sp;
+		memcpy(wd->image_version, ver + (ver_len - copy_len), copy_len);
+		wd->uptime = (uint32_t)k_uptime_get();
+		wd->reset_flags = system_get_reset_flags();
+	} else {
+		panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+		panic_set_info_reg(pdata, pc);
+		panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+	}
 
 	panic_data_finalize(pdata);
 }
@@ -335,38 +391,63 @@ __override void zassert_post_action(const char *path, unsigned int line)
 
 uint32_t panic_get_reason_reg(const struct panic_data *pdata)
 {
-	return pdata ? PANIC_REG_REASON(pdata) : 0;
+	if (!pdata)
+		return 0;
+	/* On hardware wd.reason_* overlay the native slot; POSIX has none. */
+	if (IS_ENABLED(CONFIG_ARCH_POSIX) && pdata->arch == PANIC_ARCH_WATCHDOG)
+		return pdata->wd.reason_x86;
+	return PANIC_REG_REASON(pdata);
 }
 
 void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
 {
-	if (pdata) {
-		PANIC_REG_REASON(pdata) = reason;
+	if (!pdata)
+		return;
+	if (pdata->arch == PANIC_ARCH_WATCHDOG) {
+		pdata->wd.reason_x86 = reason;
+		pdata->wd.reason_cm = reason;
+		pdata->wd.reason_riscv = reason;
+		return;
 	}
+	PANIC_REG_REASON(pdata) = reason;
 }
 
+/* Watchdog data has no info/exception: reads return 0, writes are ignored. */
 uint32_t panic_get_info_reg(const struct panic_data *pdata)
 {
-	return pdata ? PANIC_REG_INFO(pdata) : 0;
+	if (!pdata || pdata->arch == PANIC_ARCH_WATCHDOG)
+		return 0;
+	return PANIC_REG_INFO(pdata);
 }
 
 void panic_set_info_reg(struct panic_data *pdata, uint32_t info)
 {
-	if (pdata) {
+	if (pdata && pdata->arch != PANIC_ARCH_WATCHDOG) {
 		PANIC_REG_INFO(pdata) = info;
 	}
 }
 
 uint8_t panic_get_exception_reg(const struct panic_data *pdata)
 {
-	return pdata ? (uint8_t)PANIC_REG_EXCEPTION(pdata) : 0;
+	if (!pdata || pdata->arch == PANIC_ARCH_WATCHDOG)
+		return 0;
+	return (uint8_t)PANIC_REG_EXCEPTION(pdata);
 }
 
 void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception)
 {
-	if (pdata) {
+	if (pdata && pdata->arch != PANIC_ARCH_WATCHDOG) {
 		PANIC_REG_EXCEPTION(pdata) = exception;
 	}
+}
+
+/* Watchdog struct written by the warning handler, not yet finalized. */
+static bool is_watchdog_panic_data_warning(const struct panic_data *pdata)
+{
+	return pdata->arch == PANIC_ARCH_WATCHDOG &&
+	       pdata->wd.struct_major_version ==
+		       WATCHDOG_PANIC_DATA_MAJOR_VERSION &&
+	       (pdata->wd.struct_flags & WATCHDOG_PANIC_DATA_FLAG_WARNING);
 }
 
 test_export_static int panic_data_init(void)
@@ -408,23 +489,22 @@ test_export_static int panic_data_init(void)
 	 * image.
 	 */
 	if (is_watchdog_reset) {
-		/* If the panic reason is a watchdog warning, then change
-		 * the reason to a regular watchdog reason while preserving
-		 * the info and exception from the watchdog warning.
-		 */
-		if (is_panic_new && reason == PANIC_SW_WATCHDOG_WARN) {
-			LOG_INF("Promoting watchdog warning to watchdog panic");
+		if (is_panic_new && is_watchdog_panic_data_warning(pdata)) {
+			/* Keep the warning context; mark it as a real reset. */
+			LOG_INF("Finalizing watchdog panic data warning");
+			pdata->wd.struct_flags &=
+				~WATCHDOG_PANIC_DATA_FLAG_WARNING;
+			panic_data_finalize(pdata);
+		} else if (is_panic_new && reason == PANIC_SW_WATCHDOG_WARN) {
+			LOG_INF("Promoting legacy watchdog warning to watchdog panic");
 			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG);
 			panic_data_finalize(pdata);
 		} else if ((reason != PANIC_SW_WATCHDOG &&
 			    reason != PANIC_SW_WATCHDOG_HARD) ||
 			   !is_panic_new) {
-			/* The watchdog panic info may have already been
-			 * initialized by the watchdog handler, so only set it
-			 * here if the panic reason is not a watchdog or the
-			 * panic info has already been read, i.e. an old
-			 * watchdog panic. Both RO and RW flags are unset
-			 * because source image is not known.
+			/*
+			 * No new watchdog panic recorded: log a hard watchdog.
+			 * Source image is unknown, so clear RO/RW flags.
 			 */
 			LOG_INF("Setting hard watchdog panic");
 			pdata = panic_data_reset(NULL);

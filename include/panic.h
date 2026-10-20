@@ -15,6 +15,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -23,6 +24,24 @@ extern "C" {
 
 #ifdef CONFIG_RO_PANIC_DATA_SIZE
 BUILD_ASSERT(sizeof(struct panic_data) == CONFIG_RO_PANIC_DATA_SIZE);
+#endif
+
+/*
+ * Keep the reason_* fields at the legacy reason offsets. The size is frozen
+ * for v1.0; the <= check is the ceiling for future minor versions.
+ */
+BUILD_ASSERT(sizeof(struct watchdog_panic_data) == 56);
+BUILD_ASSERT(sizeof(struct watchdog_panic_data) <=
+	     sizeof(struct cortex_panic_data));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_x86) ==
+	     offsetof(struct panic_data, x86.vector));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_x86) ==
+	     offsetof(struct panic_data, nds_n8.itype));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_cm) ==
+	     offsetof(struct panic_data, cm.regs[CORTEX_PANIC_REGISTER_R4]));
+#ifndef CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_riscv) ==
+	     offsetof(struct panic_data, riscv.regs[11]));
 #endif
 
 /* Use PANIC_DATA_PTR to refer to the persistent storage location */
@@ -102,11 +121,14 @@ void panic_data_write_assert(const char *path, unsigned int line);
 /**
  * Write panic data for a watchdog warning event.
  *
- * @param pc Program counter where execution was interrupted.
- * @param thread Thread pointer of the interrupted thread.
+ * All values come from the frame stacked when the current thread was
+ * interrupted. Pass 0 for values that are unavailable.
+ *
+ * @param pc Thread program counter.
+ * @param lr Thread link register (RA on RISC-V).
+ * @param sp Thread stack pointer at exception entry.
  */
-void panic_data_write_watchdog_warning(uintptr_t pc,
-				       const struct k_thread *thread);
+void panic_data_write_watchdog_warning(uint32_t pc, uint32_t lr, uint32_t sp);
 
 /**
  * Write panic data for a Zephyr fatal error without an ESF.
@@ -159,6 +181,9 @@ void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason);
 /**
  * Get the panic info field from a panic_data structure for the current
  * architecture.
+ *
+ * For PANIC_ARCH_WATCHDOG data, the info/exception getters return 0 and the
+ * setters do nothing.
  */
 uint32_t panic_get_info_reg(const struct panic_data *pdata);
 
