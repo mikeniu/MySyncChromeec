@@ -1,0 +1,148 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "270e24d7_24314224",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:06:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\nThis CL bundles multiple independent logical changes. According to the Single Logical Change rule, since the edit categories listed in the commit message can be committed independently without breaking functionality or tests, they must be separated. Please split this into at least three atomic CLs:\n1. Refactoring `fp_led` and `fp_btn_ign_out` peripherals to use `FpSensorMode` (along with their unit tests).\n2. Refactoring `FpImageFrameParamsCache` to use `FpCaptureType`.\n3. Introducing `FpSensorInfoBuffer` and test helpers (along with its missing unit tests).\n\n**Commit Message Style:**\nIn the split CLs, please replace the bulleted diff-narration with 1-2 concise prose paragraphs focusing on *why* the refactor is being made and the conceptual change, rather than restating the `std::expected` or `FpSensorMode` signatures.\n\nExample replacement for CL 1:\n```text\nfpsensor: Refactor peripheral controllers to use FpSensorMode\n\nUpdates the fingerprint LED and button-ignore controllers to accept strongly-typed `FpSensorMode` wrappers instead of raw bitmasks, improving type safety and encapsulating the bitwise checks within the mode abstraction.\n```\n[🔗](http://go/tj/39d674aa-7ce7-42d1-90a2-cdc7ead71162)",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d33f319d_a535cc83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:06:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n**Functionality:** The refactoring looks functionally correct, but some APIs could be cleaner.\n**Architecture \u0026 Component Fit:** ❌ Found encapsulation issues. The new controller classes leak their locks and work queues as global variables.\n**Code Simplicity:** ❌ Some over-engineering. `find_capture_params` takes an optional parameter only to immediately return an error if it is empty.\n**Idiomaticity \u0026 Readability:** Good use of modern C++ features overall.\n**Security:** No issues found.\n**Testing:** ❌ Missing tests for the newly introduced `FpSensorInfoBuffer` class.\n**CL Size \u0026 Scope:** ❌ `Size: XL (+862, -441)`. This CL bundles multiple independent logical changes. According to the Single Logical Change rule, please split this into at least three atomic CLs:\n1. Refactoring `fp_led` and `fp_btn_ign_out` to use `FpSensorMode`.\n2. Refactoring `FpImageFrameParamsCache` to use `FpCaptureType`.\n3. Introducing `FpSensorInfoBuffer` and test helpers (along with its missing unit tests).\n**Commit Message:** ❌ The commit message narrates the diff statement-by-statement in a bulleted list. In the split CLs, please use 1-2 concise prose paragraphs focusing on *why* the refactor is being made and the conceptual change.\n\n[🔗](http://go/tj/39d674aa-7ce7-42d1-90a2-cdc7ead71162)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ce99e95_7182b395",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:06:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `FpButtonIgnoreController` is defined as a class to encapsulate its state, its synchronization primitives (`btn_ign_lock`) and work queue items (`deactivation_dwork`) should be private members of the class rather than namespace-scope globals.\n\nYou can embed them as `k_sem` and `k_work_delayable` fields and initialize them via `k_sem_init(\u0026btn_ign_lock, 1, 1)` and `k_work_init_delayable(\u0026deactivation_dwork, deactivation_handler)` inside `init()`. The callback can either capture the global `controller` or use Zephyr\u0027s `CONTAINER_OF` idiom.\n[🔗](http://go/tj/39d674aa-7ce7-42d1-90a2-cdc7ead71162)",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6034a102_9474466f",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:06:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since this method immediately returns an error if `capture_type` is empty, there is no reason to accept a `std::optional`. Taking `FpCaptureType` directly simplifies the API and removes the need for the caller to wrap the argument, shifting the \"must be valid\" requirement to compile time rather than runtime.\n\n```cpp\nstd::expected\u003cfp_image_frame_params_v2, ec_error_list\u003e\nFpSensorInfoBuffer::find_capture_params(FpCaptureType capture_type)\n{\n\tFpSensorInfoBuffer info{};\n\tconst auto types \u003d info.query();\n\tif (!types.has_value()) {\n\t\treturn std::unexpected(types.error());\n\t}\n\tconst auto it \u003d\n\t\tstd::ranges::find(*types, capture_type.raw(),\n\t\t\t\t  \u0026fp_image_frame_params_v2::fp_capture_type);\n// ...\n```\n[🔗](http://go/tj/39d674aa-7ce7-42d1-90a2-cdc7ead71162)",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cf844f0_c111143b",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:06:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similarly to `btn_ign_out`, `led_lock` and `led_update_dwork` should be encapsulated as private fields within the `FpLedController` class. They can be initialized dynamically via `k_sem_init` and `k_work_init_delayable` inside `FpLedController::init()`, rather than living as leaked globals alongside the class.\n[🔗](http://go/tj/39d674aa-7ce7-42d1-90a2-cdc7ead71162)",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f73aff14_b5aa179a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:06:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Missing automated tests for the newly introduced `FpSensorInfoBuffer` class (`query()`, `find_capture_params()`, and `populate_response()`). Please add unit tests covering its successful population, missing/invalid capture types, and boundary conditions (like `EC_HOST_CMD_OVERFLOW` when the output buffer is too small).\n[🔗](http://go/tj/39d674aa-7ce7-42d1-90a2-cdc7ead71162)",
+      "range": {
+        "startLine": 186,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
