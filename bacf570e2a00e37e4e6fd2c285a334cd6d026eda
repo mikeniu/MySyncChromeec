@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd4cb7f0_1f01fc61",
+        "filename": "zephyr/subsys/bt_passthru/zephyr_bt_sender.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T16:39:11Z",
+      "side": 1,
+      "message": "Existing issue: The `reinterpret_cast` here, dereferencing a raw `uint8_t` array as a struct pointer, can be dangerous. It violates standard C++ Strict Aliasing rules (undefined behavior) and could cause alignment faults on architectures that strictly enforce it (like Cortex-M0). Since an HCI command parameter length is always the 4th byte of the H4 packet, accessing `h4Buf[3]` or using `h4Buf[1 + offsetof(struct bt_hci_cmd_hdr, param_len)]` would avoid casting entirely and satisfy compiler standards safely.",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 0
+      },
+      "revId": "bacf570e2a00e37e4e6fd2c285a334cd6d026eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18d38d2d_bb5a8b73",
+        "filename": "zephyr/test/bt_passthru/src/mock_hci_driver.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T16:39:11Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Prefer using `net_buf_put(\u0026g_held_tx_bufs, buf)` rather than `k_fifo_put`. Zephyr provides buffer-specific queue APIs that decouple drivers from internal buffer layouts and provide type safety.",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 0
+      },
+      "revId": "bacf570e2a00e37e4e6fd2c285a334cd6d026eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4304ddd3_2945fa7a",
+        "filename": "zephyr/test/bt_passthru/src/mock_hci_driver.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T16:39:11Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Prefer using `net_buf_get(\u0026g_held_tx_bufs, K_NO_WAIT)` instead of `k_fifo_get`.",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 0
+      },
+      "revId": "bacf570e2a00e37e4e6fd2c285a334cd6d026eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
