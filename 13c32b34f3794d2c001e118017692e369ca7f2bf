@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d933db1_112fa860",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T09:51:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ Works as intended. The reset cause accurately differentiates watchdog resets from a cold power-up by relying on the non-volatile `R_AL_DUMMY0` run flag.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated inside the driver\u0027s initialization sequence, aligning well with Zephyr\u0027s `SYS_INIT`.\n*   **Code Simplicity:** ✅ The added control flow is simple and minimal.\n*   **Idiomaticity \u0026 Readability:** ✅ The code utilizes descriptive names and defined constants for registers and bitmasks rather than magic values.\n*   **Security:** ✅ No security vulnerabilities introduced.\n*   **Testing:** ✅ The test coverage is comprehensive. Unit tests rigorously evaluate branches, exact bitmask determinism, and unrelated boundary bit mutations.\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+86, -5)` — This constitutes a single logical change.\n*   **Commit Message:** ✅ The commit message is concise, accurate, and adheres to the guidelines by avoiding diff narration and providing clear conceptual context.\n\n[[trajectory](https://goto.corp.google.com/traj/c6cc8d6e-9cb8-419d-976e-0f2dccca5f80)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "13c32b34f3794d2c001e118017692e369ca7f2bf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
