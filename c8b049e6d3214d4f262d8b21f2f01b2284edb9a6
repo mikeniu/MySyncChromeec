@@ -22,6 +22,30 @@
       },
       "revId": "c8b049e6d3214d4f262d8b21f2f01b2284edb9a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "743b39d9_79c751b7",
+        "filename": "zephyr/subsys/chre/chre_host_cmd.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T17:14:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "529bf516_d0a68abc",
+      "range": {
+        "startLine": 270,
+        "startChar": 22,
+        "endLine": 270,
+        "endChar": 36
+      },
+      "revId": "c8b049e6d3214d4f262d8b21f2f01b2284edb9a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
