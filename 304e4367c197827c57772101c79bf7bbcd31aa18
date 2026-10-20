@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32e54052_b439fd33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:54:37Z",
+      "side": 1,
+      "message": "Already addressed; see the Kconfig thread.",
+      "parentUuid": "5c5a83ca_4a827b97",
+      "revId": "304e4367c197827c57772101c79bf7bbcd31aa18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa7e6283_39bd45e6",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "304e4367c197827c57772101c79bf7bbcd31aa18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e2ee0aa_f3369a01",
+        "filename": "zephyr/program/fpmcu/Kconfig",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:54:37Z",
+      "side": 1,
+      "message": "Already addressed: the block is uncommented and the comment says realtekfp.",
+      "parentUuid": "aa7e6283_39bd45e6",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 9999
+      },
       "revId": "304e4367c197827c57772101c79bf7bbcd31aa18",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
