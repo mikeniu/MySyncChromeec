@@ -18,6 +18,29 @@
       "isAi": true,
       "revId": "2c9764158ea18a51065841bc5eee492c8677105e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "621e8020_83e8956c",
+        "filename": "chip/g/rdd.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1136059
+      },
+      "writtenOn": "2026-10-20T15:09:11Z",
+      "side": 1,
+      "message": "Some devices have leakage on the cc lines which causes GSC to falsely detect CCD in G3. This will disable deep sleep in G3 on those devices.",
+      "range": {
+        "startLine": 84,
+        "startChar": 5,
+        "endLine": 84,
+        "endChar": 23
+      },
+      "revId": "2c9764158ea18a51065841bc5eee492c8677105e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
