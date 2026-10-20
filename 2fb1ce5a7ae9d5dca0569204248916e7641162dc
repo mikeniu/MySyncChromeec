@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc905c0f_fef6fd75",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:02:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Blocker — Action Required]** The description narrates line-by-line code syntax changes and uses a bulleted outline without stating the high-level problem or why this change is needed. \n\nPer `go/cl-descriptions#llm-prompts` and `go/cl-descriptions#informative`, please state the high-level functional intent and motivation in 1-3 short prose paragraphs at the top of the CL description, rather than listing diff minutiae in bullets. For example:\n\n```\nfpsensor: Enable C++23 and modernize leaf utilities\n\nMigrate the fingerprint sensor task environment to C++23 and modernize core validation and logging utilities.\n\nReplace legacy C-style macros and functions with type-safe `constexpr` helpers and `std::array` abstractions, eliminating dynamic string allocations and ensuring safer buffer handling across the fingerprint sensor codebase.\n```\n(Provide options for split CLs if you choose to split the CL as requested).\n[🔗](http://go/tj/42e0b4a9-ede8-4d05-b16c-437dbd626b32)",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2fb1ce5a7ae9d5dca0569204248916e7641162dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf1a67a5_28ffc56c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:02:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n**CL Size \u0026 Scope:** Size: L (+490, -207). This CL violates the Single Logical Change rule by bundling multiple independent refactorings (enabling C++23, rewriting fourcc_to_string, adding hardware detect lookup methods, and replacing macros with inline functions). Furthermore, the subject joins two action verbs with \"and\", and the description bullets narrate these distinct edit categories. Please split this into smaller, self-contained CLs:\n1. Enable C++23 in the build configuration.\n2. Modernize `fpsensor_detect.h` (FpDetectedHardware).\n3. Modernize `fourcc_to_string` (FpFourCc) and its tests.\n4. Replace C macros with inline functions.\n5. (Extract `checked_subspan` and `bytes_are_trivial` with tests to a separate CL, as they are currently unused here).\n\n### Review Summary\n* **Functionality:** ❌ `FpFourCc` uses `std::bit_cast` which is endian-dependent, breaking the previous bitwise shift logic. See inline comment.\n* **Architecture \u0026 Component Fit:** ✅ Moved string lookups to `constexpr` header functions appropriately.\n* **Code Simplicity:** ❌ Standalone utilities (`checked_subspan`, `bytes_are_trivial`) were introduced without callers in this CL.\n* **Idiomaticity \u0026 Readability:** ✅ Good use of modern C++ features (`std::array`, `constexpr`).\n* **Security:** ✅ N/A\n* **Testing:** ❌ The new utilities lack unit test coverage.\n* **Commit Message:** ❌ The description narrates diff minutiae rather than stating the high-level *What \u0026 Why*. See inline comment on `/COMMIT_MSG`.\n\n[🔗](http://go/tj/42e0b4a9-ede8-4d05-b16c-437dbd626b32)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2fb1ce5a7ae9d5dca0569204248916e7641162dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d8462c8_a92b4d88",
+        "filename": "include/fpsensor/fpsensor_utils.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:02:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Single Logical Change \u0026 Testing (Blocking)**: `checked_subspan` and `bytes_are_trivial` are introduced in this CL but appear to have no callers in the modified production code, and they lack unit test coverage in `fpsensor_utils.cc` (violating boundary value testing requirements). \n\nPer `go/small-cls`, introducing standalone utilities that are unused in the current CL bundles unrelated concerns. Please either remove these until the CL that actually integrates them, or extract them into a separate prerequisite CL that includes their dedicated unit tests.\n[🔗](http://go/tj/42e0b4a9-ede8-4d05-b16c-437dbd626b32)",
+      "range": {
+        "startLine": 190,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2fb1ce5a7ae9d5dca0569204248916e7641162dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "984817dc_eee60709",
+        "filename": "include/fpsensor/fpsensor_utils.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:02:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Functionality (Endianness Bug)**: The previous `fourcc_to_string` implementation used bitwise shifts `(value \u003e\u003e (index * 8)) \u0026 0xFF`, which safely extracted `a` first regardless of the target\u0027s endianness. Replacing this with `std::bit_cast\u003cstd::array\u003cuint8_t, sizeof(value)\u003e\u003e` relies on memory layout, which means on big-endian targets, `bytes[0]` will be `d` instead of `a`.\n\nPlease restore the bitwise shift logic to ensure correct behavior across all platforms:\n```cpp\n\texplicit constexpr FpFourCc(uint32_t value) noexcept : chars_{}\n\t{\n\t\tfor (size_t i \u003d 0; i \u003c sizeof(value); ++i) {\n\t\t\tconst uint8_t ch \u003d (value \u003e\u003e (i * 8)) \u0026 0xFF;\n\t\t\tchars_[i] \u003d (ch \u003e\u003d 0x20 \u0026\u0026 ch \u003c\u003d 0x7e) ? static_cast\u003cchar\u003e(ch) : \u0027.\u0027;\n\t\t}\n\t}\n```\n[🔗](http://go/tj/42e0b4a9-ede8-4d05-b16c-437dbd626b32)",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 226,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2fb1ce5a7ae9d5dca0569204248916e7641162dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
