@@ -10,6 +10,7 @@
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
+#include "fpsensor/fpsensor_crypto_context.h"
 #include "fpsensor/fpsensor_state.h"
 #include "openssl/mem.h"
 #include "openssl/rand.h"
@@ -59,11 +60,11 @@ fp_command_generate_nonce(struct ec_host_cmd_handler_args *args)
 
 	ScopedFastCpu fast_cpu;
 
-	RAND_bytes(session_nonce.data(), session_nonce.size());
-
-	std::ranges::copy(session_nonce, r->nonce);
-
-	global_context.fp_encryption_status |= FP_CONTEXT_SESSION_NONCE_SET;
+	if (!FpSessionNonce::generate(session_nonce, r->nonce,
+				      global_context.fp_encryption_status)
+		     .has_value()) {
+		return EC_HOST_CMD_UNAVAILABLE;
+	}
 
 	args->output_buf_size = sizeof(*r);
 	return EC_HOST_CMD_SUCCESS;
@@ -156,13 +157,11 @@ fp_cmd_generate_challenge(struct ec_host_cmd_handler_args *args)
 
 	ScopedFastCpu fast_cpu;
 
-	RAND_bytes(challenge.data(), challenge.size());
-	std::ranges::copy(challenge, r->challenge);
-
-	timestamp_t now = get_time();
-	challenge_ctime.val = now.val;
-
-	global_context.fp_encryption_status |= FP_AUTH_CHALLENGE_SET;
+	if (!FpAuthChallenge::generate(challenge, r->challenge, challenge_ctime,
+				       global_context.fp_encryption_status)
+		     .has_value()) {
+		return EC_HOST_CMD_UNAVAILABLE;
+	}
 
 	args->output_buf_size = sizeof(*r);
 	return EC_HOST_CMD_SUCCESS;
@@ -181,35 +180,11 @@ validate_request(std::span<const uint8_t> context,
 		'f', 'i', 'n', 'g', 'e', 'r', '_', 'g', 'u', 'a', 'r', 'd'
 	};
 	static constexpr std::span sender = sender_str;
-	std::array<uint8_t, SHA256_DIGEST_LENGTH> computed_mac{};
-
-	/* Make sure new challenge was generated. */
-	if (!(global_context.fp_encryption_status & FP_AUTH_CHALLENGE_SET)) {
-		return EC_ERROR_ACCESS_DENIED;
-	}
-
-	/* Remove the bit so the challenge is not reused. */
-	global_context.fp_encryption_status &= ~FP_AUTH_CHALLENGE_SET;
-
-	/* Make sure the challenge has not expired. */
-	timestamp_t now = get_time();
-	if (now.val > challenge_ctime.val + (5 * SECOND)) {
-		return EC_ERROR_TIMEOUT;
-	}
-
-	/* Compute expected signature. */
-	if (compute_message_signature(session_key, context, sender, operation,
-				      challenge, computed_mac) != EC_SUCCESS) {
-		return EC_ERROR_INVAL;
-	}
-
-	/* Compare computed signature with received one. */
-	static_assert(mac.size() == computed_mac.size());
-	if (CRYPTO_memcmp(mac.data(), computed_mac.data(), mac.size())) {
-		return EC_ERROR_ACCESS_DENIED;
-	}
-
-	return EC_SUCCESS;
+	return FpAuthChallenge::consume_and_verify(
+		       session_key, challenge, challenge_ctime,
+		       global_context.fp_encryption_status, context, sender,
+		       operation, mac)
+		.error_or(EC_SUCCESS);
 }
 
 enum ec_error_list

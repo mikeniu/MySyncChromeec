@@ -11,12 +11,14 @@
 #include "common.h"
 #include "ec_commands.h"
 #include "overflow.h"
+#include "timer.h"
 
 #ifdef is_negative
 #undef is_negative
 #endif
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <expected>
 #include <span>
@@ -69,6 +71,21 @@ struct ec_host_cmd_handler_args {
 #define SMALLEST_TYPE(T1, T2) \
 	std::conditional_t<sizeof(T1) < sizeof(T2), T1, T2>
 #endif
+
+struct FpClock {
+	using rep = int64_t;
+	using period = std::micro;
+	using duration = std::chrono::microseconds;
+	using time_point = std::chrono::time_point<FpClock>;
+	static constexpr bool is_steady = true;
+
+	[[nodiscard]] static time_point now() noexcept
+	{
+		return time_point{ duration{ get_time().val } };
+	}
+};
+
+using FpTimestamp = FpClock::time_point;
 
 /**
  * Test that size+offset does not exceed buffer_size
