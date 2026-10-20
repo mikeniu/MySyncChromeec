@@ -55,7 +55,6 @@ register_rex_project(
 )
 register_rex_project(
     project_name="karis",
-    snippets=["npcx-45mhz"],
 )
 
 register_ish_project(
