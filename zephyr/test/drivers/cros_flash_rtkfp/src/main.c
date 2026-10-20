@@ -262,6 +262,118 @@ ZTEST_USER(cros_flash_rtkfp, test_get_status)
 	zassert_equal(sr2, SPI_FLASH_SR2_QE);
 }
 
+ZTEST_USER(cros_flash_rtkfp, test_write_erase_roundtrip)
+{
+	uint32_t value = 42;
+	uint32_t read_value = 0;
+
+	zassert_equal(cros_flash_physical_write(cros_flash_dev, 0,
+						sizeof(value),
+						(const char *)&value),
+		      EC_SUCCESS);
+	crec_flash_physical_read(0, sizeof(read_value), (char *)&read_value);
+	zassert_equal(value, read_value);
+
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 0,
+						CONFIG_FLASH_ERASE_SIZE),
+		      EC_SUCCESS);
+	crec_flash_physical_read(0, sizeof(read_value), (char *)&read_value);
+	zassert_equal(read_value, 0xffffffff);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_write_erase_protected_range)
+{
+	uint8_t value = 42;
+	uint8_t read_value = 0;
+
+	/* Range [0, CONFIG_WP_STORAGE_SIZE) is protected by BP bits. */
+	fake_set_sr(SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP0,
+		    0);
+
+	zassert_equal(cros_flash_physical_write(cros_flash_dev, 0,
+						sizeof(value),
+						(const char *)&value),
+		      EC_ERROR_ACCESS_DENIED);
+	/* A write straddling the end of the protected range is rejected. */
+	zassert_equal(cros_flash_physical_write(cros_flash_dev,
+						CONFIG_WP_STORAGE_SIZE - 1, 2,
+						(const char *)&value),
+		      EC_ERROR_ACCESS_DENIED);
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 0,
+						CONFIG_FLASH_ERASE_SIZE),
+		      EC_ERROR_ACCESS_DENIED);
+
+	/* The first byte after the protected range is writable. */
+	zassert_equal(cros_flash_physical_write(cros_flash_dev,
+						CONFIG_WP_STORAGE_SIZE,
+						sizeof(value),
+						(const char *)&value),
+		      EC_SUCCESS);
+	crec_flash_physical_read(CONFIG_WP_STORAGE_SIZE, sizeof(read_value),
+				 (char *)&read_value);
+	zassert_equal(value, read_value);
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev,
+						CONFIG_WP_STORAGE_SIZE,
+						CONFIG_FLASH_ERASE_SIZE),
+		      EC_SUCCESS);
+	crec_flash_physical_read(CONFIG_WP_STORAGE_SIZE, sizeof(read_value),
+				 (char *)&read_value);
+	zassert_equal(read_value, 0xff);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_write_erase_undecodable_status)
+{
+	uint8_t value = 42;
+
+	/* CMP=1 has no entry in the protection table: fail closed. */
+	fake_set_sr(0, SPI_FLASH_SR2_CMP);
+
+	zassert_equal(cros_flash_physical_write(cros_flash_dev, 0,
+						sizeof(value),
+						(const char *)&value),
+		      EC_ERROR_ACCESS_DENIED);
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 0,
+						CONFIG_FLASH_ERASE_SIZE),
+		      EC_ERROR_ACCESS_DENIED);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_write_erase_out_of_range)
+{
+	uint8_t value = 42;
+
+	zassert_equal(cros_flash_physical_write(cros_flash_dev,
+						CONFIG_FLASH_SIZE_BYTES - 1, 2,
+						(const char *)&value),
+		      EC_ERROR_INVAL);
+	zassert_equal(cros_flash_physical_erase(
+			      cros_flash_dev,
+			      CONFIG_FLASH_SIZE_BYTES - CONFIG_FLASH_ERASE_SIZE,
+			      2 * CONFIG_FLASH_ERASE_SIZE),
+		      EC_ERROR_INVAL);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_write_erase_invalid_args)
+{
+	uint8_t value = 42;
+
+	zassert_equal(cros_flash_physical_write(cros_flash_dev, 0,
+						sizeof(value), NULL),
+		      EC_ERROR_INVAL);
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 0, 0),
+		      EC_ERROR_INVAL);
+	/* A negative size wraps in the range check and is rejected there. */
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 0, -1),
+		      EC_ERROR_INVAL);
+}
+
+ZTEST_USER(cros_flash_rtkfp, test_erase_flash_failure)
+{
+	/* The fake flash rejects erases that are not page aligned. */
+	zassert_equal(cros_flash_physical_erase(cros_flash_dev, 1,
+						CONFIG_FLASH_ERASE_SIZE),
+		      -EINVAL);
+}
+
 static void cros_flash_rtkfp_before(void *fixture)
 {
 	/*
