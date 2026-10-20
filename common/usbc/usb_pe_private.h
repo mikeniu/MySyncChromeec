@@ -40,8 +40,6 @@ enum {
 	/* Waiting for Sink Capabailities timed out.  Used for retry error
 	   handling */
 	PE_FLAGS_SNK_WAIT_CAP_TIMEOUT_FN,
-	/* Power Supply voltage/current transition timed out */
-	PE_FLAGS_PS_TRANSITION_TIMEOUT_FN,
 	/* Flag to note current Atomic Message Sequence is interruptible */
 	PE_FLAGS_INTERRUPTIBLE_AMS_FN,
 	/* Flag to note Power Supply reset has completed */
