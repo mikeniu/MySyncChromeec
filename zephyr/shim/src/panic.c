@@ -20,6 +20,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
+#include <zephyr/sys/atomic.h>
 
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
@@ -317,6 +318,18 @@ FUNC_NORETURN
 #endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
+	static atomic_t in_assert;
+
+	if (!atomic_cas(&in_assert, 0, 1)) {
+		panic_puts("Recursive assert\n");
+		panic_reboot();
+#ifdef CONFIG_ASSERT_TEST
+		return;
+#else
+		CODE_UNREACHABLE;
+#endif
+	}
+
 	panic_data_write_assert(path, line);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
@@ -329,7 +342,9 @@ __override void zassert_post_action(const char *path, unsigned int line)
 
 	panic_reboot();
 
-#ifndef CONFIG_ASSERT_TEST
+#ifdef CONFIG_ASSERT_TEST
+	atomic_clear(&in_assert);
+#else
 	CODE_UNREACHABLE;
 #endif
 }
