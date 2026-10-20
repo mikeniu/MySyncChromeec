@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34615f9b_9c814b1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:28:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n*   **Functionality:** ✅ The test logic accurately exercises the driver API.\n*   **Architecture \u0026 Component Fit:** ✅ The tests integrate correctly with Zephyr`s `ztest` framework.\n*   **Code Simplicity:** ✅ Test cases construct minimal state and verify behaviors directly.\n*   **Idiomaticity \u0026 Readability:** ✅ The tests appropriately use Zephyr`s idiomatic assertion macros.\n*   **Security:** ✅ No security issues.\n*   **Testing:** ✅ The tests appropriately verify the `PRESENT`, `NONE`, and unmapped state behaviors. See inline suggestion on avoiding the magic number `42`.\n*   **CL Size \u0026 Scope:** ✅ Size: S (+21, -0). Thank you for splitting the CL! This effectively satisfies the Single Logical Change rule by separating the finger status testing from the image acquisition testing.\n*   **Commit Message:** ✅ The description is concise, accurate, and aligned with the single change logic.\n\n[🔗](http://go/tj/a6541bfa-9cc4-4644-988c-3b78d10b1c87)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a9d8dc00744797bc05e71f68dcd485ba8df2a7dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf60b5d6_509e0e7a",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:28:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:** To avoid magic numbers, consider using an offset from the maximum valid enum value (e.g., `RTS_FINGER_PRESENT + 1`) instead of an arbitrary hardcoded literal like `42`. This explicitly demonstrates that the test is checking a boundary condition just outside the defined enum range.\n\n```c\nZTEST_F(rts5817maa, test_finger_status_unmapped)\n{\n\trts5817maa_sensor_finger_status_fake.return_val \u003d (rts_finger_sts_t)(RTS_FINGER_PRESENT + 1);\n\tzassert_equal(fingerprint_finger_status(fixture-\u003edev),\n\t\t      FINGERPRINT_FINGER_STATE_NONE);\n}\n```\n[🔗](http://go/tj/a6541bfa-9cc4-4644-988c-3b78d10b1c87)",
+      "range": {
+        "startLine": 371,
+        "startChar": 0,
+        "endLine": 376,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a9d8dc00744797bc05e71f68dcd485ba8df2a7dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

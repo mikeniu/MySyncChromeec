@@ -76,6 +76,32 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a9a37ac_6dc85710",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:28:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Resolved in latest patchset.",
+      "parentUuid": "58217616_1f250264",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35a243ed_aa320433",
@@ -109,6 +135,26 @@
       "side": 1,
       "message": "The N+1 boundary test is added in ps4. Not splitting for now (see the COMMIT_MSG thread).",
       "parentUuid": "35a243ed_aa320433",
+      "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20b7e349_bf190d7d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:28:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Resolved in latest patchset.",
+      "parentUuid": "35a243ed_aa320433",
+      "tag": "cl_review_agent",
+      "isAi": true,
       "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -158,6 +204,32 @@
         "endLine": 433,
         "endChar": 9999
       },
+      "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e488a4c_26145dcc",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:28:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Resolved in latest patchset.",
+      "parentUuid": "aae25340_f714cf4a",
+      "range": {
+        "startLine": 423,
+        "startChar": 0,
+        "endLine": 433,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
       "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
