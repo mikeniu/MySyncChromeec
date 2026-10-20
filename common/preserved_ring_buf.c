@@ -19,7 +19,8 @@
  */
 void preserved_ring_buf_reset(const preserved_ring_buf_t *buf)
 {
-	buf->properties->checksum = 0;
+	buf->properties->start_magic = PRESERVED_RING_BUF_START_MAGIC;
+	*buf->end_magic = PRESERVED_RING_BUF_END_MAGIC;
 	buf->properties->head = 0;
 	buf->properties->version = buf->constants.version;
 	buf->properties->capacity = buf->constants.capacity;
@@ -37,29 +38,16 @@ uint32_t preserved_ring_buf_version(const preserved_ring_buf_t *buf)
 }
 
 /*
- * Checksum is across entire buffer, even if partially filled. This works
- * because the buffer is zero'd on reset.
- */
-static uint32_t
-preserved_ring_buf_calc_checksum(const preserved_ring_buf_t *buf)
-{
-	uint32_t sum = 0;
-	for (int i = 0; i < buf->constants.capacity; i++) {
-		sum += buf->buffer[i];
-	}
-	return sum;
-}
-
-/*
  * A buffer is valid if the preserved properties match the expected
- * constant properties and the checksum matches.
+ * constant properties and the start and end magic canaries match.
  */
 bool preserved_ring_buf_verify(const preserved_ring_buf_t *buf)
 {
-	return (buf->properties->version == buf->constants.version &&
-		buf->properties->capacity == buf->constants.capacity &&
-		buf->properties->checksum ==
-			preserved_ring_buf_calc_checksum(buf));
+	return (buf->properties->start_magic ==
+			PRESERVED_RING_BUF_START_MAGIC &&
+		*buf->end_magic == PRESERVED_RING_BUF_END_MAGIC &&
+		buf->properties->version == buf->constants.version &&
+		buf->properties->capacity == buf->constants.capacity);
 }
 
 /*
