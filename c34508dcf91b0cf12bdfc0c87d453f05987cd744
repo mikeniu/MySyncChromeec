@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76facd6c_6aff89f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T02:31:10Z",
+      "side": 1,
+      "message": "spilit into https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8604431 and https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8604432",
+      "parentUuid": "fe75c508_00a7bb24",
+      "revId": "c34508dcf91b0cf12bdfc0c87d453f05987cd744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27dce192_6e7edb5e",
@@ -45,6 +63,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcea64de_7f330dbd",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T02:31:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27dce192_6e7edb5e",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 214,
+        "endChar": 9999
+      },
+      "revId": "c34508dcf91b0cf12bdfc0c87d453f05987cd744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d924ab9d_bf678736",
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "c34508dcf91b0cf12bdfc0c87d453f05987cd744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e301e79_23b8e20b",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T02:31:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d924ab9d_bf678736",
+      "range": {
+        "startLine": 493,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 9999
+      },
       "revId": "c34508dcf91b0cf12bdfc0c87d453f05987cd744",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
