@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c00330e_fcd59ec6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:20Z",
+      "side": 1,
+      "message": "Converted FpFrameStorage to namespace fp_frame_storage, moved system_is_locked() back to get_frame in fpsensor.cc, and added unit tests for captured_frame and get_raw_frame in fpsensor_utils.cc.",
+      "parentUuid": "b9fd21bc_e132252d",
+      "isAi": true,
+      "revId": "abee21b470fabb3bcc197a32a0efaf352fc13011",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "968ca6a6_93a3ae69",
@@ -45,6 +64,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e18212f4_5481a977",
+        "filename": "include/fpsensor/fpsensor_frame_storage.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:20Z",
+      "side": 1,
+      "message": "Removed system_is_locked() from fp_frame_storage::get_raw_frame and kept the lock check in the get_frame caller in common/fpsensor/fpsensor.cc.",
+      "parentUuid": "968ca6a6_93a3ae69",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "abee21b470fabb3bcc197a32a0efaf352fc13011",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b637b62_9a6adecc",
@@ -65,6 +109,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "abee21b470fabb3bcc197a32a0efaf352fc13011",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95010c5b_f5a99fce",
+        "filename": "include/fpsensor/fpsensor_frame_storage.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:20Z",
+      "side": 1,
+      "message": "Replaced struct FpFrameStorage with namespace fp_frame_storage.",
+      "parentUuid": "6b637b62_9a6adecc",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "abee21b470fabb3bcc197a32a0efaf352fc13011",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
