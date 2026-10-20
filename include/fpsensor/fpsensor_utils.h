@@ -18,6 +18,8 @@
 
 #include <array>
 #include <cstdint>
+#include <expected>
+#include <span>
 #include <string_view>
 
 /**
@@ -43,6 +45,19 @@ validate_fp_buffer_offset(const uint32_t buffer_size, const uint32_t offset,
 	}
 
 	return EC_SUCCESS;
+}
+
+template <typename T, size_t Extent>
+[[nodiscard]] constexpr std::expected<std::span<T>, ec_error_list>
+checked_subspan(std::span<T, Extent> buffer, uint32_t offset,
+		uint32_t size) noexcept
+{
+	if (const ec_error_list err =
+		    validate_fp_buffer_offset(buffer.size(), offset, size);
+	    err != EC_SUCCESS) {
+		return std::unexpected(err);
+	}
+	return buffer.subspan(offset, size);
 }
 
 [[nodiscard]] constexpr bool fp_match_success(const int match_result) noexcept
