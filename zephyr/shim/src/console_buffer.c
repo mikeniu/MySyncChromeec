@@ -45,34 +45,38 @@ static atomic_t dropped_logs_mutex;
 static atomic_t dropped_logs_overflow;
 #endif
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
-/* Guarded with console_write_lock */
-static bool new_console_log;
+/* Set once the host has been notified since the last snapshot. */
+static atomic_t new_console_log;
 
-void console_log_notify_host(char new_char)
+static void console_log_notify_host(void)
 {
-	/* Inform about every new line, not to send event every char. */
-	if (new_char == '\n') {
-		/* Avoid waking the host from a low-power state for console
-		 * logs.
-		 */
-		bool wake_host = true;
+	/*
+	 * Setting a host event can reach the LPC/eSPI drivers, so only do
+	 * it from a context that may block. If this is skipped, the next
+	 * newline logged from such a context sends the event.
+	 */
+	if (!k_can_yield()) {
+		return;
+	}
+
+	/* Avoid waking the host from a low-power state for console logs. */
 #ifdef CONFIG_AP_POWER_CONTROL
-		if (power_get_state() != POWER_S0) {
-			wake_host = false;
-		}
+	if (power_get_state() != POWER_S0) {
+		return;
+	}
 #endif /* CONFIG_AP_POWER_CONTROL */
 #ifdef CONFIG_EC_HOST_CMD_BACKEND_USB
-		if (usb_is_suspended()) {
-			wake_host = false;
-		}
+	if (usb_is_suspended()) {
+		return;
+	}
 #endif /* CONFIG_EC_HOST_CMD_BACKEND_USB */
-		if (!new_console_log && wake_host) {
-			/* Set the host event once since last snapshot not to
-			 * spam events e.g. in case host doesn't read the logs.
-			 */
-			new_console_log = true;
-			host_set_single_event(EC_HOST_EVENT_CONSOLE_LOGS);
-		}
+
+	/*
+	 * Set the host event once since last snapshot not to spam events,
+	 * e.g. in case host doesn't read the logs.
+	 */
+	if (!atomic_set(&new_console_log, 1)) {
+		host_set_single_event(EC_HOST_EVENT_CONSOLE_LOGS);
 	}
 }
 #endif
@@ -133,6 +137,8 @@ size_t console_buf_notify_chars(const char *s, size_t len)
 		return 0;
 	}
 	/* We got the mutex. */
+	bool new_line = false;
+
 	for (size_t i = 0; i < len; i++) {
 		/* Don't copy null byte into buffer */
 		if (!(*s)) {
@@ -158,20 +164,35 @@ size_t console_buf_notify_chars(const char *s, size_t len)
 		if (new_tail == read_next_idx)
 			read_next_idx = next_log(read_next_idx);
 
+		/* Inform about every new line, not to send event every char. */
+		if (*s == '\n')
+			new_line = true;
+
 		console_buf[tail_idx] = *s++;
-
-#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
-		console_log_notify_host(console_buf[tail_idx]);
-#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
-
 		tail_idx = new_tail;
 	}
 	k_mutex_unlock(&console_write_lock);
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
+	if (new_line)
+		console_log_notify_host();
+#else
+	ARG_UNUSED(new_line);
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
+
 	return len;
 }
 
 enum ec_status uart_console_read_buffer_init(void)
 {
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
+	/*
+	 * Clear the event before taking the snapshot, so a log written
+	 * after the snapshot always raises it again.
+	 */
+	host_clear_events(EC_HOST_EVENT_MASK(EC_HOST_EVENT_CONSOLE_LOGS));
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
+
 	if (k_mutex_lock(&console_write_lock, K_MSEC(100)))
 		/* Failed to acquire console buffer mutex */
 		return EC_RES_TIMEOUT;
@@ -190,8 +211,7 @@ enum ec_status uart_console_read_buffer_init(void)
 	current_snapshot_idx = tail_idx;
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
-	new_console_log = false;
-	host_clear_events(EC_HOST_EVENT_MASK(EC_HOST_EVENT_CONSOLE_LOGS));
+	atomic_clear(&new_console_log);
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
 
 	k_mutex_unlock(&console_write_lock);
