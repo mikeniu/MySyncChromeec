@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <ec_commands.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <host_command.h>
 #include <span>
 
@@ -440,6 +441,44 @@ ZTEST_USER(fpsensor_state, test_fp_sensor_stats_response)
 	zassert_equal(resp.matching_time_us, 42u);
 	zassert_equal(resp.timestamps_invalid, FPSTATS_CAPTURE_INV);
 	zassert_equal(resp.template_matched, 3);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_command_parsing_and_dispatch)
+{
+	static_assert(std::holds_alternative<FpSensorStateMachine::IdleCommand>(
+		FpSensorStateMachine::parse_command(FpSensorMode(0))));
+	static_assert(
+		std::holds_alternative<FpSensorStateMachine::DetectFingerCommand>(
+			FpSensorStateMachine::parse_command(
+				FpSensorMode(FP_MODE_MATCH))));
+	static_assert(std::holds_alternative<
+		      FpSensorStateMachine::ImmediateCaptureCommand>(
+		FpSensorStateMachine::parse_command(FpSensorMode(
+			FP_MODE_CAPTURE |
+			(FP_CAPTURE_PATTERN0 << FP_MODE_CAPTURE_TYPE_SHIFT)))));
+	static_assert(
+		std::holds_alternative<FpSensorStateMachine::ResetSensorCommand>(
+			FpSensorStateMachine::parse_command(
+				FpSensorMode(FP_MODE_RESET_SENSOR))));
+	static_assert(
+		std::holds_alternative<FpSensorStateMachine::MaintenanceCommand>(
+			FpSensorStateMachine::parse_command(
+				FpSensorMode(FP_MODE_SENSOR_MAINTENANCE))));
+	static_assert(std::holds_alternative<
+		      FpSensorStateMachine::EncryptTemplateCommand>(
+		FpSensorStateMachine::parse_command(
+			FpSensorMode(FP_MODE_ENCRYPT_TEMPLATE))));
+	static_assert(std::holds_alternative<
+		      FpSensorStateMachine::DecryptTemplateCommand>(
+		FpSensorStateMachine::parse_command(
+			FpSensorMode(FP_MODE_DECRYPT_TEMPLATE))));
+
+	FpSensorContext local_ctx{};
+	FpSensorStateMachine sm{ local_ctx };
+	local_ctx.sensor_mode = FP_MODE_FINGER_UP;
+	sm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });
+	zassert_equal(sm.timeout_us(),
+		      FpSensorStateMachine::kFingerPollingDelayUs);
 }
 
 static void *fpsensor_setup(void)

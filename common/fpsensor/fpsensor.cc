@@ -22,6 +22,7 @@
 #include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_platform.h"
 #include "fpsensor/fpsensor_state.h"
+#include "fpsensor/fpsensor_state_machine.h"
 #include "fpsensor/fpsensor_template_store.h"
 #include "fpsensor/fpsensor_utils.h"
 #include "gpio.h"
@@ -303,9 +304,57 @@ void fpsensor_context::decrypt_and_commit_template()
 	sensor_mode &= ~FP_MODE_DECRYPT_TEMPLATE;
 }
 
+#ifdef HAVE_FP_PRIVATE_DRIVER
+void FpSensorStateMachine::execute_command(ImmediateCaptureCommand cmd)
+{
+	ctx_.current_capture_type = FP_CAPTURE_TYPE_INVALID;
+	if (!fp_acquire_image(fp_buffer, cmd.capture_type.raw())) {
+		ctx_.current_capture_type = cmd.capture_type.raw();
+	}
+	ctx_.sensor_mode &= ~(FP_MODE_CAPTURE | FP_MODE_CAPTURE_TYPE_MASK);
+	send_mkbp_event(EC_MKBP_FP_IMAGE_READY);
+}
+
+void FpSensorStateMachine::handle_mode_change()
+{
+	fp_platform::prepare_for_mode_change();
+	ctx_.sync_enroll_session(ctx_.sensor_mode);
+	timeout_us_ = -1;
+	const Command cmd = parse_command(FpSensorMode(ctx_.sensor_mode));
+	std::visit([this](const auto &c) { execute_command(c); }, cmd);
+	if (!std::holds_alternative<ImmediateCaptureCommand>(cmd)) {
+		fp_btn_ign_out::update(FpSensorMode(ctx_.sensor_mode));
+		fp_led::update_mode(FpSensorMode(ctx_.sensor_mode));
+	}
+}
+#endif /* HAVE_FP_PRIVATE_DRIVER */
+
+void FpSensorStateMachine::handle_event(FpTaskEvent evt)
+{
+#ifdef HAVE_FP_PRIVATE_DRIVER
+	if (evt.is_update_config()) {
+		handle_mode_change();
+	} else if (evt.is_sensor_or_timer()) {
+		ctx_.stats.start_overall();
+		fp_platform::prepare_for_sensor_or_timer_event(evt);
+		ctx_.poll_finger_and_capture(timeout_us_);
+		if (ctx_.sensor_mode & FP_MODE_ANY_WAIT_IRQ) {
+			fp_configure_detect();
+			fp_platform::enable_sensor_irq();
+		} else {
+			fp_platform::enter_sensor_low_power(evt);
+		}
+		fp_btn_ign_out::update(FpSensorMode(ctx_.sensor_mode));
+		fp_led::update_mode(FpSensorMode(ctx_.sensor_mode));
+	}
+#else
+	send_mkbp_event(evt.raw);
+#endif
+}
+
 extern "C" void fp_task(void)
 {
-	int timeout_us = -1;
+	FpSensorStateMachine state_machine{ global_context };
 
 	/* Lock PM for initialization. */
 	fp_platform::lock_pm();
@@ -325,79 +374,16 @@ extern "C" void fp_task(void)
 			fp_platform::ScopedPmUnlock pm_unlock(
 				!(global_context.sensor_mode &
 				  FP_MODE_ENROLL_SESSION));
-			evt = FpTaskEvent{ task_wait_event(timeout_us) };
+			evt = FpTaskEvent{ task_wait_event(
+				state_machine.timeout_us()) };
 		}
-
-		if (evt.is_update_config()) {
-			uint32_t mode = global_context.sensor_mode;
-			fp_platform::prepare_for_mode_change();
-			global_context.sync_enroll_session(mode);
-			if (!is_finger_needed(mode)) {
-				enum fp_capture_type capture_type =
-					FP_CAPTURE_TYPE(mode);
-				global_context.current_capture_type =
-					FP_CAPTURE_TYPE_INVALID;
-				if (!fp_acquire_image(fp_buffer,
-						      capture_type)) {
-					global_context.current_capture_type =
-						capture_type;
-				}
-				global_context.sensor_mode &=
-					~(FP_MODE_CAPTURE |
-					  FP_MODE_CAPTURE_TYPE_MASK);
-				send_mkbp_event(EC_MKBP_FP_IMAGE_READY);
-				continue;
-			} else if (global_context.sensor_mode &
-				   FP_MODE_ANY_DETECT_FINGER) {
-				/* wait for a finger on the sensor */
-				fp_configure_detect();
-			}
-			if (global_context.sensor_mode & FP_MODE_DEEPSLEEP)
-				/* Shutdown the sensor */
-				fp_sensor_low_power();
-			if (global_context.sensor_mode & FP_MODE_FINGER_UP)
-				/* Poll the sensor to detect finger removal */
-				timeout_us = FINGER_POLLING_DELAY;
-			else
-				timeout_us = -1;
-			if (mode & FP_MODE_ANY_WAIT_IRQ) {
-				fp_platform::enable_sensor_irq();
-			} else if (mode & FP_MODE_RESET_SENSOR) {
-				fp_reset_and_clear_context();
-				global_context.sensor_mode &=
-					~FP_MODE_RESET_SENSOR;
-			} else if (mode & FP_MODE_SENSOR_MAINTENANCE) {
-				fp_maintenance();
-				global_context.sensor_mode &=
-					~FP_MODE_SENSOR_MAINTENANCE;
-			} else if (mode & FP_MODE_ENCRYPT_TEMPLATE) {
-				global_context.encrypt_requested_template();
-			} else if (mode & FP_MODE_DECRYPT_TEMPLATE) {
-				global_context.decrypt_and_commit_template();
-			} else {
-				fp_sensor_low_power();
-			}
-		} else if (evt.is_sensor_or_timer()) {
-			global_context.stats.start_overall();
-			fp_platform::prepare_for_sensor_or_timer_event(evt);
-			global_context.poll_finger_and_capture(timeout_us);
-
-			if (global_context.sensor_mode & FP_MODE_ANY_WAIT_IRQ) {
-				fp_configure_detect();
-				fp_platform::enable_sensor_irq();
-			} else {
-				fp_platform::enter_sensor_low_power(evt);
-			}
-		}
-		fp_btn_ign_out::update(
-			FpSensorMode(global_context.sensor_mode));
-		fp_led::update_mode(FpSensorMode(global_context.sensor_mode));
+		state_machine.handle_event(evt);
 	}
 #else /* !HAVE_FP_PRIVATE_DRIVER */
 	while (1) {
-		uint32_t evt = task_wait_event(timeout_us);
+		uint32_t evt = task_wait_event(state_machine.timeout_us());
 
-		send_mkbp_event(evt);
+		state_machine.handle_event(FpTaskEvent{ evt });
 	}
 #endif /* !HAVE_FP_PRIVATE_DRIVER */
 }
