@@ -19,6 +19,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
+#include <zephyr/sys/atomic.h>
 
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
@@ -215,6 +216,7 @@ void panic_data_write_assert(const char *path, unsigned int line)
 {
 	struct panic_data *const pdata = panic_data_reset(NULL);
 	uint32_t info;
+	k_tid_t thread = k_is_pre_kernel() ? NULL : k_current_get();
 
 	if (path) {
 		const char *last_slash = strrchr(path, '/');
@@ -232,7 +234,7 @@ void panic_data_write_assert(const char *path, unsigned int line)
 
 	panic_set_reason_reg(pdata, PANIC_SW_ASSERT);
 	panic_set_info_reg(pdata, info);
-	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)k_current_get());
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
 
 	panic_data_finalize(pdata);
 }
@@ -315,20 +317,33 @@ FUNC_NORETURN
 #endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
+	static atomic_t in_assert;
+
+	if (!atomic_cas(&in_assert, 0, 1)) {
+		panic_puts("Recursive assert\n");
+		panic_reboot();
+#ifdef CONFIG_ASSERT_TEST
+		return;
+#else
+		CODE_UNREACHABLE;
+#endif
+	}
+
 	panic_data_write_assert(path, line);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
 	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO) &&
-	    IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
+	    IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT) &&
+	    !k_is_pre_kernel()) {
 		print_stack_trace(k_current_get());
 	}
 
 	panic_reboot();
 
-#ifndef CONFIG_ASSERT_TEST
-	CODE_UNREACHABLE;
+#ifdef CONFIG_ASSERT_TEST
+	atomic_clear(&in_assert);
 #endif
 }
 #endif /* CONFIG_PLATFORM_EC_DEBUG_ASSERT */
