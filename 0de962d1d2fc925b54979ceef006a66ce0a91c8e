@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc6dab32_e9fdeec0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:23:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please fix standard `std::expected` usage. [[trajectory](https://goto.corp.google.com/traj/b9692b7f-ed7b-4f5b-9fe8-b411106bb1c5)]\n\n### Review Summary\n* **Functionality \u0026 Security:** ✅ The `RAND_bytes` error handling and challenge expiration logic look great and address the previous security defects.\n* **Architecture \u0026 Component Fit:** ✅ The abstraction of `FpSessionNonce` and `FpAuthChallenge` cleanly encapsulates the protocol state.\n* **Code Simplicity:** ✅ Very clean early returns and scoped logic.\n* **Idiomaticity \u0026 Readability:** ❌ `std::expected` does not have an `.error_or()` method. See inline comment for standard C++23 access.\n* **Testing:** ✅ Added comprehensive boundary testing for the expiration window.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+164, -41)`. Cleanly focused on a single logical change now that `FpFrameStorage` is split out.\n* **Commit Message:** ✅ Concise prose that clearly explains the *why* and *what*.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0de962d1d2fc925b54979ceef006a66ce0a91c8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7881878d_243bae07",
+        "filename": "common/fpsensor/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:23:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect:** `std::expected` does not have an `.error_or()` method in standard C++23.\n\nWhile Chromium\u0027s `base::expected` historically provided this as a non-standard extension, the standard `\u003cexpected\u003e` header does not include it. To ensure standard compliance and portability, use the standard access pattern to extract the error or return success:\n\n```cpp\n\tif (auto res \u003d FpAuthChallenge::consume_and_verify(\n\t\t       session_key, challenge, challenge_ctime,\n\t\t       global_context.fp_encryption_status, context, sender,\n\t\t       operation, mac); !res) {\n\t\treturn res.error();\n\t}\n\treturn EC_SUCCESS;\n``` [🔗](http://go/tj/b9692b7f-ed7b-4f5b-9fe8-b411106bb1c5)",
+      "range": {
+        "startLine": 183,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0de962d1d2fc925b54979ceef006a66ce0a91c8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
