@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dc6f3ea_ae7fe08e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:06:03Z",
+      "side": 1,
+      "message": "Tests are in the following CLs of this series (8593837 onward); commit message updated.",
+      "parentUuid": "67091791_a2fb62bd",
+      "revId": "fc8b0e9084aed9d6e3d06d8b80aa64ba7d3ee30f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a2d8709_0a3e6960",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "fc8b0e9084aed9d6e3d06d8b80aa64ba7d3ee30f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ede4523_5c994c83",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:06:03Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "2a2d8709_0a3e6960",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
       "revId": "fc8b0e9084aed9d6e3d06d8b80aa64ba7d3ee30f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
