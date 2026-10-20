@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "714236280a3033ff7f74bdfcb11fc4e8dd2fd6ef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "308bccde_a15f0e4a",
+        "filename": "board/ampton/board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-20T17:18:01Z",
+      "side": 1,
+      "message": "This CL is a clean `git cherry-pick -x` of commit c0f7d2745326 (\"ampton: Convert ampton_usb_muxes to struct usb_mux_chain\", crrev.com/c/8574068) from `ec-legacy` onto the R152 stabilization branch (`firmware-R152-16765.2.B-ec-legacy`), so we keep the cherry-pick identical to `ec-legacy`. Both `usb_muxes` (`baseboard/octopus/baseboard.c`) and `ampton_usb_muxes` (`board/ampton/board.c`) are declared as `struct usb_mux_chain[CONFIG_USB_PD_PORT_MAX_COUNT]`.",
+      "parentUuid": "5eff73ce_6dec3881",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 9999
+      },
+      "revId": "714236280a3033ff7f74bdfcb11fc4e8dd2fd6ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
