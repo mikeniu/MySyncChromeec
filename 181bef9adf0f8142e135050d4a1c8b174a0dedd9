@@ -22,6 +22,30 @@
       },
       "revId": "181bef9adf0f8142e135050d4a1c8b174a0dedd9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7580491_96fae4f2",
+        "filename": "zephyr/program/fatcat/chre.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T17:13:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03d713ac_ca08bcd7",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 37
+      },
+      "revId": "181bef9adf0f8142e135050d4a1c8b174a0dedd9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
