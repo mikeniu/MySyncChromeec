@@ -26,6 +26,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1903cf31_376d76d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:15Z",
+      "side": 1,
+      "message": "Rewrote the commit message as two concise prose paragraphs explaining the motivation and conceptual change without bulleted diff narration.",
+      "parentUuid": "ec87f928_397a0ee1",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c4e92c0_3e65f677",
@@ -40,6 +65,25 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality**: Code logic appears correct for the extracted classes.\n**Architecture \u0026 Component Fit**: `FpTemplateStore` correctly groups related state into a dedicated object, but its integration into the main codebase is not complete in this CL.\n**Code Simplicity**: Found an over-engineered C++23 template deduction pattern for `as_bytes()` and `payload()` that should be simplified to standard `const`/non-`const` overloads.\n**Idiomaticity \u0026 Readability**: Good use of modern C++ features (`std::expected`, `std::span`) for the new classes.\n**Security**: Encrypted template buffers correctly clear their contents on failure.\n**Testing**: Unit tests are added for the newly extracted states.\n**CL Size \u0026 Scope**: Size: L (+795, -98). The non-test production diff is approximately 760 lines, which exceeds the 250-line limit for a single logical change. Please split this CL to ease review and enforce single logical changes. A suggested split plan:\n1. Introduce `FpTemplateId` and `FpPositiveMatchSecretState` with their unit tests.\n2. Introduce `FpEncryptedTemplateBuffer` and its associated methods.\n3. Introduce `FpTemplateStore` and adapt the `fp_template` global references.\n\n**Commit Message**: **[CL Description Blocker — Action Required]** The description narrates the syntax changes (\"Extract X into Y\", \"Move Z\") but omits the high-level functional intent and motivation for *why* this extraction is happening now (e.g., what prospective capability this preparatory refactoring supports). Per go/cl-descriptions#llm-prompts and go/cl-descriptions#informative, please add a brief prose paragraph at the top explaining the problem and conceptual solution.\n\n[🔗](http://go/tj/45ece242-a413-4f73-9e18-8d3f3d7e97d0)",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3864f2ce_92840354",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:15Z",
+      "side": 1,
+      "message": "Scoped this CL to \u003c 250 non-test lines introducing FpTemplateId, FpTemplateStore, and FpRateLimiter alongside their callers in fpsensor_state.cc and fpsensor.cc and boundary unit tests.",
+      "parentUuid": "9c4e92c0_3e65f677",
       "isAi": true,
       "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -65,6 +109,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02fdd41e_415d0afe",
+        "filename": "include/fpsensor/fpsensor_template_store.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:15Z",
+      "side": 1,
+      "message": "Removed the deducing-this template metaprogramming pattern to keep the template store helper simple and readable.",
+      "parentUuid": "e882f20c_6a93a5d0",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "11a741524c52c63fd08d8b2f78302932974f63d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
