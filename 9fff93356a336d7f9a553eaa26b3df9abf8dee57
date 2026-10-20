@@ -55,6 +55,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f0a3d1e8_27c99a2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T19:13:05Z",
+      "side": 1,
+      "message": "There seems to be other fixes in the CL that seem unrelated to adding a spinlock, can we split this up?",
+      "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c1a6da23_d319f5ee",
         "filename": "zephyr/shim/src/console_buffer.c",
         "patchSetId": 2
