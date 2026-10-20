@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "3e7a57df800d833a36f3ad93636a8d6711803380",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f22bf30c_23a7b133",
+        "filename": "include/fpsensor/fpsensor_frame_storage.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:45:10Z",
+      "side": 1,
+      "message": "Simplified get_raw_frame by removing the redundant frame_size \u003e image_buffer.size() check and relying on checked_subspan for bounds and overflow validation.",
+      "parentUuid": "d9153254_e5c31488",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "3e7a57df800d833a36f3ad93636a8d6711803380",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
