@@ -154,8 +154,15 @@ struct fpsensor_context {
 	uint16_t template_encrypted_id;
 	/** Template decryption result. */
 	atomic_t template_decryption_result;
+	/** Active enrollment session flag in algorithm driver. */
+	uint32_t enroll_session;
 	/** Capture and matching telemetry statistics. */
 	FpSensorStats stats;
+
+	void poll_finger_and_capture(int &timeout_us);
+	void sync_enroll_session(uint32_t mode);
+	void encrypt_requested_template();
+	void decrypt_and_commit_template();
 };
 
 using FpSensorContext = fpsensor_context;
