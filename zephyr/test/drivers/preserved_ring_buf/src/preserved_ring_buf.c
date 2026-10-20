@@ -80,12 +80,12 @@ ZTEST_USER(preserved_ring_buf, test_corrupt)
 
 	preserved_ring_buf_reset(buf);
 	zassert_true(preserved_ring_buf_verify(buf));
-	buf->buffer[0] = 0xff;
+	buf->properties->start_magic = 0;
 	zassert_false(preserved_ring_buf_verify(buf));
 
 	preserved_ring_buf_reset(buf);
 	zassert_true(preserved_ring_buf_verify(buf));
-	buf->properties->checksum = -1;
+	*buf->end_magic = 0;
 	zassert_false(preserved_ring_buf_verify(buf));
 
 	preserved_ring_buf_reset(buf);
