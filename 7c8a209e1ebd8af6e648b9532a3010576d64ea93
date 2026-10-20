@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdc78b0f_86946f3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:14:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ The `FpFourCc` implementation safely handles endianness via bitwise shifts and returns a properly null-terminated string representation. Compile-time constants and shifts effectively avoid signed integer overflow.\n* **Architecture \u0026 Component Fit:** ✅ The modernization to `constexpr` correctly preserves behavior and encapsulation. Unrelated test configurations and macros were correctly split out.\n* **Code Simplicity:** ✅ The change elegantly eliminates dynamic string allocations, leveraging modern C++ features for compile-time buffer evaluation.\n* **Idiomaticity \u0026 Readability:** ✅ Excellent use of C++23 `constexpr`, `std::string_view`, and `noexcept`.\n* **Security:** ✅ Buffer offset validation is fully preserved, utilizing bounds-checked `check_add_overflow` safely within `constexpr`.\n* **Testing:** ✅ Boundary logic for `FpFourCc` encompasses expected printable and non-printable inputs. Relocation of preexisting functions does not necessitate new unit tests per the Pure Move policy.\n* **CL Size \u0026 Scope:** ✅ Size: M (+102, -99). The scope correctly adheres to the Single Logical Change rule, strictly modernizing `fpsensor_utils`. \n* **Commit Message:** ✅ The commit message provides a high-level motivation for the change and is clearly articulated with concise prose (no excessive diff narration or bullets).\n\n[[trajectory](https://goto.corp.google.com/traj/bfa3ff64-8b82-401b-bc8a-26fa948893d6)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7c8a209e1ebd8af6e648b9532a3010576d64ea93",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
