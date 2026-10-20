@@ -48,6 +48,11 @@ static char *button_debug_state_strings[] = {
 	} while (false)
 
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+#include <zephyr/drivers/gpio/gpio_emul.h>
+#define PB_KEYBOARD_NODE \
+	DT_COMPAT_GET_ANY_STATUS_OKAY(cros_ec_power_button_keyboard)
+#define PB_SUPPRESS_EN_GPIO \
+	GPIO_DT_FROM_NODE(DT_PHANDLE(PB_KEYBOARD_NODE, suppress_enable_pin))
 static int mock_pb_asserted = -1;
 #endif
 static int mock_eating_release = -1;
@@ -74,11 +79,15 @@ static void *button_setup(void)
 
 static void button_before(void *f)
 {
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+	const struct gpio_dt_spec *pb_suppress_en = PB_SUPPRESS_EN_GPIO;
+#endif
 	((struct button_fixture *)f)->fake_time.val = 0;
 	reset_button_debug_state();
 	button_init();
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
 	tablet_reset();
+	gpio_emul_input_set(pb_suppress_en->port, pb_suppress_en->pin, 1);
 	hook_notify(HOOK_TABLET_MODE_CHANGE);
 #endif
 	/* Sleep for 30s to flush any pending tasks */
@@ -658,6 +667,22 @@ ZTEST(button, test_keyboard_pb_suppression_tablet)
 		      "Expected power button change to be suppressed");
 }
 
+ZTEST(button, test_keyboard_pb_suppression_tablet_backlight_off)
+{
+	const struct gpio_dt_spec *pb_suppress_en = PB_SUPPRESS_EN_GPIO;
+
+	tablet_set_mode(1, TABLET_TRIGGER_LID);
+	gpio_emul_input_set(pb_suppress_en->port, pb_suppress_en->pin, 0);
+	pb_change_count = 0;
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "powerbtn 100"));
+	pass_time(150);
+
+	zassert_true(
+		pb_change_count >= 1,
+		"Expected power button change to NOT be suppressed when backlight is off");
+}
+
 ZTEST(button, test_keyboard_pb_suppress_inactive_on_suspend)
 {
 	/* Enable tablet mode to activate suppression */
@@ -671,6 +696,7 @@ ZTEST(button, test_keyboard_pb_suppress_inactive_on_suspend)
 		      "Expected power button change to be suppressed");
 
 	/* Trigger suspend, which should deactivate suppression */
+	power_set_state(POWER_S3);
 	hook_notify(HOOK_CHIPSET_SUSPEND);
 
 	/* Press again, should NOT be suppressed */
@@ -681,6 +707,7 @@ ZTEST(button, test_keyboard_pb_suppress_inactive_on_suspend)
 		     "Expected power button change to NOT be suppressed");
 
 	/* Cleanup */
+	power_set_state(POWER_S0);
 	tablet_set_mode(0, TABLET_TRIGGER_LID);
 }
 
