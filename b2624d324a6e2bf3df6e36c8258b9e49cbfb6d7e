@@ -22,6 +22,30 @@
       },
       "revId": "b2624d324a6e2bf3df6e36c8258b9e49cbfb6d7e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abdd4f1f_0ed87cf8",
+        "filename": "common/usbc/usb_pe_drp_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 4331,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-20T22:57:54Z",
+      "side": 1,
+      "message": "I suspect it was never needed. I\u0027m working on an initial CL to remove it.",
+      "parentUuid": "4c807618_3c06e864",
+      "range": {
+        "startLine": 4321,
+        "startChar": 0,
+        "endLine": 4331,
+        "endChar": 2
+      },
+      "revId": "b2624d324a6e2bf3df6e36c8258b9e49cbfb6d7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
