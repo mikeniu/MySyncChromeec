@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c807618_3c06e864",
+        "filename": "common/usbc/usb_pe_drp_sm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 4331,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-10-20T10:26:16Z",
+      "side": 1,
+      "message": "After moving charge_manager_invalidate_suppliers to line 4309, is this block still needed?",
+      "range": {
+        "startLine": 4321,
+        "startChar": 0,
+        "endLine": 4331,
+        "endChar": 2
+      },
+      "revId": "b2624d324a6e2bf3df6e36c8258b9e49cbfb6d7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
