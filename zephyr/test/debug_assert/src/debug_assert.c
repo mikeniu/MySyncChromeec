@@ -12,18 +12,11 @@
 DECLARE_FAKE_VOID_FUNC(system_reset, int);
 DEFINE_FAKE_VOID_FUNC(system_reset, int);
 
-ZTEST(debug_assert, test_assert_false)
+static void verify_assert_panic_data(int linenum)
 {
-	struct panic_data *pdata;
-	int linenum;
-	const char *filename;
+	const char *filename = strrchr(__FILE__, '/') + 1;
+	struct panic_data *pdata = panic_get_data();
 
-	filename = strrchr(__FILE__, '/') + 1;
-	linenum = __LINE__ + 1;
-	__ASSERT(false, "Test false assert");
-
-	zassert_equal(system_reset_fake.call_count, 1);
-	pdata = panic_get_data();
 	zassert_not_null(pdata);
 	zassert_equal(PANIC_SW_ASSERT, panic_get_reason_reg(pdata));
 	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO)) {
@@ -39,6 +32,17 @@ ZTEST(debug_assert, test_assert_false)
 		      panic_get_exception_reg(pdata));
 }
 
+ZTEST(debug_assert, test_assert_false)
+{
+	int linenum;
+
+	linenum = __LINE__ + 1;
+	__ASSERT(false, "Test false assert");
+
+	zassert_equal(system_reset_fake.call_count, 1);
+	verify_assert_panic_data(linenum);
+}
+
 ZTEST(debug_assert, test_assert_true)
 {
 	__ASSERT(true, "Test true assert");
@@ -47,9 +51,33 @@ ZTEST(debug_assert, test_assert_true)
 	zassert_is_null(panic_get_data());
 }
 
+static void system_reset_recursive_assert(int flags)
+{
+	ARG_UNUSED(flags);
+
+	/* Trigger a second assert while inside zassert_post_action(). */
+	if (system_reset_fake.call_count == 1) {
+		__ASSERT(false, "Second assert");
+	}
+}
+
+ZTEST(debug_assert, test_assert_recursive_post_action)
+{
+	int linenum;
+
+	system_reset_fake.custom_fake = system_reset_recursive_assert;
+
+	linenum = __LINE__ + 1;
+	__ASSERT(false, "First assert");
+
+	zassert_equal(system_reset_fake.call_count, 2);
+	verify_assert_panic_data(linenum);
+}
+
 static void reset(void *data)
 {
 	ARG_UNUSED(data);
+	system_reset_fake.custom_fake = NULL;
 	/* clear panic data */
 	memset(get_panic_data_write(), 0, sizeof(struct panic_data));
 	RESET_FAKE(system_reset);
