@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4599b06_2f08de80",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:49:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/54db98b3-d6b0-4967-80e2-715a459e381f)]\n\n### Review Summary\n**Functionality:** The extraction of the frame slicing logic works as intended and provides safe bounds checking.\n**Architecture \u0026 Component Fit:** Clean encapsulation of the frame calculations in `fp_frame_storage`.\n**Code Simplicity:** Excellent. `checked_subspan` provides a robust, reusable boundary check.\n**Idiomaticity \u0026 Readability:** Excellent use of modern C++ features (`std::span`, `std::expected`, `std::ranges::copy`).\n**Security:** Replaced manual arithmetic and `memcpy` with safe span utilities, ensuring no buffer over-reads.\n**Testing:** Thorough boundary tests cover the new helpers and error paths, including off-by-one bounds testing.\n**CL Size \u0026 Scope:** `Size: M (+155, -43)`. Scope is atomic and properly addresses the single logical change.\n**Commit Message:** Concise, clear, and accurately explains the *Why* and *What*.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "dd667683acc5c42e9b1902178ddf10579c5756ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
