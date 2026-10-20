@@ -26,6 +26,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "975e65da_c3e53379",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:47Z",
+      "side": 1,
+      "message": "Scoped this CL to \u003c 250 non-test lines encapsulating task statistics and context operations in FpSensorContext, and rewrote the commit message in two concise prose paragraphs without \u0027and\u0027 in the subject.",
+      "parentUuid": "e2862912_a310626b",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "43660c4d825b875d48382f1c59924fea1e3afb90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8102e150_ada84033",
@@ -40,6 +65,25 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n`Size: XL (+4143, -6225)`\nThis CL is too large and bundles multiple independent logical changes, violating the Single Logical Change rule. Please split this CL into smaller, self-contained CLs to enable effective review.\n\nProposed split plan:\n1. **CL 1:** Replace `fpsensor_context` with `FpSensorContext` wrapper.\n2. **CL 2:** Extract `EC_CMD_FP_*` host command handlers into `fpsensor_host_commands.cc`.\n3. **CL 3:** Migrate callers (auth commands, handshake, ASCP, console) to use the new `FpSensorContext` methods.\n\n**Functionality:**\nNot thoroughly reviewed due to the need to split the CL.\n\n**Architecture \u0026 Component Fit:**\nThe extraction and encapsulation steps appear to be positive architectural improvements, but they must be evaluated in isolated CLs.\n\n**Code Simplicity:**\nNot fully evaluated due to the size of the CL.\n\n**Idiomaticity \u0026 Readability:**\nNot fully evaluated due to the size of the CL.\n\n**Security:**\nNo obvious new vulnerabilities noticed in a high-level scan.\n\n**Testing:**\nTests are modified alongside the refactoring, which is good, but test refactorings should accompany their respective split CLs.\n\n**Commit Message:**\nSee inline comment on `/COMMIT_MSG` for feedback and suggested commit descriptions for the split CLs.\n\n[🔗](http://go/tj/b7d210e7-18b8-4f37-9134-0eab9c041ee8)",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "43660c4d825b875d48382f1c59924fea1e3afb90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63e1a42f_b51cad69",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:47Z",
+      "side": 1,
+      "message": "Reduced this CL to \u003c 250 non-test lines focused on FpSensorStats and FpSensorContext member operations with unit test coverage in fpsensor_state.cc.",
+      "parentUuid": "8102e150_ada84033",
       "isAi": true,
       "revId": "43660c4d825b875d48382f1c59924fea1e3afb90",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
