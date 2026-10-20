@@ -26,6 +26,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7722b7ef_b98fd4af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:12:34Z",
+      "side": 1,
+      "message": "Scoped this CL to a single atomic change (\u003c 250 non-test lines) encapsulating raw frame slicing in checked_subspan and FpFrameStorage, and rewrote the commit message in two concise prose paragraphs.",
+      "parentUuid": "270e24d7_24314224",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d33f319d_a535cc83",
@@ -40,6 +65,25 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n**Functionality:** The refactoring looks functionally correct, but some APIs could be cleaner.\n**Architecture \u0026 Component Fit:** ❌ Found encapsulation issues. The new controller classes leak their locks and work queues as global variables.\n**Code Simplicity:** ❌ Some over-engineering. `find_capture_params` takes an optional parameter only to immediately return an error if it is empty.\n**Idiomaticity \u0026 Readability:** Good use of modern C++ features overall.\n**Security:** No issues found.\n**Testing:** ❌ Missing tests for the newly introduced `FpSensorInfoBuffer` class.\n**CL Size \u0026 Scope:** ❌ `Size: XL (+862, -441)`. This CL bundles multiple independent logical changes. According to the Single Logical Change rule, please split this into at least three atomic CLs:\n1. Refactoring `fp_led` and `fp_btn_ign_out` to use `FpSensorMode`.\n2. Refactoring `FpImageFrameParamsCache` to use `FpCaptureType`.\n3. Introducing `FpSensorInfoBuffer` and test helpers (along with its missing unit tests).\n**Commit Message:** ❌ The commit message narrates the diff statement-by-statement in a bulleted list. In the split CLs, please use 1-2 concise prose paragraphs focusing on *why* the refactor is being made and the conceptual change.\n\n[🔗](http://go/tj/39d674aa-7ce7-42d1-90a2-cdc7ead71162)",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "419b97be_afe91138",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:12:34Z",
+      "side": 1,
+      "message": "Split peripheral mode updates into CL 8619015 and kept this CL focused solely on FpFrameStorage raw frame slicing (\u003c 250 non-test lines) with boundary unit tests.",
+      "parentUuid": "d33f319d_a535cc83",
       "isAi": true,
       "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -70,6 +114,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "418a88a7_bbc9a363",
+        "filename": "common/fpsensor/fpsensor_btn_ign_out.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:12:34Z",
+      "side": 1,
+      "message": "Moved peripheral mode updates to CL 8619015 while keeping the existing translation-unit synchronization primitives intact.",
+      "parentUuid": "8ce99e95_7182b395",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6034a102_9474466f",
@@ -90,6 +159,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ffa32f0_2d9bdc4f",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:12:34Z",
+      "side": 1,
+      "message": "Simplified FpFrameStorage to operate directly on validated FpCaptureType values.",
+      "parentUuid": "6034a102_9474466f",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -120,6 +214,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd8bcb68_71c1636f",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:12:34Z",
+      "side": 1,
+      "message": "Moved peripheral mode updates to CL 8619015 while keeping the existing translation-unit synchronization primitives intact.",
+      "parentUuid": "6cf844f0_c111143b",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f73aff14_b5aa179a",
@@ -140,6 +259,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e96bdfe7_bbdd06b1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:12:34Z",
+      "side": 1,
+      "message": "Scoped this CL to FpFrameStorage and added boundary unit tests for checked_subspan and get_raw_frame.",
+      "parentUuid": "f73aff14_b5aa179a",
+      "range": {
+        "startLine": 186,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "9a52eca2f8223ffa2aae9e3bef6f88dbda7e6fc0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
