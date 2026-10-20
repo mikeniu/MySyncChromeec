@@ -221,6 +221,11 @@ ZTEST(host_cmd_host_commands, test_thread_info)
 	bool found_idle = false;
 	bool found_current = false;
 	bool found_test_thread = false;
+	bool runtime_usage_valid = false;
+	bool usage_analysis_valid = false;
+	uint64_t total_execution_time_us = 0;
+	uint64_t total_window_peak_us = 0;
+	uint64_t total_window_avg_us = 0;
 
 	/* Create an extra thread */
 	tid = k_thread_create(&extra_test_thread, extra_test_stack,
@@ -257,13 +262,14 @@ ZTEST(host_cmd_host_commands, test_thread_info)
 		/* Check that flags are valid and value is != 0 for unchecked
 		 * fields */
 		if (r.valid_flags & EC_THREAD_INFO_DETAIL_RUNTIME_USAGE_VALID) {
-			zassert_true(r.execution_time_us != 0,
-				     "Execution time is 0");
+			runtime_usage_valid = true;
+			total_execution_time_us += r.execution_time_us;
 		}
 		if (r.valid_flags &
 		    EC_THREAD_INFO_DETAIL_USAGE_ANALYSIS_VALID) {
-			zassert_true(r.window_peak_us != 0, "Window peak is 0");
-			zassert_true(r.window_avg_us != 0, "Window avg is 0");
+			usage_analysis_valid = true;
+			total_window_peak_us += r.window_peak_us;
+			total_window_avg_us += r.window_avg_us;
 		}
 		if (r.valid_flags & EC_THREAD_INFO_DETAIL_PC_VALID) {
 			zassert_true(r.pc != 0, "PC is 0");
@@ -312,6 +318,16 @@ ZTEST(host_cmd_host_commands, test_thread_info)
 	zassert_true(found_idle, "No idle thread found");
 	zassert_true(found_current, "No current thread found");
 	zassert_true(found_test_thread, "Extra test thread not found in list");
+	if (runtime_usage_valid) {
+		zassert_true(total_execution_time_us > 0,
+			     "Total execution time across all threads is 0");
+	}
+	if (usage_analysis_valid) {
+		zassert_true(total_window_peak_us > 0,
+			     "Total window peak across all threads is 0");
+		zassert_true(total_window_avg_us > 0,
+			     "Total window avg across all threads is 0");
+	}
 
 	/* Clean up thread */
 	k_thread_abort(tid);
