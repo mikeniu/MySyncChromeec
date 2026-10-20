@@ -24,7 +24,7 @@ void preserved_ring_buf_reset(const preserved_ring_buf_t *buf)
 	buf->properties->version = buf->constants.version;
 	buf->properties->capacity = buf->constants.capacity;
 	buf->properties->word_size = buf->constants.word_size;
-	memset((void *)buf->buffer.as_uint8, 0,
+	memset(buf->buffer.as_uint8, 0,
 	       buf->constants.capacity * buf->constants.word_size);
 }
 
@@ -91,39 +91,6 @@ uint32_t preserved_ring_buf_len(const preserved_ring_buf_t *buf)
 }
 
 /*
- * Write word to buffer and increment head. Head is 32 bits and only increments.
- * Note: head will wrap at uint32 max. In this infrequent event the buffer will
- * effectively be truncated. The trade off is improved performance on write.
- *
- * Forcing always inline to optimize write speed.
- */
-void inline __attribute__((always_inline))
-preserved_ring_buf_write(const preserved_ring_buf_t *buf, uint32_t word)
-{
-	const uint32_t index =
-		(buf->properties->head++ % buf->constants.capacity);
-	switch (buf->constants.word_size) {
-	case 1:
-		buf->properties->checksum +=
-			(word & 0xff) - buf->buffer.as_uint8[index];
-		buf->buffer.as_uint8[index] = word;
-		break;
-	case 2:
-		buf->properties->checksum +=
-			(word & 0xffff) - buf->buffer.as_uint16[index];
-		buf->buffer.as_uint16[index] = word;
-		break;
-	case 4:
-		buf->properties->checksum +=
-			word - buf->buffer.as_uint32[index];
-		buf->buffer.as_uint32[index] = word;
-		break;
-	default:
-		__builtin_unreachable();
-	}
-}
-
-/*
  * Read a word at a given offset.
  * Offset is wrapped to buffer capacity.
  * Tail is 0 until head passes buffer capacity, then it matches head.
@@ -134,7 +101,8 @@ uint32_t preserved_ring_buf_read(const preserved_ring_buf_t *buf,
 	uint32_t tail = 0;
 	if (buf->properties->head > buf->constants.capacity)
 		tail = buf->properties->head;
-	const uint32_t index = (tail + offset) % buf->constants.capacity;
+	/* Capacity is a power of 2, so bitmask replaces modulo. */
+	const uint32_t index = (tail + offset) & (buf->constants.capacity - 1);
 	switch (buf->constants.word_size) {
 	case 1:
 		return buf->buffer.as_uint8[index];
