@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63fc0b95_da2207a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T02:28:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5043e747-d799-4c5c-b222-353a1af8a827)]\n\n**Review Summary:**\n*   **Functionality \u0026 Security:** Cortex-M33 (ARMv8-M) MPU support is correctly implemented. The rollback region locking mechanism properly relies on `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` to prevent privileged access since `P_NA` is unsupported on ARMv8-M.\n*   **Architecture \u0026 Component Fit:** The implementation integrates well into Zephyr`s ARM CMSE MPU API.\n*   **Code Simplicity:** Clean use of `arm_cmse_mpu_region_get` avoiding redundant loops.\n*   **Idiomaticity \u0026 Readability:** Code adheres to Zephyr configuration patterns. Hardware-specific design choices are well-documented inline.\n*   **Testing:** `TEST\u003dnone` is justified under the Hardware/Physical Exception since MPU register mutations are hardware-dependent and cannot be generically tested in software.\n*   **CL Size \u0026 Scope:** Size: M (+120, -2). The CL is appropriately scoped to adding Cortex-M33 MPU support.\n*   **Commit Message:** The message concisely explains the why and what, and includes required `BUG` and `TEST` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1a2e4451cc697d1d1ab92207ade35cd4f74e072f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
