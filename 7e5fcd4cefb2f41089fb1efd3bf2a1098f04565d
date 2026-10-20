@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "908d91c2_e6f85360",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:13:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Blocker — Action Required]** The description narrates line-by-line syntax changes (e.g., `State \u003d std::variant\u003c...\u003e`, `Command \u003d std::variant\u003c...\u003e`) without stating the high-level problem or why this state machine refactoring is needed. Per go/cl-descriptions#llm-prompts and go/cl-descriptions#informative, please state the high-level functional intent and motivation at the top of the CL description, and condense the low-level type enumerations.\n\n**Option for CL 2 (State Machine Refactor):**\n```text\nRefactor fp_task into a typestate FpSensorStateMachine.\n\nThe monolithic fp_task loop was difficult to unit test and reason about due to intertwined resting states and one-shot config commands.\n\nExtract the fingerprint task loop into FpSensorStateMachine, separating resting states from config commands. This enables hermetic unit testing of the sensor transitions.\n```\n\n**Option for CL 1 (Enrollment Session):**\n```text\nEncapsulate enrollment session lifecycle in FpEnrollSession.\n\nExtract the enrollment tracking logic into a dedicated FpEnrollSession class to simplify sensor mode derivation and improve state encapsulation.\n```\n[🔗](http://go/tj/a344cdd5-432d-4ce2-a0d3-a4ddc13b6a57)",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7e5fcd4cefb2f41089fb1efd3bf2a1098f04565d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79864ee9_6c256765",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T20:13:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n**CL Size \u0026 Scope:** Size: L (+738, -245). This CL is too large and violates the Single Logical Change rule. The non-test production diff exceeds 250 lines and bundles multiple independent refactorings that can be decoupled. Please split this into smaller, self-contained CLs:\n1. **CL 1:** Encapsulate enrollment session lifecycle in `FpEnrollSession`.\n2. **CL 2:** Extract the fingerprint task loop and state machine into `FpSensorStateMachine`.\n\n**Commit Message:** The description consists of code syntax translation (`State \u003d std::variant\u003c...\u003e`, `Command \u003d std::variant\u003c...\u003e`) without explaining the high-level functional intent or why the state machine refactoring is needed. See the inline comment on `/COMMIT_MSG`.\n\n**Architecture \u0026 Component Fit:** The typestate design and `std::variant` command structures cleanly encapsulate the sensor states.\n\n**Code Simplicity:** The extraction of `parse_command` and `transition_on_sensor_or_timer` significantly reduces the control-flow complexity of the original `fp_task()` loop.\n\n**Testing:** Excellent addition of hermetic unit tests in `fpsensor_state.cc` covering the new state machine commands and transitions.\n\n[🔗](http://go/tj/a344cdd5-432d-4ce2-a0d3-a4ddc13b6a57)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7e5fcd4cefb2f41089fb1efd3bf2a1098f04565d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
