@@ -33,6 +33,23 @@
       "message": "Hi @keithshort@chromium.org,\n\nCould you please review again?\nI solved CQ failure.",
       "revId": "266b384a77f31dea310dccba5a9ec33bf7e0eb38",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e273c9f_987068e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 45
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-10-20T01:53:06Z",
+      "side": 1,
+      "message": "Hi @alevkoy@chromium.org,\n\nI checked the result in the CQ link, it shows:\n0 test variants: status\u003dFAILED\n332 test variants: status\u003dPASSED or SKIPPED\n\nI didn\u0027t find any fail items, so could you please help to confirm the reason for the failure?",
+      "revId": "266b384a77f31dea310dccba5a9ec33bf7e0eb38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
