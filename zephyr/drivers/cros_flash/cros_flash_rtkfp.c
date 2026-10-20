@@ -98,6 +98,107 @@ static int flash_set_status(const struct device *dev, uint8_t sr1, uint8_t sr2)
 	return rv;
 }
 
+static int flash_check_prot_reg(const struct device *dev, unsigned int offset,
+				unsigned int bytes)
+{
+	unsigned int start;
+	unsigned int len;
+	uint8_t sr1, sr2;
+	int rv = EC_SUCCESS;
+
+	/* Invalid value */
+	if (bytes > CONFIG_FLASH_SIZE_BYTES ||
+	    offset > CONFIG_FLASH_SIZE_BYTES - bytes) {
+		return EC_ERROR_INVAL;
+	}
+
+	/* Compute current protect range */
+	rv = flash_get_status(dev, &sr1, &sr2);
+	if (rv) {
+		return rv;
+	}
+
+	rv = spi_flash_reg_to_protect(sr1, sr2, &start, &len);
+	if (rv) {
+		/* Fail closed on undecodable status */
+		return EC_ERROR_ACCESS_DENIED;
+	}
+
+	/* Check if ranges overlap */
+	if (MAX(start, offset) < MIN(start + len, offset + bytes)) {
+		return EC_ERROR_ACCESS_DENIED;
+	}
+
+	return EC_SUCCESS;
+}
+
+static int cros_flash_rtkfp_write(const struct device *dev, int offset,
+				  int size, const char *data)
+{
+	const struct cros_flash_rtkfp_config *cfg = DRV_CONFIG(dev);
+	int ret;
+
+	/* check protection */
+	ret = flash_check_prot_reg(dev, offset, size);
+	if (ret) {
+		return ret;
+	}
+
+	/* Invalid data pointer */
+	if (data == NULL) {
+		return EC_ERROR_INVAL;
+	}
+
+	/* Lock physical flash operations */
+	crec_flash_lock_mapped_storage(1);
+
+	LOG_DBG("fwrite %x, %x", offset, size);
+
+	ret = flash_write(cfg->flash_dev, offset, data, size);
+
+	/* Unlock physical flash operations */
+	crec_flash_lock_mapped_storage(0);
+
+	return ret;
+}
+
+static int cros_flash_rtkfp_erase(const struct device *dev, int offset,
+				  int size)
+{
+	const struct cros_flash_rtkfp_config *cfg = DRV_CONFIG(dev);
+	int ret;
+
+	ret = flash_check_prot_reg(dev, offset, size);
+	if (ret) {
+		return ret;
+	}
+
+	if (size <= 0) {
+		return EC_ERROR_INVAL;
+	}
+
+	crec_flash_lock_mapped_storage(1);
+
+	for (; size > 0; size -= CONFIG_FLASH_ERASE_SIZE) {
+		ret = flash_erase(cfg->flash_dev, offset,
+				  CONFIG_FLASH_ERASE_SIZE);
+		if (ret) {
+			break;
+		}
+
+		offset += CONFIG_FLASH_ERASE_SIZE;
+	}
+	/* Unlock physical flash operations */
+	crec_flash_lock_mapped_storage(0);
+
+	if (ret) {
+		LOG_ERR("Erase Failed, code %d.", ret);
+	} else {
+		LOG_DBG("Erase success.");
+	}
+	return ret;
+}
+
 static int cros_flash_rtkfp_sw_protect(const struct device *dev, bool enable)
 {
 	const struct cros_flash_rtkfp_config *cfg = DRV_CONFIG(dev);
@@ -151,6 +252,8 @@ static int cros_flash_rtkfp_init(const struct device *dev)
 /* cros ec flash driver registration */
 static const struct cros_flash_driver_api cros_flash_rtkfp_driver_api = {
 	.init = cros_flash_rtkfp_init,
+	.physical_write = cros_flash_rtkfp_write,
+	.physical_erase = cros_flash_rtkfp_erase,
 	.physical_get_status = flash_get_status,
 };
 
