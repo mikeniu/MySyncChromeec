@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af58eea9_8ce88aed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n*   **Functionality:** `✅`. The `fp_platform` namespace correctly mirrors the existing Zephyr vs. legacy EC preprocessor behavior, and properly handles the PM lock state via `ScopedPmUnlock`.\n*   **Architecture \u0026 Component Fit:** `✅`. Extracting platform-specific OS interactions into a dedicated inline header cleans up the core state machine while preserving zero-overhead execution.\n*   **Code Simplicity:** `✅`. `ScopedPmUnlock` cleanly replaces the manual lock/unlock tracking variables.\n*   **Idiomaticity \u0026 Readability:** `✅`. The use of standard C++20 `constexpr` methods on `FpTaskEvent` simplifies the bitwise checks.\n*   **Security:** `✅`. No issues identified.\n*   **Testing:** `✅`. Compile-time `static_assert` statements provide full boolean-clause mutation coverage for the `FpTaskEvent` bitmask helpers.\n*   **CL Size \u0026 Scope:** `✅` **Size: L (+163, -93)**. This CL is purely focused on the extraction of platform hooks. The production delta is \u003c 150 lines, and it successfully adheres to the Single Logical Change rule.\n*   **Commit Message:** `✅`. Uses concise prose to explain the rationale (clutter in the main loop) and the solution (`fp_platform` header).\n\n[🔗](http://go/tj/37eac0b1-e39d-40bc-b7bd-aea4af06fb47)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "febe3fe30bfde179184064d322d1150203e23611",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71bce788_193f0419",
+        "filename": "include/fpsensor/fpsensor_platform.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This extraction lost an important explanatory comment regarding a hardware/driver workaround. Consider restoring the original comment so future readers understand why we ignore the return value here:\n\n```cpp\n\t/* Clean up SPI before clocking up to avoid hang on the dsb\n\t * in dma_go. Ignore the return value to let the WDT reboot\n\t * the MCU (and avoid getting trapped in the loop).\n\t * b/112781659 */\n```\n\n[🔗](http://go/tj/37eac0b1-e39d-40bc-b7bd-aea4af06fb47)",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "febe3fe30bfde179184064d322d1150203e23611",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
