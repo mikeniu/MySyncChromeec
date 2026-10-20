@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d83c835_f8b6843c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:51:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f0da77_7af4b2ce",
+      "revId": "a2a109d2358595f8e738472413ab6fbe71783aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be7fceb1_9b9fa160",
@@ -35,6 +53,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nPlease see the inline comments for required updates to the unit test assertions and commit message.\n\n### Review Summary\n\n*   **Functionality:** ✅ No functional issues found.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated inside the driver init and reset cause logic.\n*   **Code Simplicity:** ✅ The added control flow is minimalistic.\n*   **Idiomaticity \u0026 Readability:** ✅ The code uses descriptive names and defined constants for registers and bitmasks rather than magic values.\n*   **Security:** ✅ No security vulnerabilities introduced.\n*   **Testing:** ❌ **Changes Requested** — The unit tests use a weak bitwise inclusion check (`zassert_true(var \u0026 FLAG)`) rather than checking the exact expected deterministic state. See inline comments.\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+85, -4)` — This represents a single logical change (adding reset cause detection).\n*   **Commit Message:** ❌ **Changes Requested** — The commit message includes a paragraph narrating the unit test additions, which should be omitted. See inline comment for a suggested replacement.\n\n[🔗](http://go/tj/b0c3bfc9-03a4-48ae-88b0-e5a65793c4d6)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a2a109d2358595f8e738472413ab6fbe71783aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b876e3e8_5e78ad31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:51:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be7fceb1_9b9fa160",
       "revId": "a2a109d2358595f8e738472413ab6fbe71783aa1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -64,6 +100,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a3c87ef_1fe1f4b7",
+        "filename": "zephyr/test/drivers/cros_system_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:51:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eaf6dc97_ba9298b9",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 9999
+      },
+      "revId": "a2a109d2358595f8e738472413ab6fbe71783aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee3ec08d_c4578e73",
@@ -85,6 +145,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a2a109d2358595f8e738472413ab6fbe71783aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9fa7f46_eaef54c8",
+        "filename": "zephyr/test/drivers/cros_system_rtkfp/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:51:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee3ec08d_c4578e73",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 9999
+      },
       "revId": "a2a109d2358595f8e738472413ab6fbe71783aa1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
