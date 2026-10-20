@@ -3709,8 +3709,6 @@ static void pe_snk_transition_sink_run(int port)
 	 */
 	if (pd_timer_is_expired(port, PE_TIMER_PS_TRANSITION) &&
 	    pe[port].hard_reset_counter <= N_HARD_RESET_COUNT) {
-		PE_SET_FLAG(port, PE_FLAGS_PS_TRANSITION_TIMEOUT);
-
 		pe_set_hard_reset(port);
 	}
 }
@@ -4062,22 +4060,6 @@ static void pe_snk_hard_reset_entry(int port)
 
 	/* Increment the HardResetCounter */
 	pe[port].hard_reset_counter++;
-
-	/*
-	 * Transition the Sink’s power supply to the new power level if
-	 * PSTransistionTimer timeout occurred.
-	 */
-	if (PE_CHK_FLAG(port, PE_FLAGS_PS_TRANSITION_TIMEOUT)) {
-		PE_CLR_FLAG(port, PE_FLAGS_PS_TRANSITION_TIMEOUT);
-
-		/* Transition Sink's power supply to the new power level */
-		pd_set_input_current_limit(port, pe[port].curr_limit,
-					   pe[port].supply_voltage);
-		if (IS_ENABLED(CONFIG_CHARGE_MANAGER))
-			/* Set ceiling based on what's negotiated */
-			charge_manager_set_ceil(port, CEIL_REQUESTOR_PD,
-						pe[port].curr_limit);
-	}
 }
 
 static void pe_snk_hard_reset_run(int port)
