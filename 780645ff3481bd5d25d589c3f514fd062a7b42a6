@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdc2c855_deae4cbd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:39:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n*   **Functionality:** Found a critical bug in `rts5817maa_irq` where the GPIO port device is passed to the fingerprint core callback instead of the fingerprint sensor device. Also found that `rts5817maa_init` returns a positive bitflag on failure (which Zephyr treats as success), and `rts5817maa_get_info` incorrectly overwrites `model_id` with `0` when the private driver is disabled. See inline comments.\n*   **Architecture \u0026 Component Fit:** The driver accurately implements the standard `cros_fingerprint` APIs.\n*   **Code Simplicity:** Generally straightforward implementation.\n*   **Idiomaticity \u0026 Readability:** Excellent use of native structs, static visibility, and Zephyr idioms.\n*   **Security:** No resource leaks identified.\n*   **Testing \u0026 Test Coverage:** Missing automated test coverage. Per the review guidelines, test coverage is **mandatory** for new logic and must be included in the same CL. Even if tests depend on a test harness, the harness should be introduced in a prerequisite CL, and the driver CL stacked on top so the tests can be reviewed alongside the driver implementation.\n*   **CL Size \u0026 Scope:** Size: L (+403, -0). The production diff is $\\ge 250$ lines, which exceeds the strictly enforced limits. While this is a single cohesive driver, the missing tests and sheer volume of logic make it difficult to review effectively. Please work to stack the test harness first, include the unit tests here, and if possible, split the driver implementation into smaller logical pieces (e.g., base implementation in one CL, capture/maintenance functionality in another).\n*   **Commit Message:** The tags are formatted correctly. Once unit tests are added, update the `TEST\u003d` line to reflect the verification command.\n\n[🔗](http://go/tj/6f389ceb-7f03-4dd0-925a-d102091adef7)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b4c3864_e755e061",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:39:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n`convert_rts_snr_init_error_code` returns a positive bitflag (e.g., `FINGERPRINT_ERROR_INIT_FAIL` / `BIT(15)`). Returning this positive value from `rts5817maa_init` violates the Zephyr API contract for device initialization, which expects `0` for success or a **negative** error code (like `-EIO` or `-ENODEV`). Zephyr`s device initialization sequence treats positive return values as success!\n\nPlease return a standard negative error code (like `-EIO`) while still setting the `data-\u003eerrors` state correctly:\n\n```c\n\tif (ret) {\n\t\tLOG_ERR(\"sensor init failed %d\", ret);\n\t\tdata-\u003eerrors |\u003d (ret | FINGERPRINT_ERROR_INIT_FAIL);\n\t\treturn -EIO;\n\t}\n```\n\n[🔗](http://go/tj/6f389ceb-7f03-4dd0-925a-d102091adef7)",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 119,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83db2505_f516bbc9",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:39:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nIf `CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER` is disabled, `rts5817maa_sensor_get_hwid` is skipped, meaning `ret` and `sensor_id` remain `0`. The function then blindly assigns `sensor_info-\u003emodel_id \u003d sensor_id;`, which incorrectly overwrites the default `model_id` of `1` (from the macro) with `0`.\n\nPlease enclose the error checking and assignment inside the `IS_ENABLED` block so the default values are preserved when the private driver is disabled:\n\n```c\n\tif (IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {\n\t\tret \u003d rts5817maa_sensor_get_hwid(\u0026sensor_id);\n\t\tif (ret) {\n\t\t\tLOG_ERR(\"Failed to get sensor hwid: %d\", ret);\n\t\t\treturn -EINVAL;\n\t\t}\n\t\tsensor_info-\u003emodel_id \u003d sensor_id;\n\t}\n```\n\n[🔗](http://go/tj/6f389ceb-7f03-4dd0-925a-d102091adef7)",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf4a25ba_d92e484d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:39:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe `dev` argument passed to the GPIO interrupt callback is the GPIO port device, not the fingerprint sensor device. By calling `data-\u003ecallback(dev);`, the fingerprint core will receive the GPIO port device pointer instead of the fingerprint device pointer, which will lead to memory corruption or crashes when it attempts to use it.\n\nPlease pass `data-\u003edev` to the callback instead:\n\n```c\nstatic void rts5817maa_irq(const struct device *dev, struct gpio_callback *cb,\n\t\t       uint32_t pins)\n{\n\tstruct rts5817maa_data *data \u003d CONTAINER_OF(cb, struct rts5817maa_data, irq_cb);\n\n\trts5817maa_disable_irq(data-\u003edev);\n\n\tif (data-\u003ecallback !\u003d NULL) {\n\t\tdata-\u003ecallback(data-\u003edev);\n\t}\n}\n```\n\n[🔗](http://go/tj/6f389ceb-7f03-4dd0-925a-d102091adef7)",
+      "range": {
+        "startLine": 297,
+        "startChar": 0,
+        "endLine": 307,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
