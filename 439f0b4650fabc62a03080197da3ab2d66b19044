@@ -1,0 +1,148 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "617a311d_d5eeda71",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:06:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](http://go/tj/d037d9a5-f6b3-4a33-8322-0a86a2e32ead)]\n\n### Review Summary\n**Functionality**: Found one defect where the return value of `flash_ex_op` is ignored in `flash_get_status`. If a read fails, it could leave the status registers uninitialized, which would later be written back to the flash chip, potentially causing a lock-out.\n**Architecture \u0026 Component Fit**: The driver appropriately bridges Zephyr\u0027s SPI flash extensions and the `cros_flash` driver API.\n**Code Simplicity**: I suggested removing the single-use `cros_flash_rtkfp_set_status_reg` wrapper and checking its unneeded `cfg \u003d\u003d NULL` condition, rolling the `flash_ex_op` call directly into `flash_set_status`.\n**Idiomaticity \u0026 Readability**: Follows Zephyr EC C idioms effectively.\n**Security**: No new security issues.\n**Testing**: Thank you for splitting this CL and adding the mock Zephyr unit tests! The test coverage is solid and directly tests the initialization and flag logic.\n**CL Size \u0026 Scope**: `Size: L (+532, -0)`. This CL satisfies the Single Logical Change rule and the \"Thorough Unit Tests Exception\" for Size: L: the production logic is only ~190 lines, while the remaining delta is entirely dedicated to the fake flash test setup and unit tests directly validating this change. This is correctly scoped.\n**Commit Message**: The commit message is now well-written, with good context, proper bulleting, and a populated `TEST\u003d` line.\n\nTAG\u003dagy\nCONV\u003d1dbf6176-af36-4a88-b667-16b306549263",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7141d0a_a489a170",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:06:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `cros_flash_rtkfp_set_status_reg` is only called once by `flash_set_status`. Since `DRV_CONFIG(dev)` points to statically allocated data via `DEVICE_DT_INST_DEFINE`, `cfg` will never be `NULL`. You can simplify the code by deleting this function and merging the `flash_ex_op` call directly into `flash_set_status`.\n[🔗](http://go/tj/d037d9a5-f6b3-4a33-8322-0a86a2e32ead)",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80548961_196ec727",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:06:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect** — The return value of `flash_ex_op` is ignored. If reading the status register fails (e.g., due to an SPI error), `sr[0]` and `sr[1]` will remain uninitialized. Later in `cros_flash_rtkfp_init`, this garbage data will be modified and written back to the flash chip, which could lock the chip into an unpredictable protection state.\n\nPlease change this function to return an `int` and propagate the error:\n\n```c\nstatic int flash_get_status(const struct device *dev, uint8_t *sr1, uint8_t *sr2)\n{\n\tconst struct cros_flash_rtkfp_config *cfg \u003d DRV_CONFIG(dev);\n\tuint8_t sr[2];\n\tint rv;\n\n\tcrec_flash_lock_mapped_storage(1);\n\trv \u003d flash_ex_op(cfg-\u003eflash_dev, FLASH_RTS5817_EX_OP_RD_SR, (uintptr_t)NULL,\n\t\t         sr);\n\tcrec_flash_lock_mapped_storage(0);\n\n\tif (rv \u003d\u003d 0) {\n\t\t*sr1 \u003d sr[0];\n\t\t*sr2 \u003d sr[1];\n\t}\n\n\treturn rv;\n}\n```\n[🔗](http://go/tj/d037d9a5-f6b3-4a33-8322-0a86a2e32ead)",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b47de5d5_5abd533f",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:06:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] If you delete `cros_flash_rtkfp_set_status_reg` as suggested above, this becomes:\n\n```c\nstatic int flash_set_status(const struct device *dev, uint8_t sr1, uint8_t sr2)\n{\n\tconst struct cros_flash_rtkfp_config *cfg \u003d DRV_CONFIG(dev);\n\tuint8_t regs[2] \u003d { sr1, sr2 };\n\tint rv;\n\n\tcrec_flash_lock_mapped_storage(1);\n\trv \u003d flash_ex_op(cfg-\u003eflash_dev, FLASH_RTS5817_EX_OP_WR_SR,\n\t\t\t (uintptr_t)regs, NULL);\n\tcrec_flash_lock_mapped_storage(0);\n\n\treturn rv;\n}\n```\n[🔗](http://go/tj/d037d9a5-f6b3-4a33-8322-0a86a2e32ead)",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d30a9ed0_097f29cd",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:06:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] With `flash_get_status` returning an `int`, this function should propagate its return value directly:\n\n```c\nstatic int cros_flash_rtkfp_get_status(const struct device *dev,\n\t\t\t\t       uint8_t *sr1, uint8_t *sr2)\n{\n\treturn flash_get_status(dev, sr1, sr2);\n}\n```\n[🔗](http://go/tj/d037d9a5-f6b3-4a33-8322-0a86a2e32ead)",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "508e02cf_460c5496",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T03:06:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Ensure you check and propagate the return value of `flash_get_status` here once it is updated to return an `int`:\n\n```c\n\tret \u003d flash_get_status(dev, \u0026sr1, \u0026sr2);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\tsr1 \u0026\u003d ~SPI_FLASH_SR1_SRP0;\n\tsr2 \u0026\u003d ~SPI_FLASH_SR2_SRP1;\n```\n[🔗](http://go/tj/d037d9a5-f6b3-4a33-8322-0a86a2e32ead)",
+      "range": {
+        "startLine": 141,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
