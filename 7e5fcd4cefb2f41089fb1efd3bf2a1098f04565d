@@ -26,6 +26,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be6c494f_9d944334",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:54Z",
+      "side": 1,
+      "message": "Rewrote the commit message as two concise prose paragraphs explaining why fp_task was refactored into FpSensorStateMachine without low-level syntax narration.",
+      "parentUuid": "908d91c2_e6f85360",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7e5fcd4cefb2f41089fb1efd3bf2a1098f04565d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79864ee9_6c256765",
@@ -40,6 +65,25 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n**CL Size \u0026 Scope:** Size: L (+738, -245). This CL is too large and violates the Single Logical Change rule. The non-test production diff exceeds 250 lines and bundles multiple independent refactorings that can be decoupled. Please split this into smaller, self-contained CLs:\n1. **CL 1:** Encapsulate enrollment session lifecycle in `FpEnrollSession`.\n2. **CL 2:** Extract the fingerprint task loop and state machine into `FpSensorStateMachine`.\n\n**Commit Message:** The description consists of code syntax translation (`State \u003d std::variant\u003c...\u003e`, `Command \u003d std::variant\u003c...\u003e`) without explaining the high-level functional intent or why the state machine refactoring is needed. See the inline comment on `/COMMIT_MSG`.\n\n**Architecture \u0026 Component Fit:** The typestate design and `std::variant` command structures cleanly encapsulate the sensor states.\n\n**Code Simplicity:** The extraction of `parse_command` and `transition_on_sensor_or_timer` significantly reduces the control-flow complexity of the original `fp_task()` loop.\n\n**Testing:** Excellent addition of hermetic unit tests in `fpsensor_state.cc` covering the new state machine commands and transitions.\n\n[🔗](http://go/tj/a344cdd5-432d-4ce2-a0d3-a4ddc13b6a57)",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7e5fcd4cefb2f41089fb1efd3bf2a1098f04565d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7217b189_d5663d73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:13:54Z",
+      "side": 1,
+      "message": "Moved enrollment session synchronization into CL 8619398 so this CL is strictly \u003c 250 non-test lines focused on FpSensorStateMachine with hermetic unit tests.",
+      "parentUuid": "79864ee9_6c256765",
       "isAi": true,
       "revId": "7e5fcd4cefb2f41089fb1efd3bf2a1098f04565d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
