@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a5ca319_14799ccc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:21:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ Works as intended. The reset cause correctly differentiates watchdog vs. cold power-up.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated inside the driver initialization sequence.\n*   **Code Simplicity:** ✅ Minimalist control flow.\n*   **Idiomaticity \u0026 Readability:** ✅ The code uses descriptive constants and bitmasks.\n*   **Security:** ✅ No security issues.\n*   **Testing:** ✅ Unit tests cover branches, boundary mutations, and assert exact determinism, fully addressing previous feedback.\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+86, -5)` — This is a single logical change.\n*   **Commit Message:** ✅ Concise, accurate, and omits unnecessary diff narration.\n\n[🔗](http://go/tj/3f5d758f-a024-4e48-8a06-42768864ab3b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c287e2830fc3ca0dc203f5f15891908ac9918c29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
