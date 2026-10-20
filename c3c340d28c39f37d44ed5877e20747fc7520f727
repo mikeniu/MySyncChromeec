@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a04b031_18a9cedc",
+        "filename": "common/system.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-20T18:05:40Z",
+      "side": 1,
+      "message": "Done.  Marked ret and copy __maybe_unused and dropped the extra #ifdef CONFIG_MPU block.",
+      "parentUuid": "4b82d5d3_e750e07f",
+      "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea9fb280_24394267",
@@ -52,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6ee497e_407ea36b",
+        "filename": "core/cortex-m/include/mpu.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-20T18:05:40Z",
+      "side": 1,
+      "message": "Done.  Moved the MPU register macro overrides into test/system.c before including mpu.c so core/cortex-m/include/mpu.h doesn\u0027t need any BOARD_HOST conditionals.",
+      "parentUuid": "ea9fb280_24394267",
+      "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "717ee904_34885a15",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-10-19T20:15:02Z",
       "side": 1,
       "message": "The commit message says this is conditional on unlocked, but it looks unconditional here.",
+      "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ae9b361_5de0ee58",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-20T18:05:40Z",
+      "side": 1,
+      "message": "Done.  Updated the commit message to clarify that the HOOK_SYSJUMP hook disables the MPU unconditionally (locked systems cannot reach jump_to_image() after system_disable_jump() enables the MPU).",
+      "parentUuid": "717ee904_34885a15",
       "revId": "c3c340d28c39f37d44ed5877e20747fc7520f727",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
