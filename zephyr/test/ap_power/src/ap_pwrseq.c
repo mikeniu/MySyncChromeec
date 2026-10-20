@@ -26,6 +26,9 @@
 
 #include <ap_power/ap_pwrseq.h>
 #include <ap_power_override_functions.h>
+#ifndef CONFIG_AP_PWRSEQ_DRIVER
+#include <x86_non_dsx_common_pwrseq_sm_handler.h>
+#endif
 
 LOG_MODULE_REGISTER(test_ap_pwrseq);
 
@@ -631,6 +634,42 @@ ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
 	zassert_not_null(pwrseq_thread);
 	zassert_equal(pwrseq_thread, get_ap_pwrseq_thread());
 }
+
+#ifndef CONFIG_AP_PWRSEQ_DRIVER
+ZTEST(ap_pwrseq, test_pwr_seq_initial_state)
+{
+	/* Bring system up to S0 */
+	power_up_test_g3_to_s0_helper();
+	zassert_equal(pwr_sm_get_state(), SYS_POWER_STATE_S0);
+
+	/*
+	 * Test 1: Late sysjump in S0.
+	 * SLEEP_MASK_AP_RUN should be set.
+	 */
+	enable_sleep(SLEEP_MASK_AP_RUN);
+	zassert_equal(atomic_get(&sleep_mask) & SLEEP_MASK_AP_RUN, 0);
+
+	system_set_reset_flags(EC_RESET_FLAG_SYSJUMP);
+	pwr_seq_set_initial_state();
+
+	zassert_equal(pwr_sm_get_state(), SYS_POWER_STATE_S0);
+	zassert_not_equal(atomic_get(&sleep_mask) & SLEEP_MASK_AP_RUN, 0);
+
+	system_clear_reset_flags(EC_RESET_FLAG_SYSJUMP);
+
+	/*
+	 * Test 2: Reset without sysjump flag while signals are in S0.
+	 * CPU should be forced to G3 and SLEEP_MASK_AP_RUN should NOT be set.
+	 */
+	enable_sleep(SLEEP_MASK_AP_RUN);
+	zassert_equal(atomic_get(&sleep_mask) & SLEEP_MASK_AP_RUN, 0);
+
+	pwr_seq_set_initial_state();
+
+	zassert_equal(pwr_sm_get_state(), SYS_POWER_STATE_G3);
+	zassert_equal(atomic_get(&sleep_mask) & SLEEP_MASK_AP_RUN, 0);
+}
+#endif /* !CONFIG_AP_PWRSEQ_DRIVER */
 
 void ap_pwrseq_after_test(void *data)
 {
