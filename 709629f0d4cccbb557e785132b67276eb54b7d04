@@ -1,6 +1,46 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "fff9c818_8924be0f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-10-20T00:03:01Z",
+      "side": 1,
+      "message": "I\u0027d rather say tps6699x here, since just \u0027tps\u0027 could refer to many things, including ones that aren\u0027t PDCs.",
+      "revId": "709629f0d4cccbb557e785132b67276eb54b7d04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a67257a5_53984296",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-10-20T00:03:01Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"intenally\" is a possible misspelling of \"internally\".\n\nTo bypass Spellchecker, ...\n\n\"intenally\" is a possible misspelling of \"internally\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 11,
+        "startChar": 25,
+        "endLine": 11,
+        "endChar": 34
+      },
+      "revId": "709629f0d4cccbb557e785132b67276eb54b7d04",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0d0c6279_a7532971",
