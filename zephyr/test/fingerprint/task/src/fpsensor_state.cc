@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <ec_commands.h>
 #include <fpsensor/fpsensor_state.h>
+#include <fpsensor/fpsensor_state_machine.h>
 #include <host_command.h>
 #include <span>
 
@@ -477,6 +478,93 @@ ZTEST_USER(fpsensor_state, test_fp_sensor_context_task_operations)
 	local_ctx.sensor_mode = FP_MODE_DECRYPT_TEMPLATE;
 	local_ctx.decrypt_and_commit_template();
 	zassert_equal(local_ctx.sensor_mode & FP_MODE_DECRYPT_TEMPLATE, 0u);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_command_parsing)
+{
+	{
+		constexpr auto cmd = FpSensorStateMachine::parse_command(
+			FpSensorMode::assume_valid(0));
+		static_assert(std::holds_alternative<
+			      FpSensorStateMachine::IdleCommand>(cmd));
+	}
+	{
+		constexpr auto cmd = FpSensorStateMachine::parse_command(
+			FpSensorMode::assume_valid(FP_MODE_MATCH));
+		static_assert(std::holds_alternative<
+			      FpSensorStateMachine::DetectFingerCommand>(cmd));
+		static_assert(
+			std::get<FpSensorStateMachine::DetectFingerCommand>(cmd)
+				.mode == FP_MODE_MATCH);
+	}
+	{
+		constexpr auto cmd = FpSensorStateMachine::parse_command(
+			FpSensorMode::assume_valid(
+				FP_MODE_CAPTURE |
+				(FP_CAPTURE_PATTERN0
+				 << FP_MODE_CAPTURE_TYPE_SHIFT)));
+		static_assert(std::holds_alternative<
+			      FpSensorStateMachine::ImmediateCaptureCommand>(
+			cmd));
+		static_assert(
+			std::get<FpSensorStateMachine::ImmediateCaptureCommand>(
+				cmd)
+				.capture_type.raw() == FP_CAPTURE_PATTERN0);
+	}
+	{
+		constexpr auto cmd = FpSensorStateMachine::parse_command(
+			FpSensorMode::assume_valid(FP_MODE_RESET_SENSOR));
+		static_assert(std::holds_alternative<
+			      FpSensorStateMachine::ResetSensorCommand>(cmd));
+	}
+	{
+		constexpr auto cmd = FpSensorStateMachine::parse_command(
+			FpSensorMode::assume_valid(FP_MODE_SENSOR_MAINTENANCE));
+		static_assert(std::holds_alternative<
+			      FpSensorStateMachine::MaintenanceCommand>(cmd));
+	}
+	{
+		constexpr auto cmd = FpSensorStateMachine::parse_command(
+			FpSensorMode::assume_valid(FP_MODE_ENCRYPT_TEMPLATE));
+		static_assert(std::holds_alternative<
+			      FpSensorStateMachine::EncryptTemplateCommand>(
+			cmd));
+	}
+	{
+		constexpr auto cmd = FpSensorStateMachine::parse_command(
+			FpSensorMode::assume_valid(FP_MODE_DECRYPT_TEMPLATE));
+		static_assert(std::holds_alternative<
+			      FpSensorStateMachine::DecryptTemplateCommand>(
+			cmd));
+	}
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_dispatch_finger_up)
+{
+	FpSensorContext local_ctx{};
+	FpSensorStateMachine sm{ local_ctx };
+	local_ctx.sensor_mode = FP_MODE_FINGER_UP;
+	sm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });
+	zassert_equal(sm.timeout_us(),
+		      FpSensorStateMachine::kFingerPollingDelayUs);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_dispatch_reset)
+{
+	FpSensorContext local_ctx{};
+	FpSensorStateMachine sm{ local_ctx };
+	local_ctx.sensor_mode = FP_MODE_RESET_SENSOR;
+	sm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });
+	zassert_equal(local_ctx.sensor_mode & FP_MODE_RESET_SENSOR, 0);
+}
+
+ZTEST_USER(fpsensor_state, test_state_machine_dispatch_maintenance)
+{
+	FpSensorContext local_ctx{};
+	FpSensorStateMachine sm{ local_ctx };
+	local_ctx.sensor_mode = FP_MODE_SENSOR_MAINTENANCE;
+	sm.handle_event(FpTaskEvent{ TASK_EVENT_UPDATE_CONFIG });
+	zassert_equal(local_ctx.sensor_mode & FP_MODE_SENSOR_MAINTENANCE, 0);
 }
 
 static void *fpsensor_setup(void)
