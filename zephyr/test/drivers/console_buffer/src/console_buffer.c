@@ -39,7 +39,11 @@ ZTEST_USER(console, test_buf_notify_null)
 	uint16_t write_count;
 	size_t consumed_count;
 
-	/* Flush the console buffer before we start. */
+	/* Flush the console buffer and any dropped logs message. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
 	zassert_ok(uart_console_read_buffer_init(), NULL);
 
 	/* Write a nul char to the buffer. */
@@ -113,6 +117,95 @@ ZTEST_USER(console, test_buf_dropped_logs)
 		      drops_isr, drops_mutex, drops_overflow);
 }
 
+/*
+ * A read too small for the dropped logs message leaves it pending, and the
+ * next read finishes the partially read line before inserting it.
+ */
+ZTEST_USER(console, test_buf_dropped_logs_partial_read)
+{
+	char buffer[200];
+	uint16_t write_count;
+	const char *msg = "1234567890\n";
+	size_t msg_len = strlen(msg);
+	uint32_t total_drops = 0;
+	uint32_t drops_isr = 0;
+	uint32_t drops_mutex = 0;
+	uint32_t drops_overflow = 0;
+
+	/* Flush console buffer and clear dropped log counters */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Overflow console_buf to record dropped logs */
+	for (size_t i = 0;
+	     i < (CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE / msg_len) + 5;
+	     i++) {
+		console_buf_notify_chars(msg, msg_len);
+	}
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* The message doesn't fit, so only log data is returned. */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer, 20,
+					    &write_count),
+		   NULL);
+	zassert_equal(write_count, 20, "got %d", write_count);
+	zassert_equal(0, strcmp(buffer, "1234567890\n12345678"), "got '%s'",
+		      buffer);
+
+	/* The rest of the line comes first, then the message. */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+	zassert_equal(0, strncmp(buffer, "90\nDropped ", 11), "got '%s'",
+		      buffer);
+	zassert_equal(sscanf(buffer + 3,
+			     "Dropped %u logs (ISR: %u, Mutex: %u, "
+			     "Overflow: %u)",
+			     &total_drops, &drops_isr, &drops_mutex,
+			     &drops_overflow),
+		      4, "got '%s'", buffer);
+	zassert_true(drops_overflow > 0, "got %u", drops_overflow);
+	zassert_equal(total_drops, drops_overflow, "got %u", total_drops);
+}
+
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS */
+
+/* CONSOLE_READ_NEXT reads the whole buffer across multiple reads. */
+ZTEST_USER(console, test_buf_read_next)
+{
+	static char all[CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE + 200];
+	char buffer[100];
+	uint16_t write_count;
+	size_t total = 0;
+	const char *msg = "read_next\n";
+	int reads = 0;
+
+	console_buf_notify_chars(msg, strlen(msg));
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	do {
+		zassert_ok(uart_console_read_buffer(CONSOLE_READ_NEXT, buffer,
+						    sizeof(buffer),
+						    &write_count),
+			   NULL);
+		if (write_count == 0)
+			break;
+		/* Drop the null terminator. */
+		zassert_true(total + write_count - 1 < sizeof(all));
+		memcpy(all + total, buffer, write_count - 1);
+		total += write_count - 1;
+	} while (++reads < 1000);
+
+	zassert_true(reads > 0);
+	zassert_true(total >= strlen(msg));
+	zassert_equal(0, memcmp(all + total - strlen(msg), msg, strlen(msg)),
+		      "buffer does not end with '%s'", msg);
+}
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
 extern struct k_mutex console_write_lock;
 
 static void isr_notify_wrapper(const void *arg)
