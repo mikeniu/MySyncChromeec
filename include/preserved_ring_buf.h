@@ -18,9 +18,6 @@
  *
  * This ring buffer does not support dequeuing, it can only be cleared by
  * resetting the buffer. This buffer is intended to be dumped all at once.
- *
- * The ring buffer supports uint8, uint16 or uint32 word sizes. It does not
- * support mixing word types on the same instance.
  */
 
 #ifndef PLATFORM_EC_INCLUDE_PRESERVED_RING_BUF_H_
@@ -30,11 +27,10 @@
 
 /* Static ring buffer properties */
 typedef struct {
-	/* Buffer capacity in words */
+	/* Buffer capacity in bytes */
 	const uint32_t capacity;
 	/* User specified version. Update if higher level schema changes. */
 	const uint32_t version;
-	const uint32_t word_size;
 } preserved_ring_buf_const_t;
 
 /* Preserved ring buffer properties */
@@ -43,51 +39,38 @@ typedef struct {
 	uint32_t checksum;
 	/* Write head. Only increments. Modulo with capacity to get index. */
 	uint32_t head;
-	/* Capacity of buffer in words */
+	/* Capacity of buffer in bytes */
 	uint32_t capacity;
 	/* User specified version. Update if higher level schema changes. */
 	uint32_t version;
-	/* Word size in bytes */
-	uint32_t word_size;
 } preserved_ring_buf_properties_t;
 
 typedef struct {
 	const preserved_ring_buf_const_t constants;
 	preserved_ring_buf_properties_t *properties;
-	union {
-		uint8_t *as_uint8;
-		uint16_t *as_uint16;
-		uint32_t *as_uint32;
-	} buffer;
+	uint8_t *buffer;
 } preserved_ring_buf_t;
 
-#define DECLARE_PRESERVED_RING_BUF(word_type, name, _capacity, _version)          \
-	/* Buffer capacity must be a factor of 2 */                               \
-	BUILD_ASSERT((_capacity & (_capacity - 1)) == 0);                         \
-	/* Word size must be 1, 2, or 4 */                                        \
-	BUILD_ASSERT((sizeof(word_type) == 1) || (sizeof(word_type) == 2) ||      \
-		     (sizeof(word_type) == 4));                                   \
-	static uint8_t _preserved_ring_buf_##name##_buffer                        \
-		[_capacity * sizeof(word_type)] __uncached __aligned(4)           \
-			__noinit_end_of_ram(                                      \
-				_preserved_ring_buf_##name##_buffer);             \
-	static preserved_ring_buf_properties_t                                    \
-		_preserved_ring_buf_##name##_properties __uncached __aligned(     \
-			4)                                                        \
-			__noinit_end_of_ram(                                      \
-				_preserved_ring_buf_##name##_properties);         \
-	static const preserved_ring_buf_t _preserved_ring_buf_##name##_data = { \
-			.buffer = { \
-				.as_uint8 = _preserved_ring_buf_##name##_buffer, \
-			}, \
-			.properties = &_preserved_ring_buf_##name##_properties, \
-			.constants = { \
-				.capacity = _capacity, \
-				.version = _version, \
-				.word_size = sizeof(word_type), \
-			}, \
-    	}; \
-	static const preserved_ring_buf_t *const name =                           \
+#define DECLARE_PRESERVED_RING_BUF(name, _capacity, _version)                    \
+	/* Buffer capacity must be a factor of 2 */                              \
+	BUILD_ASSERT((_capacity & (_capacity - 1)) == 0);                        \
+	static uint8_t _preserved_ring_buf_##name##_buffer[_capacity] __uncached \
+		__aligned(4) __noinit_end_of_ram(                                \
+			_preserved_ring_buf_##name##_buffer);                    \
+	static preserved_ring_buf_properties_t                                   \
+		_preserved_ring_buf_##name##_properties __uncached __aligned(    \
+			4)                                                       \
+			__noinit_end_of_ram(                                     \
+				_preserved_ring_buf_##name##_properties);        \
+	static const preserved_ring_buf_t _preserved_ring_buf_##name##_data = {\
+		.buffer = _preserved_ring_buf_##name##_buffer,                 \
+		.properties = &_preserved_ring_buf_##name##_properties,        \
+		.constants = {                                                 \
+			.capacity = _capacity,                                 \
+			.version = _version,                                   \
+		},                                                             \
+	}; \
+	static const preserved_ring_buf_t *const name =                          \
 		&_preserved_ring_buf_##name##_data
 /*
  * Zero the buffer and set all preserved properties to the constant
@@ -117,39 +100,22 @@ uint32_t preserved_ring_buf_version(const preserved_ring_buf_t *buf);
 uint32_t preserved_ring_buf_capacity(const preserved_ring_buf_t *buf);
 
 /*
- * Write a word to the buffer and increment head.
+ * Write a byte to the buffer and increment head.
  */
 static inline void preserved_ring_buf_write(const preserved_ring_buf_t *buf,
-					    const uint32_t word)
+					    const uint8_t byte)
 {
-	/* Capacity is a power of 2, so bitmask replaces modulo. */
 	const uint32_t index =
 		(buf->properties->head++ & (buf->constants.capacity - 1));
-	switch (buf->constants.word_size) {
-	case 1:
-		buf->properties->checksum +=
-			(word & 0xff) - buf->buffer.as_uint8[index];
-		buf->buffer.as_uint8[index] = word;
-		break;
-	case 2:
-		buf->properties->checksum +=
-			(word & 0xffff) - buf->buffer.as_uint16[index];
-		buf->buffer.as_uint16[index] = word;
-		break;
-	case 4:
-		buf->properties->checksum +=
-			word - buf->buffer.as_uint32[index];
-		buf->buffer.as_uint32[index] = word;
-		break;
-	default:
-		__builtin_unreachable();
-	}
+
+	buf->properties->checksum += byte - buf->buffer[index];
+	buf->buffer[index] = byte;
 }
 
 /*
- * Returns the word at the offset from the tail.
+ * Returns the byte at the offset from the tail.
  */
-uint32_t preserved_ring_buf_read(const preserved_ring_buf_t *buf,
-				 uint32_t offset);
+uint8_t preserved_ring_buf_read(const preserved_ring_buf_t *buf,
+				uint32_t offset);
 
 #endif /* PLATFORM_EC_INCLUDE_PRESERVED_RING_BUF_H_ */
