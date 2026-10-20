@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "383e80de_6ef84c2a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:08:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL.**\n\n### Review Summary\n\n*   **Functionality:** ✅ The test logic accurately exercises the driver API.\n*   **Architecture \u0026 Component Fit:** ✅ The tests integrate correctly with Zephyr\u0027s `ztest` framework.\n*   **Code Simplicity:** ✅ Test cases construct minimal state and verify behaviors directly.\n*   **Idiomaticity \u0026 Readability:** ✅ The tests appropriately use Zephyr\u0027s idiomatic assertion macros.\n*   **Security:** ✅ No security issues.\n*   **Testing:** ✅ Excellent boundary testing. Thank you for adding the $N+1$ upper boundary test (`test_acquire_image_large_buffer`) in this patchset.\n*   **CL Size \u0026 Scope:** ❌ Size: M (+151, -0). This CL violates the Single Logical Change rule by bundling tests for `finger_status` with tests for `acquire_image` and `convert_fp_capture_type_to_rts_capture_type`. Please split this into two separate CLs.\n*   **Commit Message:** ❌ The commit message lists independent testing categories and must be split along with the CL.\n\n[🔗](http://go/tj/45fea9eb-6008-48fe-9690-339fbc43dc90)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bf5327a6731fd49109132980cac70b8a98b0d3c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

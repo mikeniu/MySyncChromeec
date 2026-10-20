@@ -50,6 +50,32 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b5b4508_bc42798c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:08:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Yes, please split the CL. The review guidelines require strictly enforcing the Single Logical Change rule, even for small test-only CLs that touch the same suite. Splitting ensures that the `finger_status` tests and `acquire_image` tests can be independently reviewed, reverted, or bisected if needed. Thank you for accommodating!\n\n[🔗](http://go/tj/45fea9eb-6008-48fe-9690-339fbc43dc90)",
+      "parentUuid": "bc28af55_4a24ef23",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35a243ed_aa320433",
