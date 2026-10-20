@@ -18,6 +18,24 @@
       "isAi": true,
       "revId": "bf5327a6731fd49109132980cac70b8a98b0d3c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "214d208b_1211968e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:06:39Z",
+      "side": 1,
+      "message": "Done. acquire_image tests moved to 8617740.",
+      "parentUuid": "383e80de_6ef84c2a",
+      "revId": "bf5327a6731fd49109132980cac70b8a98b0d3c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
