@@ -4,6 +4,7 @@
  */
 
 #include "ap_reset_log.h"
+#include "common.h"
 #include "system_boot_time.h"
 #include "task_id.h"
 #include "zephyr_console_shim.h"
@@ -667,7 +668,7 @@ static int common_pwr_sm_run(int state)
  * Determine the current CPU state and ensure it
  * is matching what is required.
  */
-static void pwr_seq_set_initial_state(void)
+test_export_static void pwr_seq_set_initial_state(void)
 {
 	uint32_t reset_flags = system_get_reset_flags();
 	/* Determine current state using chipset specific handler */
@@ -680,6 +681,9 @@ static void pwr_seq_set_initial_state(void)
 	    (state != SYS_POWER_STATE_G3)) {
 		ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
 		state = SYS_POWER_STATE_G3;
+	}
+	if (state == SYS_POWER_STATE_S0) {
+		disable_sleep(SLEEP_MASK_AP_RUN);
 	}
 	pwr_sm_set_state(state);
 }
