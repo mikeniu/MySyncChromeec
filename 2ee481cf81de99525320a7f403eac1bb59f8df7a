@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e646c104_46e04a22",
+        "filename": "zephyr/test/chre/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T17:15:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3133af46_4e6f34f9",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 74
+      },
+      "revId": "2ee481cf81de99525320a7f403eac1bb59f8df7a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "715bc3cf_38635f13",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f899fd71_cf27bc7d",
+        "filename": "zephyr/test/chre/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T17:15:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "715bc3cf_38635f13",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 47
+      },
+      "revId": "2ee481cf81de99525320a7f403eac1bb59f8df7a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b0ffcfc_67397501",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-19T17:32:58Z",
       "side": 1,
       "message": "Do we need this Kconfig file? The test already pulls in `zephyr/subsys/chre/Kconfig`, right?",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 15
+      },
+      "revId": "2ee481cf81de99525320a7f403eac1bb59f8df7a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2655c1d_d8c9ff7a",
+        "filename": "zephyr/test/chre/Kconfig",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T17:15:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b0ffcfc_67397501",
       "range": {
         "startLine": 5,
         "startChar": 0,
