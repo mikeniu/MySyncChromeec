@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bd7a3c4_52b3b461",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:23:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/c70a0bbc-5347-46da-b13d-8987f6a97077)]\n\n### Review Summary\n* **Functionality:** Verified. The tests correctly mock and assert the success, failure, partial, and fast-finger error paths of `acquire_image`.\n* **Architecture \u0026 Component Fit:** Verified. Test cases correctly belong to the `rts5817maa` suite and mock the lower-layer private driver function `rts5817maa_sensor_acquire_image`.\n* **Code Simplicity:** Verified. Test methods are clean, declarative, and avoid complex branching or boilerplate setup logic.\n* **Idiomaticity \u0026 Readability:** Verified.\n* **Security:** Verified.\n* **Testing:** Verified. Complete BVA coverage including explicit bounds checks for exactly `N`, `N-1`, and `N+1` buffer sizes, as well as full coverage over the `capture_type` conversion.\n* **CL Size \u0026 Scope:** Size: M (+130, -0). The CL focuses entirely on adding tests for the `acquire_image` flow. This is a single atomic change.\n* **Commit Message:** Verified.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4c6a7d9f280de5f6216009b3ac85bf9a6b599401",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
