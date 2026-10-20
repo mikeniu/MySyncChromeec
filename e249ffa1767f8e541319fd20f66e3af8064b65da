@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2c18126_9ad02bad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 53
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T17:51:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/15e3363e-8b5d-4490-ab28-ed13bec66ff3)]\n\n**Review Summary**\n* **Functionality:** The patch correctly blocks legacy v0 template commits when fingerprint authentication is enabled by returning `EC_RES_ACCESS_DENIED`. This successfully forces the use of the authenticated v1 channel.\n* **Architecture \u0026 Component Fit:** The change correctly places the access denial check directly at the entry point of the legacy command handler.\n* **Code Simplicity:** The code is straightforward and implements the block with a minimal `if` statement.\n* **Idiomaticity \u0026 Readability:** The code is idiomatic and the explanatory comment clearly documents the security rationale.\n* **Security:** This introduces a solid security invariant that prevents arbitrary template injection via unauthenticated paths when the device is in a secure state.\n* **Testing \u0026 Test Coverage:** The two new tests added in this CL (`test_fp_command_template_v0_disabled_under_auth` and `test_fp_template_v0_disabled_under_auth`) provide excellent coverage for the new access denial logic. The previous issues regarding the unintended short-circuiting of existing tests have been successfully resolved by the prerequisite CL.\n* **CL Size \u0026 Scope:** Size: M (+51, -0). The CL is appropriately sized and focuses tightly on a single security enhancement.\n* **Commit Message:** The commit message accurately and concisely explains the rationale for the change and the added test coverage.\n\nTAG\u003dagy\nCONV\u003da8806a05-6a48-4e83-887f-14f625b72b73",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e249ffa1767f8e541319fd20f66e3af8064b65da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
