@@ -37,11 +37,15 @@ void print_stack_trace(const struct k_thread *thread)
 		return;
 	}
 
+	if (thread == NULL) {
+		return;
+	}
+
 	int frame_idx = 0;
 	char state[32];
 	uint32_t sp = 0;
 	struct arch_esf *esf = NULL;
-	bool is_current_thread = thread == k_current_get();
+	bool is_current_thread = (thread == get_current_thread());
 	char thread_name[16];
 
 	get_thread_name(thread, thread_name, sizeof(thread_name));
@@ -72,11 +76,15 @@ void get_thread_name(const struct k_thread *thread, char *name, size_t size)
 
 uint32_t get_stack_ptr(const struct k_thread *thread)
 {
+	if (thread == NULL) {
+		return 0;
+	}
+
 #if defined(CONFIG_ARM64)
 	/* We are assuming that the SP of interest is SP_EL1 */
 	return thread->callee_saved.sp_elx;
 #elif defined(CONFIG_ARM)
-	if (thread == k_current_get()) {
+	if (thread == get_current_thread()) {
 		uint32_t sp;
 		__asm__ volatile("mrs %0, psp" : "=r"(sp));
 		return sp;
@@ -93,7 +101,7 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 	return thread->callee_saved.esp;
 #endif
 #elif defined(CONFIG_RISCV)
-	if (thread == k_current_get()) {
+	if (thread == get_current_thread()) {
 		uint32_t sp;
 
 		if (k_is_in_isr()) {

@@ -229,21 +229,24 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
 	uint32_t exception_address = 0;
-	const char *thread_name;
-	struct k_thread *thread = k_current_get();
+	const char *thread_name = NULL;
+	struct k_thread *thread = get_current_thread();
 
 #ifdef CONFIG_RISCV
 	struct arch_esf *esf = (struct arch_esf *)get_stack_ptr(thread);
 
-	exception_address = esf->mepc;
+	if (esf != NULL) {
+		exception_address = esf->mepc;
+	}
 #elif CONFIG_CPU_CORTEX_M
-	struct arch_esf *esf;
-	/*
-	 * Watchdog warning should only be triggered while executing in thread
-	 * context, thus PSP will point to esf.
-	 */
-	__asm__ volatile("mrs %0, psp" : "=r"(esf));
-	exception_address = esf->basic.pc;
+	struct arch_esf *esf = NULL;
+
+	if (thread != NULL) {
+		__asm__ volatile("mrs %0, psp" : "=r"(esf));
+	}
+	if (esf != NULL) {
+		exception_address = esf->basic.pc;
+	}
 #endif
 
 	/* Save the current task id in panic info before any printk or thread
@@ -254,19 +257,21 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 */
 	panic_data_write_watchdog_warning(exception_address, thread);
 
-	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
+	if (IS_ENABLED(CONFIG_THREAD_NAME) && thread != NULL) {
 		thread_name = k_thread_name_get(thread);
-	} else {
+	}
+	if (thread_name == NULL) {
 		thread_name = "unknown";
 	}
 
 #ifdef CONFIG_RISCV
 	printk("WDT pre-warning MEPC:%p RA:%p THREAD:%p THREAD_NAME:%s\n",
-	       (void *)esf->mepc, (void *)esf->ra, (void *)thread, thread_name);
+	       esf ? (void *)esf->mepc : NULL, esf ? (void *)esf->ra : NULL,
+	       (void *)thread, thread_name);
 #elif CONFIG_CPU_CORTEX_M
 	printk("WDT pre-warning PC:%p LR:%p THREAD:%p THREAD_NAME:%s\n",
-	       (void *)esf->basic.pc, (void *)esf->basic.lr, (void *)thread,
-	       thread_name);
+	       esf ? (void *)esf->basic.pc : NULL,
+	       esf ? (void *)esf->basic.lr : NULL, (void *)thread, thread_name);
 #else
 	/* TODO(b/176523207): watchdog warning message */
 	printk("Watchdog deadline is close! THREAD:%p THREAD_NAME:%s\n",

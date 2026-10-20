@@ -148,10 +148,6 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 		}
 	}
 
-	if (thread_id->base.thread_state & _THREAD_DUMMY) {
-		return TASK_ID_INVALID;
-	}
-
 	LOG_ERR("Failed to map thread to task: thread_id=%p, name=%s",
 		thread_id, SAFE_THREAD_NAME(thread_id));
 
@@ -160,12 +156,13 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 
 task_id_t task_get_current(void)
 {
-	/* k_current_get() is not valid pre kernel */
-	if (k_is_pre_kernel()) {
+	k_tid_t thread = get_current_thread();
+
+	if (thread == NULL) {
 		return TASK_ID_INVALID;
 	}
 
-	return thread_id_to_task_id(k_current_get());
+	return thread_id_to_task_id(thread);
 }
 
 void task_set_event(task_id_t cros_task_id, uint32_t event)

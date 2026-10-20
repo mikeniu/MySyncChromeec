@@ -4,6 +4,7 @@
  */
 
 #include "ec_tasks.h"
+#include "host_command.h"
 #include "task.h"
 #include "timer.h"
 
@@ -283,6 +284,7 @@ static int pre_kernel(void)
 {
 	zassert_false(pre_kernel_ran);
 	zassert_true(k_is_pre_kernel());
+	zassert_is_null(get_current_thread());
 	zassert_equal(TASK_ID_INVALID, task_get_current());
 	pre_kernel_ran = true;
 	return 0;
@@ -299,6 +301,7 @@ static int post_kernel(void)
 {
 	zassert_false(post_kernel_ran);
 	zassert_false(k_is_pre_kernel());
+	zassert_equal(get_main_thread(), get_current_thread());
 	zassert_equal(TASK_ID_MAIN, task_get_current());
 	post_kernel_ran = true;
 	return 0;
