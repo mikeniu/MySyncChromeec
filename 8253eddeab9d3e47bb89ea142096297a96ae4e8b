@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc28af55_4a24ef23",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:54:23Z",
+      "side": 1,
+      "message": "Not split for now; the finger_status and acquire_image tests are small and in the same suite. Happy to split if you still prefer.",
+      "parentUuid": "58217616_1f250264",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 9999
+      },
+      "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35a243ed_aa320433",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL.** \n\n### Review Summary\n\n*   **Functionality:** ✅ The test logic accurately exercises the driver API.\n*   **Architecture \u0026 Component Fit:** ✅ The tests integrate correctly with Zephyr`s `ztest` framework.\n*   **Code Simplicity:** ✅ Test cases construct minimal state and verify behaviors directly.\n*   **Idiomaticity \u0026 Readability:** ✅ The tests appropriately use Zephyr`s idiomatic assertion macros.\n*   **Security:** ✅ No security issues.\n*   **Testing:** ❌ Missing an off-by-one test for the upper boundary ($N+1$) of the image buffer size.\n*   **CL Size \u0026 Scope:** ❌ Size: M (+139, -0). This CL violates the Single Logical Change rule by bundling tests for `finger_status` with tests for `acquire_image`. Please split this into two CLs:\n    1.  CL 1: Unit tests for `finger_status`\n    2.  CL 2: Unit tests for `acquire_image` and `convert_fp_capture_type_to_rts_capture_type`\n*   **Commit Message:** ❌ The commit message lists independent testing categories and must be split along with the CL (see inline comment for replacement text).\n\n[🔗](http://go/tj/12b95bed-4d36-4bd3-82cf-7b5d3afe5d30)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ef80a04_a6d7dda1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:54:23Z",
+      "side": 1,
+      "message": "The N+1 boundary test is added in ps4. Not splitting for now (see the COMMIT_MSG thread).",
+      "parentUuid": "35a243ed_aa320433",
       "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae5ab5b8_a108d11e",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:54:23Z",
+      "side": 1,
+      "message": "Done in ps4: added test_acquire_image_large_buffer.",
+      "parentUuid": "aae25340_f714cf4a",
+      "range": {
+        "startLine": 423,
+        "startChar": 0,
+        "endLine": 433,
+        "endChar": 9999
+      },
       "revId": "8253eddeab9d3e47bb89ea142096297a96ae4e8b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
