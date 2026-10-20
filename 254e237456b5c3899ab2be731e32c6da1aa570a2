@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9f3cd7d_cbeba1f2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Commit Message Inaccurate**\n\nThe commit message mentions introducing `FpEncryptedKeyBlob`, but this class is not included in the current patchset.\n\nPlease update the commit message to accurately reflect only the changes included in this CL (i.e., `FpP256Key` and `FpPairingKey`).\n\n```text\nIntroduce FpP256Key and FpPairingKey to encapsulate\nNIST P-256 key lifecycle management, pairing key wrapping, and automatic\nmemory cleansing across authentication handshakes.\n```\n[🔗](http://go/tj/9e33ab0e-2da8-4690-9da0-e5ee6e427dc4)",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fec201d_9afeca5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n*   **Functionality:** The wrappers `FpP256Key` and `FpPairingKey` correctly encapsulate P-256 keys and pairing key operations.\n*   **Architecture \u0026 Component Fit:** Using RAII to manage BoringSSL key lifecycles and secret memory is a strong architectural improvement that prevents memory leaks and duplicate cleanup logic.\n*   **Code Simplicity:** The abstraction cleanly simplifies the `fpsensor_auth_ascp` and `fpsensor_auth_handshake` commands by eliminating manual pointer and error-handling boilerplate.\n*   **Idiomaticity \u0026 Readability:** Excellent use of modern C++ idioms (`std::expected`, `std::span`, `std::optional`, `std::ranges::copy`, and `CleanseWrapper`).\n*   **Security:** Cryptographic primitives properly leverage `CleanseWrapper` and `bssl::UniquePtr` to ensure secrets are cleansed and memory is freed immediately upon exiting scope.\n*   **Testing:** Boundary conditions (such as invalid version tags and bad uncompressed point headers) are well tested. However, several error paths (e.g., `key \u003d\u003d nullptr` branches during private key parsing, default-constructed key shared secret computation, and `decrypt_pairing_key` failures) lack automated test coverage.\n*   **CL Size \u0026 Scope:** Size: M (+196, -51). The CL is appropriately scoped to introducing RAII for authentication keys and represents a single logical change.\n*   **Commit Message:** The commit message effectively provides the *Why* and *What* in concise prose, but it inaccurately mentions introducing `FpEncryptedKeyBlob`, which is absent from the patchset.\n\nPlease address the missing test coverage and the commit message inaccuracy noted in the inline comments.\n[🔗](http://go/tj/9e33ab0e-2da8-4690-9da0-e5ee6e427dc4)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9e33bbc_4e2d087e",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Missing Test Coverage**\n\nThis error path (`key \u003d\u003d nullptr`) lacks test coverage. Per the Strict Automated Test Requirement, please add a unit test in `fpsensor_auth_commands.cc` that verifies `FpP256Key::from_private_key` correctly returns `EC_ERROR_INVAL` when passed invalid private key bytes.\n[🔗](http://go/tj/9e33ab0e-2da8-4690-9da0-e5ee6e427dc4)",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 328,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6abec48d_331dcfd7",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Missing Test Coverage**\n\nThis boundary condition (`key_ \u003d\u003d nullptr || peer_public_key.key_ \u003d\u003d nullptr`) lacks test coverage. Please add a test that verifies `compute_shared_secret` returns `EC_ERROR_INVAL` when called on a default-constructed `FpP256Key` or with a default-constructed peer key.\n[🔗](http://go/tj/9e33ab0e-2da8-4690-9da0-e5ee6e427dc4)",
+      "range": {
+        "startLine": 343,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68780438_c18aab71",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Missing Test Coverage**\n\nThis error path is lacking test coverage. Please add a unit test verifying that `FpPairingKey::unwrap_into` correctly returns the expected error when `decrypt_pairing_key` fails (e.g., when passed a corrupted or invalid ciphertext blob).\n[🔗](http://go/tj/9e33ab0e-2da8-4690-9da0-e5ee6e427dc4)",
+      "range": {
+        "startLine": 393,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "254e237456b5c3899ab2be731e32c6da1aa570a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
