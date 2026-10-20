@@ -16,6 +16,24 @@
       "message": "Nit: Might be nice as a follow up to split this file up per architecture so we can clean up all these `CONFIG_[ARM|X86|..]` ifdefs",
       "revId": "da8123b9abc4ab14f25442e60e0e19620b361396",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dd1c228_27ebf0f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-20T20:19:33Z",
+      "side": 1,
+      "message": "Exploring this in https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8613052.",
+      "parentUuid": "c263c15f_392c1d69",
+      "revId": "da8123b9abc4ab14f25442e60e0e19620b361396",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
