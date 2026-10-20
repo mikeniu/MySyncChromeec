@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_NPCX_CLOCK_H_
+#error "Upstream chip DTSI (<nuvoton/npcx*.dtsi>) must be included before <cros/nuvoton/...>"
+#endif
+
 #include <cros/binman.dtsi>
 
 / {
