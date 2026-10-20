@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "ec_commands.h"
+#include "host_command.h"
 #include "overflow.h"
 #include "timer.h"
 
@@ -38,6 +39,21 @@ struct FpClock {
 };
 
 using FpTimestamp = FpClock::time_point;
+
+struct FpRateLimiter {
+	FpClock::duration cooldown = std::chrono::seconds(1);
+	FpTimestamp deadline{};
+
+	[[nodiscard]] constexpr std::expected<void, ec_host_cmd_status>
+	try_acquire(FpTimestamp now = FpClock::now()) noexcept
+	{
+		if (now < deadline) {
+			return std::unexpected(EC_HOST_CMD_BUSY);
+		}
+		deadline = now + cooldown;
+		return {};
+	}
+};
 
 /**
  * Test that size+offset does not exceed buffer_size
