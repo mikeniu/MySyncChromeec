@@ -134,14 +134,29 @@ ZTEST(watchdog, test_wdt_warning_handler)
 	struct panic_data *pdata = panic_get_data();
 
 	zassert_not_null(pdata);
-	zassert_equal(PANIC_SW_WATCHDOG_WARN, panic_get_reason_reg(pdata),
+
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_WATCHDOG_PANIC_DATA)) {
+		zassert_equal(PANIC_SW_WATCHDOG_WARN,
+			      panic_get_reason_reg(pdata));
+		zassert_equal((uint8_t)(uintptr_t)k_current_get(),
+			      panic_get_exception_reg(pdata),
+			      "Panic exception should match current thread id");
+		zassert_equal(
+			0, panic_get_info_reg(pdata),
+			"Panic info should match exception address (0 on posix)");
+		return;
+	}
+
+	zassert_equal(PANIC_ARCH_WATCHDOG, pdata->arch);
+	zassert_true(pdata->wd.struct_flags & WATCHDOG_PANIC_DATA_FLAG_WARNING);
+
+	zassert_equal(PANIC_SW_WATCHDOG, panic_get_reason_reg(pdata),
 		      "Watchdog warning panic reason was not set");
 
-	zassert_equal((uint8_t)(uintptr_t)k_current_get(),
-		      panic_get_exception_reg(pdata),
-		      "Panic exception should match current thread id");
-	zassert_equal(0, panic_get_info_reg(pdata),
-		      "Panic info should match exception address (0 on posix)");
+	zassert_equal((uint32_t)(uintptr_t)k_current_get(), pdata->wd.thread_id,
+		      "Panic thread ID should match current thread");
+	zassert_equal(0, pdata->wd.pc,
+		      "Panic PC should match exception address (0 on posix)");
 }
 
 /**

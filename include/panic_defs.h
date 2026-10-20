@@ -8,7 +8,17 @@
 #ifndef PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
 #define PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
 
+#include <stddef.h>
 #include <stdint.h>
+
+#ifdef CHROMIUM_EC
+#include "compile_time_macros.h"
+#else
+/* If BUILD_ASSERT isn't already defined, make it a no-op */
+#ifndef BUILD_ASSERT
+#define BUILD_ASSERT(_cond)
+#endif /* !BUILD_ASSERT */
+#endif /* CHROMIUM_EC */
 
 #ifdef __cplusplus
 extern "C" {
@@ -135,6 +145,48 @@ struct posix_panic_data {
 	uint8_t reserved[3];
 };
 
+/* Flags for watchdog_panic_data.struct_flags */
+/* Written by the watchdog warning; cleared by RW after a watchdog reset. */
+#define WATCHDOG_PANIC_DATA_FLAG_WARNING BIT(0)
+
+#define WATCHDOG_PANIC_DATA_MAJOR_VERSION 1
+#define WATCHDOG_PANIC_DATA_MINOR_VERSION 0
+
+/*
+ * Architecture-agnostic watchdog warning data (PANIC_ARCH_WATCHDOG).
+ *
+ * Images that predate PANIC_ARCH_WATCHDOG ignore arch and read the software
+ * panic reason from a fixed per-arch offset. reason_x86, reason_cm and
+ * reason_riscv sit at those offsets and all hold the same reason, so any
+ * image recognizes a watchdog panic and leaves the data intact.
+ *
+ * Layout rules (see docs/panic_data.md):
+ * - Minor version: append fields only.
+ * - Major version: required for any removal/reorder. The reason_* fields and
+ *   the version bytes must stay at their current offsets.
+ * - Total size must not exceed sizeof(struct cortex_panic_data) (104 bytes) so
+ *   sizeof(struct panic_data) is unchanged on every board.
+ */
+struct watchdog_panic_data {
+	uint32_t reason_x86; /* Panic reason at the x86/NDS32 reason offset */
+	uint8_t struct_major_version; /* WATCHDOG_PANIC_DATA_MAJOR_VERSION */
+	uint8_t struct_minor_version; /* WATCHDOG_PANIC_DATA_MINOR_VERSION */
+	uint16_t struct_flags; /* WATCHDOG_PANIC_DATA_FLAG_* */
+	uint32_t thread_id; /* Thread running when the warning fired */
+	uint32_t reason_cm; /* Panic reason at the Cortex-M reason offset */
+	uint32_t pc; /* Thread PC when the warning fired (MEPC on RISC-V) */
+	uint32_t lr; /* Thread LR when the warning fired (RA on RISC-V) */
+	uint32_t sp; /* Thread SP at exception entry */
+	char image_version[16]; /* Last 16 chars of the version, no NUL */
+	uint32_t reason_riscv; /* Panic reason at the RISC-V reason offset */
+	uint32_t uptime; /* ms since boot; wraps at ~49.7 days */
+	uint32_t reset_flags; /* system_get_reset_flags() */
+	/*
+	 * TODO(b/496927100): Add power_signals, power_state, battery_level,
+	 * and isr_depth.
+	 */
+};
+
 /* Data saved across reboots */
 struct panic_data {
 	uint8_t arch; /* Architecture (PANIC_ARCH_*) */
@@ -152,6 +204,7 @@ struct panic_data {
 		struct rv32i_panic_data riscv; /* RISC-V RV32I */
 #endif
 		struct posix_panic_data posix; /* POSIX (native_sim) */
+		struct watchdog_panic_data wd; /* Watchdog warning */
 	};
 
 	/*
@@ -161,6 +214,24 @@ struct panic_data {
 	uint32_t struct_size; /* Size of this struct */
 	uint32_t magic; /* PANIC_SAVE_MAGIC if valid */
 };
+
+/*
+ * Keep the reason_* fields at the legacy reason offsets. The size is frozen
+ * for v1.0; the <= check is the ceiling for future minor versions.
+ */
+BUILD_ASSERT(sizeof(struct watchdog_panic_data) == 56);
+BUILD_ASSERT(sizeof(struct watchdog_panic_data) <=
+	     sizeof(struct cortex_panic_data));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_x86) ==
+	     offsetof(struct panic_data, x86.vector));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_x86) ==
+	     offsetof(struct panic_data, nds_n8.itype));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_cm) ==
+	     offsetof(struct panic_data, cm.regs[CORTEX_PANIC_REGISTER_R4]));
+#ifndef CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_riscv) ==
+	     offsetof(struct panic_data, riscv.regs[11]));
+#endif
 
 #define PANIC_DATA_MAGIC 0x21636e50 /* "Pnc!" */
 #define PANIC_DATA_VERSION 2
@@ -173,6 +244,7 @@ enum panic_arch {
 	PANIC_ARCH_RISCV_RV32I = 4, /* RISC-V RV32I */
 #endif
 	PANIC_ARCH_POSIX = 5, /* POSIX (native_sim) */
+	PANIC_ARCH_WATCHDOG = 6, /* Arch-independent watchdog_panic_data */
 };
 
 #define PANIC_ZEPHYR_FATAL_ERROR 0xDEAD6800
