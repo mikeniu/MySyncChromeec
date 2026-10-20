@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f47ae9e7_85e5a1bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T10:07:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **CL Size \u0026 Scope:** `Size: S (+30, -0)`. The CL has been successfully split into a single logical change introducing the driver configuration and data structs.\n* **Functionality:** Looks good. The header properly declares the necessary driver hardware structures.\n* **Architecture \u0026 Component Fit:** The standalone driver config/data header aligns well with clean abstraction layers.\n* **Code Simplicity:** Minimal declarations.\n* **Idiomaticity \u0026 Readability:** Clean and idiomatic C struct definitions with proper include guards.\n* **Security:** N/A. No implementation logic introduced.\n* **Testing:** N/A. Since this CL only introduces declarative headers (structs, enums, function signatures) with no executable logic, automated test coverage is not required here.\n* **Commit Message:** Clear and concise explanation of the header\u0027s purpose. [🔗](http://go/tj/4cb53f17-442c-4937-b7e3-d4458f44a56b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b41c87a17e6d162414929a707e8c194fc033838a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
