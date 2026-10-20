@@ -179,7 +179,7 @@ EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_PANIC_LOG_READ, host_command_read_panic_log,
 
 test_export_static void panic_log_corrupt(void)
 {
-	panic_log->properties->checksum = -1;
+	panic_log->properties->start_magic = 0;
 }
 
 static int command_panic_log(int argc, const char **argv)
