@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2c0fb0d_26f82440",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T09:33:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ Code adds the RTS5817MAA sensor to `realtekfp` and enables it properly.\n*   **Architecture \u0026 Component Fit:** ✅ Follows existing patterns for device tree integration and sensor shim.\n*   **Code Simplicity:** ✅ Uses a macro for frame properties to avoid duplication across configs.\n*   **Idiomaticity \u0026 Readability:** ✅ Configuration and code are standard and readable. Kconfig directives are correct.\n*   **Security:** ✅ No security implications.\n*   **Testing:** ✅ This CL consists entirely of declarative hardware configuration and compile-time preprocessor mappings, which falls under the hardware/physical exception for automated unit tests.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+76, -0). This CL represents a single, tightly focused logical change (integrating the `RTS5817MAA` sensor on the `realtekfp` board).\n*   **Commit Message:** ✅ Clear, concise, and properly formatted with `BUG` and `TEST` tags.\n\n[🔗](http://go/tj/258356da-a138-4817-9e5a-8785221fb6b2)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4e1079c1c10b73994b644a099256ef06314ee8f2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
