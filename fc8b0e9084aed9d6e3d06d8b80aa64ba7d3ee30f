@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67091791_a2fb62bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:18:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please add tests to this CL**\n\n### Review Summary\n\n*   **Functionality:** Found a potential issue where `convert_rts_get_image_error_code` can leak vendor-specific positive enum values (like `RTS_FP_POOR_QUALITY`) or unmapped negatives to the caller instead of standard negative error codes. See inline comment.\n*   **Architecture \u0026 Component Fit:** The driver correctly encapsulates sensor interactions and maps to standard Cros EC APIs.\n*   **Code Simplicity:** The driver implementation is straightforward and makes good use of guard clauses.\n*   **Idiomaticity \u0026 Readability:** Previous issues with missing `static` modifiers and initialization error masking have been resolved.\n*   **Security:** No obvious vulnerabilities or memory leaks. `rts5817maa_irq` safely delegates to the callback.\n*   **Testing \u0026 Test Coverage:** Missing automated test coverage in this CL. The commit message states *\"Unit tests for the driver are added in a follow-up change.\"* However, the review guidelines strictly require that unit tests testing a CL\u0027s own new production behavior must be included in the **same** CL. Splitting tests into a follow-up CL violates the Single Logical Change rule and the Strict Automated Test Requirement. Please move the driver unit tests into this CL.\n*   **CL Size \u0026 Scope:** Size: L (+401, -0). Although the production code exceeds 250 lines, a single driver implementation file is difficult to split without leaving dead code. Please prioritize adding the unit tests to this CL first to ensure the new behavior is fully covered.\n*   **Commit Message:** The `TEST\u003d` tags currently document a test command that only works when a follow-up CL is applied. Once unit tests are added to this CL, update the `TEST\u003d` line to reflect the standalone verification command for this patchset.\n\n[🔗](http://go/tj/fb64d767-657a-4435-8092-5997823e25c3)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fc8b0e9084aed9d6e3d06d8b80aa64ba7d3ee30f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a2d8709_0a3e6960",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T06:18:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nReturning the raw `rts_fp_return_t` code in the `default` case can leak vendor-specific positive integers (e.g., `RTS_FP_POOR_QUALITY \u003d 6`) or unmapped vendor negatives directly up to the caller. The Zephyr/Cros EC fingerprint API expects standard negative error codes (like `-EIO` or `-EINVAL`) for failures.\n\nPlease explicitly handle `RTS_FP_SUCCESS` (to return 0) and map all other unhandled vendor errors to a standard negative error code:\n\n```c\nstatic int convert_rts_get_image_error_code(rts_fp_return_t code)\n{\n\tswitch (code) {\n\tcase RTS_FP_SUCCESS:\n\t\treturn 0;\n\tcase RTS_ERROR_FAST_FINGER_UP:\n\t\treturn FINGERPRINT_SENSOR_SCAN_TOO_FAST;\n\tcase RTS_ERROR_IMAGE_PARTIAL:\n\t\treturn FINGERPRINT_SENSOR_SCAN_LOW_SENSOR_COVERAGE;\n\tdefault:\n\t\treturn -EIO;\n\t}\n}\n```\n\n[🔗](http://go/tj/fb64d767-657a-4435-8092-5997823e25c3)",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fc8b0e9084aed9d6e3d06d8b80aa64ba7d3ee30f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
