@@ -45,8 +45,14 @@ LOG_MODULE_REGISTER(cros_flash, LOG_LEVEL_ERR);
 #error "No suitable devicetree overlay specified for zephyr_flash_controller"
 #endif
 
+/* The flash protection for spi nor chips goes from bottom to top.
+ * The EC application uses the from bottom to top scheme for
+ * RO -> [RB ->] -> RW protection.
+ */
+#define FLASH_PROTECTION_START 0
+
 struct cros_flash_rtkfp_data {
-	int sw_protected;
+	bool sw_protected;
 };
 
 struct cros_flash_rtkfp_config {
@@ -199,6 +205,98 @@ static int cros_flash_rtkfp_erase(const struct device *dev, int offset,
 	return ret;
 }
 
+static int cros_flash_rtkfp_get_protect(const struct device *dev, int bank)
+{
+	struct cros_flash_rtkfp_data *data = DRV_DATA(dev);
+	unsigned int addr_start = bank * CONFIG_FLASH_BANK_SIZE;
+
+	/*
+	 * The physical_get_protect returns protection state until reboot,
+	 * so it is used to determine *_NOW flags.
+	 *
+	 * Make sure flash protection is enabled and software protection is
+	 * enabled.
+	 */
+	if (!data->sw_protected && (addr_start >= CONFIG_WP_STORAGE_OFF)) {
+		return 0;
+	}
+
+	if (flash_check_prot_reg(dev, addr_start, CONFIG_FLASH_BANK_SIZE) ==
+	    EC_ERROR_ACCESS_DENIED) {
+		return 1;
+	}
+
+	return 0;
+}
+
+static uint32_t cros_flash_rtkfp_get_protect_flags(const struct device *dev)
+{
+	struct cros_flash_rtkfp_data *data = DRV_DATA(dev);
+	uint32_t flags = 0;
+	uint8_t sr1, sr2;
+	unsigned int prot_start;
+	unsigned int prot_end;
+	unsigned int prot_len;
+	int ret;
+
+	ret = flash_get_status(dev, &sr1, &sr2);
+	if (ret) {
+		return EC_FLASH_PROTECT_ERROR_UNKNOWN;
+	}
+
+	/*
+	 * Make sure SRP bits are cleared - only software write protection.
+	 * The HW WP pin is not used.
+	 */
+	if ((sr1 & SPI_FLASH_SR1_SRP0) || (sr2 & SPI_FLASH_SR2_SRP1)) {
+		return EC_FLASH_PROTECT_ERROR_INCONSISTENT;
+	}
+
+	ret = spi_flash_reg_to_protect(sr1, sr2, &prot_start, &prot_len);
+	if (ret) {
+		return EC_FLASH_PROTECT_ERROR_UNKNOWN;
+	}
+	prot_end = prot_start + prot_len;
+
+	/* Check unexpected state. */
+	if (prot_start != FLASH_PROTECTION_START) {
+		flags = EC_FLASH_PROTECT_ERROR_INCONSISTENT;
+		return flags;
+	}
+
+	/* Check if ranges fully overlap. This logic assumes a certain flash
+	 * layout: RO -> ROLLBACKS -> RW.
+	 */
+	if (prot_end >= (CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE)) {
+		flags |= EC_FLASH_PROTECT_RO_AT_BOOT;
+	}
+#ifdef CONFIG_ROLLBACK
+	if (prot_end >= (CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE)) {
+		flags |= EC_FLASH_PROTECT_ROLLBACK_AT_BOOT;
+	}
+#endif /* CONFIG_ROLLBACK */
+	if (prot_end >= (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)) {
+		flags |= EC_FLASH_PROTECT_ALL_AT_BOOT;
+	}
+
+	/* Software protection is enabled. Add proper _NOW flags. */
+	if (data->sw_protected) {
+		if (flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
+			flags |= EC_FLASH_PROTECT_RO_NOW;
+		}
+#ifdef CONFIG_ROLLBACK
+		if (flags & EC_FLASH_PROTECT_ROLLBACK_AT_BOOT) {
+			flags |= EC_FLASH_PROTECT_ROLLBACK_NOW;
+		}
+#endif /* CONFIG_ROLLBACK */
+		if (flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
+			flags |= EC_FLASH_PROTECT_ALL_NOW;
+		}
+	}
+
+	return flags;
+}
+
 static int cros_flash_rtkfp_sw_protect(const struct device *dev, bool enable)
 {
 	const struct cros_flash_rtkfp_config *cfg = DRV_CONFIG(dev);
@@ -243,7 +341,7 @@ static int cros_flash_rtkfp_init(const struct device *dev)
 		if (ret) {
 			return ret;
 		}
-		data->sw_protected = 1;
+		data->sw_protected = true;
 	}
 
 	return EC_SUCCESS;
@@ -254,6 +352,8 @@ static const struct cros_flash_driver_api cros_flash_rtkfp_driver_api = {
 	.init = cros_flash_rtkfp_init,
 	.physical_write = cros_flash_rtkfp_write,
 	.physical_erase = cros_flash_rtkfp_erase,
+	.physical_get_protect = cros_flash_rtkfp_get_protect,
+	.physical_get_protect_flags = cros_flash_rtkfp_get_protect_flags,
 	.physical_get_status = flash_get_status,
 };
 
@@ -264,7 +364,7 @@ static int flash_rtkfp_init(const struct device *dev)
 	const struct cros_flash_rtkfp_config *cfg = DRV_CONFIG(dev);
 	struct cros_flash_rtkfp_data *data = DRV_DATA(dev);
 
-	data->sw_protected = 0;
+	data->sw_protected = false;
 
 	if (!device_is_ready(cfg->flash_dev)) {
 		LOG_ERR("device %s not ready", cfg->flash_dev->name);
