@@ -3,6 +3,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "882951da_60ca9138",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n**CL Size \u0026 Scope:** Size: L (+208, -69). The production (non-test) diff is \u003c 250 lines (162 lines) and implements a single cohesive logical change (extracting `FpSensorStateMachine`). The size is now acceptable. ✅\n\n**Architecture \u0026 Component Fit:** The `std::variant` dispatch combined with `std::visit` simplifies the monolithic event loop drastically, creating a clean typestate boundary that natively models mutually exclusive configurations.\n\n**Testing:** ❌ There are blocking test defects regarding weak test oracles (`static_assert(std::holds_alternative\u003c...\u003e)`) and missing test coverage for the runtime state transitions. See the inline comment in `fpsensor_state.cc` for a drop-in test suite snippet to resolve this.\n\n[🔗](http://go/tj/845db0c7-e228-4196-abd6-68bca82c6b3a)",
+      "isAi": true,
+      "revId": "93d2bb5391530b50bc4d9282409ade053d7fdb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dc6ccc05_29234d2c",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
         "patchSetId": 2
@@ -21,6 +39,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "93d2bb5391530b50bc4d9282409ade053d7fdb9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b36a2de_ef368f4f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:46Z",
+      "side": 1,
+      "message": "Strengthened test_state_machine_command_parsing to assert the inner DetectFingerCommand::mode and ImmediateCaptureCommand::capture_type values, and added test_state_machine_dispatch_reset and test_state_machine_dispatch_maintenance.",
+      "parentUuid": "dc6ccc05_29234d2c",
+      "range": {
+        "startLine": 446,
+        "startChar": 0,
+        "endLine": 482,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "93d2bb5391530b50bc4d9282409ade053d7fdb9d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
