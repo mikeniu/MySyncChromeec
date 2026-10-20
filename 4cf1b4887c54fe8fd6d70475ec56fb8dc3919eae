@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e9b054c_fddd20d4",
+        "filename": "zephyr/subsys/ucsi/ppm_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 627,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T16:42:13Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Consider moving this macro definition to the top of the file alongside other configurations, or inside `ppm_common_taskloop` if it is only intended to be used there, to align with standard formatting.",
+      "range": {
+        "startLine": 627,
+        "startChar": 0,
+        "endLine": 627,
+        "endChar": 0
+      },
+      "revId": "4cf1b4887c54fe8fd6d70475ec56fb8dc3919eae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aba5a5df_f4364d19",
+        "filename": "zephyr/subsys/ucsi/ppm_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-20T16:42:13Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Returning early here is safe because `ppm_common_taskloop` is executed within an infinite `do...while` loop in `ppm_common_task`. \n\nHowever, if you choose to fall through instead of `return;`, the pending async event or command could be processed *immediately* within the same loop iteration (as the switch statement below handles `PPM_STATE_IDLE_NOTIFY`), eliminating one loop iteration cycle. Either approach is functionally equivalent in practice, but falling through avoids the premature return.",
+      "range": {
+        "startLine": 658,
+        "startChar": 0,
+        "endLine": 658,
+        "endChar": 0
+      },
+      "revId": "4cf1b4887c54fe8fd6d70475ec56fb8dc3919eae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
