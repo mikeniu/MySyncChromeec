@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef58e4ca_c255e398",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7141d0a_a489a170",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 9999
+      },
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80548961_196ec727",
@@ -66,6 +90,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f7423da_d98685ca",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80548961_196ec727",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 9999
+      },
       "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -95,6 +143,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a61c164_05f9479e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b47de5d5_5abd533f",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 9999
+      },
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d30a9ed0_097f29cd",
@@ -120,6 +192,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84850ac6_9c69a24d",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d30a9ed0_097f29cd",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 9999
+      },
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "508e02cf_460c5496",
@@ -141,6 +237,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c883956c_45ff46f5",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "508e02cf_460c5496",
+      "range": {
+        "startLine": 141,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 9999
+      },
       "revId": "439f0b4650fabc62a03080197da3ab2d66b19044",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
