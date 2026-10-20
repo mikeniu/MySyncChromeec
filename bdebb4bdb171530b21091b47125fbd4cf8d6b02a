@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f74c7bc8_424bb471",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-20T10:14:07Z",
+      "side": 1,
+      "message": "I left several suggestions how to share more common code in the base class, and a potential issue if the generator chaining approach suggested in the first CL in the chain is implemented.",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c6cfbe8_c7c32854",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-20T10:14:07Z",
+      "side": 1,
+      "message": "What if, instead of adding a `logger` parameter here, the `BaseSigner.__init__` simply set `self.logger \u003d logging.getLogger(self.__class__.__name__)` and `_run_futility` used `self.logger` as it used to?",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eb5751f_e82d11da",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-20T10:14:07Z",
+      "side": 1,
+      "message": "Please clean up the whitespace changes throughout the documentation",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e48b9e84_410b6401",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-20T10:14:07Z",
+      "side": 1,
+      "message": "What if `BaseSigner` implemented this function, `checksum_ro` was renamed to `sign_ec`, and the descendents only implemented abstract `sign_ec`?",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f618b43b_e4ee0890",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-20T10:14:07Z",
+      "side": 1,
+      "message": "```suggestion\n        \"\"\"Calculate checksum of an EC RO binary.\n```",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20c6aa9f_adc04e13",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-20T10:14:07Z",
+      "side": 1,
+      "message": "(This is an AI finding so please double-check)\n\nIf the generators are chained as suggested in the first CL in the chain and they use the same `signed_bin` path, the input and output file for this futility call are identical, which apparently triggers some processing edge case in futility logic. Please change `signed_bin` path to a unique string, e.g. `ec-rochksum.bin` or similar.",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
