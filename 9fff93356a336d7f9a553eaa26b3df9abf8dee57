@@ -33,6 +33,23 @@
       "message": "Hi Rob, is there a plan to merge this CL?",
       "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1a6da23_d319f5ee",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-20T11:35:04Z",
+      "side": 1,
+      "message": "I think signaling logs here is dangerous. As you mentioned in the comment above, it can reach drivers which uses mutexes, maybe logging (and this code is a part of logging) so it can create some infinite loops. Maybe schedule a work here to signal a new console event?",
+      "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
