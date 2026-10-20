@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "542c953d_db53dd26",
+        "filename": "zephyr/subsys/ucsi/ppm_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-20T17:24:42Z",
+      "side": 1,
+      "message": "Done in PS3. Removed the early `return;` on timeout so `ppm_common_taskloop` falls through directly into `case PPM_STATE_IDLE_NOTIFY:` in the same iteration.",
+      "revId": "4cf1b4887c54fe8fd6d70475ec56fb8dc3919eae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a43da4f4_17c7d7f5",
+        "filename": "zephyr/subsys/ucsi/ppm_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-20T17:24:42Z",
+      "side": 1,
+      "message": "Done in PS3. Moved `#define PPM_CC_ACK_TIMEOUT_MS 5000` to the top of `ppm_common.c` alongside the other file-level defines.",
+      "revId": "4cf1b4887c54fe8fd6d70475ec56fb8dc3919eae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e9b054c_fddd20d4",
