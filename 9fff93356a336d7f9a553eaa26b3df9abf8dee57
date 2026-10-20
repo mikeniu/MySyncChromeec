@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96755b7e_07907722",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-20T18:07:06Z",
+      "side": 1,
+      "message": "I wanted to do more testing before merging, ready now.",
+      "parentUuid": "be776a29_7d89e720",
+      "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1a6da23_d319f5ee",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-20T11:35:04Z",
       "side": 1,
       "message": "I think signaling logs here is dangerous. As you mentioned in the comment above, it can reach drivers which uses mutexes, maybe logging (and this code is a part of logging) so it can create some infinite loops. Maybe schedule a work here to signal a new console event?",
+      "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45c677b9_c2fa8405",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-20T18:07:06Z",
+      "side": 1,
+      "message": "console_lock is released before console_log_notify_host() is called, and new_console_log guards re-entrant console_log_notify_host() calls.\n\nDeferring this to k_sys_work_q via k_work_submit() creates a race with uart_console_read_buffer_init().",
+      "parentUuid": "c1a6da23_d319f5ee",
       "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
