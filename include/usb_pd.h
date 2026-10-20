@@ -85,6 +85,16 @@ enum pd_rx_errors {
 #define PDO_MAX_OBJECTS 7
 #endif
 
+/*
+ * The v1 EC_CMD_TYPEC_STATUS response holds every stored PDO. Only the v0
+ * response can truncate the stored PDOs, when the EC supports EPR.
+ */
+BUILD_ASSERT(ARRAY_SIZE(((struct ec_response_typec_status_v1 *)0)
+				->source_cap_pdos) >= PDO_MAX_OBJECTS);
+BUILD_ASSERT(
+	ARRAY_SIZE(((struct ec_response_typec_status_v1 *)0)->sink_cap_pdos) >=
+	PDO_MAX_OBJECTS);
+
 /* PDO : Power Data Object */
 /*
  * 1. The vSafe5V Fixed Supply Object shall always be the first object.
