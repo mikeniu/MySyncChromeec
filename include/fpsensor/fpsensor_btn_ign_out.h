@@ -7,6 +7,7 @@
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H_
 
 #include "ec_commands.h"
+#include "fpsensor/fpsensor_modes.h"
 
 #include <cstdint>
 
@@ -14,9 +15,9 @@ namespace fp_btn_ign_out
 {
 
 #if defined(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT)
-void update(std::uint32_t sensor_mode);
+void update(FpSensorMode sensor_mode);
 #else
-inline void update(std::uint32_t sensor_mode)
+inline void update(FpSensorMode sensor_mode)
 {
 }
 #endif

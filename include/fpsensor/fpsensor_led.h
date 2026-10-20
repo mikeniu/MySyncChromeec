@@ -7,6 +7,7 @@
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_LED_H_
 
 #include "ec_commands.h"
+#include "fpsensor/fpsensor_modes.h"
 
 #include <cstdint>
 
@@ -14,10 +15,10 @@ namespace fp_led
 {
 
 #if defined(CONFIG_PLATFORM_EC_FP_LED)
-void update_mode(uint32_t sensor_mode);
+void update_mode(FpSensorMode sensor_mode);
 void update_match(bool success);
 #else
-inline void update_mode(uint32_t sensor_mode)
+inline void update_mode(FpSensorMode sensor_mode)
 {
 }
 inline void update_match(bool success)
