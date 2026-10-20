@@ -61,18 +61,6 @@ static FpRateLimiter encryption_rate_limiter{};
 /* Delay between 2 s of the sensor to detect finger removal */
 #define FINGER_POLLING_DELAY (100 * MSEC)
 
-/* Timing statistics. */
-static uint32_t capture_time_us;
-static uint32_t matching_time_us;
-static uint32_t overall_time_us;
-static timestamp_t overall_t0;
-static uint8_t timestamps_invalid;
-/*
- * Last matched template index, persisted for telemetry (EC_CMD_FP_STATS).
- * Unlike global_context, this is not cleared when the secret is read.
- */
-static int8_t stats_template_matched;
-
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
 
 /* Interrupt line from the fingerprint sensor */
@@ -162,8 +150,9 @@ static uint32_t fp_process_match(void)
 	int res = -1;
 	uint32_t updated = 0;
 	int32_t fgr = FP_NO_SUCH_TEMPLATE;
-	timestamps_invalid = 0;
-	stats_template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
+	global_context.stats.timestamps_invalid = 0;
+	global_context.stats.template_matched =
+		static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
 
 	/* match finger against current templates */
 	fp_disable_positive_match_secret(
@@ -185,14 +174,15 @@ static uint32_t fp_process_match(void)
 			 * with EC_MKBP_FP_ERR_MATCH_NO_INTERNAL.
 			 */
 			if (fgr >= 0 && fgr < FP_MAX_FINGER_COUNT) {
-				stats_template_matched = fgr;
+				global_context.stats.template_matched = fgr;
 				fp_enable_positive_match_secret(
 					fgr,
 					&global_context
 						 .positive_match_secret_state);
 			} else {
 				res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
-				timestamps_invalid |= FPSTATS_MATCHING_INV;
+				global_context.stats.timestamps_invalid |=
+					FPSTATS_MATCHING_INV;
 			}
 		} else if (res < 0) {
 			/*
@@ -202,7 +192,8 @@ static uint32_t fp_process_match(void)
 			 * happened.
 			 */
 			res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
-			timestamps_invalid |= FPSTATS_MATCHING_INV;
+			global_context.stats.timestamps_invalid |=
+				FPSTATS_MATCHING_INV;
 		}
 
 		fp_led::update_match(fp_match_success(res));
@@ -212,10 +203,10 @@ static uint32_t fp_process_match(void)
 	} else {
 		CPRINTS("No enrolled templates");
 		res = EC_MKBP_FP_ERR_MATCH_NO_TEMPLATES;
-		timestamps_invalid |= FPSTATS_MATCHING_INV;
+		global_context.stats.timestamps_invalid |= FPSTATS_MATCHING_INV;
 	}
 
-	matching_time_us = time_since32(t0);
+	global_context.stats.matching_time_us = time_since32(t0);
 	return EC_MKBP_FP_MATCH | EC_MKBP_FP_ERRCODE(res) |
 	       ((fgr << EC_MKBP_FP_MATCH_IDX_OFFSET) &
 		EC_MKBP_FP_MATCH_IDX_MASK);
@@ -230,9 +221,8 @@ static void fp_process_finger(void)
 
 	CPRINTS("Capturing ...");
 	int res = fp_acquire_image(fp_buffer, capture_type);
-	capture_time_us = time_since32(t0);
+	global_context.stats.record_capture(t0, res == 0);
 	if (res) {
-		timestamps_invalid |= FPSTATS_CAPTURE_INV;
 		return;
 	}
 
@@ -252,7 +242,7 @@ static void fp_process_finger(void)
 	global_context.sensor_mode &=
 		~(FP_MODE_ANY_CAPTURE | FP_MODE_CAPTURE_TYPE_MASK |
 		  FP_MODE_MATCH_NO_TEMPLATE_UPDATE);
-	overall_time_us = time_since32(overall_t0);
+	global_context.stats.finish_overall();
 	send_mkbp_event(evt);
 }
 #endif /* HAVE_FP_PRIVATE_DRIVER */
@@ -376,7 +366,7 @@ extern "C" void fp_task(void)
 				fp_sensor_low_power();
 			}
 		} else if (evt.is_sensor_or_timer()) {
-			overall_t0 = get_time();
+			global_context.stats.start_overall();
 			fp_platform::prepare_for_sensor_or_timer_event(evt);
 			if (global_context.sensor_mode &
 			    FP_MODE_ANY_DETECT_FINGER) {
@@ -768,13 +758,7 @@ fp_command_stats(struct ec_host_cmd_handler_args *args)
 {
 	auto *r = static_cast<struct ec_response_fp_stats *>(args->output_buf);
 
-	r->capture_time_us = capture_time_us;
-	r->matching_time_us = matching_time_us;
-	r->overall_time_us = overall_time_us;
-	r->overall_t0.lo = overall_t0.le.lo;
-	r->overall_t0.hi = overall_t0.le.hi;
-	r->timestamps_invalid = timestamps_invalid;
-	r->template_matched = stats_template_matched;
+	*r = global_context.stats.to_response();
 
 	args->output_buf_size = sizeof(*r);
 	return EC_HOST_CMD_SUCCESS;
