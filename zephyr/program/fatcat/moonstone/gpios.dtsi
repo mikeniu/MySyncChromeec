@@ -9,6 +9,11 @@
 		gpio-btn-ign-in = &gpio_fp_btn_ign;
 	};
 
+	power-button-keyboard {
+		compatible = "cros-ec,power-button-keyboard";
+		suppress-enable-pin = <&gpio_soc_edp_bl_en>;
+	};
+
 	named-adc-channels {
 		compatible = "named-adc-channels";
 

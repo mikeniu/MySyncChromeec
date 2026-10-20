@@ -1,0 +1,21 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  Keyboard-matrix power button suppression configuration.
+
+compatible: "cros-ec,power-button-keyboard"
+
+include: base.yaml
+
+properties:
+  suppress-enable-pin:
+    type: phandle
+    required: true
+    description: |
+      GPIO node (in named-gpios) that gates power button suppression in S0
+      tablet mode (e.g. the eDP backlight enable signal). Power button
+      presses are only suppressed in S0 tablet mode when this signal is
+      asserted, allowing the power button to wake the display when the
+      screen is off in S0.
