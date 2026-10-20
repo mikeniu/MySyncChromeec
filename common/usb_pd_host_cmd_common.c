@@ -258,6 +258,8 @@ hc_typec_status(struct ec_host_cmd_handler_args *args)
 	void *src_pdos;
 	void *snk_pdos;
 	uint8_t max_pdos;
+	uint8_t src_cap_count;
+	uint8_t snk_cap_count;
 
 	if (!board_pd_port_num_is_valid(p->port))
 		return EC_HOST_CMD_INVALID_PARAM;
@@ -323,12 +325,16 @@ hc_typec_status(struct ec_host_cmd_handler_args *args)
 		max_pdos = ARRAY_SIZE(r1->source_cap_pdos);
 	}
 
-	cs->source_cap_count = min(pd_get_src_cap_cnt(p->port), max_pdos);
+	src_cap_count = min(pd_get_src_cap_cnt(p->port), max_pdos);
+	snk_cap_count = min(pd_get_snk_cap_cnt(p->port), max_pdos);
 	memcpy(src_pdos, pd_get_src_caps(p->port),
-	       cs->source_cap_count * sizeof(uint32_t));
-	cs->sink_cap_count = min(pd_get_snk_cap_cnt(p->port), max_pdos);
+	       src_cap_count * sizeof(uint32_t));
 	memcpy(snk_pdos, pd_get_snk_caps(p->port),
-	       cs->sink_cap_count * sizeof(uint32_t));
+	       snk_cap_count * sizeof(uint32_t));
+
+	/* Record the final PDO counts. */
+	cs->source_cap_count = src_cap_count;
+	cs->sink_cap_count = snk_cap_count;
 
 	return EC_HOST_CMD_SUCCESS;
 }

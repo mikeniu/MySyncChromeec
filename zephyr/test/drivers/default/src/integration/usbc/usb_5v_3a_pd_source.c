@@ -120,6 +120,47 @@ ZTEST(usb_attach_5v_3a_pd_source, test_typec_status)
 		      status.power_role);
 }
 
+/*
+ * Check that both versions of EC_CMD_TYPEC_STATUS report PDO counts that
+ * match the PDOs copied into the response.
+ */
+static void check_typec_status_pdo_counts(int port)
+{
+	struct ec_params_typec_status params = { .port = port };
+	struct ec_response_typec_status_v0 r0;
+	struct ec_response_typec_status_v1 r1;
+	struct host_cmd_handler_args args0 =
+		BUILD_HOST_COMMAND(EC_CMD_TYPEC_STATUS, 0, r0, params);
+	struct host_cmd_handler_args args1 =
+		BUILD_HOST_COMMAND(EC_CMD_TYPEC_STATUS, 1, r1, params);
+	uint8_t src_cnt = pd_get_src_cap_cnt(port);
+	uint8_t snk_cnt = pd_get_snk_cap_cnt(port);
+
+	zassert_ok(host_command_process(&args0));
+	zassert_equal(args0.response_size, sizeof(r0));
+	zassert_equal(r0.typec_status.source_cap_count, src_cnt);
+	zassert_equal(r0.typec_status.sink_cap_count, snk_cnt);
+	zassert_mem_equal(r0.source_cap_pdos, pd_get_src_caps(port),
+			  src_cnt * sizeof(uint32_t));
+	zassert_mem_equal(r0.sink_cap_pdos, pd_get_snk_caps(port),
+			  snk_cnt * sizeof(uint32_t));
+
+	zassert_ok(host_command_process(&args1));
+	zassert_equal(args1.response_size, sizeof(r1));
+	zassert_equal(r1.typec_status.source_cap_count, src_cnt);
+	zassert_equal(r1.typec_status.sink_cap_count, snk_cnt);
+	zassert_mem_equal(r1.source_cap_pdos, pd_get_src_caps(port),
+			  src_cnt * sizeof(uint32_t));
+	zassert_mem_equal(r1.sink_cap_pdos, pd_get_snk_caps(port),
+			  snk_cnt * sizeof(uint32_t));
+}
+
+ZTEST(usb_attach_5v_3a_pd_source, test_typec_status_pdo_counts)
+{
+	zassert_equal(pd_get_src_cap_cnt(0), 2);
+	check_typec_status_pdo_counts(0);
+}
+
 ZTEST(usb_attach_5v_3a_pd_source, test_power_info)
 {
 	struct ec_response_usb_pd_power_info info = host_cmd_power_info(0);
