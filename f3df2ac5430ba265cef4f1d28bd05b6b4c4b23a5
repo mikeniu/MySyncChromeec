@@ -28,6 +28,31 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "557d040b_97973be1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:40Z",
+      "side": 1,
+      "message": "Split this CL into two atomic CLs (one for FpSensorStats telemetry encapsulation and a follow-up CL for FpSensorContext task loop operations) and updated the commit messages accordingly.",
+      "parentUuid": "f7f2f4a1_19549623",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e9626589_09dfbcbe",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -40,6 +65,25 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n`Size: L (+144, -115)`\nThis CL bundles two independent, orthogonal refactorings into a single commit, which violates the Single Logical Change rule. Please split this CL to allow each set of changes to be reviewed and tested independently:\n1. **CL 1:** Encapsulate telemetry statistics into `FpSensorStats` (and add missing unit test coverage for success paths).\n2. **CL 2:** Extract task loop operations into `FpSensorContext` member functions (`poll_finger_and_capture`, `sync_enroll_session`, etc.).\n\n**Functionality:**\nThe behavioral extractions appear mechanically correct.\n\n**Architecture \u0026 Component Fit:**\nGood use of encapsulation to move state closer to where it is used.\n\n**Code Simplicity:**\nControl flow in `poll_finger_and_capture` contains redundant branching that could be unified, though this is pre-existing.\n\n**Idiomaticity \u0026 Readability:**\nNo major concerns.\n\n**Testing:**\nMissing test coverage for `stats.record_capture(..., true)`. Unit tests for the relocated `FpSensorContext` member functions should be added in a follow-up CL to keep the extraction pure.\n\n**Commit Message:**\nSee inline comment on `/COMMIT_MSG` to address the multi-bullet subject/body and diff-narration.\n[🔗](http://go/tj/fd0dca27-b060-4ea6-bbec-163aaf26a56f)",
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40d81990_0dd69e3b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:40Z",
+      "side": 1,
+      "message": "Split this CL so this change only encapsulates telemetry statistics in FpSensorStats (with success and invalid capture test coverage), and moved the FpSensorContext task loop operations into a separate follow-up CL.",
+      "parentUuid": "e9626589_09dfbcbe",
       "isAi": true,
       "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -70,6 +114,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e92fc4_a0237e71",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:40Z",
+      "side": 1,
+      "message": "Extracted poll_finger_and_capture into the follow-up FpSensorContext task operations CL and simplified its control flow as suggested.",
+      "parentUuid": "6e6030c9_1c915736",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 265,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1aa3b461_2c6eeb89",
@@ -95,6 +164,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52166a75_7fdeb55d",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:40Z",
+      "side": 1,
+      "message": "Moved these FpSensorContext member functions into the follow-up CL alongside unit tests covering their state transitions.",
+      "parentUuid": "1aa3b461_2c6eeb89",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c9fdd31_e62eea12",
@@ -115,6 +209,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7741f82_9552100c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:11:40Z",
+      "side": 1,
+      "message": "Added test_fp_sensor_stats_capture_success verifying the success\u003dtrue path of stats.record_capture.",
+      "parentUuid": "6c9fdd31_e62eea12",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 443,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "f3df2ac5430ba265cef4f1d28bd05b6b4c4b23a5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
