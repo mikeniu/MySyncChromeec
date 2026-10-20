@@ -223,11 +223,11 @@ void off()
 namespace fp_led
 {
 
-void update_mode(uint32_t sensor_mode)
+void update_mode(FpSensorMode sensor_mode)
 {
-	if (sensor_mode & FP_MODE_ENROLL_SESSION)
+	if (sensor_mode.is_enroll_session())
 		enroll();
-	else if (sensor_mode & FP_MODE_MATCH)
+	else if (sensor_mode.is_match())
 		match();
 	else
 		off();

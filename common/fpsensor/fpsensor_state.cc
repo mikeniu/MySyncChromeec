@@ -12,6 +12,7 @@
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_image_frame_params.h"
+#include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_matcher.h"
@@ -182,46 +183,28 @@ EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FP_ENC_STATUS,
 			      fp_command_encryption_status, EC_VER_MASK(0),
 			      struct ec_response_fp_encryption_status);
 
-static int validate_fp_mode(const uint32_t mode)
+static int validate_fp_mode(const uint32_t raw_mode)
 {
-	uint32_t capture_type = FP_CAPTURE_TYPE(mode);
-	uint32_t algo_mode = mode & ~FP_MODE_CAPTURE_TYPE_MASK;
-	uint32_t cur_mode = global_context.sensor_mode;
+	const auto candidate = FpSensorMode::create(raw_mode);
+	if (!candidate.has_value()) {
+		return candidate.error();
+	}
 
-	if (capture_type >= FP_CAPTURE_TYPE_MAX)
-		return EC_ERROR_INVAL;
-
-	if (algo_mode & ~FP_VALID_MODES)
-		return EC_ERROR_INVAL;
-
-	if ((mode & FP_MODE_ENROLL_SESSION) &&
+	const FpSensorMode cur_mode(global_context.sensor_mode);
+	if (candidate->is_enroll_session() &&
 	    global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
 		CPRINTS("Maximum number of fingers already enrolled: %d",
 			FP_MAX_FINGER_COUNT);
 		return EC_ERROR_INVAL;
 	}
 
-	/*
-	 * FP_MODE_ENROLL_IMAGE requires an active enrollment session flag
-	 * to be set concurrently in the requested mode.
-	 */
-	if ((mode & FP_MODE_ENROLL_IMAGE) && !(mode & FP_MODE_ENROLL_SESSION)) {
-		CPRINTS("FP_MODE_ENROLL_IMAGE requested without FP_MODE_ENROLL_SESSION");
+	if (candidate->has_any(FP_MODE_RESET_SENSOR) &&
+	    cur_mode.has_any(FP_VALID_MODES)) {
 		return EC_ERROR_INVAL;
 	}
 
-	/* Don't allow sensor reset if any other mode is
-	 * set (including FP_MODE_RESET_SENSOR itself).
-	 */
-	if ((mode & FP_MODE_RESET_SENSOR) && (cur_mode & FP_VALID_MODES)) {
-		return EC_ERROR_INVAL;
-	}
-
-	/*
-	 * Reject mode changes while a crypto operation is in progress.
-	 */
-	if (!(mode & FP_MODE_DONT_CHANGE) &&
-	    (cur_mode & FP_MODES_CRYPTO_IN_PROGRESS)) {
+	if (!candidate->has_any(FP_MODE_DONT_CHANGE) &&
+	    cur_mode.has_any(FP_MODES_CRYPTO_IN_PROGRESS)) {
 		return EC_ERROR_INVAL;
 	}
 
