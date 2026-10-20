@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9fd21bc_e132252d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n**Functionality:** The extraction of the slicing logic works as intended.\n**Architecture \u0026 Component Fit:** ❌ Found encapsulation issues. `FpFrameStorage` couples raw memory slicing with global system security state (`system_is_locked()`).\n**Code Simplicity:** Good.\n**Idiomaticity \u0026 Readability:** ❌ Used a `struct` to group static methods instead of a `namespace`, contrary to the C++ style guide.\n**Security:** No issues found.\n**Testing:** ❌ The commit message mentions \"added boundary unit tests for checked_subspan and get_raw_frame\", but `zephyr/test/fingerprint/task/src/fpsensor_utils.cc` only contains tests for `checked_subspan`. Please add the missing test coverage for `captured_frame` and `get_raw_frame` (covering success, invalid capture types, size overflows, and offset bounds).\n**CL Size \u0026 Scope:** ✅ `Size: M (+110, -47)`. Cleanly scoped to a single logical change.\n**Commit Message:** ✅ Concise and accurate. [🔗](http://go/tj/9107a884-bb4c-43af-9d8e-72ba3dfb690f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "abee21b470fabb3bcc197a32a0efaf352fc13011",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "968ca6a6_93a3ae69",
+        "filename": "include/fpsensor/fpsensor_frame_storage.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nPlease remove `system_is_locked()` from this low-level storage utility and keep it in the `get_frame` caller (in `fpsensor.cc`).\n\n`fp_frame_storage` is an algorithmic utility for computing spans and offsets. Injecting a global business/security policy (`system_is_locked()`) tightly couples the memory manipulation logic to the global system state, violating separation of concerns and making `get_raw_frame` harder to unit-test in isolation. [🔗](http://go/tj/9107a884-bb4c-43af-9d8e-72ba3dfb690f)",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "abee21b470fabb3bcc197a32a0efaf352fc13011",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b637b62_9a6adecc",
+        "filename": "include/fpsensor/fpsensor_frame_storage.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:22:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nPlease use a `namespace fp_frame_storage` instead of a `struct FpFrameStorage` to group these static methods. The C++ Style Guide explicitly advises against using a class/struct simply to group static members.\n\n```cpp\nnamespace fp_frame_storage {\n\t[[nodiscard]] std::expected\u003cstd::span\u003cconst uint8_t\u003e, ec_status\u003e\n\tcaptured_frame(...) { ... }\n\n\t[[nodiscard]] std::expected\u003cvoid, ec_status\u003e\n\tget_raw_frame(...) { ... }\n} // namespace fp_frame_storage\n``` [🔗](http://go/tj/9107a884-bb4c-43af-9d8e-72ba3dfb690f)",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "abee21b470fabb3bcc197a32a0efaf352fc13011",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
