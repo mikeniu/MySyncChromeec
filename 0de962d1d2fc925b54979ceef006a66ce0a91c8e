@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "716f8d71_ee12f77a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:49Z",
+      "side": 1,
+      "message": "Replaced the non-standard .error_or() call with a standard C++23 std::expected check.",
+      "parentUuid": "cc6dab32_e9fdeec0",
+      "isAi": true,
+      "revId": "0de962d1d2fc925b54979ceef006a66ce0a91c8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7881878d_243bae07",
@@ -40,6 +59,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0de962d1d2fc925b54979ceef006a66ce0a91c8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2ac27fb_8abaf31a",
+        "filename": "common/fpsensor/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:10:49Z",
+      "side": 1,
+      "message": "Replaced .error_or(EC_SUCCESS) with standard `if (const auto res \u003d ...; !res.has_value()) return res.error(); return EC_SUCCESS;`.",
+      "parentUuid": "7881878d_243bae07",
+      "range": {
+        "startLine": 183,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "0de962d1d2fc925b54979ceef006a66ce0a91c8e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
