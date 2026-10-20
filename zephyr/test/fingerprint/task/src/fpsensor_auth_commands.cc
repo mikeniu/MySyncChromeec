@@ -1759,3 +1759,34 @@ static void before_fpsensor_auth_commands(void *fixture)
 
 ZTEST_SUITE(fpsensor_auth_commands, nullptr, fpsensor_auth_commands_setup,
 	    before_fpsensor_auth_commands, nullptr, nullptr);
+
+ZTEST(fpsensor_auth_commands, test_raii_p256_and_pairing_key_wrappers)
+{
+	const auto key1 = FpP256Key::generate();
+	const auto key2 = FpP256Key::generate();
+	zassert_true(key1.has_value());
+	zassert_true(key2.has_value());
+
+	const auto pub2 = key2->to_public_key();
+	zassert_true(pub2.has_value());
+
+	std::array<uint8_t, FP_ASCP_KEY_SIZE> bad_point{};
+	bad_point[0] = 0x03;
+	zassert_equal(FpP256Key::from_uncompressed_point(bad_point).error(),
+		      EC_ERROR_INVAL);
+	bad_point[0] = 0x05;
+	zassert_equal(FpP256Key::from_uncompressed_point(bad_point).error(),
+		      EC_ERROR_INVAL);
+
+	zassert_equal(FpPairingKey::establish_and_wrap(*key1, *pub2, 0).error(),
+		      EC_ERROR_INVAL);
+	zassert_equal(FpPairingKey::establish_and_wrap(*key1, *pub2, 2).error(),
+		      EC_ERROR_INVAL);
+
+	const auto wrapped = FpPairingKey::establish_and_wrap(*key1, *pub2, 1);
+	zassert_true(wrapped.has_value());
+
+	FpPairingKey::Bytes unwrapped{};
+	zassert_true(
+		FpPairingKey::unwrap_into(*wrapped, unwrapped).has_value());
+}
