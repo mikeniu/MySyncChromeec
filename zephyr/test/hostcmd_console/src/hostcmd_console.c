@@ -8,6 +8,8 @@
 #include "test_state.h"
 #include "uart.h"
 
+#include <zephyr/interrupt_util.h>
+#include <zephyr/irq.h>
 #include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
 
@@ -231,6 +233,95 @@ ZTEST_USER(uart_hostcmd, test_uart_hc_read_recent_v1)
 	zassert_mem_equal(msg3, response, MSG_LEN(msg3),
 			  "expected \"%s\", got \"%.*s\"", msg3, MSG_LEN(msg3),
 			  response);
+}
+
+#define TEST_IRQ_LINE 27
+#define TEST_IRQ_PRIO 2
+
+static bool isr_called;
+
+static void test_isr(const void *param)
+{
+	ARG_UNUSED(param);
+
+	isr_called = true;
+	cputs(CC_SYSTEM, msg1);
+}
+
+/**
+ * Test that console output emitted from an ISR is captured in the AP console
+ * buffer with the "[ISR]" prefix even when CONFIG_LOG_MODE_MINIMAL is disabled.
+ */
+ZTEST(uart_hostcmd, test_uart_hc_isr)
+{
+	static const char expected[] = "[ISR]test";
+	char response[CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE + 1];
+	struct ec_params_console_read_v1 params = {
+		.subcmd = CONSOLE_READ_RECENT,
+	};
+	struct host_cmd_handler_args read_args =
+		BUILD_HOST_COMMAND(EC_CMD_CONSOLE_READ, 1, response, params);
+
+	IRQ_CONNECT(TEST_IRQ_LINE, TEST_IRQ_PRIO, test_isr, NULL, 0);
+	irq_enable(TEST_IRQ_LINE);
+
+	/* Take a snapshot to isolate output after setup. */
+	zassert_equal(EC_RES_SUCCESS, ec_cmd_console_snapshot(NULL));
+
+	isr_called = false;
+	trigger_irq(TEST_IRQ_LINE);
+	zassert_true(isr_called);
+
+	zassert_equal(EC_RES_SUCCESS, ec_cmd_console_snapshot(NULL));
+
+	read_args.response_size = 0;
+	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
+	zassert_equal(sizeof(expected), read_args.response_size,
+		      "expected message length %zu, got %d", sizeof(expected),
+		      read_args.response_size);
+	zassert_mem_equal(expected, response, sizeof(expected) - 1,
+			  "expected \"%s\", got \"%.*s\"", expected,
+			  (int)(sizeof(expected) - 1), response);
+}
+
+/**
+ * Test that console output emitted from a non-yielding context is captured in
+ * the AP console buffer even when CONFIG_LOG_MODE_MINIMAL is disabled.
+ */
+ZTEST(uart_hostcmd, test_uart_hc_no_yield)
+{
+	char response[CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE + 1];
+	struct ec_params_console_read_v1 params = {
+		.subcmd = CONSOLE_READ_RECENT,
+	};
+	struct host_cmd_handler_args read_args =
+		BUILD_HOST_COMMAND(EC_CMD_CONSOLE_READ, 1, response, params);
+	unsigned int key;
+
+	/* Take a snapshot to isolate output after setup. */
+	zassert_equal(EC_RES_SUCCESS, ec_cmd_console_snapshot(NULL));
+
+	key = irq_lock();
+	zassert_false(k_can_yield());
+	cputs(CC_SYSTEM, msg1);
+	LOG_RAW(LOG_TEST_MSG);
+	irq_unlock(key);
+
+	zassert_equal(EC_RES_SUCCESS, ec_cmd_console_snapshot(NULL));
+
+	read_args.response_size = 0;
+	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
+	zassert_equal(MSG_LEN(msg1) + MSG_LEN(msg3) + 1,
+		      read_args.response_size,
+		      "expected message length %d, got %d",
+		      MSG_LEN(msg1) + MSG_LEN(msg3) + 1,
+		      read_args.response_size);
+	zassert_mem_equal(msg1, response, MSG_LEN(msg1),
+			  "expected \"%s\", got \"%.*s\"", msg1, MSG_LEN(msg1),
+			  response);
+	zassert_mem_equal(msg3, response + MSG_LEN(msg1), MSG_LEN(msg3),
+			  "expected \"%s\", got \"%.*s\"", msg3, MSG_LEN(msg3),
+			  response + MSG_LEN(msg1));
 }
 
 ZTEST_SUITE(uart_hostcmd, predicate_post_main, NULL,
