@@ -15,3 +15,7 @@
 
 	};
 };
+
+&pcc {
+	apb4-prescaler = <6>; /* APB4_CLK runs at 15 MHz */
+};
