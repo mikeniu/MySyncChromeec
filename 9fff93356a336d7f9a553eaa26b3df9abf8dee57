@@ -70,6 +70,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe7e8ce8_d19fe65e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-20T20:46:28Z",
+      "side": 1,
+      "message": "Done — split out the additional unit tests (crrev.com/c/8614435) and the host event notification changes (crrev.com/c/8614436) into parent CLs so this CL only covers the spinlock conversion.",
+      "parentUuid": "f0a3d1e8_27c99a2c",
+      "isAi": true,
+      "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1a6da23_d319f5ee",
