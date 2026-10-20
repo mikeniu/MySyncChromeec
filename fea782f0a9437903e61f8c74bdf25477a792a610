@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da42270f_cb73da31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please address inline comments**\n\n### Review Summary\n\n**CL Size \u0026 Scope**: Size: L (+196, -62). The production diff is roughly \u003c 250 lines and implements a single cohesive logical change.\n**Functionality**: Code behaves correctly, but `FpTemplateStore::consume_secret` replicates a legacy bug by returning `TIMEOUT` instead of `ACCESS_DENIED` for unreadable secrets.\n**Architecture \u0026 Component Fit**: Clean RAII encapsulation for the template ID and secrets. Integration into the global state is consistent.\n**Code Simplicity**: Found duplicated control flow conditions in `consume_secret` that can be flattened.\n**Idiomaticity \u0026 Readability**: Modern C++ idioms are properly used throughout.\n**Testing**: Thorough boundary tests are present for `FpTemplateId` and `FpRateLimiter`, but `FpTemplateStore` transitions/timeouts lack coverage. I have provided a test snippet.\n\n[🔗](http://go/tj/d02eb2ee-a60a-4539-bf81-8656191e4735)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fea782f0a9437903e61f8c74bdf25477a792a610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e22a97c6_ff6b05bc",
+        "filename": "include/fpsensor/fpsensor_template_store.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity \u0026 Control Flow:** This is a multi-way branch block with split error paths that duplicate the `!copy.readable || !matched.has_value()` check.\n\nThe old loosely ordered code caused `fp_read_match_secret` to accidentally return `EC_RES_TIMEOUT` on an unreadable secret (because `deadline` was `0`, making `now \u003e\u003d 0` true). Rather than preserving that bug via complex `expected_fgr` gating, we can simplify this block to check readability first, resolving both the duplicated logic and the spurious timeout error code:\n\n```cpp\n\t\tif (!copy.readable || !matched.has_value()) {\n\t\t\treturn std::unexpected(EC_RES_ACCESS_DENIED);\n\t\t}\n\t\tif (now \u003e\u003d\n\t\t    FpTimestamp{ FpClock::duration{ copy.deadline.val } }) {\n\t\t\treturn std::unexpected(EC_RES_TIMEOUT);\n\t\t}\n\t\tif (expected_fgr.has_value() \u0026\u0026 *matched !\u003d *expected_fgr) {\n\t\t\treturn std::unexpected(EC_RES_ACCESS_DENIED);\n\t\t}\n```\n[🔗](http://go/tj/d02eb2ee-a60a-4539-bf81-8656191e4735)",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fea782f0a9437903e61f8c74bdf25477a792a610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d831663b_7468a357",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T22:26:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing:** While `FpRateLimiter` and `FpTemplateId` have thorough boundary tests, there are no tests for the new `FpTemplateStore` logic and state transitions (e.g., verifying `consume_secret` timeouts, double-reads, and boundary expiration).\n\nPlease add test coverage for `FpTemplateStore` (you can append this snippet to this file):\n\n```cpp\nZTEST(fpsensor_utils, test_template_store_secret_lifecycle)\n{\n\tpositive_match_secret_state state{};\n\tFpTemplateStore::disable_secret(state);\n\tzassert_equal(state.template_matched, FP_NO_SUCH_TEMPLATE);\n\tzassert_false(state.readable);\n\tzassert_equal(state.deadline.val, 0);\n\n\tconst FpTimestamp t0{ std::chrono::seconds(10) };\n\tconst auto window \u003d FpTemplateStore::kSecretValidityWindow;\n\n\t// Enable secret\n\tzassert_true(FpTemplateStore::enable_secret(1, state, t0).has_value());\n\tzassert_equal(state.template_matched, 1);\n\tzassert_true(state.readable);\n\n\t// Enable while already readable fails and disables\n\tzassert_equal(FpTemplateStore::enable_secret(2, state, t0).error(), EC_ERROR_UNKNOWN);\n\tzassert_false(state.readable);\n\n\t// Consume unreadable secret fails\n\tzassert_equal(FpTemplateStore::consume_secret(state, std::nullopt, t0).error(), EC_RES_ACCESS_DENIED);\n\n\t// Re-enable and consume with mismatched expected_fgr\n\tzassert_true(FpTemplateStore::enable_secret(2, state, t0).has_value());\n\tzassert_equal(FpTemplateStore::consume_secret(state, *FpTemplateId::create(1), t0).error(), EC_RES_ACCESS_DENIED);\n\tzassert_false(state.readable);\n\n\t// Re-enable and consume at exactly the timeout (N boundary)\n\tzassert_true(FpTemplateStore::enable_secret(2, state, t0).has_value());\n\tzassert_equal(FpTemplateStore::consume_secret(state, std::nullopt, t0 + window).error(), EC_RES_TIMEOUT);\n\n\t// Re-enable and consume exactly before timeout (N-1 boundary)\n\tzassert_true(FpTemplateStore::enable_secret(2, state, t0).has_value());\n\tconst auto matched \u003d FpTemplateStore::consume_secret(state, std::nullopt, t0 + window - std::chrono::microseconds(1));\n\tzassert_true(matched.has_value());\n\tzassert_equal(matched-\u003eraw(), 2);\n}\n```\n[🔗](http://go/tj/d02eb2ee-a60a-4539-bf81-8656191e4735)",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fea782f0a9437903e61f8c74bdf25477a792a610",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
