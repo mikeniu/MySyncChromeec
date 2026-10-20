@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd4bbfb9_915b8c98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:30Z",
+      "side": 1,
+      "message": "Oracle and magic-value items are addressed. The CL is not split for now because the tests share one harness; the mode/IRQ and image acquisition tests are already separate CLs.",
+      "parentUuid": "f8cf0836_3f975160",
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "822b2541_7de0a637",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2268d3e3_bee74895",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:30Z",
+      "side": 1,
+      "message": "Done: asserts the exact errors bitmask.",
+      "parentUuid": "822b2541_7de0a637",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 9999
+      },
       "revId": "9030956a53c718a730283c7ec10778624062ddd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccefe5be_83a8226d",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:30Z",
+      "side": 1,
+      "message": "Done: asserts the exact errors bitmask.",
+      "parentUuid": "b51e0ba9_7e7cf00c",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9999
+      },
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74c4acc4_12e9cc17",
@@ -95,6 +161,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7515210c_c63b7445",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:30Z",
+      "side": 1,
+      "message": "Done: asserts the exact errors bitmask.",
+      "parentUuid": "74c4acc4_12e9cc17",
+      "range": {
+        "startLine": 194,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 9999
+      },
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4529dbb1_12d43224",
@@ -116,6 +206,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "9030956a53c718a730283c7ec10778624062ddd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1d22e9c_02a30a60",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:53:30Z",
+      "side": 1,
+      "message": "Done: uses the named constants RTS5817MAA_EXPECTED_PRODUCT_ID and RTS5817MAA_EXPECTED_VERSION.",
+      "parentUuid": "4529dbb1_12d43224",
+      "range": {
+        "startLine": 218,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 9999
+      },
       "revId": "9030956a53c718a730283c7ec10778624062ddd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
