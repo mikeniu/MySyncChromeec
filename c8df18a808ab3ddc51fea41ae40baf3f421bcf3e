@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba5fd15c_8bc1bf1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:52:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n**Functionality:** ✅ The extraction accurately preserves the original `fp_task` loop behavior and transitions.\n**Architecture \u0026 Component Fit:** ✅ Operations were correctly shifted to `fpsensor_context` methods, which improves encapsulation and testability for state transitions.\n**Code Simplicity:** ✅ Simplifies `fp_task` by replacing deep inline blocks with appropriately named member function calls.\n**Idiomaticity \u0026 Readability:** ✅ The new context methods are clean and idiomatic.\n**Security:** ✅ No issues found.\n**Testing:** ✅ Introduces baseline unit tests for the extracted context operations. (See inline comment for follow-up suggestions to expand coverage).\n**CL Size \u0026 Scope:** ✅ `Size: M (+102, -85)`. This is a clean, single-purpose structural refactoring (Pure Move).\n**Commit Message:** ✅ Clear and concise summary following Chromium conventions.\n\n[🔗](http://go/tj/5051e78e-2660-43e3-b896-e67c9ca66cdc)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c8df18a808ab3ddc51fea41ae40baf3f421bcf3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdb8cc25_ce62a67f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:52:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nThe unit tests added here provide good baseline coverage for the extracted context operations. However, `poll_finger_and_capture()` is missing test coverage. Additionally, the `encrypt_requested_template()` test only covers the early return path (`FP_NO_SUCH_TEMPLATE`).\n\nConsider adding boundary tests for the `FINGER_PRESENT` / `FINGER_NONE` states and the `EC_SUCCESS` encryption path in a follow-up CL to ensure complete coverage of the state transitions.\n\n[🔗](http://go/tj/5051e78e-2660-43e3-b896-e67c9ca66cdc)",
+      "range": {
+        "startLine": 457,
+        "startChar": 0,
+        "endLine": 480,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c8df18a808ab3ddc51fea41ae40baf3f421bcf3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
