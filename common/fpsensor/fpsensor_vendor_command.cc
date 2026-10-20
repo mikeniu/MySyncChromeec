@@ -10,35 +10,40 @@
 #include "system.h"
 #include "util.h"
 
+#pragma GCC poison global_context
+
 #ifdef CONFIG_PLATFORM_EC_FINGERPRINT_VENDOR_COMMAND
-static enum ec_host_cmd_status
-fp_command_vendor(struct ec_host_cmd_handler_args *args)
+namespace
 {
-	const auto *params = static_cast<const struct ec_params_fp_vendor *>(
-		args->input_buf);
-	int ret;
+
+ec_status fp_command_vendor(host_cmd_handler_args *args)
+{
+	const auto *params =
+		static_cast<const ec_params_fp_vendor *>(args->params);
 
 	if (system_is_locked()) {
-		return EC_HOST_CMD_ACCESS_DENIED;
+		return EC_RES_ACCESS_DENIED;
 	}
 
-	ret = fp_vendor_command(params->param1,
-				reinterpret_cast<uint8_t *>(args->output_buf),
-				args->output_buf_max);
+	const int ret = fp_vendor_command(
+		params->param1, static_cast<uint8_t *>(args->response),
+		args->response_max);
 	if (ret < 0) {
-		return EC_HOST_CMD_ERROR;
-	} else if (ret > args->output_buf_max) {
+		return EC_RES_ERROR;
+	}
+	if (ret > args->response_max) {
 		/*
 		 * This should be handled by the host command subsystem, but we
 		 * can't easily test it in the unit tests unless we handle it
 		 * here.
 		 */
-		return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		return EC_RES_RESPONSE_TOO_BIG;
 	}
-	args->output_buf_size = ret;
+	args->response_size = ret;
 
-	return EC_HOST_CMD_SUCCESS;
+	return EC_RES_SUCCESS;
 }
-EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_FP_VENDOR, fp_command_vendor,
-			    EC_VER_MASK(0));
+DECLARE_HOST_COMMAND(EC_CMD_FP_VENDOR, fp_command_vendor, EC_VER_MASK(0));
+
+} /* namespace */
 #endif /* CONFIG_PLATFORM_EC_FINGERPRINT_VENDOR_COMMAND */

@@ -19,6 +19,7 @@
 #include "fpsensor/fpsensor_detect.h"
 #include "fpsensor/fpsensor_led.h"
 #include "fpsensor/fpsensor_modes.h"
+#include "fpsensor/fpsensor_platform.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor/fpsensor_utils.h"
 #include "gpio.h"
@@ -39,11 +40,6 @@
 #include <algorithm>
 #include <array>
 #include <variant>
-
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/pm/policy.h>
-#include <zephyr/shell/shell.h>
-#endif
 
 #if !defined(CONFIG_RNG)
 #error "fpsensor requires RNG"
@@ -72,23 +68,6 @@ static uint8_t timestamps_invalid;
 static int8_t stats_template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
-
-#ifndef CONFIG_ZEPHYR
-/* Define the PM functions for compatibility with EC-legacy. */
-static inline void pm_policy_state_all_lock_get(void)
-{
-}
-
-static inline void pm_policy_state_all_lock_put(void)
-{
-}
-#endif
-
-/* Interrupt line from the fingerprint sensor */
-extern "C" void fps_event(enum gpio_signal signal)
-{
-	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_SENSOR_IRQ);
-}
 
 static void send_mkbp_event(uint32_t event)
 {
@@ -248,15 +227,7 @@ static void fp_process_finger(void)
 	global_context.current_capture_type = capture_type;
 	uint32_t evt = EC_MKBP_FP_IMAGE_READY;
 
-#ifndef CONFIG_ZEPHYR
-	/* Clean up SPI before clocking up to avoid hang on the dsb
-	 * in dma_go. Ignore the return value to let the WDT reboot
-	 * the MCU (and avoid getting trapped in the loop).
-	 * b/112781659 */
-	res = spi_transaction_flush(&spi_devices[0]);
-	if (res)
-		CPRINTS("Failed to flush SPI: 0x%x", res);
-#endif
+	fp_platform::flush_spi_after_acquire();
 
 	/* we need CPU power to do the computations */
 	ScopedFastCpu fast_cpu;
@@ -284,7 +255,7 @@ extern "C" void fp_task(void)
 	__maybe_unused bool pm_locked = true;
 
 	/* Lock PM for initialization. */
-	pm_policy_state_all_lock_get();
+	fp_platform::lock_pm();
 	CPRINTS("FP_SENSOR_SEL: %s",
 		fp_sensor_type_to_str(fpsensor_detect_get_type()));
 
@@ -302,7 +273,7 @@ extern "C" void fp_task(void)
 		 * enrollment process.
 		 */
 		if (!(global_context.sensor_mode & FP_MODE_ENROLL_SESSION)) {
-			pm_policy_state_all_lock_put();
+			fp_platform::unlock_pm();
 			pm_locked = false;
 		}
 		/* Wait for a sensor IRQ or a new mode configuration */
@@ -312,25 +283,13 @@ extern "C" void fp_task(void)
 		 * with a FP sensor.
 		 */
 		if (!pm_locked) {
-			pm_policy_state_all_lock_get();
+			fp_platform::lock_pm();
 			pm_locked = true;
 		}
 
 		if (evt & TASK_EVENT_UPDATE_CONFIG) {
 			uint32_t mode = global_context.sensor_mode;
-			/*
-			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
-			 * migration to Zephyr is completed.
-			 */
-#ifdef CONFIG_ZEPHYR
-			/*
-			 * We are about to change sensor mode, so exit any
-			 * previous states.
-			 */
-			fp_idle();
-#else
-			gpio_disable_interrupt(GPIO_FPS_INT);
-#endif
+			fp_platform::prepare_for_mode_change();
 			if ((mode ^ enroll_session) & FP_MODE_ENROLL_SESSION) {
 				int ret = 0;
 				if (mode & FP_MODE_ENROLL_SESSION) {
@@ -374,16 +333,7 @@ extern "C" void fp_task(void)
 			else
 				timeout_us = -1;
 			if (mode & FP_MODE_ANY_WAIT_IRQ) {
-				/*
-				 * FP_MODE_ANY_WAIT_IRQ is a subset of
-				 * FP_MODE_ANY_DETECT_FINGER. In Zephyr FPMCU
-				 * interrupts are enabled by the sensor driver
-				 * when configuring finger detection.
-				 */
-#ifndef CONFIG_ZEPHYR
-				gpio_clear_pending_interrupt(GPIO_FPS_INT);
-				gpio_enable_interrupt(GPIO_FPS_INT);
-#endif
+				fp_platform::enable_sensor_irq();
 			} else if (mode & FP_MODE_RESET_SENSOR) {
 				fp_reset_and_clear_context();
 				global_context.sensor_mode &=
@@ -426,17 +376,8 @@ extern "C" void fp_task(void)
 			}
 		} else if (evt & (TASK_EVENT_SENSOR_IRQ | TASK_EVENT_TIMER)) {
 			overall_t0 = get_time();
-			/*
-			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
-			 * migration to Zephyr is completed.
-			 */
-#ifdef CONFIG_ZEPHYR
-			/* On timeout, put sensor into idle state. */
-			if (evt & TASK_EVENT_TIMER)
-				fp_idle();
-#else
-			gpio_disable_interrupt(GPIO_FPS_INT);
-#endif
+			fp_platform::prepare_for_sensor_or_timer_event(
+				FpTaskEvent(evt));
 			if (global_context.sensor_mode &
 			    FP_MODE_ANY_DETECT_FINGER) {
 				st = fp_finger_status();
@@ -473,26 +414,10 @@ extern "C" void fp_task(void)
 
 			if (global_context.sensor_mode & FP_MODE_ANY_WAIT_IRQ) {
 				fp_configure_detect();
-
-				/* In Zephyr FPMCU interrupts are enabled by the
-				 * sensor driver when configuring finger
-				 * detection.
-				 */
-#ifndef CONFIG_ZEPHYR
-				gpio_clear_pending_interrupt(GPIO_FPS_INT);
-				gpio_enable_interrupt(GPIO_FPS_INT);
-#endif
+				fp_platform::enable_sensor_irq();
 			} else {
-				/*
-				 * In Zephyr FPMCU interrupts are managed by
-				 * the driver.
-				 */
-#ifndef CONFIG_ZEPHYR
-				if (evt & (TASK_EVENT_SENSOR_IRQ))
-					gpio_clear_pending_interrupt(
-						GPIO_FPS_INT);
-#endif
-				fp_sensor_low_power();
+				fp_platform::enter_sensor_low_power(
+					FpTaskEvent(evt));
 			}
 		}
 		fp_btn_ign_out::update(
