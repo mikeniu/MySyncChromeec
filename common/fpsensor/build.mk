@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 # Build for fingerprint sensor
+CXXFLAGS += -std=gnu++2b
 
 # Only build if CONFIG_FINGERPRINT_MCU is "y".
 ifneq (,$(filter y,$(CONFIG_FINGERPRINT_MCU)))
