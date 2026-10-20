@@ -19,6 +19,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
+#include <zephyr/sys/atomic.h>
 
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
@@ -315,6 +316,18 @@ FUNC_NORETURN
 #endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
+	static atomic_t in_assert;
+
+	if (!atomic_cas(&in_assert, 0, 1)) {
+		panic_puts("Recursive assert\n");
+		panic_reboot();
+#ifdef CONFIG_ASSERT_TEST
+		return;
+#else
+		CODE_UNREACHABLE;
+#endif
+	}
+
 	/*
 	 * Upstream Zephyr calls zassert_post_action() with interrupts unlocked
 	 * because assertions can be configured as recoverable. On EC, asserts
@@ -345,7 +358,9 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	if (IS_ENABLED(CONFIG_ZTEST))
 		irq_unlock(key);
 
-#ifndef CONFIG_ASSERT_TEST
+#ifdef CONFIG_ASSERT_TEST
+	atomic_clear(&in_assert);
+#else
 	CODE_UNREACHABLE;
 #endif
 }
