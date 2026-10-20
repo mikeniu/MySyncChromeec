@@ -22,6 +22,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d6efc8be_492b4304",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:52:08Z",
+      "side": 1,
+      "message": "Not split for now: the CL contains only declarations (no logic) and the two headers are tightly coupled. The inline typo/doc comments are fixed in ps3. Happy to split if you still prefer.",
+      "parentUuid": "2e8bfacc_686f9c28",
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57f7bf06_6650bfc0",
         "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
         "patchSetId": 1
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e782f1c_3cfe9ad5",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:52:08Z",
+      "side": 1,
+      "message": "Done in ps3: all documentation blocks use /**.",
+      "parentUuid": "57f7bf06_6650bfc0",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 9999
+      },
       "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "744e150b_8bf83765",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:52:08Z",
+      "side": 1,
+      "message": "Done in ps3: now reads \u0027Adds fingerprint image to the current enrollment session.\u0027",
+      "parentUuid": "b16d3a5b_af0111d0",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 9999
+      },
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2cb3be1d_c14072d6",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cad628b_a6aac31a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:52:08Z",
+      "side": 1,
+      "message": "Done in ps3: fixed \u0027effecive\u0027 in both rts_bio_enroll_step and rts_bio_match.",
+      "parentUuid": "2cb3be1d_c14072d6",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 169,
+        "endChar": 9999
+      },
       "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35551a78_c9e7d25d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:52:08Z",
+      "side": 1,
+      "message": "Done in ps3: fixed \u0027shouldbe\u0027 and \u0027donnot\u0027.",
+      "parentUuid": "81c97595_0910dabc",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 9999
+      },
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6de5e913_f642b922",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fc44295_a907719c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:52:08Z",
+      "side": 1,
+      "message": "Keeping bool: rts_bio_match is implemented by the Realtek vendor library, whose signature we cannot change.",
+      "parentUuid": "6de5e913_f642b922",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 218,
+        "endChar": 9999
+      },
       "revId": "8c62881b99d53c47c63d6c9e699d164526ad99bd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
