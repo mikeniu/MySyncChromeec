@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d500374_e305765a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:55:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "511d1346_55c66d31",
+      "revId": "15566034d13262332a8d8e3894d576050056d1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc3afd95_be6ecd8f",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "15566034d13262332a8d8e3894d576050056d1f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3da0ffeb_137a0bc8",
+        "filename": "zephyr/test/fingerprint/algorithm/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T05:55:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc3afd95_be6ecd8f",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
       "revId": "15566034d13262332a8d8e3894d576050056d1f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
