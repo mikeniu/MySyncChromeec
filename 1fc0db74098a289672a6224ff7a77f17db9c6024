@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4ecbeaf_49f2a105",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:17:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n* **Functionality \u0026 Security:** ✅ \\`RAND_bytes\\` errors are now handled and challenge reuse/expiry is verified.\n* **Architecture \u0026 Component Fit:** ✅ \\`FpAuthChallenge\\` cleanly encapsulates the protocol state logic.\n* **Code Simplicity:** ✅ Very clean early returns.\n* **Idiomaticity \u0026 Readability:** ✅ The standard \\`std::expected\\` \\`!res.has_value()\\` pattern is used properly.\n* **Testing:** ✅ Added comprehensive boundary testing for the expiration window. Added a minor inline suggestion to also test the exhaustion path.\n* **CL Size \u0026 Scope:** ✅ \\`Size: M (+165, -39)\\`. Cleanly focused on a single logical change.\n* **Commit Message:** ✅ Concise prose that clearly explains the why and what. [🔗](http://go/tj/30ad4974-a36b-4802-80c6-9effd7236608)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1fc0db74098a289672a6224ff7a77f17db9c6024",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29c23b3f_83516e9a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 1838,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T23:17:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:** Since the `status` bit was just cleared, this is the perfect spot to explicitly assert that the challenge cannot be reused.\n\nYou can verify the exhaustion path with one additional assertion before re-setting the bit:\n```cpp\n\tzassert_equal(FpAuthChallenge::consume_and_verify(\n\t\t\t      key, chal, ctime, status, {}, kSender, kOp, mac,\n\t\t\t      exact_expiry)\n\t\t\t      .error(),\n\t\t      EC_ERROR_ACCESS_DENIED);\n``` [🔗](http://go/tj/30ad4974-a36b-4802-80c6-9effd7236608)",
+      "range": {
+        "startLine": 1838,
+        "startChar": 0,
+        "endLine": 1838,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1fc0db74098a289672a6224ff7a77f17db9c6024",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
