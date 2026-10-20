@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71296edb_96a80afd",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:06:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "b3ab2c6b_3501020a",
+      "range": {
+        "startLine": 200,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 9999
+      },
+      "revId": "ba9c229845cac57cd44182247d02354d48e9f680",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4fb9c4b5_1ac3210e",
@@ -66,6 +90,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "ba9c229845cac57cd44182247d02354d48e9f680",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f457ceb_344e2a84",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:06:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "4fb9c4b5_1ac3210e",
+      "range": {
+        "startLine": 234,
+        "startChar": 0,
+        "endLine": 234,
+        "endChar": 9999
+      },
       "revId": "ba9c229845cac57cd44182247d02354d48e9f680",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
