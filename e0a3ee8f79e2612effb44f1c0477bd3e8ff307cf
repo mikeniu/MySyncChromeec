@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "052aaf8b_861b9441",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-20T05:59:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL.**\n\n### Review Summary\n\n* **CL Size \u0026 Scope:** `Size: L (+250, -0)`. The production (non-test) diff is exactly 250 lines. Per the CL Size \u0026 Scope guidelines, any CL with a production diff of 250 lines or more MUST be split into smaller, independently reviewable CLs. Even though this CL consists only of headers, it introduces two separate headers that can be committed independently. Please split this into two smaller CLs:\n  1. CL 1: Add the generic driver configuration and data header (`zephyr/drivers/fingerprint/fingerprint_rts5817maa.h`).\n  2. CL 2: Add the vendor-specific private API header (`zephyr/drivers/fingerprint/fingerprint_rts5817maa_private.h`).\n* **Functionality:** Looks good. The headers properly declare the hardware structures and error codes.\n* **Architecture \u0026 Component Fit:** The separation of the driver config/data header from the private vendor API header aligns well with clean abstraction layers.\n* **Code Simplicity:** Minimal declarations.\n* **Idiomaticity \u0026 Readability:** All previous inline comments regarding typos and Doxygen syntax have been successfully resolved by the author in this patchset. The boolean parameter `template_update` is acceptable as it matches a fixed vendor library signature.\n* **Security:** N/A. No implementation logic introduced.\n* **Testing:** N/A. Since this CL only introduces declarative headers (structs, enums, function signatures) with no executable logic, automated test coverage is not required here.\n* **Commit Message:** The commit message clearly explains the purpose of the two headers, but bundling them violates the Single Logical Change rule.\n\n[🔗](http://go/tj/f5a4c081-76c2-4c07-b2ac-89fda5cb004d)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e0a3ee8f79e2612effb44f1c0477bd3e8ff307cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
