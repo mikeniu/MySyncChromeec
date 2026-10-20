@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed3c4edc_2f9f6508",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:01:32Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "01f44305_4a2f7de4",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 118,
+        "endChar": 9999
+      },
+      "revId": "f47d67b28c89dc1c19c91d101a1fa75fa2b2a6f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e706d63f_a4cb7677",
@@ -66,6 +90,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "f47d67b28c89dc1c19c91d101a1fa75fa2b2a6f9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f581e7e4_bbed0571",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 19
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-20T10:01:32Z",
+      "side": 1,
+      "message": "Done. Test updated to preset an SRP bit.",
+      "parentUuid": "e706d63f_a4cb7677",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 9999
+      },
       "revId": "f47d67b28c89dc1c19c91d101a1fa75fa2b2a6f9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
