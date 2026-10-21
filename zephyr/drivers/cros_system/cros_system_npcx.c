@@ -257,6 +257,8 @@ system_npcx_hibernate_by_lfw_in_last_ram(uint32_t pd_ram_mask)
 	 */
 	__set_PRIMASK(1);
 	__set_BASEPRI(0);
+	__DSB();
+	__ISB();
 
 	/* Enter system sleep mode */
 	__asm__ volatile("wfi");
