@@ -35,6 +35,57 @@
       "message": "@patrykd@google.com @tomhughes@chromium.org friendly ping.",
       "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "271ca2c9_8b599cca",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-21T04:21:49Z",
+      "side": 1,
+      "message": "On Zephyr, `fp_configure_detect()` at L366 enables the sensor GPIO IRQ (`FINGERPRINT_SENSOR_MODE_DETECT`), whereas on legacy EC `GPIO_FPS_INT` is only enabled when `mode \u0026 FP_MODE_ANY_WAIT_IRQ`.\n\nBecause `FP_MODE_FINGER_UP` is polled (`!(mode \u0026 FP_MODE_ANY_WAIT_IRQ)`) and the user\u0027s finger is still resting on the sensor after capture/match, leaving the GPIO IRQ enabled on Zephyr triggers an immediate `TASK_EVENT_SENSOR_IRQ` wakeup (where the driver\u0027s GPIO ISR `*_irq()` then disables the IRQ).\n\nWhen `!(mode \u0026 FP_MODE_ANY_WAIT_IRQ)`, we should call `fp_idle()` on Zephyr to disable the GPIO IRQ (since `FINGERPRINT_SENSOR_MODE_IDLE` in all 6 Zephyr drivers only calls `*_disable_irq(dev)` without exiting detect mode on the sensor):\n```cpp\nif (mode \u0026 FP_MODE_ANY_DETECT_FINGER) {\n#ifdef CONFIG_ZEPHYR\n\tif (!(mode \u0026 FP_MODE_ANY_WAIT_IRQ))\n\t\tfp_idle();\n#else\n\tif (mode \u0026 FP_MODE_ANY_WAIT_IRQ) {\n\t\tgpio_clear_pending_interrupt(GPIO_FPS_INT);\n\t\tgpio_enable_interrupt(GPIO_FPS_INT);\n\t}\n#endif\n}\n```",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b0fc3c3_8c044a4a",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-21T04:21:49Z",
+      "side": 1,
+      "message": "Simply skipping `fp_sensor_low_power()` when `FP_MODE_FINGER_UP` is set does not guarantee the sensor stays in detect mode:\n\n1. **Combined modes (`FP_MODE_ANY_CAPTURE | FP_MODE_FINGER_UP`)**: `fp_process_finger()` calls `fp_acquire_image()` (which takes all sensors out of detect mode) and clears `FP_MODE_ANY_CAPTURE`, leaving only `FP_MODE_FINGER_UP`. Because L473 checks `FP_MODE_ANY_WAIT_IRQ`, `fp_configure_detect()` is never called after capture.\n2. **Repeated polls in `FP_MODE_FINGER_UP` on `egis630`**: In `isensor_read_interrupt_type_ec630()`, reading a latched FOD interrupt (`THH` when the finger is still down with CL:9963875) calls `ec630_stop_detect_mode()` (line 1570), putting the sensor into `FP_MODE_STANDBY`. Without calling `fp_configure_detect()` again after `fp_finger_status()`, the sensor is only in detect mode for the first poll and stays in `FP_MODE_STANDBY` for all remaining 100ms polls.\n3. **Skipped `gpio_clear_pending_interrupt` on `!CONFIG_ZEPHYR`**: Gating the `else` block on `!(global_context.sensor_mode \u0026 FP_MODE_FINGER_UP)` skips `gpio_clear_pending_interrupt(GPIO_FPS_INT)` at L489 when `evt \u0026 TASK_EVENT_SENSOR_IRQ` is true and `FP_MODE_FINGER_UP` remains set.\n\nL473 should check `FP_MODE_ANY_DETECT_FINGER` symmetrically with L364/L375:\n```cpp\nif (global_context.sensor_mode \u0026 FP_MODE_ANY_DETECT_FINGER) {\n\tfp_configure_detect();\n#ifdef CONFIG_ZEPHYR\n\tif (!(global_context.sensor_mode \u0026 FP_MODE_ANY_WAIT_IRQ))\n\t\tfp_idle();\n#else\n\tif (evt \u0026 TASK_EVENT_SENSOR_IRQ)\n\t\tgpio_clear_pending_interrupt(GPIO_FPS_INT);\n\tif (global_context.sensor_mode \u0026 FP_MODE_ANY_WAIT_IRQ)\n\t\tgpio_enable_interrupt(GPIO_FPS_INT);\n#endif\n} else {\n#ifndef CONFIG_ZEPHYR\n\tif (evt \u0026 (TASK_EVENT_SENSOR_IRQ))\n\t\tgpio_clear_pending_interrupt(GPIO_FPS_INT);\n#endif\n\tfp_sensor_low_power();\n}\n```",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df304e9f_e7f1c282",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-21T04:21:49Z",
+      "side": 1,
+      "message": "In all 6 real Zephyr drivers (`egis630`, `egis660`, `elan_series`, `fpc1025`, `fpc1145`, `ft98xx`), `FINGERPRINT_SENSOR_MODE_IDLE` only disables the MCU GPIO IRQ (`*_disable_irq(dev)`) and does not exit `detect_mode` or `low_power_mode` on the sensor hardware.\n\n`FINGERPRINT_SENSOR_MODE_IDLE` here shouldn\u0027t modify `detect_mode` or `low_power_mode`, and `fp_simulator_acquire_image()` (L165) should set `data-\u003estate.detect_mode \u003d false` to match real hardware exiting detect mode on image capture.",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
