@@ -52,38 +52,6 @@ validate_fp_buffer_offset(const uint32_t buffer_size, const uint32_t offset,
 }
 
 /**
- * @param mode sensor mode
- * @return true if the mode is a test capture that requires finger touch.
- */
-[[nodiscard]] constexpr bool is_finger_needed(uint32_t mode) noexcept
-{
-	enum fp_capture_type capture_type = FP_CAPTURE_TYPE(mode);
-	return !((mode & FP_MODE_CAPTURE) &&
-		 (capture_type == FP_CAPTURE_DEFECT_PXL_TEST ||
-		  capture_type == FP_CAPTURE_ABNORMAL_TEST ||
-		  capture_type == FP_CAPTURE_NOISE_TEST ||
-		  capture_type == FP_CAPTURE_PATTERN0 ||
-		  capture_type == FP_CAPTURE_PATTERN1 ||
-		  capture_type == FP_CAPTURE_RESET_TEST ||
-		  capture_type == FP_CAPTURE_PATTERN2));
-}
-
-/**
- * @param capture_type current capture type
- * @return true if the capture type is the one where we only care about the
- * embedded/offset image bytes to be returned over EC_CMD_FRAME.
- * Some capture types (simple, pattern0, pattern1, and reset_test) are only
- * interested in the height*width*bpp image bytes that are offset inside the
- * frame. Other modes require the full frame.
- */
-[[nodiscard]] constexpr bool
-skip_image_offset(enum fp_capture_type capture_type) noexcept
-{
-	return !(capture_type == FP_CAPTURE_VENDOR_FORMAT ||
-		 capture_type == FP_CAPTURE_QUALITY_TEST);
-}
-
-/**
  * Format an unsigned int FOURCC value as a printable string.
  *
  * If the character is unprintable, we will print '.', instead.
@@ -119,5 +87,7 @@ class FpFourCc {
 {
 	return FpFourCc(value);
 }
+
+#include "fpsensor/fpsensor_modes.h"
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_UTILS_H_ */

@@ -131,3 +131,31 @@ ZTEST(fpsensor_utils, test_fourcc_constexpr_boundaries)
 	zassert_equal(fourcc_to_string(FOURCC('\x1f', ' ', '~', '\x7f')).view(),
 		      ". ~.");
 }
+
+ZTEST(fpsensor_utils, test_mode_and_capture_type_wrappers)
+{
+	zassert_false(FpCaptureType::create(-1).has_value());
+	zassert_false(FpCaptureType::create(FP_CAPTURE_TYPE_MAX).has_value());
+	zassert_true(FpCaptureType::create(0).has_value());
+	zassert_true(
+		FpCaptureType::create(FP_CAPTURE_TYPE_MAX - 1).has_value());
+
+	zassert_false(FpSensorMode::create(FP_MODE_ENROLL_IMAGE).has_value());
+	zassert_false(FpSensorMode::create(0x00100000U).has_value());
+	zassert_equal(FpSensorMode::assume_valid(FP_MODE_MATCH).raw(),
+		      FP_MODE_MATCH);
+	const auto enroll_mode = FpSensorMode::create(FP_MODE_ENROLL_SESSION |
+						      FP_MODE_ENROLL_IMAGE);
+	zassert_true(enroll_mode.has_value());
+	zassert_true(enroll_mode->is_enroll_session());
+	zassert_true(enroll_mode->is_detect_finger());
+	zassert_true(enroll_mode->is_finger_needed());
+	zassert_equal(enroll_mode->raw(),
+		      FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE);
+
+	const auto pattern_mode = FpSensorMode::create(
+		FP_MODE_CAPTURE |
+		FpCaptureType::create(FP_CAPTURE_PATTERN0)->to_mode_bits());
+	zassert_true(pattern_mode.has_value());
+	zassert_false(pattern_mode->is_finger_needed());
+}
