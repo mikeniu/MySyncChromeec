@@ -89,9 +89,12 @@ static void add_access_history_entry(struct rt1718s_emul_data *rt1718s_data,
  */
 static void rt1718s_emul_reset(const struct emul *emul)
 {
+	struct tcpc_emul_data *tcpc_data = emul->data;
 	struct rt1718s_emul_data *rt1718s_data = emul->data;
 
 	tcpci_emul_reset(emul);
+	tcpc_data->tcpci_ctx->common.msg_state = I2C_COMMON_EMUL_NONE_MSG;
+	rt1718s_data->current_page = 1;
 	memset(rt1718s_data->reg_page1, 0, sizeof(rt1718s_data->reg_page1));
 	memset(rt1718s_data->reg_page2, 0, sizeof(rt1718s_data->reg_page2));
 }
@@ -340,10 +343,13 @@ static int rt1718s_emul_write_byte_wrapper(const struct emul *emul, int reg,
 					   uint8_t val, int bytes)
 {
 	int err;
+	struct tcpc_emul_data *tcpc_data = emul->data;
 	struct rt1718s_emul_data *rt1718s_data = emul->data;
 
 	err = rt1718s_emul_write_byte(emul, reg, val, bytes);
 	if (err != EC_SUCCESS) {
+		tcpc_data->tcpci_ctx->common.msg_state =
+			I2C_COMMON_EMUL_NONE_MSG;
 		rt1718s_data->current_page = 1;
 	}
 	return err;

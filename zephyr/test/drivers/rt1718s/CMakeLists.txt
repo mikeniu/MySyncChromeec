@@ -11,4 +11,5 @@ target_sources(app PRIVATE
   src/gpio.c
   src/adc.c
   src/bc12.c
+  src/ppc.c
 )
