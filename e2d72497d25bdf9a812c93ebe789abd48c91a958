@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6c40cee_820284ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T09:06:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ Works as intended. The reset cause correctly differentiates watchdog vs. cold power-up by reading the `R_AL_DUMMY0` run flag.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated inside the driver initialization sequence (`SYS_INIT`).\n*   **Code Simplicity:** ✅ Minimalist control flow; early guard clause cleanly isolates the watchdog reset case.\n*   **Idiomaticity \u0026 Readability:** ✅ The code uses descriptive constant names and bitmasks (`SYSTEM_RUN_FLAG`, `BIT(16)`).\n*   **Security:** ✅ No security vulnerabilities introduced.\n*   **Testing:** ✅ The test coverage is comprehensive. Unit tests rigorously evaluate exact bitmask determinism and unrelated boundary bit mutations.\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+86, -5)` — Represents a single, atomic logical change.\n*   **Commit Message:** ✅ Concise, accurate, and avoids diff narration.\n\n[🔗](http://go/tj/eb14d8d4-964d-4881-a189-dd0647d34ad0)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e2d72497d25bdf9a812c93ebe789abd48c91a958",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
