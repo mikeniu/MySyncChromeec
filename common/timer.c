@@ -14,9 +14,6 @@
 
 #include <zephyr/kernel.h> /* For k_usleep() */
 
-/* High 32-bits of the 64-bit timestamp counter. */
-STATIC_IF_NOT(CONFIG_HWTIMER_64BIT) volatile uint32_t clksrc_high;
-
 int timestamp_expired(timestamp_t deadline, const timestamp_t *now)
 {
 	timestamp_t now_val;
@@ -63,21 +60,7 @@ timestamp_t get_time(void)
 		return *get_time_mock;
 #endif /* CONFIG_ZTEST */
 
-	if (IS_ENABLED(CONFIG_HWTIMER_64BIT)) {
-		ts.val = __hw_clock_source_read64();
-	} else {
-		ts.le.hi = clksrc_high;
-		ts.le.lo = __hw_clock_source_read();
-		/*
-		 * TODO(b/213342294) If statement below doesn't catch overflows
-		 * when interrupts are disabled or currently processed interrupt
-		 * has higher priority.
-		 */
-		if (ts.le.hi != clksrc_high) {
-			ts.le.hi = clksrc_high;
-			ts.le.lo = __hw_clock_source_read();
-		}
-	}
+	ts.val = __hw_clock_source_read64();
 
 	return ts;
 }
