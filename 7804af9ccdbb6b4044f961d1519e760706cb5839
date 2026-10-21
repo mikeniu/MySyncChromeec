@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bef4a144_ef090e77",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1467080
+      },
+      "writtenOn": "2026-10-21T18:28:42Z",
+      "side": 1,
+      "message": "Done. Implemented Option #1: added zephyr/dts/bindings/input/cros-ec,power-button-keyboard.yaml with suppress-enable-pin marked required: true, made PLATFORM_EC_POWER_BUTTON_KEYBOARD depend on DT_HAS_CROS_EC_POWER_BUTTON_KEYBOARD_ENABLED, and dropped the runtime #if guard.",
+      "parentUuid": "4d646472_77316a5c",
+      "range": {
+        "startLine": 482,
+        "startChar": 1,
+        "endLine": 482,
+        "endChar": 49
+      },
+      "revId": "7804af9ccdbb6b4044f961d1519e760706cb5839",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cb84c6c_1236ef3b",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a13e481_d1f90473",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 1467080
+      },
+      "writtenOn": "2026-10-21T18:28:42Z",
+      "side": 1,
+      "message": "Done (updated to check gpio_pin_get_dt(PB_SUPPRESS_EN_GPIO) \u003d\u003d 1).",
+      "parentUuid": "5cb84c6c_1236ef3b",
+      "range": {
+        "startLine": 484,
+        "startChar": 6,
+        "endLine": 484,
+        "endChar": 21
+      },
+      "revId": "7804af9ccdbb6b4044f961d1519e760706cb5839",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4140070_82cca2ff",
@@ -77,6 +125,30 @@
       "writtenOn": "2026-10-21T00:07:55Z",
       "side": 1,
       "message": "Nit: This should be moved before the call to tablet_reset() to align with CrosEC code style guidelines",
+      "range": {
+        "startLine": 83,
+        "startChar": 1,
+        "endLine": 84,
+        "endChar": 42
+      },
+      "revId": "7804af9ccdbb6b4044f961d1519e760706cb5839",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b29bae50_a92ccba1",
+        "filename": "zephyr/test/drivers/button/src/main.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1467080
+      },
+      "writtenOn": "2026-10-21T18:28:42Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e4140070_82cca2ff",
       "range": {
         "startLine": 83,
         "startChar": 1,
