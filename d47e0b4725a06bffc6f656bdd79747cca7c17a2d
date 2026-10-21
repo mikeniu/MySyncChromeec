@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "623cf187_f7210e0d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T08:30:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **[CL Description Blocker — Action Required]** The description narrates the diff (listing functions like `acquire_image` and `finger_status` and their internal conversion logic) without stating the high-level purpose or why these additions are needed. Per go/cl-descriptions#llm-prompts and go/cl-descriptions#informative, please state the high-level functional intent and motivation (e.g., supporting biometric authentication flows).\n\nSince this CL must be split (see top-level comment), please use targeted commit messages for each split CL.\nFor example, for the image capture CL:\n```\nzephyr: fingerprint: Implement rts5817maa image capture\n\nImplement the image capture flow for the RTS5817MAA driver to support biometric authentication.\n\nThis translates standard capture types to the vendor-specific format and maps sensor response codes to standard fingerprint scan errors.\n```\nFor the finger status CL:\n```\nzephyr: fingerprint: Implement rts5817maa finger status detection\n\nImplement finger status detection for the RTS5817MAA driver to determine when a user is interacting with the sensor.\n```\n\n[🔗](http://go/tj/989fbd5c-657a-47db-a191-87105bef8574)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d47e0b4725a06bffc6f656bdd79747cca7c17a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea13745e_b4e8fcb1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T08:30:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\nThis CL violates the **Single Logical Change** rule by bundling two independent capabilities.\n\n### Review Summary\n* **Functionality:** Verified. The error mapping and boundary logic are correct.\n* **Architecture \u0026 Component Fit:** Verified.\n* **Code Simplicity:** Verified. The `ret` variable scoping has been fixed cleanly.\n* **Idiomaticity \u0026 Readability:** Verified.\n* **Testing:** Verified. Complete coverage with exact argument assertions.\n* **CL Size \u0026 Scope:** Size: M (+244, -0). ❌ **Changes Requested**. The CL implements two independent driver features. The subject line explicitly joins two distinct noun categories (\"image capture and finger status\") under the umbrella verb \"Add\", and the changes pass the independent-revert test. Please split this CL:\n  1. CL 1: Add `finger_status` support to the driver and its unit tests.\n  2. CL 2: Add `acquire_image` support to the driver and its unit tests.\n* **Commit Message:** ❌ **Changes Requested**. See inline comment on `/COMMIT_MSG` regarding missing high-level intent and diff narration.\n\n[🔗](http://go/tj/989fbd5c-657a-47db-a191-87105bef8574)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d47e0b4725a06bffc6f656bdd79747cca7c17a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
