@@ -1,0 +1,3 @@
+tests:
+  npcx_itim:
+    tags: npcx timer
