@@ -51,40 +51,40 @@ ZTEST(fpsensor_utils, test_validate_fp_buffer_offset_failure_overflow)
 
 ZTEST(fpsensor_utils, test_is_finger_needed)
 {
-	zassert_true(is_finger_needed(FP_MODE_CAPTURE |
-				      FP_CAPTURE_VENDOR_FORMAT
-					      << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
-				       FP_CAPTURE_DEFECT_PXL_TEST
+	static_assert(is_finger_needed(FP_MODE_CAPTURE |
+				       FP_CAPTURE_VENDOR_FORMAT
 					       << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
-				       FP_CAPTURE_ABNORMAL_TEST
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_DEFECT_PXL_TEST
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_ABNORMAL_TEST
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_NOISE_TEST
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(is_finger_needed(FP_MODE_CAPTURE |
+				       FP_CAPTURE_SIMPLE_IMAGE
 					       << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
-				       FP_CAPTURE_NOISE_TEST
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_PATTERN0
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_PATTERN1
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(is_finger_needed(FP_MODE_CAPTURE |
+				       FP_CAPTURE_QUALITY_TEST
 					       << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_true(is_finger_needed(FP_MODE_CAPTURE |
-				      FP_CAPTURE_SIMPLE_IMAGE
-					      << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
-				       FP_CAPTURE_PATTERN0
-					       << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
-				       FP_CAPTURE_PATTERN1
-					       << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_true(is_finger_needed(FP_MODE_CAPTURE |
-				      FP_CAPTURE_QUALITY_TEST
-					      << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
-				       FP_CAPTURE_RESET_TEST
-					       << FP_MODE_CAPTURE_TYPE_SHIFT));
-	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
-				       FP_CAPTURE_PATTERN2
-					       << FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_RESET_TEST
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_PATTERN2
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
 
 	/* Check the case where FP_MODE_CAPTURE is not set. */
-	zassert_true(is_finger_needed(FP_CAPTURE_PATTERN0
-				      << FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(is_finger_needed(FP_CAPTURE_PATTERN0
+				       << FP_MODE_CAPTURE_TYPE_SHIFT));
 }
 
 ZTEST(fpsensor_utils, test_skip_image_offset)
