@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "452c89ef_2d64d41e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:50:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5f7fa545-e513-4316-8af1-3ca27908dcf6)]\n\n### Review Summary\n* **Functionality:** No issues found. The behavior is correctly preserved.\n* **Architecture \u0026 Component Fit:** No issues found. Moving the function to the header is appropriate for `constexpr` compile-time evaluation.\n* **Code Simplicity:** No issues found. The test code correctly delegates evaluation to `static_assert` rather than duplicating the evaluation with runtime assertions.\n* **Idiomaticity \u0026 Readability:** No issues found. The use of `[[nodiscard]]` and `noexcept` is excellent modernization.\n* **Security:** No issues found.\n* **Testing:** No issues found. Exhaustive coverage of all boundary and enum values (`EC_MKBP_FP_ERR_MATCH_YES*` and `EC_MKBP_FP_ERR_MATCH_NO*`) is correctly implemented via `static_assert`.\n* **CL Size \u0026 Scope:** Size: S (+20, -8). The CL appropriately encapsulates a single logical change to make `fp_match_success` a compile-time evaluated function, along with its exhaustive test.\n* **Commit Message:** No issues found. The message is concise and accurately captures the *Why* and *What* of the change.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "14e1246ac82f3ec77eccda306e44d8c56d1e6690",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
