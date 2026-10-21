@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d11fca2_4cdbcae5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T04:02:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for blocking issues. [🔗](http://go/tj/32f5f437-b113-453e-81e5-3321f664924a)\n\n### Review Summary\n* **Functionality:** Verified. The behavior and error handling logic for `acquire_image` and `finger_status` are correctly mapped.\n* **Architecture \u0026 Component Fit:** Verified.\n* **Code Simplicity:** ❌ **Changes Requested**. The `ret` variable scope in `rts5817maa_acquire_image` should be minimized to the point of assignment.\n* **Idiomaticity \u0026 Readability:** ❌ **Changes Requested**. Found a few minor whitespace and indentation issues in `rts5817maa_acquire_image`.\n* **Testing:** ❌ **Changes Requested**. Test coverage is excellent, including boundary tests for buffer size and exhaustive capture type conversions. However, the `acquire_image` tests omit asserting that the `image` buffer pointer was correctly passed down to the mocked sensor function.\n* **CL Size \u0026 Scope:** Size: M (+243, -0). The CL adds the `acquire_image` and `finger_status` flows, which together represent a cohesive set of image capture operations.\n* **Commit Message:** Verified.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "441430568e599824264cd39a3d4ce9f3f5925e25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4024d78f_227a50b2",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T04:02:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `ret` variable is declared at the top of the function but not used until after the initial validation checks. To follow the principle of minimal lexical scope, declare and initialize it directly at the point of assignment.\n\nAdditionally, fix the indentation for `rts5817maa_sensor_acquire_image`, the `LOG_ERR` arguments, and the `return -ENOTSUP` statement (which currently has an errant leading space).\n\nSuggestion:\n```c\n\tif (!IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {\n\t\treturn -ENOTSUP;\n\t}\n\n\tint ret \u003d convert_rts_get_image_error_code(\n\t\trts5817maa_sensor_acquire_image(image, rts_capture_mode));\n\n\tif (ret) {\n\t\tLOG_ERR(\"Failed to acquire image with capture_type %d: %d\",\n\t\t\tcapture_type, ret);\n\t}\n\n\treturn ret;\n```\n(and remove `int ret \u003d 0;` at line 242).\n[🔗](http://go/tj/32f5f437-b113-453e-81e5-3321f664924a)",
+      "range": {
+        "startLine": 255,
+        "startChar": 0,
+        "endLine": 266,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "441430568e599824264cd39a3d4ce9f3f5925e25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df4d1c57_8bb8245a",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T04:02:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Missing Test Oracle Integrity:** The test verifies `arg1_val` (the capture mode) but omits verifying that the actual `image` buffer pointer was correctly passed down to the fake (`arg0_val`).\n\nRequire asserting the exact expected arguments to prevent regression:\n```c\n\tzassert_equal(rts5817maa_sensor_acquire_image_fake.call_count, 1);\n\tzassert_equal(rts5817maa_sensor_acquire_image_fake.arg0_val, buffer);\n\tzassert_equal(rts5817maa_sensor_acquire_image_fake.arg1_val,\n\t\t      RTS_CAPTURE_NORMAL_FORMAT);\n```\n\n*Note: This also applies to `test_acquire_image_large_buffer`.*\n[🔗](http://go/tj/32f5f437-b113-453e-81e5-3321f664924a)",
+      "range": {
+        "startLine": 406,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "441430568e599824264cd39a3d4ce9f3f5925e25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
