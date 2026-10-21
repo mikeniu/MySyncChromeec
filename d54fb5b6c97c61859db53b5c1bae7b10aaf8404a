@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f1bb798_f821ffd1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T09:02:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/6c0ed1e5-ed1c-4129-925f-2523e661a760)]\n\n### Review Summary\n\n*   **Functionality:** The logic correctly enforces protection range checks and overlaps, translating EC flags into SPI flash status register boundaries.\n*   **Architecture \u0026 Component Fit:** Cleanly implements the `cros_flash_driver_api`.\n*   **Code Simplicity:** Excellent. Redundant states have been removed and nested conditions flattened into clear guard clauses.\n*   **Idiomaticity \u0026 Readability:** Excellent. The code uses clear variable names and follows standard Zephyr C idioms.\n*   **Security:** Handles I/O failure securely by panicking if it cannot re-enable software protection after a temporary disable, failing closed.\n*   **Testing:** Thorough test suite with exact on-boundary and off-by-one (`ROR`) tests for the protected ranges, as well as error path validation for status register writes.\n*   **CL Size \u0026 Scope:** Size: L (+365, -27). The production (non-test) diff is ~150 lines and implements a single cohesive logical change. The remaining delta consists of unit tests. This is well within the acceptable limits.\n*   **Commit Message:** Clear, concise, follows the formatting rules, and includes required `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d54fb5b6c97c61859db53b5c1bae7b10aaf8404a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
