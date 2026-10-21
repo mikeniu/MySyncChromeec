@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dbf728a_6711ae70",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:35:27Z",
+      "side": 1,
+      "message": "Done. Removed all_protected and its users. ALL protection is now represented only by the status register range.",
+      "parentUuid": "647f9ff3_ce215080",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 9999
+      },
+      "revId": "64a9383a8dd3dda20f80933dbd8b7aaf0ae6cde6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f133db5c_c2d9f87a",
@@ -66,6 +90,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "64a9383a8dd3dda20f80933dbd8b7aaf0ae6cde6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "346ff018_6fc32828",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:35:27Z",
+      "side": 1,
+      "message": "Done. Flattened into an early-return guard.",
+      "parentUuid": "f133db5c_c2d9f87a",
+      "range": {
+        "startLine": 441,
+        "startChar": 0,
+        "endLine": 451,
+        "endChar": 9999
+      },
       "revId": "64a9383a8dd3dda20f80933dbd8b7aaf0ae6cde6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
