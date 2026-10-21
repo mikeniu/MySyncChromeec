@@ -1,0 +1,135 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e86b0ea7_c9913654",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-21T14:11:32Z",
+      "side": 1,
+      "message": "can you use a uint16_t here? save a couple bytes of flash, I\u0027d imagine the range of this would be pretty small anyway",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87f78a80_14ce41da",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-21T14:11:32Z",
+      "side": 1,
+      "message": "you can drop the `_OR` part since you have a default in the binding (or you can drop the default in the binding, either works)",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf291d87_acece871",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-21T14:11:32Z",
+      "side": 1,
+      "message": "just pass `enabled`, no point using a ternary to set the boolean to 1/0, I\u0027d drop the one below as well, `gpio_pin_get_dt` already returns 0 or 1 in the success case",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76253f85_e08c301b",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-21T14:11:32Z",
+      "side": 1,
+      "message": "add braces, that\u0027s the convention for code under zephyr/",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 31
+      },
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10352b79_05c9548a",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-21T14:11:32Z",
+      "side": 1,
+      "message": "use two condition and use `LOG_ERR_DEVICE_NOT_READY` so you get the message pointing at the specific gpio device and you have no extra flash used since the error string is already in the image",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 2
+      },
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fa72f02_caae5006",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-21T14:11:32Z",
+      "side": 1,
+      "message": "drop, these kindof driver should stay quiet, not a lot of value in knowing it initialized the basic stuff anyway, save a bit of flash if anything",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fcddac3_dc116b79",
+        "filename": "zephyr/dts/bindings/switchcap/cros-ec,switchcap.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-21T14:11:32Z",
+      "side": 1,
+      "message": "is it referred as `poff` in some datasheet specifically? otherwise I\u0027d go for the full name, you have `power-good`, just use `power-off-delay-ms`",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
