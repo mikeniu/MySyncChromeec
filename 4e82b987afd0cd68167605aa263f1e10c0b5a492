@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94db4821_9c535d31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:58:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n*   **Functionality:** Found a silent defect where `.image_data_offset_bytes` is missing from the production `RTS5817MAA_IMAGE_PARAM_INITIALIZER` macro, masked by the test harness`s zero-initialization. Also noted that `rts5817maa_deinit` silently drops the return value of `rts5817maa_disable_irq`. See inline comments.\n*   **Architecture \u0026 Component Fit:** The base driver correctly implements the `cros_fingerprint` interface and safely encapsulates private library calls.\n*   **Code Simplicity:** Straightforward and minimal implementation overall.\n*   **Idiomaticity \u0026 Readability:** Clean use of device tree macros and Zephyr idioms.\n*   **Security:** No vulnerabilities or resource leaks detected.\n*   **Testing \u0026 Test Coverage:** Unit tests have been added to this CL. The core behavior and mapping logic are properly verified with FFF mocks.\n*   **CL Size \u0026 Scope:** Size: L (+600, -0). The production diff is $\u003c 250$ lines, representing a cohesive driver base implementation cleanly separated from the test harness. This is an appropriate single logical change.\n*   **Commit Message:** Clean and accurate, with an updated `TEST\u003d` command.\n\n[🔗](http://go/tj/8db060fd-a54b-4e3a-90dd-2e76b45a8a98)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4e82b987afd0cd68167605aa263f1e10c0b5a492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f3f1ac9_d7696c32",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:58:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe return value of `rts5817maa_disable_irq(dev)` is dropped here. Since `deinit` returns an `int` to indicate success or failure, it is more robust to propagate the error back to the Zephyr API if disabling the interrupt fails.\n\nSuggested replacement:\n```c\n\treturn rts5817maa_disable_irq(dev);\n```\n[🔗](http://go/tj/8db060fd-a54b-4e3a-90dd-2e76b45a8a98)",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4e82b987afd0cd68167605aa263f1e10c0b5a492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12ca512d_0bc3e114",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:58:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe production driver macro `RTS5817MAA_IMAGE_PARAM_INITIALIZER` is missing the initialization for `.image_data_offset_bytes`.\n\nBecause omitted fields in a designated initializer are zero-initialized, and the test overlay uses `image-data-offset-bytes \u003d \u003c0\u003e;`, the test`s `zassert_mem_equal` passes, silently masking the fact that the driver fails to extract this field from the devicetree.\n\nPlease add it so that non-zero offsets from real configs are properly extracted:\n```c\n\t\t.image_data_offset_bytes \u003d                                     \\\n\t\t\tFINGERPRINT_SENSOR_IMAGE_OFFSET(idx, DT_DRV_INST(inst)), \\\n```\n[🔗](http://go/tj/8db060fd-a54b-4e3a-90dd-2e76b45a8a98)",
+      "range": {
+        "startLine": 199,
+        "startChar": 0,
+        "endLine": 211,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4e82b987afd0cd68167605aa263f1e10c0b5a492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
