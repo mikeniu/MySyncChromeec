@@ -19,7 +19,6 @@ _fpsensor_crypto_obj:=$(_fpsensor_dir)fpsensor_crypto.o
 _fpsensor_obj:=$(_fpsensor_dir)fpsensor.o
 _fpsensor_detect_strings_obj:=$(_fpsensor_dir)fpsensor_detect_strings.o
 _fpsensor_debug_obj:=$(_fpsensor_dir)fpsensor_debug.o
-_fpsensor_utils_obj:=$(_fpsensor_dir)fpsensor_utils.o
 _fpsensor_auth_commands_obj:=$(_fpsensor_dir)fpsensor_auth_commands.o
 _fpsensor_auth_handshake_obj:=$(_fpsensor_dir)fpsensor_auth_handshake.o
 _fpsensor_auth_crypto_stateful_obj:=$(_fpsensor_dir)fpsensor_auth_crypto_stateful.o
@@ -31,7 +30,6 @@ $(out)/RW/$(_fpsensor_crypto_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_detect_strings_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_debug_obj): CFLAGS+=$(fpsensor_CFLAGS)
-$(out)/RW/$(_fpsensor_utils_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_commands_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_handshake_obj): CFLAGS+=$(fpsensor_CFLAGS)
 $(out)/RW/$(_fpsensor_auth_crypto_stateful_obj): CFLAGS+=$(fpsensor_CFLAGS)
@@ -57,7 +55,6 @@ ifeq ($(TEST_BUILD),y)
 fpsensor_obj_image=y
 endif
 
-all-obj-$(fpsensor_obj_image)+=$(_fpsensor_utils_obj)
 all-obj-$(fpsensor_obj_image)+=$(_fpsensor_auth_crypto_stateless_obj)
 all-obj-$(fpsensor_obj_image)+=$(_fpsensor_crypto_obj)
 all-obj-$(fpsensor_obj_image)+=$(_fpsensor_auth_crypto_stateful_obj)
