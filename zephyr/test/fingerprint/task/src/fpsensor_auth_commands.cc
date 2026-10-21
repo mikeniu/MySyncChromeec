@@ -11,6 +11,7 @@
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
+#include "fpsensor/fpsensor_crypto_context.h"
 #include "fpsensor/fpsensor_state.h"
 #include "mock/otpi_mock.h"
 #include "openssl/aes.h"
@@ -1833,4 +1834,60 @@ ZTEST(fpsensor_auth_commands, test_raii_p256_and_pairing_key_wrappers)
 	zassert_equal(fp_pairing_key::unwrap_into(corrupted, unwrapped)
 			      .error_or(EC_SUCCESS),
 		      EC_ERROR_INVAL);
+}
+
+ZTEST(fpsensor_auth_commands, test_challenge_expiry_boundaries)
+{
+	std::array<uint8_t, SHA256_DIGEST_LENGTH> key{};
+	std::array<uint8_t, FP_CHALLENGE_SIZE> chal{};
+	std::array<uint8_t, FP_CHALLENGE_SIZE> out{};
+	timestamp_t ctime{};
+	uint32_t status = 0;
+
+	zassert_true(
+		FpAuthChallenge::generate(chal, out, ctime, status).has_value());
+	zassert_true(status & FP_AUTH_CHALLENGE_SET);
+
+	const FpTimestamp issued{ FpClock::duration{ ctime.val } };
+	const FpTimestamp exact_expiry =
+		issued + FpAuthChallenge::kValidityWindow;
+
+	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
+	static constexpr uint8_t kSender[] = { 'f', 'p' };
+	static constexpr uint8_t kOp[] = { 'o', 'p' };
+	zassert_equal(compute_message_signature(key, {}, kSender, kOp, chal,
+						mac),
+		      EC_SUCCESS);
+
+	zassert_true(FpAuthChallenge::consume_and_verify(
+			     key, chal, ctime, status, {}, kSender, kOp, mac,
+			     exact_expiry - std::chrono::microseconds(1))
+			     .has_value());
+	status |= FP_AUTH_CHALLENGE_SET;
+
+	zassert_true(FpAuthChallenge::consume_and_verify(key, chal, ctime,
+							 status, {}, kSender,
+							 kOp, mac, exact_expiry)
+			     .has_value());
+	zassert_false(status & FP_AUTH_CHALLENGE_SET);
+	zassert_equal(FpAuthChallenge::consume_and_verify(
+			      key, chal, ctime, status, {}, kSender, kOp, mac,
+			      exact_expiry)
+			      .error(),
+		      EC_ERROR_ACCESS_DENIED);
+
+	status |= FP_AUTH_CHALLENGE_SET;
+	zassert_equal(FpAuthChallenge::consume_and_verify(
+			      key, chal, ctime, status, {}, kSender, kOp, mac,
+			      exact_expiry + std::chrono::microseconds(1))
+			      .error(),
+		      EC_ERROR_TIMEOUT);
+
+	status |= FP_AUTH_CHALLENGE_SET;
+	mac[0] ^= 1;
+	zassert_equal(FpAuthChallenge::consume_and_verify(
+			      key, chal, ctime, status, {}, kSender, kOp, mac,
+			      exact_expiry)
+			      .error(),
+		      EC_ERROR_ACCESS_DENIED);
 }

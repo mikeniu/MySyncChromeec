@@ -10,16 +10,33 @@
 
 #include "common.h"
 #include "ec_commands.h"
+#include "timer.h"
 
 #ifdef is_negative
 #undef is_negative
 #endif
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <expected>
 #include <span>
 #include <string_view>
+
+struct FpClock {
+	using rep = int64_t;
+	using period = std::micro;
+	using duration = std::chrono::microseconds;
+	using time_point = std::chrono::time_point<FpClock>;
+	static constexpr bool is_steady = true;
+
+	[[nodiscard]] static time_point now() noexcept
+	{
+		return time_point{ duration{ get_time().val } };
+	}
+};
+
+using FpTimestamp = FpClock::time_point;
 
 /**
  * Test that size+offset does not exceed buffer_size
