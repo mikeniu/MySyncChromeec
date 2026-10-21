@@ -26,13 +26,7 @@ extern "C" {
 /* Host unit test (Twister/native_sim) uses the fake in system_fake.c */
 void ztest_interrupt_disable_all(void);
 #define interrupt_disable_all() ztest_interrupt_disable_all()
-#elif defined(CONFIG_CPU_CORTEX_M)
-/*
- * For cortex-m we cannot use irq_lock() for disabling all the interrupts
- * because it leaves some (NMI and faults) still enabled.
- */
-#define interrupt_disable_all() __asm__ volatile("cpsid i" ::: "memory")
-#else /* !CONFIG_CPU_CORTEX_M */
+#else
 #define interrupt_disable_all() irq_lock()
 #endif
 
