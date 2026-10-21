@@ -10,6 +10,7 @@
 #include "registers.h"
 #define SERVO_BRIDGE_FIXED_LEADER 1
 #include "servo_usb_bridge_frame.h"
+#include "system.h"
 #include "task.h"
 #include "timer.h"
 #include "usart.h"
@@ -19,6 +20,22 @@
 #include "usb_hw.h"
 #include "usb_pd.h"
 #include "util.h"
+
+#ifndef DEFAULT_SERIALNO
+#define DEFAULT_SERIALNO "Uninitialized"
+#endif
+
+static inline int servo_strcmp(const char *s1, const char *s2)
+{
+	while (*s1 && (*s1 == *s2)) {
+		s1++;
+		s2++;
+	}
+	return *(const unsigned char *)s1 - *(const unsigned char *)s2;
+}
+#ifndef strcmp
+#define strcmp(s1, s2) servo_strcmp((s1), (s2))
+#endif
 
 #ifndef STM32_USART_CR2_STOP_2B
 #define STM32_USART_CR2_STOP_2B BIT(13)
@@ -42,6 +59,9 @@ static uint8_t fb_tx_64b_count;
 static uint32_t last_ep7_in_drain_us;
 static bool kbd_in_flight;
 static uint32_t last_key_cmd_us;
+static volatile uint8_t ep2_out_pending;
+static uint8_t latest_msc_req_tag;
+static bool pending_serial_sync;
 
 #define SERVO_PROBE_WAIT_BOOT_1M_US (250 * MSEC)
 #define SERVO_PROBE_9600_TIMEOUT_US 10000U
@@ -59,6 +79,42 @@ static uint32_t usart4_virtual_baud = 1000000U;
 
 static usb_uint ep_bridge_rx_buffer[64 / 2] __usb_ram;
 static usb_uint ep_bridge_tx_buffer[64 / 2] __usb_ram;
+static usb_uint ep_msc_rx_buffer[64 / 2] __usb_ram;
+static usb_uint ep_msc_tx_buffer[64 / 2] __usb_ram;
+
+const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_MSC) = {
+	.bLength = USB_DT_INTERFACE_SIZE,
+	.bDescriptorType = USB_DT_INTERFACE,
+	.bInterfaceNumber = USB_IFACE_MSC,
+	.bAlternateSetting = 0,
+	.bNumEndpoints = 2,
+	.bInterfaceClass = USB_CLASS_VENDOR_SPEC,
+	.bInterfaceSubClass = 0x50,
+	.bInterfaceProtocol = 0x01,
+	.iInterface = 0,
+};
+const struct usb_endpoint_descriptor USB_EP_DESC(USB_IFACE_MSC, 0) = {
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = 0x80 | USB_EP_MSC,
+	.bmAttributes = 0x02 /* Bulk IN */,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+};
+const struct usb_endpoint_descriptor USB_EP_DESC(USB_IFACE_MSC, 1) = {
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = USB_EP_MSC,
+	.bmAttributes = 0x02 /* Bulk OUT */,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+};
+
+static void usb_msc_tx(void);
+static void usb_msc_rx(void);
+static void usb_msc_event(enum usb_ep_event evt);
+
+USB_DECLARE_EP(USB_EP_MSC, usb_msc_tx, usb_msc_rx, usb_msc_event);
 
 const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_BRIDGE) = {
 	.bLength = USB_DT_INTERFACE_SIZE,
@@ -107,11 +163,16 @@ DECLARE_DEFERRED(bridge_dppu_reconnect_deferred);
 #define EP_CTR_TX BIT(7)
 #define EP_CTR_BOTH (EP_CTR_RX | EP_CTR_TX)
 
-static void ep7_toggle_safe(uint16_t mask, uint16_t val)
+static void ep_toggle_safe(int ep, uint16_t mask, uint16_t val)
 {
 	interrupt_disable();
-	STM32_TOGGLE_EP(USB_EP_BRIDGE, mask, val, EP_CTR_BOTH);
+	STM32_TOGGLE_EP(ep, mask, val, EP_CTR_BOTH);
 	interrupt_enable();
+}
+
+static inline void ep7_toggle_safe(uint16_t mask, uint16_t val)
+{
+	ep_toggle_safe(USB_EP_BRIDGE, mask, val);
 }
 
 static void ep7_disarm_tx_preserve_dtog(void)
@@ -218,6 +279,10 @@ static void bridge_dppu_reconnect_deferred(void)
 		ep7_toggle_safe(EP_TX_RX_MASK | EP_RX_DTOG | EP_TX_DTOG,
 				EP_TX_NAK | EP_RX_VALID);
 	}
+	btable_ep[USB_EP_MSC].tx_count = 0;
+	btable_ep[USB_EP_MSC].rx_count = usb_ep_rx_size(64);
+	ep_toggle_safe(USB_EP_MSC, EP_TX_RX_MASK | EP_RX_DTOG | EP_TX_DTOG,
+		       EP_TX_NAK | EP_RX_VALID);
 }
 
 static void usart4_configure_line(int baud, bool two_stop_bits)
@@ -317,6 +382,9 @@ void usb_bridge_init(void)
 	fb_tx_64b_count = 0;
 	kbd_in_flight = false;
 	host_usb_reset_irq = false;
+	ep2_out_pending = 0;
+	latest_msc_req_tag = 0;
+	pending_serial_sync = true;
 	atmel_reset_held = false;
 	active_usb_protocol = SERVO_PROTO_NONE;
 	effective_usb_protocol = SERVO_PROTO_NONE;
@@ -335,6 +403,32 @@ void usb_bridge_init(void)
 	usart4_configure_line(1000000, /*two_stop_bits=*/true);
 
 	hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+}
+
+static void usb_msc_tx(void)
+{
+	STM32_TOGGLE_EP(USB_EP_MSC, 0, 0, EP_CTR_RX);
+	hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+}
+
+static void usb_msc_rx(void)
+{
+	STM32_TOGGLE_EP(USB_EP_MSC, 0, 0, EP_CTR_TX);
+	ep2_out_pending = 1;
+	hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+}
+
+static void usb_msc_event(enum usb_ep_event evt)
+{
+	if (evt == USB_EVENT_RESET) {
+		ep2_out_pending = 0;
+		btable_ep[USB_EP_MSC].tx_addr = usb_sram_addr(ep_msc_tx_buffer);
+		btable_ep[USB_EP_MSC].tx_count = 0;
+		btable_ep[USB_EP_MSC].rx_addr = usb_sram_addr(ep_msc_rx_buffer);
+		btable_ep[USB_EP_MSC].rx_count = usb_ep_rx_size(64);
+
+		STM32_USB_EP(USB_EP_MSC) = USB_EP_MSC | EP_TX_NAK | EP_RX_VALID;
+	}
 }
 
 static void usb_bridge_tx(void)
@@ -539,6 +633,30 @@ static void bridge_process_uart_rx(uint32_t now_us)
 			queue_add_unit(&bridge_kbd_to_usb, &fx.key_ack_ch);
 		}
 
+		if (fx.msc_frame_received &&
+		    fx.msc_frame_type == SERVO_FRAME_MSC_REQ &&
+		    fx.msc_frame_len == sizeof(struct servo_msc_req)) {
+			latest_msc_req_tag = fx.msc_frame_payload[1];
+			if (bridge.pending_msc_len > 0 &&
+			    bridge.pending_msc_type == SERVO_FRAME_MSC_DATA &&
+			    bridge.pending_msc_buf[0] != SERVO_MSC_RSP_SERIAL &&
+			    bridge.pending_msc_buf[1] != latest_msc_req_tag) {
+				bridge.pending_msc_len = 0;
+			}
+			interrupt_disable();
+			STM32_TOGGLE_EP(USB_EP_MSC, EP_TX_MASK, EP_TX_NAK,
+					EP_CTR_BOTH);
+			memcpy_to_usbram(
+				(void *)usb_sram_addr(ep_msc_tx_buffer),
+				fx.msc_frame_payload,
+				sizeof(struct servo_msc_req));
+			btable_ep[USB_EP_MSC].tx_count =
+				sizeof(struct servo_msc_req);
+			STM32_TOGGLE_EP(USB_EP_MSC, EP_TX_MASK, EP_TX_VALID,
+					EP_CTR_BOTH);
+			interrupt_enable();
+		}
+
 		if (evt == SERVO_RX_EVT_FRAME_COMPLETE &&
 		    ((bridge.rx.type & SERVO_OPCODE_MASK) ==
 			     SERVO_FRAME_RESET_REQ ||
@@ -546,6 +664,7 @@ static void bridge_process_uart_rx(uint32_t now_us)
 			     SERVO_FRAME_RESET_ACK) &&
 		    (bridge.rx.arg_len & SERVO_RESET_FLAG_BOOT) != 0) {
 			kbd_in_flight = false;
+			pending_serial_sync = true;
 		}
 	}
 }
@@ -817,7 +936,7 @@ static void bridge_arbiter_deferred(void)
 			ep7_toggle_safe(EP_TX_MASK, EP_TX_VALID);
 		}
 
-		/* 4. Inbound Keyboard & Bulk OUT Staging */
+		/* 4. Inbound Keyboard, Bulk OUT, & MSC Staging */
 		if (probe_state == USB_BRIDGE_LOCKED_1M_BRIDGE) {
 			if (servo_bridge_can_send_key_cmd(&bridge,
 							  kbd_in_flight) &&
@@ -828,6 +947,67 @@ static void bridge_arbiter_deferred(void)
 					servo_bridge_send_key_cmd(&bridge, kch);
 					kbd_in_flight = true;
 					last_key_cmd_us = now_us;
+				}
+			}
+
+			if (pending_serial_sync &&
+			    bridge.state == SERVO_STATE_ACTIVE &&
+			    bridge.pending_msc_len == 0U) {
+				pending_serial_sync = false;
+				const char *serial = board_read_serial();
+				if (serial && serial[0] != '\0' &&
+				    strcmp(serial, DEFAULT_SERIALNO) != 0) {
+					uint8_t slen = 0;
+					while (slen < 32U &&
+					       serial[slen] != '\0')
+						slen++;
+					uint8_t spkt[36];
+					spkt[0] = SERVO_MSC_RSP_SERIAL;
+					spkt[1] = 0;
+					spkt[2] = slen;
+					spkt[3] = 0;
+					for (uint8_t i = 0; i < slen; i++)
+						spkt[4 + i] =
+							(uint8_t)serial[i];
+					servo_bridge_send_msc_data(
+						&bridge, spkt,
+						(uint8_t)(4U + slen));
+				}
+			}
+
+			if (ep2_out_pending) {
+				uint8_t pkt[SERVO_MAX_DATA_LEN];
+				size_t rx_len = btable_ep[USB_EP_MSC].rx_count &
+						RX_COUNT_MASK;
+				if (rx_len > SERVO_MAX_DATA_LEN)
+					rx_len = SERVO_MAX_DATA_LEN;
+				if (rx_len > 0) {
+					memcpy_from_usbram(
+						pkt,
+						(void *)usb_sram_addr(
+							ep_msc_rx_buffer),
+						rx_len);
+				}
+				if (rx_len < 2U ||
+				    pkt[1] != latest_msc_req_tag) {
+					/*
+					 * Stale req_tag fast-drain at 12 Mbps
+					 * USB speed
+					 * (NoStaleTagForwardedToUsart4).
+					 */
+					ep2_out_pending = 0;
+					btable_ep[USB_EP_MSC].rx_count =
+						usb_ep_rx_size(64);
+					ep_toggle_safe(USB_EP_MSC, EP_RX_MASK,
+						       EP_RX_VALID);
+				} else if (bridge.pending_msc_len == 0U) {
+					servo_bridge_send_msc_data(
+						&bridge, pkt, (uint8_t)rx_len);
+					ep2_out_pending = 0;
+					btable_ep[USB_EP_MSC].rx_count =
+						usb_ep_rx_size(64);
+					ep_toggle_safe(USB_EP_MSC, EP_RX_MASK,
+						       EP_RX_VALID);
 				}
 			}
 
@@ -903,7 +1083,8 @@ static void bridge_arbiter_deferred(void)
 		   bridge.pending_reset_req || bridge.pending_reset_ack ||
 		   bridge.pending_credit || bridge.pending_nak ||
 		   bridge.pending_key_cmd || bridge.pending_data_tx ||
-		   ep7_out_pending ||
+		   bridge.pending_msc_len > 0 || ep2_out_pending ||
+		   pending_serial_sync || ep7_out_pending ||
 		   (bridge.active_proto == SERVO_PROTO_FASTBOOT &&
 		    (fb_tx_64b_count & 0x03) != 0 && !ep7_zlp_in_flight)) {
 		hook_call_deferred(&bridge_arbiter_deferred_data, 1 * MSEC);
@@ -1063,34 +1244,84 @@ int bridge_iface_request(usb_uint *ep0_buf_rx, usb_uint *ep0_buf_tx)
 }
 USB_DECLARE_IFACE(USB_IFACE_BRIDGE, bridge_iface_request);
 
-int usb_bridge_clear_halt(uint8_t ep_addr)
+int msc_iface_request(usb_uint *ep0_buf_rx, usb_uint *ep0_buf_tx)
 {
-	if (effective_usb_protocol == SERVO_PROTO_NONE || dppu_pulse_active)
+	if (!ep0_buf_rx)
 		return -1;
 
-	if (ep_addr == (USB_EP_BRIDGE | 0x80)) {
-		btable_ep[USB_EP_BRIDGE].tx_count = 0;
-		ep7_zlp_in_flight = false;
-		STM32_TOGGLE_EP(USB_EP_BRIDGE, EP_TX_MASK | EP_TX_DTOG,
-				EP_TX_NAK, EP_CTR_BOTH);
-		if (bridge.usb_in_busy || !bridge.tx_credits ||
-		    bridge.has_tx_data) {
-			host_usb_reset_irq = true;
-			hook_call_deferred(&bridge_arbiter_deferred_data, 0);
-		}
-	} else if (ep_addr == USB_EP_BRIDGE) {
-		ep7_out_pending = 0;
-		ep7_out_session_handled = false;
-		btable_ep[USB_EP_BRIDGE].rx_count = usb_ep_rx_size(64);
-		STM32_TOGGLE_EP(USB_EP_BRIDGE, EP_RX_MASK | EP_RX_DTOG,
+	if (ep0_buf_rx[0] ==
+	    (USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_INTERFACE |
+	     (USB_REQ_SET_INTERFACE << 8))) {
+		if (ep0_buf_rx[1] != 0)
+			return -1;
+
+		btable_ep[USB_EP_MSC].tx_count = 0;
+		btable_ep[USB_EP_MSC].rx_count = usb_ep_rx_size(64);
+		ep2_out_pending = 0;
+		STM32_TOGGLE_EP(USB_EP_MSC,
+				EP_TX_RX_MASK | EP_RX_DTOG | EP_TX_DTOG,
+				EP_TX_NAK | EP_RX_VALID, EP_CTR_BOTH);
+		btable_ep[0].tx_count = 0;
+		STM32_TOGGLE_EP(0, EP_TX_RX_MASK, EP_RX_VALID | EP_TX_VALID, 0);
+		return 0;
+	}
+
+	if (ep0_buf_rx[0] ==
+	    (USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_INTERFACE |
+	     (USB_REQ_GET_INTERFACE << 8))) {
+		ep0_buf_tx[0] = 0;
+		btable_ep[0].tx_count = 1;
+		STM32_TOGGLE_EP(0, EP_TX_RX_MASK, EP_RX_VALID | EP_TX_VALID,
+				EP_STATUS_OUT);
+		return 0;
+	}
+
+	return -1;
+}
+USB_DECLARE_IFACE(USB_IFACE_MSC, msc_iface_request);
+
+int usb_bridge_clear_halt(uint8_t ep_addr)
+{
+	if (ep_addr == (USB_EP_MSC | 0x80)) {
+		btable_ep[USB_EP_MSC].tx_count = 0;
+		STM32_TOGGLE_EP(USB_EP_MSC, EP_TX_MASK | EP_TX_DTOG, EP_TX_NAK,
+				EP_CTR_BOTH);
+	} else if (ep_addr == USB_EP_MSC) {
+		ep2_out_pending = 0;
+		btable_ep[USB_EP_MSC].rx_count = usb_ep_rx_size(64);
+		STM32_TOGGLE_EP(USB_EP_MSC, EP_RX_MASK | EP_RX_DTOG,
 				EP_RX_VALID, EP_CTR_BOTH);
-		if (bridge.usb_in_busy || !bridge.tx_credits ||
-		    bridge.has_tx_data) {
-			host_usb_reset_irq = true;
-			hook_call_deferred(&bridge_arbiter_deferred_data, 0);
-		}
 	} else {
-		return -1;
+		if (effective_usb_protocol == SERVO_PROTO_NONE ||
+		    dppu_pulse_active)
+			return -1;
+
+		if (ep_addr == (USB_EP_BRIDGE | 0x80)) {
+			btable_ep[USB_EP_BRIDGE].tx_count = 0;
+			ep7_zlp_in_flight = false;
+			STM32_TOGGLE_EP(USB_EP_BRIDGE, EP_TX_MASK | EP_TX_DTOG,
+					EP_TX_NAK, EP_CTR_BOTH);
+			if (bridge.usb_in_busy || !bridge.tx_credits ||
+			    bridge.has_tx_data) {
+				host_usb_reset_irq = true;
+				hook_call_deferred(
+					&bridge_arbiter_deferred_data, 0);
+			}
+		} else if (ep_addr == USB_EP_BRIDGE) {
+			ep7_out_pending = 0;
+			ep7_out_session_handled = false;
+			btable_ep[USB_EP_BRIDGE].rx_count = usb_ep_rx_size(64);
+			STM32_TOGGLE_EP(USB_EP_BRIDGE, EP_RX_MASK | EP_RX_DTOG,
+					EP_RX_VALID, EP_CTR_BOTH);
+			if (bridge.usb_in_busy || !bridge.tx_credits ||
+			    bridge.has_tx_data) {
+				host_usb_reset_irq = true;
+				hook_call_deferred(
+					&bridge_arbiter_deferred_data, 0);
+			}
+		} else {
+			return -1;
+		}
 	}
 
 	btable_ep[0].tx_count = 0;
