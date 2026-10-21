@@ -562,6 +562,7 @@ ZTEST(nct38xx, test_vendor_defined_alert_device_not_ready)
 	const struct device *dev;
 	struct device_state *state;
 	int original_res;
+	bool original_init;
 	uint16_t val;
 	int rv;
 
@@ -571,8 +572,10 @@ ZTEST(nct38xx, test_vendor_defined_alert_device_not_ready)
 
 	state = (struct device_state *)dev->state;
 	original_res = state->init_res;
+	original_init = state->initialized;
 
 	/* Simulate device not ready */
+	state->initialized = false;
 	state->init_res = -1;
 	zassert_false(device_is_ready(dev), "Device should not be ready now");
 
@@ -585,6 +588,7 @@ ZTEST(nct38xx, test_vendor_defined_alert_device_not_ready)
 	nct38xx_tcpm_drv.tcpc_alert(NCT38XX_PORT);
 
 	/* Restore device state */
+	state->initialized = original_init;
 	state->init_res = original_res;
 	zassert_true(device_is_ready(dev), "Device should be ready again");
 
