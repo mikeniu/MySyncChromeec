@@ -163,16 +163,19 @@ struct usart_hw_config const usart4_hw = {
 static void usart3_4_interrupt(void)
 {
 	/*
-	 * This interrupt handler could be called with one of these configs
-	 * not initialized, so we need to check here and only call the generic
-	 * USART interrupt handler for initialized configs.
+	 * Service configs[3] (USART4) before configs[2] (USART3) and run
+	 * STM32_IRQ_USART3_4 at NVIC priority 0 (highest priority): on
+	 * servo_v4p1, USART4 connects to the ATmega32U4 USB bridge at
+	 * 1,000,000 baud (10 us per byte), whereas USART3 is a 115,200 baud
+	 * console UART. Servicing USART4 first at priority 0 minimizes
+	 * interrupt latency on high-speed framed traffic.
 	 */
-	if (configs[2])
-		usart_interrupt(configs[2]);
-
 	if (configs[3])
 		usart_interrupt(configs[3]);
+
+	if (configs[2])
+		usart_interrupt(configs[2]);
 }
 
-DECLARE_IRQ(STM32_IRQ_USART3_4, usart3_4_interrupt, 2);
+DECLARE_IRQ(STM32_IRQ_USART3_4, usart3_4_interrupt, 0);
 #endif
