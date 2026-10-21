@@ -21,6 +21,8 @@
 #include "usb_console.h"
 #include "util.h"
 
+#include <zephyr/logging/log_ctrl.h>
+
 #include <stdalign.h>
 
 /*
@@ -138,8 +140,21 @@ void panic_printf(const char *format, ...)
  */
 void panic_reboot(void)
 {
+	/*
+	 * Lock interrupts to disable preemption and force synchronous output.
+	 */
+	unsigned int key = irq_lock();
+
+	/*
+	 * Flush any remaining deferred log messages before printing the reboot
+	 * banner. LOG_PANIC() is idempotent if already called earlier.
+	 */
+	LOG_PANIC();
 	panic_puts("\n\nRebooting...\n");
 	system_reset(0);
+
+	if (IS_ENABLED(CONFIG_ZTEST))
+		irq_unlock(key);
 }
 
 test_mockable struct panic_data *panic_get_data(void)
