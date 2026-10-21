@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a8338e2_d320c6a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:38:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address inline comments. [[trajectory](http://go/tj/64b872c6-d1b3-4c0c-9331-56b86eaaa3c3)]\n\n### Review Summary\n\n**CL Size \u0026 Scope**: Size: L (+208, -46). The production diff is well under 250 lines and implements a single cohesive logical change (extracting `FpTemplateStore` and `FpTemplateId`). `✅`\n**Functionality**: Code behaves correctly, but `FpTemplateStore::consume_secret` bakes in a legacy test bug by using complex branch logic to return `TIMEOUT` instead of `ACCESS_DENIED` for unreadable secrets.\n**Architecture \u0026 Component Fit**: Clean RAII encapsulation for the template ID and secrets.\n**Code Simplicity**: The `consume_secret` branch logic should be flattened. Dropped log messages in `fp_command_sign_match` should be restored for consistency.\n**Testing**: Comprehensive boundary tests are provided, but the edge case for consuming an unreadable secret with an `expected_fgr` needs coverage once the logic is flattened.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810d947c_ec14b707",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:38:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Functionality / Observability**: This refactoring dropped the `CPRINTS(\"No match to be signed\");` and `CPRINTS(\"Deadline has passed\");` logging that existed in the previous logic (and which was preserved in the sibling function `fp_read_match_secret`).\n\nUnless removing these logs was intentional to save space, please restore them to maintain debuggability and consistency with the other command handler:\n\n```cpp\n\tconst auto matched \u003d FpTemplateStore::consume_secret(\n\t\tglobal_context.positive_match_secret_state);\n\tif (!matched.has_value()) {\n\t\tif (matched.error() \u003d\u003d EC_RES_TIMEOUT) {\n\t\t\tCPRINTS(\"Deadline has passed\");\n\t\t\treturn EC_HOST_CMD_TIMEOUT;\n\t\t}\n\t\tCPRINTS(\"No match to be signed\");\n\t\treturn EC_HOST_CMD_ACCESS_DENIED;\n\t}\n```\n[🔗](http://go/tj/64b872c6-d1b3-4c0c-9331-56b86eaaa3c3)",
+      "range": {
+        "startLine": 517,
+        "startChar": 0,
+        "endLine": 522,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f4293ab_6c0ffc88",
+        "filename": "include/fpsensor/fpsensor_template_store.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:38:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity \u0026 Control Flow**: As noted in the previous review, this multi-way branch block uses split error paths with duplicated checks (`copy.readable`) to preserve a legacy bug where `fp_read_match_secret` returned `TIMEOUT` instead of `ACCESS_DENIED` on an unreadable secret (because `deadline` was `0`, making `now \u003e\u003d 0` true).\n\nBaking a caller-specific legacy bug into a core domain abstraction (`FpTemplateStore`) violates encapsulation and forces convoluted branch logic. The abstraction should enforce the correct invariant (an unreadable secret is an access denial, regardless of the timeout check).\n\nPlease simplify this block to check readability first. If the legacy host tests (`fpsensor_match.cc` or `ec-legacy fpsensor_state.cc`) assert `EC_RES_TIMEOUT` on an unreadable secret, those tests should be updated to expect `EC_RES_ACCESS_DENIED` rather than warping this abstraction to preserve the broken test:\n\n```cpp\n\t\tif (!copy.readable || !matched.has_value()) {\n\t\t\treturn std::unexpected(EC_RES_ACCESS_DENIED);\n\t\t}\n\t\tif (now \u003e\u003d\n\t\t    FpTimestamp{ FpClock::duration{ copy.deadline.val } }) {\n\t\t\treturn std::unexpected(EC_RES_TIMEOUT);\n\t\t}\n\t\tif (expected_fgr.has_value() \u0026\u0026 *matched !\u003d *expected_fgr) {\n\t\t\treturn std::unexpected(EC_RES_ACCESS_DENIED);\n\t\t}\n```\n[🔗](http://go/tj/64b872c6-d1b3-4c0c-9331-56b86eaaa3c3)",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 118,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a087f3ed_5039b6c1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:38:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing**: Once `consume_secret` is fixed to check readability first, please add a test case verifying that passing `expected_fgr` to an unreadable secret correctly returns `EC_RES_ACCESS_DENIED` (not `EC_RES_TIMEOUT`):\n\n```cpp\n\t// Consume unreadable secret fails (with or without expected_fgr)\n\tzassert_equal(\n\t\tFpTemplateStore::consume_secret(state, std::nullopt, t0).error(),\n\t\tEC_RES_ACCESS_DENIED);\n\tzassert_equal(\n\t\tFpTemplateStore::consume_secret(state, *FpTemplateId::create(1), t0).error(),\n\t\tEC_RES_ACCESS_DENIED);\n```\n[🔗](http://go/tj/64b872c6-d1b3-4c0c-9331-56b86eaaa3c3)",
+      "range": {
+        "startLine": 246,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
