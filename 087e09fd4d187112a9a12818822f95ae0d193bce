@@ -35,6 +35,24 @@
       "message": "Looks like this fails on other boards. We can fix it with something like this: http://b/574030199",
       "revId": "087e09fd4d187112a9a12818822f95ae0d193bce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4acd0c3_e7bf7fd9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-21T12:45:30Z",
+      "side": 1,
+      "message": "@caiyi_zhong@realtek.corp-partner.google.com please check if crrev/c/8618001 fixes the test for you. It implements the approach suggested in the bug linked above",
+      "parentUuid": "4b0e62c6_e77f8c89",
+      "revId": "087e09fd4d187112a9a12818822f95ae0d193bce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
