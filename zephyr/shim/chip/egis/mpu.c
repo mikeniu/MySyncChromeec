@@ -6,3 +6,8 @@
 void mpu_enable(void)
 {
 }
+
+int mpu_protect_data_ram(void)
+{
+	return 0;
+}

@@ -54,3 +54,8 @@ test_mockable int mpu_lock_rollback(bool lock)
 					      PMP_R | PMP_W);
 }
 #endif
+
+int mpu_protect_data_ram(void)
+{
+	return 0;
+}

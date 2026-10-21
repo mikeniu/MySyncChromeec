@@ -10,3 +10,8 @@ void mpu_enable(void)
 	 * to do here. (no code RAM will be overwritten)
 	 */
 }
+
+int mpu_protect_data_ram(void)
+{
+	return 0;
+}

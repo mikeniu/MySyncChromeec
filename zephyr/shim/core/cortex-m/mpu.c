@@ -50,6 +50,18 @@ void mpu_enable(void)
 	}
 }
 
+int mpu_protect_data_ram(void)
+{
+	for (int index = 0; index < mpu_config.num_regions; index++) {
+		if (mpu_config.mpu_regions[index].base ==
+		    CONFIG_SRAM_BASE_ADDRESS) {
+			MPU->RNR = index;
+			MPU->RASR |= MPU_RASR_ENABLE_Msk;
+		}
+	}
+	return 0;
+}
+
 static int mpu_disable_fixed_regions(void)
 {
 	/* MPU is configured and enabled by the Zephyr init code, disable the

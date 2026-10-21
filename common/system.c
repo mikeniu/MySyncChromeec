@@ -443,7 +443,8 @@ test_mockable void system_disable_jump(void)
 		/* All regions were configured successfully, enable MPU */
 		mpu_enable();
 	} else {
-		CPRINTS("System is unlocked. Skip MPU configuration");
+		CPRINTS("System is unlocked. Keeping minimal MPU configuration to protect SRAM");
+		mpu_protect_data_ram();
 	}
 #endif /* CONFIG_MPU */
 }
