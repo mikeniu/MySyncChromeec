@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5b6d4ba_6ee031c1",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_non_dsx_common_pwrseq_sm_handler.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-21T22:21:18Z",
+      "side": 1,
+      "message": "Removed from header and declared in the unit test file.",
+      "parentUuid": "4d6763fa_4753c5bf",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 37
+      },
+      "revId": "f6891939e3c963a9a10e33322b3f97fdd21b93b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b002342_4416e3cf",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-21T19:55:14Z",
       "side": 1,
       "message": "Use `test_export_static` to allow this function to be called by unit tests.",
+      "range": {
+        "startLine": 670,
+        "startChar": 0,
+        "endLine": 670,
+        "endChar": 4
+      },
+      "revId": "f6891939e3c963a9a10e33322b3f97fdd21b93b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8e499e9_1e80e62c",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_sm_handler.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-21T22:21:18Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "2b002342_4416e3cf",
       "range": {
         "startLine": 670,
         "startChar": 0,
