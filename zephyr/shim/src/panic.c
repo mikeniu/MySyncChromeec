@@ -444,11 +444,11 @@ SYS_INIT(panic_data_init, PRE_KERNEL_2, 0);
 #if defined(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)
 static void panic_host_event_init(void)
 {
-	struct panic_data *pdata = panic_get_data();
+	uint8_t *flags = get_panic_data_flags();
 
-	if (pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT)) {
+	if (flags && !(*flags & PANIC_DATA_FLAG_OLD_HOSTEVENT)) {
 		host_set_single_event(EC_HOST_EVENT_PANIC);
-		pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
+		*flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, panic_host_event_init, HOOK_PRIO_LAST);

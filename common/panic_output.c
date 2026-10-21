@@ -161,11 +161,21 @@ test_mockable struct panic_data *panic_get_data(void)
 	return pdata_ptr;
 }
 
+test_mockable uint8_t *get_panic_data_flags(void)
+{
+	uintptr_t start = get_panic_data_start();
+
+	if (!start)
+		return NULL;
+
+	return &((struct panic_data *)start)->flags;
+}
+
 bool panic_data_is_new(void)
 {
-	struct panic_data *const pdata = panic_get_data();
+	const uint8_t *flags = get_panic_data_flags();
 
-	return pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
+	return flags && !(*flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
 }
 
 uint32_t get_panic_data_size(void)
@@ -511,7 +521,7 @@ host_command_panic_info(struct ec_host_cmd_handler_args *args)
 {
 	uint32_t pdata_size = get_panic_data_size();
 	uintptr_t pdata_start = get_panic_data_start();
-	struct panic_data *pdata = panic_get_data();
+	uint8_t *flags = get_panic_data_flags();
 	uint32_t read_size = pdata_size;
 	uintptr_t read_start = pdata_start;
 	uint16_t read_offset = 0;
@@ -563,19 +573,19 @@ host_command_panic_info(struct ec_host_cmd_handler_args *args)
 			panic_printf("Panic data size %u is too "
 				     "large, truncating to %u\n",
 				     pdata_size, read_size);
-			if (pdata) {
-				pdata->flags |= PANIC_DATA_FLAG_TRUNCATED;
+			if (flags) {
+				*flags |= PANIC_DATA_FLAG_TRUNCATED;
 			}
 		}
 	}
 	memcpy(args->output_buf, (void *)read_start, read_size);
 	args->output_buf_size = read_size;
 
-	if (pdata && !preserve_old_hostcmd_flag &&
+	if (flags && !preserve_old_hostcmd_flag &&
 	    /* For version >= 2, only set flag if last byte has been read */
 	    (args->version < 2 || read_offset + read_size == pdata_size)) {
 		/* Data has now been returned */
-		pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
+		*flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 	}
 
 	return EC_HOST_CMD_SUCCESS;
