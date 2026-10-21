@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b0fd06d_3d8fc44c",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-21T18:28:45Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Looks like a typo here: `ALOGIRTHM` instead of `ALGORITHM`.",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 0
+      },
+      "revId": "7e87b112200071bb0fb71593f7cc88636a347ae1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
