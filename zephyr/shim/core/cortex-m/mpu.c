@@ -4,10 +4,12 @@
  */
 
 #include "config.h"
+#include "hooks.h"
 #include "mpu.h"
 #if defined(CONFIG_NPCX_RAM_LOCK)
 #include "ram_lock.h"
 #endif
+#include "system.h"
 
 #include <stdbool.h>
 
@@ -30,18 +32,22 @@ void mpu_enable(void)
 		 * CONFIG_FLASH_BASE_ADDRESS is used as the code RAM base, and
 		 * CONFIG_SRAM_BASE_ADDRESS is used as the data RAM base.
 		 */
-		if (mpu_config.mpu_regions[index].base ==
-		    CONFIG_FLASH_BASE_ADDRESS) {
-			/* Apply the write lock to code RAM */
-			ram_lock_config_lock_region(REGION_STORAGE,
-						    CONFIG_FLASH_BASE_ADDRESS,
-						    (CONFIG_FLASH_SIZE << 10));
-		} else if (mpu_config.mpu_regions[index].base ==
-			   CONFIG_SRAM_BASE_ADDRESS) {
-			/* Apply the fetch lock to data RAM */
-			ram_lock_config_lock_region(REGION_DATA_RAM,
-						    CONFIG_SRAM_BASE_ADDRESS,
-						    (CONFIG_SRAM_SIZE << 10));
+		if (system_is_locked()) {
+			if (mpu_config.mpu_regions[index].base ==
+			    CONFIG_FLASH_BASE_ADDRESS) {
+				/* Apply the write lock to code RAM */
+				ram_lock_config_lock_region(
+					REGION_STORAGE,
+					CONFIG_FLASH_BASE_ADDRESS,
+					(CONFIG_FLASH_SIZE << 10));
+			} else if (mpu_config.mpu_regions[index].base ==
+				   CONFIG_SRAM_BASE_ADDRESS) {
+				/* Apply the fetch lock to data RAM */
+				ram_lock_config_lock_region(
+					REGION_DATA_RAM,
+					CONFIG_SRAM_BASE_ADDRESS,
+					(CONFIG_SRAM_SIZE << 10));
+			}
 		}
 #endif
 		MPU->RNR = index;
@@ -65,6 +71,17 @@ static int mpu_disable_fixed_regions(void)
 }
 
 SYS_INIT(mpu_disable_fixed_regions, PRE_KERNEL_1, 50);
+
+/*
+ * The fixed regions are enabled by system_disable_jump() even on unlocked
+ * systems, which still allow sysjump. Disable them before jumping so the
+ * target image (or a RAM loader such as the MCHP LFW) can execute.
+ */
+static void mpu_disable_on_sysjump(void)
+{
+	mpu_disable_fixed_regions();
+}
+DECLARE_HOOK(HOOK_SYSJUMP, mpu_disable_on_sysjump, HOOK_PRIO_LAST);
 
 #ifdef CONFIG_PLATFORM_EC_ROLLBACK_MPU_PROTECT
 /*
