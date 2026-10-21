@@ -59,6 +59,7 @@ static bool is_valid_rt1718s_page2_register(int reg)
 	switch (combined_reg_address) {
 	case RT1718S_RT2_SBU_CTRL_01:
 	case RT1718S_RT2_BC12_SNK_FUNC:
+	case RT1718S_RT2_BC12_STAT:
 	case RT1718S_RT2_DPDM_CTR1_DPDM_SET:
 	case RT1718S_RT2_VBUS_VOL_CTRL:
 	case RT1718S_VCON_CTRL4:
