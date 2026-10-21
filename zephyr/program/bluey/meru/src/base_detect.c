@@ -41,7 +41,7 @@ DECLARE_DEFERRED(base_update);
 
 static void base_get_thresholds(int *attach_th, int *detach_th)
 {
-	if (!gpio_pin_get_dt(
+	if (gpio_pin_get_dt(
 		    GPIO_DT_FROM_NODELABEL(gpio_ec_keyboard_det_cntl))) {
 		*attach_th = BASE_ATTACH_TH_LID_MV;
 		*detach_th = BASE_DETACH_TH_LID_MV;
@@ -107,7 +107,9 @@ void base_detect_control(void)
 
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_keyboard_det_cntl),
 			enable);
-	hook_call_deferred(&base_detect_tick_data, 0);
+	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+		hook_call_deferred(&base_detect_tick_data, 0);
+	}
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, base_detect_control, HOOK_PRIO_DEFAULT);
 
