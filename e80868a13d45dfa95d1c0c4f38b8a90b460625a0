@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "831586d1_40477292",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:43:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments. [[trajectory](https://goto.corp.google.com/traj/c4516b3c-c44b-42d1-afd5-83ae3f3a11e0)]\n\n### Review Summary\n\n*   **Functionality:** ❌ **Changes Requested.** `cros_flash_rtkfp_get_protect` incorrectly returns `0` (writable) when `sw_protected` is false due to an early return condition. This masks the true hardware state and creates an inconsistency because `write` will still reject the operation if the hardware BP bits are set. This bypass also causes `test_protect_at_boot_only_without_sw_lock` to fail. See inline comment for the fix.\n*   **Architecture \u0026 Component Fit:** ✅ The driver properly abstracts the status register parsing and translates it into standard `EC_FLASH_PROTECT_*` flags using the shared `spi_flash_reg_to_protect` utility, avoiding redundant parsing logic.\n*   **Code Simplicity:** ✅ The `#ifdef` blocks and `else if` chains in `cros_flash_rtkfp_get_protect_flags` were successfully flattened and unified, making the logic much more declarative.\n*   **Idiomaticity \u0026 Readability:** ✅ The use of `\u003cstdbool.h\u003e` and `bool` for `sw_protected` is correct, and the control flow uses declarative checks.\n*   **Security:** ✅ Status register parsing explicitly rejects inconsistent SRP bit settings or undecodable configurations by failing closed with `EC_FLASH_PROTECT_ERROR_INCONSISTENT` and `EC_FLASH_PROTECT_ERROR_UNKNOWN`.\n*   **Testing:** ✅ Comprehensive coverage is provided for the protection query API, including exact hardware boundary checks (`WP_BANK - 1`, `WP_BANK`), hardware initialization dependencies, and error handling paths.\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+197, -3)`. The CL successfully complies with the Single Logical Change rule by isolating the state queries into this CL and moving the mutation operations to a separate CL.\n*   **Commit Message:** ✅ The message is concise, avoids diff narration, focuses on the core intent of mapping BP bits/software locks to the `cros_flash` API flags, and includes the proper issue and test verification tags.\n[🔗](http://go/tj/c4516b3c-c44b-42d1-afd5-83ae3f3a11e0)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e80868a13d45dfa95d1c0c4f38b8a90b460625a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4353879_92dca020",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:43:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe early return here creates a state inconsistency and will cause your new `test_protect_at_boot_only_without_sw_lock` test to fail. \n\nWhen `!data-\u003esw_protected` is true (e.g. WP is deasserted) and `CONFIG_WP_STORAGE_OFF \u003d\u003d 0`, `addr_start \u003e\u003d 0` is always true. This causes `get_protect` to blindly return `0` (writable) for all banks, bypassing `flash_check_prot_reg`. \n\nHowever, `cros_flash_rtkfp_write` unconditionally checks `flash_check_prot_reg` and will still return `EC_ERROR_ACCESS_DENIED` if the hardware BP bits are set. If the hardware rejects the write, `get_protect` must accurately report the bank as protected (`1`). \n\nRemoving this bypass aligns `get_protect` with `write` and fixes the failing `zassert_equal(cros_flash_physical_get_protect(cros_flash_dev, 0), 1)` in your test suite:\n\n```c\n\t/*\n\t * The physical_get_protect returns protection state until reboot,\n\t * so it is used to determine *_NOW flags.\n\t */\n\tif (flash_check_prot_reg(dev, addr_start, CONFIG_FLASH_BANK_SIZE) \u003d\u003d\n\t    EC_ERROR_ACCESS_DENIED) {\n\t\treturn 1;\n\t}\n\n\treturn 0;\n```\n[🔗](http://go/tj/c4516b3c-c44b-42d1-afd5-83ae3f3a11e0)",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 230,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e80868a13d45dfa95d1c0c4f38b8a90b460625a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
