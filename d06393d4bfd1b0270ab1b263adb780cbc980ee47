@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "d06393d4bfd1b0270ab1b263adb780cbc980ee47",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1be5a9e_a5a9dedf",
+        "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:34:08Z",
+      "side": 1,
+      "message": "I\u0027d like to keep the hardcoded values. The MPU SRAM region has to cover the whole 256K starting at 0x20000000, including retain_mem. realtekfp.dts overrides sram0 to \u003c0x20000400 DT_SIZE_K(255)\u003e to leave the first 1K for retain_mem, so taking the base and size from sram0 would leave that part outside the MPU region. I added a comment above REGION_SRAM_BASE to explain this.",
+      "parentUuid": "1e2e9433_48357a5c",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
+      "revId": "d06393d4bfd1b0270ab1b263adb780cbc980ee47",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
