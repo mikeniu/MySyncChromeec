@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5e08989_4c06dcce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:30:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n* **Functionality:** No functional issues. The `__builtin_add_overflow` is correctly used in place of `check_add_overflow` to support compile-time evaluation.\n* **Architecture \u0026 Component Fit:** The logic is placed appropriately in the shared utility header. \n* **Code Simplicity:** The function maintains its minimal control flow.\n* **Idiomaticity \u0026 Readability:** The use of `[[nodiscard]] constexpr` and `noexcept` is correct and idiomatic C++ for compile-time bounds checks.\n* **Security:** The CL preserves memory-safety bounds and integer overflow protection.\n* **Testing:** The CL safely updates existing tests to check the new `static_assert` evaluation. I provided a follow-up CL suggestion inline to add the missing off-by-one boundary checks.\n* **CL Size \u0026 Scope:** Size: S (+20, -18). The CL is small, atomic, and implements a single cohesive logical change.\n* **Commit Message:** The commit message clearly answers *what* changed and *why*, and correctly includes bug and test tags. [[trajectory](https://goto.corp.google.com/traj/d267d1cb-111c-4b49-8c79-cdf1a534e297)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c234035975250688bff66953c4eaa52b803a1f3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9c62c64_8a86688f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:30:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nThe existing test coverage is missing the `N-1` (off-by-one below the boundary) checks for both the buffer size check and the overflow check. Consider adding these in a follow-up CL to fully verify the boundary values:\n\n```cpp\nZTEST(fpsensor_utils, test_validate_fp_buffer_offset_success_below_boundary)\n{\n\tstatic_assert(validate_fp_buffer_offset(2, 0, 1) \u003d\u003d EC_SUCCESS);\n\tzassert_equal(validate_fp_buffer_offset(2, 0, 1), EC_SUCCESS);\n}\n\nZTEST(fpsensor_utils, test_validate_fp_buffer_offset_failure_max_no_overflow)\n{\n\tstatic_assert(validate_fp_buffer_offset(1, UINT32_MAX - 1, 1) \u003d\u003d EC_ERROR_INVAL);\n\tzassert_equal(validate_fp_buffer_offset(1, UINT32_MAX - 1, 1), EC_ERROR_INVAL);\n}\n```\n[🔗](http://go/tj/d267d1cb-111c-4b49-8c79-cdf1a534e297)",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c234035975250688bff66953c4eaa52b803a1f3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
