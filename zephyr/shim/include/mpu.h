@@ -7,6 +7,7 @@
 #define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_MPU_H_
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /* This matches up with core/cortex-m/include/mpu.h */
 
@@ -44,6 +45,28 @@ int mpu_lock_rw_flash(void);
  * @retval <0 Error occurred.
  */
 int mpu_lock_rollback(bool lock);
+#endif
+
+#ifdef CONFIG_ZTEST
+#define MPU_RASR_ENABLE_Msk 1UL
+
+struct cortex_m_mpu_regs {
+	uint32_t RNR;
+	uint32_t RBAR;
+	uint32_t RASR;
+};
+
+struct arm_mpu_region {
+	uint32_t base;
+};
+
+struct arm_mpu_config {
+	uint32_t num_regions;
+	const struct arm_mpu_region *mpu_regions;
+};
+
+extern struct cortex_m_mpu_regs test_mpu_regs;
+extern const struct arm_mpu_config mpu_config;
 #endif
 
 #endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_MPU_H_ */

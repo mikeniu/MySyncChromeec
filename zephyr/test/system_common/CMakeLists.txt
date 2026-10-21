@@ -11,3 +11,12 @@ add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
 
 FILE(GLOB test_sources src/*.c)
 target_sources(app PRIVATE ${test_sources})
+
+if (DEFINED CONFIG_TEST_CORTEX_M_MPU)
+	target_include_directories(app PRIVATE
+		${PLATFORM_EC}/zephyr/shim/chip/npcx/include
+	)
+	target_sources(app PRIVATE
+		${PLATFORM_EC}/zephyr/shim/core/cortex-m/mpu.c
+	)
+endif()
