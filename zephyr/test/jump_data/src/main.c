@@ -420,6 +420,54 @@ ZTEST(jump_data, test_init_corrupted_struct_size)
 		      EC_RESET_FLAG_POWER_ON | EC_RESET_FLAG_SYSJUMP);
 }
 
+ZTEST(jump_data, test_init_corrupted_panic_struct_size)
+{
+	struct panic_data *pdata = GET_JUMP_DATA_PTR(struct panic_data, 0);
+
+	/* Set up valid panic magic but corrupted struct_size */
+	pdata->magic = PANIC_DATA_MAGIC;
+
+	/* Test out-of-bounds struct_size (0xFFFFFFFF) */
+	pdata->struct_size = 0xFFFFFFFF;
+	struct jump_data *jdata = get_jump_data();
+	zassert_equal(
+		(uintptr_t)jdata,
+		(uintptr_t)GET_JUMP_DATA_PTR(struct jump_data, 0),
+		"jdata should default to end of RAM when struct_size is 0xFFFFFFFF");
+
+	/* Test struct_size smaller than PANIC_DATA_MIN_SIZE */
+	pdata->struct_size = PANIC_DATA_MIN_SIZE - 4;
+	jdata = get_jump_data();
+	zassert_equal(
+		(uintptr_t)jdata,
+		(uintptr_t)GET_JUMP_DATA_PTR(struct jump_data, 0),
+		"jdata should default to end of RAM when struct_size < MIN");
+
+	/* Test unaligned struct_size */
+	pdata->struct_size = sizeof(struct panic_data) + 2;
+	jdata = get_jump_data();
+	zassert_equal(
+		(uintptr_t)jdata,
+		(uintptr_t)GET_JUMP_DATA_PTR(struct jump_data, 0),
+		"jdata should default to end of RAM when struct_size is unaligned");
+
+	/* Test struct_size larger than PANIC_DATA_MAX_SIZE */
+	pdata->struct_size = CONFIG_PRESERVED_END_OF_RAM_SIZE;
+	jdata = get_jump_data();
+	zassert_equal(
+		(uintptr_t)jdata,
+		(uintptr_t)GET_JUMP_DATA_PTR(struct jump_data, 0),
+		"jdata should default to end of RAM when struct_size > MAX");
+
+	/* Test valid struct_size: jump_data is placed immediately below
+	 * panic_data */
+	pdata->struct_size = sizeof(struct panic_data);
+	jdata = get_jump_data();
+	zassert_equal(
+		(uintptr_t)jdata, (uintptr_t)pdata - sizeof(struct jump_data),
+		"jdata should precede panic_data when struct_size is valid");
+}
+
 ZTEST(jump_data, test_init_watchdog_reset)
 {
 	struct jump_data *jdata = GET_JUMP_DATA_PTR(struct jump_data, 0);

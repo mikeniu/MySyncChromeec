@@ -12,6 +12,7 @@
 #include "common.h"
 #include "panic_defs.h"
 #include "software_panic.h"
+#include "sysjump.h"
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -24,6 +25,20 @@ extern "C" {
 #ifdef CONFIG_RO_PANIC_DATA_SIZE
 BUILD_ASSERT(sizeof(struct panic_data) == CONFIG_RO_PANIC_DATA_SIZE);
 #endif
+
+/*
+ * Minimum size of panic data: 4-byte header (arch, struct_version, flags,
+ * reserved) + struct_size (4 bytes) + magic (4 bytes).
+ */
+#define PANIC_DATA_MIN_SIZE 12
+
+/*
+ * Maximum size of panic data preserved at the end of RAM, leaving room
+ * for jump_data and at least one maximum-sized jump tag.
+ */
+#define PANIC_DATA_MAX_SIZE                                            \
+	(CONFIG_PRESERVED_END_OF_RAM_SIZE - sizeof(struct jump_data) - \
+	 JUMP_TAG_MAX_SIZE)
 
 /* Use PANIC_DATA_PTR to refer to the persistent storage location */
 #define PANIC_DATA_PTR ((struct panic_data *)CONFIG_PANIC_DATA_BASE)
@@ -204,6 +219,13 @@ void ignore_bus_fault(int ignored);
  * example, the last reboot was not caused by a panic).
  */
 struct panic_data *panic_get_data(void);
+
+/**
+ * Return size of panic data if valid, or 0 if no valid panic data.
+ *
+ * Checks magic, minimum size, maximum size, and 4-byte alignment.
+ */
+uint32_t get_panic_data_size(void);
 
 /**
  * Return a pointer to the beginning of panic data. This function can be
