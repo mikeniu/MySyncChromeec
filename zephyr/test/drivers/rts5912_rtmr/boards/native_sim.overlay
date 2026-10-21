@@ -1,0 +1,77 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+
+/ {
+	chosen {
+		cros-ec,watchdog = &wdog;
+		cros-ec,bbram = &bbram;
+	};
+
+	cpus {
+		cpu@0 {
+			cpu-power-states = <&state0 &state1>;
+		};
+
+		power-states {
+			state0: state0 {
+				compatible = "zephyr,power-state";
+				power-state-name = "suspend-to-idle";
+				min-residency-us = <10000>;
+				exit-latency-us = <100>;
+			};
+
+			state1: state1 {
+				compatible = "zephyr,power-state";
+				power-state-name = "standby";
+				min-residency-us = <20000>;
+				exit-latency-us = <200>;
+			};
+		};
+	};
+
+	sccon: sccon@40012000 {
+		reg = <0x40012000 0x1000>;
+	};
+
+	wdog: wdog@40013000 {
+		reg = <0x40013000 0x1000>;
+	};
+
+	bbram: test-bbram-dev {
+		compatible = "zephyr,bbram-emul";
+		size = <64>;
+	};
+
+	named-bbram-regions {
+		compatible = "named-bbram-regions";
+
+		key {
+			offset = <0x00>;
+			size = <0x04>;
+		};
+
+		key_rev {
+			offset = <0x04>;
+			size = <0x04>;
+		};
+
+		saved_reset_flags {
+			offset = <0x08>;
+			size = <0x04>;
+		};
+
+		wp_at_boot {
+			offset = <0x0c>;
+			size = <0x04>;
+		};
+
+		board_batt_keep {
+			offset = <0x10>;
+			size = <0x04>;
+		};
+	};
+};
