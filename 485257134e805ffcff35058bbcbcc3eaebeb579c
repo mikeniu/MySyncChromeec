@@ -16,6 +16,40 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "485257134e805ffcff35058bbcbcc3eaebeb579c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cdb21c9_50d00f0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-21T18:45:36Z",
+      "side": 1,
+      "message": "Can you describe what happens to the Source Info fields on Realtek when we send SET_PDOs?\n\nRight now, we already have a `set_max_pdp` function implemented by both drivers. If SET_PDOs is supposed to just update Source Info under the hood, then maybe it makes sense for the driver API to maintain UCSI semantics and for this quirk to live under the hood in the TI driver.\n\nBut if the Realtek driver also requires a separate command to synchronize Source Info and Source Caps, or if it would at least tolerate a redundant Source Info set in this situation, then it seems more natural to elevate this sequence of commands to `pdc_power_mgmt`. `pdc_power_mgmt` would call something like `set_source_info` before calling `set_pdos`. Each driver would then implement `set_source_info` to the best of its ability.\n\nOn TI, it could probably get simpler than it is now. On Realtek, I don\u0027t know whether the set of available commands would support this interface. Can you check?",
+      "revId": "485257134e805ffcff35058bbcbcc3eaebeb579c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c8f8d43_06ab499c",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 2099,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-21T18:45:36Z",
+      "side": 1,
+      "message": "This could be a little flatter. Something like\n```\nrv \u003d tps_rw_source_info(...);\nif (rv) goto error;\nnew_source_info \u003d source_info;\n\nnew_source_info.present_pdp \u003d pdp;\nnew_source_info.reported_pdp \u003d pdp;\n\nif (new_source_info !\u003d source_info)\n  rv \u003d tps_rw_source_info(...);\nif (rv) goto error;\n\ntask_ucsi(...);\n\nerror:\nset_state(ERROR_RECOVERY);\nreturn;\n```\n\nThat\u0027s just mechanical. Even better would be to know all of the Source Info field values from information the EC already has. (I think we do.) Then we wouldn\u0027t need to read the existing Source Info first. We could just write it. I\u0027d probably do that unconditionally. First of all, it makes the code simpler. Secondly, we should only really be changing our PDOs if our Source Info would actually change, so I think we can presume that the update is needed.",
+      "revId": "485257134e805ffcff35058bbcbcc3eaebeb579c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
