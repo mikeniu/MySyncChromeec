@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "5fe718505826edd9a23614ac09d5b3fbed60d0eb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6452a430_48f96b6a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 1856,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:28:20Z",
+      "side": 1,
+      "message": "Added checks for exact_expiry - std::chrono::microseconds(1) and corrupted MAC (mac[0] ^\u003d 1) in test_challenge_expiry_boundaries.",
+      "parentUuid": "836d1186_e680a2c6",
+      "range": {
+        "startLine": 1816,
+        "startChar": 0,
+        "endLine": 1856,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5fe718505826edd9a23614ac09d5b3fbed60d0eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
