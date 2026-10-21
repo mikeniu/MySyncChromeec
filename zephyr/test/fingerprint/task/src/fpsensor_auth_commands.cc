@@ -1759,3 +1759,55 @@ static void before_fpsensor_auth_commands(void *fixture)
 
 ZTEST_SUITE(fpsensor_auth_commands, nullptr, fpsensor_auth_commands_setup,
 	    before_fpsensor_auth_commands, nullptr, nullptr);
+
+ZTEST(fpsensor_auth_commands, test_raii_p256_and_pairing_key_wrappers)
+{
+	const auto key1 = FpP256Key::generate();
+	const auto key2 = FpP256Key::generate();
+	zassert_true(key1.has_value());
+	zassert_true(key2.has_value());
+
+	const auto pub2 = key2->to_public_key();
+	zassert_true(pub2.has_value());
+
+	const FpP256Key empty_key{};
+	zassert_equal(empty_key.to_public_key().error(), EC_ERROR_INVAL);
+	zassert_equal(empty_key.compute_shared_secret(*key2).error(),
+		      EC_ERROR_INVAL);
+	zassert_equal(key1->compute_shared_secret(empty_key).error(),
+		      EC_ERROR_INVAL);
+
+	std::array<uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> zero_priv{};
+	zassert_equal(FpP256Key::from_private_key(zero_priv).error(),
+		      EC_ERROR_INVAL);
+
+	std::array<uint8_t, FP_ASCP_KEY_SIZE> bad_point{};
+	bad_point[0] = POINT_CONVERSION_UNCOMPRESSED - 1;
+	zassert_equal(FpP256Key::from_uncompressed_point(bad_point).error(),
+		      EC_ERROR_INVAL);
+	bad_point[0] = POINT_CONVERSION_UNCOMPRESSED + 1;
+	zassert_equal(FpP256Key::from_uncompressed_point(bad_point).error(),
+		      EC_ERROR_INVAL);
+
+	zassert_equal(FpPairingKey::establish_and_wrap(
+			      *key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION - 1)
+			      .error(),
+		      EC_ERROR_INVAL);
+	zassert_equal(FpPairingKey::establish_and_wrap(
+			      *key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION + 1)
+			      .error(),
+		      EC_ERROR_INVAL);
+
+	const auto wrapped = FpPairingKey::establish_and_wrap(
+		*key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION);
+	zassert_true(wrapped.has_value());
+
+	FpPairingKey::Bytes unwrapped{};
+	zassert_true(
+		FpPairingKey::unwrap_into(*wrapped, unwrapped).has_value());
+
+	ec_fp_encrypted_pairing_key corrupted = *wrapped;
+	corrupted.info.struct_version = FP_AES_KEY_ENC_METADATA_VERSION - 1;
+	zassert_equal(FpPairingKey::unwrap_into(corrupted, unwrapped).error(),
+		      EC_ERROR_INVAL);
+}

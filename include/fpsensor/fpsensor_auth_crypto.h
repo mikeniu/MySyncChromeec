@@ -8,12 +8,18 @@
 #ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H_
 #define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H_
 
+#include "crypto/cleanse_wrapper.h"
+#include "crypto/elliptic_curve_key.h"
 #include "ec_commands.h"
 #include "openssl/ec.h"
 #include "openssl/sha.h"
 
+#include <algorithm>
+#include <array>
+#include <expected>
 #include <optional>
 #include <span>
+#include <utility>
 
 /**
  * Create a @fp_elliptic_curve_public_key with the content of boringssl @p
@@ -262,5 +268,138 @@ enum ec_error_list compute_message_signature(
 	std::span<const uint8_t> operation,
 	std::span<const uint8_t, FP_CHALLENGE_SIZE> challenge,
 	std::span<uint8_t, SHA256_DIGEST_LENGTH> signature);
+
+/**
+ * NIST P-256 elliptic curve key wrapper around BoringSSL EC_KEY.
+ */
+class FpP256Key {
+    public:
+	FpP256Key() = default;
+	explicit FpP256Key(bssl::UniquePtr<EC_KEY> key) noexcept
+		: key_(std::move(key))
+	{
+	}
+
+	[[nodiscard]] static std::expected<FpP256Key, ec_error_list> generate()
+	{
+		bssl::UniquePtr<EC_KEY> key = generate_elliptic_curve_key();
+		if (key == nullptr) {
+			return std::unexpected(EC_ERROR_MEMORY_ALLOCATION);
+		}
+		return FpP256Key(std::move(key));
+	}
+
+	[[nodiscard]] static std::expected<FpP256Key, ec_error_list>
+	from_public_key(const fp_elliptic_curve_public_key &pubkey)
+	{
+		bssl::UniquePtr<EC_KEY> key = create_ec_key_from_pubkey(pubkey);
+		if (key == nullptr) {
+			return std::unexpected(EC_ERROR_INVAL);
+		}
+		return FpP256Key(std::move(key));
+	}
+
+	[[nodiscard]] static std::expected<FpP256Key, ec_error_list>
+	from_uncompressed_point(std::span<const uint8_t, FP_ASCP_KEY_SIZE> point)
+	{
+		if (point[0] != POINT_CONVERSION_UNCOMPRESSED) {
+			return std::unexpected(EC_ERROR_INVAL);
+		}
+		fp_elliptic_curve_public_key pubkey{};
+		std::ranges::copy(point.subspan<1, sizeof(pubkey.x)>(),
+				  pubkey.x);
+		std::ranges::copy(
+			point.subspan<1 + sizeof(pubkey.x), sizeof(pubkey.y)>(),
+			pubkey.y);
+		return from_public_key(pubkey);
+	}
+
+	[[nodiscard]] static std::expected<FpP256Key, ec_error_list>
+	from_private_key(std::span<const uint8_t,
+				   FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> privkey)
+	{
+		bssl::UniquePtr<EC_KEY> key = create_ec_key_from_privkey(
+			privkey.data(), privkey.size());
+		if (key == nullptr) {
+			return std::unexpected(EC_ERROR_INVAL);
+		}
+		return FpP256Key(std::move(key));
+	}
+
+	[[nodiscard]] std::expected<fp_elliptic_curve_public_key, ec_error_list>
+	to_public_key() const
+	{
+		if (key_ == nullptr) {
+			return std::unexpected(EC_ERROR_INVAL);
+		}
+		const auto pubkey = create_pubkey_from_ec_key(*key_);
+		if (!pubkey.has_value()) {
+			return std::unexpected(EC_ERROR_INVAL);
+		}
+		return *pubkey;
+	}
+
+	[[nodiscard]] std::expected<
+		CleanseWrapper<std::array<uint8_t, FP_PAIRING_KEY_LEN> >,
+		ec_error_list>
+	compute_shared_secret(const FpP256Key &peer_public_key) const
+	{
+		if (key_ == nullptr || peer_public_key.key_ == nullptr) {
+			return std::unexpected(EC_ERROR_INVAL);
+		}
+		CleanseWrapper<std::array<uint8_t, FP_PAIRING_KEY_LEN> >
+			secret{};
+		if (const ec_error_list err =
+			    generate_ecdh_shared_secret_without_kdf(
+				    *key_, *peer_public_key.key_, secret);
+		    err != EC_SUCCESS) {
+			return std::unexpected(err);
+		}
+		return secret;
+	}
+
+    private:
+	bssl::UniquePtr<EC_KEY> key_{};
+};
+
+class FpPairingKey {
+    public:
+	using Bytes = std::array<uint8_t, FP_PAIRING_KEY_LEN>;
+
+	[[nodiscard]] static std::expected<ec_fp_encrypted_pairing_key,
+					   ec_error_list>
+	establish_and_wrap(const FpP256Key &private_key,
+			   const fp_elliptic_curve_public_key &peer_pubkey,
+			   uint16_t version = FP_AES_KEY_ENC_METADATA_VERSION)
+	{
+		const auto peer = FpP256Key::from_public_key(peer_pubkey);
+		if (!peer.has_value()) {
+			return std::unexpected(peer.error());
+		}
+		const auto secret = private_key.compute_shared_secret(*peer);
+		if (!secret.has_value()) {
+			return std::unexpected(secret.error());
+		}
+		ec_fp_encrypted_pairing_key wrapped{};
+		if (const ec_error_list err = encrypt_pairing_key(
+			    version, wrapped.info, *secret, wrapped.data);
+		    err != EC_SUCCESS) {
+			return std::unexpected(err);
+		}
+		return wrapped;
+	}
+
+	[[nodiscard]] static std::expected<void, ec_error_list>
+	unwrap_into(const ec_fp_encrypted_pairing_key &encrypted,
+		    std::span<uint8_t, FP_PAIRING_KEY_LEN> out)
+	{
+		if (const ec_error_list err = decrypt_pairing_key(
+			    encrypted.info, encrypted.data, out);
+		    err != EC_SUCCESS) {
+			return std::unexpected(err);
+		}
+		return {};
+	}
+};
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H_ */
