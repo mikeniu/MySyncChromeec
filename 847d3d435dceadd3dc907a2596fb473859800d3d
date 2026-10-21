@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03a0d129_620b6603",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:28:14Z",
+      "side": 1,
+      "message": "Split the introduction of FpP256Key and FpPairingKey (and their unit tests) into a prerequisite CL, and updated this CL to migrate the callers in fpsensor_auth_ascp.cc and fpsensor_auth_handshake.cc.",
+      "parentUuid": "62164d3e_09a79d2b",
+      "isAi": true,
+      "revId": "847d3d435dceadd3dc907a2596fb473859800d3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e8bbb54_5cc1fc41",
@@ -40,6 +59,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "847d3d435dceadd3dc907a2596fb473859800d3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3042bf21_39f73dcd",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:28:14Z",
+      "side": 1,
+      "message": "Removed unused #include \u003cstring_view\u003e from include/fpsensor/fpsensor_auth_crypto.h.",
+      "parentUuid": "6e8bbb54_5cc1fc41",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "847d3d435dceadd3dc907a2596fb473859800d3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
