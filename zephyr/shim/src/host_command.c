@@ -12,6 +12,10 @@
 #include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
 #include <zephyr/sys/iterable_sections.h>
 
+#define HOST_CMD_MIN_REST_MS 3
+#define HOST_CMD_RATE_LIMIT_PERIOD_MS 500
+#define HOST_CMD_RECESS_MS 20
+
 #ifndef CONFIG_ZTEST
 #ifdef CONFIG_EC_HOST_CMD_DEDICATED_THREAD
 #error "The upstream Host Command subsystem is supported only with reusing " \
@@ -81,9 +85,13 @@ BUILD_ASSERT(offsetof(struct ec_host_response, data_len) ==
 BUILD_ASSERT(offsetof(struct ec_host_response, reserved) ==
 	     offsetof(struct ec_host_cmd_response_header, reserved));
 
-static void ec_host_cmd_user_cb(const struct ec_host_cmd_rx_ctx *rx_ctx,
-				void *user_data)
+test_export_static void
+ec_host_cmd_user_cb(const struct ec_host_cmd_rx_ctx *rx_ctx, void *user_data)
 {
+	static int64_t t_recess = 0;
+	static int64_t t_last = 0;
+	int64_t t_now = k_uptime_get();
+
 	const struct ec_host_cmd_request_header *const rx_header =
 		(void *)rx_ctx->buf;
 
@@ -95,6 +103,24 @@ static void ec_host_cmd_user_cb(const struct ec_host_cmd_rx_ctx *rx_ctx,
 	if (rx_header->cmd_id == EC_CMD_REBOOT) {
 		system_reset(SYSTEM_RESET_HARD);
 	}
+
+	/* reset rate limiting if we have slept enough */
+	if (t_now - t_last > HOST_CMD_MIN_REST_MS) {
+		t_recess = t_now;
+	}
+
+	/*
+	 * rate limiting : check how long we have gone without a
+	 * significant interruption to avoid DoS from host
+	 */
+	if (t_now - t_recess > HOST_CMD_RATE_LIMIT_PERIOD_MS) {
+		/* Short recess */
+		k_sleep(K_MSEC(HOST_CMD_RECESS_MS));
+		t_now = k_uptime_get();
+		t_recess = t_now;
+	}
+
+	t_last = t_now;
 }
 
 void host_command_main(void)
