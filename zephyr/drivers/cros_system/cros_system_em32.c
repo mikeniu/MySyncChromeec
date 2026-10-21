@@ -185,7 +185,7 @@ int cros_system_soc_reset(void)
 #endif
 
 	/* Disable interrupts to avoid task swaps during reboot */
-	interrupt_disable_all();
+	irq_lock();
 
 	/* Stop watchdog */
 	system_em32_watchdog_stop();

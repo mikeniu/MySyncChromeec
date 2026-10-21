@@ -284,7 +284,7 @@ static int cros_system_rtk_init(void)
 int cros_system_soc_reset(void)
 {
 	/* Disable interrupts to avoid task swaps during reboot */
-	interrupt_disable_all();
+	irq_lock();
 
 	/*
 	 * Set minimal watchdog timeout - 10 millisecond.
@@ -318,7 +318,7 @@ void wake_isr(enum gpio_signal signal)
 int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 {
 	/* Disable interrupt first */
-	interrupt_disable_all();
+	irq_lock();
 	/* Stop the watchdog */
 	system_rtk_watchdog_stop();
 
