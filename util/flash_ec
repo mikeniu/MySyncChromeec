@@ -12,6 +12,20 @@ if [[ "$(basename "${EC_DIR}")" != "ec" ]]; then
 	EC_DIR=
 fi
 
+if [[ "${FLASH_EC_IMPLEMENTATION}" == "python" ]]; then
+	export SERVOD_PORT="${SERVOD_PORT:-9999}"
+	if python3 -m flash_ec "$@"; then
+		exit 0
+	else
+		ret=$?
+		if (( ret > 128 )); then
+			echo "Python flash_ec exited with signal (code ${ret}); aborting to preserve servo state." >&2
+			exit "${ret}"
+		fi
+		echo "Python flash_ec failed (code ${ret}); falling back to bash implementation..." >&2
+	fi
+fi
+
 # Loads script libraries.
 # shellcheck source=../../../scripts/lib/shflags/shflags
 . "${SHFLAGS:-/usr/share/misc/shflags}" || exit 1
