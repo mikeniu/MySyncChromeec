@@ -92,3 +92,18 @@ ZTEST(fpsensor_utils, test_skip_image_offset)
 	zassert_true(skip_image_offset(FP_CAPTURE_PATTERN2));
 	zassert_true(skip_image_offset(FP_CAPTURE_TYPE_MAX));
 }
+
+ZTEST(fpsensor_utils, test_fp_match_success)
+{
+	static_assert(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES));
+	static_assert(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES_UPDATED));
+	static_assert(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES_UPDATE_FAILED));
+	static_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO));
+	static_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_INTERNAL));
+
+	zassert_true(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES));
+	zassert_true(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES_UPDATED));
+	zassert_true(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES_UPDATE_FAILED));
+	zassert_false(fp_match_success(EC_MKBP_FP_ERR_MATCH_NO));
+	zassert_false(fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_INTERNAL));
+}
