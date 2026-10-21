@@ -35,6 +35,29 @@
       "parentUuid": "9fb2341f_66be42c1",
       "revId": "429e2b2f139326a9afee035c5ae719df19ed03e8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2826a2ed_24841fd6",
+        "filename": "chip/stm32/flash-stm32h7.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-21T20:23:54Z",
+      "side": 1,
+      "message": "Parameter is `bool`.  Pass in `false`.",
+      "range": {
+        "startLine": 589,
+        "startChar": 35,
+        "endLine": 589,
+        "endChar": 36
+      },
+      "revId": "429e2b2f139326a9afee035c5ae719df19ed03e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
