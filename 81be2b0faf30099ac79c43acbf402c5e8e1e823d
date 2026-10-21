@@ -39,6 +39,30 @@
       },
       "revId": "81be2b0faf30099ac79c43acbf402c5e8e1e823d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95721b49_dc2b336d",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 7931,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-21T17:19:09Z",
+      "side": 1,
+      "message": "This file ensures that they\u0027re no-ops in coreboot and kernel.",
+      "parentUuid": "c5dd2e4b_1b434b61",
+      "range": {
+        "startLine": 7928,
+        "startChar": 0,
+        "endLine": 7931,
+        "endChar": 12
+      },
+      "revId": "81be2b0faf30099ac79c43acbf402c5e8e1e823d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
