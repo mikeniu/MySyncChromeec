@@ -17,6 +17,19 @@
 /* High 32-bits of the 64-bit timestamp counter. */
 STATIC_IF_NOT(CONFIG_HWTIMER_64BIT) volatile uint32_t clksrc_high;
 
+/*
+ * Packed 32-bit lock-free tracker (8-bit clksrc_high tag | 24-bit lo >> 8)
+ * used to detect 32-bit hardware timer rollovers while interrupts are disabled.
+ */
+STATIC_IF_NOT(CONFIG_HWTIMER_64BIT) uint32_t track_packed;
+
+#if defined(CONFIG_ZTEST) || defined(TEST_BUILD)
+void timer_reset_track_packed_for_test(void)
+{
+	__atomic_store_n(&track_packed, 0, __ATOMIC_RELAXED);
+}
+#endif
+
 int timestamp_expired(timestamp_t deadline, const timestamp_t *now)
 {
 	timestamp_t now_val;
@@ -74,6 +87,32 @@ timestamp_t get_time(void)
 		if (ts.le.hi != clksrc_high) {
 			ts.le.hi = clksrc_high;
 			ts.le.lo = __hw_clock_source_read();
+		}
+
+		/* Lock-free timer overflow detection for b/213342294 */
+		uint32_t cur_hi_tag = (ts.le.hi & 0xFFU) << 24;
+		uint32_t cur_lo_val = ts.le.lo >> 8;
+		uint32_t cur_packed = cur_hi_tag | cur_lo_val;
+
+		uint32_t prev_packed =
+			__atomic_load_n(&track_packed, __ATOMIC_RELAXED);
+		uint32_t prev_hi_tag = prev_packed & 0xFF000000U;
+		uint32_t prev_lo_val = prev_packed & 0x00FFFFFFU;
+
+		if (prev_hi_tag == cur_hi_tag) {
+			if (prev_lo_val > cur_lo_val &&
+			    (prev_lo_val - cur_lo_val) > 0x00400000U) {
+				ts.le.hi++;
+			} else if (cur_lo_val > prev_lo_val) {
+				__atomic_compare_exchange_n(
+					&track_packed, &prev_packed, cur_packed,
+					0, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
+			}
+		} else if ((int8_t)((cur_hi_tag - prev_hi_tag) >> 24) > 0) {
+			__atomic_compare_exchange_n(&track_packed, &prev_packed,
+						    cur_packed, 0,
+						    __ATOMIC_RELAXED,
+						    __ATOMIC_RELAXED);
 		}
 	}
 

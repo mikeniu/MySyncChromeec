@@ -4,4 +4,5 @@
 
 target_sources(app PRIVATE
   src/timer.c
+  src/test_overflow.c
 )
