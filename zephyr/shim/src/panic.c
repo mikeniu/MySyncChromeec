@@ -315,7 +315,22 @@ FUNC_NORETURN
 #endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
+	/*
+	 * Lock interrupts immediately (matching z_fatal_error()) so the
+	 * asserting thread cannot be preempted while saving panic data or
+	 * flushing logs, and so k_can_yield() is false for all console/UART
+	 * output below.
+	 */
+	unsigned int key = irq_lock();
+
+	/* Save assert panic data first before logging or stack walking. */
 	panic_data_write_assert(path, line);
+
+	/*
+	 * Switch the logger to panic mode and flush queued log messages
+	 * (including "ASSERTION FAIL ...") before printing the stack trace.
+	 */
+	LOG_PANIC();
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
@@ -326,6 +341,12 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	}
 
 	panic_reboot();
+
+	/*
+	 * Reached only in unit tests where system_reset() is mocked; restores
+	 * IRQ state and marks key as used when CODE_UNREACHABLE follows.
+	 */
+	irq_unlock(key);
 
 #ifndef CONFIG_ASSERT_TEST
 	CODE_UNREACHABLE;

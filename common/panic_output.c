@@ -21,6 +21,8 @@
 #include "usb_console.h"
 #include "util.h"
 
+#include <zephyr/logging/log_ctrl.h>
+
 #include <stdalign.h>
 
 /*
@@ -138,8 +140,28 @@ void panic_printf(const char *format, ...)
  */
 void panic_reboot(void)
 {
+	/*
+	 * Lock interrupts so nothing preempts the final log flush or reboot,
+	 * and so k_can_yield() is false (forcing synchronous polling output in
+	 * log backends and preventing uart_tx_flush() in panic_puts() from
+	 * sleeping).
+	 */
+	unsigned int key = irq_lock();
+
+	/*
+	 * Flush any remaining deferred log messages before printing the reboot
+	 * banner. Safe if already called by k_sys_fatal_error_handler() or
+	 * zassert_post_action() since log_panic() is idempotent.
+	 */
+	LOG_PANIC();
 	panic_puts("\n\nRebooting...\n");
 	system_reset(0);
+
+	/*
+	 * Reached only in CONFIG_ZTEST builds where system_reset() is mocked;
+	 * restores IRQ state for subsequent tests.
+	 */
+	irq_unlock(key);
 }
 
 test_mockable struct panic_data *panic_get_data(void)
