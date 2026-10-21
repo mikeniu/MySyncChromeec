@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "a512c0f5041d3aa62ef23dcbf1d09e779f251bb0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b7271db_091cd8c5",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:35:09Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "ddfab375_11d510e5",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 265,
+        "endChar": 9999
+      },
+      "revId": "a512c0f5041d3aa62ef23dcbf1d09e779f251bb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
