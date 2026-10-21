@@ -5,6 +5,7 @@
 
 """Unit tests for ServoDriver and flash_ec CLI entrypoint."""
 
+import os
 import subprocess
 import unittest
 from unittest.mock import MagicMock
@@ -81,7 +82,9 @@ class TestFlashEcCli(unittest.TestCase):
 
     def test_parse_args_defaults(self) -> None:
         """Verify default timeout (600s), port, region, and OpenOCD flags."""
-        args = parse_args(["--board=veluza", "--ocd_chip_cfg=custom.cfg"])
+        with patch.dict(os.environ):
+            os.environ.pop("SERVOD_PORT", None)
+            args = parse_args(["--board=veluza", "--ocd_chip_cfg=custom.cfg"])
         self.assertEqual(args.board, "veluza")
         self.assertEqual(args.timeout, 600)
         self.assertEqual(args.port, 9999)
@@ -89,6 +92,15 @@ class TestFlashEcCli(unittest.TestCase):
         self.assertTrue(args.verify)
         self.assertFalse(args.ro)
         self.assertFalse(args.rw)
+
+    @patch.dict(os.environ, {"SERVOD_PORT": "9901"})
+    def test_parse_args_port_from_servod_port(self) -> None:
+        """Default --port to $SERVOD_PORT like bash flash_ec; --port wins."""
+        self.assertEqual(parse_args(["--board=veluza"]).port, 9901)
+        args = parse_args(["--board=veluza", "--port=9905"])
+        self.assertEqual(args.port, 9905)
+        os.environ["SERVOD_PORT"] = ""
+        self.assertEqual(parse_args(["--board=veluza"]).port, 9999)
 
     def test_parse_args_region_flags(self) -> None:
         """Verify --ro and --rw select the region to flash."""

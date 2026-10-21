@@ -54,8 +54,8 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         "--port",
         "-p",
         type=int,
-        default=9999,
-        help="Servod port (default: 9999)",
+        default=os.environ.get("SERVOD_PORT") or "9999",
+        help="Servod port (default: $SERVOD_PORT, else 9999)",
     )
     parser.add_argument(
         "--host",
