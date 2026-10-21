@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "c8df18a808ab3ddc51fea41ae40baf3f421bcf3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3f0c00f_ad80b558",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:28:47Z",
+      "side": 1,
+      "message": "Acknowledged; EncryptTemplate and DecryptTemplate dispatch tests are included in the state machine CL (8619399).",
+      "parentUuid": "bdb8cc25_ce62a67f",
+      "range": {
+        "startLine": 457,
+        "startChar": 0,
+        "endLine": 480,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "c8df18a808ab3ddc51fea41ae40baf3f421bcf3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
