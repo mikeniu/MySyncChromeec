@@ -14,6 +14,7 @@
 #include "fpsensor/fpsensor_image_frame_params.h"
 #include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
+#include "fpsensor/fpsensor_template_store.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_matcher.h"
 #include "host_command.h"
@@ -405,51 +406,43 @@ EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_CONTEXT, fp_command_context,
 int fp_enable_positive_match_secret(uint16_t fgr,
 				    struct positive_match_secret_state *state)
 {
-	if (state->readable) {
+	const auto res = FpTemplateStore::enable_secret(fgr, *state);
+	if (!res.has_value()) {
 		CPRINTS("Error: positive match secret already readable.");
-		fp_disable_positive_match_secret(state);
-		return EC_ERROR_UNKNOWN;
+		return res.error();
 	}
-
-	timestamp_t now = get_time();
-	state->template_matched = fgr;
-	state->readable = true;
-	state->deadline.val = now.val + (15 * SECOND); /* b/478160541 */
 	return EC_SUCCESS;
 }
 
 void fp_disable_positive_match_secret(struct positive_match_secret_state *state)
 {
-	state->template_matched = FP_NO_SUCH_TEMPLATE;
-	state->readable = false;
-	state->deadline.val = 0;
+	FpTemplateStore::disable_secret(*state);
 }
 
 enum ec_status fp_read_match_secret(
 	int8_t fgr,
 	std::span<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES> positive_match_secret)
 {
-	timestamp_t now = get_time();
-	struct positive_match_secret_state state_copy =
-		global_context.positive_match_secret_state;
-
-	fp_disable_positive_match_secret(
-		&global_context.positive_match_secret_state);
-
-	if (fgr < 0 || fgr >= FP_MAX_FINGER_COUNT) {
+	const auto template_id = FpTemplateId::create(fgr);
+	if (!template_id.has_value()) {
 		CPRINTS("Invalid finger number %d", fgr);
-		return EC_RES_INVALID_PARAM;
+		FpTemplateStore::disable_secret(
+			global_context.positive_match_secret_state);
+		return template_id.error();
 	}
-	if (timestamp_expired(state_copy.deadline, &now)) {
-		CPRINTS("Reading positive match secret disallowed: "
-			"deadline has passed.");
-		return EC_RES_TIMEOUT;
-	}
-	if (fgr != state_copy.template_matched || !state_copy.readable) {
-		CPRINTS("Positive match secret for finger %d is not meant to "
-			"be read now.",
-			fgr);
-		return EC_RES_ACCESS_DENIED;
+
+	const auto matched = FpTemplateStore::consume_secret(
+		global_context.positive_match_secret_state, *template_id);
+	if (!matched.has_value()) {
+		if (matched.error() == EC_RES_TIMEOUT) {
+			CPRINTS("Reading positive match secret disallowed: "
+				"deadline has passed.");
+		} else {
+			CPRINTS("Positive match secret for finger %d is not meant to "
+				"be read now.",
+				fgr);
+		}
+		return matched.error();
 	}
 
 	if (derive_positive_match_secret(
@@ -521,22 +514,15 @@ fp_command_sign_match(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
-	timestamp_t now = get_time();
-	struct positive_match_secret_state state_copy =
-		global_context.positive_match_secret_state;
-
-	fp_disable_positive_match_secret(
-		&global_context.positive_match_secret_state);
-
-	if (FP_NO_SUCH_TEMPLATE == state_copy.template_matched ||
-	    !state_copy.readable) {
+	const auto matched = FpTemplateStore::consume_secret(
+		global_context.positive_match_secret_state);
+	if (!matched.has_value()) {
+		if (matched.error() == EC_RES_TIMEOUT) {
+			CPRINTS("Deadline has passed");
+			return EC_HOST_CMD_TIMEOUT;
+		}
 		CPRINTS("No match to be signed");
 		return EC_HOST_CMD_ACCESS_DENIED;
-	}
-
-	if (timestamp_expired(state_copy.deadline, &now)) {
-		CPRINTS("Deadline has passed");
-		return EC_HOST_CMD_TIMEOUT;
 	}
 
 	if (sign_message(context, operation, challenge, signature)) {

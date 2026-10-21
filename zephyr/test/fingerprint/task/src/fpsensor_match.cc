@@ -631,7 +631,7 @@ ZTEST_USER(fpsensor_match, test_match_success_read_positive_match_secret_twice)
 	/*
 	 * Confirm that we can't read positive match secret for the second time.
 	 */
-	zassert_equal(EC_RES_TIMEOUT,
+	zassert_equal(EC_RES_ACCESS_DENIED,
 		      ec_cmd_fp_read_match_secret(NULL, &secret_params,
 						  &secret_response));
 }
@@ -658,7 +658,7 @@ ZTEST_USER(fpsensor_match,
 
 	/* Confirm that we can't read positive match secret. */
 	secret_params.fgr = 0;
-	zassert_equal(EC_RES_TIMEOUT,
+	zassert_equal(EC_RES_ACCESS_DENIED,
 		      ec_cmd_fp_read_match_secret(NULL, &secret_params,
 						  &secret_response));
 }
@@ -685,7 +685,7 @@ ZTEST_USER(fpsensor_match, test_match_error_no_positive_match_secret)
 
 	/* Confirm that we can't read positive match secret. */
 	secret_params.fgr = 0;
-	zassert_equal(EC_RES_TIMEOUT,
+	zassert_equal(EC_RES_ACCESS_DENIED,
 		      ec_cmd_fp_read_match_secret(NULL, &secret_params,
 						  &secret_response));
 }
