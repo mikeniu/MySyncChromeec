@@ -575,6 +575,7 @@ static void system_xec_hibernate_by_dsleep(uint32_t seconds,
 	 * Set PRIMASK = 1 so on wake the CPU will not vector to any ISR.
 	 * Set BASEPRI = 0 to allow any priority to wake.
 	 */
+	__disable_irq();
 	__set_BASEPRI(0);
 	/* triggers sleep hardware */
 	__WFI();
