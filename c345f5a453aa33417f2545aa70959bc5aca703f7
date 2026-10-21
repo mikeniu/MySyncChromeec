@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fae1be66_991dd7c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-21T20:46:15Z",
+      "side": 1,
+      "message": "I have CL pending review which also fixes this issue and adds emulator support for test coverage https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8615307",
+      "revId": "c345f5a453aa33417f2545aa70959bc5aca703f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
