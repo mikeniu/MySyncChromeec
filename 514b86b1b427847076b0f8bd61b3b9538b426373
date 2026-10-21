@@ -16,6 +16,25 @@
       "message": "Not index 0? Are shards base 1 indexed?",
       "revId": "514b86b1b427847076b0f8bd61b3b9538b426373",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c017894_3fbfd18c",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-21T19:53:16Z",
+      "side": 1,
+      "message": "Yes, worker shards are 1-indexed (1..shard_count), while 0/unset represents the unsharded build or the parent orchestrator build:\n\n- In chromiumos/platform/ec, shard_projects() validates `1 \u003c\u003d opts.shard_index \u003c\u003d opts.shard_count` and computes `(opts.shard_index - 1) * chunk_size`: https://chromium.googlesource.com/chromiumos/platform/ec/+/76c3cdd4d4a3426eb0e103bef9c446d3631de510/zephyr/scripts/firmware_builder_lib.py#108 (and `--shard-index` is defined as \"1-based index of the current shard to execute\" at https://chromium.googlesource.com/chromiumos/platform/ec/+/76c3cdd4d4a3426eb0e103bef9c446d3631de510/zephyr/scripts/firmware_builder_lib.py#407, matching Twister `TWISTER_SUBSET\u003d{opts.shard_index}/{opts.shard_count}` at https://chromium.googlesource.com/chromiumos/platform/ec/+/76c3cdd4d4a3426eb0e103bef9c446d3631de510/zephyr/firmware_builder.py#789).\n- In chromiumos/infra/recipes, the parent build runs when `shard_count \u003e 1 and not shard_index` and schedules worker shards with `for i in range(1, shard_count + 1): props[\"shard_index\"] \u003d i`: https://chromium.googlesource.com/chromiumos/infra/recipes/+/7f1bdd0d53f0d97ec241f7acffca165505585a90/recipes/build_firmware.py#183",
+      "parentUuid": "f306ab4f_1164321d",
+      "isAi": true,
+      "revId": "514b86b1b427847076b0f8bd61b3b9538b426373",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
