@@ -11,6 +11,7 @@
 #include <ec_commands.h>
 #include <fpsensor/fpsensor.h>
 #include <fpsensor/fpsensor_frame_storage.h>
+#include <fpsensor/fpsensor_platform.h>
 #include <fpsensor/fpsensor_template_store.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <mkbp_event.h>
@@ -294,4 +295,19 @@ ZTEST(fpsensor_utils, test_template_store_secret_lifecycle)
 		t0 + window - std::chrono::microseconds(1));
 	zassert_true(matched.has_value());
 	zassert_equal(matched->raw(), 2);
+}
+
+ZTEST(fpsensor_utils, test_task_event_wrapper)
+{
+	constexpr FpTaskEvent kCfg{ TASK_EVENT_UPDATE_CONFIG };
+	static_assert(kCfg.is_update_config());
+	static_assert(!kCfg.is_sensor_or_timer());
+
+	constexpr FpTaskEvent kIrq{ TASK_EVENT_SENSOR_IRQ };
+	static_assert(kIrq.is_sensor_irq());
+	static_assert(kIrq.is_sensor_or_timer());
+
+	constexpr FpTaskEvent kTimer{ TASK_EVENT_TIMER };
+	static_assert(kTimer.is_timer());
+	static_assert(kTimer.is_sensor_or_timer());
 }
