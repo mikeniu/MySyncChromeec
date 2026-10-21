@@ -245,6 +245,13 @@ uint32_t get_panic_data_size(void);
  */
 uintptr_t get_panic_data_start(void);
 
+/**
+ * Return a pointer to the flags field of valid panic data, or NULL if none.
+ *
+ * This safely accesses header flags across panic_data struct_size differences.
+ */
+uint8_t *get_panic_data_flags(void);
+
 #if defined(CONFIG_BOARD_NATIVE_POSIX) || defined(CONFIG_BOARD_NATIVE_SIM)
 /**
  * @brief Test-only function for accessing the pdata_ptr object.

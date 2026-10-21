@@ -208,3 +208,28 @@ ZTEST_USER(host_cmd_get_panic_info, test_get_panic_info_v2_invalid_offset)
 	params.read_offset = sizeof(struct panic_data) + 1;
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
 }
+
+ZTEST_USER(host_cmd_get_panic_info, test_get_panic_info_cross_size)
+{
+	struct panic_data *pdata_actual = get_panic_data_write();
+	uint32_t cross_size = sizeof(struct panic_data) - 4;
+	struct panic_data *pdata =
+		(struct panic_data *)((uintptr_t)pdata_actual + 4);
+	struct panic_data response = { 0 };
+	struct host_cmd_handler_args args = BUILD_HOST_COMMAND_RESPONSE(
+		EC_CMD_GET_PANIC_INFO, UINT8_C(0), response);
+
+	pdata_actual->magic = PANIC_DATA_MAGIC;
+	pdata_actual->struct_size = cross_size;
+	pdata->arch = 1;
+	pdata->struct_version = PANIC_DATA_VERSION;
+	pdata->flags = 0;
+	pdata->reserved = 0;
+
+	zassert_ok(host_command_process(&args), NULL);
+	zassert_equal(args.response_size, cross_size, NULL);
+	zassert_equal(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD,
+		      PANIC_DATA_FLAG_OLD_HOSTCMD, NULL);
+
+	pdata_actual->struct_size = sizeof(struct panic_data);
+}
