@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f451a92_87d392c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:47:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** No functional issues. The use of `__builtin_add_overflow` correctly provides compile-time overflow checking.\n* **Architecture \u0026 Component Fit:** Moving the function to the header is correct for a `constexpr` utility.\n* **Code Simplicity:** The code is minimal and direct.\n* **Idiomaticity \u0026 Readability:** The use of `[[nodiscard]] constexpr` and `noexcept` is perfectly idiomatic C++.\n* **Security:** Memory-safety boundary checks and integer overflow protections are maintained.\n* **Testing:** Test coverage is excellent. The new patchset correctly adds the missing off-by-one boundary checks for both `buffer_size` and the overflow boundary, tested via both `static_assert` and `zassert_equal`.\n* **CL Size \u0026 Scope:** Size: S (+26, -18). The CL is small, atomic, and implements a single cohesive logical change.\n* **Commit Message:** The commit message clearly explains *what* changed and *why*, and correctly includes bug and test tags.\n[🔗](http://go/tj/d5b7b62a-95c5-456b-88c8-af38d495873a)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a519976824a15afc58127730f704a0b112fd7e1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
