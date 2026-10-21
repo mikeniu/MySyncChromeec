@@ -1,0 +1,31 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config TEST_SYSTEM_MPU
+	bool "Enable MPU for system_common tests"
+	default y
+	select CPU_HAS_MPU
+	select MPU
+
+config NPCX_RAM_LOCK
+	bool "Enable NPCX RAM lock for system_common tests"
+	default y
+
+config FLASH_BASE_ADDRESS
+	hex "Flash base address for MPU test"
+	default 0x10058000
+
+config FLASH_SIZE
+	int "Flash size in KB for MPU test"
+	default 512
+
+config SRAM_BASE_ADDRESS
+	hex "SRAM base address for MPU test"
+	default 0x200c0000
+
+config SRAM_SIZE
+	int "SRAM size in KB for MPU test"
+	default 64
+
+source "Kconfig.zephyr"

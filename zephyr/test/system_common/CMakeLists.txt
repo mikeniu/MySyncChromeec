@@ -9,5 +9,13 @@ project(system_common_test)
 # Include FFF fakes
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
 
+target_include_directories(app PRIVATE
+	include
+	${PLATFORM_EC}/zephyr/shim/chip/npcx/include
+)
+
 FILE(GLOB test_sources src/*.c)
-target_sources(app PRIVATE ${test_sources})
+target_sources(app PRIVATE
+	${test_sources}
+	${PLATFORM_EC}/zephyr/shim/core/cortex-m/mpu.c
+)
