@@ -84,6 +84,9 @@ struct ucsi_ppm_device {
 
 	/** Connection status change mask */
 	union conn_status_change_bits_t change_mask;
+
+	/* Deadline for CC_ACK timeout */
+	uint64_t cc_ack_deadline;
 };
 
 const char *ppm_state_strings[] = {
@@ -564,6 +567,8 @@ static void ppm_common_handle_pending_command(struct ucsi_ppm_device *dev)
 			 * need to be acked.
 			 */
 			dev->ppm_state = PPM_STATE_WAITING_CC_ACK;
+			dev->cc_ack_deadline =
+				k_uptime_get() + PPM_CC_ACK_TIMEOUT_MS;
 			ppm_common_opm_notify(dev);
 			break;
 		}
@@ -584,6 +589,8 @@ static void ppm_common_handle_pending_command(struct ucsi_ppm_device *dev)
 			dev->ucsi_data.cci.acknowledge_command = 1;
 		} else {
 			dev->ppm_state = PPM_STATE_WAITING_CC_ACK;
+			dev->cc_ack_deadline =
+				k_uptime_get() + PPM_CC_ACK_TIMEOUT_MS;
 		}
 
 		/* Notify OPM to handle result and wait for ack if we're
@@ -640,10 +647,13 @@ static void ppm_common_taskloop(struct ucsi_ppm_device *dev)
 	 */
 	if (dev->ppm_state != PPM_STATE_PROCESSING_COMMAND &&
 	    !is_pending_command(dev) && !handle_async_event) {
-		k_timeout_t timeout =
-			(dev->ppm_state == PPM_STATE_WAITING_CC_ACK) ?
-				K_MSEC(PPM_CC_ACK_TIMEOUT_MS) :
-				K_FOREVER;
+		k_timeout_t timeout = K_FOREVER;
+		if (dev->ppm_state == PPM_STATE_WAITING_CC_ACK) {
+			int64_t remaining =
+				dev->cc_ack_deadline - k_uptime_get();
+			timeout = (remaining <= 0) ? K_NO_WAIT :
+						     K_MSEC(remaining);
+		}
 
 		LOG_DBG("Waiting for next command at state %d (%s)...",
 			dev->ppm_state, ppm_state_to_string(dev->ppm_state));
