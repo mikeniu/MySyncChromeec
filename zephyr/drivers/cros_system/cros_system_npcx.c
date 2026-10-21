@@ -600,7 +600,7 @@ int cros_system_soc_reset(void)
 	struct twd_reg *const inst_twd = HAL_TWD_INST();
 
 	/* Disable interrupts to avoid task swaps during reboot */
-	interrupt_disable_all();
+	irq_lock();
 
 	/*
 	 * NPCX chip doesn't have the specific system reset functionality. Use
@@ -643,7 +643,7 @@ int cros_system_soc_reset(void)
 int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 {
 	/* Disable interrupt first */
-	interrupt_disable_all();
+	irq_lock();
 
 	/* Stop the watchdog */
 	system_npcx_watchdog_stop();

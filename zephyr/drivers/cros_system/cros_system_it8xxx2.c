@@ -125,7 +125,7 @@ int cros_system_soc_reset(void)
 	uint32_t chip_reset_flags = chip_read_reset_flags();
 
 	/* Disable interrupts to avoid task swaps during reboot. */
-	interrupt_disable_all();
+	irq_lock();
 
 	if (chip_reset_flags & (EC_RESET_FLAG_HARD | EC_RESET_FLAG_HIBERNATE))
 		gctrl_base->GCTRL_ETWDUARTCR |= IT8XXX2_GCTRL_ETWD_HW_RST_EN;
@@ -332,7 +332,7 @@ int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 	struct wdt_it8xxx2_regs *const wdt_base = WDT_IT8XXX2_REG_BASE;
 
 	/* Disable all interrupts. */
-	interrupt_disable_all();
+	irq_lock();
 
 	/* Save and disable interrupts */
 	ite_intc_save_and_disable_interrupts();
