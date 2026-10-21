@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e0f7b3b_d84d9067",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:36:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding `FpPairingKey` abstraction and missing test assertions.\n\n### Review Summary\n* **Functionality:** ✅ No regressions or bugs found.\n* **Architecture \u0026 Component Fit:** ❌ **Changes Requested** — `FpPairingKey` is a class consisting purely of static methods. Google C++ Style prohibits using classes just to group static functions.\n* **Code Simplicity:** ✅ Abstractions cleanly encapsulate BoringSSL lifecycle management.\n* **Idiomaticity \u0026 Readability:** ✅ Modern C++ features like `std::expected` and `std::span` are used correctly.\n* **Security:** ✅ No new vulnerabilities. P256 memory is zeroized cleanly.\n* **Testing:** ❌ **Changes Requested** — Missing successful path tests for `from_uncompressed_point` and `from_private_key`. The `unwrap_into` test lacks a strong oracle (it only verifies decryption succeeds, but not that it correctly outputs the original shared secret).\n* **CL Size \u0026 Scope:** ✅ Size: M (+191, -0). The CL cleanly introduces RAII wrappers as an isolated prerequisite change.\n* **Commit Message:** ✅ Rationale and summary are clear and appropriately scoped. [🔗](http://go/tj/7b66bda6-c1b7-4de9-89f6-07c0434458a1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fe05fd9b2fe77e3bee40344a7e55b269b829dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e977d38_6e94529e",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:36:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Architecture \u0026 Component Fit (Class vs. Namespace):** The `FpPairingKey` class contains only static methods and no state. The Google C++ Style Guide (`go/cstyle#Nonmember,_Static_Member,_and_Global_Functions`) discourages using classes merely to group static functions. Consider replacing this class with a namespace (e.g., `namespace fp_pairing_key { ... }`) or simply providing free functions like `EstablishAndWrapPairingKey` and `UnwrapPairingKey`. [🔗](http://go/tj/7b66bda6-c1b7-4de9-89f6-07c0434458a1)",
+      "range": {
+        "startLine": 365,
+        "startChar": 0,
+        "endLine": 365,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fe05fd9b2fe77e3bee40344a7e55b269b829dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aa6ca41_8c556bce",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 1808,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:36:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Test Oracle Integrity \u0026 Anti-Masking Audit:** This assertion only verifies that the decryption operation returns success, but it does not verify that the unwrapped pairing key actually matches the originally computed shared secret. Please assert the exact expected bytes to prevent silent data corruption. \n\nAdditionally, there are no tests verifying the successful path for `FpP256Key::from_uncompressed_point` or `FpP256Key::from_private_key`—only their failure modes.\n\nSuggestion for verifying the unwrapped secret and happy paths:\n```cpp\n\tconst auto expected_secret \u003d key1-\u003ecompute_shared_secret(*key2);\n\tzassert_true(expected_secret.has_value());\n\n\tFpPairingKey::Bytes unwrapped{};\n\tzassert_true(\n\t\tFpPairingKey::unwrap_into(*wrapped, unwrapped).has_value());\n\tzassert_mem_equal(unwrapped.data(), expected_secret-\u003edata(),\n\t\t\t  unwrapped.size());\n\n\t// Test happy path for from_uncompressed_point\n\tstd::array\u003cuint8_t, FP_ASCP_KEY_SIZE\u003e valid_point{};\n\tvalid_point[0] \u003d POINT_CONVERSION_UNCOMPRESSED;\n\tstd::ranges::copy(pub2-\u003ex, valid_point.begin() + 1);\n\tstd::ranges::copy(pub2-\u003ey, valid_point.begin() + 1 + sizeof(pub2-\u003ex));\n\tzassert_true(FpP256Key::from_uncompressed_point(valid_point).has_value());\n\n\t// Test happy path for from_private_key\n\tstd::array\u003cuint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN\u003e valid_priv{};\n\tvalid_priv[31] \u003d 1; // A valid simple scalar\n\tzassert_true(FpP256Key::from_private_key(valid_priv).has_value());\n```\n*(Also consider a minor safety improvement for the other `zassert_equal(..., EC_ERROR_INVAL)` assertions: calling `.error()` on an `std::expected` that accidentally succeeds invokes undefined behavior or crashes the test runner. Checking `!res.has_value()` first is safer.)* [🔗](http://go/tj/7b66bda6-c1b7-4de9-89f6-07c0434458a1)",
+      "range": {
+        "startLine": 1805,
+        "startChar": 0,
+        "endLine": 1808,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fe05fd9b2fe77e3bee40344a7e55b269b829dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
