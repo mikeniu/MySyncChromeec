@@ -27,11 +27,18 @@
 
 #ifdef CONFIG_ZEPHYR
 #include <zephyr/linker/devicetree_regions.h>
+#include <zephyr/toolchain.h>
 
 #if DT_NODE_EXISTS(DT_CHOSEN(cros_fp_fingerprint_memory_frame))
 #define FP_FRAME_SECTION                                       \
 	__attribute__((__section__(LINKER_DT_NODE_REGION_NAME( \
 		DT_CHOSEN(cros_fp_fingerprint_memory_frame)))))
+#elif defined(CONFIG_NOCACHE_MEMORY)
+/*
+ * Use uncacheable memory region for the frame buffer to enable SPI DMA
+ * transfers, which are unsupported on cached memory.
+ */
+#define FP_FRAME_SECTION __nocache
 #endif
 
 #if DT_NODE_EXISTS(DT_CHOSEN(cros_fp_fingerprint_memory_template))
