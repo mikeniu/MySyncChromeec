@@ -16,6 +16,24 @@
       "message": "I presume you can delete the snippet itself as well?",
       "revId": "43bcd0295ed9dc69abf913b639d9e9a7e123dbeb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc104a94_fe9f1b31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-21T20:13:51Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e557c4dc_e122a2fd",
+      "revId": "43bcd0295ed9dc69abf913b639d9e9a7e123dbeb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
