@@ -842,7 +842,7 @@ class AllTests:
             TestConfig(
                 test_name="benchmark",
                 # TODO(b/485954886): Runs slowly on helipilot Renode.
-                timeout_secs=150,
+                timeout_secs=300,
             ),
             TestConfig(test_name="boringssl_crypto"),
             # TODO(b/468409589): Add RISC-V FPU test.
