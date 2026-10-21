@@ -49,12 +49,10 @@ AP_POWER_STATE_DECL(S0)
 	AP_PWRSEQ_CHIPSET_SUB_STATE_DECL_(                     \
 		DT_CAT6(node_id, _P_, prop, _IDX_, idx, _STRING_TOKEN))
 
-#define AP_PWRSEQ_EACH_CHIPSET_SUB_STATE_DECL(node_id)                      \
-	COND_CODE_1(                                                        \
-		DT_NODE_HAS_PROP(node_id, chipset),                         \
-		(DT_FOREACH_PROP_ELEM(node_id, chipset,                     \
-				      AP_PWRSEQ_CHIPSET_SUB_STATE_DECL__)), \
-		())
+#define AP_PWRSEQ_EACH_CHIPSET_SUB_STATE_DECL(node_id)     \
+	IF_ENABLED(DT_NODE_HAS_PROP(node_id, chipset),     \
+		   (DT_FOREACH_PROP_ELEM(node_id, chipset, \
+					 AP_PWRSEQ_CHIPSET_SUB_STATE_DECL__)))
 
 #define AP_PWRSEQ_APP_SUB_STATE_DECL(state) \
 	extern const struct ap_pwrseq_smf app_state_##state;
@@ -65,11 +63,10 @@ AP_POWER_STATE_DECL(S0)
 	AP_PWRSEQ_APP_SUB_STATE_DECL_(                     \
 		DT_CAT6(node_id, _P_, prop, _IDX_, idx, _STRING_TOKEN))
 
-#define AP_PWRSEQ_EACH_APP_SUB_STATE_DECL(node_id)                          \
-	COND_CODE_1(DT_NODE_HAS_PROP(node_id, application),                 \
-		    (DT_FOREACH_PROP_ELEM(node_id, application,             \
-					  AP_PWRSEQ_APP_SUB_STATE_DECL__)), \
-		    ())
+#define AP_PWRSEQ_EACH_APP_SUB_STATE_DECL(node_id)             \
+	IF_ENABLED(DT_NODE_HAS_PROP(node_id, application),     \
+		   (DT_FOREACH_PROP_ELEM(node_id, application, \
+					 AP_PWRSEQ_APP_SUB_STATE_DECL__)))
 
 DT_FOREACH_STATUS_OKAY(ap_pwrseq_sub_states,
 		       AP_PWRSEQ_EACH_CHIPSET_SUB_STATE_DECL)

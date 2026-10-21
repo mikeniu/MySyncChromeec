@@ -27,11 +27,10 @@ extern "C" {
 		DT_NODE_HAS_PROP(node_id, chipset),                             \
 		(DT_FOREACH_PROP_ELEM(node_id, chipset,                         \
 				      AP_POWER_SUB_STATE_ENUM_DEF_WITH_COMMA)), \
-		(COND_CODE_1(DT_NODE_HAS_PROP(node_id, application),            \
-			     (DT_FOREACH_PROP_ELEM(                             \
-				     node_id, application,                      \
-				     AP_POWER_SUB_STATE_ENUM_DEF_WITH_COMMA)),  \
-			     ())))
+		(IF_ENABLED(DT_NODE_HAS_PROP(node_id, application),             \
+			    (DT_FOREACH_PROP_ELEM(                              \
+				    node_id, application,                       \
+				    AP_POWER_SUB_STATE_ENUM_DEF_WITH_COMMA)))))
 
 /**
  * @brief AP power sequence valid power states.

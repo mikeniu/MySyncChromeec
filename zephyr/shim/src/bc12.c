@@ -22,9 +22,9 @@ BUILD_ASSERT(DT_HAS_COMPAT_STATUS_OKAY(RT1718S_TCPC_COMPAT));
 #define BC12_CHIP_ENTRY(usbc_id, bc12_id, chip_fn) \
 	[USBC_PORT_NEW(usbc_id)] = chip_fn(bc12_id)
 
-#define CHECK_COMPAT(compat, usbc_id, bc12_id, config)   \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(bc12_id, compat), \
-		    (BC12_CHIP_ENTRY(usbc_id, bc12_id, config)), ())
+#define CHECK_COMPAT(compat, usbc_id, bc12_id, config)  \
+	IF_ENABLED(DT_NODE_HAS_COMPAT(bc12_id, compat), \
+		   (BC12_CHIP_ENTRY(usbc_id, bc12_id, config)))
 
 #define BC12_CHIP_FIND(usbc_id, bc12_id)                                       \
 	CHECK_COMPAT(RT1718S_BC12_COMPAT, usbc_id, bc12_id, BC12_CHIP_RT1718S) \
@@ -37,9 +37,9 @@ BUILD_ASSERT(DT_HAS_COMPAT_STATUS_OKAY(RT1718S_TCPC_COMPAT));
 	CHECK_COMPAT(PI3USB9201_UPSTREAM_COMPAT, usbc_id, bc12_id,             \
 		     BC12_CHIP_UPSTREAM)
 
-#define BC12_CHIP(usbc_id)                           \
-	COND_CODE_1(DT_NODE_HAS_PROP(usbc_id, bc12), \
-		    (BC12_CHIP_FIND(usbc_id, DT_PHANDLE(usbc_id, bc12))), ())
+#define BC12_CHIP(usbc_id)                          \
+	IF_ENABLED(DT_NODE_HAS_PROP(usbc_id, bc12), \
+		   (BC12_CHIP_FIND(usbc_id, DT_PHANDLE(usbc_id, bc12))))
 
 /* BC1.2 controllers */
 struct bc12_config bc12_ports[CHARGE_PORT_COUNT] = { DT_FOREACH_STATUS_OKAY(

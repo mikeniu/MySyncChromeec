@@ -29,7 +29,7 @@
 LOG_MODULE_REGISTER(tcpc, CONFIG_GPIO_LOG_LEVEL);
 
 #define HAS_TCPC_PROP(usbc_id) \
-	COND_CODE_1(DT_NODE_HAS_PROP(usbc_id, tcpc), (|| 1), ())
+	IF_ENABLED(DT_NODE_HAS_PROP(usbc_id, tcpc), (|| 1))
 
 #define DT_HAS_TCPC (0 DT_FOREACH_STATUS_OKAY(named_usbc_port, HAS_TCPC_PROP))
 
@@ -39,8 +39,8 @@ LOG_MODULE_REGISTER(tcpc, CONFIG_GPIO_LOG_LEVEL);
 	[USBC_PORT_NEW(usbc_id)] = config_fn(tcpc_id),
 
 #define CHECK_COMPAT(compat, usbc_id, tcpc_id, config_fn) \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(tcpc_id, compat),  \
-		    (TCPC_CHIP_ENTRY(usbc_id, tcpc_id, config_fn)), ())
+	IF_ENABLED(DT_NODE_HAS_COMPAT(tcpc_id, compat),   \
+		   (TCPC_CHIP_ENTRY(usbc_id, tcpc_id, config_fn)))
 
 /**
  * @param driver Tuple containing the TCPC (compatible, config) pair.
@@ -108,9 +108,9 @@ MAYBE_CONST struct tcpc_config_t tcpc_config[] = { DT_FOREACH_STATUS_OKAY(
 	const struct tcpc_config_t TCPC_ALT_NAME_GET(node_id) = \
 		config_fn(node_id)
 
-#define TCPC_ALT_DEFINE(node_id, config_fn)         \
-	COND_CODE_1(DT_PROP_OR(node_id, is_alt, 0), \
-		    (TCPC_ALT_DEFINITION(node_id, config_fn);), ())
+#define TCPC_ALT_DEFINE(node_id, config_fn)        \
+	IF_ENABLED(DT_PROP_OR(node_id, is_alt, 0), \
+		   (TCPC_ALT_DEFINITION(node_id, config_fn);))
 
 /*
  * Define a struct tcpc_config_t for every TCPC node in the tree with the

@@ -51,9 +51,9 @@ extern "C" {
 
 #define NODE_MATCHES(node1, node2) IS_EQ(DT_DEP_ORD(node1), DT_DEP_ORD(node2))
 
-#define COMPARE_PDC_ARRAY_MEMBER(usbc_id, prop, idx, target)                  \
-	COND_CODE_1(NODE_MATCHES(DT_PROP_BY_IDX(usbc_id, prop, idx), target), \
-		    (USBC_PORT_NEW(usbc_id)), ())
+#define COMPARE_PDC_ARRAY_MEMBER(usbc_id, prop, idx, target)                 \
+	IF_ENABLED(NODE_MATCHES(DT_PROP_BY_IDX(usbc_id, prop, idx), target), \
+		   (USBC_PORT_NEW(usbc_id)))
 
 #define GET_USBC_PORT_IF_PDC_IN_LIST(usbc_id, target)                      \
 	DT_FOREACH_PROP_ELEM_VARGS(usbc_id, pdc, COMPARE_PDC_ARRAY_MEMBER, \

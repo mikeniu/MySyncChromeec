@@ -246,11 +246,10 @@ DT_FOREACH_STATUS_OKAY(cros_ec_motionsense_bodydetect,
 /* Construct an entry iff the alternate_for property exists. */
 #define MK_SENSOR_ALT_ENTRY(inst, s_compat, s_chip, s_type, s_drv, s_min_freq, \
 			    s_max_freq)                                        \
-	COND_CODE_1(DT_NODE_HAS_PROP(DT_INST(inst, s_compat), alternate_for),  \
-		    (DO_MK_SENSOR_ENTRY(DT_INST(inst, s_compat), s_chip,       \
-					s_type, s_drv, s_min_freq,             \
-					s_max_freq)),                          \
-		    ())
+	IF_ENABLED(DT_NODE_HAS_PROP(DT_INST(inst, s_compat), alternate_for),   \
+		   (DO_MK_SENSOR_ENTRY(DT_INST(inst, s_compat), s_chip,        \
+				       s_type, s_drv, s_min_freq,              \
+				       s_max_freq)))
 
 #undef CREATE_SENSOR_DATA
 /*
@@ -415,10 +414,10 @@ DECLARE_HOOK(HOOK_INIT, sensor_enable_irqs, HOOK_PRIO_DEFAULT);
 		}                                                            \
 	} while (0)
 
-#define ALT_SENSOR_CHECK_SSFC_ID(id)                                          \
-	COND_CODE_1(UTIL_AND(DT_NODE_HAS_PROP(id, alternate_for),             \
-			     DT_NODE_HAS_PROP(id, alternate_ssfc_indicator)), \
-		    (CHECK_SSFC_AND_ENABLE_ALT_SENSOR(id);), ())
+#define ALT_SENSOR_CHECK_SSFC_ID(id)                                         \
+	IF_ENABLED(UTIL_AND(DT_NODE_HAS_PROP(id, alternate_for),             \
+			    DT_NODE_HAS_PROP(id, alternate_ssfc_indicator)), \
+		   (CHECK_SSFC_AND_ENABLE_ALT_SENSOR(id);))
 
 #define CHECK_UFSC_AND_ENABLE_ALT_SENSOR(id)                                 \
 	do {                                                                 \
@@ -433,10 +432,10 @@ DECLARE_HOOK(HOOK_INIT, sensor_enable_irqs, HOOK_PRIO_DEFAULT);
 		}                                                            \
 	} while (0)
 
-#define ALT_SENSOR_CHECK_UFSC_ID(id)                                          \
-	COND_CODE_1(UTIL_AND(DT_NODE_HAS_PROP(id, alternate_for),             \
-			     DT_NODE_HAS_PROP(id, alternate_ufsc_indicator)), \
-		    (CHECK_UFSC_AND_ENABLE_ALT_SENSOR(id);), ())
+#define ALT_SENSOR_CHECK_UFSC_ID(id)                                         \
+	IF_ENABLED(UTIL_AND(DT_NODE_HAS_PROP(id, alternate_for),             \
+			    DT_NODE_HAS_PROP(id, alternate_ufsc_indicator)), \
+		   (CHECK_UFSC_AND_ENABLE_ALT_SENSOR(id);))
 
 #if DT_NODE_EXISTS(SENSOR_ALT_NODE)
 

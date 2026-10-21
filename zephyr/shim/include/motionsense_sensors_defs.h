@@ -37,10 +37,10 @@ enum sensor_id {
 /* Define the SENSOR_ID if:
  * DT_NODE_HAS_STATUS(id, okay) && DT_NODE_HAS_PROP(id, alternate_for)
  */
-#define SENSOR_ID_WITH_COMMA(id)                                     \
-	IF_ENABLED(DT_NODE_HAS_STATUS(id, okay),                     \
-		   (COND_CODE_1(DT_NODE_HAS_PROP(id, alternate_for), \
-				(SENSOR_ID(id), ), ())))
+#define SENSOR_ID_WITH_COMMA(id)                                    \
+	IF_ENABLED(DT_NODE_HAS_STATUS(id, okay),                    \
+		   (IF_ENABLED(DT_NODE_HAS_PROP(id, alternate_for), \
+			       (SENSOR_ID(id), ))))
 /* clang-format off */
 enum sensor_alt_id {
 #if DT_NODE_EXISTS(SENSOR_ALT_NODE)

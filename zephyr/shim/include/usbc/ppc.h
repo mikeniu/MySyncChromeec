@@ -79,9 +79,9 @@ extern "C" {
 #define PPC_ALT_DECLARATION(node_id) \
 	extern const struct ppc_config_t PPC_ALT_NAME_GET(node_id)
 
-#define PPC_ALT_DECLARE(node_id, config_fn)         \
-	COND_CODE_1(DT_PROP_OR(node_id, is_alt, 0), \
-		    (PPC_ALT_DECLARATION(node_id);), ())
+#define PPC_ALT_DECLARE(node_id, config_fn)        \
+	IF_ENABLED(DT_PROP_OR(node_id, is_alt, 0), \
+		   (PPC_ALT_DECLARATION(node_id);))
 
 /*
  * Forward declare a struct ppc_config_t for every PPC node in the tree with the

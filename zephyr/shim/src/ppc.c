@@ -22,8 +22,8 @@ LOG_MODULE_REGISTER(ppc, CONFIG_GPIO_LOG_LEVEL);
 	[USBC_PORT_NEW(usbc_id)] = config_fn(ppc_id),
 
 #define CHECK_COMPAT(compat, usbc_id, ppc_id, config_fn) \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(ppc_id, compat),  \
-		    (PPC_CHIP_ENTRY(usbc_id, ppc_id, config_fn)), ())
+	IF_ENABLED(DT_NODE_HAS_COMPAT(ppc_id, compat),   \
+		   (PPC_CHIP_ENTRY(usbc_id, ppc_id, config_fn)))
 
 /**
  * @param driver Tuple containing the PPC (compatible, config) pair.
@@ -73,10 +73,9 @@ LOG_MODULE_REGISTER(ppc, CONFIG_GPIO_LOG_LEVEL);
 	IF_ENABLED(DT_NODE_HAS_PROP(usbc_id, ppc), \
 		   (PPC_PROP_COMPATIBLE_VERIFY(DT_PHANDLE(usbc_id, ppc))))
 
-#define PPC_CHIP_ALT(usbc_id)                                               \
-	COND_CODE_1(DT_NODE_HAS_PROP(usbc_id, ppc_alt),                     \
-		    (PPC_CHIP_FIND(usbc_id, DT_PHANDLE(usbc_id, ppc_alt))), \
-		    ())
+#define PPC_CHIP_ALT(usbc_id)                          \
+	IF_ENABLED(DT_NODE_HAS_PROP(usbc_id, ppc_alt), \
+		   (PPC_CHIP_FIND(usbc_id, DT_PHANDLE(usbc_id, ppc_alt))))
 
 /*
  * The PPC_CHIP_VERIFY macro expands to nothing when the PPC driver
@@ -96,9 +95,9 @@ struct ppc_config_t ppc_chips_alt[] = { DT_FOREACH_STATUS_OKAY(named_usbc_port,
 #define PPC_ALT_DEFINITION(node_id, config_fn) \
 	const struct ppc_config_t PPC_ALT_NAME_GET(node_id) = config_fn(node_id)
 
-#define PPC_ALT_DEFINE(node_id, config_fn)          \
-	COND_CODE_1(DT_PROP_OR(node_id, is_alt, 0), \
-		    (PPC_ALT_DEFINITION(node_id, config_fn);), ())
+#define PPC_ALT_DEFINE(node_id, config_fn)         \
+	IF_ENABLED(DT_PROP_OR(node_id, is_alt, 0), \
+		   (PPC_ALT_DEFINITION(node_id, config_fn);))
 
 /*
  * Define a global struct ppc_config_t for every PPC node in the tree with the

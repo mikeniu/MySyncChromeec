@@ -57,11 +57,10 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(cros_ec_cbi_ssfc) < 2,
 		: DT_PROP(id, size);
 
 #define CBI_SSFC_PLUS_FIELD_SIZE(id) +DT_PROP(id, size)
-#define CBI_SSFC_FIELDS_SIZE                                                 \
-	(0 COND_CODE_1(                                                      \
-		DT_NODE_EXISTS(CBI_SSFC_NODE),                               \
-		(DT_FOREACH_CHILD(CBI_SSFC_NODE, CBI_SSFC_PLUS_FIELD_SIZE)), \
-		()))
+#define CBI_SSFC_FIELDS_SIZE                   \
+	(0 IF_ENABLED(                         \
+		DT_NODE_EXISTS(CBI_SSFC_NODE), \
+		(DT_FOREACH_CHILD(CBI_SSFC_NODE, CBI_SSFC_PLUS_FIELD_SIZE))))
 
 BUILD_ASSERT(CBI_SSFC_FIELDS_SIZE <= 32, "CBI SSFS is bigger than 32 bits");
 

@@ -96,18 +96,17 @@ AP_POWER_STATE_WEAK_DEFINE(S0)
 	AP_PWRSEQ_EACH_CHIPSET_SUB_STATE_NODE_DEFINE_(                     \
 		DT_CAT6(node_id, _P_, prop, _IDX_, idx, _STRING_TOKEN))
 
-#define AP_PWRSEQ_EACH_SUB_STATE_NODE_CHILD_DEFINE(node_id)                   \
-	COND_CODE_1(                                                          \
-		DT_NODE_HAS_PROP(node_id, chipset),                           \
-		(DT_FOREACH_PROP_ELEM(                                        \
-			node_id, chipset,                                     \
-			AP_PWRSEQ_EACH_CHIPSET_SUB_STATE_NODE_DEFINE__)),     \
-		(COND_CODE_1(                                                 \
-			DT_NODE_HAS_PROP(node_id, application),               \
-			(DT_FOREACH_PROP_ELEM(                                \
-				node_id, application,                         \
-				AP_PWRSEQ_EACH_APP_SUB_STATE_NODE_DEFINE__)), \
-			())))
+#define AP_PWRSEQ_EACH_SUB_STATE_NODE_CHILD_DEFINE(node_id)               \
+	COND_CODE_1(                                                      \
+		DT_NODE_HAS_PROP(node_id, chipset),                       \
+		(DT_FOREACH_PROP_ELEM(                                    \
+			node_id, chipset,                                 \
+			AP_PWRSEQ_EACH_CHIPSET_SUB_STATE_NODE_DEFINE__)), \
+		(IF_ENABLED(                                              \
+			DT_NODE_HAS_PROP(node_id, application),           \
+			(DT_FOREACH_PROP_ELEM(                            \
+				node_id, application,                     \
+				AP_PWRSEQ_EACH_APP_SUB_STATE_NODE_DEFINE__)))))
 
 /**
  * @brief Array containing power state action handlers for all state and

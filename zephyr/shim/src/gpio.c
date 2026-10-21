@@ -56,7 +56,7 @@ struct gpio_config {
 		.no_auto_init = DT_PROP(id, no_auto_init), \
 	},
 #define GPIO_IMPL_CONFIG(id) \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, gpios), (GPIO_CONFIG(id)), ())
+	IF_ENABLED(DT_NODE_HAS_PROP(id, gpios), (GPIO_CONFIG(id)))
 
 static const struct gpio_config configs[] = {
 #if DT_NODE_EXISTS(NAMED_GPIOS_NODE)
@@ -82,12 +82,10 @@ static const struct gpio_config configs[] = {
  * of the configs array. Also some compilers don't like negative index.
  */
 
-#define GPIO_PTRS(id)                                               \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, gpios),                    \
-		    (const struct gpio_dt_spec *const GPIO_DT_NAME( \
-			     GPIO_SIGNAL(id)) =                     \
-			     &configs[GPIO_SIGNAL(id)].spec;),      \
-		    ())
+#define GPIO_PTRS(id)                                                          \
+	IF_ENABLED(DT_NODE_HAS_PROP(id, gpios),                                \
+		   (const struct gpio_dt_spec *const GPIO_DT_NAME(GPIO_SIGNAL( \
+			    id)) = &configs[GPIO_SIGNAL(id)].spec;))
 
 #if DT_NODE_EXISTS(NAMED_GPIOS_NODE)
 DT_FOREACH_CHILD(NAMED_GPIOS_NODE, GPIO_PTRS)

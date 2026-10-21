@@ -74,131 +74,100 @@ enum {
  * not CONFIG_SHIMMED_TASKS.
  */
 #ifdef CONFIG_SHIMMED_TASKS
-#define CROS_EC_TASK_LIST                                                  \
-	COND_CODE_1(HAS_TASK_CHG_RAMP,                                     \
-		    (CROS_EC_TASK(CHG_RAMP, chg_ramp_task, 0,              \
-				  CONFIG_TASK_CHG_RAMP_STACK_SIZE,         \
-				  EC_TASK_CHG_RAMP_PRIO, 0)),              \
-		    ())                                                    \
-	COND_CODE_1(CONFIG_PLATFORM_EC_USB_CHARGER,                        \
-		    (CROS_EC_TASK(USB_CHG, usb_charger_task_shared, 0,     \
-				  CONFIG_TASK_USB_CHG_STACK_SIZE,          \
-				  EC_TASK_USB_CHG_PRIO, 0)),               \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_DPS,                                          \
-		    (CROS_EC_TASK(DPS, dps_task, 0,                        \
-				  CONFIG_TASK_DPS_STACK_SIZE,              \
-				  EC_TASK_DPS_PRIO, 0)),                   \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PCHG,                                         \
-		    (CROS_EC_TASK(PCHG, pchg_task, 0,                      \
-				  CONFIG_TASK_PCHG_STACK_SIZE,             \
-				  EC_TASK_PCHG_PRIO, 0)),                  \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_CHARGER,                                      \
-		    (CROS_EC_TASK(CHARGER, charger_task, 0,                \
-				  CONFIG_TASK_CHARGER_STACK_SIZE,          \
-				  EC_TASK_CHARGER_PRIO, 0)),               \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_CHIPSET,                                      \
-		    (CROS_EC_TASK(CHIPSET, chipset_task, 0,                \
-				  CONFIG_TASK_CHIPSET_STACK_SIZE,          \
-				  EC_TASK_CHIPSET_PRIO, 0)),               \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_MOTIONSENSE,                                  \
-		    (CROS_EC_TASK(MOTIONSENSE, motion_sense_task, 0,       \
-				  CONFIG_TASK_MOTIONSENSE_STACK_SIZE,      \
-				  EC_TASK_MOTIONSENSE_PRIO, 0)),           \
-		    ())                                                    \
-	IF_ENABLED(HAS_TASK_USB_MUX,                                       \
-		   (CROS_EC_TASK(USB_MUX, usb_mux_task, 0,                 \
-				 CONFIG_TASK_USB_MUX_STACK_SIZE,           \
-				 EC_TASK_USB_MUX_PRIO, 0)))                \
-	COND_CODE_1(HAS_TASK_HOSTCMD_DEDICATED,                            \
-		    (CROS_EC_TASK(HOSTCMD, host_command_task, 0,           \
-				  CONFIG_TASK_HOSTCMD_STACK_SIZE,          \
-				  EC_TASK_HOSTCMD_PRIO, 0)),               \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_KEYPROTO,                                     \
-		    (CROS_EC_TASK(KEYPROTO, keyboard_protocol_task, 0,     \
-				  CONFIG_TASK_KEYPROTO_STACK_SIZE,         \
-				  EC_TASK_KEYPROTO_PRIO, 0)),              \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_POWERBTN,                                     \
-		    (CROS_EC_TASK(POWERBTN, power_button_task, 0,          \
-				  CONFIG_TASK_POWERBTN_STACK_SIZE,         \
-				  EC_TASK_POWERBTN_PRIO, 0)),              \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_KEYSCAN,                                      \
-		    (CROS_EC_TASK(KEYSCAN, keyboard_scan_task, 0,          \
-				  CONFIG_TASK_KEYSCAN_STACK_SIZE,          \
-				  EC_TASK_KEYSCAN_PRIO, 0)),               \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PD_C0,                                        \
-		    (CROS_EC_TASK(PD_C0, pd_task, 0,                       \
-				  CONFIG_TASK_PD_STACK_SIZE,               \
-				  EC_TASK_PD_C0_PRIO, 0)),                 \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PD_C1,                                        \
-		    (CROS_EC_TASK(PD_C1, pd_task, 0,                       \
-				  CONFIG_TASK_PD_STACK_SIZE,               \
-				  EC_TASK_PD_C1_PRIO, 0)),                 \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PD_C2,                                        \
-		    (CROS_EC_TASK(PD_C2, pd_task, 0,                       \
-				  CONFIG_TASK_PD_STACK_SIZE,               \
-				  EC_TASK_PD_C2_PRIO, 0)),                 \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PD_C3,                                        \
-		    (CROS_EC_TASK(PD_C3, pd_task, 0,                       \
-				  CONFIG_TASK_PD_STACK_SIZE,               \
-				  EC_TASK_PD_C3_PRIO, 0)),                 \
-		    ())                                                    \
-	IF_ENABLED(CONFIG_HAS_TASK_PD_INT_SHARED,                          \
-		   (CROS_EC_TASK(PD_INT_SHARED, pd_shared_alert_task,      \
-				 PD_INT_SHARED_PORT_MASK,                  \
-				 CONFIG_TASK_PD_INT_STACK_SIZE,            \
-				 EC_TASK_PD_INT_SHARED_PRIO, 0)))          \
-	COND_CODE_1(HAS_TASK_PD_INT_C0,                                    \
-		    (CROS_EC_TASK(PD_INT_C0, pd_interrupt_handler_task, 0, \
-				  CONFIG_TASK_PD_INT_STACK_SIZE,           \
-				  EC_TASK_PD_INT_C0_PRIO, 0)),             \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PD_INT_C1,                                    \
-		    (CROS_EC_TASK(PD_INT_C1, pd_interrupt_handler_task, 1, \
-				  CONFIG_TASK_PD_INT_STACK_SIZE,           \
-				  EC_TASK_PD_INT_C1_PRIO, 0)),             \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PD_INT_C2,                                    \
-		    (CROS_EC_TASK(PD_INT_C2, pd_interrupt_handler_task, 2, \
-				  CONFIG_TASK_PD_INT_STACK_SIZE,           \
-				  EC_TASK_PD_INT_C2_PRIO, 0)),             \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_PD_INT_C3,                                    \
-		    (CROS_EC_TASK(PD_INT_C3, pd_interrupt_handler_task, 3, \
-				  CONFIG_TASK_PD_INT_STACK_SIZE,           \
-				  EC_TASK_PD_INT_C3_PRIO, 0)),             \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_TOUCHPAD,                                     \
-		    (CROS_EC_TASK(TOUCHPAD, touchpad_task, 0,              \
-				  CONFIG_TASK_TOUCHPAD_STACK_SIZE,         \
-				  EC_TASK_TOUCHPAD_PRIO, 0)),              \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_FPSENSOR,                                     \
-		    (CROS_EC_TASK(FPSENSOR, fp_task, 0,                    \
-				  CONFIG_TASK_FPSENSOR_STACK_SIZE,         \
-				  EC_TASK_FPSENSOR_PRIO, K_FP_REGS)),      \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_RWSIG,                                        \
-		    (CROS_EC_TASK(RWSIG, rwsig_task, 0,                    \
-				  CONFIG_TASK_RWSIG_STACK_SIZE,            \
-				  EC_TASK_RWSIG_PRIO, 0)),                 \
-		    ())                                                    \
-	COND_CODE_1(HAS_TASK_CEC,                                          \
-		    (CROS_EC_TASK(CEC, cec_task, 0,                        \
-				  CONFIG_TASK_CEC_STACK_SIZE,              \
-				  EC_TASK_CEC_PRIO, 0)),                   \
-		    ())
+#define CROS_EC_TASK_LIST                                                      \
+	IF_ENABLED(HAS_TASK_CHG_RAMP,                                          \
+		   (CROS_EC_TASK(CHG_RAMP, chg_ramp_task, 0,                   \
+				 CONFIG_TASK_CHG_RAMP_STACK_SIZE,              \
+				 EC_TASK_CHG_RAMP_PRIO, 0)))                   \
+	IF_ENABLED(CONFIG_PLATFORM_EC_USB_CHARGER,                             \
+		   (CROS_EC_TASK(USB_CHG, usb_charger_task_shared, 0,          \
+				 CONFIG_TASK_USB_CHG_STACK_SIZE,               \
+				 EC_TASK_USB_CHG_PRIO, 0)))                    \
+	IF_ENABLED(HAS_TASK_DPS,                                               \
+		   (CROS_EC_TASK(DPS, dps_task, 0, CONFIG_TASK_DPS_STACK_SIZE, \
+				 EC_TASK_DPS_PRIO, 0)))                        \
+	IF_ENABLED(HAS_TASK_PCHG, (CROS_EC_TASK(PCHG, pchg_task, 0,            \
+						CONFIG_TASK_PCHG_STACK_SIZE,   \
+						EC_TASK_PCHG_PRIO, 0)))        \
+	IF_ENABLED(HAS_TASK_CHARGER,                                           \
+		   (CROS_EC_TASK(CHARGER, charger_task, 0,                     \
+				 CONFIG_TASK_CHARGER_STACK_SIZE,               \
+				 EC_TASK_CHARGER_PRIO, 0)))                    \
+	IF_ENABLED(HAS_TASK_CHIPSET,                                           \
+		   (CROS_EC_TASK(CHIPSET, chipset_task, 0,                     \
+				 CONFIG_TASK_CHIPSET_STACK_SIZE,               \
+				 EC_TASK_CHIPSET_PRIO, 0)))                    \
+	IF_ENABLED(HAS_TASK_MOTIONSENSE,                                       \
+		   (CROS_EC_TASK(MOTIONSENSE, motion_sense_task, 0,            \
+				 CONFIG_TASK_MOTIONSENSE_STACK_SIZE,           \
+				 EC_TASK_MOTIONSENSE_PRIO, 0)))                \
+	IF_ENABLED(HAS_TASK_USB_MUX,                                           \
+		   (CROS_EC_TASK(USB_MUX, usb_mux_task, 0,                     \
+				 CONFIG_TASK_USB_MUX_STACK_SIZE,               \
+				 EC_TASK_USB_MUX_PRIO, 0)))                    \
+	IF_ENABLED(HAS_TASK_HOSTCMD_DEDICATED,                                 \
+		   (CROS_EC_TASK(HOSTCMD, host_command_task, 0,                \
+				 CONFIG_TASK_HOSTCMD_STACK_SIZE,               \
+				 EC_TASK_HOSTCMD_PRIO, 0)))                    \
+	IF_ENABLED(HAS_TASK_KEYPROTO,                                          \
+		   (CROS_EC_TASK(KEYPROTO, keyboard_protocol_task, 0,          \
+				 CONFIG_TASK_KEYPROTO_STACK_SIZE,              \
+				 EC_TASK_KEYPROTO_PRIO, 0)))                   \
+	IF_ENABLED(HAS_TASK_POWERBTN,                                          \
+		   (CROS_EC_TASK(POWERBTN, power_button_task, 0,               \
+				 CONFIG_TASK_POWERBTN_STACK_SIZE,              \
+				 EC_TASK_POWERBTN_PRIO, 0)))                   \
+	IF_ENABLED(HAS_TASK_KEYSCAN,                                           \
+		   (CROS_EC_TASK(KEYSCAN, keyboard_scan_task, 0,               \
+				 CONFIG_TASK_KEYSCAN_STACK_SIZE,               \
+				 EC_TASK_KEYSCAN_PRIO, 0)))                    \
+	IF_ENABLED(HAS_TASK_PD_C0,                                             \
+		   (CROS_EC_TASK(PD_C0, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
+				 EC_TASK_PD_C0_PRIO, 0)))                      \
+	IF_ENABLED(HAS_TASK_PD_C1,                                             \
+		   (CROS_EC_TASK(PD_C1, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
+				 EC_TASK_PD_C1_PRIO, 0)))                      \
+	IF_ENABLED(HAS_TASK_PD_C2,                                             \
+		   (CROS_EC_TASK(PD_C2, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
+				 EC_TASK_PD_C2_PRIO, 0)))                      \
+	IF_ENABLED(HAS_TASK_PD_C3,                                             \
+		   (CROS_EC_TASK(PD_C3, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
+				 EC_TASK_PD_C3_PRIO, 0)))                      \
+	IF_ENABLED(CONFIG_HAS_TASK_PD_INT_SHARED,                              \
+		   (CROS_EC_TASK(PD_INT_SHARED, pd_shared_alert_task,          \
+				 PD_INT_SHARED_PORT_MASK,                      \
+				 CONFIG_TASK_PD_INT_STACK_SIZE,                \
+				 EC_TASK_PD_INT_SHARED_PRIO, 0)))              \
+	IF_ENABLED(HAS_TASK_PD_INT_C0,                                         \
+		   (CROS_EC_TASK(PD_INT_C0, pd_interrupt_handler_task, 0,      \
+				 CONFIG_TASK_PD_INT_STACK_SIZE,                \
+				 EC_TASK_PD_INT_C0_PRIO, 0)))                  \
+	IF_ENABLED(HAS_TASK_PD_INT_C1,                                         \
+		   (CROS_EC_TASK(PD_INT_C1, pd_interrupt_handler_task, 1,      \
+				 CONFIG_TASK_PD_INT_STACK_SIZE,                \
+				 EC_TASK_PD_INT_C1_PRIO, 0)))                  \
+	IF_ENABLED(HAS_TASK_PD_INT_C2,                                         \
+		   (CROS_EC_TASK(PD_INT_C2, pd_interrupt_handler_task, 2,      \
+				 CONFIG_TASK_PD_INT_STACK_SIZE,                \
+				 EC_TASK_PD_INT_C2_PRIO, 0)))                  \
+	IF_ENABLED(HAS_TASK_PD_INT_C3,                                         \
+		   (CROS_EC_TASK(PD_INT_C3, pd_interrupt_handler_task, 3,      \
+				 CONFIG_TASK_PD_INT_STACK_SIZE,                \
+				 EC_TASK_PD_INT_C3_PRIO, 0)))                  \
+	IF_ENABLED(HAS_TASK_TOUCHPAD,                                          \
+		   (CROS_EC_TASK(TOUCHPAD, touchpad_task, 0,                   \
+				 CONFIG_TASK_TOUCHPAD_STACK_SIZE,              \
+				 EC_TASK_TOUCHPAD_PRIO, 0)))                   \
+	IF_ENABLED(HAS_TASK_FPSENSOR,                                          \
+		   (CROS_EC_TASK(FPSENSOR, fp_task, 0,                         \
+				 CONFIG_TASK_FPSENSOR_STACK_SIZE,              \
+				 EC_TASK_FPSENSOR_PRIO, K_FP_REGS)))           \
+	IF_ENABLED(HAS_TASK_RWSIG, (CROS_EC_TASK(RWSIG, rwsig_task, 0,         \
+						 CONFIG_TASK_RWSIG_STACK_SIZE, \
+						 EC_TASK_RWSIG_PRIO, 0)))      \
+	IF_ENABLED(HAS_TASK_CEC,                                               \
+		   (CROS_EC_TASK(CEC, cec_task, 0, CONFIG_TASK_CEC_STACK_SIZE, \
+				 EC_TASK_CEC_PRIO, 0)))
 #elif defined(CONFIG_HAS_TEST_TASKS)
 #include "shimmed_test_tasks.h"
 
@@ -265,14 +234,12 @@ enum {
 	COND_CODE_1(CONFIG_TASK_HOSTCMD_THREAD_MAIN,                    \
 		(IF_ENABLED(CONFIG_SHIMMED_TASKS, (fn(HOSTCMD)))),      \
 		(fn(MAIN)))                                             \
-	COND_CODE_1(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED,               \
+	IF_ENABLED(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED,                \
 		(IF_ENABLED(CONFIG_SHIMMED_TASKS,                       \
-			    (IF_ENABLED(CONFIG_EC_HOST_CMD, (fn(HOSTCMD)))))), \
-		())                                                     \
+			    (IF_ENABLED(CONFIG_EC_HOST_CMD, (fn(HOSTCMD))))))) \
 	COND_CODE_1(CONFIG_SHELL_BACKEND_SERIAL, (fn(SHELL)),           \
-		(COND_CODE_1(CONFIG_SHELL_BACKEND_DUMMY, (fn(SHELL)),   \
-		())))                                                   \
-	COND_CODE_1(CONFIG_AP_PWRSEQ, (fn(AP_PWRSEQ)), ())              \
+		(IF_ENABLED(CONFIG_SHELL_BACKEND_DUMMY, (fn(SHELL)))))  \
+	IF_ENABLED(CONFIG_AP_PWRSEQ, (fn(AP_PWRSEQ)))                   \
 	fn(SYSWORKQ)                                                    \
 	fn(IDLE)
 /* clang-format on */

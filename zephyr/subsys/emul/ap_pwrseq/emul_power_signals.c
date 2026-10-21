@@ -118,15 +118,15 @@ struct power_signal_emul_node {
 				     (PWR_SIG_EMUL_SRC_EXT),                  \
 				     (PWR_SIG_EMUL_SRC_ADC))))))
 
-#define EMUL_POWER_SIGNAL_GET_SIGNAL_SPEC(inst, dir_signal)                     \
-	{ COND_CODE_1(                                                          \
-		DT_NODE_HAS_COMPAT(DT_PROP(inst, dir_signal),                   \
-				   intel_ap_pwrseq_gpio),                       \
-		(.gpio = GPIO_DT_SPEC_GET(DT_PROP(inst, dir_signal), gpios)),   \
-		(COND_CODE_1(DT_NODE_HAS_COMPAT(DT_PROP(inst, dir_signal),      \
-						intel_ap_pwrseq_vw),            \
-			     (.vw = VW_DT_SPEC_GET(DT_PROP(inst, dir_signal))), \
-			     ()))) }
+#define EMUL_POWER_SIGNAL_GET_SIGNAL_SPEC(inst, dir_signal)                   \
+	{ COND_CODE_1(                                                        \
+		DT_NODE_HAS_COMPAT(DT_PROP(inst, dir_signal),                 \
+				   intel_ap_pwrseq_gpio),                     \
+		(.gpio = GPIO_DT_SPEC_GET(DT_PROP(inst, dir_signal), gpios)), \
+		(IF_ENABLED(                                                  \
+			DT_NODE_HAS_COMPAT(DT_PROP(inst, dir_signal),         \
+					   intel_ap_pwrseq_vw),               \
+			(.vw = VW_DT_SPEC_GET(DT_PROP(inst, dir_signal)))))) }
 
 #ifdef CONFIG_AP_PWRSEQ_SIGNAL_DEBUG_NAMES
 #define ENUM_DBGNAME(inst, dir)         \

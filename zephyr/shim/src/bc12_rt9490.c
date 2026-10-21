@@ -26,13 +26,13 @@ DECLARE_HOOK(HOOK_INIT, rt9490_bc12_enable_irqs, HOOK_PRIO_DEFAULT);
 			irq_pin)) : rt9490_interrupt(USBC_PORT_NEW(usbc_id)); \
 		 break;))
 
-#define RT9490_CHECK(usbc_id, bc12_id)                           \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(bc12_id, richtek_rt9490), \
-		    (RT9490_DISPATCH_INTERRUPT(usbc_id, bc12_id)), ())
+#define RT9490_CHECK(usbc_id, bc12_id)                          \
+	IF_ENABLED(DT_NODE_HAS_COMPAT(bc12_id, richtek_rt9490), \
+		   (RT9490_DISPATCH_INTERRUPT(usbc_id, bc12_id)))
 
-#define RT9490_INTERRUPT(usbc_id)                    \
-	COND_CODE_1(DT_NODE_HAS_PROP(usbc_id, bc12), \
-		    (RT9490_CHECK(usbc_id, DT_PHANDLE(usbc_id, bc12))), ())
+#define RT9490_INTERRUPT(usbc_id)                   \
+	IF_ENABLED(DT_NODE_HAS_PROP(usbc_id, bc12), \
+		   (RT9490_CHECK(usbc_id, DT_PHANDLE(usbc_id, bc12))))
 
 void rt9490_bc12_dt_interrupt(enum gpio_signal signal)
 {

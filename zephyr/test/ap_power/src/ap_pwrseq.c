@@ -61,7 +61,7 @@ static void ap_pwrseq_wake(void)
 	},
 
 #define PWRSEQ_GPIOS(nodeid) \
-	COND_CODE_1(DT_PROP(nodeid, output), (PWRSEQ_OUTPUT(nodeid)), ())
+	IF_ENABLED(DT_PROP(nodeid, output), (PWRSEQ_OUTPUT(nodeid)))
 
 struct ec_output {
 	uint8_t signal_enum;

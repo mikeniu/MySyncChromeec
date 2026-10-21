@@ -28,7 +28,7 @@ extern "C" {
 #define TEMP_SENSORS_NODEID DT_INST(0, TEMP_SENSORS_COMPAT)
 
 #define TEMP_RT9490_FN(node_id, fn) \
-	COND_CODE_1(DT_NODE_HAS_PROP(node_id, thermistor), (fn(node_id)), ())
+	IF_ENABLED(DT_NODE_HAS_PROP(node_id, thermistor), (fn(node_id)))
 
 #define FOREACH_TEMP_SENSOR(fn)                                             \
 	DT_FOREACH_STATUS_OKAY(PCT2075_COMPAT, fn)                          \

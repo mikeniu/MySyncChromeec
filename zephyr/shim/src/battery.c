@@ -29,9 +29,9 @@
 		.cfet_mask = DT_PROP_OR(node, fet_cfet_mask, 0), \
 		.cfet_off_val = DT_PROP_OR(node, fet_cfet_off_val, 0), \
 	}, \
-	COND_CODE_1(UTIL_AND(IS_ENABLED(CONFIG_BATTERY_MEASURE_IMBALANCE), \
-			     DT_NODE_HAS_PROP(node, imbalance_mv)), \
-		(.imbalance_mv = DT_STRING_TOKEN(node, imbalance_mv),), ()) \
+	IF_ENABLED(UTIL_AND(IS_ENABLED(CONFIG_BATTERY_MEASURE_IMBALANCE), \
+			    DT_NODE_HAS_PROP(node, imbalance_mv)), \
+		(.imbalance_mv = DT_STRING_TOKEN(node, imbalance_mv),)) \
 },
 
 #define NODE_BATT_INFO(node)                                                 \

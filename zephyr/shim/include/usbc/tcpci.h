@@ -110,9 +110,9 @@ extern "C" {
  * @param config_fn Unused by this macro, but required by the
  *                  DT_FOREACH_USBC_DRIVER_STATUS_OK_VARGS() wrapper.
  */
-#define TCPC_ALT_DECLARE(node_id, config_fn)        \
-	COND_CODE_1(DT_PROP_OR(node_id, is_alt, 0), \
-		    (TCPC_ALT_DECLARATION(node_id);), ())
+#define TCPC_ALT_DECLARE(node_id, config_fn)       \
+	IF_ENABLED(DT_PROP_OR(node_id, is_alt, 0), \
+		   (TCPC_ALT_DECLARATION(node_id);))
 
 /*
  * For all TCPC drivers/emulators, forward declare a struct

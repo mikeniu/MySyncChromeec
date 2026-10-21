@@ -277,9 +277,9 @@ const struct apl6012_sensor_t apl6012_sensors[APL6012_IDX_COUNT] = {
 			GET_ZEPHYR_TEMP_SENSOR_APL6012(named_id, sensor_id), \
 	}
 
-#define CHECK_COMPAT_APL6012(compat, named_id, sensor_id, config_fn)  \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(DT_PARENT(sensor_id), compat), \
-		    (config_fn(named_id, sensor_id)), ())
+#define CHECK_COMPAT_APL6012(compat, named_id, sensor_id, config_fn) \
+	IF_ENABLED(DT_NODE_HAS_COMPAT(DT_PARENT(sensor_id), compat), \
+		   (config_fn(named_id, sensor_id)))
 
 /* There can be only one thermistor on RT9490 with current driver */
 #define ADD_ONE(node_id) 1 +
@@ -297,21 +297,21 @@ const struct apl6012_sensor_t apl6012_sensors[APL6012_IDX_COUNT] = {
 		.update_temperature = NULL,                 \
 		FILL_POWER_GOOD(named_id) })
 
-#define TEMP_RT9490(named_id, sensor_id) \
-	COND_CODE_1(DT_NODE_HAS_PROP(sensor_id, thermistor), (                 \
-		[TEMP_SENSOR_ID(named_id)] = {                                 \
-			.name = DT_NODE_FULL_NAME(sensor_id),                  \
-			.idx = 0,                                              \
-			.type = TEMP_SENSOR_TYPE_BOARD,                        \
-			.zephyr_info = GET_ZEPHYR_TEMP_SENSOR_RT9490(named_id, \
-				       sensor_id),                             \
-		} ), ())
+#define TEMP_RT9490(named_id, sensor_id)                                  \
+	IF_ENABLED(DT_NODE_HAS_PROP(sensor_id, thermistor),               \
+		   ([TEMP_SENSOR_ID(named_id)] = {                        \
+			    .name = DT_NODE_FULL_NAME(sensor_id),         \
+			    .idx = 0,                                     \
+			    .type = TEMP_SENSOR_TYPE_BOARD,               \
+			    .zephyr_info = GET_ZEPHYR_TEMP_SENSOR_RT9490( \
+				    named_id, sensor_id),                 \
+		    }))
 
 #define DT_DRV_COMPAT TEMP_SENSORS_COMPAT
 
 #define CHECK_COMPAT(compat, named_id, sensor_id, config_fn) \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(sensor_id, compat),   \
-		    (config_fn(named_id, sensor_id)), ())
+	IF_ENABLED(DT_NODE_HAS_COMPAT(sensor_id, compat),    \
+		   (config_fn(named_id, sensor_id)))
 
 #define TEMP_SENSOR_FIND(named_id, sensor_id)                                 \
 	CHECK_COMPAT(THERMISTOR_COMPAT, named_id, sensor_id, TEMP_THERMISTOR) \

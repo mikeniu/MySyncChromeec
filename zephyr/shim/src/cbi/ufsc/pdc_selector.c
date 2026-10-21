@@ -20,18 +20,16 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 #define SELECTOR_NODE DT_DRV_INST(0)
 
 /* Helper to check a specific index in the selections array. */
-#define CHECK_MATCH(node_id, prop, idx, return_ptr)                           \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(DT_PHANDLE_BY_IDX(node_id, prop, idx), \
-				       cros_ec_cbi_ufsc_value),               \
-		    (/* UFSC-Value node: check if it matches. */              \
-		     if (*return_ptr == NULL &&                               \
-			 cros_cbi_ufsc_check_match(CBI_UFSC_VALUE_ID(         \
-				 DT_PHANDLE_BY_IDX(node_id, prop, idx)))) {   \
-			     *return_ptr = DEVICE_DT_GET(DT_PHANDLE_BY_IDX(   \
-				     node_id, prop, UTIL_INC(idx)));          \
-		     }),                                                      \
-		    (/* Device node: skip. */                                 \
-		     ))
+#define CHECK_MATCH(node_id, prop, idx, return_ptr)                          \
+	IF_ENABLED(DT_NODE_HAS_COMPAT(DT_PHANDLE_BY_IDX(node_id, prop, idx), \
+				      cros_ec_cbi_ufsc_value),               \
+		   (/* UFSC-Value node: check if it matches. */              \
+		    if (*return_ptr == NULL &&                               \
+			cros_cbi_ufsc_check_match(CBI_UFSC_VALUE_ID(         \
+				DT_PHANDLE_BY_IDX(node_id, prop, idx)))) {   \
+			    *return_ptr = DEVICE_DT_GET(DT_PHANDLE_BY_IDX(   \
+				    node_id, prop, UTIL_INC(idx)));          \
+		    }))
 
 /* Generates a static resolver function for a specific slot node. */
 #define GENERATE_PORT_RESOLVER(child_node)                          \

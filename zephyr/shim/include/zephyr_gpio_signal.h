@@ -61,7 +61,7 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(named_gpios) == 1,
 #define GPIO_SIGNAL(id) GPIO_SIGNAL_NAME(id)
 
 #define GPIO_IMPL_SIGNAL(id) \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, gpios), (GPIO_SIGNAL(id), ), ())
+	IF_ENABLED(DT_NODE_HAS_PROP(id, gpios), (GPIO_SIGNAL(id), ))
 
 #define GPIO_UNIMPL_SIGNAL(id)                       \
 	COND_CODE_1(DT_NODE_HAS_PROP(id, gpios), (), \
@@ -73,7 +73,7 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(named_gpios) == 1,
 	DT_STRING_UPPER_TOKEN(id, alias) = DT_STRING_UPPER_TOKEN(id, enum_name),
 
 #define GPIO_DT_ALIAS_LIST(id) \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, alias), (GPIO_DT_MK_ALIAS(id)), ())
+	IF_ENABLED(DT_NODE_HAS_PROP(id, alias), (GPIO_DT_MK_ALIAS(id)))
 
 /* clang-format off */
 enum gpio_signal {
@@ -160,11 +160,10 @@ BUILD_ASSERT(GPIO_COUNT < GPIO_LIMIT);
  */
 struct gpio_dt_spec;
 
-#define GPIO_DT_PTR_DECL(id)                                               \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, gpios),                           \
-		    (extern const struct gpio_dt_spec *const GPIO_DT_NAME( \
-			     GPIO_SIGNAL(id));),                           \
-		    ())
+#define GPIO_DT_PTR_DECL(id)                                              \
+	IF_ENABLED(DT_NODE_HAS_PROP(id, gpios),                           \
+		   (extern const struct gpio_dt_spec *const GPIO_DT_NAME( \
+			    GPIO_SIGNAL(id));))
 
 DT_FOREACH_CHILD(NAMED_GPIOS_NODE, GPIO_DT_PTR_DECL)
 

@@ -38,11 +38,10 @@ struct ap_pwrseq_data {
 		DT_NODE_HAS_PROP(node_id, application),                      \
 		(DT_FOREACH_PROP_ELEM(node_id, application,                  \
 				      AP_PWRSEQ_EACH_SUB_STATE_STR_DEFINE)), \
-		(COND_CODE_1(DT_NODE_HAS_PROP(node_id, chipset),             \
-			     (DT_FOREACH_PROP_ELEM(                          \
-				     node_id, chipset,                       \
-				     AP_PWRSEQ_EACH_SUB_STATE_STR_DEFINE)),  \
-			     ())))
+		(IF_ENABLED(DT_NODE_HAS_PROP(node_id, chipset),              \
+			    (DT_FOREACH_PROP_ELEM(                           \
+				    node_id, chipset,                        \
+				    AP_PWRSEQ_EACH_SUB_STATE_STR_DEFINE)))))
 
 static const char *const ap_pwrseq_state_str[AP_POWER_STATE_COUNT] = {
 	"UNINIT",

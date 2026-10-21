@@ -227,7 +227,7 @@ extern "C" {
  * @param cb_op Operation to perform on USB muxes
  */
 #define USB_MUX_CB_DECLARE_IF_EXIST(mux_id, cb_prop, cb_op) \
-	COND_CODE_1(DT_NODE_HAS_PROP(mux_id, cb_prop), (cb_op(mux_id)), ())
+	IF_ENABLED(DT_NODE_HAS_PROP(mux_id, cb_prop), (cb_op(mux_id)))
 
 /**
  * @brief Declare USB mux board_set function @p mux_id has board_set property
@@ -359,7 +359,7 @@ extern "C" {
  * @param op Operation to perform on USB muxes
  */
 #define USB_MUX_SKIP_ROOT(chain_id, unused2, idx, op) \
-	COND_CODE_1(UTIL_BOOL(idx), (op(chain_id, idx)), ())
+	IF_ENABLED(UTIL_BOOL(idx), (op(chain_id, idx)))
 
 /**
  * @brief Call @p op for each mux in @p chain_id chain except the root mux

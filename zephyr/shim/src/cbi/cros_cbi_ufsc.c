@@ -80,13 +80,12 @@ static const uint8_t ufsc_values[] = { DT_INST_FOREACH_STATUS_OKAY(
  * this expands to `| (value << bit_offset)`. Otherwise, it expands to nothing
  * (or `| 0`).
  */
-#define CBI_UFSC_DEFAULT_TERM(inst, index)                           \
-	COND_CODE_1(DT_INST_PROP(inst, default),                     \
-		    (| (((UFSC_FIELD_START(inst) / 32) == index) ?   \
-				(UFSC_VALUE(inst)                    \
-				 << (UFSC_FIELD_START(inst) % 32)) : \
-				0)),                                 \
-		    ())
+#define CBI_UFSC_DEFAULT_TERM(inst, index)                          \
+	IF_ENABLED(DT_INST_PROP(inst, default),                     \
+		   (| (((UFSC_FIELD_START(inst) / 32) == index) ?   \
+			       (UFSC_VALUE(inst)                    \
+				<< (UFSC_FIELD_START(inst) % 32)) : \
+			       0)))
 
 /*
  * Builds a complete 32-bit default value for a single data by iterating

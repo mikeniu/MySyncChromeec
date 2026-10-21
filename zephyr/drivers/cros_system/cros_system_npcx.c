@@ -501,12 +501,11 @@ int cros_system_get_reset_cause(void)
  * Match PSL node with a known wake source label.
  */
 #define MATCH_PSL_WAKE_SOURCE(node_id, prop, idx, label, source, wake_source) \
-	COND_CODE_1(DT_NODE_EXISTS(DT_NODELABEL(label)),                      \
-		    (if (DT_SAME_NODE(DT_PHANDLE_BY_IDX(node_id, prop, idx),  \
-				      DT_NODELABEL(label))) {                 \
-			    wake_source = source;                             \
-		    }),                                                       \
-		    ())
+	IF_ENABLED(DT_NODE_EXISTS(DT_NODELABEL(label)),                       \
+		   (if (DT_SAME_NODE(DT_PHANDLE_BY_IDX(node_id, prop, idx),   \
+				     DT_NODELABEL(label))) {                  \
+			   wake_source = source;                              \
+		   }))
 
 /**
  * Check if the PSL wake source matches one of the known signals (lid, power

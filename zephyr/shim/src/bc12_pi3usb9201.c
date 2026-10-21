@@ -22,14 +22,13 @@
 		.i2c_addr_flags = DT_REG_ADDR(bc12_id), \
 	},
 
-#define PI3SUSB9201_CHECK(usbc_id, bc12_id)                          \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(bc12_id, pericom_pi3usb9201), \
-		    (USBC_PORT_BC12(usbc_id, bc12_id)), ())
+#define PI3SUSB9201_CHECK(usbc_id, bc12_id)                         \
+	IF_ENABLED(DT_NODE_HAS_COMPAT(bc12_id, pericom_pi3usb9201), \
+		   (USBC_PORT_BC12(usbc_id, bc12_id)))
 
-#define BC12_CHIP(usbc_id)                                                   \
-	COND_CODE_1(DT_NODE_HAS_PROP(usbc_id, bc12),                         \
-		    (PI3SUSB9201_CHECK(usbc_id, DT_PHANDLE(usbc_id, bc12))), \
-		    ())
+#define BC12_CHIP(usbc_id)                          \
+	IF_ENABLED(DT_NODE_HAS_PROP(usbc_id, bc12), \
+		   (PI3SUSB9201_CHECK(usbc_id, DT_PHANDLE(usbc_id, bc12))))
 
 const struct pi3usb9201_config_t pi3usb9201_bc12_chips[] = {
 	DT_FOREACH_STATUS_OKAY(named_usbc_port, BC12_CHIP)

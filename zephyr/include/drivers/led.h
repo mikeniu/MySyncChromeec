@@ -74,9 +74,8 @@ BUILD_ASSERT(LED_TRANSITION_COUNT <= UINT8_MAX,
 __overridable int board_led_alt_policy(void);
 
 #define LED_ENUM(id, enum_name) DT_STRING_TOKEN(id, enum_name)
-#define LED_ENUM_WITH_COMMA(id, enum_name)           \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, enum_name), \
-		    (LED_ENUM(id, enum_name), ), ())
+#define LED_ENUM_WITH_COMMA(id, enum_name) \
+	IF_ENABLED(DT_NODE_HAS_PROP(id, enum_name), (LED_ENUM(id, enum_name), ))
 
 /*
  * Struct defining LED GPIO pin and value to set.

@@ -22,9 +22,9 @@ LOG_MODULE_REGISTER(shim_bc12, CONFIG_USBC_LOG_LEVEL);
 #define BC12_CHIP_ENTRY(usbc_id, bc12_id, chip_fn) \
 	[USBC_PORT_NEW(usbc_id)] = chip_fn(bc12_id)
 
-#define CHECK_COMPAT(compat, usbc_id, bc12_id, config)   \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(bc12_id, compat), \
-		    (BC12_CHIP_ENTRY(usbc_id, bc12_id, config)), ())
+#define CHECK_COMPAT(compat, usbc_id, bc12_id, config)  \
+	IF_ENABLED(DT_NODE_HAS_COMPAT(bc12_id, compat), \
+		   (BC12_CHIP_ENTRY(usbc_id, bc12_id, config)))
 
 #define BC12_SHIM_DRIVER_FIND(usbc_id, bc12_id)                    \
 	CHECK_COMPAT(PI3USB9201_UPSTREAM_COMPAT, usbc_id, bc12_id, \

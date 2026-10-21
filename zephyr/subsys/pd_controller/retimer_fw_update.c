@@ -91,9 +91,9 @@
 	COND_CODE_1(DT_PROP(usbc_id, pd_retimer), (CHECK_PD_CHIP(usbc_id)), \
 		    (PD_CHIP_NULL))
 
-#define PD_RETIMER(usbc_id)                                \
-	COND_CODE_1(DT_NODE_HAS_PROP(usbc_id, pd_retimer), \
-		    (CHECK_RETIMER(usbc_id)), ())
+#define PD_RETIMER(usbc_id)                               \
+	IF_ENABLED(DT_NODE_HAS_PROP(usbc_id, pd_retimer), \
+		   (CHECK_RETIMER(usbc_id)))
 
 /* Flags to check retimer firmware update status */
 #define USB_PD_RETIMER_FW_UPDATE_ERROR 0

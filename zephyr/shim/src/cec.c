@@ -56,7 +56,7 @@ DT_FOREACH_STATUS_OKAY(CEC_BITBANG_COMPAT, CEC_DRV_CONFIG_BITBANG)
 	}
 
 #define CHECK_COMPAT(node_id, compat, config) \
-	COND_CODE_1(DT_NODE_HAS_COMPAT(node_id, compat), (config(node_id)), ())
+	IF_ENABLED(DT_NODE_HAS_COMPAT(node_id, compat), (config(node_id)))
 
 #define CEC_CONFIG_FIND(node_id)                                      \
 	CHECK_COMPAT(node_id, CEC_BITBANG_COMPAT, CEC_CONFIG_BITBANG) \

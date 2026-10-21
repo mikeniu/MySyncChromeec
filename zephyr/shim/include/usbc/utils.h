@@ -58,8 +58,8 @@
  * @param chip Name of chip phandle property
  */
 #define DEVICE_GET_USBC_BINDING_IF_PORT_MATCH(usbc_id, port, chip) \
-	COND_CODE_1(IS_EQ(USBC_PORT_NEW(usbc_id), port),           \
-		    (DEVICE_GET_CHIP_BINDING(DT_PHANDLE(usbc_id, chip))), ())
+	IF_ENABLED(IS_EQ(USBC_PORT_NEW(usbc_id), port),            \
+		   (DEVICE_GET_CHIP_BINDING(DT_PHANDLE(usbc_id, chip))))
 
 /**
  * @brief Get the struct device for a phandle @p chip property of USBC @p port
