@@ -82,6 +82,30 @@
       },
       "revId": "429e2b2f139326a9afee035c5ae719df19ed03e8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa523490_97d12ad8",
+        "filename": "chip/stm32/flash-stm32h7.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-21T21:00:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fd4e898_f52da15f",
+      "range": {
+        "startLine": 589,
+        "startChar": 35,
+        "endLine": 589,
+        "endChar": 36
+      },
+      "revId": "429e2b2f139326a9afee035c5ae719df19ed03e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
