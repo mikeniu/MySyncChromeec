@@ -53,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ec861dd_18b790e2",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-21T17:02:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "10bc86ec_2a786c6f",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "555ec9d2_a86a3764",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "This retries the full initialization sequence, rather than replaying a failed I2C transfer. After an initialization command reports a UCSI error and GET_ERROR_STATUS completes, the driver restarts from PPM_RESET.\n\nThe intent is to provide a bounded recovery opportunity before disabling the port. I don\u0027t currently have retry-success measurements; two retries is a policy limit, not a hardware requirement.\n\nI\u0027ll fix the off-by-one check so this means two retries after the initial attempt, three attempts total, and clarify the comment.",
       "parentUuid": "555ec9d2_a86a3764",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a4284ca_332f5a3e",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-21T17:02:00Z",
+      "side": 1,
+      "message": "I\u0027m not saying you need to gather data on success rate. I\u0027m uncertain about this process, but it may not fundamentally be a matter of chance.\n\nI think retries might be appropriate if there is a known, nondeterministic failure mode during init. Ideally, we\u0027d fix that or at least understand how often it happens and choose a number of retries on that basis. If it\u0027s not fixable or well measured, an arbitrary number of retries is fine. Whichever the case, I\u0027d suggest documenting the failure mode and whatever you used to choose the number in a comment here.\n\nBut if there is no known failure mode that would benefit from retries, I\u0027d suggest dropping the mechanism and just failing after the first try. I wouldn\u0027t add this in against some hypothetical failure mode we haven\u0027t seen or tried to fix. Just for the sake of simplicity.",
+      "parentUuid": "bd39cccb_96aba684",
       "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
