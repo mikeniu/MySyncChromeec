@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a240d0a_8e391d42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:37:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n**Functionality:** No issues found. The API header correctly declares the vendor-specific structures and function prototypes for the RTS5817MAA sensor.\n**Architecture \u0026 Component Fit:** The new header properly encapsulates the vendor\u0027s binary algorithm API definitions within `zephyr/drivers/fingerprint/`.\n**Code Simplicity:** The definitions are minimal and straightforward.\n**Idiomaticity \u0026 Readability:** Standard C headers and type definitions are correctly used.\n**Security:** No issues found.\n**Testing:** N/A (Declarations only). The commit message relies on `zmake build realtekfp` to verify compilation.\n**CL Size \u0026 Scope:** Size: M (+220, -0). The production diff is well under 250 lines. The CL represents a single logical change adding the sensor\u0027s private API header.\n**Commit Message:** The commit message clearly explains the addition of the RTS5817MAA private library API header. [🔗](http://go/tj/665200e1-512f-4cd1-8c5a-60b5dca14a14)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cae50a1fb0483a4aae920216ed0810371d00789a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
