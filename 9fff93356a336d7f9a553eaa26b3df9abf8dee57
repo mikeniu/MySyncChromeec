@@ -122,6 +122,24 @@
       "parentUuid": "c1a6da23_d319f5ee",
       "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "589c4194_9e67ce99",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-21T12:27:03Z",
+      "side": 1,
+      "message": "Yeah, I missed it\u0027s called after release the spinlock. You are right that the infinite loop should be broken with the `new_console_log` check.",
+      "parentUuid": "45c677b9_c2fa8405",
+      "revId": "9fff93356a336d7f9a553eaa26b3df9abf8dee57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
