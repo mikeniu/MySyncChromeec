@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "927eb262_fca209ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:33:18Z",
+      "side": 1,
+      "message": "Addressed in this patchset. The unit tests are now in the same CL, and the driver is split into three CLs: base (this one), 8605693 (mode and IRQ handling) and 8617740 (image capture and finger status). Each one adds at most 243 lines of driver code.",
+      "parentUuid": "fdc2c855_deae4cbd",
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b4c3864_e755e061",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "887c930c_13f25385",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:33:18Z",
+      "side": 1,
+      "message": "Done. rts5817maa_init() now returns -EIO on failure and the error bits are only recorded in data-\u003eerrors. Tests updated to expect -EIO.",
+      "parentUuid": "0b4c3864_e755e061",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 119,
+        "endChar": 9999
+      },
       "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "808b2e6d_9c6181ff",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:33:18Z",
+      "side": 1,
+      "message": "Done. The hwid read, the error check and the model_id assignment are now all inside the CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER block, so the default model_id is kept when the private driver is disabled.",
+      "parentUuid": "83db2505_f516bbc9",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 9999
+      },
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf4a25ba_d92e484d",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5693f3fd_7fb51754",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-21T03:33:18Z",
+      "side": 1,
+      "message": "Done. The IRQ handler now passes data-\u003edev to the callback. The handler moved to 8605693 (mode and IRQ handling) with this split, where test_irq_invokes_callback now also checks that the callback receives the sensor device.",
+      "parentUuid": "cf4a25ba_d92e484d",
+      "range": {
+        "startLine": 297,
+        "startChar": 0,
+        "endLine": 307,
+        "endChar": 9999
+      },
       "revId": "780645ff3481bd5d25d589c3f514fd062a7b42a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
