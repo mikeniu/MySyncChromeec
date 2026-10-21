@@ -256,7 +256,7 @@ test_mockable void system_reset(int flags)
 	uint32_t save_flags;
 
 	/* Disable interrupts to avoid task swaps during reboot */
-	interrupt_disable_all();
+	irq_lock();
 
 	/*  Get flags to be saved in BBRAM */
 	system_encode_save_flags(flags, &save_flags);

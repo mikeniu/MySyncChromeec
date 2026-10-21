@@ -576,7 +576,7 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	 * Note: HOOK_SYSJUMP handlers run with interrupts disabled and must
 	 * not depend on interrupt-driven driver I/O or kernel sleeps.
 	 */
-	interrupt_disable_all();
+	irq_lock();
 
 	/* Call other hooks; these may add tags
 	 *
