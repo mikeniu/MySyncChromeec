@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed96d51e_c2e0acf1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-21T20:14:03Z",
+      "side": 1,
+      "message": "Clang vs GCC compilation error fix. GCC, the stricter version, is correct. It\u0027s undefined to even assign an unaligned `uint32_t*`, even if it gets immediately cast back to a `void*`. Semantically, PDOs are `uint32_t`s. Mechanically, these pointers only get passed to `memcpy`, which takes them as `void*` anyway.",
+      "revId": "0bd452ae65dd16a5fabe69a39be0b252a76a5bc9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
