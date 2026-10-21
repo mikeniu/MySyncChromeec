@@ -149,6 +149,7 @@ static void check_reset_cause(void)
 	    (flags & EC_RESET_FLAG_POWER_ON)) {
 		if (flags & EC_RESET_FLAG_INITIAL_PWR) {
 			/* Second boot, clear the flag immediately */
+			flags &= ~EC_RESET_FLAG_INITIAL_PWR;
 			chip_save_reset_flags(flags_to_keep);
 		} else {
 			/*
