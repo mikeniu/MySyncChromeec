@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "210d8462_9c91e53c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:28:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n*   **Functionality:** ✅ Exact behavior is preserved in the relocated function.\n*   **Architecture \u0026 Component Fit:** ✅ The function is cleanly exposed as a `constexpr` utility in the header, correctly fulfilling the design intent.\n*   **Code Simplicity:** ✅ A follow-up suggestion was provided to simplify the boolean chain into a `switch` statement.\n*   **Idiomaticity \u0026 Readability:** ✅ A minor suggestion was provided regarding the redundant `enum` keyword in C++.\n*   **Security:** ✅ No new security implications.\n*   **Testing:** ✅ `static_assert` tests were added to verify the new compile-time evaluation capability. A minor suggestion was provided to convert the rest of the runtime assertions to `static_assert` for consistency.\n*   **CL Size \u0026 Scope:** ✅ `Size: S (+18, -15)`. This is a clean, single logical change implementing the `constexpr` transition and its corresponding test updates.\n*   **Commit Message:** ✅ Concisely explains the rationale (*why* it was moved) and the changes made (*what*), with appropriate test verification commands.\n\n[🔗](http://go/tj/66c8ed7d-3519-4e26-bc19-9552e6fb2561)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9adfbb8e435affc08755439e521448e7fece2079",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb5eeb5b_5dee884d",
+        "filename": "include/fpsensor/fpsensor_utils.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:28:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nThe long boolean chain can be simplified into a cleaner `switch` statement, which is fully supported in `constexpr` functions since C++14. Additionally, the `enum` keyword before `fp_capture_type` is a C-ism and is not needed in C++.\n\n```cpp\n[[nodiscard]] constexpr bool is_finger_needed(uint32_t mode) noexcept\n{\n\tif (!(mode \u0026 FP_MODE_CAPTURE)) {\n\t\treturn true;\n\t}\n\n\tswitch (FP_CAPTURE_TYPE(mode)) {\n\tcase FP_CAPTURE_DEFECT_PXL_TEST:\n\tcase FP_CAPTURE_ABNORMAL_TEST:\n\tcase FP_CAPTURE_NOISE_TEST:\n\tcase FP_CAPTURE_PATTERN0:\n\tcase FP_CAPTURE_PATTERN1:\n\tcase FP_CAPTURE_RESET_TEST:\n\tcase FP_CAPTURE_PATTERN2:\n\t\treturn false;\n\tdefault:\n\t\treturn true;\n\t}\n}\n```\n[🔗](http://go/tj/66c8ed7d-3519-4e26-bc19-9552e6fb2561)",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9adfbb8e435affc08755439e521448e7fece2079",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ac878db_1c228fb7",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:28:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:**\n\nSince `is_finger_needed` is now `constexpr`, you could convert all of the `zassert_true` / `zassert_false` runtime checks in this test to `static_assert` to verify them all at compile time, ensuring consistent coverage of the `constexpr` evaluation. Leaving just these two as a demonstration is also fine.\n[🔗](http://go/tj/66c8ed7d-3519-4e26-bc19-9552e6fb2561)",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9adfbb8e435affc08755439e521448e7fece2079",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
