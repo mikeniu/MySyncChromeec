@@ -2130,6 +2130,7 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_CMD_THREAD=y
     - CONFIG_EC_HOST_CMD_DEDICATED_THREAD=n
+    - CONFIG_IRQ_OFFLOAD=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
