@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28b7585e_2c7f6abe",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-21T23:15:30Z",
+      "side": 1,
+      "message": "As a follow-up, it could be worthwhile to experiment with enabling `CONFIG_SPIN_VALIDATE` on unlocked builds.  The documentation says this adds 3K of overhead so not something to enable on production builds.",
+      "range": {
+        "startLine": 132,
+        "startChar": 24,
+        "endLine": 132,
+        "endChar": 35
+      },
+      "revId": "ed06dcadf201bc7ea6f03ff41dfda6c31d5fc791",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de3c3f5d_a0c68f1e",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-21T23:15:30Z",
+      "side": 1,
+      "message": "Why is this moved before the trailing null and count updates?",
+      "range": {
+        "startLine": 349,
+        "startChar": 0,
+        "endLine": 349,
+        "endChar": 35
+      },
+      "revId": "ed06dcadf201bc7ea6f03ff41dfda6c31d5fc791",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bb96d98_f45e867e",
+        "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-21T23:15:30Z",
+      "side": 1,
+      "message": "Non-blocking - It probably makes sense to move this test suite to [zephyr/test/console](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/HEAD:src/platform/ec/zephyr/test/console/CMakeLists.txt;l\u003d9) as a follow up activity.",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 36
+      },
+      "revId": "ed06dcadf201bc7ea6f03ff41dfda6c31d5fc791",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
