@@ -29,6 +29,7 @@
 #include "temp_sensor.dtsi"
 #include "usbc.dtsi"
 #include "battery.dtsi"
+#include <coolum/overlay.dtsi>
 
 /*
  * Map GPIOs used for interrupts to common names
@@ -75,3 +76,18 @@ gpio_ec_pch_wake_odl: &gpio_smc_wake_sci_n_r {};
 	enable-gpios = <&gpioi 7 GPIO_ACTIVE_HIGH>;
 };
 
+&spi0 {
+	status = "okay";
+	pinctrl-0 = <&spi_ssce0_default &spi_smosi_default>;
+	pinctrl-names = "default";
+
+	spi0_dev0: spi0_dev@0 {
+		reg = <0>;
+		chain-length = <4>;
+		reset-delay = <205>;
+		spi-max-frequency = <6000000>;
+		bits-per-symbol = <8>;
+		spi-one-frame = <0xF8>;
+		spi-zero-frame = <0xC0>;
+	};
+};
