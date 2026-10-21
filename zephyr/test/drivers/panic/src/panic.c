@@ -117,6 +117,61 @@ ZTEST(panic, test_get_panic_data_start)
 	struct panic_data *pdata = get_panic_data_write();
 
 	pdata->magic = PANIC_DATA_MAGIC;
+	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
+	zassert_equal((uintptr_t)pdata, get_panic_data_start(), NULL);
+}
+
+ZTEST(panic, test_get_panic_data_start_bounds)
+{
+	struct panic_data *pdata = get_panic_data_write();
+	uint32_t max_valid_size =
+		PANIC_DATA_MAX_SIZE - (PANIC_DATA_MAX_SIZE % 4);
+
+	pdata->magic = PANIC_DATA_MAGIC;
+
+	/* Test struct_size too small (0 or < PANIC_DATA_MIN_SIZE) */
+	pdata->struct_size = 0;
+	zassert_equal(0, get_panic_data_start(), NULL);
+
+	pdata->struct_size = PANIC_DATA_MIN_SIZE - 4;
+	zassert_equal(0, get_panic_data_start(), NULL);
+
+	/* Test struct_size unaligned (not a multiple of 4) */
+	pdata->struct_size = CONFIG_PANIC_DATA_SIZE + 2;
+	zassert_equal(0, get_panic_data_start(), NULL);
+
+	/* Test struct_size too large (> PANIC_DATA_MAX_SIZE) */
+	pdata->struct_size = max_valid_size + 4;
+	zassert_equal(0, get_panic_data_start(), NULL);
+
+	pdata->struct_size = CONFIG_PRESERVED_END_OF_RAM_SIZE;
+	zassert_equal(0, get_panic_data_start(), NULL);
+
+	/* Test valid bounds: PANIC_DATA_MIN_SIZE */
+	pdata->struct_size = PANIC_DATA_MIN_SIZE;
+	zassert_equal((uintptr_t)pdata + CONFIG_PANIC_DATA_SIZE -
+			      PANIC_DATA_MIN_SIZE,
+		      get_panic_data_start(), NULL);
+
+	/* Test valid bounds: max_valid_size (<= PANIC_DATA_MAX_SIZE and 4-byte
+	 * aligned) */
+	pdata->struct_size = max_valid_size;
+	zassert_equal((uintptr_t)pdata + CONFIG_PANIC_DATA_SIZE -
+			      max_valid_size,
+		      get_panic_data_start(), NULL);
+
+	/* If PANIC_DATA_MAX_SIZE is not aligned, verify it returns 0 */
+	if ((PANIC_DATA_MAX_SIZE % 4) != 0) {
+		pdata->struct_size = PANIC_DATA_MAX_SIZE;
+		zassert_equal(0, get_panic_data_start(), NULL);
+	}
+
+	/* Test valid size larger than local CONFIG_PANIC_DATA_SIZE */
+	pdata->struct_size = CONFIG_PANIC_DATA_SIZE + 4;
+	zassert_equal((uintptr_t)pdata - 4, get_panic_data_start(), NULL);
+
+	/* Restore standard struct_size */
+	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
 	zassert_equal((uintptr_t)pdata, get_panic_data_start(), NULL);
 }
 

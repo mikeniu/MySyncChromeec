@@ -16,6 +16,8 @@
 
 #include <sys/types.h>
 
+static void reset(void *data);
+
 /**
  * @brief Returns a pointer to an object (such as a struct jump_data) of type
  *        TYPE at the end of the mock_end_of_ram_data memory region, plus an
@@ -196,6 +198,64 @@ ZTEST(panic_output_get_panic_data_write, test_no_panic_data__jump_data_v3)
 
 	zassert_mem_equal(&jdata_expected, jdata_moved,
 			  sizeof(struct jump_data_v3_plus_tags));
+}
+
+ZTEST(panic_output_get_panic_data_write, test_corrupt_struct_size)
+{
+	struct panic_data *pdata_actual = test_get_panic_data_pointer();
+	const uint32_t corrupt_sizes[] = {
+		0xFFFFFFFF,
+		4,
+		CONFIG_PANIC_DATA_SIZE + 2,
+		CONFIG_PRESERVED_END_OF_RAM_SIZE,
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(corrupt_sizes); i++) {
+		reset(NULL);
+		pdata_actual->magic = PANIC_DATA_MAGIC;
+		pdata_actual->struct_size = corrupt_sizes[i];
+
+		zassert_equal(0, get_panic_data_size(),
+			      "Expected size 0 for corrupt size 0x%x",
+			      corrupt_sizes[i]);
+		zassert_equal(0, get_panic_data_start(),
+			      "Expected start 0 for corrupt size 0x%x",
+			      corrupt_sizes[i]);
+
+		zassert_equal(pdata_actual, get_panic_data_write(), NULL);
+		zassert_equal(pdata_actual->struct_size, CONFIG_PANIC_DATA_SIZE,
+			      NULL);
+		zassert_equal(pdata_actual->magic, 0, NULL);
+	}
+}
+
+ZTEST(panic_output_get_panic_data_write, test_larger_struct_size__jump_data_v1)
+{
+	struct panic_data *pdata_actual = test_get_panic_data_pointer();
+	struct jump_data_v1 jdata_expected = {
+		.magic = JUMP_DATA_MAGIC,
+		.version = 1,
+		.reset_flags = 0xAABBCCDD,
+	};
+	uint32_t prev_size = CONFIG_PANIC_DATA_SIZE + 4;
+
+	/* Place jump data immediately below previous panic data */
+	*GET_JUMP_DATA_PTR(struct jump_data_v1, -prev_size) = jdata_expected;
+
+	pdata_actual->magic = PANIC_DATA_MAGIC;
+	pdata_actual->struct_size = prev_size;
+
+	zassert_equal(pdata_actual, get_panic_data_write(), NULL);
+
+	/* Jump data should move forward by 4 bytes to -CONFIG_PANIC_DATA_SIZE
+	 */
+	ssize_t expected_move_delta = -1 * sizeof(struct panic_data);
+	struct jump_data_v1 *jdata_moved =
+		GET_JUMP_DATA_PTR(struct jump_data_v1, expected_move_delta);
+
+	zassert_mem_equal(&jdata_expected, jdata_moved,
+			  sizeof(struct jump_data_v1), NULL);
+	zassert_equal(pdata_actual->struct_size, CONFIG_PANIC_DATA_SIZE, NULL);
 }
 
 static void reset(void *data)

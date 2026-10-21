@@ -168,6 +168,19 @@ bool panic_data_is_new(void)
 	return pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
 }
 
+uint32_t get_panic_data_size(void)
+{
+	if (pdata_ptr->magic != PANIC_DATA_MAGIC)
+		return 0;
+
+	if (pdata_ptr->struct_size < PANIC_DATA_MIN_SIZE ||
+	    pdata_ptr->struct_size > PANIC_DATA_MAX_SIZE ||
+	    (pdata_ptr->struct_size % 4) != 0)
+		return 0;
+
+	return pdata_ptr->struct_size;
+}
+
 /*
  * Returns pointer to beginning of panic data.
  * Please note that it is not safe to interpret this
@@ -175,25 +188,12 @@ bool panic_data_is_new(void)
  */
 uintptr_t get_panic_data_start(void)
 {
-	if (pdata_ptr->magic != PANIC_DATA_MAGIC)
+	uint32_t size = get_panic_data_size();
+
+	if (!size)
 		return 0;
 
-	if (IS_ENABLED(CONFIG_BOARD_NATIVE_POSIX) ||
-	    IS_ENABLED(CONFIG_BOARD_NATIVE_SIM))
-		return (uintptr_t)pdata_ptr;
-
-	/* LCOV_EXCL_START - Can't cover non posix lines (yet) */
-	return ((uintptr_t)CONFIG_PANIC_DATA_BASE + CONFIG_PANIC_DATA_SIZE -
-		pdata_ptr->struct_size);
-	/* LCOV_EXCL_STOP */
-}
-
-static uint32_t get_panic_data_size(void)
-{
-	if (pdata_ptr->magic != PANIC_DATA_MAGIC)
-		return 0;
-
-	return pdata_ptr->struct_size;
+	return (uintptr_t)pdata_ptr + CONFIG_PANIC_DATA_SIZE - size;
 }
 
 /*
@@ -232,15 +232,12 @@ test_mockable struct panic_data *get_panic_data_write(void)
 
 	/*
 	 * If panic data exists, jump data and jump tags should be moved
-	 * about difference between size of panic_data structure and size of
+	 * by the difference between size of panic_data structure and size of
 	 * structure that is present in memory.
 	 *
-	 * If panic data doesn't exist, lets create place for a one
+	 * If panic data doesn't exist, create space for one.
 	 */
-	if (pdata_ptr->magic == PANIC_DATA_MAGIC)
-		delta = CONFIG_PANIC_DATA_SIZE - pdata_ptr->struct_size;
-	else
-		delta = CONFIG_PANIC_DATA_SIZE;
+	delta = CONFIG_PANIC_DATA_SIZE - get_panic_data_size();
 
 	/* If delta is 0, there is no need to move anything */
 	if (delta == 0)
