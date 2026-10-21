@@ -71,7 +71,12 @@ validate_fp_buffer_offset(const uint32_t buffer_size, const uint32_t offset,
  * interested in the height*width*bpp image bytes that are offset inside the
  * frame. Other modes require the full frame.
  */
-bool skip_image_offset(enum fp_capture_type capture_type);
+[[nodiscard]] constexpr bool
+skip_image_offset(enum fp_capture_type capture_type) noexcept
+{
+	return !(capture_type == FP_CAPTURE_VENDOR_FORMAT ||
+		 capture_type == FP_CAPTURE_QUALITY_TEST);
+}
 
 /**
  * Format an unsigned int FOURCC value as a printable string.

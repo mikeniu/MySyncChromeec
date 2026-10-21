@@ -89,6 +89,9 @@ ZTEST(fpsensor_utils, test_is_finger_needed)
 
 ZTEST(fpsensor_utils, test_skip_image_offset)
 {
+	static_assert(!skip_image_offset(FP_CAPTURE_VENDOR_FORMAT));
+	static_assert(skip_image_offset(FP_CAPTURE_SIMPLE_IMAGE));
+	static_assert(!skip_image_offset(FP_CAPTURE_QUALITY_TEST));
 	zassert_true(skip_image_offset(FP_CAPTURE_TYPE_INVALID));
 	zassert_false(skip_image_offset(FP_CAPTURE_VENDOR_FORMAT));
 	zassert_true(skip_image_offset(FP_CAPTURE_DEFECT_PXL_TEST));
