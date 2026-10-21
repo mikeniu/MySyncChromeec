@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b60f54d4_aab12041",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:50:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5402757c-84cc-4e98-bd7f-e6a21c619780)]\n\n### Review Summary\n\n*   **Functionality:** The logic correctly enforces protection range checks and overlaps, translating EC flags into SPI flash status register boundaries. The `all_protected` shadow state was successfully removed, relying on physical boundaries.\n*   **Architecture \u0026 Component Fit:** Cleanly implements the `cros_flash_driver_api`.\n*   **Code Simplicity:** Excellent. The nested conditions have been properly flattened into guard clauses, keeping the main paths unindented and removing redundant state.\n*   **Idiomaticity \u0026 Readability:** Excellent. The code uses clear variable names and follows standard Zephyr C idioms.\n*   **Security:** Handles I/O failure securely (panics if it cannot re-enable software protection after a temporary disable, preventing a fail-open scenario).\n*   **Testing:** Thorough test suite with exact on-boundary and off-by-one (`ROR`) tests for the protected ranges, as well as error path validation for status register writes.\n*   **CL Size \u0026 Scope:** Size: L (+365, -27). The production (non-test) delta is ~150 lines and implements a single cohesive protection feature, which is well within limits.\n*   **Commit Message:** Clear, concise, follows the R1/R2/R3 rules, and includes required `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "724d5a8243030180ca86177056cd6deeea8dbeeb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
