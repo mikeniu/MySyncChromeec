@@ -50,7 +50,18 @@ validate_fp_buffer_offset(const uint32_t buffer_size, const uint32_t offset,
  * @param mode sensor mode
  * @return true if the mode is a test capture that requires finger touch.
  */
-bool is_finger_needed(uint32_t mode);
+[[nodiscard]] constexpr bool is_finger_needed(uint32_t mode) noexcept
+{
+	enum fp_capture_type capture_type = FP_CAPTURE_TYPE(mode);
+	return !((mode & FP_MODE_CAPTURE) &&
+		 (capture_type == FP_CAPTURE_DEFECT_PXL_TEST ||
+		  capture_type == FP_CAPTURE_ABNORMAL_TEST ||
+		  capture_type == FP_CAPTURE_NOISE_TEST ||
+		  capture_type == FP_CAPTURE_PATTERN0 ||
+		  capture_type == FP_CAPTURE_PATTERN1 ||
+		  capture_type == FP_CAPTURE_RESET_TEST ||
+		  capture_type == FP_CAPTURE_PATTERN2));
+}
 
 /**
  * @param capture_type current capture type

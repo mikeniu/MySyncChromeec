@@ -45,6 +45,12 @@ ZTEST(fpsensor_utils, test_validate_fp_buffer_offset_failure_overflow)
 
 ZTEST(fpsensor_utils, test_is_finger_needed)
 {
+	static_assert(is_finger_needed(FP_MODE_CAPTURE |
+				       FP_CAPTURE_VENDOR_FORMAT
+					       << FP_MODE_CAPTURE_TYPE_SHIFT));
+	static_assert(!is_finger_needed(FP_MODE_CAPTURE |
+					FP_CAPTURE_PATTERN0
+						<< FP_MODE_CAPTURE_TYPE_SHIFT));
 	zassert_true(is_finger_needed(FP_MODE_CAPTURE |
 				      FP_CAPTURE_VENDOR_FORMAT
 					      << FP_MODE_CAPTURE_TYPE_SHIFT));
