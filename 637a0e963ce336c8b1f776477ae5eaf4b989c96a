@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d5665e5_8492ce96",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T07:53:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The commit message narrates the diff step-by-step (`fp_idle`, `fp_sensor_low_power`, `TASK_EVENT_UPDATE_CONFIG`) instead of just providing a conceptual summary. Per `go/cl-descriptions#minutiae` and `go/cl-descriptions#llm-prompts`, please condense the low-level file breakdown into a high-level summary.\n\nSuggested replacement:\n```text\nfpsensor: Keep sensor in detect mode while waiting for finger up\n\nWhen FP_MODE_FINGER_UP is requested, fp_task previously put the sensor into low power or idle state prematurely, even when the finger was still present on the sensor.\n\nFix this by ensuring the sensor stays active and does not enter low power mode or idle state while waiting for the finger to be removed. The fingerprint simulator and presence tests are also updated to track mode transitions.\n\nBUG\u003db:560263098\nBUG\u003db:565886719\nTEST\u003d./twister -v -i -s fingerprint.task.finger_presence\n```\n[🔗](http://go/tj/961df6c4-1fde-4ff3-a531-ea05863ed720)",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "637a0e963ce336c8b1f776477ae5eaf4b989c96a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3345c99a_4d0bd1dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T07:53:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See the inline comment on the commit message for necessary adjustments. [[trajectory](https://goto.corp.google.com/traj/961df6c4-1fde-4ff3-a531-ea05863ed720)]\n\n### Review Summary\n* **Functionality:** ✅ The state transition logic correctly keeps the sensor active when waiting for a finger-up event, resolving the early low-power state issue.\n* **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated within the existing task event loop and properly leverages the sensor modes.\n* **Code Simplicity:** ✅ The changes are minimal, straightforward, and no longer include unnecessary calls to `fp_idle()`.\n* **Idiomaticity \u0026 Readability:** ✅ Standard C/C++ idioms are followed and consistent with the existing codebase.\n* **Security:** ✅ No security vulnerabilities introduced.\n* **Testing:** ✅ The test suite comprehensively asserts both `detect_mode` and `low_power_mode` transitions correctly on all boundary paths, fully verifying the fix.\n* **CL Size \u0026 Scope:** ✅ Size: M (+62, -12). The CL is focused strictly on fixing the finger-up sensor mode issue and passes the Single Logical Change rule.\n* **Commit Message:** ❌ The description narrates the diff step-by-step (`fp_idle`, `fp_sensor_low_power`, `TASK_EVENT_UPDATE_CONFIG`) rather than remaining at a high level. See the inline comment for a suggested rewrite.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "637a0e963ce336c8b1f776477ae5eaf4b989c96a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
