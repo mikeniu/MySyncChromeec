@@ -250,6 +250,15 @@ system_npcx_hibernate_by_lfw_in_last_ram(uint32_t pd_ram_mask)
 	/* Set deep idle mode */
 	inst_pmc->PMCSR = BIT(NPCX_PMCSR_IDLE) | BIT(NPCX_PMCSR_DHF);
 
+	/*
+	 * Set PRIMASK = 1 so on wake the CPU will not vector to any ISR.
+	 * Set BASEPRI = 0 to allow any priority to wake.
+	 */
+	__disable_irq();
+	__set_BASEPRI(0);
+	__DSB();
+	__ISB();
+
 	/* Enter system sleep mode */
 	__asm__ volatile("wfi");
 
