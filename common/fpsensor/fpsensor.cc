@@ -17,6 +17,7 @@
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_detect.h"
+#include "fpsensor/fpsensor_frame_storage.h"
 #include "fpsensor/fpsensor_led.h"
 #include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
@@ -639,52 +640,16 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 					    uint8_t *output)
 {
-	enum ec_error_list ret;
-
 	if (system_is_locked())
 		return EC_RES_ACCESS_DENIED;
-
-	if (global_context.current_capture_type == FP_CAPTURE_TYPE_INVALID) {
-		return EC_RES_INVALID_PARAM;
+	if (const auto res = fp_frame_storage::get_raw_frame(
+		    { fp_buffer, sizeof(fp_buffer) },
+		    global_context.current_capture_type,
+		    global_context.fp_image_frame_params_cache, offset,
+		    { output, size });
+	    !res.has_value()) {
+		return res.error();
 	}
-
-	uint32_t current_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
-			global_context.current_capture_type);
-
-	if (current_frame_size > sizeof(fp_buffer)) {
-		return EC_RES_INVALID_PARAM;
-	}
-
-	ret = validate_fp_buffer_offset(current_frame_size, offset, size);
-	if (ret != EC_SUCCESS)
-		return EC_RES_INVALID_PARAM;
-
-	/*
-	 * Checks if the capture type is one where we only care about
-	 * the embedded/offset image bytes, like simple, pattern0,
-	 * pattern1, and reset_test.
-	 */
-	if (skip_image_offset(global_context.current_capture_type)) {
-		uint32_t adjusted_offset;
-
-		if (check_add_overflow(
-			    offset,
-			    static_cast<uint32_t>(FP_SENSOR_IMAGE_OFFSET),
-			    &adjusted_offset)) {
-			return EC_RES_INVALID_PARAM;
-		}
-
-		ret = validate_fp_buffer_offset(sizeof(fp_buffer),
-						adjusted_offset, size);
-		if (ret != EC_SUCCESS)
-			return EC_RES_INVALID_PARAM;
-
-		offset = adjusted_offset;
-	}
-
-	memcpy(output, fp_buffer + offset, size);
-
 	return EC_RES_SUCCESS;
 }
 

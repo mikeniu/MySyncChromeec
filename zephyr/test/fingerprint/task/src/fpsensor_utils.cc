@@ -3,11 +3,14 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
+
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
 
 #include <ec_commands.h>
 #include <fpsensor/fpsensor.h>
+#include <fpsensor/fpsensor_frame_storage.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <mkbp_event.h>
 #include <rollback.h>
@@ -154,4 +157,62 @@ ZTEST(fpsensor_utils, test_mode_and_capture_type_wrappers)
 		FpCaptureType::create(FP_CAPTURE_PATTERN0)->to_mode_bits());
 	zassert_true(pattern_mode.has_value());
 	zassert_false(pattern_mode->is_finger_needed());
+}
+
+ZTEST(fpsensor_utils, test_checked_subspan_boundaries)
+{
+	std::array<uint8_t, 4> buf{ 10, 20, 30, 40 };
+	const auto sub = checked_subspan(std::span(buf), 1, 3);
+	zassert_true(sub.has_value());
+	zassert_equal(sub->size(), 3u);
+	zassert_equal((*sub)[0], 20);
+	zassert_equal(checked_subspan(std::span(buf), 2, 3).error(),
+		      EC_ERROR_INVAL);
+	zassert_equal(checked_subspan(std::span(buf), UINT32_MAX, 1).error(),
+		      EC_ERROR_OVERFLOW);
+}
+
+ZTEST(fpsensor_utils, test_fp_frame_storage_slicing)
+{
+	std::array<uint8_t, FP_SENSOR_IMAGE_OFFSET + 8> buf{};
+	for (size_t i = 0; i < buf.size(); ++i) {
+		buf[i] = static_cast<uint8_t>(i + 1);
+	}
+	FpImageFrameParamsCache cache{};
+	std::array<uint8_t, 2> out{};
+
+	zassert_equal(fp_frame_storage::captured_frame(buf, FP_CAPTURE_TYPE_MAX,
+						       cache)
+			      .error(),
+		      EC_RES_INVALID_PARAM);
+	zassert_equal(fp_frame_storage::captured_frame(
+			      buf, FP_CAPTURE_VENDOR_FORMAT, cache)
+			      .error(),
+		      EC_RES_INVALID_PARAM);
+
+	FpImageFrameParamsCacheTestHelper::set_frame_size(
+		cache, FP_CAPTURE_VENDOR_FORMAT, buf.size() + 1);
+	zassert_equal(fp_frame_storage::captured_frame(
+			      buf, FP_CAPTURE_VENDOR_FORMAT, cache)
+			      .error(),
+		      EC_RES_INVALID_PARAM);
+
+	FpImageFrameParamsCacheTestHelper::set_frame_size(
+		cache, FP_CAPTURE_VENDOR_FORMAT, 4);
+	zassert_true(fp_frame_storage::get_raw_frame(
+			     buf, FP_CAPTURE_VENDOR_FORMAT, cache, 2, out)
+			     .has_value());
+	zassert_equal(out[0], buf[2]);
+	zassert_equal(out[1], buf[3]);
+	zassert_equal(fp_frame_storage::get_raw_frame(
+			      buf, FP_CAPTURE_VENDOR_FORMAT, cache, 3, out)
+			      .error(),
+		      EC_RES_INVALID_PARAM);
+
+	FpImageFrameParamsCacheTestHelper::set_frame_size(
+		cache, FP_CAPTURE_SIMPLE_IMAGE, 4);
+	const auto simple_slice = fp_frame_storage::captured_frame(
+		buf, FP_CAPTURE_SIMPLE_IMAGE, cache);
+	zassert_true(simple_slice.has_value());
+	zassert_equal((*simple_slice)[0], buf[FP_SENSOR_IMAGE_OFFSET]);
 }
