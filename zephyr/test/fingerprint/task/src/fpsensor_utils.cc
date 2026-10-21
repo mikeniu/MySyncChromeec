@@ -25,16 +25,26 @@ enum ec_error_list rollback_get_secret(uint8_t *secret)
 
 ZTEST(fpsensor_utils, test_validate_fp_buffer_offset_success)
 {
+	static_assert(validate_fp_buffer_offset(1, 0, 1) == EC_SUCCESS);
+	static_assert(validate_fp_buffer_offset(2, 0, 1) == EC_SUCCESS);
 	zassert_equal(validate_fp_buffer_offset(1, 0, 1), EC_SUCCESS);
+	zassert_equal(validate_fp_buffer_offset(2, 0, 1), EC_SUCCESS);
 }
 
 ZTEST(fpsensor_utils, test_validate_fp_buffer_offset_failure_no_overflow)
 {
+	static_assert(validate_fp_buffer_offset(1, 1, 1) == EC_ERROR_INVAL);
+	static_assert(validate_fp_buffer_offset(1, UINT32_MAX - 1, 1) ==
+		      EC_ERROR_INVAL);
 	zassert_equal(validate_fp_buffer_offset(1, 1, 1), EC_ERROR_INVAL);
+	zassert_equal(validate_fp_buffer_offset(1, UINT32_MAX - 1, 1),
+		      EC_ERROR_INVAL);
 }
 
 ZTEST(fpsensor_utils, test_validate_fp_buffer_offset_failure_overflow)
 {
+	static_assert(validate_fp_buffer_offset(1, UINT32_MAX, 1) ==
+		      EC_ERROR_OVERFLOW);
 	zassert_equal(validate_fp_buffer_offset(1, UINT32_MAX, 1),
 		      EC_ERROR_OVERFLOW);
 }
