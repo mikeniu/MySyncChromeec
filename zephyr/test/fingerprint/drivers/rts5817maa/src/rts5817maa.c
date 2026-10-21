@@ -8,6 +8,7 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
@@ -28,10 +29,22 @@ DEFINE_FFF_GLOBALS;
 /* Mocks for the private RTS5817MAA sensor library. */
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_init);
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_get_hwid, uint8_t *);
+FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_power_down);
+FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_configure_detect,
+		       rts_detect_mode_t);
 
 struct rts5817maa_fixture {
 	const struct device *dev;
 };
+
+static int callback_count;
+static const struct device *callback_dev;
+
+static void test_fingerprint_callback(const struct device *dev)
+{
+	callback_count++;
+	callback_dev = dev;
+}
 
 static rts_fp_return_t fake_get_hwid(uint8_t *id)
 {
@@ -49,6 +62,13 @@ static rts_fp_return_t fake_get_hwid_fail(uint8_t *id)
 	return RTS_ERROR_IO_EXCEPTION;
 }
 
+static void rts5817maa_set_irq_pin(const struct device *dev, int val)
+{
+	const struct rts5817maa_cfg *cfg = dev->config;
+
+	gpio_emul_input_set(cfg->interrupt.port, cfg->interrupt.pin, val);
+}
+
 static void *rts5817maa_setup(void)
 {
 	static struct rts5817maa_fixture fixture = {
@@ -61,15 +81,34 @@ static void *rts5817maa_setup(void)
 
 static void rts5817maa_before(void *f)
 {
-	ARG_UNUSED(f);
+	struct rts5817maa_fixture *fixture = f;
 
 	FFF_RESET_HISTORY();
 
 	RESET_FAKE(rts5817maa_sensor_init);
 	RESET_FAKE(rts5817maa_sensor_get_hwid);
+	RESET_FAKE(rts5817maa_sensor_power_down);
+	RESET_FAKE(rts5817maa_sensor_configure_detect);
 
 	rts5817maa_sensor_init_fake.return_val = RTS_FP_SUCCESS;
 	rts5817maa_sensor_get_hwid_fake.custom_fake = fake_get_hwid;
+	rts5817maa_sensor_power_down_fake.return_val = RTS_FP_SUCCESS;
+	rts5817maa_sensor_configure_detect_fake.return_val = RTS_FP_SUCCESS;
+
+	callback_count = 0;
+	callback_dev = NULL;
+
+	/* Keep the IRQ pin low so that rising edges are observable. */
+	rts5817maa_set_irq_pin(fixture->dev, 0);
+}
+
+static void rts5817maa_after(void *f)
+{
+	struct rts5817maa_fixture *fixture = f;
+
+	/* Reset the IRQ pin and the callback to prevent state leakage. */
+	rts5817maa_set_irq_pin(fixture->dev, 0);
+	fingerprint_config(fixture->dev, NULL);
 }
 
 #define RTS5817MAA_IMAGE_FRAME_PARAM_INITIALIZER(idx, node_id)         \
@@ -93,7 +132,8 @@ static const struct fingerprint_image_frame_params
 		NUM_IMAGE_CAPTURE_TYPES, RTS5817MAA_IMAGE_FRAME_PARAM_INITIALIZER,
 		(, ), DT_NODELABEL(rts5817maa)) };
 
-ZTEST_SUITE(rts5817maa, NULL, rts5817maa_setup, rts5817maa_before, NULL, NULL);
+ZTEST_SUITE(rts5817maa, NULL, rts5817maa_setup, rts5817maa_before,
+	    rts5817maa_after, NULL);
 
 ZTEST_F(rts5817maa, test_init_success)
 {
@@ -249,4 +289,102 @@ ZTEST_F(rts5817maa, test_get_info_hwid_error)
 					   image_frame_params_array,
 					   &num_params),
 		      -EINVAL);
+}
+
+ZTEST_F(rts5817maa, test_config)
+{
+	zassert_ok(fingerprint_config(fixture->dev, test_fingerprint_callback));
+}
+
+ZTEST_F(rts5817maa, test_config_null_callback)
+{
+	zassert_ok(fingerprint_config(fixture->dev, NULL));
+}
+
+ZTEST_F(rts5817maa, test_irq_invokes_callback)
+{
+	zassert_ok(fingerprint_config(fixture->dev, test_fingerprint_callback));
+	zassert_ok(fingerprint_set_mode(fixture->dev,
+					FINGERPRINT_SENSOR_MODE_DETECT));
+
+	rts5817maa_set_irq_pin(fixture->dev, 1);
+	zassert_equal(callback_count, 1);
+	zassert_equal(callback_dev, fixture->dev,
+		      "callback must receive the fingerprint sensor device");
+}
+
+ZTEST_F(rts5817maa, test_irq_ignored_when_not_detecting)
+{
+	zassert_ok(fingerprint_config(fixture->dev, test_fingerprint_callback));
+	zassert_ok(fingerprint_set_mode(fixture->dev,
+					FINGERPRINT_SENSOR_MODE_IDLE));
+
+	rts5817maa_set_irq_pin(fixture->dev, 1);
+	zassert_equal(callback_count, 0);
+}
+
+ZTEST_F(rts5817maa, test_set_mode_detect)
+{
+	zassert_ok(fingerprint_set_mode(fixture->dev,
+					FINGERPRINT_SENSOR_MODE_DETECT));
+	zassert_equal(rts5817maa_sensor_configure_detect_fake.call_count, 1);
+	zassert_equal(rts5817maa_sensor_configure_detect_fake.arg0_val,
+		      RTS_DETECT_MODE_NORMAL);
+}
+
+ZTEST_F(rts5817maa, test_set_mode_low_power)
+{
+	zassert_ok(fingerprint_set_mode(fixture->dev,
+					FINGERPRINT_SENSOR_MODE_LOW_POWER));
+	zassert_equal(rts5817maa_sensor_power_down_fake.call_count, 1);
+}
+
+ZTEST_F(rts5817maa, test_set_mode_detect_error)
+{
+	rts5817maa_sensor_configure_detect_fake.return_val =
+		RTS_ERROR_IO_EXCEPTION;
+
+	zassert_ok(fingerprint_config(fixture->dev, test_fingerprint_callback));
+	zassert_equal(fingerprint_set_mode(fixture->dev,
+					   FINGERPRINT_SENSOR_MODE_DETECT),
+		      -EIO);
+	zassert_equal(rts5817maa_sensor_configure_detect_fake.call_count, 1);
+
+	rts5817maa_set_irq_pin(fixture->dev, 1);
+	zassert_equal(callback_count, 0,
+		      "IRQ must be disabled after detect configuration fails");
+}
+
+ZTEST_F(rts5817maa, test_set_mode_low_power_error)
+{
+	rts5817maa_sensor_power_down_fake.return_val = RTS_ERROR_IO_EXCEPTION;
+
+	zassert_equal(fingerprint_set_mode(fixture->dev,
+					   FINGERPRINT_SENSOR_MODE_LOW_POWER),
+		      -EIO);
+	zassert_equal(rts5817maa_sensor_power_down_fake.call_count, 1);
+}
+
+ZTEST_F(rts5817maa, test_set_mode_idle)
+{
+	zassert_ok(fingerprint_set_mode(fixture->dev,
+					FINGERPRINT_SENSOR_MODE_IDLE));
+}
+
+ZTEST_F(rts5817maa, test_set_mode_invalid)
+{
+	zassert_equal(fingerprint_set_mode(fixture->dev,
+					   FINGERPRINT_SENSOR_MODE_DETECT + 1),
+		      -ENOTSUP);
+	zassert_equal(fingerprint_set_mode(fixture->dev, UINT16_MAX),
+		      -ENOTSUP);
+}
+
+ZTEST_F(rts5817maa, test_maintenance)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE] = { 0 };
+
+	zassert_equal(fingerprint_maintenance(fixture->dev, buffer,
+					      sizeof(buffer)),
+		      0);
 }
