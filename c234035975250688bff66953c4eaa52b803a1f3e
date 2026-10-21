@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "c234035975250688bff66953c4eaa52b803a1f3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77e40085_d4c84ae9",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:44:12Z",
+      "side": 1,
+      "message": "Added boundary checks for buffer_size \u003d 2, offset \u003d 0, size \u003d 1 (EC_SUCCESS) and buffer_size \u003d 1, offset \u003d UINT32_MAX - 1, size \u003d 1 (EC_ERROR_INVAL).",
+      "parentUuid": "f9c62c64_8a86688f",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "c234035975250688bff66953c4eaa52b803a1f3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
