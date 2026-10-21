@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8534a625_0c09b9d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T21:00:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/f5008f25-6839-4765-a827-31f21490b1d9)]\n\n**Review Summary:**\n* **Functionality**: The logic correctly ensures that physical flash protection (option bytes) is re-applied during `crec_flash_pre_init` if the RO region is already protected (`EC_FLASH_PROTECT_RO_NOW`) and hardware write protect is asserted.\n* **Security**: This is a positive security improvement, ensuring the flash option bytes are correctly locked down during early initialization.\n* **Style**: Code adheres to the existing project coding style. The parameter to `crec_flash_physical_protect_now` was correctly updated to `false` in this patchset to match the function signature.\n* **Consistency**: Aligns the `stm32h7` implementation with other STM32 variants.\n* **Testing \u0026 Test Coverage**: Test additions are comprehensive and use the correct patterns for testing the RO write protect flow.\n* **CL Size \u0026 Scope**: Size: M (+147, -0). The CL is well scoped, containing a small production change (~8 lines) with corresponding unit tests.\n* **Commit Message**: The commit message is concise and accurately reflects the changes.\n\nTAG\u003dagy\nCONV\u003da547e084-b7ec-445d-bb29-4d05afcb81a1",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "17aa2b8ca8043901f3890aec49ff3104a58e0998",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
