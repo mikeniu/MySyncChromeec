@@ -454,6 +454,31 @@ ZTEST_USER(fpsensor_state, test_fp_sensor_stats_capture_success)
 	zassert_equal(resp.timestamps_invalid, 0);
 }
 
+ZTEST_USER(fpsensor_state, test_fp_sensor_context_task_operations)
+{
+	FpSensorContext local_ctx{};
+	local_ctx.sensor_mode = FP_MODE_ENROLL_SESSION;
+	local_ctx.sync_enroll_session(local_ctx.sensor_mode);
+	zassert_equal(local_ctx.enroll_session, FP_MODE_ENROLL_SESSION);
+
+	local_ctx.sensor_mode = 0;
+	local_ctx.sync_enroll_session(local_ctx.sensor_mode);
+	zassert_equal(local_ctx.enroll_session, 0u);
+
+	local_ctx.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+	local_ctx.template_encrypted_id = FP_NO_SUCH_TEMPLATE;
+	local_ctx.fp_encryption_status = FP_ENCRYPTED_TEMPLATE_READY;
+	local_ctx.encrypt_requested_template();
+	zassert_equal(local_ctx.sensor_mode & FP_MODE_ENCRYPT_TEMPLATE, 0u);
+	zassert_equal(local_ctx.fp_encryption_status &
+			      FP_ENCRYPTED_TEMPLATE_READY,
+		      0u);
+
+	local_ctx.sensor_mode = FP_MODE_DECRYPT_TEMPLATE;
+	local_ctx.decrypt_and_commit_template();
+	zassert_equal(local_ctx.sensor_mode & FP_MODE_DECRYPT_TEMPLATE, 0u);
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
