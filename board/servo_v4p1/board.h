@@ -133,7 +133,11 @@
 
 /* USB interface indexes (use define rather than enum to expand them) */
 #define USB_IFACE_CONSOLE 0
+#ifdef SECTION_IS_RO
+#define USB_IFACE_MSC 1
+#else
 #define USB_IFACE_EMPTY 1
+#endif
 #define USB_IFACE_I2C 2
 #define USB_IFACE_USART3_STREAM 3
 #define USB_IFACE_USART4_STREAM 4
@@ -148,7 +152,11 @@
 /* USB endpoint indexes (use define rather than enum to expand them) */
 #define USB_EP_CONTROL 0
 #define USB_EP_CONSOLE 1
+#ifdef SECTION_IS_RO
+#define USB_EP_MSC 2
+#else
 #define USB_EP_EMPTY 2
+#endif
 #define USB_EP_I2C 3
 #define USB_EP_USART3_STREAM 4
 #define USB_EP_USART4_STREAM 5
