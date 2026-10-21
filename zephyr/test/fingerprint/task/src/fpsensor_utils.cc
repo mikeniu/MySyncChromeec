@@ -7,9 +7,11 @@
 #include <zephyr/ztest.h>
 
 #include <ec_commands.h>
+#include <fpsensor/fpsensor.h>
 #include <fpsensor/fpsensor_utils.h>
 #include <mkbp_event.h>
 #include <rollback.h>
+#include <string_view>
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
@@ -119,4 +121,13 @@ ZTEST(fpsensor_utils, test_fp_match_success)
 	zassert_true(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES_UPDATE_FAILED));
 	zassert_false(fp_match_success(EC_MKBP_FP_ERR_MATCH_NO));
 	zassert_false(fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_INTERNAL));
+}
+
+ZTEST(fpsensor_utils, test_fourcc_constexpr_boundaries)
+{
+	constexpr FpFourCc kGrey(FOURCC('G', 'R', 'E', 'Y'));
+	static_assert(kGrey.view() == "GREY");
+	zassert_equal(std::string_view(kGrey.c_str()), "GREY");
+	zassert_equal(fourcc_to_string(FOURCC('\x1f', ' ', '~', '\x7f')).view(),
+		      ". ~.");
 }

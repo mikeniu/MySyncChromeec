@@ -11,8 +11,13 @@
 #include "common.h"
 #include "ec_commands.h"
 
+#ifdef is_negative
+#undef is_negative
+#endif
+
+#include <array>
 #include <cstdint>
-#include <string>
+#include <string_view>
 
 /**
  * Test that size+offset does not exceed buffer_size
@@ -84,6 +89,35 @@ skip_image_offset(enum fp_capture_type capture_type) noexcept
  * If the character is unprintable, we will print '.', instead.
  * This is similar to hexdump's behavior.
  */
-const std::string fourcc_to_string(uint32_t value);
+class FpFourCc {
+    public:
+	explicit constexpr FpFourCc(uint32_t value) noexcept : chars_{}
+	{
+		for (size_t i = 0; i < sizeof(value); ++i) {
+			const uint8_t ch = (value >> (i * 8)) & 0xFF;
+			chars_[i] = (ch >= 0x20 && ch <= 0x7e) ?
+					    static_cast<char>(ch) :
+					    '.';
+		}
+	}
+
+	[[nodiscard]] constexpr const char *c_str() const noexcept
+	{
+		return chars_.data();
+	}
+
+	[[nodiscard]] constexpr std::string_view view() const noexcept
+	{
+		return { chars_.data(), sizeof(uint32_t) };
+	}
+
+    private:
+	std::array<char, sizeof(uint32_t) + 1> chars_;
+};
+
+[[nodiscard]] constexpr FpFourCc fourcc_to_string(uint32_t value) noexcept
+{
+	return FpFourCc(value);
+}
 
 #endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_UTILS_H_ */
