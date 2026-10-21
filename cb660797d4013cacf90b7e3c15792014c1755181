@@ -45,6 +45,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a3d06ad_6bafb654",
+        "filename": "common/fpsensor/fpsensor_auth_ascp.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:35Z",
+      "side": 1,
+      "message": "Spelled out the explicit return type const std::expected\u003cFpP256Key, ec_error_list\u003e for public_key.",
+      "parentUuid": "44e37d3a_127c369f",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2480e760_7cf9ed62",
@@ -65,6 +90,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef219b0b_d967864f",
+        "filename": "common/fpsensor/fpsensor_auth_ascp.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:35Z",
+      "side": 1,
+      "message": "Spelled out the explicit return type const std::expected\u003cFpP256Key, ec_error_list\u003e for private_key.",
+      "parentUuid": "2480e760_7cf9ed62",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -95,6 +145,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90325869_e860771f",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:35Z",
+      "side": 1,
+      "message": "Updated the comment on ecdh_key in common/fpsensor/fpsensor_auth_handshake.cc.",
+      "parentUuid": "27f13f35_ccc7c556",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ea5894f_6389ef9e",
@@ -115,6 +190,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5086c497_aecfc81f",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:35Z",
+      "side": 1,
+      "message": "Spelled out std::expected\u003cFpP256Key, ec_error_list\u003e key \u003d FpP256Key::generate();.",
+      "parentUuid": "1ea5894f_6389ef9e",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -145,6 +245,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "262cc86a_b6c91518",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:35Z",
+      "side": 1,
+      "message": "Spelled out const std::expected\u003cfp_elliptic_curve_public_key, ec_error_list\u003e pubkey \u003d ecdh_key-\u003eto_public_key();.",
+      "parentUuid": "14e22021_ecf33ea6",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48c31dd7_0bfa93a3",
@@ -165,6 +290,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bc1998b_0cd1e316",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:35Z",
+      "side": 1,
+      "message": "Spelled out const std::expected\u003cec_fp_encrypted_pairing_key, ec_error_list\u003e wrapped and updated callers to use fp_pairing_key.",
+      "parentUuid": "48c31dd7_0bfa93a3",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
