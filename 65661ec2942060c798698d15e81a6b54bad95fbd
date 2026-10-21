@@ -22,6 +22,30 @@
       },
       "revId": "65661ec2942060c798698d15e81a6b54bad95fbd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a622184a_9f954a5a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-21T20:13:06Z",
+      "side": 1,
+      "message": "Updated the commit message to note these are used on the ec-legacy branch and unused on the Zephyr EC main branch.",
+      "parentUuid": "38f6b883_69f11c02",
+      "range": {
+        "startLine": 13,
+        "startChar": 7,
+        "endLine": 13,
+        "endChar": 19
+      },
+      "revId": "65661ec2942060c798698d15e81a6b54bad95fbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
