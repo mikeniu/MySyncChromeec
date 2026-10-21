@@ -89,18 +89,18 @@ ZTEST(fpsensor_utils, test_is_finger_needed)
 
 ZTEST(fpsensor_utils, test_skip_image_offset)
 {
-	zassert_true(skip_image_offset(FP_CAPTURE_TYPE_INVALID));
-	zassert_false(skip_image_offset(FP_CAPTURE_VENDOR_FORMAT));
-	zassert_true(skip_image_offset(FP_CAPTURE_DEFECT_PXL_TEST));
-	zassert_true(skip_image_offset(FP_CAPTURE_ABNORMAL_TEST));
-	zassert_true(skip_image_offset(FP_CAPTURE_NOISE_TEST));
-	zassert_true(skip_image_offset(FP_CAPTURE_SIMPLE_IMAGE));
-	zassert_true(skip_image_offset(FP_CAPTURE_PATTERN0));
-	zassert_true(skip_image_offset(FP_CAPTURE_PATTERN1));
-	zassert_false(skip_image_offset(FP_CAPTURE_QUALITY_TEST));
-	zassert_true(skip_image_offset(FP_CAPTURE_RESET_TEST));
-	zassert_true(skip_image_offset(FP_CAPTURE_PATTERN2));
-	zassert_true(skip_image_offset(FP_CAPTURE_TYPE_MAX));
+	static_assert(skip_image_offset(FP_CAPTURE_TYPE_INVALID));
+	static_assert(!skip_image_offset(FP_CAPTURE_VENDOR_FORMAT));
+	static_assert(skip_image_offset(FP_CAPTURE_DEFECT_PXL_TEST));
+	static_assert(skip_image_offset(FP_CAPTURE_ABNORMAL_TEST));
+	static_assert(skip_image_offset(FP_CAPTURE_NOISE_TEST));
+	static_assert(skip_image_offset(FP_CAPTURE_SIMPLE_IMAGE));
+	static_assert(skip_image_offset(FP_CAPTURE_PATTERN0));
+	static_assert(skip_image_offset(FP_CAPTURE_PATTERN1));
+	static_assert(!skip_image_offset(FP_CAPTURE_QUALITY_TEST));
+	static_assert(skip_image_offset(FP_CAPTURE_RESET_TEST));
+	static_assert(skip_image_offset(FP_CAPTURE_PATTERN2));
+	static_assert(skip_image_offset(FP_CAPTURE_TYPE_MAX));
 }
 
 ZTEST(fpsensor_utils, test_fp_match_success)

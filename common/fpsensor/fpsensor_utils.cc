@@ -3,19 +3,12 @@
  * found in the LICENSE file.
  */
 
-#include "ec_commands.h"
 #include "fpsensor/fpsensor_utils.h"
 
 #include <stdio.h>
 
 #include <cctype>
 #include <string>
-
-bool skip_image_offset(enum fp_capture_type capture_type)
-{
-	return !(capture_type == FP_CAPTURE_VENDOR_FORMAT ||
-		 capture_type == FP_CAPTURE_QUALITY_TEST);
-}
 
 const std::string fourcc_to_string(uint32_t value)
 {
