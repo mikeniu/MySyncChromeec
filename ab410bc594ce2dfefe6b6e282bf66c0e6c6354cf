@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea741d6e_23a18410",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T09:09:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The commit message is inaccurate.\n\nThe commit message mentions adding \"build entries\", but this patchset does not contain any changes to `CMakeLists.txt` or other build files. Please update the commit message to accurately reflect the contents of the patchset.\n\nSuggested replacement:\n```\nzephyr: fingerprint: Add rts5817maa bindings and Kconfig\n\nAdd the devicetree binding and Kconfig options for the\nRTS5817MAA fingerprint sensor driver.\n\nBUG\u003db:478708415\nTEST\u003dzmake build realtekfp\n```\n\n### Review Summary\n*   **Functionality:** Looks good. Adds Kconfig and device tree bindings for the RTS5817MAA fingerprint sensor.\n*   **Architecture \u0026 Component Fit:** The new configurations follow the established pattern for fingerprint drivers in Zephyr.\n*   **Code Simplicity:** Simple and direct declarative additions.\n*   **Idiomaticity \u0026 Readability:** Good. The Kconfig help text correctly aligns with the default heap size values (fixed in this patchset).\n*   **Security:** N/A.\n*   **Testing:** This CL adds declarative configurations (bindings, Kconfig) and no procedural logic, so new automated tests are not applicable here.\n*   **CL Size \u0026 Scope:** `Size: M (+64, -0)`. This CL is atomic and focused on a single logical change.\n*   **Commit Message:** The commit message contains a factual contradiction, as it mentions \"build entries\" which are not present in the diff. [🔗](http://go/tj/8baa9b35-c37c-4cc7-bcc8-b4cc228cc549)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ab410bc594ce2dfefe6b6e282bf66c0e6c6354cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
