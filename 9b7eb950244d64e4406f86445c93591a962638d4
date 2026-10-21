@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d42fda9_ab4a6481",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T03:34:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5373d9d4-9160-43fd-8af3-dfaea60d10fd)]\n\n**Review Summary:**\n*   **Functionality \u0026 Security:** Cortex-M33 (ARMv8-M) MPU support is correctly implemented. The mechanism to lock the rollback region by disabling the MPU region (relying on `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` for protection) is logically sound and well-documented.\n*   **Style \u0026 Consistency:** The code uses appropriate Zephyr macros and devicetree bindings. The `BUILD_ASSERT` verifies contiguous regions as expected.\n*   **CL Size \u0026 Scope:** Size: M (+125, -2). The CL is appropriately scoped and atomic, focusing solely on adding Cortex-M33 MPU support.\n*   **Testing:** Manual and hardware-in-the-loop validation is acceptable due to the known limitations of triggering MPU faults in privileged mode on ARMv8-M.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9b7eb950244d64e4406f86445c93591a962638d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
