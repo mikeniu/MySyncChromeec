@@ -40,9 +40,6 @@ struct test_too_big_jump_data_struct {
 
 static void system_before(void *data)
 {
-	/* Reset flag before each test. */
-	system_fake_reset_interrupt_disabled();
-
 	add_tag_func = NULL;
 	system_common_pre_init();
 	system_set_shrspi_image_copy(EC_IMAGE_RO);
@@ -118,10 +115,9 @@ static void add_basic_jump_tag(void)
 
 static void test_sysjump_hook(void)
 {
-	/* Verify interrupt_disable_all() was invoked prior to HOOK_SYSJUMP */
-	zassert_true(
-		system_fake_is_interrupt_disabled(),
-		"HOOK_SYSJUMP executed before interrupt_disable_all() was called!");
+	/* Verify interrupts are locked prior to HOOK_SYSJUMP */
+	zassert_false(arch_cpu_irqs_are_enabled(),
+		      "HOOK_SYSJUMP executed with interrupts enabled!");
 
 	if (add_tag_func)
 		add_tag_func();
