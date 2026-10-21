@@ -896,6 +896,32 @@ ZTEST_USER_F(ppm_test, test_CCACK_timeout_recovers_to_idle_notify)
 	zassert_true(check_cci_matches(fixture, &cci_cmd_complete));
 }
 
+ZTEST_USER_F(ppm_test, test_CCACK_timeout_with_lpm_alerts_does_not_hang)
+{
+	initialize_fake_to_idle_notify(fixture);
+	int notified_count = fixture->notified_count;
+
+	struct ucsi_control_t control = {
+		.command = UCSI_GET_CONNECTOR_CAPABILITY, .data_length = 0
+	};
+	queue_command_for_fake_driver(fixture, UCSI_GET_CONNECTOR_CAPABILITY,
+				      /*result=*/0, /*lpm_data=*/NULL);
+
+	zassert_false(write_command(fixture, &control) < 0);
+	notified_count++;
+	zassert_true(wait_for_notification(fixture, notified_count));
+	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
+
+	/* Fire async events periodically, which should not restart the CC_ACK
+	 * timeout */
+	for (int i = 0; i < 6; i++) {
+		k_msleep(1000);
+		ucsi_ppm_lpm_alert(fixture->ppm_dev, PDC_DEFAULT_CONNECTOR);
+	}
+
+	zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE_NOTIFY);
+}
+
 /* When waiting for a Connection Indicator Ack, we accept an immediate ACK_CC_CI
  * to switch the state back to Idle with Notifications. Trying to use command
  * complete in that state should also fail.
