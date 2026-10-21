@@ -138,7 +138,12 @@
 #define USB_IFACE_USART3_STREAM 3
 #define USB_IFACE_USART4_STREAM 4
 #define USB_IFACE_UPDATE 5
+#ifdef SECTION_IS_RO
+#define USB_IFACE_BRIDGE 6
+#define USB_IFACE_COUNT 7
+#else
 #define USB_IFACE_COUNT 6
+#endif
 
 /* USB endpoint indexes (use define rather than enum to expand them) */
 #define USB_EP_CONTROL 0
@@ -148,7 +153,12 @@
 #define USB_EP_USART3_STREAM 4
 #define USB_EP_USART4_STREAM 5
 #define USB_EP_UPDATE 6
+#ifdef SECTION_IS_RO
+#define USB_EP_BRIDGE 7
+#define USB_EP_COUNT 8
+#else
 #define USB_EP_COUNT 7
+#endif
 
 /* Enable console recasting of GPIO type. */
 #define CONFIG_CMD_GPIO_EXTENDED
@@ -295,6 +305,9 @@ enum usb_strings {
 	USB_STR_USART3_STREAM_NAME,
 	USB_STR_USART4_STREAM_NAME,
 	USB_STR_UPDATE_NAME,
+#ifdef SECTION_IS_RO
+	USB_STR_BRIDGE_NAME,
+#endif
 	USB_STR_COUNT
 };
 
