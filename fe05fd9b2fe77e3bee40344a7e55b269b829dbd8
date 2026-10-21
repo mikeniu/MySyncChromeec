@@ -45,6 +45,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18e0cbee_f253045a",
+        "filename": "include/fpsensor/fpsensor_auth_crypto.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:05Z",
+      "side": 1,
+      "message": "Replaced class FpPairingKey with namespace fp_pairing_key in include/fpsensor/fpsensor_auth_crypto.h.",
+      "parentUuid": "8e977d38_6e94529e",
+      "range": {
+        "startLine": 365,
+        "startChar": 0,
+        "endLine": 365,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "fe05fd9b2fe77e3bee40344a7e55b269b829dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0aa6ca41_8c556bce",
@@ -65,6 +90,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fe05fd9b2fe77e3bee40344a7e55b269b829dbd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc7c1145_e63b7163",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 1808,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:05Z",
+      "side": 1,
+      "message": "Added zassert_mem_equal verifying unwrapped against expected_secret, added happy-path tests for FpP256Key::from_uncompressed_point and FpP256Key::from_private_key, and used .error_or(EC_SUCCESS) for safe error assertions.",
+      "parentUuid": "0aa6ca41_8c556bce",
+      "range": {
+        "startLine": 1805,
+        "startChar": 0,
+        "endLine": 1808,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "fe05fd9b2fe77e3bee40344a7e55b269b829dbd8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
