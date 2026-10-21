@@ -22,33 +22,28 @@ fp_command_ascp_establish(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params = static_cast<const ec_params_fp_ascp_establish *>(
 		args->input_buf);
-	if (params->pk_g[0] != 0x04) {
-		return EC_HOST_CMD_INVALID_PARAM;
-	}
-	bssl::UniquePtr<EC_KEY> public_key = create_ec_key_from_pubkey(
-		*reinterpret_cast<const fp_elliptic_curve_public_key *>(
-			&params->pk_g[1]));
-	if (public_key == nullptr) {
+	const std::expected<FpP256Key, ec_error_list> public_key =
+		FpP256Key::from_uncompressed_point(params->pk_g);
+	if (!public_key.has_value()) {
 		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	CleanseWrapper<std::array<uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> >
 		sk_f{};
-	auto ret = ascp_get_sk_f(sk_f.data(), sk_f.size());
-	if (ret != EC_SUCCESS) {
+	if (ascp_get_sk_f(sk_f.data(), sk_f.size()) != EC_SUCCESS) {
 		return EC_HOST_CMD_ERROR;
 	}
-	bssl::UniquePtr<EC_KEY> private_key =
-		create_ec_key_from_privkey(sk_f.data(), sk_f.size());
-	if (private_key == nullptr) {
+	const std::expected<FpP256Key, ec_error_list> private_key =
+		FpP256Key::from_private_key(sk_f);
+	if (!private_key.has_value()) {
 		return EC_HOST_CMD_ERROR;
 	}
 
-	ret = generate_ecdh_shared_secret_without_kdf(*private_key, *public_key,
-						      pairing_key);
-	if (ret != EC_SUCCESS) {
+	const auto secret = private_key->compute_shared_secret(*public_key);
+	if (!secret.has_value()) {
 		return EC_HOST_CMD_ERROR;
 	}
+	std::ranges::copy(*secret, pairing_key.begin());
 
 	return EC_HOST_CMD_SUCCESS;
 }
