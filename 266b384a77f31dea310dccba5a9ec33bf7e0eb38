@@ -68,6 +68,24 @@
       "parentUuid": "3e273c9f_987068e5",
       "revId": "266b384a77f31dea310dccba5a9ec33bf7e0eb38",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "081e490d_dbb9aafe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 45
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-10-21T06:53:07Z",
+      "side": 1,
+      "message": "Thanks! Modify the commit message.\nWhen uploading CLs, I always run \"hook script\", it passes all the checks and doesn\u0027t show commit message too long error.",
+      "parentUuid": "4247efa5_1691fa7c",
+      "revId": "266b384a77f31dea310dccba5a9ec33bf7e0eb38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
