@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c14f04e_96b5c478",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-21T17:15:17Z",
+      "side": 1,
+      "message": "It feels like I reviewed this change multiple times.",
+      "revId": "81be2b0faf30099ac79c43acbf402c5e8e1e823d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5dd2e4b_1b434b61",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 7931,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-21T17:15:17Z",
+      "side": 1,
+      "message": "Are these build asserts portable? Are they going to work in coreboot and kernel?",
+      "range": {
+        "startLine": 7928,
+        "startChar": 0,
+        "endLine": 7931,
+        "endChar": 12
+      },
+      "revId": "81be2b0faf30099ac79c43acbf402c5e8e1e823d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
