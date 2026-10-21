@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f65e6066_7511ba30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:29:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments. [[trajectory](https://goto.corp.google.com/traj/2482b8ca-91b8-4ea8-be76-3e3564222351)]\n\n### Review Summary\n\n* **Functionality:** No issues found. The move preserves behavior and correctly adds `constexpr`.\n* **Architecture \u0026 Component Fit:** No issues found. Moving the function to the header is necessary to support `constexpr` evaluation at compile time.\n* **Code Simplicity:** ❌ The new unit test includes redundant runtime assertions (`zassert_true` / `zassert_false`) that duplicate the `static_assert` compile-time checks on the exact same literals.\n* **Idiomaticity \u0026 Readability:** No issues found. The addition of `[[nodiscard]]` and `noexcept` is excellent modernization.\n* **Security:** No issues found.\n* **Testing:** ❌ The newly added unit test is missing coverage for several `EC_MKBP_FP_ERR_MATCH_NO_*` failure statuses. I have provided a snippet inline to exhaustively test all boundary values.\n* **CL Size \u0026 Scope:** Size: S (+21, -8). The CL is appropriately sized and represents a single logical change.\n* **Commit Message:** No issues found. The message correctly provides the rationale and summary.\n[🔗](http://go/tj/2482b8ca-91b8-4ea8-be76-3e3564222351)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0b01f5b3de69fbbf5866863a532e93b3bb426112",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73a2db7e_0c186d22",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:29:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While the `static_assert`s perfectly validate the new `constexpr` behavior, the `zassert_true` / `zassert_false` runtime checks on the exact same literal values are redundant because `static_assert` already guarantees their evaluation.\n\nAdditionally, per the requirement to test all boundary and unhandled enum/status values, this test should exhaustively verify the remaining `EC_MKBP_FP_ERR_MATCH_NO_*` failure statuses defined in `ec_commands.h` to ensure no failure mode is accidentally categorized as a success.\n\n```cpp\nZTEST(fpsensor_utils, test_fp_match_success)\n{\n\tstatic_assert(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES));\n\tstatic_assert(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES_UPDATED));\n\tstatic_assert(fp_match_success(EC_MKBP_FP_ERR_MATCH_YES_UPDATE_FAILED));\n\n\tstatic_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO));\n\tstatic_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_INTERNAL));\n\tstatic_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_TEMPLATES));\n\tstatic_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_AUTH_FAIL));\n\tstatic_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_LOW_QUALITY));\n\tstatic_assert(!fp_match_success(EC_MKBP_FP_ERR_MATCH_NO_LOW_COVERAGE));\n}\n```\n[🔗](http://go/tj/2482b8ca-91b8-4ea8-be76-3e3564222351)",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0b01f5b3de69fbbf5866863a532e93b3bb426112",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
