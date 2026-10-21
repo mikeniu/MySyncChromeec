@@ -438,12 +438,11 @@ test_mockable void system_disable_jump(void)
 	disable_jump = 1;
 
 #ifdef CONFIG_MPU
-	if (system_is_locked()) {
-		/* All regions were configured successfully, enable MPU */
-		mpu_enable();
-	} else {
-		CPRINTS("System is unlocked. Skip MPU configuration");
-	}
+	if (IS_ENABLED(CONFIG_NPCX_RAM_LOCK) && !system_is_locked())
+		CPRINTS("System is unlocked. Skip RAM lock configuration");
+
+	/* All regions were configured successfully, enable MPU */
+	mpu_enable();
 #endif /* CONFIG_MPU */
 }
 

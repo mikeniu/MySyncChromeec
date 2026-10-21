@@ -7,6 +7,7 @@
 #define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_MPU_H_
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /* This matches up with core/cortex-m/include/mpu.h */
 

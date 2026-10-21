@@ -22,27 +22,6 @@
 
 LOG_MODULE_REGISTER(shim_mpu, LOG_LEVEL_ERR);
 
-extern void arm_core_mpu_disable(void);
-
-void arch_pre_system_jump(void)
-{
-	/*
-	 * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then
-	 * the last 64 bytes of the stack is protected to detect stack
-	 * overflows. Size of protected region must be greater than exception
-	 * frame, so CPU won't overwrite some other data when exception occurs.
-	 *
-	 * EC uses different RAM layout than Zephyr, so it's possible that after
-	 * sysjump some variables are stored in the protected region. EC also
-	 * reconfigures MPU late (Zephyr does it in reset handler).
-	 *
-	 * Disable MPU protection to avoid problems after sysjump to EC.
-	 */
-	if (IS_ENABLED(CONFIG_HW_STACK_PROTECTION)) {
-		arm_core_mpu_disable();
-	}
-}
-
 void mpu_enable(void)
 {
 	for (int index = 0; index < mpu_config.num_regions; index++) {
@@ -52,18 +31,22 @@ void mpu_enable(void)
 		 * CONFIG_FLASH_BASE_ADDRESS is used as the code RAM base, and
 		 * CONFIG_SRAM_BASE_ADDRESS is used as the data RAM base.
 		 */
-		if (mpu_config.mpu_regions[index].base ==
-		    CONFIG_FLASH_BASE_ADDRESS) {
-			/* Apply the write lock to code RAM */
-			ram_lock_config_lock_region(REGION_STORAGE,
-						    CONFIG_FLASH_BASE_ADDRESS,
-						    (CONFIG_FLASH_SIZE << 10));
-		} else if (mpu_config.mpu_regions[index].base ==
-			   CONFIG_SRAM_BASE_ADDRESS) {
-			/* Apply the fetch lock to data RAM */
-			ram_lock_config_lock_region(REGION_DATA_RAM,
-						    CONFIG_SRAM_BASE_ADDRESS,
-						    (CONFIG_SRAM_SIZE << 10));
+		if (system_is_locked()) {
+			if (mpu_config.mpu_regions[index].base ==
+			    CONFIG_FLASH_BASE_ADDRESS) {
+				/* Apply the write lock to code RAM */
+				ram_lock_config_lock_region(
+					REGION_STORAGE,
+					CONFIG_FLASH_BASE_ADDRESS,
+					(CONFIG_FLASH_SIZE << 10));
+			} else if (mpu_config.mpu_regions[index].base ==
+				   CONFIG_SRAM_BASE_ADDRESS) {
+				/* Apply the fetch lock to data RAM */
+				ram_lock_config_lock_region(
+					REGION_DATA_RAM,
+					CONFIG_SRAM_BASE_ADDRESS,
+					(CONFIG_SRAM_SIZE << 10));
+			}
 		}
 #endif
 		MPU->RNR = index;
@@ -87,6 +70,37 @@ static int mpu_disable_fixed_regions(void)
 }
 
 SYS_INIT(mpu_disable_fixed_regions, PRE_KERNEL_1, 50);
+
+extern void arm_core_mpu_disable(void);
+
+void arch_pre_system_jump(void)
+{
+	/*
+	 * The fixed regions are enabled by system_disable_jump() even on
+	 * unlocked systems, which still allow sysjump. Disable them before
+	 * jumping so the target image (or a RAM loader such as the MCHP LFW)
+	 * can execute.
+	 */
+	mpu_disable_fixed_regions();
+	__DSB();
+	__ISB();
+
+	/*
+	 * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then
+	 * the last 64 bytes of the stack is protected to detect stack
+	 * overflows. Size of protected region must be greater than exception
+	 * frame, so CPU won't overwrite some other data when exception occurs.
+	 *
+	 * EC uses different RAM layout than Zephyr, so it's possible that after
+	 * sysjump some variables are stored in the protected region. EC also
+	 * reconfigures MPU late (Zephyr does it in reset handler).
+	 *
+	 * Disable MPU protection to avoid problems after sysjump to EC.
+	 */
+	if (IS_ENABLED(CONFIG_HW_STACK_PROTECTION)) {
+		arm_core_mpu_disable();
+	}
+}
 
 #ifdef CONFIG_PLATFORM_EC_ROLLBACK_MPU_PROTECT
 /*
