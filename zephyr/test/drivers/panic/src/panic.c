@@ -619,3 +619,121 @@ ZTEST(panic, test_panic_host_event)
 	hook_notify(HOOK_CHIPSET_STARTUP);
 	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
 }
+
+ZTEST(panic, test_panic_data_is_new__cross_size)
+{
+	struct panic_data *pdata_actual = get_panic_data_write();
+	uint32_t cross_size = CONFIG_PANIC_DATA_SIZE - 4;
+	struct panic_data *pdata =
+		(struct panic_data *)((uintptr_t)pdata_actual + 4);
+
+	pdata_actual->magic = PANIC_DATA_MAGIC;
+	pdata_actual->struct_size = cross_size;
+	pdata->flags = 0;
+
+	zassert_true(
+		panic_data_is_new(),
+		"Expected panic_data_is_new() to be true for unread cross-size panic data");
+
+	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
+	zassert_false(
+		panic_data_is_new(),
+		"Expected panic_data_is_new() to be false when OLD_HOSTCMD is set");
+
+	pdata_actual->struct_size = CONFIG_PANIC_DATA_SIZE;
+}
+
+ZTEST(panic, test_panic_data_init__cross_size_preserve_unread)
+{
+	struct panic_data *pdata_actual = get_panic_data_write();
+	uint32_t cross_size = CONFIG_PANIC_DATA_SIZE - 4;
+	struct panic_data *pdata =
+		(struct panic_data *)((uintptr_t)pdata_actual + 4);
+
+	/* Set up valid unread cross-size panic data */
+	pdata_actual->magic = PANIC_DATA_MAGIC;
+	pdata_actual->struct_size = cross_size;
+	pdata->flags = PANIC_DATA_FLAG_RO_IMAGE;
+	pdata->arch = 0xAA;
+
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+
+	/* In both RO and RW, unread cross-size panic data must be preserved */
+	zassert_equal(get_panic_data_size(), cross_size,
+		      "Cross-size panic data size must be preserved");
+	zassert_equal(pdata_actual->magic, PANIC_DATA_MAGIC,
+		      "Cross-size panic data magic must be preserved");
+	zassert_equal(pdata->flags, PANIC_DATA_FLAG_RO_IMAGE,
+		      "Cross-size panic data flags must be preserved");
+	zassert_equal(pdata->arch, 0xAA,
+		      "Cross-size panic data contents must be preserved");
+
+	pdata_actual->struct_size = CONFIG_PANIC_DATA_SIZE;
+}
+
+ZTEST(panic, test_panic_data_init__cross_size_overwrite_old)
+{
+	struct panic_data *pdata_actual = get_panic_data_write();
+	uint32_t cross_size = CONFIG_PANIC_DATA_SIZE - 4;
+	struct panic_data *pdata =
+		(struct panic_data *)((uintptr_t)pdata_actual + 4);
+
+	/* Set up already-read cross-size panic data */
+	pdata_actual->magic = PANIC_DATA_MAGIC;
+	pdata_actual->struct_size = cross_size;
+	pdata->flags = PANIC_DATA_FLAG_OLD_HOSTCMD;
+
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		/* In RW, already-read cross-size data should be overwritten
+		 * with hard watchdog panic */
+		zassert_equal(
+			get_panic_data_size(), CONFIG_PANIC_DATA_SIZE,
+			"Expected hard watchdog panic of standard size in RW");
+		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
+				  sizeof(hard_watchdog_panic), NULL);
+	} else {
+		/* In RO, panic data remains unchanged */
+		zassert_equal(get_panic_data_size(), cross_size,
+			      "RO must not overwrite panic data");
+		pdata_actual->struct_size = CONFIG_PANIC_DATA_SIZE;
+	}
+}
+
+ZTEST(panic, test_panic_host_event_cross_size)
+{
+	struct panic_data *pdata_actual;
+	struct panic_data *pdata;
+	uint32_t cross_size = CONFIG_PANIC_DATA_SIZE - 4;
+
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)) {
+		ztest_test_skip();
+	}
+
+	host_clear_events(CONFIG_HOST_EVENT_REPORT_MASK);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+
+	pdata_actual = get_panic_data_write();
+	pdata = (struct panic_data *)((uintptr_t)pdata_actual + 4);
+	pdata_actual->magic = PANIC_DATA_MAGIC;
+	pdata_actual->struct_size = cross_size;
+	pdata->flags = 0;
+
+	/* Trigger HOOK_CHIPSET_STARTUP */
+	hook_notify(HOOK_CHIPSET_STARTUP);
+
+	/* Verify host event is set and flag is set in cross-size panic data */
+	zassert_true(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+	zassert_equal(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT,
+		      PANIC_DATA_FLAG_OLD_HOSTEVENT, NULL);
+
+	/* Verify subsequent HOOK_CHIPSET_STARTUP does not re-set host event */
+	host_clear_events(CONFIG_HOST_EVENT_REPORT_MASK);
+	hook_notify(HOOK_CHIPSET_STARTUP);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+
+	pdata_actual->struct_size = CONFIG_PANIC_DATA_SIZE;
+}

@@ -416,9 +416,9 @@ test_export_static int panic_data_init(void)
 			LOG_INF("Promoting watchdog warning to watchdog panic");
 			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG);
 			panic_data_finalize(pdata);
-		} else if ((reason != PANIC_SW_WATCHDOG &&
-			    reason != PANIC_SW_WATCHDOG_HARD) ||
-			   !is_panic_new) {
+		} else if (!is_panic_new ||
+			   (pdata && reason != PANIC_SW_WATCHDOG &&
+			    reason != PANIC_SW_WATCHDOG_HARD)) {
 			/* The watchdog panic info may have already been
 			 * initialized by the watchdog handler, so only set it
 			 * here if the panic reason is not a watchdog or the
@@ -444,7 +444,7 @@ SYS_INIT(panic_data_init, PRE_KERNEL_2, 0);
 #if defined(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)
 static void panic_host_event_init(void)
 {
-	struct panic_data *pdata = panic_get_data();
+	struct panic_data *pdata = (struct panic_data *)get_panic_data_start();
 
 	if (pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT)) {
 		host_set_single_event(EC_HOST_EVENT_PANIC);

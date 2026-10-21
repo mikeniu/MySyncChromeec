@@ -163,9 +163,13 @@ test_mockable struct panic_data *panic_get_data(void)
 
 bool panic_data_is_new(void)
 {
-	struct panic_data *const pdata = panic_get_data();
+	uintptr_t start = get_panic_data_start();
 
-	return pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
+	if (!start)
+		return false;
+
+	return !(((const struct panic_data *)start)->flags &
+		 PANIC_DATA_FLAG_OLD_HOSTCMD);
 }
 
 uint32_t get_panic_data_size(void)
@@ -511,7 +515,7 @@ host_command_panic_info(struct ec_host_cmd_handler_args *args)
 {
 	uint32_t pdata_size = get_panic_data_size();
 	uintptr_t pdata_start = get_panic_data_start();
-	struct panic_data *pdata = panic_get_data();
+	struct panic_data *pdata = (struct panic_data *)pdata_start;
 	uint32_t read_size = pdata_size;
 	uintptr_t read_start = pdata_start;
 	uint16_t read_offset = 0;
