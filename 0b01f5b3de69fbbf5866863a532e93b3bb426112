@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "0b01f5b3de69fbbf5866863a532e93b3bb426112",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3ad8e3d_259f1bf8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:44:07Z",
+      "side": 1,
+      "message": "Removed the redundant runtime assertions in test_fp_match_success and added static_assert checks covering all EC_MKBP_FP_ERR_MATCH_NO_* failure statuses.",
+      "parentUuid": "73a2db7e_0c186d22",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "0b01f5b3de69fbbf5866863a532e93b3bb426112",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
