@@ -1,0 +1,173 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f5aca80_6abd3477",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/1159222a-f096-4d78-a4ab-efe2e37c815a)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44e37d3a_127c369f",
+        "filename": "common/fpsensor/fpsensor_auth_ascp.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion: Explicit Type for Factory Return**\n\nPer `cc-readability` (`go/cstyle#Type_deduction`), prefer spelling out the type when calling factory methods so readers don\u0027t have to guess whether it returns `std::optional`, `std::expected`, or `absl::StatusOr`.\n\n```cpp\n\tconst std::expected\u003cFpP256Key, ec_error_list\u003e public_key \u003d\n\t\tFpP256Key::from_uncompressed_point(params-\u003epk_g);\n```\n[🔗](http://go/tj/1159222a-f096-4d78-a4ab-efe2e37c815a)",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2480e760_7cf9ed62",
+        "filename": "common/fpsensor/fpsensor_auth_ascp.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion: Explicit Type for Factory Return**\n\nPlease spell out the expected return type instead of using `auto` here as well:\n\n```cpp\n\tconst std::expected\u003cFpP256Key, ec_error_list\u003e private_key \u003d FpP256Key::from_private_key(sk_f);\n```\n[🔗](http://go/tj/1159222a-f096-4d78-a4ab-efe2e37c815a)",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27f13f35_ccc7c556",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion: Outdated Comment**\n\nSince `ecdh_key` is now a `std::optional` containing the key rather than a pointer, consider updating this comment:\n\n```cpp\n/* The FPMCU\u0027s ECDH private key for the current handshake. */\n```\n[🔗](http://go/tj/1159222a-f096-4d78-a4ab-efe2e37c815a)",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ea5894f_6389ef9e",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion: Explicit Type for Factory Return**\n\nPer `cc-readability`, prefer spelling out the return type for factory methods so readers can clearly see the error wrapper type being used.\n\n```cpp\n\tstd::expected\u003cFpP256Key, ec_error_list\u003e key \u003d FpP256Key::generate();\n```\n[🔗](http://go/tj/1159222a-f096-4d78-a4ab-efe2e37c815a)",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14e22021_ecf33ea6",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion: Explicit Type for Factory Return**\n\n```cpp\n\tconst std::expected\u003cfp_elliptic_curve_public_key, ec_error_list\u003e pubkey \u003d ecdh_key-\u003eto_public_key();\n```\n[🔗](http://go/tj/1159222a-f096-4d78-a4ab-efe2e37c815a)",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48c31dd7_0bfa93a3",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion: Explicit Type for Factory Return**\n\n```cpp\n\tconst std::expected\u003cec_fp_encrypted_pairing_key, ec_error_list\u003e wrapped \u003d FpPairingKey::establish_and_wrap(\n\t\t*ecdh_key, params-\u003epeers_pubkey);\n```\n[🔗](http://go/tj/1159222a-f096-4d78-a4ab-efe2e37c815a)",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb660797d4013cacf90b7e3c15792014c1755181",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
