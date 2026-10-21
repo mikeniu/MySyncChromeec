@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e08d585_7b93686f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T04:05:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/06cef657-1bb7-4500-b560-456b0fa9b5e6)]\n\n### Review Summary\n\n* **CL Size \u0026 Scope:** `Size: S (+30, -0)`. The production (non-test) diff is exactly 30 lines. The CL is properly scoped as a single logical change introducing the driver configuration and runtime data structures.\n* **Functionality:** Looks good. The header properly declares the necessary driver hardware structures and correctly uses a flexible array member (`sensor_image_configs[]`) for the variable-length image configuration array.\n* **Architecture \u0026 Component Fit:** The separation of the hardware data structures into a standalone header provides a clean component interface that aligns well with Zephyr device driver patterns.\n* **Code Simplicity:** Minimal, direct declarations without unnecessary abstractions.\n* **Idiomaticity \u0026 Readability:** Clean, idiomatic C struct definitions with proper include guards and `#include` groupings.\n* **Security:** N/A. No executable logic introduced.\n* **Testing:** N/A. Since this CL only introduces declarative headers (structs, macros, function signatures) with no executable logic, automated test coverage is not required here.\n* **Commit Message:** The commit message clearly and concisely explains the purpose of the header.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "501fd6cf026523bb2485eb43ede8a3223f6fe2ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
