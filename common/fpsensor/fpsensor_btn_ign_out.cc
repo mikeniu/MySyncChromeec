@@ -82,10 +82,10 @@ void deactivate()
 namespace fp_btn_ign_out
 {
 
-void update(std::uint32_t sensor_mode)
+void update(FpSensorMode sensor_mode)
 {
-	if (sensor_mode &
-	    (FP_MODE_ENROLL_SESSION | FP_MODE_MATCH | FP_MODE_CAPTURE))
+	if (sensor_mode.has_any(FP_MODE_ENROLL_SESSION | FP_MODE_MATCH |
+				FP_MODE_CAPTURE))
 		activate();
 	else
 		deactivate();
