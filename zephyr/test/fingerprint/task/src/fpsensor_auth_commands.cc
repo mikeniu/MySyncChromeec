@@ -1759,3 +1759,78 @@ static void before_fpsensor_auth_commands(void *fixture)
 
 ZTEST_SUITE(fpsensor_auth_commands, nullptr, fpsensor_auth_commands_setup,
 	    before_fpsensor_auth_commands, nullptr, nullptr);
+
+ZTEST(fpsensor_auth_commands, test_raii_p256_and_pairing_key_wrappers)
+{
+	const auto key1 = FpP256Key::generate();
+	const auto key2 = FpP256Key::generate();
+	zassert_true(key1.has_value());
+	zassert_true(key2.has_value());
+
+	const auto pub2 = key2->to_public_key();
+	zassert_true(pub2.has_value());
+
+	const FpP256Key empty_key{};
+	zassert_equal(empty_key.to_public_key().error_or(EC_SUCCESS),
+		      EC_ERROR_INVAL);
+	zassert_equal(
+		empty_key.compute_shared_secret(*key2).error_or(EC_SUCCESS),
+		EC_ERROR_INVAL);
+	zassert_equal(
+		key1->compute_shared_secret(empty_key).error_or(EC_SUCCESS),
+		EC_ERROR_INVAL);
+
+	std::array<uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> zero_priv{};
+	zassert_equal(
+		FpP256Key::from_private_key(zero_priv).error_or(EC_SUCCESS),
+		EC_ERROR_INVAL);
+
+	std::array<uint8_t, FP_ELLIPTIC_CURVE_PRIVATE_KEY_LEN> valid_priv{};
+	valid_priv[31] = 1;
+	zassert_true(FpP256Key::from_private_key(valid_priv).has_value());
+
+	std::array<uint8_t, FP_ASCP_KEY_SIZE> valid_point{};
+	valid_point[0] = POINT_CONVERSION_UNCOMPRESSED;
+	std::ranges::copy(pub2->x, valid_point.begin() + 1);
+	std::ranges::copy(pub2->y, valid_point.begin() + 1 + sizeof(pub2->x));
+	zassert_true(
+		FpP256Key::from_uncompressed_point(valid_point).has_value());
+
+	std::array<uint8_t, FP_ASCP_KEY_SIZE> bad_point{};
+	bad_point[0] = POINT_CONVERSION_UNCOMPRESSED - 1;
+	zassert_equal(FpP256Key::from_uncompressed_point(bad_point).error_or(
+			      EC_SUCCESS),
+		      EC_ERROR_INVAL);
+	bad_point[0] = POINT_CONVERSION_UNCOMPRESSED + 1;
+	zassert_equal(FpP256Key::from_uncompressed_point(bad_point).error_or(
+			      EC_SUCCESS),
+		      EC_ERROR_INVAL);
+
+	zassert_equal(fp_pairing_key::establish_and_wrap(
+			      *key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION - 1)
+			      .error_or(EC_SUCCESS),
+		      EC_ERROR_INVAL);
+	zassert_equal(fp_pairing_key::establish_and_wrap(
+			      *key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION + 1)
+			      .error_or(EC_SUCCESS),
+		      EC_ERROR_INVAL);
+
+	const auto expected_secret = key1->compute_shared_secret(*key2);
+	zassert_true(expected_secret.has_value());
+
+	const auto wrapped = fp_pairing_key::establish_and_wrap(
+		*key1, *pub2, FP_AES_KEY_ENC_METADATA_VERSION);
+	zassert_true(wrapped.has_value());
+
+	fp_pairing_key::Bytes unwrapped{};
+	zassert_true(
+		fp_pairing_key::unwrap_into(*wrapped, unwrapped).has_value());
+	zassert_mem_equal(unwrapped.data(), expected_secret->data(),
+			  unwrapped.size());
+
+	ec_fp_encrypted_pairing_key corrupted = *wrapped;
+	corrupted.info.struct_version = FP_AES_KEY_ENC_METADATA_VERSION - 1;
+	zassert_equal(fp_pairing_key::unwrap_into(corrupted, unwrapped)
+			      .error_or(EC_SUCCESS),
+		      EC_ERROR_INVAL);
+}
