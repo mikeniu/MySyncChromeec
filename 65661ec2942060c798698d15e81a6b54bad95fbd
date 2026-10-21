@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38f6b883_69f11c02",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-10-21T01:10:04Z",
+      "side": 1,
+      "message": "hmm... i\u0027m pretty sure it was used on production partner devices.\ni think zephyr based EC FW on brya (alder lake) as a whole\nwas experimental.",
+      "range": {
+        "startLine": 13,
+        "startChar": 7,
+        "endLine": 13,
+        "endChar": 19
+      },
+      "revId": "65661ec2942060c798698d15e81a6b54bad95fbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
