@@ -220,3 +220,22 @@ ZTEST(fpsensor_utils, test_fp_frame_storage_slicing)
 	zassert_true(simple_slice.has_value());
 	zassert_equal((*simple_slice)[0], buf[FP_SENSOR_IMAGE_OFFSET]);
 }
+
+ZTEST(fpsensor_utils, test_rate_limiter_boundaries)
+{
+	FpRateLimiter limiter{};
+	const FpTimestamp t0{ std::chrono::seconds(10) };
+
+	zassert_equal(limiter.try_acquire(t0), EC_HOST_CMD_SUCCESS);
+
+	zassert_equal(limiter.try_acquire(t0 + std::chrono::seconds(1) -
+					  std::chrono::microseconds(1)),
+		      EC_HOST_CMD_BUSY);
+
+	zassert_equal(limiter.try_acquire(t0 + std::chrono::seconds(1)),
+		      EC_HOST_CMD_SUCCESS);
+
+	zassert_equal(limiter.try_acquire(t0 + std::chrono::seconds(2) +
+					  std::chrono::microseconds(1)),
+		      EC_HOST_CMD_SUCCESS);
+}
