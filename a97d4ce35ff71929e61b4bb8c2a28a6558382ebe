@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "785e4bf9_62b28d81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T04:14:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/f3359a56-0e81-43a2-bc2d-05303cc288c4)]\n\n### Review Summary\n\n*   **Functionality:** ✅ Works as intended. The logic correctly reads and updates the R_AL_DUMMY0 run flag to determine the reset cause.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly placed within the driver initialization sequence (cros_system_rtkfp_init) and uses Zephyr SYS_INIT.\n*   **Code Simplicity:** ✅ Control flow is minimalistic, with a clean guard clause in the determination helper.\n*   **Idiomaticity \u0026 Readability:** ✅ The code cleanly utilizes descriptive names, macros (BIT), and register constants rather than raw magic values.\n*   **Security:** ✅ No security issues.\n*   **Testing:** ✅ Comprehensive test coverage. Unit tests explicitly test bitwise state isolation and correctly assert exact expected states.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+86, -5) — Represents a single, atomic logical change.\n*   **Commit Message:** ✅ Concise, accurate, and avoids diff narration.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a97d4ce35ff71929e61b4bb8c2a28a6558382ebe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
