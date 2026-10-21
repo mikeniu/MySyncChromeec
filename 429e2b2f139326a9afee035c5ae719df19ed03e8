@@ -58,6 +58,30 @@
       },
       "revId": "429e2b2f139326a9afee035c5ae719df19ed03e8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fd4e898_f52da15f",
+        "filename": "chip/stm32/flash-stm32h7.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-21T20:59:02Z",
+      "side": 1,
+      "message": "Done. Updated both the argument and the comment above it to false (the comment in `flash-f.c` was left over from before `3bbdefd678ce` changed `crec_flash_physical_protect_now` from `int` to `bool`, which is why Tom had asked to match the comment in PS9)",
+      "parentUuid": "2826a2ed_24841fd6",
+      "range": {
+        "startLine": 589,
+        "startChar": 35,
+        "endLine": 589,
+        "endChar": 36
+      },
+      "revId": "429e2b2f139326a9afee035c5ae719df19ed03e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
