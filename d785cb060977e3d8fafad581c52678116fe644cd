@@ -45,6 +45,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f41409aa_112f42ef",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:44Z",
+      "side": 1,
+      "message": "Restored the Deadline has passed and No match to be signed CPRINTS logs in fp_command_sign_match.",
+      "parentUuid": "810d947c_ec14b707",
+      "range": {
+        "startLine": 517,
+        "startChar": 0,
+        "endLine": 522,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f4293ab_6c0ffc88",
@@ -70,6 +95,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02ee2b56_f7bf70be",
+        "filename": "include/fpsensor/fpsensor_template_store.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:44Z",
+      "side": 1,
+      "message": "Simplified FpTemplateStore::consume_secret to check !copy.readable || !matched.has_value() first and updated fpsensor_match.cc to expect EC_RES_ACCESS_DENIED when reading an unreadable secret.",
+      "parentUuid": "5f4293ab_6c0ffc88",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 118,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a087f3ed_5039b6c1",
@@ -90,6 +140,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23a73a4c_694e49de",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:57:44Z",
+      "side": 1,
+      "message": "Added the assertion verifying that FpTemplateStore::consume_secret with expected_fgr on an unreadable secret returns EC_RES_ACCESS_DENIED.",
+      "parentUuid": "a087f3ed_5039b6c1",
+      "range": {
+        "startLine": 246,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "d785cb060977e3d8fafad581c52678116fe644cd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
