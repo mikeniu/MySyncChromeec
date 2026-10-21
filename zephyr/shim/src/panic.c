@@ -315,7 +315,22 @@ FUNC_NORETURN
 #endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
+	/*
+	 * Upstream Zephyr calls zassert_post_action() with interrupts unlocked
+	 * because assertions can be configured as recoverable. On EC, asserts
+	 * are fatal, so lock interrupts immediately to prevent preemption and
+	 * force synchronous console/log output.
+	 */
+	unsigned int key = irq_lock();
+
+	/* Save assert panic data first before logging or stack walking. */
 	panic_data_write_assert(path, line);
+
+	/*
+	 * Switch the logger to panic mode and flush queued log messages
+	 * before printing the stack trace.
+	 */
+	LOG_PANIC();
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
@@ -326,6 +341,9 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	}
 
 	panic_reboot();
+
+	if (IS_ENABLED(CONFIG_ZTEST))
+		irq_unlock(key);
 
 #ifndef CONFIG_ASSERT_TEST
 	CODE_UNREACHABLE;
