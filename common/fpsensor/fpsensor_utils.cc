@@ -5,27 +5,11 @@
 
 #include "ec_commands.h"
 #include "fpsensor/fpsensor_utils.h"
-#include "overflow.h"
 
 #include <stdio.h>
 
 #include <cctype>
 #include <string>
-
-enum ec_error_list validate_fp_buffer_offset(const uint32_t buffer_size,
-					     const uint32_t offset,
-					     const uint32_t size)
-{
-	uint32_t bytes_requested;
-
-	if (check_add_overflow(size, offset, &bytes_requested))
-		return EC_ERROR_OVERFLOW;
-
-	if (bytes_requested > buffer_size)
-		return EC_ERROR_INVAL;
-
-	return EC_SUCCESS;
-}
 
 bool is_finger_needed(uint32_t mode)
 {

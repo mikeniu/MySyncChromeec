@@ -22,8 +22,22 @@
  *   EC_ERROR_INVAL: if size+offset > buffer_size
  *   EC_SUCCESS: otherwise
  */
-enum ec_error_list validate_fp_buffer_offset(uint32_t buffer_size,
-					     uint32_t offset, uint32_t size);
+[[nodiscard]] constexpr enum ec_error_list
+validate_fp_buffer_offset(const uint32_t buffer_size, const uint32_t offset,
+			  const uint32_t size) noexcept
+{
+	uint32_t bytes_requested = 0;
+
+	if (__builtin_add_overflow(size, offset, &bytes_requested)) {
+		return EC_ERROR_OVERFLOW;
+	}
+
+	if (bytes_requested > buffer_size) {
+		return EC_ERROR_INVAL;
+	}
+
+	return EC_SUCCESS;
+}
 
 [[nodiscard]] constexpr bool fp_match_success(const int match_result) noexcept
 {
