@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "10bc86ec_2a786c6f",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-10-21T06:57:15Z",
+      "side": 1,
+      "message": "I don\u0027t have data showing how often a failed transfer succeeds on retry, so I can\u0027t justify the current retry count.\n\nAfter checking the EC I2C driver and PDC firmware, an I2C error does not always tell us whether the PDC has already accepted the write. Replaying the transfer is therefore not always safe.\n\nI\u0027ll remove the generic I2C transfer retries and use the existing error-recovery path on failure. I\u0027ll also add error log including the error code, command, state, and transfer phase.",
+      "parentUuid": "c3cda64b_34404dff",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "555ec9d2_a86a3764",
         "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
         "patchSetId": 5
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bd39cccb_96aba684",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-10-21T06:57:15Z",
+      "side": 1,
+      "message": "This retries the full initialization sequence, rather than replaying a failed I2C transfer. After an initialization command reports a UCSI error and GET_ERROR_STATUS completes, the driver restarts from PPM_RESET.\n\nThe intent is to provide a bounded recovery opportunity before disabling the port. I don\u0027t currently have retry-success measurements; two retries is a policy limit, not a hardware requirement.\n\nI\u0027ll fix the off-by-one check so this means two retries after the initial attempt, three attempts total, and clarify the comment.",
+      "parentUuid": "555ec9d2_a86a3764",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b6638ae_c8ede8b2",
         "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
         "patchSetId": 5
@@ -65,6 +101,24 @@
       "writtenOn": "2026-10-19T21:04:54Z",
       "side": 1,
       "message": "Doesn\u0027t the smf library already contain a notion of the previous state?",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a0ce507_25c1db15",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-10-21T06:57:15Z",
+      "side": 1,
+      "message": "Done, now use previous state of smf.",
+      "parentUuid": "7b6638ae_c8ede8b2",
       "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
