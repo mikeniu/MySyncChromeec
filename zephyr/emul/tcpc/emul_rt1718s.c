@@ -33,6 +33,8 @@ static bool is_valid_rt1718s_page1_register(int reg)
 	case RT1718S_VCON_CTRL3:
 	case 0xCF: /* FOD function */
 	case RT1718S_RT_MASK1:
+	case RT1718S_RT_INT1:
+	case RT1718S_RT_INT2:
 	case RT1718S_VCONN_CONTROL_2:
 	case RT1718S_FRS_CTRL2:
 	case RT1718S_VBUS_CTRL_EN:
@@ -263,7 +265,16 @@ static int rt1718s_emul_write_byte_page1(const struct emul *emul, int reg,
 		 */
 		return -EIO;
 	}
-	rt1718s_data->reg_page1[reg] = val;
+	switch (reg) {
+	case RT1718S_RT_INT1:
+	case RT1718S_RT_INT2:
+	case RT1718S_RT_INT6:
+		rt1718s_data->reg_page1[reg] &= ~val;
+		break;
+	default:
+		rt1718s_data->reg_page1[reg] = val;
+		break;
+	}
 	add_access_history_entry(rt1718s_data, reg, val);
 
 	/* Software reset is triggered */

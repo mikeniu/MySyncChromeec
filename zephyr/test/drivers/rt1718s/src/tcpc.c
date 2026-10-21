@@ -6,9 +6,11 @@
 #include "driver/tcpm/rt1718s.h"
 #include "driver/tcpm/rt1718s_public.h"
 #include "driver/tcpm/tcpci.h"
+#include "emul/emul_common_i2c.h"
 #include "emul/tcpc/emul_rt1718s.h"
 #include "test/drivers/test_state.h"
 #include "test_common.h"
+#include "usb_pd.h"
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/sys/slist.h>
@@ -213,6 +215,8 @@ ZTEST(rt1718s_tcpc, test_set_frs)
 
 ZTEST(rt1718s_tcpc, test_set_snk_ctrl)
 {
+	struct tcpc_emul_data *tcpc_data = rt1718s_emul->data;
+
 	zassert_ok(rt1718s_tcpm_drv.set_snk_ctrl(tcpm_rt1718s_port, true));
 	compare_reg_val_with_mask(
 		rt1718s_emul, TCPC_REG_COMMAND, TCPC_REG_COMMAND_SNK_CTRL_HIGH,
@@ -222,10 +226,20 @@ ZTEST(rt1718s_tcpc, test_set_snk_ctrl)
 	compare_reg_val_with_mask(
 		rt1718s_emul, TCPC_REG_COMMAND, TCPC_REG_COMMAND_SNK_CTRL_LOW,
 		TCPC_REG_COMMAND_SNK_CTRL_HIGH | TCPC_REG_COMMAND_SNK_CTRL_LOW);
+
+	i2c_common_emul_set_write_fail_reg(&tcpc_data->tcpci_ctx->common,
+					   TCPC_REG_COMMAND);
+	zassert_not_equal(rt1718s_tcpm_drv.set_snk_ctrl(tcpm_rt1718s_port,
+							true),
+			  EC_SUCCESS);
+	i2c_common_emul_set_write_fail_reg(&tcpc_data->tcpci_ctx->common,
+					   I2C_COMMON_EMUL_NO_FAIL_REG);
 }
 
 ZTEST(rt1718s_tcpc, test_set_src_ctrl)
 {
+	struct tcpc_emul_data *tcpc_data = rt1718s_emul->data;
+
 	zassert_ok(rt1718s_tcpm_drv.set_src_ctrl(tcpm_rt1718s_port, true));
 	compare_reg_val_with_mask(
 		rt1718s_emul, TCPC_REG_COMMAND, TCPC_REG_COMMAND_SRC_CTRL_HIGH,
@@ -235,6 +249,14 @@ ZTEST(rt1718s_tcpc, test_set_src_ctrl)
 	compare_reg_val_with_mask(
 		rt1718s_emul, TCPC_REG_COMMAND, TCPC_REG_COMMAND_SRC_CTRL_LOW,
 		TCPC_REG_COMMAND_SRC_CTRL_HIGH | TCPC_REG_COMMAND_SRC_CTRL_LOW);
+
+	i2c_common_emul_set_write_fail_reg(&tcpc_data->tcpci_ctx->common,
+					   TCPC_REG_COMMAND);
+	zassert_not_equal(rt1718s_tcpm_drv.set_src_ctrl(tcpm_rt1718s_port,
+							true),
+			  EC_SUCCESS);
+	i2c_common_emul_set_write_fail_reg(&tcpc_data->tcpci_ctx->common,
+					   I2C_COMMON_EMUL_NO_FAIL_REG);
 }
 
 ZTEST(rt1718s_tcpc, test_tcpc_alert)
@@ -264,4 +286,137 @@ ZTEST(rt1718s_tcpc, test_tcpc_alert)
 	 * register.
 	 */
 	compare_reg_val_with_mask(rt1718s_emul, TCPC_REG_ALERT, 0, alert_mask);
+}
+
+ZTEST(rt1718s_tcpc, test_vendor_defined_alert_frs)
+{
+	/* Suspend PD task so pd_got_frs_signal error recovery does not
+	 * re-run rt1718s_init and clear frs_flag before the deferred hook.
+	 */
+	pd_set_suspend(tcpm_rt1718s_port, true);
+	k_msleep(50);
+
+	/* Enable FRS */
+	zassert_ok(rt1718s_tcpm_drv.set_frs_enable(tcpm_rt1718s_port, true));
+
+	/* 1. Simulate RX_FRS interrupt */
+	zassert_ok(rt1718s_emul_set_reg(rt1718s_emul, RT1718S_RT_INT1,
+					RT1718S_RT_INT1_INT_RX_FRS));
+	zassert_ok(tcpci_emul_set_reg(rt1718s_emul, TCPC_REG_ALERT,
+				      TCPC_REG_ALERT_VENDOR_DEF));
+
+	rt1718s_tcpm_drv.tcpc_alert(tcpm_rt1718s_port);
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_RT_INT1, 0, 0xFF);
+	compare_reg_val_with_mask(rt1718s_emul, TCPC_REG_ALERT, 0,
+				  TCPC_REG_ALERT_VENDOR_DEF);
+
+	/* Second call with RX_FRS already signalled should not trigger
+	 * duplicate
+	 */
+	zassert_ok(rt1718s_emul_set_reg(rt1718s_emul, RT1718S_RT_INT1,
+					RT1718S_RT_INT1_INT_RX_FRS));
+	zassert_ok(tcpci_emul_set_reg(rt1718s_emul, TCPC_REG_ALERT,
+				      TCPC_REG_ALERT_VENDOR_DEF));
+	rt1718s_tcpm_drv.tcpc_alert(tcpm_rt1718s_port);
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_RT_INT1, 0, 0xFF);
+
+	/* 2. Call set_frs_enable(false) when only RX_SIGNALLED is set:
+	 * disabling FRS registers should be deferred until VBUS_FRS_LOW.
+	 */
+	zassert_ok(rt1718s_set_frs_enable(tcpm_rt1718s_port, false));
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_FRS_CTRL2,
+				  RT1718S_FRS_CTRL2_RX_FRS_EN |
+					  RT1718S_FRS_CTRL2_VBUS_FRS_EN | 0x10,
+				  0xFF);
+	compare_reg_val_with_mask(
+		rt1718s_emul, RT1718S_VBUS_CTRL_EN,
+		RT1718S_VBUS_CTRL_EN_GPIO2_VBUS_PATH_EN |
+			RT1718S_VBUS_CTRL_EN_GPIO1_VBUS_PATH_EN | 0x3F,
+		0xFF);
+
+	/* 3. Simulate VBUS_FRS_LOW interrupt */
+	zassert_ok(rt1718s_emul_set_reg(rt1718s_emul, RT1718S_RT_INT1,
+					RT1718S_RT_INT1_INT_VBUS_FRS_LOW));
+	zassert_ok(tcpci_emul_set_reg(rt1718s_emul, TCPC_REG_ALERT,
+				      TCPC_REG_ALERT_VENDOR_DEF));
+	rt1718s_tcpm_drv.tcpc_alert(tcpm_rt1718s_port);
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_RT_INT1, 0, 0xFF);
+	compare_reg_val_with_mask(rt1718s_emul, TCPC_REG_ALERT, 0,
+				  TCPC_REG_ALERT_VENDOR_DEF);
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_FRS_CTRL2, 0x10, 0xFF);
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_VBUS_CTRL_EN, 0x3F,
+				  0xFF);
+
+	/* Wait >5ms (RT1718S_FRS_DIS_DELAY) for frs_gpio_disable_deferred */
+	k_msleep(10);
+
+	/* Clean up */
+	zassert_ok(rt1718s_tcpm_drv.set_frs_enable(tcpm_rt1718s_port, false));
+	pd_set_suspend(tcpm_rt1718s_port, false);
+}
+
+ZTEST(rt1718s_tcpc, test_vendor_defined_alert_bc12_and_vconn)
+{
+	/* Set BC12 sink done and Vconn workaround interrupt bits */
+	zassert_ok(rt1718s_emul_set_reg(rt1718s_emul, RT1718S_RT_INT6,
+					RT1718S_RT_INT6_INT_BC12_SNK_DONE));
+	zassert_ok(rt1718s_emul_set_reg(rt1718s_emul, RT1718S_RT_INT2, 0xFF));
+
+	/* Enable VCONN discharge to verify it gets disabled */
+	zassert_ok(rt1718s_update_bits8(tcpm_rt1718s_port, RT1718S_SYS_CTRL2,
+					RT1718S_SYS_CTRL2_VCONN_DISCHARGE_EN,
+					0xFF));
+
+	zassert_ok(tcpci_emul_set_reg(rt1718s_emul, TCPC_REG_ALERT,
+				      TCPC_REG_ALERT_VENDOR_DEF));
+
+	rt1718s_tcpm_drv.tcpc_alert(tcpm_rt1718s_port);
+
+	/* Verify W1C interrupts and Vconn discharge are cleared */
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_RT_INT6, 0, 0xFF);
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_RT_INT2, 0, 0xFF);
+	compare_reg_val_with_mask(rt1718s_emul, RT1718S_SYS_CTRL2, 0,
+				  RT1718S_SYS_CTRL2_VCONN_DISCHARGE_EN);
+	compare_reg_val_with_mask(rt1718s_emul, TCPC_REG_ALERT, 0,
+				  TCPC_REG_ALERT_VENDOR_DEF);
+}
+
+ZTEST(rt1718s_tcpc, test_rw16_and_update_bits8)
+{
+	int val;
+
+	/* 16-bit register write and read on <= 0xFF */
+	zassert_ok(rt1718s_write16(tcpm_rt1718s_port, TCPC_REG_ALERT_MASK,
+				   0x1234));
+	zassert_ok(
+		rt1718s_read16(tcpm_rt1718s_port, TCPC_REG_ALERT_MASK, &val));
+	zassert_equal(val, 0x1234);
+
+	/* 16-bit register write and read on > 0xFF (page 2 R/W register) */
+	zassert_ok(rt1718s_write16(tcpm_rt1718s_port, RT1718S_ADC_CTRL_01,
+				   0x0201));
+	zassert_ok(
+		rt1718s_read16(tcpm_rt1718s_port, RT1718S_ADC_CTRL_01, &val));
+	zassert_equal(val, 0x0201);
+
+	/* 8-bit update_bits with mask == 0xFF */
+	zassert_ok(rt1718s_update_bits8(tcpm_rt1718s_port, RT1718S_SYS_CTRL1,
+					0xFF, 0x00));
+	zassert_ok(rt1718s_read8(tcpm_rt1718s_port, RT1718S_SYS_CTRL1, &val));
+	zassert_equal(val, 0x00);
+
+	/* 8-bit update_bits with mask != 0xFF */
+	zassert_ok(rt1718s_update_bits8(tcpm_rt1718s_port, RT1718S_SYS_CTRL1,
+					0x0F, 0x05));
+	zassert_ok(rt1718s_read8(tcpm_rt1718s_port, RT1718S_SYS_CTRL1, &val));
+	zassert_equal(val, 0x05);
+}
+
+ZTEST(rt1718s_tcpc, test_misc_driver_helpers)
+{
+	zassert_ok(board_rt1718s_init(tcpm_rt1718s_port));
+	zassert_ok(board_rt1718s_set_snk_enable(tcpm_rt1718s_port, 1));
+	zassert_ok(board_rt1718s_set_src_enable(tcpm_rt1718s_port, 1));
+	zassert_ok(board_rt1718s_set_frs_enable(tcpm_rt1718s_port, 1));
+	zassert_ok(rt1718s_sw_reset(tcpm_rt1718s_port));
 }
