@@ -45,6 +45,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30a40a1f_ebc77cd2",
+        "filename": "include/fpsensor/fpsensor_utils.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:44:21Z",
+      "side": 1,
+      "message": "Simplified is_finger_needed using an early return for !(mode \u0026 FP_MODE_CAPTURE) and a constexpr switch over FP_CAPTURE_TYPE(mode).",
+      "parentUuid": "fb5eeb5b_5dee884d",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "9adfbb8e435affc08755439e521448e7fece2079",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ac878db_1c228fb7",
@@ -65,6 +90,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9adfbb8e435affc08755439e521448e7fece2079",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12e8c018_6740e374",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:44:21Z",
+      "side": 1,
+      "message": "Converted all assertions in test_is_finger_needed to static_assert.",
+      "parentUuid": "0ac878db_1c228fb7",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "9adfbb8e435affc08755439e521448e7fece2079",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
