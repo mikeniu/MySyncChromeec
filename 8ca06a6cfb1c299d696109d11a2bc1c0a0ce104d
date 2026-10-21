@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "62aa741f_9a4b574c",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-21T07:48:38Z",
+      "side": 1,
+      "message": "The idle mode is defined as \"The sensor is waiting for requests.\", so I don\u0027t think we can expect the sensor to work properly (detect finger up) after setting such a mode.\n\n\u003e we should call fp_idle() on Zephyr to disable the GPIO IRQ (since FINGERPRINT_SENSOR_MODE_IDLE in all 6 Zephyr drivers only calls *_disable_irq(dev) without exiting detect mode on the sensor):\n\nThat\u0027s an implementation detail that we cannot rely on (and on `ft98xx`, `FINGERPRINT_SENSOR_MODE_IDLE` actually puts the sensor into deep sleep).\n\n\u003e leaving the GPIO IRQ enabled on Zephyr triggers an immediate TASK_EVENT_SENSOR_IRQ wakeup\n\nThat\u0027s not fully true. Whether an interrupt is triggered or not depends on the sensor. From my experience, it\u0027s usually triggered on a finger presence change.",
+      "parentUuid": "271ca2c9_8b599cca",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0b0fc3c3_8c044a4a",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 4
@@ -73,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1ab97ff6_f45fb556",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-21T07:48:38Z",
+      "side": 1,
+      "message": "It doesn\u0027t change the current behavior. After actions like `fp_process_finger`, the host sends a FP_MODE command to detect FINGER_UP event.",
+      "parentUuid": "0b0fc3c3_8c044a4a",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df304e9f_e7f1c282",
         "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
         "patchSetId": 4
@@ -84,6 +120,24 @@
       "writtenOn": "2026-10-21T04:21:49Z",
       "side": 1,
       "message": "In all 6 real Zephyr drivers (`egis630`, `egis660`, `elan_series`, `fpc1025`, `fpc1145`, `ft98xx`), `FINGERPRINT_SENSOR_MODE_IDLE` only disables the MCU GPIO IRQ (`*_disable_irq(dev)`) and does not exit `detect_mode` or `low_power_mode` on the sensor hardware.\n\n`FINGERPRINT_SENSOR_MODE_IDLE` here shouldn\u0027t modify `detect_mode` or `low_power_mode`, and `fp_simulator_acquire_image()` (L165) should set `data-\u003estate.detect_mode \u003d false` to match real hardware exiting detect mode on image capture.",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb3e214e_2b1d9bcd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-21T07:48:38Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "df304e9f_e7f1c282",
       "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
