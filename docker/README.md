@@ -243,3 +243,99 @@ CI workflows can download a prebuilt Docker image independently of the host
 SDK checkout and always pass `--update`. On initial run, this populates the
 workspace checkouts from the image cache and then fetches the latest upstream
 changes before running builds or tests.
+
+---
+
+## Deploying to Satlab
+
+When changes are made to the `ec-builder` Dockerfile or dependencies locally,
+use the following procedure to package and deploy the updated image to a Satlab
+test station.
+
+> **Note**: In the commands below, replace `mysatlab` with the real Satlab
+> hostname found in the **`ec-dagwood`** swarming pool (e.g. from the ChromeOS
+> Swarming bot list for `pool:ec-dagwood` or UFS inventory).
+
+### Architecture Overview
+
+When connecting via SSH (`ssh mysatlab`), the session logs in as user `moblab`
+inside an isolated `remote-access` container. The host's Docker daemon socket
+(`/var/run/docker.sock`) is mounted directly inside the container with
+read/write permissions (0666). This allows the standard Linux `docker` CLI
+inside the session to interact directly with the host's Docker daemon without
+requiring root SSH access to the base host OS.
+
+### Step-by-Step Deployment
+
+#### 1. Save and Compress the Image Locally
+From your local workstation:
+```bash
+docker save ec-builder:latest | gzip > /tmp/ec-builder_image.tar.gz
+```
+
+#### 2. Transfer to Satlab
+Copy the tarball to Satlab's `/tmp`:
+```bash
+scp /tmp/ec-builder_image.tar.gz mysatlab:/tmp/ec-builder_image.tar.gz
+```
+
+#### 3. Load Image into Docker on Satlab
+Move the image to the shared volume, set permissions, and load it into the
+Docker daemon:
+```bash
+ssh mysatlab '
+sudo mv /tmp/ec-builder_image.tar.gz /home/satlab/shared/ec-builder_image.tar.gz && \
+sudo chmod 666 /home/satlab/shared/ec-builder_image.tar.gz && \
+docker load -i /home/satlab/shared/ec-builder_image.tar.gz
+'
+```
+
+#### 4. Verify the New Image ID on Satlab
+Verify that the image was loaded and its Image ID matches the local build:
+```bash
+ssh mysatlab 'docker images | grep ec-builder'
+```
+
+#### 5. Clean Up Dangling / Old Images (Optional)
+To reclaim disk space on the Satlab host:
+```bash
+ssh mysatlab 'docker image prune -f'
+```
+
+### Running Tests on Satlab
+
+Once the image is deployed, connect to the Satlab unit and launch the container
+with `--privileged` access to interact with the Dagwood hardware:
+
+1. **Connect to Satlab**:
+   ```bash
+   ssh mysatlab
+   ```
+
+2. **Launch `ec-builder`**: Include docker run options to include a bindmount
+to the satlab stateful partition and the options needed to access the Dagwood
+TTY and USB endpoints. Because the `remote-access` SSH container does not
+expose `/dev/ttyACM*` in its own `/dev`, query `/sys/class/tty/ttyACM*` to
+dynamically bind-mount only the `/dev/ttyACM` devices currently present on the
+Satlab host:
+   ```bash
+   docker run -it --rm \
+     --privileged \
+     -v /usr/local/ec-workspace:/workspace \
+     -v /dev/bus/usb:/dev/bus/usb \
+     $(for d in /sys/class/tty/ttyACM*; do [ -e "$d" ] && echo "-v /dev/${d##*/}:/dev/${d##*/}"; done) \
+     ec-builder:latest \
+     --update \
+     bash
+   ```
+
+3. **Verify endpoints and execute tests**: Inside the running container:
+   ```bash
+   # Verify Dagwood TTY nodes are present
+   ls -la /dev/ttyACM*
+
+   # Run all the Dagwood tests on the connected EC (e.g. ITE or Realtek)
+   cd /workspace/src/platform/ec
+   ./dagwood -p it8xxx2/it82002aw
+   # or: ./dagwood -p realtek/rts5912
+   ```
