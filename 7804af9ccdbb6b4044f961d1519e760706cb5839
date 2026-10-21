@@ -16,6 +16,75 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "7804af9ccdbb6b4044f961d1519e760706cb5839",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d646472_77316a5c",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-21T00:07:55Z",
+      "side": 1,
+      "message": "If a future convertible requires CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD, but doesn\u0027t have the display backlight gpio, then the power button as a wake source would still fail. Should this be a required DT node?\n\nWe could either:\n  1. Use a Devicetree binding YAML with \"required: true\" for the GPIO property (which aligns well with how we         \n  configure modern Zephyr features and catches missing properties at CMake time).\n  2. Add a BUILD_ASSERT(DT_NODE_EXISTS(DT_ALIAS(gpio_pb_suppress_en))) when  CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD  \n  is defined, which prevents compilation if the alias is missing and lets us drop the runtime #if guards. \n  \nI think option #1 is more inline with what we\u0027ve been doing in zephyr.",
+      "range": {
+        "startLine": 482,
+        "startChar": 1,
+        "endLine": 482,
+        "endChar": 49
+      },
+      "revId": "7804af9ccdbb6b4044f961d1519e760706cb5839",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cb84c6c_1236ef3b",
+        "filename": "common/power_button.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-21T00:07:55Z",
+      "side": 1,
+      "message": "This can return a negative error code, so it\u0027s safer to check explicitly for 1 here as the return value here.",
+      "range": {
+        "startLine": 484,
+        "startChar": 6,
+        "endLine": 484,
+        "endChar": 21
+      },
+      "revId": "7804af9ccdbb6b4044f961d1519e760706cb5839",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4140070_82cca2ff",
+        "filename": "zephyr/test/drivers/button/src/main.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-21T00:07:55Z",
+      "side": 1,
+      "message": "Nit: This should be moved before the call to tablet_reset() to align with CrosEC code style guidelines",
+      "range": {
+        "startLine": 83,
+        "startChar": 1,
+        "endLine": 84,
+        "endChar": 42
+      },
+      "revId": "7804af9ccdbb6b4044f961d1519e760706cb5839",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
