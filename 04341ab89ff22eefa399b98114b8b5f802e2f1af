@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c20dc0f3_3d8c96ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T16:33:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/f912e690-b5cc-4b3b-90d4-aea1fa677324)]\n\n### Review Summary\n* **Functionality \u0026 Security:** ✅ `RAND_bytes` return values are properly checked and `EC_ERROR_HW_INTERNAL` is returned on failure. Challenge reuse and expiry window logic is functionally correct.\n* **Architecture \u0026 Component Fit:** ✅ `FpSessionNonce` and `FpAuthChallenge` cleanly encapsulate the cryptographic protocol state, removing ad-hoc bitmask tracking from the command handlers.\n* **Code Simplicity:** ✅ Early returns and C++23 `\u003cexpected\u003e` keep the control flow linear and clean.\n* **Idiomaticity \u0026 Readability:** ✅ Uses standard C++23 `std::expected::has_value()` and `error()`, properly destructures span operations, and leverages `\u003cchrono\u003e` for type-safe time-based comparisons. The use of custom `FpClock` is idiomatic.\n* **Testing:** ✅ Comprehensive boundary testing included for the `exact_expiry`, `exact_expiry - 1`, `exact_expiry + 1` window boundaries, corrupted MAC path, and exhaustion path.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+184, -39)`. Focused squarely on the single logical change of authentication session and challenge abstractions.\n* **Commit Message:** ✅ Concise prose that clearly captures the rationale and changes without narrating the diff or relying on bulleted lists.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "04341ab89ff22eefa399b98114b8b5f802e2f1af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
