@@ -15,8 +15,8 @@
 #include "host_command.h"
 #include "scoped_fast_cpu.h"
 
-/* Pointer to the FPMCU's ECDH private key */
-static bssl::UniquePtr<EC_KEY> ecdh_key;
+/* The FPMCU's ECDH private key for the current handshake. */
+static std::optional<FpP256Key> ecdh_key;
 
 /* The FPMCU pairing key. */
 static std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
@@ -46,18 +46,20 @@ fp_command_establish_pairing_key_keygen(struct ec_host_cmd_handler_args *args)
 
 	ScopedFastCpu fast_cpu;
 
-	ecdh_key = generate_elliptic_curve_key();
-	if (ecdh_key == nullptr) {
+	std::expected<FpP256Key, ec_error_list> key = FpP256Key::generate();
+	if (!key.has_value()) {
+		ecdh_key.reset();
 		return EC_HOST_CMD_UNAVAILABLE;
 	}
+	ecdh_key = *std::move(key);
 
-	std::optional<fp_elliptic_curve_public_key> pubkey =
-		create_pubkey_from_ec_key(*ecdh_key);
+	const std::expected<fp_elliptic_curve_public_key, ec_error_list> pubkey =
+		ecdh_key->to_public_key();
 	if (!pubkey.has_value()) {
 		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
-	r->pubkey = pubkey.value();
+	r->pubkey = *pubkey;
 
 	args->output_buf_size = sizeof(*r);
 	return EC_HOST_CMD_SUCCESS;
@@ -76,41 +78,22 @@ fp_command_establish_pairing_key_wrap(struct ec_host_cmd_handler_args *args)
 	auto *r = static_cast<ec_response_fp_establish_pairing_key_wrap *>(
 		args->output_buf);
 
-	CleanseWrapper<std::array<uint8_t, FP_PAIRING_KEY_LEN> > new_pairing_key;
-
-	if (ecdh_key == nullptr) {
+	if (!ecdh_key.has_value()) {
 		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	ScopedFastCpu fast_cpu;
 
-	bssl::UniquePtr<EC_KEY> public_key =
-		create_ec_key_from_pubkey(params->peers_pubkey);
-	if (public_key == nullptr) {
+	const std::expected<ec_fp_encrypted_pairing_key, ec_error_list> wrapped =
+		fp_pairing_key::establish_and_wrap(*ecdh_key,
+						   params->peers_pubkey);
+	if (!wrapped.has_value()) {
 		return EC_HOST_CMD_UNAVAILABLE;
 	}
-
-	/*
-	 * The Pairing Key is only used to produce the Session Key.
-	 * It's not used as a key for symmetric encryption. It's okay
-	 * to not apply KDF in this case.
-	 */
-	enum ec_error_list ret = generate_ecdh_shared_secret_without_kdf(
-		*ecdh_key, *public_key, new_pairing_key);
-	if (ret != EC_SUCCESS) {
-		return EC_HOST_CMD_UNAVAILABLE;
-	}
-
-	ret = encrypt_pairing_key(FP_AES_KEY_ENC_METADATA_VERSION,
-				  r->encrypted_pairing_key.info,
-				  new_pairing_key,
-				  r->encrypted_pairing_key.data);
-	if (ret != EC_SUCCESS) {
-		return EC_HOST_CMD_UNAVAILABLE;
-	}
+	r->encrypted_pairing_key = *wrapped;
 
 	/* Deallocate the FPMCU's ECDH private key. */
-	ecdh_key = nullptr;
+	ecdh_key.reset();
 
 	args->output_buf_size = sizeof(*r);
 	return EC_HOST_CMD_SUCCESS;
@@ -147,10 +130,9 @@ fp_command_load_pairing_key(struct ec_host_cmd_handler_args *args)
 
 	ScopedFastCpu fast_cpu;
 
-	enum ec_error_list ret = decrypt_pairing_key(
-		params->encrypted_pairing_key.info,
-		params->encrypted_pairing_key.data, pairing_key);
-	if (ret != EC_SUCCESS) {
+	if (!fp_pairing_key::unwrap_into(params->encrypted_pairing_key,
+					 pairing_key)
+		     .has_value()) {
 		CPRINTS("load_pairing_key: Failed to decrypt pairing key");
 		return EC_HOST_CMD_UNAVAILABLE;
 	}
