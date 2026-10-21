@@ -3,3 +3,4 @@
 # found in the LICENSE file.
 
 target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE src/test_flood.c)
