@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15c907e1_8feecd09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:35:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/0ffc95a6-39e8-49be-961c-ddaec195e420)]\n\n### Review Summary\n* **Functionality \u0026 Security:** ✅ `RAND_bytes` errors are strictly checked, returning hardware internal errors on failure. Challenge reuse and strict time-based expirations are cleanly enforced.\n* **Architecture \u0026 Component Fit:** ✅ `FpSessionNonce` and `FpAuthChallenge` cleanly encapsulate the cryptographic protocol state, removing ad-hoc bitmasking from the command handlers.\n* **Code Simplicity:** ✅ Early returns and standard C++ `\u003cexpected\u003e` keep the control flow linear and clean.\n* **Idiomaticity \u0026 Readability:** ✅ Uses standard C++23 `\u003cexpected\u003e`, cleanly destructures span operations, and leverages `\u003cchrono\u003e` for time-based comparisons. The removal of the non-standard `.error_or()` method makes the code fully standard-compliant.\n* **Testing:** ✅ Comprehensive boundary testing included for the `N - 1`, `N`, `N + 1` validity window boundaries, MAC validation failure path, and exhaustion path.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+184, -39)`. Focused squarely on the single logical change of authentication session and challenge abstractions.\n* **Commit Message:** ✅ Concise prose that clearly captures the rationale and changes without narrating the diff or relying on bulleted lists.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0f3308d10289f1bcc022b89ffad28d962046a771",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
