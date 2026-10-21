@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "faa6cb15db941dfb59df4e2226066c4de4031a45",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb2b36f8_3469bd19",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T00:28:41Z",
+      "side": 1,
+      "message": "Replaced the manual state_copy deadline and readability checks in fp_read_match_secret with FpTemplateStore::consume_secret(global_context.positive_match_secret_state, *template_id).",
+      "parentUuid": "ba75d805_015f161d",
+      "range": {
+        "startLine": 426,
+        "startChar": 0,
+        "endLine": 448,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "faa6cb15db941dfb59df4e2226066c4de4031a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
