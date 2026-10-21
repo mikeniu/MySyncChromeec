@@ -12,6 +12,19 @@ if [[ "$(basename "${EC_DIR}")" != "ec" ]]; then
 	EC_DIR=
 fi
 
+# Opt in to the Python flash_ec in util/flash (b/145292630). If it fails, e.g.
+# on a flag it does not support yet, fall back to this script. This runs before
+# shflags is loaded because flash_ec.py does not need it.
+if [[ "${FLASH_EC_IMPLEMENTATION:-}" == "python" ]]; then
+	PYTHONPATH="${SCRIPT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+		python3 "${SCRIPT_DIR}/flash/flash_ec.py" "$@" && exit 0
+	PYTHON_EXIT=$?
+	# After a signal, servo state may not be restored, so don't retry in bash.
+	(( PYTHON_EXIT > 128 )) && exit "${PYTHON_EXIT}"
+	echo "WARNING: flash_ec.py failed (exit ${PYTHON_EXIT})," \
+		"falling back to legacy bash flash_ec." >&2
+fi
+
 # Loads script libraries.
 # shellcheck source=../../../scripts/lib/shflags/shflags
 . "${SHFLAGS:-/usr/share/misc/shflags}" || exit 1
