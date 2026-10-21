@@ -25,7 +25,12 @@
 enum ec_error_list validate_fp_buffer_offset(uint32_t buffer_size,
 					     uint32_t offset, uint32_t size);
 
-bool fp_match_success(int match_result);
+[[nodiscard]] constexpr bool fp_match_success(const int match_result) noexcept
+{
+	return match_result == EC_MKBP_FP_ERR_MATCH_YES ||
+	       match_result == EC_MKBP_FP_ERR_MATCH_YES_UPDATED ||
+	       match_result == EC_MKBP_FP_ERR_MATCH_YES_UPDATE_FAILED;
+}
 
 /**
  * @param mode sensor mode
