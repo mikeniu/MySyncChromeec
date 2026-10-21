@@ -317,6 +317,8 @@ __override void zassert_post_action(const char *path, unsigned int line)
 {
 	panic_data_write_assert(path, line);
 
+	LOG_PANIC();
+
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 

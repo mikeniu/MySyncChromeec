@@ -21,6 +21,8 @@
 #include "usb_console.h"
 #include "util.h"
 
+#include <zephyr/logging/log_ctrl.h>
+
 #include <stdalign.h>
 
 /*
@@ -138,6 +140,7 @@ void panic_printf(const char *format, ...)
  */
 void panic_reboot(void)
 {
+	LOG_PANIC();
 	panic_puts("\n\nRebooting...\n");
 	system_reset(0);
 }
