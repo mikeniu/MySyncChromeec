@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "726c3337_41a095ab",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-21T20:27:03Z",
+      "side": 1,
+      "message": "+1 to dropping the default in the binding.",
+      "parentUuid": "87f78a80_14ce41da",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bf291d87_acece871",
         "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
         "patchSetId": 1
