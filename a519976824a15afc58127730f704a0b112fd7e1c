@@ -18,6 +18,29 @@
       "isAi": true,
       "revId": "a519976824a15afc58127730f704a0b112fd7e1c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35762d80_152d897b",
+        "filename": "include/fpsensor/fpsensor_utils.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-21T17:11:59Z",
+      "side": 1,
+      "message": "Can we keep the check_add_overflow that we had originally?",
+      "range": {
+        "startLine": 31,
+        "startChar": 5,
+        "endLine": 31,
+        "endChar": 27
+      },
+      "revId": "a519976824a15afc58127730f704a0b112fd7e1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
