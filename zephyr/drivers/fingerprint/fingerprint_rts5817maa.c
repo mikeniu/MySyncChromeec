@@ -37,6 +37,20 @@ static int convert_rts_snr_init_error_code(rts_fp_return_t code)
 	}
 }
 
+static inline int rts5817maa_enable_irq(const struct device *dev)
+{
+	const struct rts5817maa_cfg *cfg = dev->config;
+	int ret;
+
+	ret = gpio_pin_interrupt_configure_dt(&cfg->interrupt,
+					      GPIO_INT_EDGE_RISING);
+	if (ret < 0) {
+		LOG_ERR("Can't enable interrupt: %d", ret);
+	}
+
+	return ret;
+}
+
 static inline int rts5817maa_disable_irq(const struct device *dev)
 {
 	const struct rts5817maa_cfg *cfg = dev->config;
@@ -139,12 +153,81 @@ static int rts5817maa_get_info(
 	return 0;
 }
 
+static int rts5817maa_maintenance(const struct device *dev, uint8_t *buf,
+			      size_t size)
+{
+	if (!IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {
+		return -ENOTSUP;
+	}
+
+	return 0;
+}
+
+static int rts5817maa_set_mode(const struct device *dev,
+			   enum fingerprint_sensor_mode mode)
+{
+	int ret = 0;
+	int disable_ret;
+
+	if (!IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {
+		return -ENOTSUP;
+	}
+
+	switch (mode) {
+	case FINGERPRINT_SENSOR_MODE_DETECT:
+		LOG_INF("Sensor changes mode to finger detect");
+		ret = rts5817maa_enable_irq(dev);
+		if (ret == 0 &&
+		    rts5817maa_sensor_configure_detect(RTS_DETECT_MODE_NORMAL) !=
+			    RTS_FP_SUCCESS) {
+			LOG_ERR("Failed to configure detect mode");
+			rts5817maa_disable_irq(dev);
+			ret = -EIO;
+		}
+		break;
+
+	case FINGERPRINT_SENSOR_MODE_LOW_POWER:
+		if (rts5817maa_sensor_power_down() != RTS_FP_SUCCESS) {
+			LOG_ERR("Failed to power down sensor");
+			ret = -EIO;
+		}
+		disable_ret = rts5817maa_disable_irq(dev);
+		if (ret == 0) {
+			ret = disable_ret;
+		}
+		break;
+
+	case FINGERPRINT_SENSOR_MODE_IDLE:
+		ret = rts5817maa_disable_irq(dev);
+		break;
+
+	default:
+		ret = -ENOTSUP;
+	}
+
+	return ret;
+}
+
 static DEVICE_API(fingerprint, cros_fp_rts5817maa_driver_api) = {
 	.init = rts5817maa_init,
 	.deinit = rts5817maa_deinit,
 	.config = rts5817maa_config,
 	.get_info = rts5817maa_get_info,
+	.maintenance = rts5817maa_maintenance,
+	.set_mode = rts5817maa_set_mode,
 };
+
+static void rts5817maa_irq(const struct device *dev, struct gpio_callback *cb,
+		       uint32_t pins)
+{
+	struct rts5817maa_data *data = CONTAINER_OF(cb, struct rts5817maa_data, irq_cb);
+
+	rts5817maa_disable_irq(data->dev);
+
+	if (data->callback != NULL) {
+		data->callback(data->dev);
+	}
+}
 
 static int rts5817maa_init_driver(const struct device *dev)
 {
@@ -180,6 +263,8 @@ static int rts5817maa_init_driver(const struct device *dev)
 	}
 
 	data->dev = dev;
+	gpio_init_callback(&data->irq_cb, rts5817maa_irq, BIT(cfg->interrupt.pin));
+	gpio_add_callback_dt(&cfg->interrupt, &data->irq_cb);
 
 	return 0;
 }
