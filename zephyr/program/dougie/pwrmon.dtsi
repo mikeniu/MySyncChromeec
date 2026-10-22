@@ -1,0 +1,395 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <zephyr/dt-bindings/sensor/pac194x.h>
+
+/ {
+	pwrmon: pwrmon {
+		compatible = "cros,pwrmon";
+		power-monitors = <&pac1>, <&pac2>, <&pac3>, <&pac4>,
+				 <&pac5>, <&pac6>, <&pac7>, <&pac8>;
+		sample-rate = <1024>;
+		gpios = <&gpiof 6 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		zephyr,deferred-init;
+	};
+};
+
+&i2c2 {
+	pac1: pac1954@10 {
+		compatible = "microchip,pac194x";
+		reg = <0x10>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* VREG_L5B_0P752 (RS4506: 10 mOhm) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "VREG_L5B_0P752";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PPVAR_SYS (R3131: 10 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "PPVAR_SYS";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PPVAR_BATT_DISCHG (R3508: 10 mOhm) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "PPVAR_BATT_DISCHG";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_WLAN (R5547: 20 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "PP3300_WLAN";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac2: pac1954@11 {
+		compatible = "microchip,pac194x";
+		reg = <0x11>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP5000_Z1 (R3310: 10 mOhm, R3311: ns) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "PP5000_Z1";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP5000_SPKR_L (RS8601: 20 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "PP5000_SPKR_L";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_PDC (RS6201: 20 mOhm) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "PP3300_PDC";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP5000_HUB (RS9701: 20 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "PP5000_HUB";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac3: pac1954@12 {
+		compatible = "microchip,pac194x";
+		reg = <0x12>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP3300_Z1 (R203: 10 mOhm) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "PP3300_Z1";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_GSC_Z1 (RS8302: 20 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "PP3300_GSC_Z1";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VPH_PWR (R5119: 2 mOhm, R5118: ns) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "VPH_PWR";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PPVAR_VBUS_IN (R3126: 10 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "PPVAR_VBUS_IN";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac4: pac1954@13 {
+		compatible = "microchip,pac194x";
+		reg = <0x13>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* VREG_S2B_0P876 (R4301: 2 mOhm) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "VREG_S2B_0P876";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_UCAM (RS5901: 20 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "PP3300_UCAM";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_S3B_S4B_S5B_0P752 (R4401: 2 mOhm) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "VREG_S3B_S4B_S5B_0P752";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_REDRIVER (RS6401: 20 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "PP3300_REDRIVER";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac5: pac1954@14 {
+		compatible = "microchip,pac194x";
+		reg = <0x14>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP3300_EDP (RS5902: 10 mOhm) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "PP3300_EDP";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_TCHSCR (RS5903: 20 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "PP3300_TCHSCR";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_TCHPAD (RS7901: 20 mOhm) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "PP3300_TCHPAD";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_EC_Z1 (RS8202: 20 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "PP3300_EC_Z1";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac6: pac1954@15 {
+		compatible = "microchip,pac194x";
+		reg = <0x15>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* VREG_S6C_S7C_S8C_0P752 (R4003: 2 mOhm) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "VREG_S6C_S7C_S8C_0P752";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_S9C (R4001: 2 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "VREG_S9C";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_S10C_0P752 (R4004: 2 mOhm) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "VREG_S10C_0P752";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_S2C_S3C_S4C_0P752 (R3901: 2 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "VREG_S2C_S3C_S4C_0P752";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac7: pac1954@16 {
+		compatible = "microchip,pac194x";
+		reg = <0x16>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PPVAR_EDP_BL (RS5904: 10 mOhm) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "PPVAR_EDP_BL";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_L8B_0P904 (RS4503: 10 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "VREG_L8B_0P904";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP5000_SPKR_R (RS9801: 20 mOhm) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "PP5000_SPKR_R";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_S6B_0P752 (R4402: 2 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "VREG_S6B_0P752";
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac8: pac1954@17 {
+		compatible = "microchip,pac194x";
+		reg = <0x17>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* VREG_L7B_2P5 (RS4501: 10 mOhm) */
+		channel@1 {
+			reg = <0x1>;
+			friendly-name = "VREG_L7B_2P5";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_L3B_0P504 (RS4504: 10 mOhm) */
+		channel@2 {
+			reg = <0x2>;
+			friendly-name = "VREG_L3B_0P504";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_L9B_1P2 (RS4502: 10 mOhm) */
+		channel@3 {
+			reg = <0x3>;
+			friendly-name = "VREG_L9B_1P2";
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* VREG_L18B_1P8_DDR (R2701: 20 mOhm) */
+		channel@4 {
+			reg = <0x4>;
+			friendly-name = "VREG_L18B_1P8_DDR";
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+};

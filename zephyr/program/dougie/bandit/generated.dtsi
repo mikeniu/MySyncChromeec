@@ -61,9 +61,6 @@
 		gpio_ec_en_pp3300_s3: ec_en_pp3300_s3 {
 			gpios = <&gpioe 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
-		gpio_ec_en_pwrmon_odl: ec_en_pwrmon_odl {
-			gpios = <&gpiof 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
-		};
 		gpio_ec_gsc_packet_mode_en: ec_gsc_packet_mode_en {
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 			enum-name = "GPIO_PACKET_MODE_EN";
