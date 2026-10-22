@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "90a5a2d5e039406ea9486de983a0d81943176cf1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbdf9597_b265c640",
+        "filename": "common/panic_output.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-22T21:07:55Z",
+      "side": 1,
+      "message": "possible deadlock here? let say we block all interrupts here and then 2 lines below printing the \"rebooting\" string and sending it to UART buffer that might be infinitely stuck waiting for Tx interrupt",
+      "range": {
+        "startLine": 146,
+        "startChar": 20,
+        "endLine": 146,
+        "endChar": 28
+      },
+      "revId": "90a5a2d5e039406ea9486de983a0d81943176cf1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
