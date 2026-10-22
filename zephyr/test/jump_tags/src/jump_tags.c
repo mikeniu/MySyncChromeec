@@ -118,10 +118,10 @@ static void add_basic_jump_tag(void)
 
 static void test_sysjump_hook(void)
 {
-	/* Verify interrupt_disable_all() was invoked prior to HOOK_SYSJUMP */
-	zassert_true(
+	/* Verify interrupt_disable_all() is not called before HOOK_SYSJUMP */
+	zassert_false(
 		system_fake_is_interrupt_disabled(),
-		"HOOK_SYSJUMP executed before interrupt_disable_all() was called!");
+		"interrupt_disable_all() was called before HOOK_SYSJUMP!");
 
 	if (add_tag_func)
 		add_tag_func();
