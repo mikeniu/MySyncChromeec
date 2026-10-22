@@ -1,0 +1,117 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05c70f55_f4c7a367",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:16:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The commit message currently narrates the step-by-step implementation details (e.g., detaching kernel drivers, chunking, polling, zero-length packets) rather than focusing on the high-level conceptual change.\n\nPlease simplify it to describe the *Why* and *What* at a higher altitude without transcribing the code.\n\n**Suggested Replacement:**\n```text\nrts5817: Implement DFU download in RtsUsbDevice.\n\nAdds firmware flashing capabilities to RtsUsbDevice by implementing the\nUSB DFU Specification (Interface Class 0xFE). This enables downloading\nfirmware payloads directly via libusb control transfers, handling\nnecessary state transitions and chunking without requiring external\ntools like dfu-util.\n\nBUG\u003db:494586772\nTEST\u003dNo standalone binary yet; the download path is exercised end to\nend by the last change in this series.\n```\n[🔗](http://go/tj/cd258020-7626-472f-abae-17b404f127f1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "850e5362_eb343efd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:16:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL.\n\n### Review Summary\n**Functionality:** Looks solid. Correctly implements the DFU download state machine over libusb.\n**Architecture \u0026 Component Fit:** The logic fits appropriately within `RtsUsbDevice`.\n**Code Simplicity:** Mostly clean, though some C-style casts and manual min calculations can be modernized. See inline comments.\n**Idiomaticity \u0026 Readability:** A few magic numbers (like the 6-byte response length) should be extracted into constants.\n**Security:** No obvious security vulnerabilities found.\n**Testing:** ❌ Missing automated tests. The commit message notes tests are handled \"end to end by the last change in this series.\" Unless this code strictly requires physical hardware behavior that cannot be mocked or tested via an interface, automated coverage for the chunking logic and state transitions is required in this CL.\n**CL Size \u0026 Scope:** ❌ `Size: L (+251, -3)`. The production (non-test) diff is \u003e\u003d 250 lines (251 lines). Per the strict size guidelines, this CL must be split into smaller, independently reviewable changes.\n*Split Plan:*\n1. **CL 1:** Introduce DFU constants, `dfu_poll_idle`, and `dfu_clear_status` helpers.\n2. **CL 2:** Implement the core `dfu_download` logic and integrate the chunking/flashing loop.\n**Commit Message:** ❌ The commit message currently narrates the step-by-step implementation details. See inline comment on `/COMMIT_MSG` for a higher-level prose suggestion.\n[🔗](http://go/tj/cd258020-7626-472f-abae-17b404f127f1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cce9783_70e4d9bc",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:16:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **No Magic Values:** Please extract the magic number `6` into a named constant to clarify the expected response length.\n\n```cpp\n\t\tconstexpr size_t kDfuGetStatusResponseLen \u003d 6;\n\t\tuint8_t response[kDfuGetStatusResponseLen];\n```\n[🔗](http://go/tj/cd258020-7626-472f-abae-17b404f127f1)",
+      "range": {
+        "startLine": 379,
+        "startChar": 0,
+        "endLine": 379,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00b4b937_029d2a69",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:16:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** Consider using `std::min` to simplify this chunk size calculation declaratively.\n\n```cpp\n\t\tsize_t chunk_size \u003d std::min(total_size - offset, static_cast\u003csize_t\u003e(transfer_size_));\n```\n(Note: This will require adding `#include \u003calgorithm\u003e` at the top of the file).\n[🔗](http://go/tj/cd258020-7626-472f-abae-17b404f127f1)",
+      "range": {
+        "startLine": 498,
+        "startChar": 0,
+        "endLine": 500,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcd6c1a3_d901add7",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:16:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** Please use `static_cast\u003cuint64_t\u003e` instead of a C-style cast, per C++ idioms.\n\n```cpp\n\t\tuint64_t pct \u003d static_cast\u003cuint64_t\u003e(offset) * 100 / total_size;\n```\n[🔗](http://go/tj/cd258020-7626-472f-abae-17b404f127f1)",
+      "range": {
+        "startLine": 538,
+        "startChar": 0,
+        "endLine": 538,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
