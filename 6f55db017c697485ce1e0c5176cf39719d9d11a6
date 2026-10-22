@@ -22,6 +22,31 @@
       },
       "revId": "6f55db017c697485ce1e0c5176cf39719d9d11a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c573b976_8ce0b9e7",
+        "filename": "zephyr/subsys/chre/chre.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-22T17:06:53Z",
+      "side": 1,
+      "message": "Done in PS 8 (added TODO(b/470819391)).",
+      "parentUuid": "f0e2d071_b3303628",
+      "range": {
+        "startLine": 26,
+        "startChar": 3,
+        "endLine": 28,
+        "endChar": 61
+      },
+      "isAi": true,
+      "revId": "6f55db017c697485ce1e0c5176cf39719d9d11a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
