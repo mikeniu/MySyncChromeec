@@ -806,6 +806,24 @@ uintptr_t system_get_fw_reset_vector(uintptr_t base);
 void chip_pre_system_jump(void);
 
 /**
+ * Architecture-specific pre-system jump configuration.
+ *
+ * This callback is invoked during a system jump (e.g., from RO to RW or
+ * vice versa) immediately after interrupts have been globally disabled
+ * in jump_to_image().
+ *
+ * It allows the architecture-specific shim to perform critical hardware
+ * cleanup or configurations (such as disabling MPU or PMP regions) that must
+ * execute in a strictly synchronous, interrupt-free context just before
+ * the actual jump.
+ *
+ * Since interrupts are guaranteed to be disabled when this is called,
+ * implementations must not attempt to lock/unlock interrupts or rely on
+ * any asynchronous operations.
+ */
+void arch_pre_system_jump(void);
+
+/**
  * Check if the EC is warm booting.
  *
  * @return true if the EC is warm booting.
