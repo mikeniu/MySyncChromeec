@@ -25,7 +25,7 @@ FAKE_VALUE_FUNC(int, get_data_rate, const struct motion_sensor_t *);
 FAKE_VALUE_FUNC(int, get_rms_noise, const struct motion_sensor_t *);
 
 extern struct motion_sensor_t *body_sensor;
-#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 extern float var_threshold;
 extern float confidence_delta;
 #else
@@ -203,7 +203,7 @@ static void body_detect_init_after(void *state)
 #define DEFAULT_CONFIDENCE_DELTA CONFIG_BODY_DETECTION_CONFIDENCE_DELTA
 #define DEFAULT_VAR_THRESHOLD CONFIG_BODY_DETECTION_VAR_THRESHOLD
 
-#if !defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if !defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 static uint64_t calculate_expected_confidence_delta(int range,
 						    int confidence_delta)
 {
@@ -237,7 +237,7 @@ ZTEST_USER(bodydetectinit, test_defaultparams)
 	 * body_detect_reset was already called in body_detect_init_before.
 	 * No need to invoke it here.
 	 */
-#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 	zassert_equal(confidence_delta, DEFAULT_CONFIDENCE_DELTA);
 	zassert_equal(var_threshold, DEFAULT_VAR_THRESHOLD);
 #else
@@ -274,7 +274,7 @@ ZTEST_USER(bodydetectinit, test_customparams)
 	memset(&params, 0, sizeof(params));
 
 	body_detect_reset();
-#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 	zassert_equal(confidence_delta, DEFAULT_CONFIDENCE_DELTA);
 	zassert_equal(var_threshold, DEFAULT_VAR_THRESHOLD);
 #else
@@ -295,7 +295,7 @@ ZTEST_USER(bodydetectinit, test_customparams)
 	params.var_threshold = 3000;
 
 	body_detect_reset();
-#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 	zassert_equal(confidence_delta, 2900);
 	zassert_equal(var_threshold, 3000);
 #else
@@ -466,7 +466,7 @@ static void body_detect_sample_before(void *state)
 	params.var_threshold = 4000;
 
 	body_detect_reset();
-#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 	zassert_equal(confidence_delta, 3000);
 	zassert_equal(var_threshold, 4000);
 #else
@@ -526,7 +526,7 @@ ZTEST_USER(bodydetectsample, test_reallife_data)
 		      "expected state %d at %d[s]", BODY_DETECTION_OFF_BODY,
 		      cnt);
 
-#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 	/*
 	 * Run body_detect with small noise and 0.25Hz "breathing" signal
 	 * in Z-axis, should detect ON_BODY.
@@ -622,8 +622,7 @@ ZTEST_USER(bodydetectsample, test_reallife_data)
 #endif
 }
 
-/* Note: ALOGIRTHM spelling matches Kconfig.body_detection */
-#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)
 static int body_detect_change_cnt;
 
 static void body_detect_change_hook(void)

@@ -273,11 +273,11 @@ if(CONFIG_PLATFORM_EC_DSP_REMOTE_BODY_DETECTION AND NOT CONFIG_PLATFORM_EC_BODY_
    zephyr_library_sources("${PLATFORM_EC}/common/body_detect_client.c")
 endif()
 
-zephyr_library_sources_ifdef(CONFIG_BODY_DETECTION_ALOGIRTHM_V1
+zephyr_library_sources_ifdef(CONFIG_BODY_DETECTION_ALGORITHM_V1
                                                 "${PLATFORM_EC}/common/body_detection.c"
                                                 "${PLATFORM_EC}/common/body_detect_client.c"
                                                 "${PLATFORM_EC}/common/body_detect_common.c")
-zephyr_library_link_libraries_ifdef(CONFIG_BODY_DETECTION_ALOGIRTHM_V2
+zephyr_library_link_libraries_ifdef(CONFIG_BODY_DETECTION_ALGORITHM_V2
                                                 vsensor.body_detection)
 
 zephyr_library_sources_ifdef(CONFIG_NAMED_ADC_CHANNELS
