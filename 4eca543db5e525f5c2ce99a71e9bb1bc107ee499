@@ -1,0 +1,87 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "232100d4_36383340",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T19:03:03Z",
+      "side": 1,
+      "message": "Looks good to me, but I\u0027m not very familiar with this code, so might be good to get another reviewer to look at it.",
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ca624ba_a09751f0",
+        "filename": "zephyr/Kconfig.console",
+        "patchSetId": 5
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T19:03:03Z",
+      "side": 1,
+      "message": "Nit (optional): The comments in `zephyr/shim/src/console.c` (lines 347–350 and 374–377) still state that non-minimal logging modes should enable `CONFIG_PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER` to capture Zephyr log messages into the AP console buffer; consider updating them to also mention `CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC`.",
+      "isAi": true,
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "537b7681_da31442f",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T19:03:03Z",
+      "side": 1,
+      "message": "Nit (optional): `process()` and `dropped()` duplicate the `line_buf_ctx` / `log_output_control_block` / `log_output` stack initialization. Consider either sharing a small initializer macro between the two, or formatting the dropped message directly in `dropped()` with `snprintk()` + `zephyr_print()`:\n```c\nstatic void dropped(const struct log_backend *const backend, uint32_t cnt)\n{\n\tchar buf[sizeof(\"--- 9999 messages dropped ---\\n\")];\n\tint len;\n\n\tARG_UNUSED(backend);\n\n\tlen \u003d snprintk(buf, sizeof(buf), \"--- %u messages dropped ---\\n\",\n\t\t       MIN(cnt, 9999U));\n\tif (len \u003e 0) {\n\t\tzephyr_print(buf, MIN((size_t)len, sizeof(buf) - 1));\n\t}\n}\n```",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b58026cb_12d57b6d",
+        "filename": "zephyr/test/hostcmd_console/src/hostcmd_console.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T19:03:03Z",
+      "side": 1,
+      "message": "Nit (optional): Consider also exercising the `if (c \u003d\u003d \u0027\\r\u0027)` branch in `char_out()` (used when `LOG_PRINTK` routes through `cr_out_func` in `log_output.c`), e.g.:\n```c\n\tif (IS_ENABLED(CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC)) {\n\t\tLOG_PRINTK(\"cr\\n\");\n\t\tzassert_equal(EC_RES_SUCCESS, ec_cmd_console_snapshot(NULL));\n\t\tread_args.response_size \u003d 0;\n\t\tzassert_equal(EC_RES_SUCCESS, host_command_process(\u0026read_args));\n\t\tzassert_equal(sizeof(\"cr\\n\"), read_args.response_size);\n\t\tzassert_mem_equal(\"cr\\n\", response, sizeof(\"cr\\n\"));\n\t}\n```",
+      "range": {
+        "startLine": 280,
+        "startChar": 0,
+        "endLine": 290,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
