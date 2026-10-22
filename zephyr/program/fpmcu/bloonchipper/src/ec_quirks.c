@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "hooks.h"
+#include "system.h"
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -22,7 +22,7 @@
 
 extern void arm_core_mpu_disable(void);
 
-static void prepare_for_sysjump_to_ec(void)
+void chip_pre_system_jump(void)
 {
 	/* Reset timers and UARTs to the defaults. */
 	DT_FOREACH_STATUS_OKAY(st_stm32_timers, RESET_PERIPHERAL);
@@ -48,7 +48,6 @@ static void prepare_for_sysjump_to_ec(void)
 	 */
 	sys_clock_disable();
 }
-DECLARE_HOOK(HOOK_SYSJUMP, prepare_for_sysjump_to_ec, HOOK_PRIO_LAST);
 
 /*
  * Old FPMCU RO (EC based) uses TIM2 to measure system uptime and schedule

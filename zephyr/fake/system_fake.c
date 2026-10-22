@@ -8,27 +8,16 @@
 
 #include <setjmp.h>
 
+#include <zephyr/irq.h>
+
 static enum ec_image shrspi_image_copy = EC_IMAGE_RO;
 
 /* setjmp environment to use for reboot (NULL if none) */
 static jmp_buf *jump_env;
 
-/* Track whether interrupts have been disabled during test execution. */
-static bool system_fake_interrupts_disabled;
-
 void ztest_interrupt_disable_all(void)
 {
-	system_fake_interrupts_disabled = true;
-}
-
-bool system_fake_is_interrupt_disabled(void)
-{
-	return system_fake_interrupts_disabled;
-}
-
-void system_fake_reset_interrupt_disabled(void)
-{
-	system_fake_interrupts_disabled = false;
+	irq_lock();
 }
 
 void system_fake_setenv(jmp_buf *env)
@@ -38,6 +27,7 @@ void system_fake_setenv(jmp_buf *env)
 
 void system_jump_to_booter(void)
 {
+	irq_unlock(0);
 	if (jump_env)
 		longjmp(*jump_env, 1);
 }
