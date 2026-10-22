@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "185d6b3e_3dfb3ad5",
+        "filename": "zephyr/Kconfig.console",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-22T21:36:00Z",
+      "side": 1,
+      "message": "Consider adding `depends on !PIGWEED_LOG_TOKENIZED_LIB` since zephyr_print() is only defined when !CONFIG_PIGWEED_LOG_TOKENIZED_LIB.",
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ca624ba_a09751f0",
         "filename": "zephyr/Kconfig.console",
         "patchSetId": 5
