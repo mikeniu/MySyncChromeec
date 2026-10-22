@@ -1177,13 +1177,10 @@ DECLARE_HOOK(HOOK_INIT, restore_enable_5v_state, HOOK_PRIO_FIRST);
 
 static void preserve_enable_5v_state(void)
 {
-	/*
-	 * Note: Interrupts are already disabled during HOOK_SYSJUMP,
-	 * so pwr_5v_en_req can be read atomically without locking
-	 * pwr_5v_ctl_mtx.
-	 */
+	k_mutex_lock(&pwr_5v_ctl_mtx, K_FOREVER);
 	system_add_jump_tag(P5_SYSJUMP_TAG, 0, sizeof(pwr_5v_en_req),
 			    &pwr_5v_en_req);
+	k_mutex_unlock(&pwr_5v_ctl_mtx);
 }
 DECLARE_HOOK(HOOK_SYSJUMP, preserve_enable_5v_state, HOOK_PRIO_DEFAULT);
 #endif /* defined(CONFIG_POWER_PP5000_CONTROL) */
