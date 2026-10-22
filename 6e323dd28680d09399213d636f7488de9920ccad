@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aeb56e9_884eb6da",
+        "filename": "chip/stm32/dma.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-22T18:39:13Z",
+      "side": 1,
+      "message": "Nit: `bool`",
+      "revId": "6e323dd28680d09399213d636f7488de9920ccad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
