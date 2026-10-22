@@ -1,0 +1,173 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a6a46e2_edfe724e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:09:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding input validation boundaries and missing test cases.\n\n### Review Summary\n\n**Functionality:** Found a few issues. `sscanf` with `%x:%x` in `parse_vid_pid` allows trailing garbage and truncates out-of-bounds hex values. Additionally, `read_file` casts `tellg()` to `size_t` directly, which will throw `std::bad_alloc` when `tellg()` returns `-1` on non-regular files.\n\n**Architecture \u0026 Component Fit:** The CLI logic is cleanly separated from the libusb flashing logic.\n\n**Code Simplicity:** Identified an opportunity to eliminate redundant RAII `device.release()` manual cleanups on error paths. The hardcoded `\"0BDA:5817\"` default string in `parse_args()` duplicates the default constants in `main()`. \n\n**Idiomaticity \u0026 Readability:** Excellent. The C++ code is clear, uses modern headers where appropriate, and isolates dependencies effectively.\n\n**Testing:** Unit tests cover normal cases for parsing but are missing boundary `ROR` mutation cases for `parse_vid_pid` to handle trailing garbage and overflow values.\n\n**Security:** N/A\n\n**CL Size \u0026 Scope:** Size: L (+421, -3). The production delta is under 250 lines and implements a single cohesive logical change (the `rts5817_flash` CLI tool and helpers). The remaining lines are unit tests. The CL passes the Single Logical Change rule and Decomposition Test.\n\n**Commit Message:** The commit message clearly and concisely explains what is being added and why, avoiding diff narration.\n\nPlease address the inline comments and I will take another look! [🔗](http://go/tj/8ddb0f15-ffe5-40ce-ba75-387ce4dc165f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b56cab6a_ef222073",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:09:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] If you remove the magic string default from `parse_args()`, you can apply the constants here smoothly without parsing:\n\n```cpp\n\t/* Step 2: Parse VID:PID. */\n\tif (!cfg.dev_id.empty()) {\n\t\tif (!parse_vid_pid(cfg.dev_id, vid, pid)) {\n\t\t\tfprintf(stderr,\n\t\t\t\t\"Warning: could not parse \u0027%s\u0027, using \"\n\t\t\t\t\"default %04x:%04x\\n\",\n\t\t\t\tcfg.dev_id.c_str(), vid, pid);\n\t\t}\n\t} else {\n\t\tprintf(\"Using default VID:PID %04X:%04X\\n\", vid, pid);\n\t}\n``` [🔗](http://go/tj/8ddb0f15-ffe5-40ce-ba75-387ce4dc165f)",
+      "range": {
+        "startLine": 618,
+        "startChar": 0,
+        "endLine": 622,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2b9c7a0_97baa06d",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:09:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `RtsUsbDevice` already uses RAII (`~RtsUsbDevice()` calls `release()`). These explicit `device.release()` cleanup calls on error paths and at the end of the function are redundant and can be safely deleted. \n\n(Note: Keep the explicit `device.release()` before `wait_for_device` in Step 5, as you need to eagerly release the handle before re-enumerating.)\n\n```cpp\n\tif (!device.enable_download()) {\n\t\treturn EXIT_FAILURE;\n\t}\n\n\t/*\n\t * Step 4: Send DFU_DETACH to transition the device from Runtime mode\n\t * to true DFU mode.  The device re-enumerates after this request.\n\t */\n\tif (!device.dfu_detach(kDetachTimeoutMs)) {\n\t\treturn EXIT_FAILURE;\n\t}\n\n\t/* Step 5: Release the handle and poll for re-enumeration with the DFU\n\t * PID.  Polling avoids the race and delay of a fixed sleep. */\n\tdevice.release();\n\n\tif (!device.wait_for_device(vid, kRts5817DfuPid, kReEnumTimeoutMs,\n\t\t\t\t    kReEnumPollIntervalMs))\n\t\treturn EXIT_FAILURE;\n\n\tprintf(\"Starting DFU download...\\n\");\n\tbool ok \u003d device.dfu_download(firmware);\n\n\tif (ok) {\n\t\tprintf(\"Flash completed successfully.\\n\");\n\t\treturn EXIT_SUCCESS;\n\t}\n\n\tfprintf(stderr, \"Flash failed.\\n\");\n\treturn EXIT_FAILURE;\n``` [🔗](http://go/tj/8ddb0f15-ffe5-40ce-ba75-387ce4dc165f)",
+      "range": {
+        "startLine": 630,
+        "startChar": 0,
+        "endLine": 664,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78790bb0_f6074ae0",
+        "filename": "util/rts5817_flash_cli.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:09:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] If the input path is a non-regular file (e.g. `/dev/null` or a named pipe), `file.tellg()` will return `-1`. Casting this to `size_t` results in `SIZE_MAX`, causing `data.resize()` to throw a fatal `std::bad_alloc` exception.\n\nConsider checking for `-1` to handle non-regular files gracefully:\n```cpp\n\tstd::streampos pos \u003d file.tellg();\n\tif (pos \u003c 0) {\n\t\tfprintf(stderr, \"Error: cannot determine file size for \u0027%s\u0027\\n\", path.c_str());\n\t\treturn false;\n\t}\n\tsize_t size \u003d static_cast\u003csize_t\u003e(pos);\n\tfile.seekg(0, std::ios::beg);\n\n\tdata.resize(size);\n``` [🔗](http://go/tj/8ddb0f15-ffe5-40ce-ba75-387ce4dc165f)",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbbc6eb9_3e98da73",
+        "filename": "util/rts5817_flash_cli.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:09:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Hardcoding `\"0BDA:5817\"` here duplicates the default VID/PID magic values that are already defined as constants (`kRts5817Vid`, `kRts5817Pid`) in `main()`.\n\nInstead of injecting a default string into the CLI struct, leave `cfg.dev_id` empty and let the caller apply the default constants.\n\n```cpp\n\tif (cfg.dev_id.empty()) {\n\t\t// Just let it remain empty, handled by caller.\n\t}\n```\n*(Also update `DeviceIdDefaultsWhenOmitted` in the test file to expect `cfg.dev_id.empty()`.)* [🔗](http://go/tj/8ddb0f15-ffe5-40ce-ba75-387ce4dc165f)",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f48d608f_b315156c",
+        "filename": "util/rts5817_flash_cli.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:09:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Using `sscanf` with `%x:%x` accepts trailing garbage (e.g., `\"1234:5678foo\"`) and truncates out-of-bounds values that exceed `uint16_t` (e.g., `\"10000:10000\"` becomes `0000:0000`).\n\nConsider checking the consumed length and validating the bounds:\n```cpp\n\tunsigned int v, p;\n\tint chars_consumed \u003d 0;\n\n\tif (sscanf(dev_id.c_str(), \"%x:%x%n\", \u0026v, \u0026p, \u0026chars_consumed) !\u003d 2)\n\t\treturn false;\n\n\tif (chars_consumed !\u003d dev_id.length() || v \u003e 0xFFFF || p \u003e 0xFFFF)\n\t\treturn false;\n\n\tvid \u003d static_cast\u003cuint16_t\u003e(v);\n\tpid \u003d static_cast\u003cuint16_t\u003e(p);\n\treturn true;\n``` [🔗](http://go/tj/8ddb0f15-ffe5-40ce-ba75-387ce4dc165f)",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74dbe1fc_1a276dd8",
+        "filename": "util/rts5817_flash_cli_test.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:09:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please add boundary (`ROR`) and mutation test cases for out-of-bounds overflow and trailing garbage values:\n\n```cpp\n\tEXPECT_FALSE(parse_vid_pid(\"0BDA-5817\", vid, pid));\n\tEXPECT_FALSE(parse_vid_pid(\"zzzz:yyyy\", vid, pid));\n\tEXPECT_FALSE(parse_vid_pid(\"0BDA:5817foo\", vid, pid));\n\tEXPECT_FALSE(parse_vid_pid(\"10000:5817\", vid, pid));\n\tEXPECT_FALSE(parse_vid_pid(\"0BDA:10000\", vid, pid));\n``` [🔗](http://go/tj/8ddb0f15-ffe5-40ce-ba75-387ce4dc165f)",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
