@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b27d0359_24870504",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-22T09:03:46Z",
+      "side": 1,
+      "message": "Done in ps4: subject is now \"rts5817: Add RtsUsbDevice libusb wrapper for flashing tool.\" (the CL was split, see the PATCHSET_LEVEL thread). The same applies to the two new CLs in the stack.",
+      "parentUuid": "ff4aa9e7_6eaf05de",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b53a5da_8b5f052d",
@@ -51,6 +75,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "83de09b6_09470b8d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-22T09:03:46Z",
+      "side": 1,
+      "message": "This CL has no standalone binary yet, so its TEST\u003d now says so. The test outcomes are recorded in the last CL of the stack (8629988): the unit test run (12 tests pass) and the flashing run with ec_rts5817.bin.",
+      "parentUuid": "3b53a5da_8b5f052d",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 9999
+      },
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03f3b0c1_f00df259",
@@ -66,6 +114,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n*   This CL is reported as `Size: L (+761, -0)`. Per `go/small-cls`, CLs of this size are too large to review effectively as a single atomic unit and must be split. The previous review requested a split, which was marked as \"Done\", but the CL remains a single monolithic commit.\n*   **Proposed Split Plan:**\n    *   **CL 1:** Add the base `RtsUsbDevice` class structure and USB initialization/detachment/cleanup logic.\n    *   **CL 2:** Implement the core DFU download protocol and polling logic within `RtsUsbDevice`.\n    *   **CL 3:** Add the command-line utility entry point (`main`, `parse_args`, `read_file`) and build system integration.\n\n**Testing \u0026 Test Coverage:**\n*   **Missing Tests:** Despite previous feedback, there are still no automated unit tests for the pure logic components (such as `parse_args` and `read_file`). When splitting this CL, please add a small suite of unit tests for these pure helpers.\n\n**Functionality \u0026 Robustness:**\n*   **Resource Leaks (Rule of Three):** `RtsUsbDevice` lacks deleted copy/assignment operators, making it vulnerable to double-frees of the libusb context if copied. See inline comment.\n\n**Idiomaticity \u0026 Readability:**\n*   A few remaining magic numbers (`1000`, `10000`, `60000`) should be extracted into `constexpr` constants.\n\n**Commit Message:**\n*   The first line should end with a period.\n*   The `TEST\u003d` footer still just lists the command run rather than the outcome.\n\nPlease split the CL into a stacked series and address the inline comments.\n[🔗](http://go/tj/5213bd81-d1c0-4dda-ae7d-88393b98a74e)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23ddf3f7_4deda3c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-22T09:03:46Z",
+      "side": 1,
+      "message": "Split into a stack of three CLs as proposed: 7911746 (RtsUsbDevice base: init/detach/release), 8629987 (DFU download protocol), 8629988 (command line tool + build integration). Unit tests for parse_args, parse_vid_pid (split out of main) and read_file are added in 8629988 as rts5817_flash_test (gtest, hooked into utils-test; 12 tests pass). Copy/assignment is deleted in this CL, and the magic numbers are now constants (see the inline threads).",
+      "parentUuid": "03f3b0c1_f00df259",
       "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -95,6 +161,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d39f0f0_dd7fb052",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-22T09:03:46Z",
+      "side": 1,
+      "message": "Done in ps4: copy constructor and copy assignment of RtsUsbDevice are deleted.",
+      "parentUuid": "12bcdbec_b1ef07f4",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 9999
+      },
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d1c57e5_18af2552",
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07ca424b_04da2618",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-22T09:03:46Z",
+      "side": 1,
+      "message": "Done: dfu_poll_idle() now uses kUsbDfuTimeoutMs. That function lives in the DFU download CL, 8629987.",
+      "parentUuid": "4d1c57e5_18af2552",
+      "range": {
+        "startLine": 416,
+        "startChar": 0,
+        "endLine": 417,
+        "endChar": 9999
+      },
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d12e96cd_393801c0",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7176183_8f183984",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-22T09:03:46Z",
+      "side": 1,
+      "message": "Done: added kDetachTimeoutMs, kReEnumTimeoutMs and kReEnumPollIntervalMs and used them in main(). main() lives in the command line tool CL, 8629988.",
+      "parentUuid": "d12e96cd_393801c0",
+      "range": {
+        "startLine": 734,
+        "startChar": 0,
+        "endLine": 744,
+        "endChar": 9999
+      },
       "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
