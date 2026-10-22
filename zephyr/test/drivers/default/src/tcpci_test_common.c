@@ -1081,6 +1081,13 @@ void test_tcpci_set_bist_mode(const struct emul *emul,
 	zassert_equal(EC_SUCCESS, drv->set_bist_test_mode(port, 1));
 	check_tcpci_reg(emul, TCPC_REG_TCPC_CTRL, exp_ctrl);
 	check_tcpci_reg(emul, TCPC_REG_ALERT_MASK, exp_mask);
+	if (drv->get_bist_test_mode) {
+		bool bist_mode = false;
+
+		zassert_equal(EC_SUCCESS,
+			      drv->get_bist_test_mode(port, &bist_mode));
+		zassert_true(bist_mode);
+	}
 
 	/* Test disabling bist test mode */
 	exp_mask = initial_mask | TCPC_REG_ALERT_RX_STATUS;
@@ -1088,6 +1095,13 @@ void test_tcpci_set_bist_mode(const struct emul *emul,
 	zassert_equal(EC_SUCCESS, drv->set_bist_test_mode(port, 0));
 	check_tcpci_reg(emul, TCPC_REG_TCPC_CTRL, exp_ctrl);
 	check_tcpci_reg(emul, TCPC_REG_ALERT_MASK, exp_mask);
+	if (drv->get_bist_test_mode) {
+		bool bist_mode = true;
+
+		zassert_equal(EC_SUCCESS,
+			      drv->get_bist_test_mode(port, &bist_mode));
+		zassert_false(bist_mode);
+	}
 }
 
 void test_tcpci_hard_reset_reinit(const struct emul *emul,
