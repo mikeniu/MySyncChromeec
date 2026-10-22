@@ -65,6 +65,30 @@
       },
       "revId": "2c9764158ea18a51065841bc5eee492c8677105e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03fb6b1e_b77213b2",
+        "filename": "chip/g/rdd.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-22T04:34:35Z",
+      "side": 1,
+      "message": "Agreed, thanks. Moved to internal cr50_stab per your request and reworked it there: crrev.com/i/9998149. SLEEP_MASK_RDD is now only asserted once a USB host has actually configured Cr50 (or AP UART is on), with a 2s delay_sleep_by window for enumeration. Boards with CC leakage in G3 and no host attached still drop into deep sleep after that window. Abandoning this one.",
+      "parentUuid": "0991e070_f92f58ab",
+      "range": {
+        "startLine": 84,
+        "startChar": 5,
+        "endLine": 84,
+        "endChar": 23
+      },
+      "revId": "2c9764158ea18a51065841bc5eee492c8677105e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
