@@ -20,6 +20,7 @@ host-util-bin-cxx-y += itecomdbgr
 host-util-bin-cxx-y += cbi-util
 
 host-util-bin-cxx-y += rtkupdate
+host-util-bin-cxx-y += rts5817_flash
 build-util-art-y += util/export_taskinfo.so
 
 build-util-bin-$(CHIP_NPCX) += ecst
@@ -54,6 +55,19 @@ iteflash-objs = iteflash.o usb_if.o
 $(out)/util/iteflash: HOST_LDFLAGS+=$(LIBFTDIUSB_HOST_LDLIBS)
 itecomdbgr-objs = itecomdbgr.o uart_utils.o
 rtkupdate-objs = rtkupdate.o uart_utils.o
+rts5817_flash-objs = rts5817_flash.o rts5817_flash_cli.o
+$(out)/util/rts5817_flash: HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs libusb-1.0)
+
+host-util-bin-cxx-y += rts5817_flash_test
+rts5817_flash_test-objs = rts5817_flash_cli.o rts5817_flash_cli_test.o
+$(out)/util/rts5817_flash_test: HOST_CXXFLAGS+=-Iutil
+$(out)/util/rts5817_flash_test: HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) --cflags gtest gtest_main)
+$(out)/util/rts5817_flash_test: HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) --libs gtest gtest_main)
+
+.PHONY: rts5817-flash-utils-test
+rts5817-flash-utils-test: $(out)/util/rts5817_flash_test
+	@$(out)/util/rts5817_flash_test
+utils-test: rts5817-flash-utils-test
 ectool-objs=ectool.o ectool_keyscan.o ec_flash.o $(comm-objs)
 ectool-objs+=ectool_i2c.o
 ectool-objs+=ectool_pdc_trace.o
