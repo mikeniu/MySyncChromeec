@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "97fd0e2f_d67977dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-22T11:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c3be640_40639f90",
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4f8820a_ea8a8b12",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb8493f3_11ee197a",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-22T11:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4f8820a_ea8a8b12",
+      "range": {
+        "startLine": 409,
+        "startChar": 0,
+        "endLine": 410,
+        "endChar": 9999
+      },
       "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06f6eae5_63eb9f02",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-22T11:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fb36183_6680402f",
+      "range": {
+        "startLine": 397,
+        "startChar": 0,
+        "endLine": 417,
+        "endChar": 9999
+      },
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f30dc92_fbf031c1",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65a69414_fe159636",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-22T11:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f30dc92_fbf031c1",
+      "range": {
+        "startLine": 396,
+        "startChar": 0,
+        "endLine": 420,
+        "endChar": 9999
+      },
       "revId": "9931001ea37e44698fe179d6b8c1764b4528eca5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
