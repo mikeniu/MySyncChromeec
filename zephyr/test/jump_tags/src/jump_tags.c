@@ -128,6 +128,17 @@ static void test_sysjump_hook(void)
 }
 DECLARE_HOOK(HOOK_SYSJUMP, test_sysjump_hook, HOOK_PRIO_DEFAULT);
 
+void chip_pre_system_jump(void)
+{
+	/*
+	 * Verify interrupt_disable_all() was invoked prior to
+	 * chip_pre_system_jump()
+	 */
+	zassert_true(
+		system_fake_is_interrupt_disabled(),
+		"chip_pre_system_jump() executed before interrupt_disable_all() was called!");
+}
+
 static void check_for_jump_tag(int jump_tag, int expected_size)
 {
 	int version;

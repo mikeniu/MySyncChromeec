@@ -6,6 +6,7 @@
 #include "hooks.h"
 #include "system.h"
 
+#include <zephyr/arch/riscv/pmp.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/sys/sys_io.h>
 #include <zephyr/sys/util_macro.h>
@@ -31,16 +32,29 @@
 		uintptr_t addr = DT_REG_ADDR_BY_IDX(node_id, idx); \
 		sys_write8(IT8XXX2_SMFI_SCARH_DISABLE, addr + 2);  \
 	} while (0)
+#endif
 
 void chip_pre_system_jump(void)
 {
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(ilm), okay)
 	/* Disable all ILM mappings before sysjump, otherwise the new image
 	 * may attempt to execute stale code from the previous image.
 	 */
 	LISTIFY(DT_NUM_REGS(DT_NODELABEL(ilm)), DISABLE_ILM_MAPPING, (;),
 		DT_NODELABEL(ilm));
-}
 #endif
+
+#ifdef CONFIG_RISCV_PMP
+	/*
+	 * Clear all Physical Memory Protection (PMP) entries before jumping to
+	 * the new image. When CONFIG_HW_STACK_PROTECTION is enabled, the
+	 * current image's PMP configuration for stack boundaries can interfere
+	 * with the stack setup of the new image, leading to crashes. Clearing
+	 * ensures the new image starts with a clean PMP state.
+	 */
+	z_riscv_pmp_clear_all();
+#endif
+}
 
 uintptr_t system_get_fw_reset_vector(uintptr_t base)
 {
