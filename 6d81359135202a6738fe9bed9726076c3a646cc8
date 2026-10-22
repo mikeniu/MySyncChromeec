@@ -28,6 +28,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd3cd719_89fffc3c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 21
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-22T12:42:26Z",
+      "side": 1,
+      "message": "I don\u0027t agree with this take. It\u0027s a migration commit, logical parts have been spitted, but now it\u0027s adding the `dartmankey` project. If it\u0027s splitted, paretent commits would be just incorrect.",
+      "parentUuid": "ee1db2b1_9185c166",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9999
+      },
+      "revId": "6d81359135202a6738fe9bed9726076c3a646cc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c356bbd1_2e5a5c00",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 21
