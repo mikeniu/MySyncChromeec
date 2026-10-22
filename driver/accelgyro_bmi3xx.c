@@ -367,6 +367,53 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	 * pending.
 	 */
 	for (i = 0; i < 200; i++) {
+		if (IS_ENABLED(CONFIG_I2C_MTK_SCP)) {
+			rv = bmi3_read_n(s, BMI3_REG_INT_STATUS_INT1,
+					 (uint8_t *)reg_data, sizeof(reg_data));
+			if (rv)
+				break;
+			burst.int_status = reg_data[1];
+
+			if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR) &&
+			    (BMI3_INT_STATUS_ORIENTATION & burst.int_status))
+				irq_set_orientation(s);
+
+			if ((burst.int_status & (BMI3_INT_STATUS_FWM |
+						 BMI3_INT_STATUS_FFULL)) == 0)
+				break;
+
+			rv = bmi3_read_n(s, BMI3_REG_FIFO_FILL_LVL,
+					 (uint8_t *)reg_data, sizeof(reg_data));
+			if (rv)
+				break;
+			fill_lvl = BMI3_GET_BIT_POS0(reg_data[1],
+						     BMI3_FIFO_FILL_LVL);
+
+			while (fill_lvl > 0) {
+				/*
+				 * MTK SCP I2C hardware FIFO is 16 bytes
+				 * (I2C_FIFO_SIZE). Read 2 FIFO frames (6 words)
+				 * plus 1 I2C sync word = 14 bytes per transfer.
+				 */
+				fifo_frame.available_fifo_len =
+					1 + ARRAY_SIZE(burst.fifo);
+				rv = bmi3_read_n(s, BMI3_REG_FIFO_DATA,
+						 (uint8_t *)fifo_frame.data,
+						 fifo_frame.available_fifo_len *
+							 sizeof(uint16_t));
+				if (rv)
+					break;
+
+				bmi3_parse_fifo_data(s, &fifo_frame,
+						     interrupt_timestamp);
+				has_read_fifo = true;
+				fill_lvl -= ARRAY_SIZE(burst.fifo);
+			}
+			if (rv)
+				break;
+			continue;
+		}
+
 		rv = bmi3_read_n(s, BMI3_REG_INT_STATUS_INT1, (uint8_t *)&burst,
 				 sizeof(burst));
 		if (rv)
