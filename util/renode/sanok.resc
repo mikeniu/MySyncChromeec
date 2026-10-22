@@ -26,17 +26,38 @@ p25q16:
 """
 
 $bin?=$ORIGIN/sanok/ec.bin
+$bin_addr?=0x80000000
 $elf_ro?=$ORIGIN/sanok/ec.RO.elf
 $elf_rw?=$ORIGIN/sanok/ec.RW.elf
 
 showAnalyzer uart0
 
-# Mock of bootrom, reads entry point from flash header and jumps there
-cpu0 AssembleBlock 0x70000000 "li t0, 0x80000000; lw t1, 24(t0); jalr zero, t1, 0"
+# Mock of bootrom, reads entry point from flash header and jumps there.
+# EC ec.bin images start at 0x80000000 with a 4KB ETU905 bootrom header that
+# stores the RO entry address (0x80001000) at byte offset 24. Standalone
+# upstream Zephyr egis_et171 images omit the ETU905 header and link the app
+# partition directly at 0x80001000, starting with the 28-byte "EGIS" header in
+# soc/egis/et171/start.S where byte offset 12 holds __rom_region_start
+# (0x80001000).
+# (Renode's monitor parser does not expand $variables inside AssembleBlock
+# string literals.)
+cpu0 AssembleBlock 0x70000000
+"""
+li t0, 0x80000000
+lw t1, 24(t0)
+beqz t1, 1f
+li t2, -1
+bne t1, t2, 2f
+1:
+li t0, 0x80001000
+lw t1, 12(t0)
+2:
+jalr zero, t1, 0
+"""
 
 macro reset
 """
-    sysbus LoadBinary $bin 0x80000000
+    sysbus LoadBinary $bin $bin_addr
     sysbus LoadSymbolsFrom $elf_ro
     sysbus LoadSymbolsFrom $elf_rw
     cpu0 PC `syscon ResetVector`
