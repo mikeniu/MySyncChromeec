@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee1db2b1_9185c166",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 21
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T11:26:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nBecause this CL is too large and bundles multiple independent logical changes, please split it into smaller, focused CLs. When you split the CL, ensure that each new commit message concisely describes the specific change without narrating the diff. \n\nHere are suggested commit messages for the split CLs:\n\nFor the base configuration:\n```\nzephyr: fpmcu: add dartmonkey base configuration\n\nAdd Zephyr EC board support for Dartmonkey (STM32H743 + FPC1145), including devicetree overlays, pin control, and build targets.\n\nBUG\u003db:355653341\nTEST\u003dzmake build -D dartmonkey --clobber\n```\n\nFor the AP sleep event handling:\n```\nzephyr: fpmcu: implement AP sleep event handling for dartmonkey\n\nHandle AP active and suspend states via slp_l and slp_alt_l GPIOs to manage PM policy state locks and trigger chipset hooks.\n\nBUG\u003db:355653341\nTEST\u003dzmake build -D dartmonkey --clobber\n```\n\nFor hardware initialization:\n```\nzephyr: fpmcu: implement hardware detection for dartmonkey\n\nDetect whether the board is a development board or production hardware using the fp_spi_sel GPIO and configure pins accordingly.\n\nBUG\u003db:355653341\nTEST\u003dzmake build -D dartmonkey --clobber\n```\n\nFor EC RO compatibility quirks:\n```\nzephyr: fpmcu: add EC RO compatibility quirks for dartmonkey\n\nDisable MPU protection and system clock before sysjump to EC to avoid memory conflicts with the different RAM layout used by the EC RO.\n\nBUG\u003db:355653341\nTEST\u003dzmake build -D dartmonkey --clobber\n```\n\n[🔗](http://go/tj/150d65ae-e1ff-403a-ba61-a3e887cf722b)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6d81359135202a6738fe9bed9726076c3a646cc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c356bbd1_2e5a5c00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T11:26:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL.\n\n### Review Summary\n\n**CL Size \u0026 Scope:** ❌ **Changes Requested**\nSize: XL (+1841, -0). This CL bundles multiple independent logical changes across the board configuration, power handling, hardware initialization, and EC quirks. Per the Single Logical Change rule, please split this into smaller, self-contained CLs. For example:\n* CL 1: Base configuration, devicetree overlays, and build targets.\n* CL 2: Power and AP sleep event handling (`power.c`) with tests.\n* CL 3: Initialization and hardware detection (`init.c`) with tests.\n* CL 4: EC RO compatibility quirks (`ec_quirks.c`) with tests.\n* CL 5: Clock module shim tests (`clock.c`).\n\n**Functionality:** ✅ Looks good.\n**Architecture \u0026 Component Fit:** ✅ Looks good.\n**Code Simplicity:** ✅ Code is straightforward.\n**Idiomaticity \u0026 Readability:** ✅ Idiomatic overall.\n**Security:** ✅ No obvious issues.\n**Testing:** ✅ Tests are thorough.\n**Commit Message:** ❌ Needs update to reflect the split changes. See inline comment on `/COMMIT_MSG`.\n\n[🔗](http://go/tj/150d65ae-e1ff-403a-ba61-a3e887cf722b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6d81359135202a6738fe9bed9726076c3a646cc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
