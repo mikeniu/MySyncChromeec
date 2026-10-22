@@ -791,19 +791,36 @@ uintptr_t system_get_fw_reset_vector(uintptr_t base);
  * Chip-specific pre-system jump configuration.
  *
  * This callback is invoked during a system jump (e.g., from RO to RW or
- * vice versa) immediately after interrupts have been globally disabled
- * in jump_to_image().
+ * vice versa) after interrupts have been globally disabled in
+ * jump_to_image(), and before arch_pre_system_jump().
  *
- * It allows the chip-specific shim to perform critical hardware cleanup or
- * configurations (such as disabling memory mappings or caching) that must
- * execute in a strictly synchronous, interrupt-free context just before
- * the actual jump.
+ * It is intended for SoC- or program-level shims (zephyr/shim/chip/ or
+ * zephyr/program/) to tear down chip peripherals and mappings (such as
+ * resetting timers/UARTs, disabling SoC caches/ILM mappings, or stopping
+ * the system clock) while CPU memory protection is still active.
  *
  * Since interrupts are guaranteed to be disabled when this is called,
  * implementations must not attempt to lock/unlock interrupts or rely on
  * any asynchronous operations.
  */
 void chip_pre_system_jump(void);
+
+/**
+ * Architecture-specific pre-system jump configuration.
+ *
+ * This callback is invoked during a system jump (e.g., from RO to RW or
+ * vice versa) after interrupts have been globally disabled and after
+ * chip_pre_system_jump() has completed in jump_to_image().
+ *
+ * It is intended for CPU architecture shims (zephyr/shim/core/) to tear
+ * down core-level state (such as disabling ARM MPU or clearing RISC-V
+ * PMP regions) immediately before jumping to the target image.
+ *
+ * Since interrupts are guaranteed to be disabled when this is called,
+ * implementations must not attempt to lock/unlock interrupts or rely on
+ * any asynchronous operations.
+ */
+void arch_pre_system_jump(void);
 
 /**
  * Check if the EC is warm booting.
