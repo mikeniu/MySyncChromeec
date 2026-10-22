@@ -1,0 +1,76 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/thermistor/thermistor.dtsi>
+
+/ {
+	temp_ufs: temp-ufs {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_charger_pmon_q>;
+	};
+
+	temp_ssd: temp-ssd {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_ec_soc_thrm_alert>;
+	};
+
+	temp_charger: temp-charger {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_ec_chgr_thrm_alert>;
+	};
+
+	temp_cpu_vr: temp-cpu-vr {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_ec_cpu_vr_thrm_alert>;
+	};
+
+	temp_ddr: temp-ddr {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_ec_ddr_thrm_alert>;
+	};
+
+	temp_5v_vr: temp-5v-vr {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_ec_5v_thrm_alert>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+
+		temp_sensor_ufs: ufs {
+			sensor = <&temp_ufs>;
+		};
+
+		temp_sensor_ssd: ssd {
+			sensor = <&temp_ssd>;
+		};
+
+		temp_sensor_charger: charger {
+			sensor = <&temp_charger>;
+		};
+
+		temp_sensor_cpu_vr: cpu_vr {
+			sensor = <&temp_cpu_vr>;
+		};
+
+		temp_sensor_ddr: ddr {
+			sensor = <&temp_ddr>;
+		};
+
+		temp_sensor_5v_vr: 5v_vr {
+			sensor = <&temp_5v_vr>;
+		};
+	};
+};
+
+&thermistor_3V3_100K_47K_NCP15WB473 {
+	status = "okay";
+};
