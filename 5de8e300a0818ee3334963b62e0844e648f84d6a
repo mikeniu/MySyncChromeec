@@ -94,6 +94,31 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bff93806_c2327d6f",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T22:55:02Z",
+      "side": 1,
+      "message": "In all 6 Zephyr fingerprint drivers, the GPIO interrupt callback ([`egis630_irq`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_egis630.c;l\u003d364;drc\u003d6e45855cf221b9dcadd845d2103b128579cd86b4), [`egis660_irq`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_egis660.c;l\u003d376;drc\u003d3add5465a811748da430096693d89746aec1c26c), [`elan_series_irq`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_elan_series.c;l\u003d386;drc\u003de501f278c2b34b89af981f61bccde9d78af7d652), [`fpc1025_irq`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_fpc1025.c;l\u003d448;drc\u003df83b438f9a902a66c41258d68b04fbf12a314ff8), [`fpc1145_irq`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_fpc1145.c;l\u003d527;drc\u003d1fed20c47b03cc0f6c29d7cd39b00a248accab84), [`ft98xx_irq`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_ft98xx.c;l\u003d359;drc\u003d3071668003ae2dac84a0e8237448f159aba1cff3)) calls `*_disable_irq(data-\u003edev)` (`gpio_pin_interrupt_configure_dt(..., GPIO_INT_DISABLE)`) before invoking `data-\u003ecallback(dev)` ([`fp_sensor_irq`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/fpsensor.c;l\u003d60-63;drc\u003d2b6133f9ce21f276009e1897bfdb05d90b48414b)). When `fp_task` handles that `TASK_EVENT_SENSOR_IRQ` in `FP_MODE_FINGER_UP` (with `FP_MODE_ANY_WAIT_IRQ` unset), [`fp_configure_detect()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/fpsensor/fpsensor.cc;l\u003d475-476;drc\u003dc5896c04db6f94dbaddef94ad8a4511e29d6392c) at line 474 is not called, so the IRQ remains disabled for the rest of the `FP_MODE_FINGER_UP` wait and subsequent checks happen via the 100ms timer.",
+      "parentUuid": "27f02311_fcaf5100",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 388,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5960447c_b8272e22",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 1
