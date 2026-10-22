@@ -22,6 +22,31 @@
       },
       "revId": "52b8e5800ac2b8ea0608dfe6e013e1594b4acb2f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f50d91af_e716e8fe",
+        "filename": "zephyr/test/geralt/common.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1182824
+      },
+      "writtenOn": "2026-10-22T18:06:52Z",
+      "side": 1,
+      "message": "`zephyr/program/geralt/src/hooks.c` references `PINCTRL_DT_DEFINE(DT_NODELABEL(i2c3))` and `DT_GPIO_CTLR_BY_IDX(DT_NODELABEL(i2c3), scl_gpios, 0)`, which are not in `zephyr,i2c-emul-controller.yaml` (it only includes `i2c-controller.yaml`).\n\nSwitched `\u0026i2c3` to `\"ite,enhance-i2c\", \"zephyr,i2c-emul-controller\"` (matching Geralt\u0027s actual IT8xxx2 I2C binding in `ite,common-i2c.yaml`) and removed `CONFIG_I2C_AMBIQ\u003dn` from `prj.conf` in Patchset 2.",
+      "parentUuid": "2a450b58_5399700a",
+      "range": {
+        "startLine": 218,
+        "startChar": 13,
+        "endLine": 218,
+        "endChar": 25
+      },
+      "isAi": true,
+      "revId": "52b8e5800ac2b8ea0608dfe6e013e1594b4acb2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
