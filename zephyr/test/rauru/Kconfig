@@ -12,5 +12,13 @@ config TEST_RAURU_USBC
 
 endchoice
 
+config RAURU_BOARD_HAS_HDMI_SUPPORT
+	bool "Board supports HDMI sub-boards"
+	default y
+
+config RAURU_LOG_LEVEL
+	int "Log level for rauru"
+	default 3
+
 # Pull Zephyr test support
 source "Kconfig.zephyr"

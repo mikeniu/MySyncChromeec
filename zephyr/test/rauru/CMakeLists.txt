@@ -17,10 +17,14 @@ zephyr_include_directories(
 	include)
 
 target_sources(app PRIVATE
-	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/usbc.c)
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/common.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/usbc.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/dp_alt_mode.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hdmi.c)
 
 # Add the test source
 target_sources(app PRIVATE
 	src/main.c
-    src/usbc_test.c
+	src/usbc_test.c
+	src/dp_alt_mode_test.c
 )

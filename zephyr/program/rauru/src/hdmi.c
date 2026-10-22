@@ -21,7 +21,7 @@
 
 LOG_MODULE_DECLARE(rauru, CONFIG_RAURU_LOG_LEVEL);
 
-static void hdmi_hpd_low_deferred(void)
+test_export_static void hdmi_hpd_low_deferred(void)
 {
 	if (!rauru_is_hpd_high(DP_PORT_HDMI)) {
 		rauru_detach_dp_path(DP_PORT_HDMI);
@@ -29,18 +29,19 @@ static void hdmi_hpd_low_deferred(void)
 }
 DECLARE_DEFERRED(hdmi_hpd_low_deferred);
 
+test_export_static bool hdmi_init;
+test_export_static bool rauru_has_hdmi;
+
 bool rauru_has_hdmi_port(void)
 {
-	static bool init;
-	static bool rauru_has_hdmi;
 	int ret;
 	uint32_t val;
 
-	if (init) {
+	if (hdmi_init) {
 		return rauru_has_hdmi;
 	}
 
-	init = true;
+	hdmi_init = true;
 	ret = cros_cbi_get_fw_config(FW_HDMI, &val);
 	if (ret != 0) {
 		LOG_WRN("Error retrieving CBI FW_CONFIG field %d", FW_HDMI);

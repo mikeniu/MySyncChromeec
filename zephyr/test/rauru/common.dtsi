@@ -7,8 +7,32 @@
 #include "../program/rauru/power_signal.dtsi"
 
 / {
+	aliases {
+		gpio-en-hdmi-pwr = &gpio_en_hdmi_pwr;
+	};
 
-    pinctrl: pinctrl {
+	rauru-fw-config {
+		compatible = "cros-ec,cbi-fw-config";
+
+		hdmi {
+			enum-name = "FW_HDMI";
+			start = <13>;
+			size = <1>;
+			hdmi-not-present {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_HDMI_NOT_PRESENT";
+				value = <0>;
+			};
+			hdmi-present {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_HDMI_PRESENT";
+				value = <1>;
+				default;
+			};
+		};
+	};
+
+	pinctrl: pinctrl {
 		compatible = "ite,it8xxx2-pinctrl";
 		status = "disabled";
 	};
@@ -61,7 +85,7 @@
 			gpios = <&gpiog 0 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_ec_ap_dp_hpd_l: ec_ap_dp_hpd_l {
-			gpios = <&gpiof 3 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <&gpiof 3 (GPIO_OUTPUT | GPIO_INPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
 		};
 		gpio_ec_ap_int_odl: ec_ap_int_odl {
 			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
@@ -166,6 +190,9 @@
 		gpio_usb_c0_dp_in_hpd: usb_c0_dp_in_hpd {
 			gpios = <&gpiof 2 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
+		gpio_usb_c1_dp_in_hpd: usb_c1_dp_in_hpd {
+			gpios = <&gpiof 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
 		gpio_usb_c0_frs_en: usb_c0_frs_en {
 			gpios = <&gpiof 0 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
@@ -187,6 +214,12 @@
 			irq-pin = <&gpio_gsc_acok_od>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
+		};
+
+		int_hdmi_ec_hpd: hdmi-ec-hpd {
+			irq-pin = <&gpio_hdmi_ec_hpd>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "hdmi_hpd_interrupt";
 		};
 	};
 
