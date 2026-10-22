@@ -47,6 +47,19 @@ include util/focaltech/build.mk
 
 include util/elan/build.mk
 
+host-util-bin-cxx-y += rts5817_flash_test
+rts5817_flash_test-objs = rts5817_usb_device.o rts5817_usb_device_test.o
+$(out)/util/rts5817_flash_test: HOST_CXXFLAGS+=-Iutil
+$(out)/util/rts5817_flash_test: HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) \
+	--cflags gtest gmock)
+$(out)/util/rts5817_flash_test: HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) \
+	--libs gtest gtest_main gmock)
+
+.PHONY: rts5817-flash-utils-test
+rts5817-flash-utils-test: $(out)/util/rts5817_flash_test
+	@$(out)/util/rts5817_flash_test
+utils-test: rts5817-flash-utils-test
+
 comm-objs=$(util-lock-objs:%=lock/%) comm-host.o comm-dev.o
 comm-objs+=comm-lpc.o comm-i2c.o misc_util.o comm-usb.o
 
