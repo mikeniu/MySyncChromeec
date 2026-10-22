@@ -656,7 +656,6 @@ class Renode(Platform):
             "flash_write_protect",  # TODO(b/567678305)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
-            "system_is_locked",  # TODO(b/483118063)
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
@@ -667,6 +666,11 @@ class Renode(Platform):
             "zephyr_cpp_std20",  # TODO(b/484366615)
             "zephyr_drivers_entropy",  # TODO(b/484366615)
             "zephyr_kernel_poll",  # TODO(b/484366615)
+        ]:
+            return True
+
+        if test_config.config_name in [
+            "system_is_locked_wp_on",  # TODO(b/567997214)
         ]:
             return True
 
