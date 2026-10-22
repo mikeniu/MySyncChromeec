@@ -16,6 +16,25 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "226442e8_5235677e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T10:25:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/61e51bb9-5d7a-4fb7-9d26-30e298bc9db2)]\n\n### Review Summary\n* **Functionality:** ✅ The state transition logic correctly keeps the sensor active when waiting for a finger-up event, resolving the early low-power state issue. The call to `fp_idle()` has been completely removed.\n* **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated within the existing task event loop and properly leverages the sensor modes.\n* **Code Simplicity:** ✅ The changes are minimal, straightforward, and no longer include unnecessary calls to `fp_idle()`.\n* **Idiomaticity \u0026 Readability:** ✅ Standard C/C++ idioms are followed and consistent with the existing codebase.\n* **Security:** ✅ No security vulnerabilities introduced.\n* **Testing:** ✅ The test suite comprehensively asserts both `detect_mode` and `low_power_mode` transitions correctly on all boundary paths, fully verifying the fix.\n* **CL Size \u0026 Scope:** ✅ Size: M (+62, -12). The CL is focused strictly on fixing the finger-up sensor mode issue and passes the Single Logical Change rule.\n* **Commit Message:** ✅ The description clearly explains the prior flawed behavior, why it occurred, and the conceptual solution.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
