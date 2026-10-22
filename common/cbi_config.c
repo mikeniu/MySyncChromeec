@@ -11,6 +11,8 @@ const struct cbi_storage_config_t *cbi_config = &flash_cbi_config;
 const struct cbi_storage_config_t *cbi_config = &eeprom_cbi_config;
 #elif defined(CONFIG_CBI_GPIO)
 const struct cbi_storage_config_t *cbi_config = &gpio_cbi_config;
+#elif defined(CONFIG_CBI_RAM)
+const struct cbi_storage_config_t *cbi_config = &ram_cbi_config;
 #else
 #error "CBI storage config not found."
 #endif

@@ -89,6 +89,13 @@ config PLATFORM_EC_CBI_GPIO
 	  Enables Chromium OS Board Info (CBI) from strapping pins. EC reads
 	  the BOARD ID and SKU ID from GPIOs and then substantiate in-memory
 	  CBI for AP to query.
+
+config PLATFORM_EC_CBI_RAM
+	bool "CBI RAM support"
+	help
+	  Enables Chromium OS Board Info (CBI) backed by an in-memory RAM
+	  buffer for co-processors (such as SCP) where CBI is relayed from
+	  the AP via host commands.
 endchoice
 
 config CROS_EC_CBI_FW_CONFIG_PARSER
