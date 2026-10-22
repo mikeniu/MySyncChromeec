@@ -52,6 +52,23 @@
       "message": "@fsammoura@google.com can you please comment on the open comments?",
       "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b30f8853_3ef9fd1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-10-22T17:29:34Z",
+      "side": 1,
+      "message": "Looks good to me. I think the direction is good, though it increases discrepancy between EC-legacy and Zephyr (which will not be a problem in foreseeable future).\n\nIn future we need to work on FINGER_UP implementation on both drivers and fpsensor task side. I believe it could be improved.\n\nFYI The problem with putting sensor to sleep in `FINGER_UP` mode started in June 2018 https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/1125062.",
+      "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
