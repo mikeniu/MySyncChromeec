@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "386a3cad_383cb77c",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-22T13:02:45Z",
+      "side": 1,
+      "message": "I don\u0027t think that\u0027s a good argument. I understand it like \"let\u0027s keep the bug, because in current configuration it\u0027s not a bug\". I would suggest separating the lid functionality, based on the fact if `gpio_lid_open` is defined or not.",
+      "parentUuid": "457246fd_84800412",
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7fc16957_bf175de5",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 1
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "Actually not, we can just keep led_mode \u003d Mode::MATCH when the match timer expires. This way the the LED might be off or on in the state Mode::MATCH, which works even better because if the lid gets open when the led is on it resets 10s timer.",
       "parentUuid": "7fc16957_bf175de5",
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "322707f2_a4ff2e34",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-22T13:02:45Z",
+      "side": 1,
+      "message": "Actually, now I think using an additional mode was a bit cleaner. It identifies the LED state explicitly. Currently, led can be ON and OFF in the MATCH mode. Sorry for the confusion.",
+      "parentUuid": "6b04c44c_4c2104b5",
       "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -125,6 +161,30 @@
       "side": 1,
       "message": "Yes, it makes no sense. I changed it to add same sense while keeping the vibe of the prints in this file.",
       "parentUuid": "52bb5032_4234736e",
+      "range": {
+        "startLine": 243,
+        "startChar": 10,
+        "endLine": 243,
+        "endChar": 35
+      },
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a246aab7_ce0c354f",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-22T13:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f90b037_b70468dc",
       "range": {
         "startLine": 243,
         "startChar": 10,
