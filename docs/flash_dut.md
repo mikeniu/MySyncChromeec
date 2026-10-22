@@ -17,17 +17,15 @@ physical Servo connection or a `crosfleet` lease.
 It leverages the shared [`dut_handlers`](../util/dut_handlers/) implementations:
 * **ChromeOS (`cros`) DUTs**: Connects over SSH (`root@<hostname>`).
   * **EC RW**: Reads the current AP firmware image (`futility read`), swaps the
-    `ecrw` payload using `/usr/share/vboot/bin/swap_ec_rw`, writes the modified
+    `ecrw` payload using `futility swap_cbfs_file`, writes the modified
     AP image back (`futility update --fast`), and reboots the DUT so AP
     Software Sync updates EC RW.
   * **EC RO**: Writes directly to the EC flash chip via `flashrom -p ec -w` and
     reboots the EC (`ectool reboot_ec`).
 * **GoogleBook (`alos`) DUTs**: Connects over ADB (`corp-adb-helper` or direct ADB).
-  * **EC RW**: Reads the AP firmware image (`futility read`), extracts `RW_FW`
-    and `RW_FWID` via `futility dump_fmap`, updates the CBFS regions
-    (`FW_MAIN_A` and `FW_MAIN_B`) using `cbfstool`, re-signs the AP image with
-    devkeys (`futility sign`), writes the image back (`futility update --fast`),
-    and reboots the DUT.
+  * **EC RW**: Reads the AP firmware image (`futility read`), swaps the EC RW
+    payload and re-signs using `futility swap_cbfs_file`, writes the image back
+    (`futility update --fast`), and reboots the DUT.
   * **EC RO**: Flashes the EC image via `futility update --ec_image` (falling
     back to `flashrom -p ec -w`) and reboots the EC (`ectool reboot_ec`).
 

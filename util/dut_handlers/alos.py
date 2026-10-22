@@ -264,101 +264,6 @@ class AlosHandler(DutHandler):
             text=capture_output,
         )
 
-    def _swap_ec_rw_on_dut(self, ap_path: str, ec_rw_path: str) -> None:
-        """Replace EC RW in AP image on DUT using cbfstool expand and futility."""
-        model = self.details["model"]
-        tmp_dir = "/data/local/tmp"
-
-        tmp_bin = f"{tmp_dir}/ecrw_extracted_{model}.bin"
-        tmp_ver = f"{tmp_dir}/ecrw_ver_{model}.bin"
-        tmp_hash = f"{tmp_dir}/ecrw_hash_{model}.bin"
-        tmp_cfg = f"{tmp_dir}/ecrw_cfg_{model}.bin"
-
-        print(
-            f"Swapping EC RW in AP firmware image {ap_path} using cbfstool..."
-        )
-
-        try:
-            # 1. Extract raw EC RW, version, and config from input binary
-            self._adb_shell(
-                f"futility dump_fmap -x {ec_rw_path} RW_FW:{tmp_bin} RW_FWID:{tmp_ver}",
-                check=False,
-            )
-
-            # 2. Compute binary SHA-256 hash of ecrw
-            self._adb_shell(
-                f"sha256sum -b {tmp_bin} | xxd -r -p > {tmp_hash}",
-                check=False,
-            )
-
-            # 3. For CBFS regions, remove old files, expand, and add updated
-            for region in ("FW_MAIN_A", "FW_MAIN_B"):
-                # Remove existing files
-                for name in (
-                    "ecrw",
-                    "ecrw.hash",
-                    "ecrw.version",
-                    "ecrw.config",
-                ):
-                    self._adb_shell(
-                        f"cbfstool {ap_path} remove -r {region} -n {name}",
-                        check=False,
-                    )
-
-                # Reclaim free space in CBFS
-                self._adb_shell(
-                    f"cbfstool {ap_path} expand -r {region}",
-                    check=False,
-                )
-
-                # Add updated files
-                self._adb_shell(
-                    f"cbfstool {ap_path} add -r {region} -t raw -c LZMA "
-                    f"-f {tmp_bin} -n ecrw"
-                )
-
-                res_hash = self._adb_shell(f"[ -s {tmp_hash} ]", check=False)
-                if res_hash.returncode == 0:
-                    self._adb_shell(
-                        f"cbfstool {ap_path} add -r {region} -t raw -c none "
-                        f"-f {tmp_hash} -n ecrw.hash"
-                    )
-
-                res_ver = self._adb_shell(f"[ -s {tmp_ver} ]", check=False)
-                if res_ver.returncode == 0:
-                    self._adb_shell(
-                        f"cbfstool {ap_path} add -r {region} -t raw -c none "
-                        f"-f {tmp_ver} -n ecrw.version"
-                    )
-
-                res_cfg = self._adb_shell(f"[ -s {tmp_cfg} ]", check=False)
-                if res_cfg.returncode == 0:
-                    self._adb_shell(
-                        f"cbfstool {ap_path} add -r {region} -t raw -c LZMA "
-                        f"-f {tmp_cfg} -n ecrw.config"
-                    )
-        finally:
-            self._adb_shell(
-                f"rm -f {tmp_bin} {tmp_ver} {tmp_hash} {tmp_cfg}", check=False
-            )
-
-    def _sign_ap_image_on_dut(self, ap_path: str) -> None:
-        """Re-sign the AP image on the DUT using futility sign with devkeys."""
-        keys_dir = "/data/local/tmp/devkeys"
-        host_keys_dir = os.path.join(
-            self.android_dir,
-            "external",
-            "vboot_reference",
-            "tests",
-            "devkeys",
-        )
-        if os.path.exists(host_keys_dir):
-            print(f"Pushing devkeys to ALOS DUT ({keys_dir})...")
-            self._adb_push(host_keys_dir, keys_dir)
-
-        print(f"Re-signing AP firmware image {ap_path} using futility sign...")
-        self._adb_shell(f"futility sign --keyset {keys_dir} {ap_path}")
-
     def flash_ec_rw(self, ec_rw_bin_path: Optional[str]) -> None:
         """Flash the EC RW section on the ALOS DUT using futility via ADB shell."""
         if not ec_rw_bin_path:
@@ -371,17 +276,23 @@ class AlosHandler(DutHandler):
         print(f"Flashing EC RW on ALOS DUT via ADB ({self.adb_target})...")
         try:
             ap_tmp_path = f"/data/local/tmp/ap_{model}.bin"
+            ec_rw_dut_path = f"/data/local/tmp/ec_rw_{model}.bin"
+            cfg_dut_path = f"/data/local/tmp/ecrw_cfg_{model}.bin"
             print("Reading AP firmware image on ALOS DUT via ADB...")
             self._adb_shell(f"futility read {ap_tmp_path}")
 
             print("Swapping EC RW section in AP firmware image on ALOS DUT...")
-            self._swap_ec_rw_on_dut(
-                ap_tmp_path,
-                f"/data/local/tmp/ec_rw_{model}.bin",
+            ec_config_path = os.path.join(
+                os.path.dirname(ec_rw_bin_path), "ec.config"
             )
-
-            print("Re-signing AP firmware image on ALOS DUT...")
-            self._sign_ap_image_on_dut(ap_tmp_path)
+            cfg_opt = (
+                f" --ec_config {cfg_dut_path}"
+                if os.path.exists(ec_config_path)
+                else ""
+            )
+            self._adb_shell(
+                f"futility swap_cbfs_file -i {ap_tmp_path} -e {ec_rw_dut_path}{cfg_opt}"
+            )
 
             print("Updating AP firmware with new EC RW image via futility...")
             self._adb_shell(f"futility update --fast -i {ap_tmp_path}")
@@ -394,8 +305,7 @@ class AlosHandler(DutHandler):
             ) from e
         finally:
             self._adb_shell(
-                f"rm -rf {ap_tmp_path} /data/local/tmp/ec_rw_{model}.bin "
-                "/data/local/tmp/devkeys",
+                f"rm -rf {ap_tmp_path} {ec_rw_dut_path} {cfg_dut_path}",
                 check=False,
             )
 
