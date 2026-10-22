@@ -23,38 +23,6 @@
 	};
 };
 
-&adc_charger_pmon_q {
-	enum-name = "ADC_PMON";
-};
-
-&adc_charger_amon_q {
-	enum-name = "ADC_TEMP_SENSOR_1";
-};
-
-&adc_ec_soc_thrm_alert {
-	enum-name = "ADC_TEMP_SENSOR_SOC";
-};
-
-&adc_ec_chgr_thrm_alert {
-	enum-name = "ADC_TEMP_SENSOR_CHARGER";
-};
-
-&adc_ec_cpu_vr_thrm_alert {
-	enum-name = "ADC_TEMP_SENSOR_2";
-};
-
-&adc_ec_ddr_thrm_alert {
-	enum-name = "ADC_TEMP_SENSOR_3";
-};
-
-&adc_ec_5v_thrm_alert {
-	enum-name = "ADC_TEMP_SENSOR_4";
-};
-
-&adc_ec_vph_pwr_det {
-	enum-name = "ADC_VPH_PWR";
-};
-
 &pwm2 {
 	prescaler-cx = <PWM_PRESCALER_C6>;
 };
