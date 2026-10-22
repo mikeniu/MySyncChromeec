@@ -14,6 +14,7 @@
 #include "../interrupts.dtsi"
 #include "../i2c.dtsi"
 #include "../power_signals.dtsi"
+#include "../pwrmon.dtsi"
 
 /* Bandit project DTS includes*/
 
