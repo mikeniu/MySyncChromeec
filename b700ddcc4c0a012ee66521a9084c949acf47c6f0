@@ -22,6 +22,30 @@
       },
       "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f01a5f96_93aed71d",
+        "filename": "include/system.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-22T22:00:41Z",
+      "side": 1,
+      "message": "FYI, cmsis provides [`__disable_irq()`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/modules/hal/cmsis_6/CMSIS/Core/Include/cmsis_gcc.h;l\u003d818;drc\u003dbc10102247df6b3e074e778b153258ac2ea9b1a6) which maps to the same assembly instruction.",
+      "parentUuid": "b77a17da_d7ab2506",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 29
+      },
+      "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
