@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "021fa962_377be760",
+        "filename": "zephyr/program/dougie/dougie.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1562687
+      },
+      "writtenOn": "2026-10-22T14:05:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c576c379_c670775d",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 2
+      },
+      "revId": "b29c555f5170c731ea4afd78d649b87648f174ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7651ce69_33902600",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-21T22:39:46Z",
       "side": 1,
       "message": "These overrides don\u0027t belong at the program level. This will make creating new project variants very tedious.\n\nJust modify the `bandit/generated.dtsi` file directly.  For other projects, best practice was to use arbitrage to auto-generate only the first version of the generated.dtsi file and then apply hand edits as needed.\n\nExample [here](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/HEAD:src/platform/ec/zephyr/program/ocelot/ocelotrvp-npcx/generated.dtsi;l\u003d5)",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 20
+      },
+      "revId": "b29c555f5170c731ea4afd78d649b87648f174ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f1aea2_8a306939",
+        "filename": "zephyr/program/dougie/gpio.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1562687
+      },
+      "writtenOn": "2026-10-22T14:05:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7651ce69_33902600",
       "range": {
         "startLine": 80,
         "startChar": 0,
