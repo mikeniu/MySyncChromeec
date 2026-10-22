@@ -7941,6 +7941,14 @@ struct ec_response_typec_status_v1 {
 	uint32_t sink_cap_pdos[11]; /* Max 11 PDOs can be present */
 } __ec_align1;
 
+/* Each version's source and sink PDO arrays are the same size. */
+BUILD_ASSERT(
+	sizeof(((struct ec_response_typec_status_v0 *)0)->source_cap_pdos) ==
+	sizeof(((struct ec_response_typec_status_v0 *)0)->sink_cap_pdos));
+BUILD_ASSERT(
+	sizeof(((struct ec_response_typec_status_v1 *)0)->source_cap_pdos) ==
+	sizeof(((struct ec_response_typec_status_v1 *)0)->sink_cap_pdos));
+
 /**
  * Get the number of peripheral charge ports
  */
