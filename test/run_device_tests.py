@@ -832,8 +832,6 @@ class AllTests:
                     ALL_TESTS_FAILED_REGEX,
                     ASSERTION_FAILURE_REGEX,
                 ],
-                # TODO(b/365628799): Need to port to Zephyr.
-                skip_for_zephyr=True,
             ),
             TestConfig(
                 test_name="bbram_retained_mem",
