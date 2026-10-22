@@ -798,7 +798,8 @@ static int check_chipid(struct common_hnd *chnd)
 		 * disable, and protect-path disable) which NACK while the core
 		 * clock domain is gated.
 		 */
-		if ((id & 0xff00f) == 0x01002 || (id & 0xff00f) == 0x02002) {
+		if ((id & 0xff00f) == 0x01002 || (id & 0xff00f) == 0x02002 ||
+		    (id & 0xff00f) == 0x03002) {
 			id |= 0x80000;
 			if (chnd->conf.reset_gpio ||
 			    chnd->conf.disable_watchdog ||
