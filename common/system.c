@@ -556,9 +556,6 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	i2c_prepare_sysjump();
 #endif
 
-	/* Flush UART output */
-	cflush();
-
 	/* Fill in preserved data between jumps */
 	jdata->reserved0 = 0;
 	jdata->magic = JUMP_DATA_MAGIC;
@@ -569,6 +566,9 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 
 	/* Call other hooks; these may add tags */
 	hook_notify(HOOK_SYSJUMP);
+
+	/* Flush UART output */
+	cflush();
 
 	/* Disable interrupts before jump */
 	interrupt_disable_all();
