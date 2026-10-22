@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10d9f0e2_689fc9e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T11:30:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/cb3b14ec-b569-48dd-b3e7-6f168bf57026)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5aa1bdb502866521e97307349f8c4334f58447fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a5ecff6_0847e8aa",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2163,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T11:30:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Error Message Accuracy:** The condition on the previous line was updated to include `SERVO_MICRO`, but the error message here still only mentions J-Link. Please update the error message to accurately reflect the new condition (e.g., `\"jlink_port specified, but flasher is not set to J-Link or servo_micro.\"`).\n\n[🔗](http://go/tj/cb3b14ec-b569-48dd-b3e7-6f168bf57026)",
+      "range": {
+        "startLine": 2163,
+        "startChar": 0,
+        "endLine": 2163,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5aa1bdb502866521e97307349f8c4334f58447fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
