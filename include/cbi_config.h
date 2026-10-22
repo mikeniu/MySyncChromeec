@@ -24,6 +24,10 @@ extern const struct cbi_storage_config_t eeprom_cbi_config;
 extern const struct cbi_storage_config_t gpio_cbi_config;
 #endif
 
+#if defined(CONFIG_CBI_RAM)
+extern const struct cbi_storage_config_t ram_cbi_config;
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -19,7 +19,11 @@
 
 #define ST_NORMALIZE_RATE(_fs) (1 << __fls(_fs))
 
+#ifdef CONFIG_I2C_MTK_SCP
+#define FIFO_BUFFER_NUM_PATTERN 2
+#else
 #define FIFO_BUFFER_NUM_PATTERN 8
+#endif
 /* Define number of data to be read from FIFO each time
  * It must be a multiple of OUT_XYZ_SIZE.
  * In case of LSM6DSM FIFO contains pattern depending ODR
