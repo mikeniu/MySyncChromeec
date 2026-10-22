@@ -3,9 +3,15 @@
  * found in the LICENSE file.
  */
 
+#include "charge_manager.h"
 #include "driver/ppc/rt1739.h"
+#include "emul/emul_common_i2c.h"
 #include "emul/emul_rt1739.h"
+#include "hooks.h"
+#include "task.h"
 #include "test/drivers/test_state.h"
+#include "usb_charge.h"
+#include "usbc_ppc.h"
 
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
@@ -18,8 +24,43 @@ FAKE_VOID_FUNC(pd_got_frs_signal, int);
 #define RT1739_NODE DT_NODELABEL(rt1739_emul)
 
 extern int rt1739_get_flag(int port);
+extern const struct bc12_drv rt1739_bc12_drv;
+extern void rt1739_deferred_interrupt(void);
+extern void rt1739_pd_connect(void);
+extern void rt1739_pd_disconnect(void);
 
 const struct emul *rt1739_emul = EMUL_DT_GET(RT1739_NODE);
+
+static bool mock_pd_connected;
+
+int __wrap_pd_is_connected(int port)
+{
+	return mock_pd_connected;
+}
+
+#ifndef TASK_ID_USB_CHG_P0
+#define TASK_ID_USB_CHG_P0 0
+#endif
+
+static atomic_t mock_task_event_bitmap;
+
+atomic_t *task_get_event_bitmap(task_id_t task_id)
+{
+	return &mock_task_event_bitmap;
+}
+
+void usb_charger_task_set_event(int port, uint8_t event)
+{
+	if (port == RT1739_PORT) {
+		atomic_or(&mock_task_event_bitmap,
+			  TASK_EVENT_CUSTOM_BIT(event) | event);
+	}
+}
+
+int pd_snk_is_vbus_provided(int port)
+{
+	return rt1739_ppc_drv.is_vbus_present(port);
+}
 
 static struct rt1739_set_reg_entry_t *
 get_next_reg_set_entry(struct _snode **iter_node, uint8_t target_reg)
@@ -413,18 +454,33 @@ ZTEST(rt1739_ppc, test_vbus_source_enable)
 	rt1739_ppc_drv.vbus_source_enable(RT1739_PORT, true);
 	test_vbus_source_enable_reg_settings(true);
 
+	/* Calling again when already enabled should be a no-op */
+	rt1739_ppc_drv.vbus_source_enable(RT1739_PORT, true);
+	test_vbus_source_enable_reg_settings(true);
+
+	rt1739_ppc_drv.vbus_source_enable(RT1739_PORT, false);
+	test_vbus_source_enable_reg_settings(false);
+
+	/* Calling again when already disabled should be a no-op */
 	rt1739_ppc_drv.vbus_source_enable(RT1739_PORT, false);
 	test_vbus_source_enable_reg_settings(false);
 }
 
 ZTEST(rt1739_ppc, test_is_vbus_present)
 {
+	struct i2c_common_emul_data *common = rt1739_emul->data;
+
 	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_INT_STS4,
 					 RT1739_VBUS_PRESENT));
 	zassert_true(rt1739_ppc_drv.is_vbus_present(RT1739_PORT));
 
 	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_INT_STS4, 0));
 	zassert_false(rt1739_ppc_drv.is_vbus_present(RT1739_PORT));
+
+	/* Test read error path */
+	i2c_common_emul_set_read_fail_reg(common, RT1739_REG_INT_STS4);
+	zassert_false(rt1739_ppc_drv.is_vbus_present(RT1739_PORT));
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
 }
 
 ZTEST(rt1739_ppc, test_set_polarity)
@@ -481,4 +537,173 @@ ZTEST(rt1739_ppc, test_interrupt)
 	zassert_equal(2, pd_got_frs_signal_fake.call_count);
 	rt1739_ppc_drv.set_frs_enable(RT1739_PORT, false);
 	zassert_equal(0, rt1739_get_flag(RT1739_PORT));
+
+	/* Drain pending events so deferred interrupt is clean */
+	rt1739_deferred_interrupt();
+}
+
+ZTEST(rt1739_ppc, test_reg_dump)
+{
+	struct i2c_common_emul_data *common = rt1739_emul->data;
+
+	zassert_ok(rt1739_ppc_drv.reg_dump(RT1739_PORT));
+
+	/* Cover read error path in reg_dump */
+	i2c_common_emul_set_read_fail_reg(common, 0x05);
+	zassert_ok(rt1739_ppc_drv.reg_dump(RT1739_PORT));
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+}
+
+ZTEST(rt1739_ppc, test_deferred_interrupt)
+{
+	struct i2c_common_emul_data *common = rt1739_emul->data;
+
+	/* Calling with no pending events should be a no-op */
+	rt1739_deferred_interrupt();
+
+	/* Test normal interrupt handling with BC1.2 sink done */
+	atomic_and(task_get_event_bitmap(TASK_ID_USB_CHG_P0),
+		   ~TASK_EVENT_CUSTOM_BIT(USB_CHG_EVENT_BC12));
+	rt1739_ppc_drv.interrupt(RT1739_PORT);
+	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_INT_EVENT5,
+					 RT1739_BC12_SNK_DONE_INT));
+	rt1739_deferred_interrupt();
+	zassert_true(*task_get_event_bitmap(TASK_ID_USB_CHG_P0) &
+		     TASK_EVENT_CUSTOM_BIT(USB_CHG_EVENT_BC12));
+	atomic_and(task_get_event_bitmap(TASK_ID_USB_CHG_P0),
+		   ~TASK_EVENT_CUSTOM_BIT(USB_CHG_EVENT_BC12));
+
+	/* Test read error on EVENT4 */
+	rt1739_ppc_drv.interrupt(RT1739_PORT);
+	i2c_common_emul_set_read_fail_reg(common, RT1739_REG_INT_EVENT4);
+	rt1739_deferred_interrupt();
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+
+	/* Test read error on EVENT5 */
+	rt1739_ppc_drv.interrupt(RT1739_PORT);
+	i2c_common_emul_set_read_fail_reg(common, RT1739_REG_INT_EVENT5);
+	rt1739_deferred_interrupt();
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+
+	/* Test when ppc_chips[port].drv != &rt1739_ppc_drv */
+	const struct ppc_drv *saved_drv = ppc_chips[RT1739_PORT].drv;
+	rt1739_ppc_drv.interrupt(RT1739_PORT);
+	ppc_chips[RT1739_PORT].drv = NULL;
+	rt1739_deferred_interrupt();
+	ppc_chips[RT1739_PORT].drv = saved_drv;
+}
+
+ZTEST(rt1739_ppc, test_bc12)
+{
+	uint8_t val;
+	struct i2c_common_emul_data *common = rt1739_emul->data;
+
+	/* Test bc12 task init */
+	rt1739_bc12_drv.usb_charger_task_init(RT1739_PORT);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_false(val & RT1739_BC12_SNK_EN);
+
+	/* Test VBUS event when non-pd sink (VBUS present) */
+	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_INT_STS4,
+					 RT1739_VBUS_PRESENT));
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_true(val & RT1739_BC12_SNK_EN);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_SBU_CTRL_01,
+					&val));
+	zassert_equal(val & (RT1739_DM_SWEN | RT1739_DP_SWEN |
+			     RT1739_SBU1_SWEN | RT1739_SBU2_SWEN),
+		      (RT1739_DM_SWEN | RT1739_DP_SWEN | RT1739_SBU1_SWEN |
+		       RT1739_SBU2_SWEN));
+
+	/* Test BC12 event with SDP */
+	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_BC12_STAT,
+					 RT1739_PORT_STAT_SDP));
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_BC12);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_false(val & RT1739_BC12_SNK_EN);
+
+	/* Test BC12 event with CDP */
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_true(val & RT1739_BC12_SNK_EN);
+	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_BC12_STAT,
+					 RT1739_PORT_STAT_CDP));
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_BC12);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_false(val & RT1739_BC12_SNK_EN);
+
+	/* Test BC12 event with DCP */
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_true(val & RT1739_BC12_SNK_EN);
+	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_BC12_STAT,
+					 RT1739_PORT_STAT_DCP));
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_BC12);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_false(val & RT1739_BC12_SNK_EN);
+
+	/* Test BC12 event with unknown device type */
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_true(val & RT1739_BC12_SNK_EN);
+	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_BC12_STAT, 0));
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_BC12);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_false(val & RT1739_BC12_SNK_EN);
+
+	/* Test BC12 event with read error on BC12_STAT */
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_true(val & RT1739_BC12_SNK_EN);
+	i2c_common_emul_set_read_fail_reg(common, RT1739_REG_BC12_STAT);
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_BC12);
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_false(val & RT1739_BC12_SNK_EN);
+
+	/* Test when not non-pd sink (e.g. VBUS removed) */
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_true(val & RT1739_BC12_SNK_EN);
+	zassert_ok(rt1739_emul_write_reg(rt1739_emul, RT1739_REG_INT_STS4, 0));
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_BC12);
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_BC12_SNK_FUNC,
+					&val));
+	zassert_false(val & RT1739_BC12_SNK_EN);
+
+	/* Test when already in CHARGE_SUPPLIER_NONE to cover no-op branch */
+	rt1739_bc12_drv.usb_charger_task_event(RT1739_PORT, USB_CHG_EVENT_VBUS);
+}
+
+ZTEST(rt1739_ppc, test_pd_connect_disconnect)
+{
+	uint8_t val;
+	const uint8_t sbu_switches = RT1739_DM_SWEN | RT1739_DP_SWEN |
+				     RT1739_SBU1_SWEN | RT1739_SBU2_SWEN;
+
+	mock_pd_connected = true;
+	rt1739_pd_connect();
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_SBU_CTRL_01,
+					&val));
+	zassert_equal(val & sbu_switches, sbu_switches);
+
+	mock_pd_connected = false;
+	rt1739_pd_disconnect();
+	zassert_ok(rt1739_emul_peek_reg(rt1739_emul, RT1739_REG_SBU_CTRL_01,
+					&val));
+	zassert_equal(val & sbu_switches, 0);
 }
