@@ -16,6 +16,100 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84f62864_ce61ba9e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T21:17:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding magic values and test coverage.\n\n### Review Summary\n* **Functionality:** Looks good. Rate limiting logic is sound, but test coverage is missing for the reset branch.\n* **Architecture \u0026 Component Fit:** `ec_host_cmd_user_cb` correctly tracks state, though static variables make the callback non-reentrant. Given the constraints of the signature, this is acceptable for a simple rate limit.\n* **Code Simplicity:** Test code contains control flow (`if` branch) that can be simplified.\n* **Idiomaticity \u0026 Readability:** Good, but needs named constants.\n* **Security:** N/A\n* **Testing:** ❌ **Blocking:** Missing boundary tests and coverage for the `t_now - t_last \u003e 3` reset branch.\n* **CL Size \u0026 Scope:** ✅ Size: M (+87, -2). This is a cohesive single logical change.\n* **Commit Message:** ✅ Accurate, concise, and follows ChromiumOS formatting guidelines.\n\n[[trajectory](https://goto.corp.google.com/traj/821f027b-322b-491e-bcfe-37c76bfbdaa2)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30f291ad_356c073b",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T21:17:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Magic Values:**\nThe thresholds `3`, `500`, and `20` are unexplained numeric literals embedded directly in the logic (even with inline comments). They must be extracted to named constants with explicit unit suffixes (e.g., `_MS`) to satisfy the No Magic Values rule.\n\nSince this is C, please define them as macros at the top of the file:\n```c\n#define HOST_CMD_MIN_REST_MS 3\n#define HOST_CMD_RATE_LIMIT_PERIOD_MS 500\n#define HOST_CMD_RECESS_MS 20\n```\nAnd use them in the logic:\n```c\n\t/* reset rate limiting if we have slept enough */\n\tif (t_now - t_last \u003e HOST_CMD_MIN_REST_MS) {\n\t\tt_recess \u003d t_now;\n\t}\n\n\t/*\n\t * rate limiting : check how long we have gone without a\n\t * significant interruption to avoid DoS from host\n\t */\n\tif (t_now - t_recess \u003e HOST_CMD_RATE_LIMIT_PERIOD_MS) {\n\t\t/* Short recess */\n\t\tk_sleep(K_MSEC(HOST_CMD_RECESS_MS));\n\t\tt_now \u003d k_uptime_get();\n\t\tt_recess \u003d t_now;\n\t}\n```\n[🔗](http://go/tj/821f027b-322b-491e-bcfe-37c76bfbdaa2)",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45b63b72_6f28a5cf",
+        "filename": "zephyr/test/drivers/host_command_thread/src/test_flood.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T21:17:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Magic Values \u0026 Code Simplicity:**\nThe magic numbers `255`, `2000`, and `20` should be extracted to named constants with explicit units (e.g., `kFloodCommandCount`, `kBusyWaitUs`, `kExpectedRecessMs`) so the boundary values are self-evident.\n\nAdditionally, the strict test standard requires constructing minimal state with zero control flow (`for`/`while`/`if`) in test bodies. While a loop is often necessary to simulate a flood, you can eliminate the `if` branch by accumulating the boolean result directly.\n\nHere is a simplified snippet:\n```c\n\tconst int kFloodCommandCount \u003d 255;\n\tconst int kBusyWaitUs \u003d 2000;\n\tconst int kExpectedRecessMs \u003d 20;\n\n\t/*\n\t * Simulate back-to-back host commands spaced 2ms apart (\u003c\u003d 3ms MIN_REST).\n\t * Total busy-wait exceeds the 500ms PERIOD and must trigger exactly one\n\t * 20ms k_sleep() recess inside ec_host_cmd_user_cb.\n\t */\n\tfor (int i \u003d 0; i \u003c kFloodCommandCount; i++) {\n\t\tk_busy_wait(kBusyWaitUs);\n\t\tcall_start \u003d k_uptime_get();\n\t\tec_host_cmd_user_cb(\u0026rx_ctx, NULL);\n\t\trecess_count +\u003d (k_uptime_get() - call_start \u003e\u003d kExpectedRecessMs) ? 1 : 0;\n\t}\n\n\tzassert_equal(recess_count, 1,\n\t\t      \"Expected exactly one %dms rate-limit recess, got %d\",\n\t\t      kExpectedRecessMs, recess_count);\n```\n[🔗](http://go/tj/821f027b-322b-491e-bcfe-37c76bfbdaa2)",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b07b7c0d_4cddaaf6",
+        "filename": "zephyr/test/drivers/host_command_thread/src/test_flood.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T21:17:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Test Coverage (Missing Branch \u0026 Boundary Tests):**\nThe current test validates the rate-limiting recess (the `t_now - t_recess \u003e 500` branch), but it completely omits coverage for the reset condition (`t_now - t_last \u003e 3`). \n\nYou must add tests covering:\n1. **Reset Branch:** A test case (e.g., `test_host_command_flood_reset`) that spaces the commands by `4ms` (or `HOST_CMD_MIN_REST_MS + 1`) and verifies that `t_recess` resets and `recess_count \u003d\u003d 0`.\n2. **Boundary Analysis:** The exact threshold for the period. The current test runs for 510ms. You should test that exactly `\u003c\u003d 500ms` of sustained commands yields 0 recesses, and `\u003e 500ms` yields 1 recess.\n\nPlease add these test cases to ensure all state transitions and boundaries introduced in this CL are verified.\n[🔗](http://go/tj/821f027b-322b-491e-bcfe-37c76bfbdaa2)",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
