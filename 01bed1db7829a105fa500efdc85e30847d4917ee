@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "01bed1db7829a105fa500efdc85e30847d4917ee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "885416e7_b8521703",
+        "filename": "zephyr/program/dougie/bandit/generated.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-22T19:30:43Z",
+      "side": 1,
+      "message": "The typical setting for an unused pin is to configure an input with a pull-up.  Any reason that you\u0027re changing all pins to pull-downs?",
+      "range": {
+        "startLine": 192,
+        "startChar": 27,
+        "endLine": 192,
+        "endChar": 41
+      },
+      "revId": "01bed1db7829a105fa500efdc85e30847d4917ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
