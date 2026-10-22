@@ -11,6 +11,15 @@
 		status = "disabled";
 	};
 
+	intc: interrupt-controller@e000e100 {
+		#address-cells = <1>;
+		compatible = "arm,v7m-nvic";
+		reg = <0xe000e100 0xc00>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		arm,num-irq-priority-bits = <4>;
+	};
+
 	named-gpios {
 		usb_c0_frs_en: usb-c0-frs-en {
 			gpios = <&gpioa 3 GPIO_OUTPUT_LOW>;
@@ -203,8 +212,31 @@
 &i2c4 {
 	/* I2C_DETACHABLE_BASE */
 	status = "okay";
+	hid_i2c_target: hid-i2c-target@56 {
+		compatible = "cros-ec,hid-i2c-touchpad";
+		reg = <0x56>;
+	};
 };
 
 &adc0 {
 	status = "okay";
 };
+
+&i2c3 {
+	compatible = "ite,enhance-i2c", "zephyr,i2c-emul-controller";
+	status = "disabled";
+	interrupt-parent = <&intc>;
+	interrupts = <0 0>;
+	port-num = <3>;
+	channel-switch-sel = <3>;
+	clock-gate-offset = <0>;
+	scl-gpios = <&gpiof 2 0>;
+	sda-gpios = <&gpiof 3 0>;
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-names = "default", "sleep";
+};
+
+
+
+

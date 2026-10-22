@@ -12,8 +12,12 @@ zephyr_include_directories(
 	"${PLATFORM_EC_PROGRAM_DIR}/geralt/include"
 	include)
 
+zephyr_compile_definitions(DT_N_S_i2c_f03680_P_target_buffered_mode=0)
+
 target_sources(app PRIVATE
 	${PLATFORM_EC_PROGRAM_DIR}/geralt/src/base_detect.c
+	${PLATFORM_EC_PROGRAM_DIR}/geralt/src/hibernate.c
+	${PLATFORM_EC_PROGRAM_DIR}/geralt/src/hooks.c
 	${PLATFORM_EC_PROGRAM_DIR}/geralt/src/usbc_config.c
 	${PLATFORM_EC_PROGRAM_DIR}/geralt/src/usb_pd_policy.c)
 

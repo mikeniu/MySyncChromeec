@@ -8,8 +8,12 @@
 
 #include "battery.h"
 
+#include <zephyr/drivers/pinctrl.h>
 #include <zephyr/fff.h>
 
 DECLARE_FAKE_VALUE_FUNC(enum battery_present, battery_is_present);
+DECLARE_FAKE_VALUE_FUNC(int, tc_is_attached_src, int);
+DECLARE_FAKE_VALUE_FUNC(int, pinctrl_configure_pins, const pinctrl_soc_pin_t *,
+			uint8_t, uintptr_t);
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_GERALT_INCLUDE_FAKES_H_ */
