@@ -32,8 +32,8 @@ static int base_interrupt_id;
 static int lid_interrupt_id;
 static int interrupt_count;
 
-extern uint8_t base_is_none;
-extern uint8_t lid_is_none;
+extern bool base_is_none;
+extern bool lid_is_none;
 
 static void teardown(void *unused)
 {
@@ -89,6 +89,9 @@ static void clamshell_reset(void *fixture)
 	fake_base_sensor = BASE_NONE;
 	fake_lid_sensor = LID_NONE;
 
+	base_is_none = false;
+	lid_is_none = false;
+
 	/* Run init hooks to initialize cbi. */
 	hook_notify(HOOK_INIT);
 
@@ -118,6 +121,9 @@ static void main_sensor_reset(void *fixture)
 	fake_form_factor = CONVERTIBLE;
 	fake_base_sensor = BASE_ICM42607;
 	fake_lid_sensor = LID_LIS2DWLTR;
+
+	base_is_none = false;
+	lid_is_none = false;
 
 	/* zephyr/program/corsola/tentacruel/src/sensor.c will set the sensor
 	 * count to 0 if the CBI fw config is set to CLAMSHELL, but there's no
@@ -156,6 +162,11 @@ static void alt_sensor_reset(void *fixture)
 	fake_form_factor = CONVERTIBLE;
 	fake_base_sensor = BASE_BMI323;
 	fake_lid_sensor = LID_BMA422;
+
+	base_is_none = false;
+	lid_is_none = false;
+
+	motion_sensor_count = DT_CHILD_NUM_STATUS_OKAY(SENSOR_NODE);
 
 	/* Run init hooks to initialize cbi. */
 	hook_notify(HOOK_INIT);

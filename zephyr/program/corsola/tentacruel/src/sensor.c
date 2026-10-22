@@ -47,8 +47,6 @@ void base_sensor_interrupt(enum gpio_signal signal)
 		else {
 			icm42607_interrupt(signal);
 		}
-	} else {
-		base_is_none = true;
 	}
 }
 
@@ -77,8 +75,6 @@ void lid_sensor_interrupt(enum gpio_signal signal)
 		else {
 			lis2dw12_interrupt(signal);
 		}
-	} else {
-		lid_is_none = true;
 	}
 }
 
@@ -110,8 +106,12 @@ static void board_sensor_init(void)
 	if (val == CLAMSHELL) {
 		motion_sensor_count = 0;
 		gmr_tablet_switch_disable();
+		base_is_none = true;
+		lid_is_none = true;
 		ccprints("Board is Clamshell");
 	} else if (val == CONVERTIBLE) {
+		base_is_none = false;
+		lid_is_none = false;
 		ccprints("Board is Convertible");
 
 		ret = cros_cbi_get_fw_config(BASE_SENSOR, &val);
