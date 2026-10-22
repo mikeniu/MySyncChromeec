@@ -18,7 +18,7 @@
 
 #include <zephyr/drivers/gpio.h>
 
-static void rauru_common_init(void)
+test_export_static void rauru_common_init(void)
 {
 	gpio_enable_dt_interrupt(
 		GPIO_INT_FROM_NODELABEL(int_ap_xhci_init_done));

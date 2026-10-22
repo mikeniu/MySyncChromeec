@@ -30,6 +30,32 @@
 				default;
 			};
 		};
+		sub-board {
+			enum-name = "FW_SUB_BOARD";
+			start = <26>;
+			size = <2>;
+
+			sub-board-none {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_SB_NONE";
+				value = <0>;
+			};
+
+			sub-board-redriver-tusb1046-ps8761 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_SB_REDRIVER";
+				value = <1>;
+				default;
+			};
+			sub-board-retimer-anx3443-ps8811 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_SB_RETIMER";
+				value = <2>;
+			};
+		};
+	};
+
+	fan0: fan0 {
 	};
 
 	pinctrl: pinctrl {
@@ -69,7 +95,7 @@
 			gpios = <&gpiom 2 (GPIO_INPUT)>;
 			enum-name = "GPIO_AP_IN_SLEEP_L";
 		};
-		gpio_ap_xhci_init_done_r: ap_xhci_init_done_r {
+		gpio_ap_xhci_init_done: ap_xhci_init_done_r {
 			gpios = <&gpioj 4 (GPIO_INPUT)>;
 		};
 		gpio_ccd_mode_odl: ccd_mode_odl {
@@ -220,6 +246,12 @@
 			irq-pin = <&gpio_hdmi_ec_hpd>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "hdmi_hpd_interrupt";
+		};
+
+		int_ap_xhci_init_done: ap-xhci-init-done {
+			irq-pin = <&gpio_ap_xhci_init_done>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "xhci_interrupt";
 		};
 	};
 

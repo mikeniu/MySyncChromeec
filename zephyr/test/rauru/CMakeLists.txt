@@ -16,15 +16,21 @@ zephyr_include_directories(
 	"${PLATFORM_EC_PROGRAM_DIR}/rauru/include"
 	include)
 
+target_compile_definitions(app PRIVATE CHARGER_SOLO=0 CONFIG_PLATFORM_EC_CHARGER_BQ25720=1)
+
 target_sources(app PRIVATE
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/common.c
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/usbc.c
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/dp_alt_mode.c
-	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hdmi.c)
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hdmi.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hooks.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hibernate.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/sub_board.c)
 
 # Add the test source
 target_sources(app PRIVATE
 	src/main.c
 	src/usbc_test.c
 	src/dp_alt_mode_test.c
+	src/hooks_test.c
 )
