@@ -72,17 +72,11 @@ add_dependencies(crypto zephyr_generated_headers)
 # -D_POSIX_C_SOURCE=200809L is needed because BoringSSL uses strdup() function
 # is guarded by __POSIX_VISIBLE >=200809 in Newlib's string.h file.
 #
-# -Wno-implicit-function-declaration is needed because BoringSSL sources use
-# functions not defined in Zephyr: fflush(), getenv(), sscanf(). We won't get
-# any linker issues because code that uses these functions is unused and will
-# be removed by -ffunction-sections and -Wl,--gc-sections.
-#
 # -fno-common disables merging tentative definitions (uninitialized global
 # variables) into pre-existing definition (initialized global variable).
 # Recommended by BoringSSL.
 set(BORINGSSL_COMPILE_OPTIONS
 	-D_POSIX_C_SOURCE=200809L
-	-Wno-implicit-function-declaration
 	-fno-common
 )
 
