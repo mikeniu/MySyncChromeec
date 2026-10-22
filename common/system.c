@@ -13,7 +13,6 @@
 #include "console.h"
 #include "cpu.h"
 #include "cros_board_info.h"
-#include "dma.h"
 #include "extpower.h"
 #include "flash.h"
 #include "gpio.h"
@@ -597,11 +596,6 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	watchdog_reload();
 
 	chip_pre_system_jump();
-
-#ifdef CONFIG_DMA_CROS
-	/* Disable all DMA channels to avoid memory corruption */
-	dma_disable_all();
-#endif /* CONFIG_DMA_CROS */
 
 	/* Jump to the reset vector */
 	resetvec = (void (*)(void))init_addr;

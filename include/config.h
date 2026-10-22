@@ -2093,15 +2093,6 @@
 /* Monitor the states of other devices */
 #undef CONFIG_DEVICE_STATE
 
-/* Support DMA transfers inside the EC */
-#undef CONFIG_DMA_CROS
-
-/* Use the common interrupt handlers for DMA IRQs */
-#define CONFIG_DMA_DEFAULT_HANDLERS
-
-/* Compile extra debugging and tests for the DMA module */
-#undef CONFIG_DMA_HELP
-
 /*
  * If the board supports DRAM, base DRAM address for the chip, where we want
  * to load extra code/data (address from chip address space).
