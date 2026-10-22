@@ -1,0 +1,104 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a33dee46_6c4c7b43",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:12:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Class Declaration Order:** The destructor should be placed after all constructors and assignment operators. Please move this destructor below the deleted copy operations (lines 73-74).\n[🔗](http://go/tj/d4846f23-a582-42b9-afcd-3ed1a0e1aaa6)",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "753f4ccf663a2f8ea90a5ad5bec4661162706eed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc6e4406_dac4aa07",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:12:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomatic C++:** Parameterless functions in C++ should be declared with empty parentheses `()` rather than `(void)`, which is a C-only idiom. Please remove `void` from the parameter list.\n\nOther locations to update:\n* **Line 91**: `bool enable_download(void);`\n* **Line 108**: `bool find_dfu_interface(void);`\n* **Line 172**: `void RtsUsbDevice::release(void)`\n* **Line 188**: `bool RtsUsbDevice::enable_download(void)`\n* **Line 264**: `bool RtsUsbDevice::find_dfu_interface(void)`\n[🔗](http://go/tj/d4846f23-a582-42b9-afcd-3ed1a0e1aaa6)",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "753f4ccf663a2f8ea90a5ad5bec4661162706eed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60772f33_296f54ae",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:12:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **No Magic Values:** The `wValue` argument `1` corresponds to the \"enable download mode\" status. Please hoist this raw numeric primitive to a named constant (e.g., `constexpr uint16_t kRtsEnableDownloadMode \u003d 1;`) to make the caller intent self-evident without needing to rely on the preceding comments.\n[🔗](http://go/tj/d4846f23-a582-42b9-afcd-3ed1a0e1aaa6)",
+      "range": {
+        "startLine": 215,
+        "startChar": 0,
+        "endLine": 217,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "753f4ccf663a2f8ea90a5ad5bec4661162706eed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da61fe56_8f14abf4",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T09:12:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Magic Buffer Index Offsets:** This loop accesses opaque positional indices (`off + 1`, `off + 5`, `off + 6`) to parse the DFU functional descriptor. Rather than hardcoding these offsets, please define a packed struct for the DFU Functional Descriptor (matching the USB specification) and safely cast or copy the payload into it, or at least extract these raw offsets into named constants (e.g., `kDescriptorTypeOffset \u003d 1`, `kTransferSizeOffset \u003d 5`).\n[🔗](http://go/tj/d4846f23-a582-42b9-afcd-3ed1a0e1aaa6)",
+      "range": {
+        "startLine": 295,
+        "startChar": 0,
+        "endLine": 313,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "753f4ccf663a2f8ea90a5ad5bec4661162706eed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
