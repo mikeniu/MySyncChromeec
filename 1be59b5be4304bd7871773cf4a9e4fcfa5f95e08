@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a8a9271_a77fc1b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-22T07:42:10Z",
+      "side": 1,
+      "message": "This has been fixed upstream (https://github.com/zephyrproject-rtos/zephyr/pull/121484) and ported downstream as crrev/c/8621054, so this CL is no longer needed.",
+      "revId": "1be59b5be4304bd7871773cf4a9e4fcfa5f95e08",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
