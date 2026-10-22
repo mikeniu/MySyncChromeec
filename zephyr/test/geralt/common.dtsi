@@ -203,8 +203,27 @@
 &i2c4 {
 	/* I2C_DETACHABLE_BASE */
 	status = "okay";
+	hid_i2c_target: hid-i2c-target@56 {
+		compatible = "cros-ec,hid-i2c-touchpad";
+		reg = <0x56>;
+	};
 };
+
 
 &adc0 {
 	status = "okay";
 };
+
+&i2c3 {
+	compatible = "ambiq,i2c", "zephyr,i2c-emul-controller";
+	status = "okay";
+	scl-gpios = <&gpiof 2 0>;
+	sda-gpios = <&gpiof 3 0>;
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-names = "default", "sleep";
+};
+
+
+
+
