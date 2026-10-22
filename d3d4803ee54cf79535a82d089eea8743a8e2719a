@@ -1,0 +1,94 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09d70ad0_8ddb8c79",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T23:22:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This commit message bundles two independent logical changes (joined by `\" and \"` in the subject line and `\"In addition, ...\"` in the body) and narrates low-level symbol names (`REGION_CODE_RAM`, `REGION_CODE_RAM2`, `CONFIG_ROLLBACK_MPU_PROTECT`, `REGION_STORAGE`, `HOOK_SYSJUMP`) rather than focusing on high-level behavior and motivation:\n\n1. **Keeping the MPU enabled in `system_disable_jump()` when write-protect is unlocked** while gating sticky `ram_lock` configuration on `system_is_locked()` and disabling the MPU before sysjump.\n2. **Marking unused SRAM in the 256 MB code RAM aperture XN and inaccessible** via a background MPU region underneath the active code RAM region when `CONFIG_EXTERNAL_STORAGE` is enabled.\n\nPlease split this CL into two focused commits so each change can be reviewed, tested, and reverted independently.\n\n### Suggested commit messages if split into 2 CLs\n\n**CL 1 (Keep MPU enabled when unlocked):**\n```text\ncortex-m: Keep MPU enabled when write protect is unlocked\n\nPreviously, system_disable_jump() skipped all MPU and RAM lock\nconfiguration whenever the system was unlocked, leaving the MPU disabled\nafter jumping to RW on unlocked devices.\n\nAlways configure and enable the MPU in system_disable_jump() regardless\nof write-protect state so memory protections match production behavior\nwhen unlocked. Gate sticky hardware RAM lock configuration on\nsystem_is_locked() and disable the MPU before sysjump so unlocked\nsystems can still jump between images without requiring a reset.\n\nBUG\u003db:478947725\nTEST\u003dmake run-system\nTEST\u003d./test/run_device_tests.py -b bloonchipper -t mpu -t panic\n```\n\n**CL 2 (Mark unused code RAM XN and inaccessible):**\n```text\ncortex-m: Mark unused code SRAM XN and inaccessible\n\nOn chips with external storage that execute code from SRAM, the MPU\npreviously configured read-only executable access for the active code\nregion while leaving the rest of the 256 MB code RAM aperture with\ndefault background permissions.\n\nConfigure a lower-priority MPU region covering the 256 MB code RAM\naperture as execute-never (XN) with no access permissions, allowing the\nhigher-priority active code region to grant read and execute access\nonly to in-use code RAM.\n\nBUG\u003db:478947725\nTEST\u003dmake run-system\nTEST\u003d./test/run_device_tests.py -b bloonchipper -t mpu -t panic\n```\n\n### Suggested commit message if kept as a single CL\n\n```text\ncortex-m: Enable MPU when unlocked and restrict unused code SRAM\n\nPreviously, system_disable_jump() skipped all MPU and RAM lock\nconfiguration whenever the system was unlocked, and chips executing from\ncode SRAM left unused portions of the 256 MB code RAM aperture with\ndefault background permissions.\n\nAlways configure and enable the MPU in system_disable_jump() regardless\nof write-protect state, while gating sticky RAM lock configuration on\nsystem_is_locked() and disabling the MPU before sysjump so unlocked\nsystems can still jump between images. Additionally, configure a\nlower-priority MPU region covering the 256 MB code RAM aperture as\nexecute-never (XN) with no access permissions so only the active code\nregion remains readable and executable.\n\nBUG\u003db:478947725\nTEST\u003dmake run-system\nTEST\u003d./test/run_device_tests.py -b bloonchipper -t mpu -t panic\n```\n\n[🔗](http://go/tj/34f9f031-2e2e-41f5-9bad-23cdbee60b93)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9b6e0b2_40a39517",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T23:22:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** — See the `CL Size \u0026 Scope` section and inline comments below. [[trajectory](https://goto.corp.google.com/traj/34f9f031-2e2e-41f5-9bad-23cdbee60b93)]\n\n### Review Summary\n\n- **Functionality**: `system_disable_jump()` now configures and enables the MPU even when `system_is_locked()` is false, while gating sticky `ram_lock_config_lock_region()` calls on `system_is_locked()` and disabling the MPU in `HOOK_SYSJUMP` so unlocked systems can sysjump cleanly. Additionally, `mpu_protect_code_ram()` configures a 256 MB lower-priority `MPU_ATTR_XN | MPU_ATTR_NO_NO` region (`REGION_CODE_RAM` / `REGION_CODE_RAM2`) under `REGION_STORAGE` when `CONFIG_EXTERNAL_STORAGE` is enabled.\n- **Architecture \u0026 Component Fit**: Gating sticky `ram_lock` hardware configuration inside `mpu_protect_data_ram()` and `mpu_protect_code_ram()` while allowing `system_disable_jump()` to unconditionally configure the MPU fits cleanly with the existing Cortex-M MPU lifecycle (`mpu_pre_init()` -\u003e `HOOK_SYSJUMP` -\u003e `system_disable_jump()`).\n- **Code Simplicity**: The control flow in `common/system.c` and `core/cortex-m/mpu.c` is straightforward, and using `IS_ENABLED(CONFIG_EXTERNAL_STORAGE)` and `IS_ENABLED(CONFIG_ROLLBACK_MPU_PROTECT)` avoids additional `#ifdef` nesting.\n- **Idiomaticity \u0026 Readability**: In `core/cortex-m/mpu.c` (lines 327–331) and `test/system.c` (lines 89–131), replace bare numeric literals (`28` for the 256 MB code RAM aperture bit-width, plus raw register/address literals in `test/system.c`) with named constants and expressions.\n- **Security**: Keeping the MPU enabled on unlocked systems and marking unused code SRAM in the 256 MB aperture as `MPU_ATTR_XN | MPU_ATTR_NO_NO` strengthens defense-in-depth without locking out developer sysjumps when write-protect is disabled.\n- **Testing**: `test/system.c` adds host unit test coverage for `system_disable_jump()` and `HOOK_SYSJUMP`, but its `mock_mpu_size_attr` assertions only check `MPU_ATTR_XN` (missing `MPU_ATTR_NO_NO`, `MPU_ATTR_RO_NO`, `REGION_STORAGE2` XN, `REGION_DATA_RAM`, and the size/subregion fields) and do not cover the `ram_lock_config_lock_region()` failure path. See the inline comment on `test/system.c`.\n- **CL Size \u0026 Scope**: This CL (`Size: L (+229, -71)`) bundles two independent logical changes that can each be compiled, tested, and reverted on their own. Please split it into 2 focused CLs:\n  1. **CL 1 — Keep MPU enabled when unlocked (`common/system.c`, `core/cortex-m/mpu.c`, `test/system.c`, `test/build.mk`, `test/test_config.h`)**: Always configure and enable the MPU in `system_disable_jump()` regardless of `system_is_locked()`, gate `ram_lock_config_lock_region()` on `system_is_locked()` in `mpu_protect_data_ram()` and `mpu_protect_code_ram()`, register `mpu_Sysjump()` on `HOOK_SYSJUMP`, and add the unit test for unlocked vs. locked MPU behavior.\n  2. **CL 2 — Mark unused code SRAM XN and inaccessible (`core/cortex-m/mpu.c`, `test/system.c`)**: Configure the 256 MB `MPU_ATTR_XN | MPU_ATTR_NO_NO` background code RAM region (`REGION_CODE_RAM` / `REGION_CODE_RAM2`) in `mpu_protect_code_ram()` when `CONFIG_EXTERNAL_STORAGE` is enabled, along with the corresponding region assertions in `test/system.c`.\n- **Commit Message**: The commit message joins two independent changes (`\"... and ...\"`, `\"In addition, ...\"`) and narrates internal macro/enum names (`REGION_CODE_RAM`, `REGION_CODE_RAM2`, `CONFIG_ROLLBACK_MPU_PROTECT`, `REGION_STORAGE`, `HOOK_SYSJUMP`). See the inline comment on `/COMMIT_MSG` for copy-pasteable replacements for both the split CLs and the single-CL option.",
+      "isAi": true,
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3c93ddb_ae56ed0a",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T23:22:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Avoid using the bare literal `28` twice for the 256 MB ($2^{28}$-byte) Cortex-M code RAM aperture bit width. Defining a named constant (for example alongside `MPU_SIZE_BITS_MIN` in `core/cortex-m/include/mpu.h` or at the top of `core/cortex-m/mpu.c`) makes the hardware aperture size self-documenting and ensures the base alignment and region size bit-width stay in sync:\n\n```c\n#define MPU_CODE_RAM_APERTURE_BITS 28\n```\n\n```c\n\treturn mpu_update_region(\n\t\tIS_ENABLED(CONFIG_ROLLBACK_MPU_PROTECT) ? REGION_CODE_RAM2 :\n\t\t\t\t\t\t\t  REGION_CODE_RAM,\n\t\talign_down_to_bits(CONFIG_PROGRAM_MEMORY_BASE,\n\t\t\t\t   MPU_CODE_RAM_APERTURE_BITS),\n\t\tMPU_CODE_RAM_APERTURE_BITS,\n\t\tMPU_ATTR_XN | MPU_ATTR_NO_NO | MPU_ATTR_INTERNAL_SRAM, 1, 0);\n```\n\n[🔗](http://go/tj/34f9f031-2e2e-41f5-9bad-23cdbee60b93)",
+      "range": {
+        "startLine": 327,
+        "startChar": 0,
+        "endLine": 331,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49a8c29a_90375035",
+        "filename": "test/system.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T23:22:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The assertions in `test_mpu_when_unlocked()` only check individual bits of `mock_mpu_size_attr` and omit several key properties and branches:\n\n1. **Access permissions (`MPU_ATTR_NO_NO` / `MPU_ATTR_RO_NO`) and size/subregion fields are not verified:**\n   - Because `MPU_ATTR_NO_NO` is `0 \u003c\u003c 8`, `TEST_BITS_SET(mock_mpu_size_attr[REGION_CODE_RAM] \u003e\u003e 16, MPU_ATTR_XN)` would still pass even if `REGION_CODE_RAM` were configured with `MPU_ATTR_RW_RW`. Asserting the full `size_attr` (`RASR`) word verifies the access permissions (`MPU_ATTR_NO_NO | MPU_ATTR_INTERNAL_SRAM`), the 28-bit size field, the subregion disable mask (`0`), and the enable bit simultaneously.\n   - Similarly, `REGION_STORAGE` and `REGION_STORAGE2` only check `MPU_ATTR_XN` on `REGION_STORAGE` (omitting `REGION_STORAGE2`, `MPU_ATTR_RO_NO | MPU_ATTR_INTERNAL_SRAM`, the size bit-widths `16` and `18`, and the subregion disable masks `0x7f` and `0xf8`), and `REGION_DATA_RAM` is not asserted at all.\n2. **Magic literals in assertions:**\n   - Replace bare literals (`0x10000000`, `0x10080000`, `16`, `1`, `2`) with named constants or expressions derived from `CONFIG_PROGRAM_MEMORY_BASE`, `MPU_CTRL_ENABLE | MPU_CTRL_PRIVDEFENA`, and an explicit helper macro for formatting expected `RASR` values.\n3. **Missing error-path coverage when `ram_lock_config_lock_region()` fails:**\n   - Testing the locked failure case (`ram_lock_config_lock_region()` returning an error) verifies that `system_disable_jump()` aborts before calling `mpu_enable()`.\n\nFor example:\n\n```c\n#define EXPECTED_MPU_RASR(attr, size_bits, srd) \\\n\t(((uint32_t)(attr) \u003c\u003c 16) | (((size_bits) - 1) \u003c\u003c 1) | ((srd) \u003c\u003c 8) | 1)\n#define CODE_RAM_APERTURE_BITS 28\n#define STORAGE1_SIZE_BITS 16\n#define STORAGE1_SRD 0x7f\n#define STORAGE2_SIZE_BITS 18\n#define STORAGE2_SRD 0xf8\n#define DATA_RAM_SIZE_BITS 17\n#define DATA_RAM_SRD 0x00\n#define EXPECTED_MPU_CTRL (MPU_CTRL_ENABLE | MPU_CTRL_PRIVDEFENA)\n#define EXPECTED_LOCKED_REGION_COUNT 2\n\nstatic int test_mpu_when_unlocked(void)\n{\n\t/* Note: initialize_system() already ran and called mpu_pre_init(). */\n\tTEST_EQ(mock_mpu_ctrl, EXPECTED_MPU_CTRL, \"%d\");\n\n\treset_mpu_Mock();\n\tmock_is_locked \u003d 0;\n\n\t/* This should configure the MPU, but not RAM lock. */\n\tsystem_disable_jump();\n\tTEST_EQ(mock_mpu_ctrl, EXPECTED_MPU_CTRL, \"%d\");\n\tTEST_EQ(mock_ram_lock_calls, 0, \"%d\");\n\n\t/* Verify REGION_DATA_RAM is XN + RW and enabled. */\n\tTEST_EQ(mock_mpu_addr[REGION_DATA_RAM],\n\t\tCONFIG_RAM_BASE | MPU_ADDR_VALID | REGION_DATA_RAM, \"0x%08x\");\n\tTEST_EQ(mock_mpu_size_attr[REGION_DATA_RAM],\n\t\tEXPECTED_MPU_RASR(MPU_ATTR_XN | MPU_ATTR_RW_RW |\n\t\t\t\t\t  MPU_ATTR_INTERNAL_SRAM,\n\t\t\t\t  DATA_RAM_SIZE_BITS, DATA_RAM_SRD),\n\t\t\"0x%08x\");\n\n\t/* Verify REGION_CODE_RAM is XN + NO_NO and covers the 256MB aperture. */\n\tTEST_EQ(mock_mpu_addr[REGION_CODE_RAM],\n\t\talign_down_to_bits(CONFIG_PROGRAM_MEMORY_BASE,\n\t\t\t\t   CODE_RAM_APERTURE_BITS) |\n\t\t\tMPU_ADDR_VALID | REGION_CODE_RAM,\n\t\t\"0x%08x\");\n\tTEST_EQ(mock_mpu_size_attr[REGION_CODE_RAM],\n\t\tEXPECTED_MPU_RASR(MPU_ATTR_XN | MPU_ATTR_NO_NO |\n\t\t\t\t\t  MPU_ATTR_INTERNAL_SRAM,\n\t\t\t\t  CODE_RAM_APERTURE_BITS, 0),\n\t\t\"0x%08x\");\n\n\t/*\n\t * Verify REGION_STORAGE and REGION_STORAGE2 are executable + RO_NO\n\t * and cover [0x10070000..0x10080000) and [0x10080000..0x100b0000).\n\t */\n\tTEST_EQ(mock_mpu_addr[REGION_STORAGE],\n\t\talign_down_to_bits(CONFIG_PROGRAM_MEMORY_BASE,\n\t\t\t\t   STORAGE1_SIZE_BITS) |\n\t\t\tMPU_ADDR_VALID | REGION_STORAGE,\n\t\t\"0x%08x\");\n\tTEST_EQ(mock_mpu_size_attr[REGION_STORAGE],\n\t\tEXPECTED_MPU_RASR(MPU_ATTR_RO_NO | MPU_ATTR_INTERNAL_SRAM,\n\t\t\t\t  STORAGE1_SIZE_BITS, STORAGE1_SRD),\n\t\t\"0x%08x\");\n\tTEST_EQ(mock_mpu_addr[REGION_STORAGE2],\n\t\t(CONFIG_PROGRAM_MEMORY_BASE + (1 \u003c\u003c (STORAGE1_SIZE_BITS - 3))) |\n\t\t\tMPU_ADDR_VALID | REGION_STORAGE2,\n\t\t\"0x%08x\");\n\tTEST_EQ(mock_mpu_size_attr[REGION_STORAGE2],\n\t\tEXPECTED_MPU_RASR(MPU_ATTR_RO_NO | MPU_ATTR_INTERNAL_SRAM,\n\t\t\t\t  STORAGE2_SIZE_BITS, STORAGE2_SRD),\n\t\t\"0x%08x\");\n\n\t/* Hooks for HOOK_SYSJUMP should disable the MPU. */\n\thook_notify(HOOK_SYSJUMP);\n\tTEST_EQ(mock_mpu_ctrl, 0, \"%d\");\n\n\t/* When locked, both MPU and RAM lock should be configured. */\n\treset_mpu_Mock();\n\tmock_is_locked \u003d 1;\n\tsystem_disable_jump();\n\tTEST_EQ(mock_mpu_ctrl, EXPECTED_MPU_CTRL, \"%d\");\n\tTEST_EQ(mock_ram_lock_calls, EXPECTED_LOCKED_REGION_COUNT, \"%d\");\n\n\treturn EC_SUCCESS;\n}\n```\n\n[🔗](http://go/tj/34f9f031-2e2e-41f5-9bad-23cdbee60b93)",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
