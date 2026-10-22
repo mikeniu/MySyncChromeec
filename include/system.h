@@ -806,6 +806,21 @@ uintptr_t system_get_fw_reset_vector(uintptr_t base);
 void chip_pre_system_jump(void);
 
 /**
+ * MPU/PMP hardware teardown hook called just prior to image execution
+ * in jump_to_image().
+ *
+ * It allows architecture- or core-specific MPU/PMP configurations to be
+ * torn down (such as clearing PMP entries or disabling MPU regions) that
+ * must execute in a strictly synchronous, interrupt-free context just before
+ * the actual jump.
+ *
+ * Since interrupts are guaranteed to be disabled when this is called,
+ * implementations must not attempt to lock/unlock interrupts or rely on
+ * any asynchronous operations.
+ */
+void mpu_pre_system_jump(void);
+
+/**
  * Check if the EC is warm booting.
  *
  * @return true if the EC is warm booting.

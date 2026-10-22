@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "hooks.h"
+#include "system.h"
 
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/clock_control.h>
@@ -13,7 +13,7 @@
 extern void arm_core_mpu_disable(void);
 
 /* TODO(b/394346384): De-duplicate with bloonchipper code */
-static void prepare_for_sysjump_to_ec(void)
+void chip_pre_system_jump(void)
 {
 	/*
 	 * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then
@@ -29,7 +29,6 @@ static void prepare_for_sysjump_to_ec(void)
 	 */
 	arm_core_mpu_disable();
 }
-DECLARE_HOOK(HOOK_SYSJUMP, prepare_for_sysjump_to_ec, HOOK_PRIO_LAST);
 
 /*
  * Old FPMCU RO (EC based) uses ITIM32-5 as a watchdog warning to save the
