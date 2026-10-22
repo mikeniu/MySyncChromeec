@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a450b58_5399700a",
+        "filename": "zephyr/test/geralt/common.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-10-22T08:29:48Z",
+      "side": 1,
+      "message": "why using ambiq-i2c, (and set ONFIG_I2C_AMBIQ\u003dn later in prj.conf)",
+      "range": {
+        "startLine": 218,
+        "startChar": 13,
+        "endLine": 218,
+        "endChar": 25
+      },
+      "revId": "52b8e5800ac2b8ea0608dfe6e013e1594b4acb2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
