@@ -12,13 +12,13 @@
 #include "timer.h"
 
 /* Support V1 algorithm */
-#ifndef CONFIG_BODY_DETECTION_ALOGIRTHM_V1
+#ifndef CONFIG_BODY_DETECTION_ALGORITHM_V1
 static
 #endif
 	int onbody_stationary_timeframe;
 
 /* Support V2 algorithm */
-#ifndef CONFIG_BODY_DETECTION_ALOGIRTHM_V2
+#ifndef CONFIG_BODY_DETECTION_ALGORITHM_V2
 static
 #endif
 	uint64_t onbody_lasttime;

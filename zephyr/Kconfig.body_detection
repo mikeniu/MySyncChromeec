@@ -16,9 +16,9 @@ if PLATFORM_EC_BODY_DETECTION
 
 choice BODY_DETECTION_ALGORITHM
 	prompt "Select on-body detection algorithm"
-	default BODY_DETECTION_ALOGIRTHM_V1
+	default BODY_DETECTION_ALGORITHM_V1
 
-config BODY_DETECTION_ALOGIRTHM_V1
+config BODY_DETECTION_ALGORITHM_V1
 	bool "Legacy version of the on-body detection"
 	help
 	  Leverages a basic calculation of variance to detect spikes in the
@@ -26,7 +26,7 @@ config BODY_DETECTION_ALOGIRTHM_V1
 	  doesn't include any decimation. Sample rates should be at 50Hz for this
 	  algorithm to work well.
 
-config BODY_DETECTION_ALOGIRTHM_V2
+config BODY_DETECTION_ALGORITHM_V2
 	bool "New on-body detection algorithm"
 	select FPU
 	help
@@ -53,7 +53,7 @@ config PLATFORM_EC_BODY_DETECTION_MAX_WINDOW_SIZE
 
 config PLATFORM_EC_BODY_DETECTION_VAR_THRESHOLD
 	int "The threshold of acceleration variance for confidence calculation"
-	default 4000 if BODY_DETECTION_ALOGIRTHM_V2
+	default 4000 if BODY_DETECTION_ALGORITHM_V2
 	default 550
 	help
 	  This thresholding is under migration, the unit is (mm/s^2)^2 for the
@@ -65,7 +65,7 @@ config PLATFORM_EC_BODY_DETECTION_VAR_THRESHOLD
 
 config PLATFORM_EC_BODY_DETECTION_CONFIDENCE_DELTA
 	int "The delta of acceleration variance for confidence calculation"
-	default 3000 if BODY_DETECTION_ALOGIRTHM_V2
+	default 3000 if BODY_DETECTION_ALGORITHM_V2
 	default 525
 	help
 	  This thresholding is under migration, the unit is (mm/s^2)^2 for the
@@ -90,7 +90,7 @@ config PLATFORM_EC_BODY_DETECTION_VAR_NOISE_FACTOR
 
 config PLATFORM_EC_BODY_DETECTION_ON_BODY_CON
 	int "The confidence limit of on_body"
-	default 90 if BODY_DETECTION_ALOGIRTHM_V2
+	default 90 if BODY_DETECTION_ALGORITHM_V2
 	default 50
 	help
 	  The unit is percentage
