@@ -619,6 +619,7 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
+            "assert_builtin",  # TODO(b/485667679)
             "flash_protection",  # TODO(b/485668014)
             "flash_protection_rw",  # TODO(b/485668836)
             "flash_write_protect",  # TODO(b/485668014)
@@ -823,8 +824,6 @@ class AllTests:
                     SINGLE_CHECK_FAILED_REGEX,
                     ALL_TESTS_FAILED_REGEX,
                 ],
-                # TODO(b/365628799): Need to port to Zephyr.
-                skip_for_zephyr=True,
             ),
             TestConfig(
                 test_name="assert_stdlib",

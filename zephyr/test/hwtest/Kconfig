@@ -20,6 +20,16 @@ config HW_TEST_AES
 	help
 	  The test verifies AES functions.
 
+config HW_TEST_ASSERT_BUILTIN
+	bool "Builtin assert test"
+	depends on ZTEST
+	depends on PLATFORM_EC_PANIC
+	select ASSERT
+	select PLATFORM_EC_DEBUG_ASSERT
+	help
+	  The test verifies if ASSERT() call works correctly and validates
+	  panic data.
+
 config HW_TEST_BBRAM_RETAINED_MEM
 	bool "BBRAM retained memory test"
 	depends on ZTEST

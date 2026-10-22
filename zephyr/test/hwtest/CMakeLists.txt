@@ -9,6 +9,7 @@ zephyr_library_sources(${PLATFORM_EC}/zephyr/test/test_utils/fff.c)
 # go/keep-sorted start
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_ABORT src/abort.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_AES src/aes.cc)
+zephyr_library_sources_ifdef(CONFIG_HW_TEST_ASSERT_BUILTIN src/assert_builtin.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_BBRAM_RETAINED_MEM src/bbram_retained_mem.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_BENCHMARK src/benchmark.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_BORINGSSL_CRYPTO src/boringssl_crypto.cc)
