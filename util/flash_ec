@@ -108,6 +108,7 @@ BOARDS_SPI_1800MV=(
 
 # hold cold_reset:on when using debug header (e.g. servo header)
 BOARDS_HOLD_COLD_RESET_DBG_HDR=(
+	coral
 	reef
 )
 
