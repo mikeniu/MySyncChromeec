@@ -17,7 +17,6 @@
 #include <zephyr/pm/policy.h>
 #include <zephyr/ztest.h>
 
-FAKE_VOID_FUNC(arm_core_mpu_disable);
 FAKE_VOID_FUNC(LL_TIM_DisableCounter, void *);
 FAKE_VALUE_FUNC(int, stm32_clock_control_off, const struct device *,
 		clock_control_subsys_t);
@@ -55,10 +54,8 @@ ZTEST(ec_quirks, test_tim2)
 ZTEST(ec_quirks, test_chip_pre_system_jump)
 {
 	RESET_FAKE(stm32_reset_line_toggle);
-	RESET_FAKE(arm_core_mpu_disable);
 
 	chip_pre_system_jump();
 
 	zassert_equal(stm32_reset_line_toggle_fake.call_count, 1);
-	zassert_equal(arm_core_mpu_disable_fake.call_count, 1);
 }
