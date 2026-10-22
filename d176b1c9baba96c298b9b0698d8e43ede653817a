@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7a03d4d_24f3a1a7",
+        "filename": "docker/entrypoint.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-22T19:39:10Z",
+      "side": 1,
+      "message": "This causes zephyrproject download a 2GB file every time when `--update` is used.\n\nAdd `--depth-1` so only the main branch is downloaded.",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 52
+      },
+      "revId": "d176b1c9baba96c298b9b0698d8e43ede653817a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
