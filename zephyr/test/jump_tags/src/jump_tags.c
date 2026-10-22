@@ -24,6 +24,9 @@
 
 #define SOME_STR_VAL "JumpTagTest"
 
+static bool chip_pre_jump_called;
+static bool arch_pre_jump_called;
+
 void (*add_tag_func)(void);
 
 struct test_basic_jump_data_struct {
@@ -40,8 +43,8 @@ struct test_too_big_jump_data_struct {
 
 static void system_before(void *data)
 {
-	/* Reset flag before each test. */
-	system_fake_reset_interrupt_disabled();
+	chip_pre_jump_called = false;
+	arch_pre_jump_called = false;
 
 	add_tag_func = NULL;
 	system_common_pre_init();
@@ -60,6 +63,9 @@ static void do_fake_sysjump(void)
 		system_run_image_copy(target_image);
 		zassert_unreachable();
 	}
+
+	zassert_true(chip_pre_jump_called);
+	zassert_true(arch_pre_jump_called);
 
 	system_set_shrspi_image_copy(target_image);
 	zassert_equal(system_get_image_copy(), target_image);
@@ -118,15 +124,48 @@ static void add_basic_jump_tag(void)
 
 static void test_sysjump_hook(void)
 {
-	/* Verify interrupt_disable_all() was invoked prior to HOOK_SYSJUMP */
-	zassert_true(
-		system_fake_is_interrupt_disabled(),
-		"HOOK_SYSJUMP executed before interrupt_disable_all() was called!");
+	/* Verify interrupts are locked prior to HOOK_SYSJUMP */
+	zassert_false(arch_cpu_irqs_are_enabled(),
+		      "HOOK_SYSJUMP executed with interrupts enabled!");
+	zassert_false(chip_pre_jump_called);
+	zassert_false(arch_pre_jump_called);
 
 	if (add_tag_func)
 		add_tag_func();
 }
 DECLARE_HOOK(HOOK_SYSJUMP, test_sysjump_hook, HOOK_PRIO_DEFAULT);
+
+__override void chip_pre_system_jump(void)
+{
+	/*
+	 * Verify interrupts are locked prior to chip_pre_system_jump()
+	 * and that it runs before arch_pre_system_jump().
+	 */
+	zassert_false(
+		arch_cpu_irqs_are_enabled(),
+		"chip_pre_system_jump() executed with interrupts enabled!");
+	zassert_false(chip_pre_jump_called);
+	zassert_false(
+		arch_pre_jump_called,
+		"arch_pre_system_jump() executed before chip_pre_system_jump()!");
+	chip_pre_jump_called = true;
+}
+
+__override void arch_pre_system_jump(void)
+{
+	/*
+	 * Verify interrupts are locked prior to arch_pre_system_jump()
+	 * and that it runs after chip_pre_system_jump().
+	 */
+	zassert_false(
+		arch_cpu_irqs_are_enabled(),
+		"arch_pre_system_jump() executed with interrupts enabled!");
+	zassert_true(
+		chip_pre_jump_called,
+		"arch_pre_system_jump() executed before chip_pre_system_jump()!");
+	zassert_false(arch_pre_jump_called);
+	arch_pre_jump_called = true;
+}
 
 static void check_for_jump_tag(int jump_tag, int expected_size)
 {
