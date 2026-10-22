@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bcb2db5_8c2d1378",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-22T04:36:36Z",
+      "side": 1,
+      "message": "This is a typo, and exists throughout src/platform/ec, please upload a follow up commit to fix the typo Typo: \"ALOGIRTHM\" should be \"ALGORITHM\".",
+      "revId": "1f6bfa0864445b3a2f8a3380e10261243225bdc7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

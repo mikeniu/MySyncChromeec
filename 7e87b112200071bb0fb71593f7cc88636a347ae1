@@ -22,6 +22,30 @@
       },
       "revId": "7e87b112200071bb0fb71593f7cc88636a347ae1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d04f20c0_d2d9a9fe",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-22T04:36:36Z",
+      "side": 1,
+      "message": "Not changed: the Kconfig symbol itself is spelled CONFIG_BODY_DETECTION_ALOGIRTHM_V2 (zephyr/Kconfig.body_detection), so correcting it here would make the #if never true. Renaming the symbol tree-wide is out of scope for this CL.",
+      "parentUuid": "0b0fd06d_3d8fc44c",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 0
+      },
+      "revId": "7e87b112200071bb0fb71593f7cc88636a347ae1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
