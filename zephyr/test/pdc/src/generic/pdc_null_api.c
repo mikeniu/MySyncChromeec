@@ -309,7 +309,7 @@ ZTEST(pdc_api_null_check, test_pdc_set_frs)
 
 ZTEST(pdc_api_null_check, test_pdc_get_attention_vdo)
 {
-	int rv = pdc_get_attention_vdo(&fake_pdc, false);
+	int rv = pdc_get_attention_vdo(&fake_pdc, NULL);
 
 	zassert_equal(-ENOSYS, rv, "Got %d, expected -ENOSYS (%d)", rv,
 		      -ENOSYS);
