@@ -23,6 +23,42 @@ showAnalyzer cr_uart1
 # will be copied to Code RAM by the bootloader on each reset.
 sysbus LoadBinary $bin 0x64000000
 
+# On NPCX9, multistep watchdog reset sequences flush the console across deep
+# sleep (where PMC.PMCSR at 0x4000D000 gates the APB2 clock of sysbus.itim64
+# while the 32 kHz LFCLK reference timer itim32 continues counting for
+# npcx_clock_compensate_system_timer()), stop the watchdog via
+# wdt_npcx_disable() (polling WDCP at offset 0x10 with interrupts disabled), and
+# trigger a "Too Early Service" watchdog reset in cros_system_soc_reset() by
+# clearing T0CSR.TESDIS (bit 5 at offset 0x6) and writing 0x5C twice to WDSDM
+# (offset 0xA). Emulate this reset sequence in Renode so pre-reset sleep does
+# not double-count itim64 ticks into a premature watchdog panic,
+# wdt_npcx_disable() waits 1 ms (WDCP=12) instead of 3072 ms, and 0x5C writes to
+# WDSDM with TESDIS cleared trigger the watchdog reset.
+# TODO(b/567996957): Remove once NPCX_TWD supports Too Early Service reset and WDCP readback in Renode.
+# TODO(b/568364437): Remove once NPCX_PMC gates sysbus.itim64 during system sleep in Renode.
+twd AddAfterWriteWordHook 0xA
+"""
+WDSDM_OFFSET = 0xa
+T0CSR_OFFSET = 0x6
+TESDIS_BIT = 0x20
+WDSDM_PET = 0x5c
+WDSDM_FORCE_RESET = 0x00
+
+if value == WDSDM_PET and (self.ReadWord(T0CSR_OFFSET) & TESDIS_BIT) == 0:
+    self.WriteWord(WDSDM_OFFSET, WDSDM_FORCE_RESET)
+"""
+twd AddAfterReadWordHook 0x10 "WDCP_MIN_CYCLES = 12; value = WDCP_MIN_CYCLES"
+sysbus AddWatchpointHook 0x4000D000 1 Write
+"""
+from System.Reflection import BindingFlags
+
+i = self.Machine['sysbus.itim64']
+timer_field = i.GetType().GetField(
+    'timer', BindingFlags.NonPublic | BindingFlags.Instance
+)
+timer_field.GetValue(i).Enabled = value == 0
+"""
+
 macro reset
 """
     sysbus LoadSymbolsFrom $elf_ro
