@@ -16,6 +16,24 @@
       "message": "This is a typo, and exists throughout src/platform/ec, please upload a follow up commit to fix the typo Typo: \"ALOGIRTHM\" should be \"ALGORITHM\".",
       "revId": "1f6bfa0864445b3a2f8a3380e10261243225bdc7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b835a526_6e5117c6",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-22T05:02:37Z",
+      "side": 1,
+      "message": "Done in crrev.com/c/8626337.",
+      "parentUuid": "6bcb2db5_8c2d1378",
+      "revId": "1f6bfa0864445b3a2f8a3380e10261243225bdc7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
