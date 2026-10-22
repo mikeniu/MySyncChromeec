@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "accelgyro.h"
+#include "driver/accelgyro_bmi3xx.h"
 #include "ec_commands.h"
 #include "ec_version.h"
 #include "hooks.h"
@@ -16,10 +18,15 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/ipm.h>
 #include <zephyr/init.h>
+#include <zephyr/irq.h>
+#include <zephyr/irq_multilevel.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/mgmt/ec_host_cmd/backend.h>
 #include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
+#include <zephyr/sys/sys_io.h>
+
+#include <tinysys_reg.h>
 
 LOG_MODULE_REGISTER(scp, LOG_LEVEL_INF);
 
@@ -233,3 +240,52 @@ static void scp_boot_handshake(void)
 	ipm_set_enabled(ipm_dev, 1);
 }
 DECLARE_HOOK(HOOK_INIT, scp_boot_handshake, HOOK_PRIO_FIRST);
+
+#define SCP_EINT_INTC_IRQ 6
+#define SCP_EINT_INTC_IRQN \
+	(IRQ_TO_L2(SCP_EINT_INTC_IRQ) | DT_IRQN(DT_NODELABEL(intc)))
+#define SCP_EINT_IMU_BIT BIT(16) /* GPIO 6 (IMU_INT_SCP_L) -> EINT bit 16 */
+#define SCP_EINT_STA (EINT_BASE + 0x000)
+#define SCP_EINT_INTACK (EINT_BASE + 0x040)
+#define SCP_EINT_MASK_SET (EINT_BASE + 0x0c0)
+#define SCP_EINT_MASK_CLR (EINT_BASE + 0x100)
+#define SCP_EINT_SENS_CLR (EINT_BASE + 0x1c0)
+#define SCP_EINT_POL_CLR (EINT_BASE + 0x380)
+
+static void scp_eint_isr(const void *arg)
+{
+	ARG_UNUSED(arg);
+	uint32_t sta = sys_read32(SCP_EINT_STA) & SCP_EINT_IMU_BIT;
+
+	if (!sta) {
+		return;
+	}
+
+	sys_write32(sta, SCP_EINT_MASK_SET);
+	sys_write32(sta, SCP_EINT_INTACK);
+	bmi3xx_interrupt(0);
+	sys_write32(sta, SCP_EINT_MASK_CLR);
+}
+
+static void scp_eint_init(void)
+{
+	/*
+	 * mt8196_scp has no Zephyr GPIO controller driver (CONFIG_GPIO=n) and
+	 * routes external sensor interrupts through the MediaTek SCP EINT
+	 * controller rather than a GPIO device, so cros-ec,gpio-interrupts
+	 * cannot be used; configure SCP EINT bit 16 and INTC IRQ 6 directly.
+	 */
+	sys_write32(SCP_EINT_IMU_BIT, SCP_EINT_MASK_SET);
+	sys_write32(SCP_EINT_IMU_BIT, SCP_EINT_POL_CLR);
+	sys_write32(SCP_EINT_IMU_BIT, SCP_EINT_SENS_CLR);
+	sys_set_bits(EINT_D0_EN, SCP_EINT_IMU_BIT);
+	sys_write32(SCP_EINT_IMU_BIT, SCP_EINT_INTACK);
+
+	sys_clear_bits(INTC_IRQ_POL0, BIT(SCP_EINT_INTC_IRQ));
+	sys_set_bits(CORE0_INTC_IRQ_GRP4_0, BIT(SCP_EINT_INTC_IRQ));
+	IRQ_CONNECT(SCP_EINT_INTC_IRQN, 0, scp_eint_isr, NULL, 0);
+	irq_enable(SCP_EINT_INTC_IRQN);
+
+	sys_write32(SCP_EINT_IMU_BIT, SCP_EINT_MASK_CLR);
+}
+DECLARE_HOOK(HOOK_INIT, scp_eint_init, HOOK_PRIO_DEFAULT);
