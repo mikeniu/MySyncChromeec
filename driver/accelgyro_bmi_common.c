@@ -290,7 +290,20 @@ int bmi_write_n(const int port, const uint16_t i2c_spi_addr_flags,
 #ifdef CONFIG_ACCELGYRO_BMI_COMM_SPI
 	CPRINTS("%s() spi part is not implemented", __func__);
 #else
-	rv = i2c_write_block(port, i2c_spi_addr_flags, reg, data_ptr, len);
+	if (len == 2) {
+		int val = (data_ptr[1] << 8) | data_ptr[0];
+
+		rv = i2c_write16(port, i2c_spi_addr_flags, reg, val);
+	} else if (len == 4) {
+		int val = ((uint32_t)data_ptr[3] << 24) |
+			  ((uint32_t)data_ptr[2] << 16) |
+			  ((uint32_t)data_ptr[1] << 8) | data_ptr[0];
+
+		rv = i2c_write32(port, i2c_spi_addr_flags, reg, val);
+	} else {
+		rv = i2c_write_block(port, i2c_spi_addr_flags, reg, data_ptr,
+				     len);
+	}
 #endif
 	/*
 	 * From Bosch:  BMI needs a delay of 450us after each write if it
