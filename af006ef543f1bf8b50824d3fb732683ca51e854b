@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9973293e_854d8498",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-22T17:03:34Z",
+      "side": 1,
+      "message": "This change doesn\u0027t work for me.  I see this error when running ./dagwood inside the docker:\n```\n/bin/sh: 0: cannot open /usr/local/bin/vpython3: Permission denied\n```",
+      "revId": "af006ef543f1bf8b50824d3fb732683ca51e854b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
