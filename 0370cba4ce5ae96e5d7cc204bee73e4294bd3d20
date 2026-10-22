@@ -35,6 +35,24 @@
       "message": "Consider folding !shell_stopped into shell_is_active() (or dropping shell_stopped if uart_shell_stop() can be made synchronous) so callers only need to check !shell_is_active().",
       "revId": "0370cba4ce5ae96e5d7cc204bee73e4294bd3d20",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e3cc867_1fa6b2d5",
+        "filename": "zephyr/shim/src/console.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-22T10:53:21Z",
+      "side": 1,
+      "message": "Added `!shell_stopped` to `shell_is_active`.",
+      "parentUuid": "681579ca_73c69a52",
+      "revId": "0370cba4ce5ae96e5d7cc204bee73e4294bd3d20",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
