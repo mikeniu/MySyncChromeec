@@ -73,6 +73,7 @@ enum cbi_storage_type {
 	CBI_STORAGE_TYPE_EEPROM = 0,
 	CBI_STORAGE_TYPE_GPIO = 1,
 	CBI_STORAGE_TYPE_FLASH = 2,
+	CBI_STORAGE_TYPE_RAM = 3,
 };
 
 /*

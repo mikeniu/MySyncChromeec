@@ -4,7 +4,10 @@
  */
 
 #include "accelgyro.h"
+#include "cbi_config.h"
+#include "cros_cbi.h"
 #include "driver/accelgyro_bmi3xx.h"
+#include "driver/accelgyro_lsm6dsm.h"
 #include "ec_commands.h"
 #include "ec_version.h"
 #include "hooks.h"
@@ -12,6 +15,7 @@
 #include "hwtimer.h"
 #include "ipi_chip.h"
 #include "mkbp_event.h"
+#include "motionsense_sensors.h"
 
 #include <string.h>
 
@@ -241,6 +245,49 @@ static void scp_boot_handshake(void)
 }
 DECLARE_HOOK(HOOK_INIT, scp_boot_handshake, HOOK_PRIO_FIRST);
 
+#if DT_NODE_EXISTS(DT_NODELABEL(alt_lid_accel))
+static struct motion_sensor_t lid_accel_primary;
+static struct motion_sensor_t lid_gyro_primary;
+static bool scp_lid_use_alt;
+
+static void scp_alt_sensor_init(void)
+{
+	lid_accel_primary = motion_sensors[SENSOR_ID(DT_NODELABEL(lid_accel))];
+	lid_gyro_primary = motion_sensors[SENSOR_ID(DT_NODELABEL(lid_gyro))];
+	scp_lid_use_alt = cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(ufsc_lid_sensor_lsm6dsm)));
+	motion_sensors_check_ufsc();
+}
+DECLARE_HOOK(HOOK_INIT, scp_alt_sensor_init, HOOK_PRIO_POST_I2C);
+
+void cbi_ram_store_notify(void)
+{
+	const int lid_accel_id = SENSOR_ID(DT_NODELABEL(lid_accel));
+	const int lid_gyro_id = SENSOR_ID(DT_NODELABEL(lid_gyro));
+	bool use_alt = cros_cbi_ufsc_check_match(
+		CBI_UFSC_VALUE_ID(DT_NODELABEL(ufsc_lid_sensor_lsm6dsm)));
+	const struct accelgyro_drv *target_drv =
+		use_alt ? motion_sensors_alt[SENSOR_ID(DT_NODELABEL(
+						     alt_lid_accel))]
+				  .drv :
+			  lid_accel_primary.drv;
+
+	if (motion_sensors[lid_accel_id].drv == target_drv) {
+		return;
+	}
+
+	scp_lid_use_alt = use_alt;
+	motion_sensors[lid_accel_id] = lid_accel_primary;
+	motion_sensors[lid_gyro_id] = lid_gyro_primary;
+	motion_sensors_check_ufsc();
+
+	for (int i = 0; i < motion_sensor_count; i++) {
+		motion_sensors[i].state = SENSOR_NOT_INITIALIZED;
+	}
+	hook_notify(HOOK_CHIPSET_RESUME);
+}
+#endif
+
 #define SCP_EINT_INTC_IRQ 6
 #define SCP_EINT_INTC_IRQN \
 	(IRQ_TO_L2(SCP_EINT_INTC_IRQ) | DT_IRQN(DT_NODELABEL(intc)))
@@ -263,7 +310,15 @@ static void scp_eint_isr(const void *arg)
 
 	sys_write32(sta, SCP_EINT_MASK_SET);
 	sys_write32(sta, SCP_EINT_INTACK);
+#if DT_NODE_EXISTS(DT_NODELABEL(alt_lid_accel))
+	if (scp_lid_use_alt) {
+		lsm6dsm_interrupt(0);
+	} else {
+		bmi3xx_interrupt(0);
+	}
+#else
 	bmi3xx_interrupt(0);
+#endif
 	sys_write32(sta, SCP_EINT_MASK_CLR);
 }
 
