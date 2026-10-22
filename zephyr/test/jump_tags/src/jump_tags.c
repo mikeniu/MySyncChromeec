@@ -124,9 +124,9 @@ static void add_basic_jump_tag(void)
 
 static void test_sysjump_hook(void)
 {
-	/* Verify interrupts are locked prior to HOOK_SYSJUMP */
-	zassert_false(arch_cpu_irqs_are_enabled(),
-		      "HOOK_SYSJUMP executed with interrupts enabled!");
+	/* Verify interrupts remain enabled during HOOK_SYSJUMP */
+	zassert_true(arch_cpu_irqs_are_enabled(),
+		     "HOOK_SYSJUMP executed with interrupts disabled!");
 	zassert_false(chip_pre_jump_called);
 	zassert_false(arch_pre_jump_called);
 
