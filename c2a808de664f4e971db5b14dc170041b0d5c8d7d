@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee0aca8d_cf1e3dcf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-22T04:35:01Z",
+      "side": 1,
+      "message": "Moved to internal cr50_stab as crrev.com/i/9998146. The build.mk tpm2 fallback is already covered there, so it\u0027s down to the termios, util.h and GNAME fixes. Abandoning this one.",
+      "parentUuid": "2e99e39e_502a670e",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9999
+      },
+      "revId": "c2a808de664f4e971db5b14dc170041b0d5c8d7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "802486c4_6ba989a5",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **CL Size \u0026 Scope:** Size: S (+12, -3). This CL bundles four distinct compilation fixes under a single umbrella theme. According to the Single Logical Change rule, each of these fixes can be reverted independently and compiles on its own. Please split this CL into four smaller, atomic CLs:\n  1. CL 1: Terminal header modernization (`\u003ctermios.h\u003e`).\n  2. CL 2: String macro undefinitions in `util.h`.\n  3. CL 3: Out-of-tree path fallback in `build.mk`.\n  4. CL 4: Macro stringification syntax fix in `registers.h`.\n* **Commit Message:** ❌ **Changes Requested**. The commit message uses a multi-bullet outline that narrates the diff for each bundled change. See the inline comment on `/COMMIT_MSG` for prose alternatives for both the split CLs and the single CL option.\n* **Functionality:** ✅ Looks good. The build and macro fixes are correct.\n* **Architecture \u0026 Component Fit:** ✅ Looks good.\n* **Code Simplicity:** ✅ Looks good. The fixes are minimal.\n* **Idiomaticity \u0026 Readability:** ✅ Looks good. Modern POSIX `\u003ctermios.h\u003e` and correct C macro stringification are used.\n* **Security:** ✅ Looks good. No obvious security concerns.\n* **Testing:** ✅ N/A (Build-system and header compatibility fixes that restore existing compilation). [🔗](http://go/tj/da6b9168-5c0c-4347-93c3-eaf50859ae73)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "c2a808de664f4e971db5b14dc170041b0d5c8d7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85b4b97e_5da93e08",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-22T04:35:01Z",
+      "side": 1,
+      "message": "Moved to internal cr50_stab as crrev.com/i/9998146. The build.mk tpm2 fallback is already covered there, so it\u0027s down to the termios, util.h and GNAME fixes. Abandoning this one.",
+      "parentUuid": "802486c4_6ba989a5",
       "revId": "c2a808de664f4e971db5b14dc170041b0d5c8d7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
