@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd3a8f52_c0febde8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T10:40:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5dcca4f1-4b32-4a7f-bac2-95384fd76e78)]\n\n### Review Summary\n\n*   **Functionality:** Excellent. The change safely prevents `shell_write_str` from sleeping in non-yielding contexts by falling back to `printk`.\n*   **Architecture \u0026 Component Fit:** Cleanly maintains existing layer boundaries and integrates well with Zephyr\u0027s context checks.\n*   **Code Simplicity:** The restructuring eliminates the duplicated return paths for ISR vs stopped shell, cleanly unifying the `printk` fallback logic.\n*   **Idiomaticity \u0026 Readability:** Idiomatic use of Zephyr\u0027s `k_can_yield()` and `k_is_in_isr()`. The string formatting for the `[ISR]` prefix is concise.\n*   **Security:** No security issues identified.\n*   **Testing:** Thorough. Added `test_no_yield_output` to properly exercise the non-yielding (but non-ISR) boundary by utilizing `irq_lock()`.\n*   **CL Size \u0026 Scope:** `Size: S (+32, -15)`. A tightly focused, single logical change comprising the fallback condition and its unit test.\n*   **Commit Message:** Clear, concise, and accurately describes the rationale and changes made.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ced0669ba935b82ba1f40c00c10154c35168b8a9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
