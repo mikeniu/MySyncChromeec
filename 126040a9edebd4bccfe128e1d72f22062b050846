@@ -16,6 +16,24 @@
       "message": "This is not otherwise used until the next CL, but I presume that `perform_pdc_init` will only be called once, regardless of retries. Otherwise, resetting this to 0 here wouldn\u0027t make sense.",
       "revId": "126040a9edebd4bccfe128e1d72f22062b050846",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56bce93b_6cd1646b",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-10-22T09:20:28Z",
+      "side": 1,
+      "message": "The retry counter and its reset assignments have been removed.",
+      "parentUuid": "25b1a3e6_bb50801c",
+      "revId": "126040a9edebd4bccfe128e1d72f22062b050846",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

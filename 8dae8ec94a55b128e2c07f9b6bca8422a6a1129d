@@ -124,6 +124,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "162f0eba_56bbfc22",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-10-22T09:20:28Z",
+      "side": 1,
+      "message": "I don\u0027t have a known intermittent initialization failure that would benefit from retries. The failures I observed during development were due to driver bugs.\n\nI\u0027ve removed the initialization retry mechanism. When an initialization command reports a UCSI error, the driver reads and logs GET_ERROR_STATUS, then disables the port instead of restarting initialization.",
+      "parentUuid": "3a4284ca_332f5a3e",
+      "revId": "8dae8ec94a55b128e2c07f9b6bca8422a6a1129d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b6638ae_c8ede8b2",
