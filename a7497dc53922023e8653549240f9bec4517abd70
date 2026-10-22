@@ -16,6 +16,24 @@
       "message": "This change is in the wrong branch. How did this not require the yolo vote?",
       "revId": "a7497dc53922023e8653549240f9bec4517abd70",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edec9117_342885c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-22T02:46:41Z",
+      "side": 1,
+      "message": "Good catch, thank you. This fix was meant for firmware-R157-16852.2.B-ec-legacy (crrev.com/c/8599078) rather than release-R157-16852.B-ec-legacy. I\u0027ve sent a clean revert in crrev.com/c/8626384.",
+      "parentUuid": "69df338e_25ab7764",
+      "revId": "a7497dc53922023e8653549240f9bec4517abd70",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
