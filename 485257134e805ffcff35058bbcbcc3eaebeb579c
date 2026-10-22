@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d90c2b6_95ffb43e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-10-22T11:56:52Z",
+      "side": 1,
+      "message": "Confirmed, RTK will set reported and present PDP based on current source PDO. So there is no need to handle this on driver level for RTK. I think it is fine to keep it on driver level then.",
+      "parentUuid": "2cdb21c9_50d00f0f",
+      "revId": "485257134e805ffcff35058bbcbcc3eaebeb579c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c8f8d43_06ab499c",
