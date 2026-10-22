@@ -102,6 +102,30 @@ static void power_seq_teardown(void *f)
 	zassert_ok(gpio_remove_callback_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5),
 					   &pp4200_callback));
 }
+
+ZTEST(power_seq, test_pp4200_pg_timeout)
+{
+	const struct gpio_dt_spec *pg_pp4200_s5_od =
+		GPIO_DT_FROM_NODELABEL(pg_pp4200_s5_od);
+
+	zassert_ok(gpio_remove_callback_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5),
+					   &pp4200_callback));
+	gpio_emul_input_set(pg_pp4200_s5_od->port, pg_pp4200_s5_od->pin, 0);
+	power_signal_interrupt(GPIO_PG_PP4200_S5_OD);
+
+	chipset_power_on();
+	task_wake(TASK_ID_CHIPSET);
+	k_sleep(K_MSEC(300));
+
+	zassert_ok(gpio_add_callback_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5),
+					&pp4200_callback));
+	zassert_equal(power_get_state(), POWER_G3);
+	zassert_equal(chipset_pre_init_hook_fake.call_count, 0);
+	zassert_equal(0, gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5)));
+
+	gpio_emul_input_set(pg_pp4200_s5_od->port, pg_pp4200_s5_od->pin, 1);
+	power_signal_interrupt(GPIO_PG_PP4200_S5_OD);
+}
 #else
 static void *power_seq_setup(void)
 {
@@ -119,8 +143,8 @@ static void power_seq_before(void *f)
 	set_test_runner_tid();
 
 	/* Start from G3 */
-	power_set_state(POWER_G3);
 	set_signal_state(POWER_G3);
+	power_set_state(POWER_G3);
 	k_sleep(K_SECONDS(POWER_OFF_DELAY_SEC));
 
 	RESET_FAKE(chipset_pre_init_hook);
@@ -138,7 +162,14 @@ ZTEST(power_seq, test_power_state_machine)
 	/* G3 -> S3 */
 	power_set_state(POWER_G3);
 	set_signal_state(POWER_S3);
-	zassert_equal(power_get_state(), POWER_S3);
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_POWERSEQ_MTK_FW_SUSPEND)) {
+		zassert_equal(power_get_state(), POWER_S0);
+		task_wake(TASK_ID_CHIPSET);
+		k_sleep(K_SECONDS(1));
+		zassert_equal(power_get_state(), POWER_S3);
+	} else {
+		zassert_equal(power_get_state(), POWER_S3);
+	}
 
 	/* S3 -> S0 */
 	power_set_state(POWER_S3);
@@ -383,6 +414,10 @@ ZTEST(power_seq, test_chipset_reset_in_s3)
 
 	/* Boot AP */
 	set_signal_state(POWER_S3);
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_POWERSEQ_MTK_FW_SUSPEND)) {
+		task_wake(TASK_ID_CHIPSET);
+		k_sleep(K_SECONDS(1));
+	}
 	zassert_equal(power_get_state(), POWER_S3);
 	RESET_FAKE(chipset_resume_hook);
 	/* Clear reset reason */

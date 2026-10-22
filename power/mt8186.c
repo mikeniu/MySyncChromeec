@@ -465,8 +465,12 @@ enum power_state power_handle_state(enum power_state state)
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(en_pp4200_s5), 1);
 		if (power_wait_mask_signals_timeout(IN_PG_PP4200_S5,
 						    IN_PG_PP4200_S5,
-						    PG_PP4200_S5_DELAY))
+						    PG_PP4200_S5_DELAY)) {
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_MTK_FW_SUSPEND
+			is_exiting_off = false;
+#endif
 			return POWER_S5G3;
+		}
 #endif
 		chipset_power_on();
 		return POWER_S5;
@@ -583,10 +587,16 @@ enum power_state power_handle_state(enum power_state state)
 		 * AP for S0.
 		 */
 		is_held = false;
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_MTK_FW_SUSPEND
+		is_exiting_off = false;
+#endif
 		return POWER_S5;
 
 	case POWER_S5G3:
 		is_s5g3_passed = true;
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_MTK_FW_SUSPEND
+		is_exiting_off = false;
+#endif
 #if DT_NODE_EXISTS(DT_NODELABEL(en_pp4200_s5))
 		if (power_wait_mask_signals_timeout(IN_PMIC_AP_RST,
 						    IN_PMIC_AP_RST,
