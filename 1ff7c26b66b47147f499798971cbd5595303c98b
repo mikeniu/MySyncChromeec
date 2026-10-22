@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08679bd0_46db27cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-22T17:37:38Z",
+      "side": 1,
+      "message": "I presume you\u0027ll land the `main` CL first.",
+      "revId": "1ff7c26b66b47147f499798971cbd5595303c98b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
