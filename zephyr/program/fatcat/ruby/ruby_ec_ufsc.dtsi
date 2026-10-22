@@ -39,3 +39,16 @@
 	};
 };
 
+&ufsc_keyboard_layout {
+	ufsc_kb_layout_default: kb-layout-default {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <0>;
+	};
+	ufsc_kb_layout_fix: kb-layout-new-fix {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <1>;
+	};
+};
+
