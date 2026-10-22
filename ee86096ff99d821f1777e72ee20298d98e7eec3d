@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97e62534_1e422f3b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T21:02:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n**Functionality:** ✅ The lock-free compare-and-exchange effectively mitigates the timer overflow race condition.\n**Architecture \u0026 Component Fit:** ✅ The lock-free `track_packed` approach cleanly fits the low-level interrupt-disabled timer requirements.\n**Code Simplicity:** ❌ The atomic compare-and-exchange condition check duplicates a branch unnecessarily. See inline comment for a simplified flow.\n**Idiomaticity \u0026 Readability:** ❌ Several domain primitives (rollover threshold, shifts, tag masks) are hardcoded as magic numbers inline. See inline comment for extraction into named constants.\n**Security:** ✅ No security issues identified.\n**Testing:** ❌ Missing boundary and off-by-one verification for the `0x00400000U` rollover threshold. See inline comment.\n**CL Size \u0026 Scope:** ✅ Size: M (+146, -0). The implementation and its test constitute a single, cohesive logical change.\n**Commit Message:** ✅ Subject and body clearly explain the lock-free mitigation rationale and follow formatting guidelines.\n\n[[trajectory](https://goto.corp.google.com/traj/4404ef33-8178-4b25-9e17-96e783966b04)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ee86096ff99d821f1777e72ee20298d98e7eec3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fe337d9_efa1b87d",
+        "filename": "common/timer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T21:02:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe current implementation duplicates the `__atomic_compare_exchange_n` call and uses several \"magic numbers\" (`0xFFU`, `0xFF000000U`, `0x00FFFFFFU`, `0x00400000U`, `24`, `8`) inline. \n\nPlease extract these domain primitives into named constants and flatten the nested branches by combining the conditions for the atomic update. This eliminates the duplicated branch and ensures self-documenting code.\n\n```c\n#define TRACK_TAG_SHIFT 24\n#define TRACK_LO_SHIFT 8\n#define TRACK_TAG_MASK 0xFF000000U\n#define TRACK_LO_MASK 0x00FFFFFFU\n#define TRACK_ROLLOVER_THRESHOLD 0x00400000U\n\n/* ... inside get_time() ... */\n\t\t/* Lock-free timer overflow detection for b/213342294 */\n\t\tuint32_t cur_hi_tag \u003d (ts.le.hi \u003c\u003c TRACK_TAG_SHIFT) \u0026 TRACK_TAG_MASK;\n\t\tuint32_t cur_lo_val \u003d ts.le.lo \u003e\u003e TRACK_LO_SHIFT;\n\t\tuint32_t cur_packed \u003d cur_hi_tag | cur_lo_val;\n\n\t\tuint32_t prev_packed \u003d\n\t\t\t__atomic_load_n(\u0026track_packed, __ATOMIC_RELAXED);\n\t\tuint32_t prev_hi_tag \u003d prev_packed \u0026 TRACK_TAG_MASK;\n\t\tuint32_t prev_lo_val \u003d prev_packed \u0026 TRACK_LO_MASK;\n\n\t\tif (prev_hi_tag \u003d\u003d cur_hi_tag \u0026\u0026 prev_lo_val \u003e cur_lo_val \u0026\u0026\n\t\t    (prev_lo_val - cur_lo_val) \u003e TRACK_ROLLOVER_THRESHOLD) {\n\t\t\tts.le.hi++;\n\t\t}\n\n\t\tif ((prev_hi_tag \u003d\u003d cur_hi_tag \u0026\u0026 cur_lo_val \u003e prev_lo_val) ||\n\t\t    (int8_t)((cur_hi_tag - prev_hi_tag) \u003e\u003e TRACK_TAG_SHIFT) \u003e 0) {\n\t\t\t__atomic_compare_exchange_n(\u0026track_packed, \u0026prev_packed,\n\t\t\t\t\t\t    cur_packed, 0,\n\t\t\t\t\t\t    __ATOMIC_RELAXED,\n\t\t\t\t\t\t    __ATOMIC_RELAXED);\n\t\t}\n```\n[🔗](http://go/tj/4404ef33-8178-4b25-9e17-96e783966b04)",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 116,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ee86096ff99d821f1777e72ee20298d98e7eec3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "229b840f_6c06849d",
+        "filename": "zephyr/test/drivers/timer/src/test_overflow.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T21:02:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe test suite covers the normal case and a full rollover, but is missing explicit boundary value tests for the `0x00400000U` (or `TRACK_ROLLOVER_THRESHOLD`) rollover threshold. For relational comparisons, please include tests verifying both the exact boundary (which should not increment) and the off-by-one adjacent value (which should increment).\n\n```c\n\t/* Test boundary condition: exact threshold (should NOT increment hi) */\n\tclksrc_high \u003d 0;\n\tmock_hw_timer \u003d 0x80000000;\n\ttimer_reset_track_packed_32bit();\n\tt1 \u003d get_time_32bit();\n\n\tmock_hw_timer \u003d 0x80000000 - 0x40000000; /* Diff is exactly 0x40000000 (\u003e\u003e 8 is 0x400000) */\n\tt2 \u003d get_time_32bit();\n\tzassert_equal(t2.le.hi, 0, \"hi should not increment at exact threshold\");\n\n\t/* Test boundary condition: threshold + 1 (should increment hi) */\n\tmock_hw_timer \u003d 0x80000000 - 0x40000000 - 0x100; /* Diff is threshold + 1 */\n\tt3 \u003d get_time_32bit();\n\tzassert_equal(t3.le.hi, 1, \"hi should increment just past threshold\");\n```\n[🔗](http://go/tj/4404ef33-8178-4b25-9e17-96e783966b04)",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ee86096ff99d821f1777e72ee20298d98e7eec3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
