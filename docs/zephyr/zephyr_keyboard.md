@@ -116,6 +116,51 @@ The boot and runtime key row and column keys are configured with a
 Note that runtime-keys operation requires a Vivaldi keyboard configuration node
 as well.
 
+If the board supports keyboards with different matrix layouts, the keys can be
+specified in one child node per layout instead, for example:
+
+```
+&kbd {
+        ...
+        boot-keys {
+                compatible = "cros-ec,boot-keys";
+
+                boot_keys_0: boot-keys-0 {
+                        down-arrow-rc = <KBD_RC(6, 11)>;
+                        esc-rc = <KBD_RC(1, 1)>;
+                        left-shift-rc = <KBD_RC(5, 7)>;
+                        refresh-rc = <KBD_RC(3, 2)>;
+                };
+
+                boot_keys_1: boot-keys-1 {
+                        down-arrow-rc = <KBD_RC(5, 16)>;
+                        esc-rc = <KBD_RC(1, 1)>;
+                        left-shift-rc = <KBD_RC(1, 0)>;
+                        refresh-rc = <KBD_RC(3, 2)>;
+                };
+        };
+        ...
+};
+```
+
+The effective configuration is then selected in the board code by implementing
+`board_boot_keys_idx` and `board_runtime_keys_idx`, which are called when the
+first key event is processed, for example:
+
+```
+#include <drivers/boot_keys.h>
+
+int8_t board_boot_keys_idx(void)
+{
+        if (cros_cbi_ufsc_check_match(
+                    CBI_UFSC_VALUE_ID(DT_NODELABEL(ufsc_kb_layout_1)))) {
+                return BOOT_KEYS_CFG_IDX(boot_keys_1);
+        }
+
+        return BOOT_KEYS_CFG_IDX(boot_keys_0);
+}
+```
+
 ### Factory test
 
 The factory test debugging command needs its own configuration, specifying
@@ -238,6 +283,10 @@ int8_t board_vivaldi_keybd_idx(void)
 }
 ```
 
+If the configurations are for keyboards with a different matrix layout, the
+top row keys location can be overridden for a specific configuration by
+specifying a `vivaldi-keys` property in the configuration node.
+
 ### Fn keys
 
 The keyboard driver can generate an alternate key code for selected keys when a
@@ -262,6 +311,11 @@ kbd {
     };
 };
 ```
+
+Similarly to the boot and runtime keys, multiple configurations can be
+specified using child nodes, each with its own `fn-rc` and `keymap`
+properties, the effective one is then selected by implementing
+`board_fn_keys_idx`.
 
 The scancode is the set2 version, which is going to then get translated by the
 8042 driver according to the [8042 protocol], and then mapped to Linux input

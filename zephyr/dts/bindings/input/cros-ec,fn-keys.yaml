@@ -24,6 +24,32 @@ description: |
       };
   };
 
+  If the board supports multiple keyboard layouts, the keys can be specified
+  in one child node per layout instead, the active one is then selected by
+  implementing board_fn_keys_idx(), for example:
+
+  kbd {
+      fn-keys {
+          compatible = "cros-ec,fn-keys";
+
+          fn_keys_0: fn-keys-0 {
+              fn-rc = <KBD_RC(0, 16)>;
+              keymap = <
+                MATRIX_KEY(0, 2, KBD_SCANCODE_F1)
+                ...
+              >;
+          };
+
+          fn_keys_1: fn-keys-1 {
+              fn-rc = <KBD_RC(4, 16)>;
+              keymap = <
+                MATRIX_KEY(0, 2, KBD_SCANCODE_F1)
+                ...
+              >;
+          };
+      };
+  };
+
 compatible: "cros-ec,fn-keys"
 
 include: base.yaml
@@ -31,12 +57,28 @@ include: base.yaml
 properties:
   fn-rc:
     type: int
-    required: true
-    description: Row-column position of the "Fn" key.
+    description: |
+      Row-column position of the "Fn" key, required if no child nodes are
+      defined.
 
   keymap:
     type: array
-    required: true
     description: |
-      List of row, key and codes, using the MATRIX_KEY() macro.
+      List of row, key and codes, using the MATRIX_KEY() macro, required if
+      no child nodes are defined.
+
+child-binding:
+  description: Fn keys configuration for a specific keyboard layout.
+  properties:
+    fn-rc:
+      type: int
+      required: true
+      description: Row-column position of the "Fn" key.
+
+    keymap:
+      type: array
+      required: true
+      description: |
+        List of row, key and codes, using the MATRIX_KEY() macro, up to 32
+        entries.
 

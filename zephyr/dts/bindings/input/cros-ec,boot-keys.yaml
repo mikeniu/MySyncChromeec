@@ -20,6 +20,30 @@ description: |
       };
   };
 
+  If the board supports multiple keyboard layouts, the keys can be specified
+  in one child node per layout instead, the active one is then selected by
+  implementing board_boot_keys_idx(), for example:
+
+  kbd {
+      boot-keys {
+          compatible = "cros-ec,boot-keys";
+
+          boot_keys_0: boot-keys-0 {
+              down-arrow-rc = <KBD_RC(6, 11)>;
+              esc-rc = <KBD_RC(1, 1)>;
+              left-shift-rc = <KBD_RC(5, 7)>;
+              refresh-rc = <KBD_RC(3, 2)>;
+          };
+
+          boot_keys_1: boot-keys-1 {
+              down-arrow-rc = <KBD_RC(5, 16)>;
+              esc-rc = <KBD_RC(1, 1)>;
+              left-shift-rc = <KBD_RC(1, 0)>;
+              refresh-rc = <KBD_RC(3, 2)>;
+          };
+      };
+  };
+
 compatible: "cros-ec,boot-keys"
 
 include: base.yaml
@@ -27,20 +51,47 @@ include: base.yaml
 properties:
   down-arrow-rc:
     type: int
-    required: true
-    description: Row-column position of the "down arrow" key.
+    description: |
+      Row-column position of the "down arrow" key, required if no child nodes
+      are defined.
 
   esc-rc:
     type: int
-    required: true
-    description: Row-column position of the "esc" key.
+    description: |
+      Row-column position of the "esc" key, required if no child nodes are
+      defined.
 
   left-shift-rc:
     type: int
-    required: true
-    description: Row-column position of the "left shift" key.
+    description: |
+      Row-column position of the "left shift" key, required if no child nodes
+      are defined.
 
   refresh-rc:
     type: int
-    required: true
-    description: Row-column position of the "refresh" key.
+    description: |
+      Row-column position of the "refresh" key, required if no child nodes are
+      defined.
+
+child-binding:
+  description: Boot keys configuration for a specific keyboard layout.
+  properties:
+    down-arrow-rc:
+      type: int
+      required: true
+      description: Row-column position of the "down arrow" key.
+
+    esc-rc:
+      type: int
+      required: true
+      description: Row-column position of the "esc" key.
+
+    left-shift-rc:
+      type: int
+      required: true
+      description: Row-column position of the "left shift" key.
+
+    refresh-rc:
+      type: int
+      required: true
+      description: Row-column position of the "refresh" key.

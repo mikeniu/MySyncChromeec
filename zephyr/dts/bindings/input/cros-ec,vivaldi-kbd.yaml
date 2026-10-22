@@ -56,6 +56,22 @@ description: |
   typically using the DT_NODE_CHILD_IDX() macro to indenty the index of the
   desired child node.
 
+  If the configurations are for keyboards with a different matrix layout, the
+  top row keys location can be overridden in the child node using the
+  vivaldi-keys property, for example:
+
+          kbd_config_1: kbd-config-1 {
+                  vivaldi-keys = <
+                          KBD_RC(0, 2)   /* T1 */
+                          KBD_RC(3, 2)   /* T2 */
+                          ...
+                  >;
+                  vivaldi-codes = <
+                          ...
+                  >;
+                  capabilities = <VIVALDI_KEYBD_CAP_SCRNLOCK_KEY>;
+          };
+
 compatible: "cros-ec,vivaldi-kbd"
 
 include: base.yaml
@@ -70,6 +86,13 @@ properties:
 
 child-binding:
   properties:
+    vivaldi-keys:
+      type: array
+      description: |
+        Array of KBD_RC() entries corresponding to the (row, column) location
+        of the top keys for this configuration, starting from T1. Overrides
+        the vivaldi-keys property of the parent node if specified.
+
     vivaldi-codes:
       type: array
       required: true

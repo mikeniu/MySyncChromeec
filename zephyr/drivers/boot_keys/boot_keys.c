@@ -12,6 +12,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+#include <drivers/boot_keys.h>
 #include <dt-bindings/kbd.h>
 #include <hooks.h>
 #include <host_command.h>
@@ -35,31 +36,81 @@ static uint32_t boot_keys_counter;
 static bool boot_keys_release_only;
 struct k_work_delayable boot_keys_timeout_dwork;
 
-#define BOOT_KEY_INIT(prop)                               \
-	{                                                 \
-		.row = KBD_RC_ROW(DT_INST_PROP(0, prop)), \
-		.col = KBD_RC_COL(DT_INST_PROP(0, prop)), \
-	}
+/* The keys can be specified directly in the boot-keys node or, if multiple
+ * keyboard layouts are supported, in one child node per layout.
+ */
+#define BOOT_KEYS_CONFIG_COUNT DT_INST_CHILD_NUM(0)
 
-static const struct boot_keys {
+BUILD_ASSERT(BOOT_KEYS_CONFIG_COUNT == 0 || !DT_INST_NODE_HAS_PROP(0, esc_rc),
+	     "boot-keys: specify the keys either in the node or in the "
+	     "child nodes, not both");
+
+struct boot_keys {
 	uint8_t row;
 	uint8_t col;
-} boot_keys[] = {
-	[BOOT_KEY_DOWN_ARROW] = BOOT_KEY_INIT(down_arrow_rc),
-	[BOOT_KEY_ESC] = BOOT_KEY_INIT(esc_rc),
-	[BOOT_KEY_LEFT_SHIFT] = BOOT_KEY_INIT(left_shift_rc),
-	[BOOT_KEY_REFRESH] = BOOT_KEY_INIT(refresh_rc),
 };
-BUILD_ASSERT(ARRAY_SIZE(boot_keys) == BOOT_KEY_COUNT);
+
+#define BOOT_KEY_INIT(node_id, prop)                       \
+	{                                                  \
+		.row = KBD_RC_ROW(DT_PROP(node_id, prop)), \
+		.col = KBD_RC_COL(DT_PROP(node_id, prop)), \
+	}
+
+#define BOOT_KEYS_INIT(node_id)                                                \
+	{                                                                      \
+		[BOOT_KEY_DOWN_ARROW] = BOOT_KEY_INIT(node_id, down_arrow_rc), \
+		[BOOT_KEY_ESC] = BOOT_KEY_INIT(node_id, esc_rc),               \
+		[BOOT_KEY_LEFT_SHIFT] = BOOT_KEY_INIT(node_id, left_shift_rc), \
+		[BOOT_KEY_REFRESH] = BOOT_KEY_INIT(node_id, refresh_rc),       \
+	}
+
+#define BOOT_KEYS_CHILD_INIT(node_id) \
+	[DT_NODE_CHILD_IDX(node_id)] = BOOT_KEYS_INIT(node_id),
+
+static const struct boot_keys boot_keys_configs[][BOOT_KEY_COUNT] = {
+#if BOOT_KEYS_CONFIG_COUNT > 0
+	DT_INST_FOREACH_CHILD(0, BOOT_KEYS_CHILD_INIT)
+#else
+	BOOT_KEYS_INIT(DT_DRV_INST(0)),
+#endif
+};
+
+#if BOOT_KEYS_CONFIG_COUNT > 1
+static int8_t boot_keys_active_idx = -1;
+
+static const struct boot_keys *get_boot_keys(void)
+{
+	if (boot_keys_active_idx < 0) {
+		int8_t idx = board_boot_keys_idx();
+
+		if (idx < 0 || idx >= BOOT_KEYS_CONFIG_COUNT) {
+			LOG_ERR("invalid boot keys config index: %d", idx);
+			idx = 0;
+		}
+
+		LOG_INF("boot_keys: config %d", idx);
+		boot_keys_active_idx = idx;
+	}
+
+	return boot_keys_configs[boot_keys_active_idx];
+}
+#else
+static const struct boot_keys *get_boot_keys(void)
+{
+	return boot_keys_configs[0];
+}
+#endif
 
 static bool ignore_key(uint8_t row, uint8_t col)
 {
+	const struct boot_keys *boot_keys = get_boot_keys();
+
 	if (!IS_ENABLED(CONFIG_BOOT_KEYS_GHOST_REFRESH_WORKAROUND)) {
 		return false;
 	}
 
 	if (row == boot_keys[BOOT_KEY_REFRESH].row) {
-		for (uint8_t i = 0; i < ARRAY_SIZE(boot_keys); i++) {
+		for (uint8_t i = 0; i < BOOT_KEY_COUNT; i++) {
 			const struct boot_keys *key = &boot_keys[i];
 
 			if (row == key->row && col == key->col) {
@@ -75,6 +126,8 @@ static bool ignore_key(uint8_t row, uint8_t col)
 
 static void process_key(uint8_t row, uint8_t col, bool pressed)
 {
+	const struct boot_keys *boot_keys = get_boot_keys();
+
 	if (ignore_key(row, col)) {
 		return;
 	}
@@ -89,7 +142,7 @@ static void process_key(uint8_t row, uint8_t col, bool pressed)
 		boot_keys_counter--;
 	}
 
-	for (uint8_t i = 0; i < ARRAY_SIZE(boot_keys); i++) {
+	for (uint8_t i = 0; i < BOOT_KEY_COUNT; i++) {
 		const struct boot_keys *key = &boot_keys[i];
 
 		if (row == key->row && col == key->col) {
@@ -218,6 +271,9 @@ void test_reset(void)
 	boot_keys_value = 0;
 	boot_keys_counter = 0;
 	boot_keys_release_only = false;
+#if BOOT_KEYS_CONFIG_COUNT > 1
+	boot_keys_active_idx = -1;
+#endif
 }
 
 void test_reinit(void)

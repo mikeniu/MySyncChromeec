@@ -22,6 +22,30 @@ description: |
       };
   };
 
+  If the board supports multiple keyboard layouts, the keys can be specified
+  in one child node per layout instead, the active one is then selected by
+  implementing board_runtime_keys_idx(), for example:
+
+  kbd {
+      runtime-keys {
+          compatible = "cros-ec,runtime-keys";
+
+          runtime_keys_0: runtime-keys-0 {
+              left-alt-rc = <KBD_RC(6, 13)>;
+              right-alt-rc = <KBD_RC(0, 10)>;
+              h-rc = <KBD_RC(1, 6)>;
+              r-rc = <KBD_RC(7, 9)>;
+          };
+
+          runtime_keys_1: runtime-keys-1 {
+              left-alt-rc = <KBD_RC(6, 2)>;
+              right-alt-rc = <KBD_RC(0, 10)>;
+              h-rc = <KBD_RC(5, 11)>;
+              r-rc = <KBD_RC(7, 6)>;
+          };
+      };
+  };
+
 compatible: "cros-ec,runtime-keys"
 
 include: base.yaml
@@ -29,26 +53,59 @@ include: base.yaml
 properties:
   left-alt-rc:
     type: int
-    required: true
-    description: Row-column position of the "left alt" key.
+    description: |
+      Row-column position of the "left alt" key, required if no child nodes
+      are defined.
 
   right-alt-rc:
     type: int
-    required: true
-    description: Row-column position of the "right alt" key.
+    description: |
+      Row-column position of the "right alt" key, required if no child nodes
+      are defined.
 
   h-rc:
     type: int
-    required: true
-    description: Row-column position of the "h" key.
+    description: |
+      Row-column position of the "h" key, required if no child nodes are
+      defined.
 
   r-rc:
     type: int
-    required: true
-    description: Row-column position of the "r" key.
+    description: |
+      Row-column position of the "r" key, required if no child nodes are
+      defined.
 
   vol-up-rc:
     type: int
     description: |
       Row-column position of the "volume up" key, only required when using the
       MKBP keyboard protocol.
+
+child-binding:
+  description: Runtime keys configuration for a specific keyboard layout.
+  properties:
+    left-alt-rc:
+      type: int
+      required: true
+      description: Row-column position of the "left alt" key.
+
+    right-alt-rc:
+      type: int
+      required: true
+      description: Row-column position of the "right alt" key.
+
+    h-rc:
+      type: int
+      required: true
+      description: Row-column position of the "h" key.
+
+    r-rc:
+      type: int
+      required: true
+      description: Row-column position of the "r" key.
+
+    vol-up-rc:
+      type: int
+      description: |
+        Row-column position of the "volume up" key, only required when using
+        the MKBP keyboard protocol.
