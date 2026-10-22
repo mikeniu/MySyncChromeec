@@ -69,6 +69,24 @@
       "message": "Looks good to me. I think the direction is good, though it increases discrepancy between EC-legacy and Zephyr (which will not be a problem in foreseeable future).\n\nIn future we need to work on FINGER_UP implementation on both drivers and fpsensor task side. I believe it could be improved.\n\nFYI The problem with putting sensor to sleep in `FINGER_UP` mode started in June 2018 https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/1125062.",
       "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73bdd2e4_70a074f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-22T22:47:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `fp_task` now keeps the sensor in detect mode (`FP_MODE_ANY_DETECT_FINGER`) when `FP_MODE_FINGER_UP` is configured and while polling for finger removal, without prematurely entering idle or low-power mode before `FINGER_NONE` is observed.\n* **Architecture \u0026 Component Fit:** ✅ The mode transition logic fits cleanly within the existing `fp_task` event loop and mode bitmasks, and `fingerprint_sensor_sim.c` accurately tracks `detect_mode` and `low_power_mode` across `FINGERPRINT_SENSOR_MODE_DETECT`, `FINGERPRINT_SENSOR_MODE_LOW_POWER`, `FINGERPRINT_SENSOR_MODE_IDLE`, and `fp_simulator_acquire_image()`.\n* **Code Simplicity:** ✅ The control-flow adjustments in `fp_task` and the state updates in the simulator are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ The changes follow standard C/C++ and Zephyr/EC conventions with clear comments and no magic values.\n* **Security:** ✅ No security issues introduced.\n* **Testing:** ✅ `fpsensor_finger_presence.cc` thoroughly verifies `detect_mode` and `low_power_mode` states across `FP_MODE_FINGER_DOWN` and `FP_MODE_FINGER_UP` transitions, including timer polling while a finger remains partially on the sensor.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+62, -12)`. The CL is a single, cohesive logical change combining the `fp_task` state fix with the corresponding simulator and unit test updates.\n* **Commit Message:** ✅ The commit message clearly explains the problem, the rationale for avoiding `FINGERPRINT_SENSOR_MODE_IDLE` during finger presence checks, and the conceptual solution.\n\n[[trajectory](https://goto.corp.google.com/traj/f999d0dd-9448-4256-9c0f-656959e1768f)] [🔗](http://go/tj/f999d0dd-9448-4256-9c0f-656959e1768f)",
+      "isAi": true,
+      "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
