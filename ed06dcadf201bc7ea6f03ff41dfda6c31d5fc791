@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29dcd984_030687ce",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-22T17:53:44Z",
+      "side": 1,
+      "message": "Tested CONFIG_SPIN_VALIDATE\u003dy on karis (+6.1 KB flash, +80 B RAM) and in twister; all console_buffer tests and DUT console reads pass.",
+      "parentUuid": "28b7585e_2c7f6abe",
+      "range": {
+        "startLine": 132,
+        "startChar": 24,
+        "endLine": 132,
+        "endChar": 35
+      },
+      "revId": "ed06dcadf201bc7ea6f03ff41dfda6c31d5fc791",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de3c3f5d_a0c68f1e",
@@ -49,6 +73,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "f07638de_aa39cb44",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-22T17:53:44Z",
+      "side": 1,
+      "message": "Technically `dest` and `write_count_out` are caller owned variables that do not need to be protected by the lock.\n\nHowever the cost of keeping the lock until the end is minimal and improves readability and safety. Restored to original location.",
+      "parentUuid": "de3c3f5d_a0c68f1e",
+      "range": {
+        "startLine": 349,
+        "startChar": 0,
+        "endLine": 349,
+        "endChar": 35
+      },
+      "revId": "ed06dcadf201bc7ea6f03ff41dfda6c31d5fc791",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7bb96d98_f45e867e",
         "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
         "patchSetId": 4
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-21T23:15:30Z",
       "side": 1,
       "message": "Non-blocking - It probably makes sense to move this test suite to [zephyr/test/console](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/HEAD:src/platform/ec/zephyr/test/console/CMakeLists.txt;l\u003d9) as a follow up activity.",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 36
+      },
+      "revId": "ed06dcadf201bc7ea6f03ff41dfda6c31d5fc791",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "accd87f4_e6dc40e3",
+        "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-22T17:53:44Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7bb96d98_f45e867e",
       "range": {
         "startLine": 216,
         "startChar": 0,
