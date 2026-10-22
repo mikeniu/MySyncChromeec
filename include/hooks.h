@@ -108,7 +108,10 @@ enum hook_type {
 	 * across such a jump should save it here and restore it in HOOK_INIT.
 	 *
 	 * Hook routines are called from the context which initiates the jump,
-	 * WITH INTERRUPTS DISABLED.
+	 * with interrupts enabled.
+	 *
+	 * Critical hardware teardown that must run with interrupts disabled
+	 * should use chip_pre_system_jump() or arch_pre_system_jump().
 	 */
 	HOOK_SYSJUMP,
 
