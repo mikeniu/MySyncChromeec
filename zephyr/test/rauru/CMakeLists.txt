@@ -27,7 +27,9 @@ target_sources(app PRIVATE
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hibernate.c
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/sub_board.c
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/navi/src/suspend_resume.c
-	${PLATFORM_EC_PROGRAM_DIR}/rauru/navi/src/usb_mux.c)
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/navi/src/usb_mux.c
+	${PLATFORM_EC}/driver/retimer/ps8802.c
+	${PLATFORM_EC}/driver/usb_mux/anx3443.c)
 
 # Add the test source
 target_sources(app PRIVATE
@@ -36,4 +38,5 @@ target_sources(app PRIVATE
 	src/dp_alt_mode_test.c
 	src/hooks_test.c
 	src/navi_test.c
+	src/retimer_mux_test.c
 )
