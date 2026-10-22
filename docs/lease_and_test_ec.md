@@ -16,10 +16,10 @@ port collisions or race conditions.
 It automatically detects the DUT operating system type from Swarming metadata
 and delegates execution to the appropriate DUT handler:
 * **CrOS DUTs**: Uses SSH tunneling via `sshwatcher`, flashes EC RW via
-  `futility`/`swap_ec_rw` (and optionally EC RO via `flashrom`), verifies
+  `futility swap_cbfs_file` (and optionally EC RO via `flashrom`), verifies
   console status with `dut-control`, and executes Tast tests inside `cros_sdk`.
 * **Android (ALOS) DUTs**: Uses ADB via `corp-adb-helper`, manages AP firmware
-  and EC sections with `cbfstool`/`futility`, and executes host tests with
+  and EC sections with `futility swap_cbfs_file`, and executes host tests with
   Tradefed (`atest`) in the Android tree.
 
 > **Note**: If you already have a network-reachable DUT (IP or hostname) and
@@ -222,13 +222,12 @@ delay.
 checks.
 6. **EC Flashing & Verification**:
    - **CrOS**: Extracts the current AP image via `futility read`, replaces the
-EC RW section using `/usr/share/vboot/bin/swap_ec_rw`, flashes the AP with
+EC RW section using `futility swap_cbfs_file`, flashes the AP with
 `futility update --fast`, and reboots the DUT to let Software Sync update the
 EC.
-   - **ALOS**: Extracts EC RW sections and replaces CBFS components (`ecrw`,
-`ecrw.hash`, `ecrw.version`, `ecrw.config`) in regions `FW_MAIN_A` and
-`FW_MAIN_B` using `cbfstool`, re-signs using `futility sign --keyset devkeys`,
-updates via `futility update --fast`, and reboots.
+   - **ALOS**: Extracts the current AP image via `futility read`, replaces the
+EC RW section and re-signs using `futility swap_cbfs_file`, flashes the AP with
+`futility update --fast`, and reboots.
    - Verifies the EC is active using `dut-control ec_board` via Servo.
    - Verifies the AP is fully booted and responsive (`ectool version` over SSH
 for CrOS; `getprop sys.boot_completed` and `ectool version` over ADB for ALOS).

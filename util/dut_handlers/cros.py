@@ -112,10 +112,10 @@ class CrosHandler(DutHandler):
 
             print(
                 "Populating AP firmware image with custom EC binary using "
-                "swap_ec_rw locally on DUT..."
+                "futility swap_cbfs_file locally on DUT..."
             )
             self._dut_ssh(
-                f"/usr/share/vboot/bin/swap_ec_rw "
+                f"futility swap_cbfs_file "
                 f"-i /tmp/ap_{model}.bin -e /tmp/ec_rw_{model}.bin"
             )
 
