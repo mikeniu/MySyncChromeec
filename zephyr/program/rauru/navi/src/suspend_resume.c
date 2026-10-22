@@ -4,6 +4,7 @@
  */
 
 #include "ap_power/ap_power.h"
+#include "common.h"
 #include "cros_board_info.h"
 #include "hooks.h"
 #include "power.h"
@@ -11,16 +12,7 @@
 #include "timer.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/pinctrl.h>
-#include <zephyr/dt-bindings/gpio/ite-it8xxx2-gpio.h>
-#include <zephyr/dt-bindings/interrupt-controller/ite-intc.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/pm/device.h>
-#include <zephyr/pm/device_runtime.h>
-#include <zephyr/pm/policy.h>
-#include <zephyr/sys/atomic.h>
-
-#include <chip_chipregs.h>
 
 LOG_MODULE_DECLARE(suspend_resume_hack, LOG_LEVEL_INF);
 
@@ -41,18 +33,19 @@ LOG_MODULE_DECLARE(suspend_resume_hack, LOG_LEVEL_INF);
 
 #define PREINIT_VERSION 0xDEADDEAD
 
-static uint32_t board_version = PREINIT_VERSION;
-static struct gpio_callback cs_callback;
+test_export_static uint32_t board_version = PREINIT_VERSION;
+test_export_static struct gpio_callback cs_callback;
 static const struct gpio_dt_spec cs_gpio =
 	GPIO_DT_SPEC_GET(DT_NODELABEL(shi0), cs_gpios);
-static void ap_wakeup_isr(const struct device *port, struct gpio_callback *cb,
-			  gpio_port_pins_t pins);
+test_export_static void ap_wakeup_isr(const struct device *port,
+				      struct gpio_callback *cb,
+				      gpio_port_pins_t pins);
 
 /*
  * Enables the interrupt on the CS_L pin. This is done with a deferred call
  * to avoid race conditions during the SPI transaction.
  */
-static void enable_cs_interrupt(void)
+test_export_static void enable_cs_interrupt(void)
 {
 	gpio_add_callback_dt(&cs_gpio, &cs_callback);
 	gpio_pin_interrupt_configure_dt(&cs_gpio, GPIO_INT_EDGE_BOTH);
@@ -67,13 +60,13 @@ DECLARE_DEFERRED(enable_cs_interrupt);
 /*
  * Disables the interrupt on the CS_L pin.
  */
-static void disable_cs_interrupt(void)
+test_export_static void disable_cs_interrupt(void)
 {
 	gpio_remove_callback_dt(&cs_gpio, &cs_callback);
 	gpio_pin_interrupt_configure_dt(&cs_gpio, GPIO_INT_EDGE_FALLING);
 }
 
-static void ap_wakeup_isr_debounce(void)
+test_export_static void ap_wakeup_isr_debounce(void)
 {
 	const struct gpio_dt_spec *s3_indicator_l =
 		GPIO_DT_FROM_NODELABEL(gpio_ap_in_sleep_l);
@@ -92,8 +85,9 @@ DECLARE_DEFERRED(ap_wakeup_isr_debounce);
  * Interrupt handler for the CS_L pin. This function is called when the AP
  * enters or exits S3 sleep.
  */
-static void ap_wakeup_isr(const struct device *port, struct gpio_callback *cb,
-			  gpio_port_pins_t pins)
+test_export_static void ap_wakeup_isr(const struct device *port,
+				      struct gpio_callback *cb,
+				      gpio_port_pins_t pins)
 {
 	const struct gpio_dt_spec *s3_indicator_l =
 		GPIO_DT_FROM_NODELABEL(gpio_ap_in_sleep_l);
@@ -145,7 +139,7 @@ AP_POWER_EVENT_CALLBACK_DEFINE(navi_power_event_handler, AP_POWER_RESUME_INIT,
  * Initializes the workaround. This function is called during system
  * initialization.
  */
-static void init_suspend_resume_workaround(void)
+test_export_static void init_suspend_resume_workaround(void)
 {
 	if (board_version == PREINIT_VERSION) {
 		if (cbi_get_board_version(&board_version)) {

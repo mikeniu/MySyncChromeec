@@ -58,6 +58,13 @@
 	fan0: fan0 {
 	};
 
+	shi0: shi {
+		compatible = "vnd,spi";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cs-gpios = <&gpiom 5 GPIO_ACTIVE_HIGH>;
+	};
+
 	pinctrl: pinctrl {
 		compatible = "ite,it8xxx2-pinctrl";
 		status = "disabled";

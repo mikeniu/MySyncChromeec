@@ -25,7 +25,9 @@ target_sources(app PRIVATE
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hdmi.c
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hooks.c
 	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/hibernate.c
-	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/sub_board.c)
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/src/sub_board.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/navi/src/suspend_resume.c
+	${PLATFORM_EC_PROGRAM_DIR}/rauru/navi/src/usb_mux.c)
 
 # Add the test source
 target_sources(app PRIVATE
@@ -33,4 +35,5 @@ target_sources(app PRIVATE
 	src/usbc_test.c
 	src/dp_alt_mode_test.c
 	src/hooks_test.c
+	src/navi_test.c
 )
