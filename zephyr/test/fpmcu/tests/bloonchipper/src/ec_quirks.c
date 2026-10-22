@@ -16,7 +16,6 @@
 #include <zephyr/pm/policy.h>
 #include <zephyr/ztest.h>
 
-FAKE_VOID_FUNC(arm_core_mpu_disable);
 FAKE_VOID_FUNC(LL_TIM_DisableCounter, void *);
 FAKE_VALUE_FUNC(int, stm32_clock_control_off, const struct device *,
 		clock_control_subsys_t);
