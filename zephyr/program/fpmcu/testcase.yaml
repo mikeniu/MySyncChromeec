@@ -148,6 +148,13 @@ tests:
     - CONFIG_PM=n
     extra_conf_files:
     - prj_hw_tests.conf
+  mpu:
+    extra_configs:
+    - CONFIG_HW_TEST_MPU=y
+    # Added to reduce RO flash usage
+    - CONFIG_PM=n
+    extra_conf_files:
+    - prj_hw_tests.conf
   null_pointer:
     extra_configs:
     - CONFIG_HW_TEST_NULL_POINTER=y

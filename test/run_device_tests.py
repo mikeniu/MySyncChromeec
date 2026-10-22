@@ -116,10 +116,10 @@ DATA_ACCESS_VIOLATION_80E0000_REGEX = re.compile(
     r"Data access violation, mfar = 80e0000\r\n"
 )
 DATA_ACCESS_VIOLATION_20000000_REGEX = re.compile(
-    r"Data access violation, mfar = 20000000\r\n"
+    r"(Data access violation, mfar = 20000000\r\n)|(.*MMFAR Address: 0x20000000\r\n)"
 )
 DATA_ACCESS_VIOLATION_24000000_REGEX = re.compile(
-    r"Data access violation, mfar = 24000000\r\n"
+    r"(Data access violation, mfar = 24000000\r\n)|(.*MMFAR Address: 0x24000000\r\n)"
 )
 DATA_ACCESS_VIOLATION_64020000_REGEX = re.compile(
     r"(Data access violation, mfar = 64020000\r\n)|(.*MMFAR Address: 0x64020000\r\n)"
@@ -127,12 +127,15 @@ DATA_ACCESS_VIOLATION_64020000_REGEX = re.compile(
 DATA_ACCESS_VIOLATION_64030000_REGEX = re.compile(
     r"(Data access violation, mfar = 64030000\r\n)|(.*MMFAR Address: 0x64030000\r\n)"
 )
-DATA_ACCESS_VIOLATION_200B0000_REGEX = re.compile(
-    r"Data access violation, mfar = 200b0000\r\n"
+DATA_ACCESS_VIOLATION_HELIPILOT_REGEX = re.compile(
+    r"(Data access violation, mfar = 200b0000\r\n)|(.*MMFAR Address: 0x200a8000\r\n)"
 )
-"""Helipilot's data RAM starting address."""
+"""Helipilot's data RAM starting address (0x200B0000 on Legacy EC with 156KiB
+data RAM, and 0x200A8000 on Zephyr where NPCX9m7f uses the full 188KiB data
+RAM).
+"""
 DATA_ACCESS_VIOLATION_200A8000_REGEX = re.compile(
-    r"Data access violation, mfar = 200a8000\r\n"
+    r"(Data access violation, mfar = 200a8000\r\n)|(.*MMFAR Address: 0x200a8000\r\n)"
 )
 """Buccaneer's data RAM starting address.
 
@@ -588,6 +591,7 @@ class Renode(Platform):
             "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
             "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
             "fpsensor_crypto",  # TODO(b/556233130)
+            "mpu",  # TODO(b/567997557)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
@@ -639,6 +643,7 @@ class Renode(Platform):
 
         if zephyr and test_config.config_name in [
             "flash_physical_ro",  # TODO(b/485668836)
+            "mpu_ro",  # TODO(b/485668836)
             "system_is_locked_wp_on",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.24337",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.27609",  # TODO(b/485669841)
@@ -937,19 +942,18 @@ class AllTests:
                 timeout_secs=120,
             ),
             TestConfig(test_name="malloc", imagetype_to_use=ImageType.RO),
-            # TODO(b/363277530): Add Zephyr MPU tests.
             TestConfig(
                 config_name="mpu_ro",
                 test_name="mpu",
                 imagetype_to_use=ImageType.RO,
                 finish_regexes=[board_config.mpu_regex],
-                skip_for_zephyr=True,
+                architectures=[Architecture.ARM],
             ),
             TestConfig(
                 config_name="mpu_rw",
                 test_name="mpu",
                 finish_regexes=[board_config.mpu_regex],
-                skip_for_zephyr=True,
+                architectures=[Architecture.ARM],
             ),
             # Handled by Zephyr - kernel.mutex test
             TestConfig(test_name="mutex", skip_for_zephyr=True),
@@ -1336,7 +1340,7 @@ HELIPILOT_CONFIG = BoardConfig(
     reboot_timeout=3,
     rollback_region0_regex=DATA_ACCESS_VIOLATION_64020000_REGEX,
     rollback_region1_regex=DATA_ACCESS_VIOLATION_64030000_REGEX,
-    mpu_regex=DATA_ACCESS_VIOLATION_200B0000_REGEX,
+    mpu_regex=DATA_ACCESS_VIOLATION_HELIPILOT_REGEX,
     fp_power_supply="ppvar_fp_mw",
     mcu_power_supply="pp3300_mcu_mw",
     # The original power utilization numbers were experimentally derived via
@@ -1393,7 +1397,7 @@ SANOK_CONFIG = BoardConfig(
     # TODO(b/468406461): configure rollback regex.
     rollback_region0_regex=NEVER_MATCH_REGEX,
     rollback_region1_regex=NEVER_MATCH_REGEX,
-    # TODO(b/363277530): create Zephyr MPU tests.
+    # PMP is tested by pmp_entries_ro and pmp_entries_rw on RISC-V.
     mpu_regex=NEVER_MATCH_REGEX,
     fp_power_supply="pp3300_fp_mw",
     mcu_power_supply="pp3300_mcu_mw",
@@ -1423,8 +1427,7 @@ CHUDOW_CONFIG = BoardConfig(
     # TODO(b/485656019): configure rollback regex.
     rollback_region0_regex=NEVER_MATCH_REGEX,
     rollback_region1_regex=NEVER_MATCH_REGEX,
-    # TODO(b/363277530): create Zephyr MPU tests.
-    mpu_regex=NEVER_MATCH_REGEX,
+    mpu_regex=DATA_ACCESS_VIOLATION_20000000_REGEX,
     fp_power_supply="pp3300_fp_mw",
     mcu_power_supply="pp3300_mcu_mw",
     # TODO(b/485657292): configure power utilization.
