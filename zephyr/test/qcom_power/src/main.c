@@ -57,6 +57,8 @@ ASSERT_SAME_CONTROLLER(lid_open_ec);
 #define PMIC_KPD_PWR_ODL_PIN \
 	DT_GPIO_PIN(NAMED_GPIOS_GPIO_NODE(pmic_kpd_pwr_odl), gpios)
 ASSERT_SAME_CONTROLLER(pmic_kpd_pwr_odl);
+#define EN_PP5000_PIN DT_GPIO_PIN(NAMED_GPIOS_GPIO_NODE(en_pp5000_s5), gpios)
+ASSERT_SAME_CONTROLLER(en_pp5000_s5);
 
 static int chipset_reset_count;
 static bool set_power_good_on_reset;
@@ -641,6 +643,19 @@ ZTEST(qcom_power, test_power_chipset_init_ap_off)
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());
+}
+
+ZTEST(qcom_power, test_power_5v_enable_sysjump)
+{
+	static const struct device *gpio_dev = GPIO_DEVICE;
+
+	power_5v_enable(TASK_ID_CHIPSET, 1);
+	zassert_equal(gpio_emul_output_get(gpio_dev, EN_PP5000_PIN), 1);
+
+	hook_notify(HOOK_SYSJUMP);
+
+	power_5v_enable(TASK_ID_CHIPSET, 0);
+	zassert_equal(gpio_emul_output_get(gpio_dev, EN_PP5000_PIN), 0);
 }
 
 void start_in_s0(void *fixture)
