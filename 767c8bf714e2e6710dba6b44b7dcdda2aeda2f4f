@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd197825_df88bcff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:38:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Thank you for splitting out the DFU status helpers and updating the commit message. There are a few edge-case/cleanup bugs in `dfu_download` and missing unit test coverage to address before approval.\n\n### Review Summary\n**Functionality:** ❌ A few edge cases and cleanup paths need attention in `RtsUsbDevice::dfu_download`:\n- Guard against empty `firmware` and `transfer_size_ \u003d\u003d 0` (which would cause `while (offset \u003c total_size)` to loop infinitely).\n- Reset `dfu_interface_ \u003d -1` if `libusb_claim_interface()` fails so `release()` does not later call `libusb_release_interface()` on an unclaimed interface, and release the claimed interface on the early error returns inside the download loop.\n- Check `ret !\u003d static_cast\u003cint\u003e(chunk_size)` on `libusb_control_transfer()` so short writes are caught rather than advancing `offset` and corrupting the flashed image.\n**Architecture \u0026 Component Fit:** ❌ `util/rts5817_flash.cc` is not yet compiled in `util/build.mk` and couples the DFU protocol chunking loop directly to `libusb_*` calls. Sibling C++ USB flashers in `util/` (`util/elan/`, `util/focaltech/`, `util/egis/`) separate USB transport operations behind a small virtual interface/seam so the protocol state machine can be unit-tested in `utils-test`.\n**Code Simplicity:** ❌ Using `size_t` for `printed_pct` and `pct` avoids the double cast (`uint64_t` -\u003e `size_t`) in the progress calculation.\n**Idiomaticity \u0026 Readability:** ❌ Extract the magic progress step `10` into a named `constexpr` constant (`kDfuProgressStepPct`), and consider taking `std::span\u003cconst uint8_t\u003e` for `firmware`.\n**Security:** ✅ No security vulnerabilities identified.\n**Testing:** ❌ Automated unit tests are required for `dfu_download` (covering chunking boundaries `\u003c transfer_size_`, `\u003d\u003d transfer_size_`, `transfer_size_ + 1`, final ZLP, and transfer/poll failure paths) via a small virtual seam or mock USB backend, as noted in the inline comment.\n**CL Size \u0026 Scope:** ✅ `Size: M (+135, -4)`. Well-scoped to implementing `dfu_download` after splitting the status helpers into the parent CL.\n**Commit Message:** ✅ Clear, concise high-level summary of the motivation and change.\n\n[🔗](http://go/tj/18748e91-0dc2-4d16-beb6-33599aa4af20)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f82aa339_c2db138a",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:38:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Functionality \u0026 Edge Cases:** There are three precondition and state-cleanup issues in the setup phase of `dfu_download`:\n\n1. **Empty `firmware` payload:** If `firmware.empty()` is true, `while (offset \u003c total_size)` is skipped and `dfu_download` immediately sends a zero-length `DFU_DOWNLOAD` packet and triggers the manifest phase.\n2. **Zero `transfer_size_` infinite loop:** `find_dfu_interface()` parses `transfer_size_` directly from the USB descriptor (`sz[0] | (sz[1] \u003c\u003c 8)`). If a malformed descriptor reports `wTransferSize \u003d\u003d 0`, `chunk_size` evaluates to `0` and `while (offset \u003c total_size)` loops infinitely without advancing `offset`.\n3. **Unclaimed `dfu_interface_` state on `libusb_claim_interface` failure:** `find_dfu_interface()` sets `dfu_interface_ \u003e\u003d 0`. If `libusb_claim_interface()` fails at line 498, `dfu_interface_` remains `\u003e\u003d 0`, causing `release()` (called in `~RtsUsbDevice()`) to call `libusb_release_interface()` on an interface that was never claimed.\n\nConsider also accepting `std::span\u003cconst uint8_t\u003e` (`#include \u003cspan\u003e`) instead of `const std::vector\u003cuint8_t\u003e \u0026` so callers can pass any contiguous byte buffer:\n\n```cpp\nbool RtsUsbDevice::dfu_download(std::span\u003cconst uint8_t\u003e firmware)\n{\n\tif (!dev_handle_ || firmware.empty())\n\t\treturn false;\n\n\t/* Step 1: Find the DFU interface. */\n\tif (!find_dfu_interface() || transfer_size_ \u003d\u003d 0) {\n\t\tdfu_interface_ \u003d -1;\n\t\treturn false;\n\t}\n\n\t/* Detach the kernel driver from the DFU interface, if any. */\n\tif (libusb_kernel_driver_active(dev_handle_, dfu_interface_) \u003d\u003d 1) {\n\t\tint kd_ret \u003d libusb_detach_kernel_driver(dev_handle_,\n\t\t\t\t\t\t\t dfu_interface_);\n\t\tif (kd_ret \u003c 0) {\n\t\t\tfprintf(stderr,\n\t\t\t\t\"Warning: cannot detach kernel driver: %s\\n\",\n\t\t\t\tlibusb_error_name(kd_ret));\n\t\t}\n\t}\n\n\tint ret \u003d libusb_claim_interface(dev_handle_, dfu_interface_);\n\tif (ret \u003c 0) {\n\t\tfprintf(stderr, \"Error: cannot claim DFU interface: %s\\n\",\n\t\t\tlibusb_error_name(ret));\n\t\tdfu_interface_ \u003d -1;\n\t\treturn false;\n\t}\n```\n\n[🔗](http://go/tj/18748e91-0dc2-4d16-beb6-33599aa4af20)",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 503,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4629de58_600cf201",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 550,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:38:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Functionality (Short Writes \u0026 Error Cleanup):**\n\n1. **Short control transfers:** `libusb_control_transfer()` returns the number of bytes actually transferred. Checking only `if (ret \u003c 0)` allows a partial transfer (`0 \u003c\u003d ret \u003c static_cast\u003cint\u003e(chunk_size)`) to silently pass and advance `offset +\u003d chunk_size`, corrupting the flashed image. Check `if (ret !\u003d static_cast\u003cint\u003e(chunk_size))` (matching the short-read check in `dfu_poll_idle()`).\n2. **Leaked interface claim on early return:** The error returns at lines 539 and 548 leave `dfu_interface_` claimed, unlike the normal exit at lines 590–591. Please release the claimed interface and reset `dfu_interface_ \u003d -1` before returning `false`.\n\n```cpp\n\t\tret \u003d libusb_control_transfer(\n\t\t\tdev_handle_, kBmReqH2dClsIf, kDfuDownload, block_num,\n\t\t\tstatic_cast\u003cuint16_t\u003e(dfu_interface_),\n\t\t\tconst_cast\u003cuint8_t *\u003e(firmware.data() + offset),\n\t\t\tstatic_cast\u003cuint16_t\u003e(chunk_size), kUsbDfuTimeoutMs);\n\n\t\tif (ret !\u003d static_cast\u003cint\u003e(chunk_size)) {\n\t\t\tfprintf(stderr,\n\t\t\t\t\"\\nDFU_DOWNLOAD failed at block %u \"\n\t\t\t\t\"(offset 0x%zx): %s\\n\",\n\t\t\t\tblock_num, offset,\n\t\t\t\tret \u003c 0 ? libusb_error_name(ret) :\n\t\t\t\t\t  \"short write\");\n\n\t\t\t/* Try to clear error and abort. */\n\t\t\tdfu_clear_status();\n\t\t\tlibusb_release_interface(dev_handle_, dfu_interface_);\n\t\t\tdfu_interface_ \u003d -1;\n\t\t\treturn false;\n\t\t}\n\n\t\t/* Poll status to wait for block to be processed. */\n\t\tif (!dfu_poll_idle()) {\n\t\t\tfprintf(stderr,\n\t\t\t\t\"DFU status error after block %u \"\n\t\t\t\t\"(offset 0x%zx).\\n\",\n\t\t\t\tblock_num, offset);\n\t\t\tlibusb_release_interface(dev_handle_, dfu_interface_);\n\t\t\tdfu_interface_ \u003d -1;\n\t\t\treturn false;\n\t\t}\n```\n\n[🔗](http://go/tj/18748e91-0dc2-4d16-beb6-33599aa4af20)",
+      "range": {
+        "startLine": 525,
+        "startChar": 0,
+        "endLine": 550,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e2fc407_eddf3cf0",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:38:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **No Magic Values \u0026 Code Simplicity:** Please extract the progress step threshold `10` into a named constant (e.g., `kDfuProgressStepPct`), and use `size_t` for `printed_pct` and `pct` (matching `offset` and `total_size`) to avoid casting `offset` to `uint64_t` and then casting `pct` back to `size_t` for `printf(\"%zu%%\", ...)`:\n\n```cpp\n\t\t/* Print progress every 10%. */\n\t\tconstexpr size_t kDfuProgressStepPct \u003d 10;\n\t\tsize_t pct \u003d offset * 100 / total_size;\n\t\tif (pct \u003e\u003d printed_pct + kDfuProgressStepPct) {\n\t\t\tprintf(\"\\r  Progress: %zu%%\", pct);\n\t\t\tfflush(stdout);\n\t\t\tprinted_pct \u003d pct;\n\t\t}\n```\n(With `size_t printed_pct \u003d 0;` at line 509.)\n\n[🔗](http://go/tj/18748e91-0dc2-4d16-beb6-33599aa4af20)",
+      "range": {
+        "startLine": 554,
+        "startChar": 0,
+        "endLine": 560,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ac999e9_812a9e77",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:38:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing \u0026 Architecture:** `dfu_download` contains core protocol state-machine and chunking logic, and `util/rts5817_flash.cc` is not yet compiled by any target in `util/build.mk`. Sibling USB flashing utilities in this directory (`util/elan/`, `util/focaltech/`, and `util/egis/`) decouple USB transport calls behind a narrow interface (or virtual seam) and exercise their flashing loops in GoogleTest suites wired into `utils-test` in `build.mk`.\n\nPlease expose `RtsUsbDevice` in a header (`util/rts5817_flash.h`) with a small virtual seam (or injected USB transport interface) and add GoogleTest coverage for `dfu_download` in this CL. For example, making the hardware hooks `virtual` on `RtsUsbDevice` (or injecting a thin `UsbBackend`):\n\n```cpp\n// In rts5817_flash_test.cc:\nclass FakeRtsUsbDevice : public RtsUsbDevice {\n    public:\n\texplicit FakeRtsUsbDevice(uint16_t transfer_size)\n\t{\n\t\tdfu_interface_ \u003d 0;\n\t\ttransfer_size_ \u003d transfer_size;\n\t}\n\n\tstd::vector\u003cstd::vector\u003cuint8_t\u003e\u003e downloaded_blocks;\n\tbool fail_on_block \u003d false;\n\tbool fail_poll_idle \u003d false;\n\tbool clear_status_called \u003d false;\n\n    protected:\n\tbool find_dfu_interface() override\n\t{\n\t\treturn dfu_interface_ \u003e\u003d 0;\n\t}\n\tbool claim_dfu_interface() override\n\t{\n\t\treturn true;\n\t}\n\tvoid release_dfu_interface() override\n\t{\n\t\tdfu_interface_ \u003d -1;\n\t}\n\tint control_transfer(uint8_t bmRequestType, uint8_t bRequest,\n\t\t\t     uint16_t wValue, uint16_t wIndex,\n\t\t\t     uint8_t *data, uint16_t wLength,\n\t\t\t     unsigned int timeout) override\n\t{\n\t\tif (bRequest \u003d\u003d kDfuDownload) {\n\t\t\tif (fail_on_block)\n\t\t\t\treturn LIBUSB_ERROR_IO;\n\t\t\tdownloaded_blocks.emplace_back(data, data + wLength);\n\t\t\treturn wLength;\n\t\t}\n\t\treturn 0;\n\t}\n\tbool dfu_poll_idle() override\n\t{\n\t\treturn !fail_poll_idle;\n\t}\n\tbool dfu_clear_status() override\n\t{\n\t\tclear_status_called \u003d true;\n\t\treturn true;\n\t}\n};\n\nTEST(RtsUsbDeviceDfuDownloadTest, ChunksPayloadAcrossTransferSizeBoundaries)\n{\n\tconstexpr uint16_t kTransferSize \u003d 4;\n\t// 5 bytes exercises exact boundary (4 bytes) + 1-byte remainder + ZLP.\n\tconst std::vector\u003cuint8_t\u003e kFirmware \u003d { 0x10, 0x20, 0x30, 0x40, 0x50 };\n\tFakeRtsUsbDevice dev(kTransferSize);\n\n\tEXPECT_TRUE(dev.dfu_download(kFirmware));\n\tASSERT_EQ(dev.downloaded_blocks.size(), 3u);\n\tEXPECT_EQ(dev.downloaded_blocks[0],\n\t\t  (std::vector\u003cuint8_t\u003e{ 0x10, 0x20, 0x30, 0x40 }));\n\tEXPECT_EQ(dev.downloaded_blocks[1], (std::vector\u003cuint8_t\u003e{ 0x50 }));\n\tEXPECT_TRUE(dev.downloaded_blocks[2].empty()); // Final ZLP\n}\n\nTEST(RtsUsbDeviceDfuDownloadTest, ClearsStatusAndAbortsOnTransferFailure)\n{\n\tFakeRtsUsbDevice dev(4);\n\tdev.fail_on_block \u003d true;\n\n\tEXPECT_FALSE(dev.dfu_download({ 0x01, 0x02 }));\n\tEXPECT_TRUE(dev.clear_status_called);\n}\n```\n\n[🔗](http://go/tj/18748e91-0dc2-4d16-beb6-33599aa4af20)",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 594,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
