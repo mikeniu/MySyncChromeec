@@ -79,5 +79,10 @@
 			start = <UFSC_BIT(2, 16)>;
 			size = <3>;
 		};
+		ufsc_ec_kb_matrix: ec-kb-matrix {
+			enum-name = "UFSC_EC_KB_MATRIX";
+			start = <UFSC_BIT(2, 19)>;
+			size = <2>;
+		};
 	};
 };
