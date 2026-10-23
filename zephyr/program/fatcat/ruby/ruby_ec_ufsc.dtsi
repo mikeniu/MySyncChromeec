@@ -39,3 +39,19 @@
 	};
 };
 
+&ufsc_ec_oem_1bit_field0 {
+	status = "okay";
+	enum-name = "UFSC_EC_KB_MATRIX";
+
+	ufsc_kb_matrix_legacy: kb-matrix-legacy {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <0>;
+		default;
+	};
+	ufsc_kb_matrix_horus_21: kb-matrix-horus-21 {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <1>;
+	};
+};
