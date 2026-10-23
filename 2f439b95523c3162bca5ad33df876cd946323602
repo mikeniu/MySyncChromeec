@@ -47,6 +47,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cc124563_c8870713",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-23T20:09:39Z",
+      "side": 1,
+      "message": "Consider renaming this directory and test suite from rts5912_rtmr to cros_system_rtk (or moving it to zephyr/test/cros_system_rtk) since it now tests cros_system_rtk.c rather than the RTMR driver.",
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff2b8c6e_e3ab4835",
         "filename": "zephyr/test/drivers/rts5912_rtmr/CMakeLists.txt",
         "patchSetId": 4
