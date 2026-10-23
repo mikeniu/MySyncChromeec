@@ -1,0 +1,148 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1e4c5e6_c34def77",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:54:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please address the following issues in the commit message and CL scope:\n\n1. **Split Independent Logical Changes:** This CL bundles four independently revertible changes:\n   - Wiring up `CONFIG_LINK_TEST_SUITE_LSM6DSO` in `zephyr/test/drivers/Kconfig` and registering `drivers.lsm6dso` in `zephyr/test/drivers/testcase.yaml`.\n   - Adding `test_push_fifo_data_oob_tags` in `zephyr/test/drivers/lsm6dso/src/main.c` to test `push_fifo_data()` out-of-bounds FIFO tag handling (which is unrelated to `set_range()`).\n   - Propagating the I2C write status `err` from `set_range()` instead of returning hardcoded `EC_SUCCESS`.\n   - Fixing accelerometer full-scale clamping, rounding, and power-of-two normalization in `set_range()`.\n   Please split these into separate, self-contained CLs.\n2. **State the Problem (*Why*) Instead of Narrating the Diff:** The body currently transcribes the code changes clause-by-clause (`clamp newrange to ... before evaluating ...`, `use \u003e instead of \u003c against ...`) without explaining *why* the previous behavior failed (inputs `\u003c 2` or `\u003e 16` were passed unclamped to `__fls()`, the inverted `\u003c` comparison never rounded up non-power-of-two ranges because `x \u003e\u003d (1 \u003c\u003c __fls(x))` for all positive integers, non-rounded ranges were left unnormalized, and returning `EC_SUCCESS` masked I2C write errors).\n3. **`TEST\u003d` Target Mismatch:** `TEST\u003d./twister -T zephyr/test/drivers -s drivers.default` runs `drivers.default` rather than the `drivers.lsm6dso` test suite (`./twister -T zephyr/test/drivers -s drivers.lsm6dso`).\n\nSuggested commit messages for the split CLs:\n\n- **CL 1 (Enable `drivers.lsm6dso` test suite):**\n```\nzephyr: test: Enable lsm6dso driver test suite in Kconfig and Twister\n\nThe lsm6dso driver test sources and CMakeLists.txt entry were added\nwithout a corresponding Kconfig symbol or Twister testcase definition,\npreventing the suite from being built and executed.\n\nDefine CONFIG_LINK_TEST_SUITE_LSM6DSO in Kconfig and register the\ndrivers.lsm6dso test target in testcase.yaml.\n\nBUG\u003db:574009721\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n```\n\n- **CL 2 (FIFO out-of-bounds tag unit test):**\n```\nzephyr: test: lsm6dso: Add unit test for out-of-bounds FIFO tags\n\nVerify that irq_handler() and push_fifo_data() safely discard FIFO\nsamples with unrecognized tag values without crashing or staging\ninvalid sensor data.\n\nBUG\u003db:574009721\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n```\n\n- **CL 3 (Propagate `set_range()` I2C error):**\n```\ndriver: accelgyro_lsm6dso: Propagate I2C write errors in set_range()\n\nset_range() previously ignored the status returned by\nst_write_data_with_mask() and unconditionally returned EC_SUCCESS,\nmasking I2C write failures from callers.\n\nReturn the error code from st_write_data_with_mask() and add a unit\ntest covering register write failure in set_range().\n\nBUG\u003db:574009721\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n```\n\n- **CL 4 (Fix accelerometer `set_range()` clamping, rounding, and normalization):**\n```\ndriver: accelgyro_lsm6dso: Fix accel range clamping and rounding\n\nIn set_range(), accelerometer inputs were passed to\nLSM6DSO_ACCEL_NORMALIZE_FS() (__fls()) before clamping to the supported\n[2G, 16G] range, the round-up check used `\u003c` instead of `\u003e` (which was\nnever true since a positive integer is always \u003e\u003d its floor power of\ntwo), and ranges below the maximum were not normalized to a power of\ntwo before computing the register value and updating current_range.\n\nClamp requested accelerometer ranges to [2G, 16G], normalize to a power\nof two, and round up to the next power of two when requested.\n\nBUG\u003db:574009721\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n```\n\n*(If keeping the `set_range()` fixes in a single CL after splitting out the Kconfig/Twister setup and FIFO test):*\n```\ndriver: accelgyro_lsm6dso: Fix set_range() accel normalization and error return\n\nIn set_range(), accelerometer inputs were passed to\nLSM6DSO_ACCEL_NORMALIZE_FS() (__fls()) before clamping to the supported\n[2G, 16G] range, the round-up check used `\u003c` instead of `\u003e` (never\nrounding up non-power-of-two inputs), and ranges were not normalized to\na power of two before computing the register value and updating\ncurrent_range. In addition, set_range() unconditionally returned\nEC_SUCCESS, masking I2C write failures from callers.\n\nClamp requested accelerometer ranges to [2G, 16G], normalize to a power\nof two (doubling when rounding up is requested), and return the status\nfrom st_write_data_with_mask().\n\nBUG\u003db:574009721\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n```\n\n[🔗](http://go/tj/e6dd4432-46cd-4def-bb54-ce54a455b610)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69a37338_35779a6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:54:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL into focused changes, simplify the accelerometer normalization control flow in `set_range()`, expand unit test coverage, and update the commit message.\n\n### Review Summary\n- **Functionality:** ✅ Clamping accelerometer ranges to `[LSM6DSO_ACCEL_FS_MIN_VAL, LSM6DSO_ACCEL_FS_MAX_VAL]`, fixing the round-up comparison to `\u003e`, normalizing to a power of two, and propagating `err` from `set_range()` address the underlying driver defects.\n- **Architecture \u0026 Component Fit:** ✅ Defining `LSM6DSO_ACCEL_FS_MIN_VAL` in `driver/accelgyro_lsm6dso.h` aligns with sibling ST motion sensor drivers (`accelgyro_lsm6dsm.h`).\n- **Code Simplicity:** ❌ In `set_range()`, normalizing the clamped `range` via `LSM6DSO_ACCEL_NORMALIZE_FS(range)` before checking `rnd` avoids calling `__fls()` twice and eliminates the subsequent `if (newrange \u003e LSM6DSO_ACCEL_FS_MAX_VAL) ... else ...` branch. In `zephyr/test/drivers/Kconfig`, `default n` on a `bool` symbol is redundant.\n- **Idiomaticity \u0026 Readability:** ❌ `test_set_range_rounding_clamping` passes a magic number (`10000000`) instead of deriving from `LSM6DSO_GYRO_NORMALIZE_FS(LSM6DSO_GYRO_FS_MAX_REG_VAL)`, and `test_push_fifo_data_oob_tags` uses a magic `0xFF` tag literal instead of deriving from `enum lsm6dso_tag_fifo`.\n- **Security:** ✅ No security vulnerabilities introduced.\n- **Testing:** ❌ `test_set_range_rounding_clamping` is missing test cases for: (1) `set_range()` I2C write error propagation (`return err`), (2) clamping below/at `LSM6DSO_ACCEL_FS_MIN_VAL`, (3) rounding down (`rnd \u003d 0`) on non-power-of-two inputs, (4) `rnd \u003d 1` on exact power-of-two boundaries and `LSM6DSO_ACCEL_FS_MAX_VAL - 1`, and (5) asserting `gyro-\u003ecurrent_range` after clamping gyro range to max.\n- **CL Size \u0026 Scope:** ❌ `Size: M (+59, -2)` (7 lines production diff, 54 lines test/config diff). While small in line count, this CL bundles four independent logical changes that should be split into separate CLs:\n  1. **CL 1:** Wire up `CONFIG_LINK_TEST_SUITE_LSM6DSO` in `zephyr/test/drivers/Kconfig` and register `drivers.lsm6dso` in `zephyr/test/drivers/testcase.yaml`.\n  2. **CL 2:** Add `test_push_fifo_data_oob_tags` in `zephyr/test/drivers/lsm6dso/src/main.c` covering out-of-bounds FIFO tag handling in `push_fifo_data()`.\n  3. **CL 3:** Fix `set_range()` in `driver/accelgyro_lsm6dso.c` to return `err` instead of `EC_SUCCESS`, with its unit test in `zephyr/test/drivers/lsm6dso/src/main.c`.\n  4. **CL 4:** Fix `set_range()` accelerometer full-scale clamping, rounding, and normalization in `driver/accelgyro_lsm6dso.h` and `driver/accelgyro_lsm6dso.c`, with boundary unit tests in `zephyr/test/drivers/lsm6dso/src/main.c`.\n- **Commit Message:** ❌ The commit message narrates the code diff without stating the *Why* (problem statement), omits the `Kconfig`/`testcase.yaml` and `test_push_fifo_data_oob_tags` changes, and lists `TEST\u003d./twister -T zephyr/test/drivers -s drivers.default` instead of `drivers.lsm6dso`. [🔗](http://go/tj/e6dd4432-46cd-4def-bb54-ce54a455b610)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d2ef4b1_b4630dfd",
+        "filename": "driver/accelgyro_lsm6dso.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:54:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `range` is clamped to `[LSM6DSO_ACCEL_FS_MIN_VAL, LSM6DSO_ACCEL_FS_MAX_VAL]` (`[2, 16]`) first, normalizing to the floor power of two (`newrange \u003d LSM6DSO_ACCEL_NORMALIZE_FS(range)`) before checking `rnd` simplifies the control flow:\n\n- When `range \u003d\u003d 16`, `newrange` is `16`, so `range \u003e newrange` is `false`.\n- When `range \u003c 16` (`range \u003c\u003d 15`), `newrange` is at most `8`; doubling `newrange` when `rnd \u0026\u0026 (range \u003e newrange)` yields at most `16` (`LSM6DSO_ACCEL_FS_MAX_VAL`) and is already a normalized power of two.\n\nThis avoids evaluating `LSM6DSO_ACCEL_NORMALIZE_FS()` (`__fls()`) twice and eliminates the second `if (newrange \u003e LSM6DSO_ACCEL_FS_MAX_VAL) ... else ...` branch (matching the normalize-then-round pattern used in `set_data_rate()` below):\n\n```c\n\tif (s-\u003etype \u003d\u003d MOTIONSENSE_TYPE_ACCEL) {\n\t\trange \u003d CLAMP(range, LSM6DSO_ACCEL_FS_MIN_VAL,\n\t\t\t      LSM6DSO_ACCEL_FS_MAX_VAL);\n\n\t\t/* Adjust and check rounded value for Acc. */\n\t\tnewrange \u003d LSM6DSO_ACCEL_NORMALIZE_FS(range);\n\t\tif (rnd \u0026\u0026 (range \u003e newrange))\n\t\t\tnewrange *\u003d 2;\n\n\t\treg_val \u003d lsm6dso_accel_fs_reg(newrange);\n\t} else {\n```\n\n[🔗](http://go/tj/e6dd4432-46cd-4def-bb54-ce54a455b610)",
+      "range": {
+        "startLine": 296,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e58bd2c_ceebf8ba",
+        "filename": "zephyr/test/drivers/Kconfig",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:54:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two points here:\n\n1. **CL Scope:** Wiring up `CONFIG_LINK_TEST_SUITE_LSM6DSO` in `Kconfig` and `drivers.lsm6dso` in `zephyr/test/drivers/testcase.yaml` enables the existing `zephyr/test/drivers/lsm6dso` test suite and should be split into a separate prerequisite CL.\n2. **Redundant `default n` \u0026 Prompt Consistency:** In Kconfig, `bool` symbols default to `n` implicitly (none of the sibling `LINK_TEST_SUITE_*` entries in this file specify `default n`). Also consider matching the prompt phrasing of the adjacent `LINK_TEST_SUITE_LIS2DH` and `LINK_TEST_SUITE_LSM6DSM` options:\n\n```kconfig\nconfig LINK_TEST_SUITE_LSM6DSO\n\tbool \"Link tests for lsm6dso driver\"\n```\n\n[🔗](http://go/tj/e6dd4432-46cd-4def-bb54-ce54a455b610)",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "081ff2a1_077983e8",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:54:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `test_push_fifo_data_oob_tags` tests out-of-bounds FIFO tag handling in `push_fifo_data()` / `irq_handler()`, which is unrelated to the `set_range()` fix in this CL. Please move this test to a separate CL (or to the CL that modified `push_fifo_data()`).\n\nWhen moving this test, please also:\n1. Replace the magic `0xFF` literal with a named constant derived from `enum lsm6dso_tag_fifo` (e.g., `const uint8_t invalid_tag \u003d (LSM6DSO_ACC_TAG + 1) \u003c\u003c 3;`).\n2. Assert the postcondition that `irq_handler()` drained the FIFO sample from `LSM6DSO_FIFO_STS1_ADDR` rather than only asserting `zassert_ok(...)`:\n\n```c\nZTEST(lsm6dso, test_push_fifo_data_oob_tags)\n{\n\tconst uint16_t initial_fifo_len \u003d 1;\n\tconst uint8_t invalid_tag \u003d (LSM6DSO_ACC_TAG + 1) \u003c\u003c 3;\n\tuint32_t event \u003d CONFIG_ACCEL_LSM6DSO_INT_EVENT;\n\tint sts \u003d 0xFF;\n\n\tzassert_ok(i2c_write16(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t       LSM6DSO_FIFO_STS1_ADDR, initial_fifo_len));\n\tzassert_ok(i2c_write8(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t      LSM6DSO_FIFO_DATA_ADDR_TAG, invalid_tag));\n\n\tzassert_ok(acc-\u003edrv-\u003eirq_handler(acc, \u0026event));\n\tzassert_ok(i2c_read8(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t     LSM6DSO_FIFO_STS1_ADDR, \u0026sts));\n\tzassert_equal(sts \u0026 LSM6DSO_FIFO_DIFF_MASK, 0);\n}\n```\n\n[🔗](http://go/tj/e6dd4432-46cd-4def-bb54-ce54a455b610)",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd6d690c_44aebaec",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:54:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please expand `test_set_range_rounding_clamping` (and add an error-propagation test) to cover all modified branches, boundaries, and postconditions in `set_range()`:\n\n1. **Missing Error-Propagation Test (`return err`):** `set_range()` was updated to return `err` instead of `EC_SUCCESS`, but no test verifies that an I2C write failure on `LSM6DSO_ACCEL_FS_ADDR` returns an error and leaves `current_range` unchanged.\n2. **Missing Lower-Bound Clamping, Round-Down (`rnd \u003d 0`), and Exact-Boundary Cases:**\n   - Clamping below and at the minimum (`0`, `LSM6DSO_ACCEL_FS_MIN_VAL - 1`, `LSM6DSO_ACCEL_FS_MIN_VAL`) is not tested.\n   - Rounding down (`rnd \u003d 0`) for a non-power-of-two input (`LSM6DSO_ACCEL_FS_MIN_VAL + 1` -\u003e `LSM6DSO_ACCEL_FS_MIN_VAL`) is not tested, leaving the normalization path for `rnd \u003d 0` unverified.\n   - Calling `set_range()` with `rnd \u003d 1` on exact power-of-two boundaries (`LSM6DSO_ACCEL_FS_MIN_VAL` and `LSM6DSO_ACCEL_FS_MAX_VAL`) and just below the max (`LSM6DSO_ACCEL_FS_MAX_VAL - 1` -\u003e `LSM6DSO_ACCEL_FS_MAX_VAL`) is not tested (needed to ensure `\u003e` does not round up exact powers of two and caps at `LSM6DSO_ACCEL_FS_MAX_VAL`).\n3. **Missing Postcondition Assertion \u0026 Magic Number on Gyro Clamping (lines 88–89):** `zassert_ok(gyro-\u003edrv-\u003eset_range(gyro, 10000000, 0));` does not assert `gyro-\u003ecurrent_range`, and uses the magic literal `10000000` instead of deriving from `LSM6DSO_GYRO_NORMALIZE_FS(LSM6DSO_GYRO_FS_MAX_REG_VAL)`.\n4. **Restore Initial Sensor State:** Save and restore `acc-\u003ecurrent_range` and `gyro-\u003ecurrent_range` so test state does not leak to other tests in the suite.\n\n```c\nZTEST(lsm6dso, test_set_range_rounding_clamping)\n{\n\tstruct motion_sensor_t *gyro \u003d \u0026motion_sensors[GYR_SENSOR_ID];\n\tconst int orig_acc_range \u003d acc-\u003ecurrent_range;\n\tconst int orig_gyro_range \u003d gyro-\u003ecurrent_range;\n\tconst int gyro_max_range \u003d\n\t\tLSM6DSO_GYRO_NORMALIZE_FS(LSM6DSO_GYRO_FS_MAX_REG_VAL);\n\n\t/* Test accel clamping below and at min */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, 0, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MIN_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MIN_VAL - 1, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MIN_VAL);\n\n\t/* Exact power-of-two boundary with rnd\u003d1 should not round up */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MIN_VAL, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MIN_VAL);\n\n\t/* Non-power-of-two with rnd\u003d0 should round down */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MIN_VAL + 1, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MIN_VAL);\n\n\t/* Non-power-of-two with rnd\u003d1 should round up to next power of 2 */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MIN_VAL + 1, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MIN_VAL * 2);\n\n\t/* Near-max with rnd\u003d1 and clamping above max */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL - 1, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MAX_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MAX_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL + 1, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MAX_VAL);\n\n\t/* Test gyro clamping to max and rounding up */\n\tzassert_ok(gyro-\u003edrv-\u003eset_range(gyro, gyro_max_range * 2, 0));\n\tzassert_equal(gyro-\u003ecurrent_range, gyro_max_range);\n\tzassert_ok(gyro-\u003edrv-\u003eset_range(gyro, LSM6DSO_GYRO_NORMALIZE_FS(0) + 1,\n\t\t\t\t\t1));\n\tzassert_equal(gyro-\u003ecurrent_range, LSM6DSO_GYRO_NORMALIZE_FS(1));\n\n\t/* Restore original ranges */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, orig_acc_range, 0));\n\tzassert_ok(gyro-\u003edrv-\u003eset_range(gyro, orig_gyro_range, 0));\n}\n\nZTEST(lsm6dso, test_set_range_write_error)\n{\n\tconst int orig_acc_range \u003d acc-\u003ecurrent_range;\n\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MIN_VAL, 0));\n\tlsm6dso_emul_set_write_fail_reg(emul, LSM6DSO_ACCEL_FS_ADDR);\n\n\tzassert_equal(EC_ERROR_INVAL,\n\t\t      acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSO_ACCEL_FS_MIN_VAL);\n\n\tlsm6dso_emul_set_write_fail_reg(emul, -1);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, orig_acc_range, 0));\n}\n```\n\n[🔗](http://go/tj/e6dd4432-46cd-4def-bb54-ce54a455b610)",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
