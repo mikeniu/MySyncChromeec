@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6bd19e3_f388c784",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-23T01:04:30Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Potential Heap Buffer Overflow or Segmentation Fault: This assumes the FIFO is completely linear, but `fifo_head` wraps around in `lsm6dso_emul_read_byte`. If `fifo_head` is near the end of `data-\u003efifo` and `fifo_pos` exceeds the remaining bytes, `data-\u003efifo_head[fifo_pos]` will write past the allocated buffer size (`sizeof(data-\u003efifo)`). You need to handle wrap-around here as well if this is simulating a circular buffer.",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 0
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a66eb28_ee858741",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-23T01:04:30Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: There is a serious bug here. In multi-byte FIFO read transactions, `bytes` increases monotonically (0, 1, 2...) while `fifo_head` is simultaneously advanced by `LSM6DSO_FIFO_SAMPLE_SIZE` (7 bytes) every 7 bytes. This results in skipping samples and eventually reading out of bounds.\n\nFor example:\nFirst sample (`bytes \u003d 0..6`): `fifo_head[bytes]` reads `fifo_head_start[0..6]`. At `bytes \u003d 6`, `fifo_head` is advanced by 7.\nSecond sample (`bytes \u003d 7`): `fifo_head[7]` will access `(fifo_head_start + 7)[7] \u003d fifo_head_start[14]`, missing the 2nd sample completely!\n\nYou should be accessing `data-\u003efifo_head[bytes % LSM6DSO_FIFO_SAMPLE_SIZE]` instead.",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 0
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e76ac52_2dc2f3de",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-23T01:04:30Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: There is an index counting inconsistency here. In `lsm6dso_emul_read_byte` line 239, you read using `data-\u003ereg[reg + bytes]`, implying `bytes` is 0-indexed. But here you write using `data-\u003ereg[reg + bytes - 1]`, implying `bytes` is 1-indexed. \n\nSince both come from standard Zephyr `i2c_common_emul` callbacks, the `bytes` parameter behavior should be consistent. One of these indexing approaches is likely buggy. If `bytes` is 0-indexed, this code will write to `reg - 1`. If `reg` is 0 and `bytes` is 0, `reg + bytes - 1` becomes -1, which when converted to unsigned (due to `sizeof`) will yield a very large value and falsely trigger the `-ENOTSUP` bounds check blocking legitimate writes to register 0.",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 0
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
