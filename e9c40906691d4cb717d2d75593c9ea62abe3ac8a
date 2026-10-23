@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8592a01_485b2d3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:07:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the blocking issues inline. [[trajectory](https://goto.corp.google.com/traj/ac82412e-6abe-4712-b20d-d8e79179ea64)]\n\n### Review Summary\n- **Functionality**: ❌ Issues found — `mpu_protect_code_ram()` enables the `MPU_ATTR_XN | MPU_ATTR_NO_NO` region over the 256 MB code RAM aperture before configuring the higher-priority `REGION_STORAGE` active code RAM exemption while the MPU is already enabled (after `mpu_pre_init()`), causing an immediate instruction access fault / Lockup when executing from code RAM.\n- **Architecture \u0026 Component Fit**: ✅ Pass\n- **Code Simplicity**: ✅ Pass\n- **Idiomaticity \u0026 Readability**: ✅ Pass\n- **Security**: ✅ Pass\n- **Testing**: ✅ Pass (note: `bloonchipper` uses internal flash so `mpu_protect_code_ram()` is not compiled there; testing on an external-storage Cortex-M target such as `helipilot` is recommended to exercise this path on hardware)\n- **CL Size \u0026 Scope**: ✅ Pass\n- **Commit Message**: ✅ Pass\n\n[🔗](http://go/tj/ac82412e-6abe-4712-b20d-d8e79179ea64)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e9c40906691d4cb717d2d75593c9ea62abe3ac8a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c0a0eac_8b1d1b86",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:07:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Bug (Instruction Access Violation / Lockup): Configure `REGION_STORAGE` before locking the code RAM aperture**\n\nWhen `mpu_protect_code_ram()` is called during boot (`system_disable_jump()`) or in `test/mpu.c` (`test_mpu_protect_code_ram()`), the MPU is already enabled with `MPU_CTRL_ENABLE | MPU_CTRL_HFNMIENA | MPU_CTRL_PRIVDEFEN` (from `mpu_pre_init()` in `common/main.c` or `reset_mpu()` in `test/mpu.c`), while `REGION_STORAGE` and `REGION_STORAGE2` are still disabled and the CPU is actively executing out of code RAM via the default background map (`PRIVDEFEN`).\n\nEnabling `REGION_CODE_RAM` / `REGION_CODE_RAM2` with `MPU_ATTR_XN | MPU_ATTR_NO_NO` over the 256 MB code RAM aperture *before* `REGION_STORAGE` is configured makes the currently executing code RAM inaccessible and execute-never as soon as `mpu_update_region()` writes `MPU_SIZE` and executes `isb; dsb;`. The next instruction fetch immediately triggers a MemManage Instruction Access Violation (`IACCVIOL`), which escalates to processor Lockup because `MPU_CTRL_HFNMIENA` is set and the fault handler also resides in code RAM.\n\n(Note: `bloonchipper` uses internal flash and does not define `CONFIG_EXTERNAL_STORAGE`, so `mpu_protect_code_ram()` is compiled out there; running the `mpu` device test on an external-storage Cortex-M board such as `helipilot` exercises this path on hardware.)\n\nConfigure the higher-priority `REGION_STORAGE` (and `REGION_STORAGE2`) active code RAM region first so that active code RAM remains executable when the lower-priority aperture region is enabled. This also allows `ret` on line 300 to be unconditionally initialized without `__maybe_unused`:\n\n```c\n\t/* Prevent write access to code RAM */\n\tret \u003d mpu_config_region(REGION_STORAGE,\n\t\t\t\tCONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF,\n\t\t\t\tCONFIG_CODE_RAM_SIZE,\n\t\t\t\tMPU_ATTR_RO_NO | MPU_ATTR_INTERNAL_SRAM, 1);\n#ifdef CONFIG_EXTERNAL_STORAGE\n\tif (ret !\u003d EC_SUCCESS)\n\t\treturn ret;\n\n\t/*\n\t * Mark unused SRAM in the code RAM aperture execute-never and\n\t * inaccessible. Active code RAM is exempted above by higher-priority\n\t * REGION_STORAGE. When CONFIG_ROLLBACK_MPU_PROTECT is enabled on an\n\t * 8-region MPU, REGION_CODE_RAM is used for rollback protection, so use\n\t * REGION_CODE_RAM2 instead.\n\t */\n\treturn mpu_update_region(\n\t\tIS_ENABLED(CONFIG_ROLLBACK_MPU_PROTECT) ? REGION_CODE_RAM2 :\n\t\t\t\t\t\t\t  REGION_CODE_RAM,\n\t\talign_down_to_bits(CONFIG_PROGRAM_MEMORY_BASE,\n\t\t\t\t   MPU_CODE_RAM_APERTURE_BITS),\n\t\tMPU_CODE_RAM_APERTURE_BITS,\n\t\tMPU_ATTR_XN | MPU_ATTR_NO_NO | MPU_ATTR_INTERNAL_SRAM, 1, 0);\n#else\n\treturn ret;\n#endif\n```\n\n[🔗](http://go/tj/ac82412e-6abe-4712-b20d-d8e79179ea64)",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 336,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e9c40906691d4cb717d2d75593c9ea62abe3ac8a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
