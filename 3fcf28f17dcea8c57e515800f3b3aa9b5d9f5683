@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "744f4951_97eb71cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 56
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:49:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** `fp_command_template_v0` returns `EC_HOST_CMD_ACCESS_DENIED` immediately when `fingerprint_auth_enabled()` is true, blocking legacy v0 template uploads and commits when an authenticated session is active.\n* **Architecture \u0026 Component Fit:** Placing the `fingerprint_auth_enabled()` guard at the entry of `fp_command_template_v0` aligns with the existing fingerprint auth command handlers and prevents reading or modifying `fp_enc_buffer` on rejected requests.\n* **Code Simplicity:** Both the production guard clause and the test cases are minimal and direct, with `fpsensor_before` in `fpsensor_template.cc` clearing `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` directly while keeping the one-time TPM seed setup in `fpsensor_setup`.\n* **Idiomaticity \u0026 Readability:** The code and comments clearly document the security invariant and follow the surrounding codebase conventions.\n* **Security:** Disabling unauthenticated v0 template modification paths when fingerprint auth is active prevents arbitrary template injection and forces template operations through the v1 channel.\n* **Testing:** `test_fp_command_template_v0_disabled_under_auth` (`fpsensor_auth_commands.cc`) and `test_fp_template_v0_disabled_under_auth` (`fpsensor_template.cc`) verify that v0 requests are rejected with `EC_RES_ACCESS_DENIED` when fingerprint auth is enabled and that `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` is reset between tests.\n* **CL Size \u0026 Scope:** `Size: S (+49, -0)`. Tightly scoped to a single logical security change and its unit tests.\n* **Commit Message:** Accurately and concisely explains the security rationale and change.\n\n[🔗](http://go/tj/fb27c9c4-0703-4365-84c8-df3548a620ea)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3fcf28f17dcea8c57e515800f3b3aa9b5d9f5683",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
