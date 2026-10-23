@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10b91bb2_0458378b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:19:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for issues that must be addressed before merging.\n\n### Review Summary\n* **Functionality:** Correctly fixes the sysjump tag size check in `ap_sku_id_restore_state()` from `sizeof(prev_ap_sku_id)` (which evaluates to pointer size, 8 bytes on 64-bit host/POSIX builds) to `sizeof(ap_sku_id)` (4 bytes, `uint32_t`), matching `ap_sku_id_preserve_state()` and the `memcpy()` call on line 124.\n* **Architecture \u0026 Component Fit:** Fits cleanly within the existing `common/system.c` sysjump state preservation and restoration pattern.\n* **Code Simplicity:** Minimal, focused 1-line fix with no unnecessary complexity.\n* **Idiomaticity \u0026 Readability:** Follows ChromiumOS EC C conventions by using `sizeof(ap_sku_id)` directly on the destination variable.\n* **Security:** Ensures `memcpy(\u0026ap_sku_id, prev_ap_sku_id, sizeof(ap_sku_id))` only executes when the stored tag payload size matches the 4-byte `ap_sku_id` buffer size across both 32-bit and 64-bit targets.\n* **Testing:** Missing unit test coverage for `ap_sku_id_restore_state()` (both happy-path sysjump preservation/restoration and negative boundary cases for missing tag, version mismatch, and size mismatch); `drivers.system` does not currently enable `CONFIG_HOSTCMD_AP_SET_SKUID` or test AP SKU ID restoration.\n* **CL Size \u0026 Scope:** XS (+1, -1 lines), single self-contained logical fix.\n* **Commit Message:** Concise and accurate summary line and body explaining both what changed and why (`sizeof(prev_ap_sku_id)` vs `sizeof(ap_sku_id)` on 64-bit targets), with `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/f9f74a07-936d-4f97-adba-425d7d5c05bf)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cfb422e13142ebcedae3138f349d40202af0a337",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51eef31f_01f1b092",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:19:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please add unit tests covering `ap_sku_id_restore_state()` to verify this fix and prevent regressions.\n\nAlthough the commit message lists `TEST\u003d./twister -T zephyr/test/drivers -s drivers.system`, the `drivers.system` suite only builds `src/system_not_board_ap_set_sku_id.c` (`!CONFIG_HOSTCMD_AP_SET_SKUID`) and does not currently enable `CONFIG_HOSTCMD_AP_SET_SKUID` or exercise `ap_sku_id_preserve_state()` / `ap_sku_id_restore_state()`.\n\nSpecifically, please add a test target/file in `zephyr/test/drivers/system` (with `CONFIG_HOSTCMD_AP_SET_SKUID` enabled) that verifies:\n1. **Happy path (preserve and restore):** Setting the SKU ID via `EC_CMD_SET_SKU_ID`, preserving state (`hook_notify(HOOK_SYSJUMP)`), resetting the in-memory `ap_sku_id`, and restoring state (`hook_notify(HOOK_INIT)`) restores `system_get_sku_id()` to the preserved value on 64-bit POSIX builds.\n2. **Missing jump tag (`prev_ap_sku_id \u003d\u003d NULL`):** Running `hook_notify(HOOK_INIT)` when no `AP_SKUID_SYSJUMP_TAG` tag is present leaves `ap_sku_id` unchanged.\n3. **Version mismatch (`version !\u003d AP_SKUID_HOOK_VERSION`):** Adding an `AP_SKUID_SYSJUMP_TAG` tag with `version \u003d AP_SKUID_HOOK_VERSION - 1` or `AP_SKUID_HOOK_VERSION + 1` and `size \u003d sizeof(uint32_t)` does not overwrite `ap_sku_id` on `hook_notify(HOOK_INIT)`.\n4. **Size mismatch boundaries (`size !\u003d sizeof(ap_sku_id)`):** Adding an `AP_SKUID_SYSJUMP_TAG` tag with `version \u003d AP_SKUID_HOOK_VERSION` and adjacent invalid sizes (`sizeof(uint32_t) - 1`, `sizeof(uint32_t) + 1`, or `sizeof(const uint32_t *)` on 64-bit) does not overwrite `ap_sku_id` on `hook_notify(HOOK_INIT)`.\n\nFor example:\n```c\n#define AP_SKUID_SYSJUMP_TAG 0x4153 /* AS */\n#define AP_SKUID_HOOK_VERSION 1\n\nstatic void prepare_jump_data(void)\n{\n\tstruct jump_data *jdata \u003d get_jump_data();\n\n\tsystem_common_pre_init();\n\tjdata-\u003emagic \u003d JUMP_DATA_MAGIC;\n\tjdata-\u003eversion \u003d JUMP_DATA_VERSION;\n\tjdata-\u003ejump_tag_total \u003d 0;\n\tjdata-\u003estruct_size \u003d sizeof(struct jump_data);\n}\n\nZTEST(system, test_ap_sku_id_preserve_and_restore)\n{\n\tstruct ec_params_set_sku_id set_sku \u003d { .sku_id \u003d 0x12345678 };\n\tstruct ec_params_set_sku_id clear_sku \u003d { .sku_id \u003d 0 };\n\n\tprepare_jump_data();\n\tzassert_ok(ec_cmd_set_sku_id(NULL, \u0026set_sku));\n\tzassert_equal(system_get_sku_id(), 0x12345678);\n\n\thook_notify(HOOK_SYSJUMP);\n\n\t/* Overwrite in-memory SKU ID before restoring from jump tag. */\n\tzassert_ok(ec_cmd_set_sku_id(NULL, \u0026clear_sku));\n\tzassert_equal(system_get_sku_id(), 0);\n\n\thook_notify(HOOK_INIT);\n\tzassert_equal(system_get_sku_id(), 0x12345678);\n}\n\nZTEST(system, test_ap_sku_id_restore_invalid_tag_conditions)\n{\n\tconst uint64_t bad_payload \u003d 0xdeadbeefdeadbeefULL;\n\tstruct ec_params_set_sku_id init_sku \u003d { .sku_id \u003d 0xabcdef01 };\n\n\t/* 1. Missing tag (prev_ap_sku_id \u003d\u003d NULL) */\n\tprepare_jump_data();\n\tzassert_ok(ec_cmd_set_sku_id(NULL, \u0026init_sku));\n\thook_notify(HOOK_INIT);\n\tzassert_equal(system_get_sku_id(), 0xabcdef01);\n\n\t/* 2. Version mismatch (AP_SKUID_HOOK_VERSION - 1 and + 1) */\n\tprepare_jump_data();\n\tzassert_ok(system_add_jump_tag(AP_SKUID_SYSJUMP_TAG,\n\t\t\t\t       AP_SKUID_HOOK_VERSION - 1,\n\t\t\t\t       sizeof(uint32_t), \u0026bad_payload));\n\thook_notify(HOOK_INIT);\n\tzassert_equal(system_get_sku_id(), 0xabcdef01);\n\n\tprepare_jump_data();\n\tzassert_ok(system_add_jump_tag(AP_SKUID_SYSJUMP_TAG,\n\t\t\t\t       AP_SKUID_HOOK_VERSION + 1,\n\t\t\t\t       sizeof(uint32_t), \u0026bad_payload));\n\thook_notify(HOOK_INIT);\n\tzassert_equal(system_get_sku_id(), 0xabcdef01);\n\n\t/* 3. Size mismatch boundaries (sizeof(uint32_t) - 1 and + 1) */\n\tprepare_jump_data();\n\tzassert_ok(system_add_jump_tag(AP_SKUID_SYSJUMP_TAG,\n\t\t\t\t       AP_SKUID_HOOK_VERSION,\n\t\t\t\t       sizeof(uint32_t) - 1, \u0026bad_payload));\n\thook_notify(HOOK_INIT);\n\tzassert_equal(system_get_sku_id(), 0xabcdef01);\n\n\tprepare_jump_data();\n\tzassert_ok(system_add_jump_tag(AP_SKUID_SYSJUMP_TAG,\n\t\t\t\t       AP_SKUID_HOOK_VERSION,\n\t\t\t\t       sizeof(uint32_t) + 1, \u0026bad_payload));\n\thook_notify(HOOK_INIT);\n\tzassert_equal(system_get_sku_id(), 0xabcdef01);\n}\n```\n\n[🔗](http://go/tj/f9f74a07-936d-4f97-adba-425d7d5c05bf)",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cfb422e13142ebcedae3138f349d40202af0a337",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
