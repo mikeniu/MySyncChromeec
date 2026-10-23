@@ -94,6 +94,30 @@
       },
       "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec74fcd0_c511d6b7",
+        "filename": "include/system.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-23T21:19:14Z",
+      "side": 1,
+      "message": "Ack - I agree that eliminating `interrupt_disable_all()` makes this much cleaner.  The original justification for using `cpsid i` appears to have been made in error and wasn\u0027t made to fix an actual problem.",
+      "parentUuid": "49c43c7a_7edc5a35",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 29
+      },
+      "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
