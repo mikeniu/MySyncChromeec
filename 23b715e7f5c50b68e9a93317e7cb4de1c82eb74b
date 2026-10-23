@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24f2ce1e_b4b93a13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T19:24:40Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "d436a7be_ed53182b",
+      "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ad2fe44_d88fd456",
@@ -73,6 +91,30 @@
       "writtenOn": "2026-10-23T18:28:22Z",
       "side": 1,
       "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17b2af59_b5ac33a8",
+        "filename": "common/charger_profile_override.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T19:24:40Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "1ad2fe44_d88fd456",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 9999
+      },
       "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
