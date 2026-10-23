@@ -53,6 +53,24 @@
       "parentUuid": "4b0e62c6_e77f8c89",
       "revId": "087e09fd4d187112a9a12818822f95ae0d193bce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad59dedb_2c1dc60b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T06:49:26Z",
+      "side": 1,
+      "message": "I have checked crrev/c/8618001, it fixes my issue. I will abandon this patch, thanks.",
+      "parentUuid": "f4acd0c3_e7bf7fd9",
+      "revId": "087e09fd4d187112a9a12818822f95ae0d193bce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
