@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28d11fed_2d625b25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T07:53:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** `rts5817maa_init`, `rts5817maa_deinit`, `rts5817maa_config`, `rts5817maa_get_info`, and `rts5817maa_init_driver` accurately handle hardware initialization, error flag bitmasks, interrupt disabling, and devicetree configuration extraction.\n*   **Architecture \u0026 Component Fit:** The driver base cleanly implements the `cros_fingerprint` driver API and follows the established structure of sibling fingerprint sensor drivers in `zephyr/drivers/fingerprint/`.\n*   **Code Simplicity:** Functions are concise, linear, and use early-return guard clauses without unnecessary state or control-flow complexity.\n*   **Idiomaticity \u0026 Readability:** Proper use of `static` linkage, Zephyr devicetree/GPIO/SPI helpers (`GPIO_DT_SPEC_INST_GET`, `SPI_DT_SPEC_INST_GET`, `LISTIFY`, `BUILD_ASSERT`), native struct assignment, and named constants.\n*   **Security:** Buffer capacities and null pointers are validated in `rts5817maa_get_info`, and compile-time `BUILD_ASSERT` checks guard image frame sizes and configuration counts.\n*   **Testing:** Comprehensive `ztest` unit tests with FFF mocks verify successful initialization, all mapped and unmapped `rts5817maa_sensor_init` error paths, deinitialization, and `get_info` nominal, null-argument, boundary capacity (`NUM_IMAGE_CAPTURE_TYPES - 1`, `NUM_IMAGE_CAPTURE_TYPES`, `NUM_IMAGE_CAPTURE_TYPES + 1`), and HWID failure cases.\n*   **CL Size \u0026 Scope:** `Size: L (+600, -0)`. The production diff is 244 lines (`fingerprint_rts5817maa.c` and `CMakeLists.txt`), well under the 250-line production threshold, with the remaining 356 lines comprising the associated `ztest` suite and test configuration for this single logical change.\n*   **Commit Message:** Clear, concise prose explaining the scope of the driver base and unit tests, with properly formatted `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/414f26b9-72a5-4c65-8e5f-9320f760ac98)] [🔗](http://go/tj/414f26b9-72a5-4c65-8e5f-9320f760ac98)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c49d851133fbec88c6f9e16dcf78985f9a08e8f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
