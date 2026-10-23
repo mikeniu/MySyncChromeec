@@ -1,0 +1,198 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f5aed73_2c09c499",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] A few improvements for the commit message:\n\n1. **Scope / Bundled changes**: The subject line joins two separate fixes with `\" and \"` (`Fix FIFO ODR on power-off and propagate error`), and the diff also includes an undocumented third change in `zephyr/emul/emul_lsm6dso.c` (decrementing the FIFO status sample count when reading `LSM6DSO_FIFO_DATA_ADDR_TAG`). Ideally, split this CL into focused CLs (see top-level review summary).\n2. **Avoid narrating code syntax**: Describe the behavior and cause in prose rather than quoting C expressions and compiler builtins (`data-\u003ebase.odr \u003d\u003d 0`, `__fls(0)`, `__builtin_clz(0)`, `accelgyro_config_fifo(s)`).\n3. **`TEST\u003d` target**: `-s drivers.default` only runs the default test suite and does not run the new `drivers.lsm6dso` test suite (`./twister -T zephyr/test/drivers -s drivers.lsm6dso`).\n\nIf split as recommended, the commit message for the primary CL (power-off FIFO ODR fix) can be:\n\n```text\ndriver: accelgyro_lsm6dso: Disable FIFO ODR when sensor is powered off\n\nPassing a zero output data rate to the ODR-to-register conversion macro\ninvokes a find-last-set bit operation on zero, which is undefined\nbehavior and writes a non-zero batching rate into FIFO_CTRL3 when powering\noff a sensor. Explicitly write LSM6DSO_DIS_BIT when the configured ODR is\nzero so FIFO batching is disabled for powered-off sensors.\n\nBUG\u003db:441152198\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n```\n\nOr if kept together with the error-propagation fix (after moving the unrelated emulator FIFO read decrement out):\n\n```text\ndriver: accelgyro_lsm6dso: Fix power-off FIFO ODR and error propagation\n\nPassing a zero output data rate to the ODR-to-register conversion macro\ninvokes a find-last-set bit operation on zero, which is undefined\nbehavior and writes a non-zero batching rate into FIFO_CTRL3 when powering\noff a sensor. Explicitly write LSM6DSO_DIS_BIT when the configured ODR is\nzero, and return any error from FIFO configuration when setting the sensor\ndata rate instead of discarding it.\n\nBUG\u003db:441152198\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n```\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0569b220_981441ec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline issues (in particular, wiring `CONFIG_LINK_TEST_SUITE_LSM6DSO` into `Kconfig` and `testcase.yaml`, ensuring state transitions before assertions in the new tests, and splitting out the unrelated emulator FIFO read change).\n\n### Review Summary\n* **Functionality**: The fixes in `driver/accelgyro_lsm6dso.c` (`accelgyro_config_fifo()` using `LSM6DSO_DIS_BIT` when `data-\u003ebase.odr \u003d\u003d 0` instead of invoking `LSM6DSO_ODR_TO_REG(0)`, and `set_data_rate()` propagating the return value of `accelgyro_config_fifo(s)`) are sound. However, the new test suite in `zephyr/test/drivers/lsm6dso` is never built or executed because `CONFIG_LINK_TEST_SUITE_LSM6DSO` is missing from `zephyr/test/drivers/Kconfig` and `drivers.lsm6dso` is missing from `zephyr/test/drivers/testcase.yaml`.\n* **Architecture \u0026 Component Fit**: The new test directory structure mirrors `zephyr/test/drivers/lsm6dsm`, and adding an emulator fault-injection helper in `zephyr/include/emul/emul_lsm6dso.h` fits the existing Zephyr driver test architecture.\n* **Code Simplicity**: Remove the unused `#include \u003czephyr/drivers/gpio.h\u003e` in `zephyr/test/drivers/lsm6dso/src/main.c`.\n* **Idiomaticity \u0026 Readability**:\n  * Replace the reserved double-underscore include guard `__EMUL_LSM6DSO_H` in `zephyr/include/emul/emul_lsm6dso.h` with `PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSO_H_`.\n  * Replace raw magic literals (`0x78` in `zephyr/emul/emul_lsm6dso.c`, `13000` and `0` in `zephyr/test/drivers/lsm6dso/src/main.c`) with the existing named constants (`LSM6DSO_FIFO_DATA_ADDR_TAG`, `LSM6DSO_ODR_MIN_VAL`, `LSM6DSO_DIS_BIT`).\n* **Security**: N/A — No untrusted inputs, credentials, or sensitive data paths are modified.\n* **Testing**:\n  * Register `LINK_TEST_SUITE_LSM6DSO` in `zephyr/test/drivers/Kconfig` and `drivers.lsm6dso` in `zephyr/test/drivers/testcase.yaml`.\n  * In `test_accelgyro_config_fifo_power_off`, configure a non-zero ODR and verify non-zero `LSM6DSO_FIFO_CTRL3_ADDR` bits before powering off, and test both `ACC_SENSOR_ID` and `GYR_SENSOR_ID` (`LSM6DSO_FIFO_ODR_MASK(s)` branches on sensor type).\n  * In `test_set_data_rate_fifo_error`, ensure `LSM6DSO_FIFO_CTRL3_ADDR` starts from a different value (`0`) before calling `set_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 1)` so `st_write_data_with_mask()` does not short-circuit on `new_data \u003d\u003d old_data`, and also cover `LSM6DSO_FIFO_CTRL4_ADDR` write failure.\n* **CL Size \u0026 Scope**: `Size: M (+239, -2)`. This CL bundles three independent logical changes and should be split into focused CLs:\n  1. **CL 1 (`driver/accelgyro_lsm6dso.c`, `zephyr/test/drivers/CMakeLists.txt`, `zephyr/test/drivers/Kconfig`, `zephyr/test/drivers/testcase.yaml`, `zephyr/test/drivers/lsm6dso/*`)**: Fix `accelgyro_config_fifo()` to write `LSM6DSO_DIS_BIT` when `data-\u003ebase.odr \u003d\u003d 0` and add the `drivers.lsm6dso` unit test suite (`test_accelgyro_config_fifo_power_off`).\n  2. **CL 2 (`driver/accelgyro_lsm6dso.c`, `zephyr/emul/emul_lsm6dso.c`, `zephyr/include/emul/emul_lsm6dso.h`, `zephyr/test/drivers/lsm6dso/src/main.c`)**: Propagate the return value of `accelgyro_config_fifo()` in `set_data_rate()`, add `lsm6dso_emul_set_write_fail_reg()`, and add `test_set_data_rate_fifo_error`.\n  3. **CL 3 (`zephyr/emul/emul_lsm6dso.c`, `zephyr/test/drivers/lsm6dso/src/main.c`)**: Decrement the unread FIFO sample count in `LSM6DSO_FIFO_STS1_ADDR`/`LSM6DSO_FIFO_STS2_ADDR` when reading `LSM6DSO_FIFO_DATA_ADDR_TAG` in `lsm6dso_emul_transfer_i2c()`, along with a unit test exercising FIFO reads.\n* **Commit Message**: See inline comment on `/COMMIT_MSG` to avoid joining independent actions with `\" and \"` in the subject, avoid narrating C expressions, and update `TEST\u003d` to `-s drivers.lsm6dso`.\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dc1bdd7_ab96e677",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two issues with this block:\n\n1. **Unrelated \u0026 untested change**: Decrementing the unread FIFO sample count in `LSM6DSO_FIFO_STS1_ADDR`/`LSM6DSO_FIFO_STS2_ADDR` when reading `LSM6DSO_FIFO_DATA_ADDR_TAG` is unrelated to fixing the power-off FIFO ODR or propagating `accelgyro_config_fifo()` errors, is not mentioned in the commit message, and is not exercised by the tests in this CL (`test_accelgyro_config_fifo_power_off` and `test_set_data_rate_fifo_error` only call `set_data_rate()`). Please move this emulator change to a separate CL along with a test that exercises FIFO reads.\n2. **Magic number**: Since `driver/accelgyro_lsm6dso.h` is now included at line 8, use the named constant `LSM6DSO_FIFO_DATA_ADDR_TAG` directly instead of `0x78 /* LSM6DSO_FIFO_DATA_ADDR_TAG */`:\n\n```c\n\t\t\tif (regn \u003d\u003d LSM6DSO_FIFO_DATA_ADDR_TAG) {\n```\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3450ff26_d4f4e4d2",
+        "filename": "zephyr/include/emul/emul_lsm6dso.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Identifiers beginning with a double underscore (`__EMUL_LSM6DSO_H`) are reserved by the C standard. Please use the standard header guard format matching sibling headers in `zephyr/include/emul/` (such as `zephyr/include/emul/emul_lsm6dsm.h`):\n\n```c\n#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSO_H_\n#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSO_H_\n```\n\n(And update the closing `#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSO_H_ */` on line 19.)\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84305a5c_ce08a7cc",
+        "filename": "zephyr/test/drivers/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `add_subdirectory_ifdef(CONFIG_LINK_TEST_SUITE_LSM6DSO lsm6dso)` guards the new test directory behind `CONFIG_LINK_TEST_SUITE_LSM6DSO`, but neither `config LINK_TEST_SUITE_LSM6DSO` in `zephyr/test/drivers/Kconfig` nor a `drivers.lsm6dso` entry in `zephyr/test/drivers/testcase.yaml` is defined in this CL. As a result, `CONFIG_LINK_TEST_SUITE_LSM6DSO` can never be enabled and the new test suite in `zephyr/test/drivers/lsm6dso` is never compiled or executed by `twister`.\n\nPlease register the Kconfig symbol in `zephyr/test/drivers/Kconfig` (matching `LINK_TEST_SUITE_LSM6DSM`):\n\n```kconfig\nconfig LINK_TEST_SUITE_LSM6DSO\n\tbool \"Link and test the lsm6dso tests\"\n```\n\nAnd add the test target in `zephyr/test/drivers/testcase.yaml`:\n\n```yaml\n  drivers.lsm6dso:\n    extra_configs:\n      - CONFIG_LINK_TEST_SUITE_LSM6DSO\u003dy\n    extra_dtc_overlay_files:\n      - ./boards/native_sim.overlay\n      - ./lsm6dso/sensor.dts\n    extra_conf_files:\n      - ./prj.conf\n      - ./lsm6dso/prj.conf\n```\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dafdbc0_6e8e77d4",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `#include \u003czephyr/drivers/gpio.h\u003e` (line 14) is unused in this file and should be removed. Additionally, `GYR_SENSOR_ID` (line 19) is currently unused — please either use it in `test_accelgyro_config_fifo_power_off` to test the gyroscope branch of `LSM6DSO_FIFO_ODR_MASK(s)` (recommended; see comment below) or remove the unused macro.\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e3244c7_42265c7c",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] There are a few issues with `test_accelgyro_config_fifo_power_off`:\n\n1. **Missing active pre-state check**: Calling `set_data_rate(acc, 0, 0)` directly without first setting a non-zero ODR and verifying that `LSM6DSO_FIFO_CTRL3_ADDR` has non-zero FIFO ODR bits means the test will pass trivially if `LSM6DSO_FIFO_CTRL3_ADDR` already contains `0` (and `st_write_data_with_mask()` skips the I2C write completely when `new_data \u003d\u003d old_data`).\n2. **Missing gyroscope mask coverage**: `LSM6DSO_FIFO_ODR_MASK(s)` branches on `s-\u003etype \u003d\u003d MOTIONSENSE_TYPE_ACCEL ? LSM6DSO_FIFO_ODR_XL_MASK : LSM6DSO_FIFO_ODR_G_MASK`. Exercising both `acc` and `gyr` verifies both branches and confirms that powering off one sensor only clears its own FIFO ODR bits without clobbering the other sensor\u0027s FIFO ODR bits.\n3. **Named constant**: Use `LSM6DSO_DIS_BIT` instead of literal `0` when asserting the disabled register field value.\n\nSuggested update:\n\n```c\nZTEST(lsm6dso, test_accelgyro_config_fifo_power_off)\n{\n\tconst struct emul *emul \u003d EMUL_DT_GET(LSM6DSO_NODE);\n\tstruct motion_sensor_t *acc \u003d \u0026motion_sensors[ACC_SENSOR_ID];\n\tstruct motion_sensor_t *gyr \u003d \u0026motion_sensors[GYR_SENSOR_ID];\n\tuint8_t ctrl3;\n\tint rv;\n\n\t/* Configure both sensors to an active ODR first. */\n\trv \u003d acc-\u003edrv-\u003eset_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 0);\n\tzassert_equal(rv, EC_SUCCESS);\n\trv \u003d gyr-\u003edrv-\u003eset_data_rate(gyr, LSM6DSO_ODR_MIN_VAL, 0);\n\tzassert_equal(rv, EC_SUCCESS);\n\n\trv \u003d i2c_common_emul_read_byte(emul, LSM6DSO_FIFO_CTRL3_ADDR, \u0026ctrl3);\n\tzassert_equal(rv, 0);\n\tzassert_not_equal(ctrl3 \u0026 LSM6DSO_FIFO_ODR_MASK(acc), LSM6DSO_DIS_BIT);\n\tzassert_not_equal(ctrl3 \u0026 LSM6DSO_FIFO_ODR_MASK(gyr), LSM6DSO_DIS_BIT);\n\n\t/* Power off accel: accel FIFO ODR is cleared, gyro FIFO ODR remains set. */\n\trv \u003d acc-\u003edrv-\u003eset_data_rate(acc, 0, 0);\n\tzassert_equal(rv, EC_SUCCESS);\n\n\trv \u003d i2c_common_emul_read_byte(emul, LSM6DSO_FIFO_CTRL3_ADDR, \u0026ctrl3);\n\tzassert_equal(rv, 0);\n\tzassert_equal(ctrl3 \u0026 LSM6DSO_FIFO_ODR_MASK(acc), LSM6DSO_DIS_BIT);\n\tzassert_not_equal(ctrl3 \u0026 LSM6DSO_FIFO_ODR_MASK(gyr), LSM6DSO_DIS_BIT);\n\n\t/* Power off gyro: gyro FIFO ODR is also cleared. */\n\trv \u003d gyr-\u003edrv-\u003eset_data_rate(gyr, 0, 0);\n\tzassert_equal(rv, EC_SUCCESS);\n\n\trv \u003d i2c_common_emul_read_byte(emul, LSM6DSO_FIFO_CTRL3_ADDR, \u0026ctrl3);\n\tzassert_equal(rv, 0);\n\tzassert_equal(ctrl3 \u0026 LSM6DSO_FIFO_ODR_MASK(gyr), LSM6DSO_DIS_BIT);\n}\n```\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34c29ab0_a3da5418",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:50:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] In `test_set_data_rate_fifo_error`:\n\n1. **Short-circuit in `st_write_data_with_mask()`**: `st_write_data_with_mask()` reads `LSM6DSO_FIFO_CTRL3_ADDR` first and returns `EC_SUCCESS` without calling `st_raw_write8()` if `new_data \u003d\u003d old_data`. In `sensor.dts`, `ec-s0` configures `10000 | ROUND_UP_FLAG`, which rounds up to `13000` mHz (`LSM6DSO_ODR_MIN_VAL`). If `LSM6DSO_FIFO_CTRL3_ADDR` already holds the encoded value for `13000` mHz when this test starts, `set_data_rate(acc, 13000, 1)` will skip writing to `LSM6DSO_FIFO_CTRL3_ADDR` and return `EC_SUCCESS` instead of triggering the injected failure. Ensure the sensor starts from a different ODR (e.g., `0`) before injecting the write failure.\n2. **Magic number**: Replace `13000` with `LSM6DSO_ODR_MIN_VAL`.\n3. **Additional FIFO config failure path**: `accelgyro_config_fifo()` also writes `LSM6DSO_FIFO_CTRL4_ADDR` when disabling/enabling the FIFO mode; testing a write failure on `LSM6DSO_FIFO_CTRL4_ADDR` as well covers the remaining error returns in `accelgyro_config_fifo()`.\n\n```c\nZTEST(lsm6dso, test_set_data_rate_fifo_error)\n{\n\tconst struct emul *emul \u003d EMUL_DT_GET(LSM6DSO_NODE);\n\tstruct motion_sensor_t *acc \u003d \u0026motion_sensors[ACC_SENSOR_ID];\n\tint rv;\n\n\t/* Ensure FIFO_CTRL3 starts at 0 so setting LSM6DSO_ODR_MIN_VAL forces a write. */\n\trv \u003d acc-\u003edrv-\u003eset_data_rate(acc, 0, 0);\n\tzassert_equal(rv, EC_SUCCESS);\n\n\tlsm6dso_emul_set_write_fail_reg(emul, LSM6DSO_FIFO_CTRL3_ADDR);\n\trv \u003d acc-\u003edrv-\u003eset_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 1);\n\tzassert_not_equal(rv, EC_SUCCESS);\n\n\tlsm6dso_emul_set_write_fail_reg(emul, LSM6DSO_FIFO_CTRL4_ADDR);\n\trv \u003d acc-\u003edrv-\u003eset_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 1);\n\tzassert_not_equal(rv, EC_SUCCESS);\n\n\tlsm6dso_emul_set_write_fail_reg(emul, -1);\n}\n```\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
