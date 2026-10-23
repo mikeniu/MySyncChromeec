@@ -1,0 +1,28 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35a03227_769747db",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T01:36:25Z",
+      "side": 1,
+      "message": "Please do not `#undef` Zephyr Devicetree, IRQ, and `SYS_INIT` macros (`DT_NUM_INST_STATUS_OKAY`, `DT_INST_REG_ADDR`, `DT_NODE_HAS_STATUS_OKAY`, `DT_NODELABEL`, `DT_REG_ADDR`, `DT_INST_IRQN`, `DT_INST_IRQ`, `IRQ_CONNECT`, `irq_enable`, `SYS_INIT`), pre-define the `ZEPHYR_DRIVERS_TIMER_SYSTEM_TIMER_GENERIC_H_` include guard, and `#include \u003c../drivers/timer/realtek_rts5912_rtmr.c\u003e` directly into a `native_sim` test:\n\n1. **Why this is problematic**:\n   - Rewriting Zephyr\u0027s core Devicetree/IRQ/init macros and textually `#include`-ing a third-party Zephyr SoC timer driver (`src/third_party/zephyrproject/zephyr/drivers/timer/realtek_rts5912_rtmr.c`) into a test file bypasses the Zephyr driver model, Kconfig, and Devicetree.\n   - Note also why this test is currently failing on CQ (`mock_dt_timer5.ldcnt` assertions at lines 124 and 139): `realtek_rts5912_rtmr.c` does not touch the watchdog (`timer5`) in `rts5912_clock_compensate_system_timer()` — it only updates `cyc_sleep_compensated +\u003d cyc_elapsed;`. The actual fix for `b/575573365` (`crrev.com/c/8614151`) is in `zephyr/drivers/cros_system/cros_system_rtk.c` (`cros_system_rtk_pm_notifier`), which calls `watchdog_reload()` on `PM_STATE_SUSPEND_TO_IDLE` entry.\n\n2. **How to write this test idiomatically**:\n   - To test the `b/575573365` fix (`cros_system_rtk_pm_notifier`), write a unit test for `zephyr/drivers/cros_system/cros_system_rtk.c` that triggers the PM state notifier (`pm_state_notify` / callback) and verifies via FFF (`FAKE_VOID_FUNC(watchdog_reload)`) that `watchdog_reload()` is called on `PM_STATE_SUSPEND_TO_IDLE` entry and not on other states.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 105,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "601a7f0b36681098ab156bb3d074aab765f3db89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
