@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97d0673b_f573d485",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:49:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Replacing `STATIC_IF(CONFIG_ACCEL_SPOOF_MODE) bool spoof_enable;` with `extern bool spoof_enable;` in `zephyr/lib/vsensor/body_detection/body_detection.c` fixes the shadowing bug where `body_detect_reset()` read an always-`false` file-local static variable instead of the shared `spoof_enable` state in `common/body_detect_common.c`.\n* **Architecture \u0026 Component Fit:** ✅ Matches the existing pattern in `zephyr/lib/vsensor/body_detection/body_detection.c` for referencing shared state defined in `common/body_detect_common.c` (such as `extern uint64_t onbody_lasttime;`).\n* **Code Simplicity:** ✅ Minimal, direct 1-line fix and 5-line test assertion.\n* **Idiomaticity \u0026 Readability:** ✅ Follows local codebase conventions and preprocessor guards without introducing magic values.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ Adds an immediate post-reset `BODY_DETECTION_ON_BODY` assertion in `test_setbodydetectionmode_forced` under `CONFIG_BODY_DETECTION_ALOGIRTHM_V2` that directly exercises resetting from spoofed `OFF_BODY` state.\n* **CL Size \u0026 Scope:** ✅ `Size: XS (+6, -1)`. Single, self-contained bug fix and its corresponding unit test assertion.\n* **Commit Message:** ✅ Clear, accurate, and properly formatted subject line, prose rationale, and `BUG\u003d`/`TEST\u003d` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/b8af83d7-7d47-41b8-9b56-e447fb6fddac)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b6eecc3895c24b17ffdfba3650cb9a8ce0983852",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
