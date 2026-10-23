@@ -25,6 +25,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "401bcd82_8fda453e",
+        "filename": "zephyr/test/system_common/include/cmsis_core.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:13:42Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "a33d2034_49dd92a1",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "revId": "9c83eb3bf94dc50e5865901e84b65e4be9e7e451",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d031cfe5_33675551",
@@ -38,6 +62,24 @@
       "writtenOn": "2026-10-22T21:37:47Z",
       "side": 1,
       "message": "What does this do?",
+      "revId": "9c83eb3bf94dc50e5865901e84b65e4be9e7e451",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fc0b935_43ba5d34",
+        "filename": "zephyr/test/system_common/include/kernel_arch_data.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:13:42Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "d031cfe5_33675551",
       "revId": "9c83eb3bf94dc50e5865901e84b65e4be9e7e451",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
