@@ -11,6 +11,7 @@
 #include <zephyr/device.h>
 #include <zephyr/init.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 
 #include <heci.h>
 
@@ -78,10 +79,24 @@ static K_SEM_DEFINE(cros_ec_ishtp_event_sem, 0, 1);
 static uint32_t cros_ec_ishtp_event;
 static uint32_t heci_cros_ec_conn_id;
 
+static atomic_t host_in_sleep;
+
 int heci_send_mkbp_event(uint32_t *timestamp)
 {
 	struct cros_ec_ishtp_msg evt;
 	struct mrd_t m = { 0 };
+
+	/*
+	 * Do not attempt to send MKBP events over HECI while the AP is
+	 * suspended (S0ix/S3). When the AP is in S0ix, it cannot ACK the
+	 * ISH2HOST doorbell, which would block the caller (e.g. SYSWORKQ via
+	 * force_mkbp_if_events) in ipm_sedi_send() for 1000 ms while holding
+	 * dev_lock and device_write_lock. Return EC_ERROR_BUSY so MKBP defers
+	 * cleanly until the AP resumes.
+	 */
+	if (atomic_get(&host_in_sleep) != 0) {
+		return EC_ERROR_BUSY;
+	}
 
 	evt.hdr.channel = CROS_MKBP_EVENT;
 	evt.hdr.status = 0;
@@ -272,12 +287,14 @@ host_command_host_sleep_event(struct ec_host_cmd_handler_args *args)
 	case HOST_SLEEP_EVENT_S3_SUSPEND:
 	case HOST_SLEEP_EVENT_S3_WAKEABLE_SUSPEND:
 		LOG_INF("%s: suspend", __FILE__);
+		atomic_set(&host_in_sleep, 1);
 		hook_notify(HOOK_CHIPSET_SUSPEND);
 		break;
 
 	case HOST_SLEEP_EVENT_S0IX_RESUME:
 	case HOST_SLEEP_EVENT_S3_RESUME:
 		LOG_INF("%s: resume", __FILE__);
+		atomic_clear(&host_in_sleep);
 		hook_notify(HOOK_CHIPSET_RESUME);
 		break;
 

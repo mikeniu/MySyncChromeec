@@ -1146,33 +1146,36 @@ static int heci_handler(uint32_t drbl)
 	struct heci_bus_msg_t *heci_msg =
 		(struct heci_bus_msg_t *)heci_dev.read_buffer;
 
-	int ret;
+	int ret = 0;
 	int msg_len = HEADER_GET_LENGTH(drbl);
 
 	if (msg_len > host_intf->max_fragment_size) {
 		LOG_ERR("invalid heci msg len");
-		ack_host();
-		return -1;
+		ret = -1;
+		goto out;
 	}
 
 	ret = host_intf->read_msg(&drbl, (uint8_t *)heci_msg, msg_len);
-	ack_host();
 	if (ret) {
 		LOG_ERR("err %d", ret);
-		return -1;
+		goto out;
 	}
 
 	LOG_HEXDUMP_DBG((uint8_t *)heci_msg, msg_len, "heci incoming");
 	LOG_DBG("drbl %08x", drbl);
 
 	/* judge if it is a valid heci msg*/
-	if (heci_msg->hdr.len + sizeof(heci_msg->hdr) == msg_len) {
-		heci_process_message(heci_msg);
-		return 0;
+	if (heci_msg->hdr.len + sizeof(heci_msg->hdr) != msg_len) {
+		LOG_ERR("invalid HECI msg");
+		ret = -1;
+		goto out;
 	}
 
-	LOG_ERR("invalid HECI msg");
-	return -1;
+	heci_process_message(heci_msg);
+
+out:
+	ack_host();
+	return ret;
 }
 
 int heci_init(struct device *arg)
