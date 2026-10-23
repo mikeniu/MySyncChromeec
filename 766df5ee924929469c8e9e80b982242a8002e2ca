@@ -16,6 +16,24 @@
       "message": "command_pe() has the same issue as command_cable() where port is parsed with strtoi() and checked against board_get_usb_pd_port_count(), but port \u003c 0 is not checked. A negative port argument will bypass this check and get passed to dump_pe(port), resulting in out-of-bounds array accesses. Consider adding port \u003c 0 here as well (and a pe -1 dump test case).",
       "revId": "766df5ee924929469c8e9e80b982242a8002e2ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23bb6363_e34de135",
+        "filename": "common/usb_pd_console_cmd.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:05:46Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "eddc8c55_57288ff5",
+      "revId": "766df5ee924929469c8e9e80b982242a8002e2ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
