@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8bb928d_72ee7d0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:41:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Deleting `board/bloonchipper` requires also updating `util/build_with_clang.py` (`BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG`) and `firmware_builder.py` (`EXPECTED_MISSING_BOARDS`) so `firmware_builder.py build` and `check_inherits` do not fail.\n\n### Review Summary\n* **Functionality:** ❌ Deleting `board/bloonchipper` removes `bloonchipper` from `make print-boards`, which will cause `check_boards()` in `util/build_with_clang.py` (invoked by `firmware_builder.py build`) to fail because `\"bloonchipper\"` is still in `BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG`, and will cause `firmware_builder.py check_inherits` to fail on ChromeOS configs referencing `bloonchipper` unless `\"bloonchipper\"` is added to `EXPECTED_MISSING_BOARDS`.\n* **Architecture \u0026 Component Fit:** ✅ Switching legacy EC FPMCU defaults and build targets from `bloonchipper` to `dartmonkey` aligns with the migration of `bloonchipper` to Zephyr (note: `util/flash_jlink.py` and `util/renode_ec_launch.py` also default to `\"bloonchipper\"` and could be updated in a follow-up if desired).\n* **Code Simplicity:** ✅ Changes are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ⚠️ In `test/run_device_tests.py`, `default_board` should reuse the existing module-level constant `DARTMONKEY` rather than repeating the string literal `\"dartmonkey\"`.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ Covered by CQ (`firmware_builder.py` build and unit test compilation checks).\n* **CL Size \u0026 Scope:** ✅ `Size: XS (+3, -5)` — Small, focused change retiring `bloonchipper` as a legacy EC build/default target in favor of `dartmonkey`.\n* **Commit Message:** ✅ Clear, concise, and properly formatted with `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/7d1cebff-ad70-4fcf-9de2-031e97f3a098)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0c0c631b997c9a40ef1fa0f4a8d6a5841987fa0c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a2d7d32_366c261d",
+        "filename": "firmware_builder.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:41:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Deleting `board/bloonchipper` removes `bloonchipper` from `make print-boards`, which will cause two checks in the `firmware_builder.py` workflow to fail unless updated alongside this change:\n\n1. **`util/build_with_clang.py` (invoked by `build()` at line 209):** `BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG` (`util/build_with_clang.py`, line 24) still contains `\"bloonchipper\"`. In `check_boards()` (`util/build_with_clang.py`, lines 303–318), `set(all_boards) ^ set(BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG + BOARDS_THAT_FAIL_WITH_CLANG)` will now be non-empty (`{\"bloonchipper\"}`) and exit with `sys.exit(1)` (and `build()` would also fail trying to build `BOARD\u003dbloonchipper`). Please remove `\"bloonchipper\"` from `BOARDS_THAT_COMPILE_SUCCESSFULLY_WITH_CLANG` in `util/build_with_clang.py`.\n2. **`EXPECTED_MISSING_BOARDS` (lines 70–83, used by `check_inherits()` at line 605):** `read_cros_config()` inspects `hardwareFeatures.fingerprint.board` across ChromeOS project configs (lines 534–541) and flags any target not present in `ec_boards` (`make print-boards`) or `EXPECTED_MISSING_BOARDS` as an error (`ERROR: Unknown EC target (FP) bloonchipper`). Please add `\"bloonchipper\"` to `EXPECTED_MISSING_BOARDS` under `# These are zephyr, not ECOS`:\n\n```python\n    # These are zephyr, not ECOS\n    \"bloonchipper\",\n    \"brox-ish\",\n    \"rex-ish\",\n```\n\n[🔗](http://go/tj/7d1cebff-ad70-4fcf-9de2-031e97f3a098)",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0c0c631b997c9a40ef1fa0f4a8d6a5841987fa0c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff22dcc2_8a148614",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2185,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:41:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `DARTMONKEY \u003d \"dartmonkey\"` is already defined as a module-level constant at line 151. Please reuse `DARTMONKEY` here instead of duplicating the raw string literal:\n\n```python\n    default_board \u003d DARTMONKEY\n```\n\n[🔗](http://go/tj/7d1cebff-ad70-4fcf-9de2-031e97f3a098)",
+      "range": {
+        "startLine": 2185,
+        "startChar": 0,
+        "endLine": 2185,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0c0c631b997c9a40ef1fa0f4a8d6a5841987fa0c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
