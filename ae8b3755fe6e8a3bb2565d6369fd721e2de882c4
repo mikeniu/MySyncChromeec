@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03c6396d_73d78446",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:24:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding DFU state/timeout handling, unused includes, magic response offsets, and unit test coverage.\n\n### Review Summary\n\n- **Functionality:** ❌ `dfu_poll_idle()` treats all unhandled `bState` values in `default:` as transient busy states (causing a 60s hang if the device is in `appIDLE`, `appDETACH`, `dfuUPLOAD-IDLE`, or an invalid state), does not check for non-zero `bStatus` outside `kDfuStateDfuError`, and multiplies the 24-bit `poll_timeout` by `1000` in signed `int` without clamping to the remaining timeout (`timeout - slept`), which can overflow `int` or sleep far beyond `kUsbDfuTimeoutMs`.\n- **Architecture \u0026 Component Fit:** ❌ `dfu_poll_idle()` and `dfu_clear_status()` are added as uncalled `private` methods directly coupled to `libusb_*` and `usleep` in an uncompiled translation unit. Introducing a small virtual or injectable USB transport seam (matching sibling utilities in `util/egis/`, `util/focaltech/`, and `util/elan/`) allows compiling and unit-testing the DFU state machine in this CL.\n- **Code Simplicity:** ❌ Remove the unused `#include \u003cvector\u003e` (and include `\u003calgorithm\u003e` and `\u003ccstddef\u003e` for `std::min` and `size_t`), and move `delay_ms` after `switch (bState)` so it is only computed on the retry path.\n- **Idiomaticity \u0026 Readability:** ❌ Replace the raw positional indices `response[0]`..`response[4]` and fallback literal `1` in `dfu_poll_idle()` with named constants (`kDfuStatusOff`, `kDfuPollTimeoutOff`, `kDfuStateOff`, `kDfuMinPollDelayMs`), consistent with `kDfuDescTypeOff` and `kDfuDescXferSizeOff`.\n- **Security:** ✅ No security vulnerabilities identified.\n- **Testing:** ❌ No automated unit tests are included (`TEST\u003dNo standalone binary yet...`). Please add GoogleTest unit tests wired into `utils-test` in `util/build.mk` covering terminal states, transient busy states, `bwPollTimeout` boundaries, timeout boundaries, error/short-read paths, and `dfu_clear_status()`.\n- **CL Size \u0026 Scope:** ✅ `Size: M (+124, -0)`. Focused on a single logical change adding DFU status polling and clearing helpers to `RtsUsbDevice`.\n- **Commit Message:** ✅ Clear subject and concise prose rationale; please update `TEST\u003d` once unit tests are wired in.\n\n[🔗](http://go/tj/3e9f23d2-ae95-43fd-9a93-225bf455e097)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d3376f2_4bfef9d5",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:24:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `std::vector` is not used in `util/rts5817_flash.cc` in this CL, whereas `size_t` is used on line 37 without `#include \u003ccstddef\u003e` (and `\u003calgorithm\u003e` is needed for `std::min` when clamping the poll delay). Please remove `#include \u003cvector\u003e` from this CL (introducing it in the CL that first uses `std::vector`) and include `\u003calgorithm\u003e` and `\u003ccstddef\u003e` instead:\n\n```cpp\n#include \u003calgorithm\u003e\n#include \u003ccstddef\u003e\n```\n\n[🔗](http://go/tj/3e9f23d2-ae95-43fd-9a93-225bf455e097)",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "901b4903_3adc309c",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:24:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `dfu_poll_idle()` and `dfu_clear_status()` are added as uncalled `private` methods in an uncompiled translation unit (`util/rts5817_flash.cc` is not yet wired into `util/build.mk`), leaving all state-machine branches and boundary conditions untested in this CL.\n\nFollowing the pattern used by sibling host flashing utilities in `util/` (`util/egis/`, `util/focaltech/`, `util/elan/`), please expose `RtsUsbDevice` in a header with a small virtual/injectable USB transport seam (for `control_transfer`, `reset_device`, and `sleep_ms`) and wire a GoogleTest target into `utils-test` in `util/build.mk` so these helpers are compiled and unit-tested in this CL.\n\nSpecifically, please add unit tests covering:\n- **Immediate terminal states:** `kDfuStateDfuIdle` (`2`) and `kDfuStateDfuDnloadIdle` (`5`) returning `true` without sleeping, and `kDfuStateDfuManifestWaitReset` (`8`) invoking `reset_device()` and returning `true`.\n- **Transient busy states \u0026 `bwPollTimeout` boundaries:** Polling across `kDfuStateDfuDnloadSync` (`3`), `kDfuStateDfuDnloadBusy` (`4`), `kDfuStateDfuManifestSync` (`6`), and `kDfuStateDfuManifest` (`7`); `poll_timeout \u003d\u003d 0` falling back to `1` ms; 24-bit little-endian decoding (`response[1..3]`); and clamping when `poll_timeout` exceeds the remaining timeout budget.\n- **Timeout boundaries:** Succeeding at `slept \u003d\u003d kUsbDfuTimeoutMs - 1` ms on the final poll vs. failing with `false` when `slept \u003d\u003d kUsbDfuTimeoutMs`.\n- **Error \u0026 boundary paths:** `control_transfer` error (`ret \u003c 0`), short read boundary (`ret \u003d\u003d kDfuGetStatusResponseLen - 1` vs. `ret \u003d\u003d kDfuGetStatusResponseLen`), `bState \u003d\u003d kDfuStateDfuError` (`10`), non-zero `bStatus`, and unexpected non-busy state (`bState \u003d\u003d 0`) failing immediately without sleeping.\n- **`dfu_clear_status()`:** Sending `kDfuClrStatus` (`0x04`) and returning `true` on `ret \u003d\u003d 0` and `false` on `ret \u003c 0`.\n\nExample test suite using a virtual seam on `RtsUsbDevice`:\n\n```cpp\nclass FakeRtsUsbDevice : public RtsUsbDevice {\n public:\n  using RtsUsbDevice::dfu_clear_status;\n  using RtsUsbDevice::dfu_poll_idle;\n\n  MOCK_METHOD(int, control_transfer,\n              (uint8_t bmRequestType, uint8_t bRequest, uint16_t wValue,\n               uint16_t wIndex, uint8_t *data, uint16_t wLength,\n               unsigned int timeout_ms),\n              (override));\n  MOCK_METHOD(int, reset_device, (), (override));\n  MOCK_METHOD(void, sleep_ms, (int delay_ms), (override));\n};\n\nTEST(RtsUsbDeviceTest, DfuPollIdleReturnsTrueOnIdleAndDnloadIdle) {\n  for (uint8_t state : {kDfuStateDfuIdle, kDfuStateDfuDnloadIdle}) {\n    FakeRtsUsbDevice dev;\n    EXPECT_CALL(dev,\n                control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, _, _,\n                                 kDfuGetStatusResponseLen, kUsbDfuTimeoutMs))\n        .WillOnce(Invoke([state](uint8_t, uint8_t, uint16_t, uint16_t,\n                                 uint8_t *data, uint16_t, unsigned int) {\n          const uint8_t resp[kDfuGetStatusResponseLen] \u003d {\n              kDfuStatusOk, 0, 0, 0, state, 0};\n          std::ranges::copy(resp, data);\n          return static_cast\u003cint\u003e(kDfuGetStatusResponseLen);\n        }));\n    EXPECT_CALL(dev, sleep_ms(_)).Times(0);\n    EXPECT_TRUE(dev.dfu_poll_idle());\n  }\n}\n\nTEST(RtsUsbDeviceTest, DfuPollIdleResetsDeviceOnManifestWaitReset) {\n  FakeRtsUsbDevice dev;\n  EXPECT_CALL(dev,\n              control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, _, _,\n                               kDfuGetStatusResponseLen, kUsbDfuTimeoutMs))\n      .WillOnce(Invoke([](uint8_t, uint8_t, uint16_t, uint16_t, uint8_t *data,\n                          uint16_t, unsigned int) {\n        const uint8_t resp[kDfuGetStatusResponseLen] \u003d {\n            kDfuStatusOk, 0, 0, 0, kDfuStateDfuManifestWaitReset, 0};\n        std::ranges::copy(resp, data);\n        return static_cast\u003cint\u003e(kDfuGetStatusResponseLen);\n      }));\n  EXPECT_CALL(dev, reset_device()).WillOnce(Return(0));\n  EXPECT_TRUE(dev.dfu_poll_idle());\n}\n\nTEST(RtsUsbDeviceTest, DfuPollIdlePollsBusyStatesAndClampsTimeoutBoundary) {\n  FakeRtsUsbDevice dev;\n  constexpr int kFirstDelayMs \u003d kUsbDfuTimeoutMs - 1;\n  EXPECT_CALL(dev,\n              control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, _, _,\n                               kDfuGetStatusResponseLen, kUsbDfuTimeoutMs))\n      .WillOnce(Invoke([](uint8_t, uint8_t, uint16_t, uint16_t, uint8_t *data,\n                          uint16_t, unsigned int) {\n        const uint8_t resp[kDfuGetStatusResponseLen] \u003d {\n            kDfuStatusOk,\n            static_cast\u003cuint8_t\u003e(kFirstDelayMs \u0026 0xFF),\n            static_cast\u003cuint8_t\u003e((kFirstDelayMs \u003e\u003e 8) \u0026 0xFF),\n            static_cast\u003cuint8_t\u003e((kFirstDelayMs \u003e\u003e 16) \u0026 0xFF),\n            kDfuStateDfuDnloadBusy,\n            0};\n        std::ranges::copy(resp, data);\n        return static_cast\u003cint\u003e(kDfuGetStatusResponseLen);\n      }))\n      .WillOnce(Invoke([](uint8_t, uint8_t, uint16_t, uint16_t, uint8_t *data,\n                          uint16_t, unsigned int) {\n        const uint8_t resp[kDfuGetStatusResponseLen] \u003d {\n            kDfuStatusOk, 0, 0, 0, kDfuStateDfuIdle, 0};\n        std::ranges::copy(resp, data);\n        return static_cast\u003cint\u003e(kDfuGetStatusResponseLen);\n      }));\n  EXPECT_CALL(dev, sleep_ms(kFirstDelayMs)).Times(1);\n  EXPECT_TRUE(dev.dfu_poll_idle());\n}\n\nTEST(RtsUsbDeviceTest, DfuPollIdleFailsOnShortReadAndTimeoutAtExactBoundary) {\n  FakeRtsUsbDevice dev;\n  EXPECT_CALL(dev,\n              control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, _, _,\n                               kDfuGetStatusResponseLen, kUsbDfuTimeoutMs))\n      .WillOnce(Return(static_cast\u003cint\u003e(kDfuGetStatusResponseLen - 1)));\n  EXPECT_FALSE(dev.dfu_poll_idle());\n}\n\nTEST(RtsUsbDeviceTest, DfuClearStatusHandlesSuccessAndError) {\n  FakeRtsUsbDevice dev;\n  EXPECT_CALL(dev,\n              control_transfer(kBmReqH2dClsIf, kDfuClrStatus, 0, _, nullptr, 0,\n                               kUsbCtrlTimeoutMs))\n      .WillOnce(Return(0))\n      .WillOnce(Return(LIBUSB_ERROR_IO));\n  EXPECT_TRUE(dev.dfu_clear_status());\n  EXPECT_FALSE(dev.dfu_clear_status());\n}\n```\n\n[🔗](http://go/tj/3e9f23d2-ae95-43fd-9a93-225bf455e097)",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b54c25c_007fcb8b",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:24:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `dfu_poll_idle()` has a few state-machine, timeout/overflow, and magic-offset issues:\n\n1. **Unchecked non-busy states and `bStatus` errors:** The `default:` branch in `switch (bState)` treats every state other than `kDfuStateDfuIdle` (`2`), `kDfuStateDfuDnloadIdle` (`5`), `kDfuStateDfuManifestWaitReset` (`8`), and `kDfuStateDfuError` (`10`) as a transient busy state. If the device is in `appIDLE` (`0`), `appDETACH` (`1`), `dfuUPLOAD-IDLE` (`9`), or an invalid state—or returns a non-zero `bStatus` before transitioning to `dfuERROR`—`dfu_poll_idle()` will spin for the full 60-second timeout instead of failing immediately. Explicitly handle the four DFU busy states (`dfuDNLOAD-SYNC \u003d 3`, `dfuDNBUSY \u003d 4`, `dfuMANIFEST-SYNC \u003d 6`, `dfuMANIFEST \u003d 7`) and fail immediately in `default:` or when `bStatus !\u003d kDfuStatusOk`.\n2. **24-bit `bwPollTimeout` multiplication overflow and oversleeping `kUsbDfuTimeoutMs`:** `poll_timeout` is a 24-bit unsigned integer up to `0xFFFFFF` (`16,777,215` ms). Computing `delay_ms * 1000` in signed `int` overflows when `poll_timeout \u003e 2,147,483` ms (undefined behavior), and sleeping for an unclamped `poll_timeout` allows a single poll iteration to block far past `kUsbDfuTimeoutMs`. Clamp `delay_ms` to `timeout - slept` and move its declaration after `switch (bState)` so it is only computed on the retry path.\n3. **Magic buffer offsets and fallback delay literal:** Replace raw positional indices `response[0]`..`response[4]` and the bare fallback literal `1` with named constants (`kDfuStatusOff`, `kDfuPollTimeoutOff`, `kDfuStateOff`, `kDfuMinPollDelayMs`), matching the descriptor offset constants at **lines 48–50**.\n\nSuggested replacement for **lines 36–43** and `dfu_poll_idle()`:\n\n```cpp\n/* DFU_GETSTATUS response: bStatus, bwPollTimeout[3], bState, iString */\nconstexpr size_t kDfuGetStatusResponseLen \u003d 6;\nconstexpr size_t kDfuStatusOff \u003d 0;\nconstexpr size_t kDfuPollTimeoutOff \u003d 1;\nconstexpr size_t kDfuStateOff \u003d 4;\n\n/* DFU status codes (from USB DFU spec) */\nconstexpr uint8_t kDfuStatusOk \u003d 0x00;\n\n/* DFU states (from USB DFU spec) */\nconstexpr uint8_t kDfuStateDfuIdle \u003d 2;\nconstexpr uint8_t kDfuStateDfuDnloadSync \u003d 3;\nconstexpr uint8_t kDfuStateDfuDnloadBusy \u003d 4;\nconstexpr uint8_t kDfuStateDfuDnloadIdle \u003d 5;\nconstexpr uint8_t kDfuStateDfuManifestSync \u003d 6;\nconstexpr uint8_t kDfuStateDfuManifest \u003d 7;\nconstexpr uint8_t kDfuStateDfuManifestWaitReset \u003d 8;\nconstexpr uint8_t kDfuStateDfuError \u003d 10;\n```\n\n```cpp\nbool RtsUsbDevice::dfu_poll_idle()\n{\n\tconstexpr int kDfuMinPollDelayMs \u003d 1;\n\tconstexpr useconds_t kUsPerMs \u003d 1000;\n\n\t/*\n\t * Use a generous timeout (60 s) for the overall polling, since the\n\t * manifest phase (flash programming) can take tens of seconds.\n\t */\n\tint timeout \u003d kUsbDfuTimeoutMs;\n\tint slept \u003d 0;\n\n\twhile (slept \u003c timeout) {\n\t\t/*\n\t\t * bmRequestType \u003d 0xA1: Device-to-Host, Class, Interface\n\t\t * bRequest \u003d kDfuGetStatus (0x03)\n\t\t * Data (6 bytes): bStatus, bwPollTimeout[3], bState, iString\n\t\t */\n\t\tuint8_t response[kDfuGetStatusResponseLen];\n\t\tint ret \u003d libusb_control_transfer(\n\t\t\tdev_handle_, kBmReqD2hClsIf, kDfuGetStatus, 0,\n\t\t\tstatic_cast\u003cuint16_t\u003e(dfu_interface_), response,\n\t\t\tsizeof(response), kUsbDfuTimeoutMs);\n\n\t\tif (ret \u003c static_cast\u003cint\u003e(kDfuGetStatusResponseLen)) {\n\t\t\tfprintf(stderr, \"DFU_GETSTATUS failed: %s\\n\",\n\t\t\t\tret \u003c 0 ? libusb_error_name(ret) : \"short read\");\n\t\t\treturn false;\n\t\t}\n\n\t\tuint8_t bStatus \u003d response[kDfuStatusOff];\n\t\tuint32_t poll_timeout \u003d\n\t\t\tresponse[kDfuPollTimeoutOff] |\n\t\t\t(static_cast\u003cuint32_t\u003e(response[kDfuPollTimeoutOff + 1])\n\t\t\t \u003c\u003c 8) |\n\t\t\t(static_cast\u003cuint32_t\u003e(response[kDfuPollTimeoutOff + 2])\n\t\t\t \u003c\u003c 16);\n\t\tuint8_t bState \u003d response[kDfuStateOff];\n\n\t\tif (bStatus !\u003d kDfuStatusOk || bState \u003d\u003d kDfuStateDfuError) {\n\t\t\tfprintf(stderr, \"DFU error: bStatus\u003d%d, bState\u003d%d\\n\",\n\t\t\t\tbStatus, bState);\n\t\t\treturn false;\n\t\t}\n\n\t\tswitch (bState) {\n\t\tcase kDfuStateDfuIdle:\n\t\tcase kDfuStateDfuDnloadIdle:\n\t\t\t/* Terminal success states. */\n\t\t\treturn true;\n\n\t\tcase kDfuStateDfuManifestWaitReset:\n\t\t\t/*\n\t\t\t * Device completed manifest and requests a USB reset.\n\t\t\t * Try issuing one; this may invalidate the device\n\t\t\t * handle (if the device re-enumerates), which is OK.\n\t\t\t */\n\t\t\tprintf(\"Device requests USB reset after manifest.\\n\");\n\t\t\tlibusb_reset_device(dev_handle_);\n\t\t\treturn true;\n\n\t\tcase kDfuStateDfuDnloadSync:\n\t\tcase kDfuStateDfuDnloadBusy:\n\t\tcase kDfuStateDfuManifestSync:\n\t\tcase kDfuStateDfuManifest:\n\t\t\t/*\n\t\t\t * Transient / busy states: sleep for the suggested\n\t\t\t * poll interval and retry.\n\t\t\t */\n\t\t\tbreak;\n\n\t\tdefault:\n\t\t\tfprintf(stderr, \"Unexpected DFU state: bState\u003d%d\\n\",\n\t\t\t\tbState);\n\t\t\treturn false;\n\t\t}\n\n\t\tint remaining_ms \u003d timeout - slept;\n\t\tint delay_ms \u003d (poll_timeout \u003e 0) ?\n\t\t\t\t       static_cast\u003cint\u003e(std::min\u003cuint32_t\u003e(\n\t\t\t\t\t       poll_timeout, remaining_ms)) :\n\t\t\t\t       std::min(kDfuMinPollDelayMs,\n\t\t\t\t\t\tremaining_ms);\n\n\t\tusleep(static_cast\u003cuseconds_t\u003e(delay_ms) * kUsPerMs);\n\t\tslept +\u003d delay_ms;\n\t}\n\n\tfprintf(stderr, \"Timed out waiting for DFU idle state.\\n\");\n\treturn false;\n}\n```\n\nOther affected locations:\n- **Lines 36–43**: Add `kDfuStatusOff`, `kDfuPollTimeoutOff`, `kDfuStateOff`, `kDfuStatusOk`, and the transient DFU state constants (`kDfuStateDfuDnloadSync`, `kDfuStateDfuDnloadBusy`, `kDfuStateDfuManifestSync`, `kDfuStateDfuManifest`).\n\n[🔗](http://go/tj/3e9f23d2-ae95-43fd-9a93-225bf455e097)",
+      "range": {
+        "startLine": 366,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
