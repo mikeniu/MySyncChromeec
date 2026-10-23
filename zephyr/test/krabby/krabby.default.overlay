@@ -29,6 +29,9 @@
 &sys_rst_odl {
 	gpios = <&gpiog 1 GPIO_OUTPUT_LOW>;
 };
+&gpio_ec_bl_en_od {
+	gpios = <&gpiob 5 (GPIO_OUTPUT_LOW | GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
 
 /* set default gpio-emul state */
 &power_button_l {

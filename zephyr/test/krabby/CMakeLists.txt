@@ -21,11 +21,14 @@ target_sources(app PRIVATE
 target_sources_ifdef(CONFIG_TEST_KRABBY
 	app PRIVATE
 	src/charger_workaround.c
+	src/hooks.c
 	src/main.c
 	src/power_seq.c
 	src/usb_mux_init.c
 	src/usbc_config.c
-	${PLATFORM_EC_PROGRAM_DIR}/corsola/src/ite_charger_workaround.c)
+	${PLATFORM_EC_PROGRAM_DIR}/corsola/src/board_chipset.c
+	${PLATFORM_EC_PROGRAM_DIR}/corsola/src/ite_charger_workaround.c
+	${PLATFORM_EC_PROGRAM_DIR}/corsola/src/ite_hooks.c)
 
 target_sources_ifdef(CONFIG_TEST_TENTACRUEL
 	app PRIVATE

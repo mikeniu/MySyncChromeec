@@ -12,6 +12,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ=y
     - CONFIG_PLATFORM_EC_POWERSEQ_PP5000_CONTROL=n
     - CONFIG_SHIMMED_TASKS=y
+    - CONFIG_PINCTRL=y
+    - CONFIG_PINCTRL_KEEP_SLEEP_STATE=y
     extra_dtc_overlay_files:
     - krabby.default.overlay
   krabby.default_ro:
@@ -25,6 +27,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ=y
     - CONFIG_PLATFORM_EC_POWERSEQ_PP5000_CONTROL=n
     - CONFIG_SHIMMED_TASKS=y
+    - CONFIG_PINCTRL=y
+    - CONFIG_PINCTRL_KEEP_SLEEP_STATE=y
     extra_dtc_overlay_files:
     - krabby.default.overlay
   krabby.default_rw:
@@ -38,6 +42,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ=y
     - CONFIG_PLATFORM_EC_POWERSEQ_PP5000_CONTROL=n
     - CONFIG_SHIMMED_TASKS=y
+    - CONFIG_PINCTRL=y
+    - CONFIG_PINCTRL_KEEP_SLEEP_STATE=y
     extra_dtc_overlay_files:
     - krabby.default.overlay
   krabby.tentacruel:
