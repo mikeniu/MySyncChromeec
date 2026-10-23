@@ -47,6 +47,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b7937fde_b5c6c4fc",
+        "filename": "zephyr/test/drivers/timer/src/test_overflow.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T01:35:52Z",
+      "side": 1,
+      "message": "Please do not `#undef CONFIG_HWTIMER_64BIT`, `#define` internal symbols (`get_time`, `timer_us_to_ticks`, `clksrc_high`), and `#include \"../../../../common/timer.c\"` inside a Zephyr test:\n\n1. **Why this is problematic**:\n   - Textually `#include`-ing a `.c` file with preprocessor macro rewrites bypasses Kconfig/CMake and compiles a synthetic translation unit that cannot exist in any real build.\n   - More importantly, the `!IS_ENABLED(CONFIG_HWTIMER_64BIT)` branch in `common/timer.c` is **unreachable dead code on `main`**:\n     - `common/timer.c` is only compiled when `CONFIG_PLATFORM_EC_TIMER\u003dy` (`zephyr/CMakeLists.txt:583`).\n     - `zephyr/shim/include/config_chip.h` unconditionally sets `#define CONFIG_HWTIMER_64BIT` whenever `CONFIG_PLATFORM_EC_TIMER` is enabled (because Zephyr timers are 64-bit).\n     - `force_time()`, `timer_init()`, and `process_timers()` have already been deleted from `common/timer.c` on `main`, so `clksrc_high` is **never written anywhere in the codebase** on `main` (it is permanently `0`).\n\n2. **Recommended fix**:\n   - The real 32-bit hardware timer overflow bug is on `ec-legacy` (covered by `crrev.com/c/8605930`).\n   - On `main`, this CL should either be abandoned or repurposed to delete the dead `clksrc_high` variable and `!IS_ENABLED(CONFIG_HWTIMER_64BIT)` branch from `common/timer.c`.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "ee86096ff99d821f1777e72ee20298d98e7eec3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "229b840f_6c06849d",
         "filename": "zephyr/test/drivers/timer/src/test_overflow.c",
         "patchSetId": 2
