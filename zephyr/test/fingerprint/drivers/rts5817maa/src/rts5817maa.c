@@ -30,9 +30,15 @@ DEFINE_FFF_GLOBALS;
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_init);
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_get_hwid, uint8_t *);
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_power_down);
+FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_acquire_image,
+		       uint8_t *, rts_capture_mode_t);
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_configure_detect,
 		       rts_detect_mode_t);
 FAKE_VALUE_FUNC(rts_finger_sts_t, rts5817maa_sensor_finger_status);
+
+/* Converts capture types from the ec domain to the rts domain. */
+rts_capture_mode_t convert_fp_capture_type_to_rts_capture_type(
+	enum fingerprint_capture_type capture_type);
 
 struct rts5817maa_fixture {
 	const struct device *dev;
@@ -89,12 +95,14 @@ static void rts5817maa_before(void *f)
 	RESET_FAKE(rts5817maa_sensor_init);
 	RESET_FAKE(rts5817maa_sensor_get_hwid);
 	RESET_FAKE(rts5817maa_sensor_power_down);
+	RESET_FAKE(rts5817maa_sensor_acquire_image);
 	RESET_FAKE(rts5817maa_sensor_configure_detect);
 	RESET_FAKE(rts5817maa_sensor_finger_status);
 
 	rts5817maa_sensor_init_fake.return_val = RTS_FP_SUCCESS;
 	rts5817maa_sensor_get_hwid_fake.custom_fake = fake_get_hwid;
 	rts5817maa_sensor_power_down_fake.return_val = RTS_FP_SUCCESS;
+	rts5817maa_sensor_acquire_image_fake.return_val = RTS_FP_SUCCESS;
 	rts5817maa_sensor_configure_detect_fake.return_val = RTS_FP_SUCCESS;
 	rts5817maa_sensor_finger_status_fake.return_val = RTS_FINGER_NONE;
 
@@ -412,4 +420,146 @@ ZTEST_F(rts5817maa, test_finger_status_unmapped)
 		(rts_finger_sts_t)(RTS_FINGER_PRESENT + 1);
 	zassert_equal(fingerprint_finger_status(fixture->dev),
 		      FINGERPRINT_FINGER_STATE_NONE);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_success)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE];
+
+	zassert_ok(fingerprint_acquire_image(
+		fixture->dev, FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE, buffer,
+		sizeof(buffer)));
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.call_count, 1);
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.arg0_val, buffer);
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.arg1_val,
+		      RTS_CAPTURE_NORMAL_FORMAT);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_fast_finger_up)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE];
+
+	rts5817maa_sensor_acquire_image_fake.return_val =
+		RTS_ERROR_FAST_FINGER_UP;
+	zassert_equal(fingerprint_acquire_image(fixture->dev,
+						FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT,
+						buffer, sizeof(buffer)),
+		      FINGERPRINT_SENSOR_SCAN_TOO_FAST);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_partial)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE];
+
+	rts5817maa_sensor_acquire_image_fake.return_val =
+		RTS_ERROR_IMAGE_PARTIAL;
+	zassert_equal(fingerprint_acquire_image(fixture->dev,
+						FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT,
+						buffer, sizeof(buffer)),
+		      FINGERPRINT_SENSOR_SCAN_LOW_SENSOR_COVERAGE);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_unmapped_error)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE];
+
+	rts5817maa_sensor_acquire_image_fake.return_val = RTS_ERROR_TIMEOUT;
+	zassert_equal(fingerprint_acquire_image(fixture->dev,
+						FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT,
+						buffer, sizeof(buffer)),
+		      -EIO);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_invalid_type)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE];
+
+	zassert_equal(fingerprint_acquire_image(fixture->dev,
+						FINGERPRINT_CAPTURE_TYPE_PATTERN0,
+						buffer, sizeof(buffer)),
+		      -EINVAL);
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.call_count, 0);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_small_buffer)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE];
+
+	zassert_equal(fingerprint_acquire_image(
+			      fixture->dev,
+			      FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE, buffer,
+			      sizeof(buffer) - 1),
+		      -EINVAL);
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.call_count, 0);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_null_buffer)
+{
+	zassert_equal(fingerprint_acquire_image(
+			      fixture->dev,
+			      FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE, NULL,
+			      CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE),
+		      -EINVAL);
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.call_count, 0);
+}
+
+ZTEST_F(rts5817maa, test_convert_capture_type)
+{
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT),
+		RTS_CAPTURE_NORMAL_FORMAT);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE),
+		RTS_CAPTURE_NORMAL_FORMAT);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_PATTERN0),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_PATTERN1),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_DEFECT_PXL_TEST),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_ABNORMAL_TEST),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_NOISE_TEST),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_RESET_TEST),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_PATTERN2),
+		RTS_CAPTURE_TYPE_INVALID);
+	zassert_equal(
+		convert_fp_capture_type_to_rts_capture_type(
+			FINGERPRINT_CAPTURE_TYPE_MAX),
+		RTS_CAPTURE_TYPE_INVALID);
+}
+
+ZTEST_F(rts5817maa, test_acquire_image_large_buffer)
+{
+	uint8_t buffer[CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE + 1];
+
+	zassert_ok(fingerprint_acquire_image(
+		fixture->dev, FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE, buffer,
+		sizeof(buffer)));
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.call_count, 1);
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.arg0_val, buffer);
+	zassert_equal(rts5817maa_sensor_acquire_image_fake.arg1_val,
+		      RTS_CAPTURE_NORMAL_FORMAT);
 }
