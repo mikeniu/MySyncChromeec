@@ -4,9 +4,12 @@
  *
  * Flashing tool for RTS5817 (Realtek USB DFU device).
  *
- * Provides RtsUsbDevice, a thin libusb wrapper that opens the device,
- * enables download mode via vendor control requests, sends DFU_DETACH and
- * releases all USB resources.
+ * Provides RtsUsbDevice, a thin libusb wrapper that enables DFU download
+ * mode on the RTS5817 device via USB control transfers and performs the DFU
+ * download directly via libusb (no external dfu-util).
+ *
+ * The DFU download protocol is implemented per the USB DFU Specification
+ * (Interface Class 0xFE, SubClass 0x01).
  *
  * Dependencies: libusb-1.0 (compile-time, shared library at runtime)
  */
@@ -16,6 +19,7 @@
 
 #include <libusb-1.0/libusb.h>
 #include <unistd.h>
+#include <algorithm>
 #include <vector>
 
 /* ---------------------------------------------------------------------------
@@ -30,6 +34,7 @@ constexpr uint16_t kRtsEnableDownloadMode = 1;
 
 /* DFU class-specific requests (bmRequestType = 0x21 or 0xA1) */
 constexpr uint8_t kDfuDetach = 0x00;
+constexpr uint8_t kDfuDownload = 0x01;
 constexpr uint8_t kDfuGetStatus = 0x03;
 constexpr uint8_t kDfuClrStatus = 0x04;
 
@@ -109,6 +114,13 @@ class RtsUsbDevice {
 
 	/** Enable DFU download mode via vendor control request. */
 	bool enable_download();
+
+	/**
+	 * Perform the full DFU firmware download.
+	 * Must be called after init() and enable_download().
+	 * @firmware:  Complete firmware blob (including DFU suffix).
+	 */
+	bool dfu_download(const std::vector<uint8_t> &firmware);
 
 	/**
 	 * Send DFU_DETACH to transition the device from Runtime mode to DFU
@@ -386,7 +398,8 @@ bool RtsUsbDevice::dfu_poll_idle()
 
 		if (ret < static_cast<int>(kDfuGetStatusResponseLen)) {
 			fprintf(stderr, "DFU_GETSTATUS failed: %s\n",
-				ret < 0 ? libusb_error_name(ret) : "short read");
+				ret < 0 ? libusb_error_name(ret) :
+					  "short read");
 			return false;
 		}
 
@@ -459,5 +472,123 @@ bool RtsUsbDevice::dfu_clear_status()
 			libusb_error_name(ret));
 		return false;
 	}
+	return true;
+}
+
+bool RtsUsbDevice::dfu_download(const std::vector<uint8_t> &firmware)
+{
+	if (!dev_handle_)
+		return false;
+
+	/* Step 1: Find the DFU interface. */
+	if (!find_dfu_interface())
+		return false;
+
+	/* Detach the kernel driver from the DFU interface, if any. */
+	if (libusb_kernel_driver_active(dev_handle_, dfu_interface_) == 1) {
+		int kd_ret = libusb_detach_kernel_driver(dev_handle_,
+							    dfu_interface_);
+		if (kd_ret < 0) {
+			fprintf(stderr,
+				"Warning: cannot detach kernel driver: %s\n",
+				libusb_error_name(kd_ret));
+		}
+	}
+
+	int ret = libusb_claim_interface(dev_handle_, dfu_interface_);
+	if (ret < 0) {
+		fprintf(stderr, "Error: cannot claim DFU interface: %s\n",
+			libusb_error_name(ret));
+		return false;
+	}
+
+	/* Step 2: Send firmware in blocks using DFU_DOWNLOAD. */
+	const size_t total_size = firmware.size();
+	size_t offset = 0;
+	uint16_t block_num = 0;
+	uint64_t printed_pct = 0;
+
+	printf("Flashing %zu bytes (%u-byte blocks)...\n", total_size,
+	       transfer_size_);
+
+	while (offset < total_size) {
+		size_t chunk_size =
+			std::min(total_size - offset,
+				 static_cast<size_t>(transfer_size_));
+
+		/*
+		 * bmRequestType = 0x21: Host-to-Device, Class, Interface
+		 * bRequest = kDfuDownload (0x01)
+		 * wValue  = block_num
+		 * wIndex  = interface number
+		 */
+		ret = libusb_control_transfer(
+			dev_handle_, kBmReqH2dClsIf, kDfuDownload, block_num,
+			static_cast<uint16_t>(dfu_interface_),
+			const_cast<uint8_t *>(firmware.data() + offset),
+			static_cast<uint16_t>(chunk_size), kUsbDfuTimeoutMs);
+
+		if (ret < 0) {
+			fprintf(stderr,
+				"\nDFU_DOWNLOAD failed at block %u "
+				"(offset 0x%zx): %s\n",
+				block_num, offset, libusb_error_name(ret));
+
+			/* Try to clear error and continue. */
+			dfu_clear_status();
+			return false;
+		}
+
+		/* Poll status to wait for block to be processed. */
+		if (!dfu_poll_idle()) {
+			fprintf(stderr,
+				"DFU status error after block %u "
+				"(offset 0x%zx).\n",
+				block_num, offset);
+			return false;
+		}
+
+		block_num++;
+		offset += chunk_size;
+
+		/* Print progress every 10%. */
+		uint64_t pct = static_cast<uint64_t>(offset) * 100 / total_size;
+		if (pct >= printed_pct + 10) {
+			printf("\r  Progress: %zu%%", static_cast<size_t>(pct));
+			fflush(stdout);
+			printed_pct = pct;
+		}
+	}
+
+	/* Step 3: Send zero-length packet to signal completion. */
+	ret = libusb_control_transfer(dev_handle_, kBmReqH2dClsIf,
+				      kDfuDownload, block_num,
+				      static_cast<uint16_t>(dfu_interface_),
+				      nullptr, 0, kUsbDfuTimeoutMs);
+
+	if (ret < 0) {
+		fprintf(stderr,
+			"\nWarning: final DFU_DOWNLOAD (ZLP) failed: %s\n",
+			libusb_error_name(ret));
+		/* Device may still complete the operation; try polling. */
+	}
+
+	/* Step 4: Wait for the device to finish (MANIFEST -> IDLE). */
+	printf("\r  Progress: 100%%\n");
+	printf("Waiting for device to complete...\n");
+
+	/*
+	 * After the final ZLP, the device goes through manifest phase.
+	 * Poll GETSTATUS until it returns to dfuIDLE.
+	 */
+	if (!dfu_poll_idle()) {
+		fprintf(stderr, "Warning: device did not reach idle after "
+				"manifest.\n");
+		/* This may still be OK; some devices self-reset here. */
+	}
+
+	libusb_release_interface(dev_handle_, dfu_interface_);
+	dfu_interface_ = -1;
+
 	return true;
 }
