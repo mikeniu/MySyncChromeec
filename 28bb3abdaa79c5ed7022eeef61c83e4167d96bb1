@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51539a6c_321691ad",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-23T21:31:06Z",
+      "side": 1,
+      "message": "Do you plan to move this after the hook_notify()?",
+      "range": {
+        "startLine": 580,
+        "startChar": 0,
+        "endLine": 580,
+        "endChar": 25
+      },
+      "revId": "28bb3abdaa79c5ed7022eeef61c83e4167d96bb1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09e9cb25_3a95bb81",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 2109,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-23T21:31:06Z",
+      "side": 1,
+      "message": "Nit - use the `__overridable` macro, which provides flexibility for different toolchains.",
+      "range": {
+        "startLine": 2109,
+        "startChar": 0,
+        "endLine": 2109,
+        "endChar": 6
+      },
+      "revId": "28bb3abdaa79c5ed7022eeef61c83e4167d96bb1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
