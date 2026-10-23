@@ -193,9 +193,7 @@ static void print_sp_pc(const struct k_thread *thread)
 {
 	uint32_t sp = get_stack_ptr(thread);
 	struct arch_esf *esf = (struct arch_esf *)sp;
-	char thread_name[16];
-
-	get_thread_name(thread, thread_name, sizeof(thread_name));
+	const char *thread_name = get_thread_name(thread);
 
 #if defined(CONFIG_ARM)
 	printk("%s [SP=%p, PC=%p, LR=%p]\n", thread_name, (void *)sp,
@@ -214,6 +212,7 @@ static void print_sp_pc(const struct k_thread *thread)
 #elif defined(CONFIG_ARCH_POSIX)
 	/* Nothing useful within esf to be printed here */
 	ARG_UNUSED(esf);
+	ARG_UNUSED(thread_name);
 #endif
 }
 
@@ -229,7 +228,6 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
 	uint32_t exception_address = 0;
-	const char *thread_name = NULL;
 	struct k_thread *thread = get_current_thread();
 
 #ifdef CONFIG_RISCV
@@ -257,12 +255,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 */
 	panic_data_write_watchdog_warning(exception_address, thread);
 
-	if (IS_ENABLED(CONFIG_THREAD_NAME) && thread != NULL) {
-		thread_name = k_thread_name_get(thread);
-	}
-	if (thread_name == NULL) {
-		thread_name = "unknown";
-	}
+	const char *thread_name = get_thread_name(thread);
 
 #ifdef CONFIG_RISCV
 	printk("WDT pre-warning MEPC:%p RA:%p THREAD:%p THREAD_NAME:%s\n",

@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ec_tasks.h"
 #include "host_command.h"
 #include "panic_utils.h"
 #include "task.h"
@@ -124,20 +125,19 @@ ZTEST_USER(extra_tasks, test_shell_thread_to_task_mapping)
 
 ZTEST_USER(extra_tasks, test_get_thread_name)
 {
-	char name[32];
+	struct k_thread unnamed = { 0 };
 	k_tid_t thread = k_current_get();
 
-	get_thread_name(thread, name, sizeof(name));
+	zassert_str_equal(get_thread_name(NULL), "unknown");
+	zassert_str_equal(get_thread_name(&unnamed), "unknown");
+
 #ifdef CONFIG_THREAD_NAME
 	const char *expected_name = k_thread_name_get(thread);
 
 	zassert_not_null(expected_name);
-	zassert_equal(strcmp(name, expected_name), 0);
+	zassert_str_equal(get_thread_name(thread), expected_name);
 #else
-	char expected[32];
-
-	snprintf(expected, sizeof(expected), "%p", thread);
-	zassert_equal(strcmp(name, expected), 0);
+	zassert_str_equal(get_thread_name(thread), "unknown");
 #endif
 }
 

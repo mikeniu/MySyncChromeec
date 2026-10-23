@@ -26,6 +26,17 @@ static inline k_tid_t get_current_thread(void)
 	return k_current_get();
 }
 
+/**
+ * Return the name of the thread, or "unknown" if the name is not set or
+ * the thread is NULL.
+ */
+static inline const char *get_thread_name(const struct k_thread *thread)
+{
+	const char *name = thread ? k_thread_name_get((k_tid_t)thread) : NULL;
+
+	return (name && name[0] != '\0') ? name : "unknown";
+}
+
 /** Starts all of the shimmed EC tasks. Requires CONFIG_SHIMMED_TASKS=y. */
 void start_ec_tasks(void);
 

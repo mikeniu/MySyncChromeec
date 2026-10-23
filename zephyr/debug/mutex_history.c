@@ -52,9 +52,8 @@ void mutex_history_dump(struct ring_buf *rb)
 	       MUTEX_EVENT_TYPE_SIZE) {
 		printk("  TS: %8u us, Mutex: %p, Thread: %s, Func: %s, Type: %u\n",
 		       event.timestamp, event.mutex,
-		       event.thread_id ? k_thread_name_get(event.thread_id) :
-					 "unknown",
-		       event.func, event.event_type);
+		       get_thread_name(event.thread_id), event.func,
+		       event.event_type);
 	}
 
 	k_spin_unlock(&rb_lock, key);

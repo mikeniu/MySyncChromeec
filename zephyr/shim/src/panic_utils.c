@@ -46,9 +46,7 @@ void print_stack_trace(const struct k_thread *thread)
 	uint32_t sp = 0;
 	struct arch_esf *esf = NULL;
 	bool is_current_thread = (thread == get_current_thread());
-	char thread_name[16];
-
-	get_thread_name(thread, thread_name, sizeof(thread_name));
+	const char *thread_name = get_thread_name(thread);
 
 	printk("Thread: %s%s, state=%s\n", is_current_thread ? "*" : "",
 	       thread_name,
@@ -63,15 +61,6 @@ void print_stack_trace(const struct k_thread *thread)
 		esf = NULL;
 	}
 	arch_stack_walk(print_trace_address, &frame_idx, thread, esf);
-}
-
-void get_thread_name(const struct k_thread *thread, char *name, size_t size)
-{
-#ifdef CONFIG_THREAD_NAME
-	snprintf(name, size, "%s", thread->name);
-#else
-	snprintf(name, size, "%p", thread);
-#endif
 }
 
 uint32_t get_stack_ptr(const struct k_thread *thread)

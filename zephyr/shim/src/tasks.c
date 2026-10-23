@@ -17,10 +17,6 @@
 
 LOG_MODULE_REGISTER(task_shim, LOG_LEVEL_INF);
 
-#define SAFE_THREAD_NAME(tid)                                           \
-	((tid) && k_thread_name_get((tid)) ? k_thread_name_get((tid)) : \
-					     "(unknown)")
-
 /* Ensure that the idle task is at lower priority than lowest priority task. */
 BUILD_ASSERT(EC_TASK_PRIORITY(EC_TASK_PRIO_LOWEST) < K_IDLE_PRIO,
 	     "CONFIG_NUM_PREEMPT_PRIORITIES too small, some tasks would run at "
@@ -149,7 +145,7 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 	}
 
 	LOG_ERR("Failed to map thread to task: thread_id=%p, name=%s",
-		thread_id, SAFE_THREAD_NAME(thread_id));
+		thread_id, get_thread_name(thread_id));
 
 	return TASK_ID_INVALID;
 }
