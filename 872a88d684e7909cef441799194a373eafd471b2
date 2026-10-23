@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26797e59_7996755b",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:19:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b56cab6a_ef222073",
+      "range": {
+        "startLine": 618,
+        "startChar": 0,
+        "endLine": 622,
+        "endChar": 9999
+      },
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b9c7a0_97baa06d",
@@ -66,6 +90,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1ae97b5_7e174640",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:19:10Z",
+      "side": 1,
+      "message": "removed the redundant release() calls, kept the one before wait_for_device.",
+      "parentUuid": "a2b9c7a0_97baa06d",
+      "range": {
+        "startLine": 630,
+        "startChar": 0,
+        "endLine": 664,
+        "endChar": 9999
+      },
       "revId": "872a88d684e7909cef441799194a373eafd471b2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -95,6 +143,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfb5774f_96bbe120",
+        "filename": "util/rts5817_flash_cli.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:19:10Z",
+      "side": 1,
+      "message": "Done in ps2: tellg() failure is now checked. Note that on /dev/null tellg() returns 0 rather than -1, so this is purely defensive and has no unit test.",
+      "parentUuid": "78790bb0_f6074ae0",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 9999
+      },
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbbc6eb9_3e98da73",
@@ -116,6 +188,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c43e9b52_ec49976b",
+        "filename": "util/rts5817_flash_cli.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:19:10Z",
+      "side": 1,
+      "message": "Done in ps2: dev_id stays empty by default and main() applies the default constants. DeviceIdDefaultsWhenOmitted is now DeviceIdEmptyWhenOmitted.",
+      "parentUuid": "fbbc6eb9_3e98da73",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 9999
+      },
       "revId": "872a88d684e7909cef441799194a373eafd471b2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -145,6 +241,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14ccac10_f3f5db9a",
+        "filename": "util/rts5817_flash_cli.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:19:10Z",
+      "side": 1,
+      "message": "Done in ps2: parse_vid_pid() rejects trailing characters and values above 0xFFFF.",
+      "parentUuid": "f48d608f_b315156c",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 9999
+      },
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74dbe1fc_1a276dd8",
@@ -166,6 +286,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "872a88d684e7909cef441799194a373eafd471b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6903056a_baebf82e",
+        "filename": "util/rts5817_flash_cli_test.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:19:10Z",
+      "side": 1,
+      "message": "Done in ps2: added the trailing garbage and overflow cases.",
+      "parentUuid": "74dbe1fc_1a276dd8",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 9999
+      },
       "revId": "872a88d684e7909cef441799194a373eafd471b2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
