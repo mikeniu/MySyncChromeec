@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "97471bc4_fc42005a",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-23T11:31:39Z",
+      "side": 1,
+      "message": "I do not think it will change the size of the struct due to the alignment it will just have two trailing bytes. I can do it to leave some space for potential future extensions.",
+      "parentUuid": "e86b0ea7_c9913654",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "87f78a80_14ce41da",
         "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
         "patchSetId": 1
@@ -53,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "94fb2123_d43796ad",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-23T11:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "726c3337_41a095ab",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf291d87_acece871",
@@ -70,6 +106,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93ae2ede_74cebbd5",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-23T11:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf291d87_acece871",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76253f85_e08c301b",
@@ -83,6 +137,30 @@
       "writtenOn": "2026-10-21T14:11:32Z",
       "side": 1,
       "message": "add braces, that\u0027s the convention for code under zephyr/",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 31
+      },
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cba064bc_22e78ebb",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-23T11:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76253f85_e08c301b",
       "range": {
         "startLine": 44,
         "startChar": 0,
@@ -116,6 +194,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2b9ad70_e0a4ea69",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-23T11:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10352b79_05c9548a",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 2
+      },
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7fa72f02_caae5006",
@@ -133,6 +235,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ab90fc1_0397bd86",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-23T11:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fa72f02_caae5006",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fcddac3_dc116b79",
@@ -146,6 +266,24 @@
       "writtenOn": "2026-10-21T14:11:32Z",
       "side": 1,
       "message": "is it referred as `poff` in some datasheet specifically? otherwise I\u0027d go for the full name, you have `power-good`, just use `power-off-delay-ms`",
+      "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36c39f9a_d3bd09a6",
+        "filename": "zephyr/dts/bindings/switchcap/cros-ec,switchcap.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-23T11:31:39Z",
+      "side": 1,
+      "message": "No, it was used only within the driver. Changed.",
+      "parentUuid": "1fcddac3_dc116b79",
       "revId": "2f5059edc5ab2b06d95be2da39e855653615729d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
