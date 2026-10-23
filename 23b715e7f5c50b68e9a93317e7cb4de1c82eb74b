@@ -1,0 +1,46 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d436a7be_ed53182b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T00:05:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the blocking issues before submitting.\n\n### Review Summary\n- **Functionality, Architecture \u0026 Component Fit, Code Simplicity, Idiomaticity \u0026 Readability, Security, CL Size \u0026 Scope, Commit Message**: The fix in `charger_profile_override_common()` properly applies bitwise negation (`~BATT_FLAG_BAD_TEMPERATURE` and `~BATT_FLAG_BAD_VOLTAGE`) when clearing the simulated bad-temperature and bad-voltage flags under `CONFIG_CMD_CHARGER_PROFILE_OVERRIDE_TEST`, preventing other active flags in `curr-\u003ebatt.flags` (such as `BATT_FLAG_RESPONSIVE` and `BATT_FLAG_WANT_CHARGE`) from being wiped out. The change (`Size: XS (+2, -2)`) is minimal, idiomatic, free of security issues, and accompanied by a clear commit message.\n- **Testing**: `common/charger_profile_override.c` currently has no automated unit test coverage, and the CL only lists `TEST\u003dmake buildall -j`. Please add a host unit test exercising `charger_profile_override_common()` under `CONFIG_CMD_CHARGER_PROFILE_OVERRIDE_TEST` across the `test_flag_temp` and `test_flag_vtg` branches (see inline comment on `common/charger_profile_override.c`).\n\n[🔗](http://go/tj/4fd7473e-d9e7-4aee-9057-6e6baac17d9e)",
+      "isAi": true,
+      "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ad2fe44_d88fd456",
+        "filename": "common/charger_profile_override.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T00:05:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please add a host unit test covering `charger_profile_override_common()` under `CONFIG_CMD_CHARGER_PROFILE_OVERRIDE_TEST` so that both branches of `test_flag_temp` and `test_flag_vtg` are verified and regressions that clobber unrelated bits in `curr-\u003ebatt.flags` are caught automatically.\n\nFor example, you can add `test/charger_profile_override.c` (with `CONFIG_CHARGER_PROFILE_OVERRIDE_COMMON`, `CONFIG_CHARGER_PROFILE_VOLTAGE_RANGES 2`, and `CONFIG_CMD_CHARGER_PROFILE_OVERRIDE_TEST` enabled in `test/test_config.h` and `test/build.mk`):\n\n```c\n#include \"battery.h\"\n#include \"charge_state.h\"\n#include \"charger_profile_override.h\"\n#include \"common.h\"\n#include \"console.h\"\n#include \"test_util.h\"\n\nstatic const struct fast_charge_profile test_profiles[] \u003d {\n\t{\n\t\t.temp_c \u003d TEMPC_TENTHS_OF_DEG(20),\n\t\t.current_mA \u003d { 1000, 500 },\n\t},\n\t{\n\t\t.temp_c \u003d CHARGER_PROF_TEMP_C_LAST_RANGE,\n\t\t.current_mA \u003d { 2000, 1500 },\n\t},\n};\n\nstatic const struct fast_charge_params test_params \u003d {\n\t.total_temp_ranges \u003d ARRAY_SIZE(test_profiles),\n\t.default_temp_range_profile \u003d 0,\n\t.voltage_mV \u003d { 4100, CHARGER_PROF_VOLTAGE_MV_LAST_RANGE },\n\t.chg_profile_info \u003d test_profiles,\n};\n\ntest_static int test_fastcharge_test_flags(void)\n{\n\tconst struct fast_charge_profile *prev_prof \u003d \u0026test_profiles[0];\n\tstruct charge_state_data curr \u003d {\n\t\t.state \u003d ST_CHARGE,\n\t};\n\n\t/*\n\t * Verify clearing both bad-reading flags (0, 0) removes only\n\t * BATT_FLAG_BAD_TEMPERATURE and BATT_FLAG_BAD_VOLTAGE while preserving\n\t * other battery status flags.\n\t */\n\tcurr.batt.flags \u003d BATT_FLAG_RESPONSIVE | BATT_FLAG_WANT_CHARGE |\n\t\t\t  BATT_FLAG_BAD_TEMPERATURE | BATT_FLAG_BAD_VOLTAGE;\n\tTEST_EQ(test_send_console_command(\"fastchgtest on 0 0 20 4000\"),\n\t\tEC_SUCCESS, \"%d\");\n\tTEST_EQ(charger_profile_override_common(\u0026curr, \u0026test_params, \u0026prev_prof,\n\t\t\t\t\t\t8800),\n\t\t0, \"%d\");\n\tTEST_BITS_CLEARED(curr.batt.flags,\n\t\t\t  BATT_FLAG_BAD_TEMPERATURE | BATT_FLAG_BAD_VOLTAGE);\n\tTEST_BITS_SET(curr.batt.flags,\n\t\t      BATT_FLAG_RESPONSIVE | BATT_FLAG_WANT_CHARGE);\n\tTEST_EQ(curr.requested_current, 1000, \"%d\");\n\n\t/*\n\t * Verify setting BATT_FLAG_BAD_TEMPERATURE (1, 0) while clearing\n\t * BATT_FLAG_BAD_VOLTAGE preserves existing flags and keeps prev_prof.\n\t */\n\tcurr.batt.flags \u003d BATT_FLAG_RESPONSIVE | BATT_FLAG_BAD_VOLTAGE;\n\tTEST_EQ(test_send_console_command(\"fastchgtest on 1 0 30 4000\"),\n\t\tEC_SUCCESS, \"%d\");\n\tTEST_EQ(charger_profile_override_common(\u0026curr, \u0026test_params, \u0026prev_prof,\n\t\t\t\t\t\t8800),\n\t\t0, \"%d\");\n\tTEST_BITS_SET(curr.batt.flags,\n\t\t      BATT_FLAG_RESPONSIVE | BATT_FLAG_BAD_TEMPERATURE);\n\tTEST_BITS_CLEARED(curr.batt.flags, BATT_FLAG_BAD_VOLTAGE);\n\tTEST_EQ(curr.requested_current, 1000, \"%d\");\n\n\t/*\n\t * Verify clearing BATT_FLAG_BAD_TEMPERATURE and setting\n\t * BATT_FLAG_BAD_VOLTAGE (0, 1) selects the highest voltage range.\n\t */\n\tTEST_EQ(test_send_console_command(\"fastchgtest on 0 1 30 4000\"),\n\t\tEC_SUCCESS, \"%d\");\n\tTEST_EQ(charger_profile_override_common(\u0026curr, \u0026test_params, \u0026prev_prof,\n\t\t\t\t\t\t8800),\n\t\t0, \"%d\");\n\tTEST_BITS_CLEARED(curr.batt.flags, BATT_FLAG_BAD_TEMPERATURE);\n\tTEST_BITS_SET(curr.batt.flags,\n\t\t      BATT_FLAG_RESPONSIVE | BATT_FLAG_BAD_VOLTAGE);\n\tTEST_EQ(curr.requested_current, 1500, \"%d\");\n\n\tTEST_EQ(test_send_console_command(\"fastchgtest off\"), EC_SUCCESS, \"%d\");\n\treturn EC_SUCCESS;\n}\n\nvoid run_test(int argc, const char **argv)\n{\n\ttest_reset();\n\tRUN_TEST(test_fastcharge_test_flags);\n\ttest_print_result();\n}\n```\n\n[🔗](http://go/tj/4fd7473e-d9e7-4aee-9057-6e6baac17d9e)",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
