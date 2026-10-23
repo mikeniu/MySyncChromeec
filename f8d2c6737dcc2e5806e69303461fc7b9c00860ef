@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c667ef5_5ae870a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-10-23T03:20:26Z",
+      "side": 1,
+      "message": "src/platform/ec/include/cros_version.h still [asserts](https://source.chromium.org/chromiumos/_/chromium/chromiumos/platform/ec/+/b11b890b5e56f7181bdca9e78f39359532b048c1:include/cros_version.h;l\u003d48;bpv\u003d1;bpt\u003d0;drc\u003ddce3480b76cc821862bf61dfaf9421e9601e048a) some offset for swap_ec_rw. Are the assertions used by futility, too?",
+      "revId": "f8d2c6737dcc2e5806e69303461fc7b9c00860ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdb50f29_af600050",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-10-23T03:20:26Z",
+      "side": 1,
+      "message": "{ec_rw_dut_path}",
+      "range": {
+        "startLine": 308,
+        "startChar": 39,
+        "endLine": 308,
+        "endChar": 72
+      },
+      "revId": "f8d2c6737dcc2e5806e69303461fc7b9c00860ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b2cc8d2_e0de2c02",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-10-23T03:20:26Z",
+      "side": 1,
+      "message": "f\"{cfg_dut_path}\"",
+      "range": {
+        "startLine": 309,
+        "startChar": 16,
+        "endLine": 309,
+        "endChar": 55
+      },
+      "revId": "f8d2c6737dcc2e5806e69303461fc7b9c00860ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
