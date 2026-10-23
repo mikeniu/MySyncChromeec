@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8375be70_a74f079c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:49:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality**: `charger_profile_override_common()` now applies bitwise negation (`~BATT_FLAG_BAD_TEMPERATURE` and `~BATT_FLAG_BAD_VOLTAGE`) when clearing the simulated bad-reading flags under `CONFIG_CMD_CHARGER_PROFILE_OVERRIDE_TEST`, preserving other active bits in `curr-\u003ebatt.flags`.\n- **Architecture \u0026 Component Fit**: The fix is in the right layer (`common/charger_profile_override.c`), and the host unit test and build configuration (`test/charger_profile_override.c`, `test/charger_profile_override.tasklist`, `test/build.mk`, and `test/test_config.h`) follow standard ChromiumOS EC host test conventions.\n- **Code Simplicity**: Both the production fix and the unit test helper (`run_cmd`, which copies the command string into a mutable stack buffer before `test_send_console_command()` tokenizes it in place) are minimal and direct.\n- **Idiomaticity \u0026 Readability**: Uses standard ChromiumOS EC macros (`ARRAY_SIZE`, `TEMPC_TENTHS_OF_DEG`, `CHARGER_PROF_TEMP_C_LAST_RANGE`, `CHARGER_PROF_VOLTAGE_MV_LAST_RANGE`, `TEST_EQ`, `TEST_BITS_SET`, `TEST_BITS_CLEARED`, `strzcpy`) and designated initializers cleanly.\n- **Security**: No security concerns; the test flag logic is gated behind `CONFIG_CMD_CHARGER_PROFILE_OVERRIDE_TEST` and buffer copies in the unit test are bounds-checked via `strzcpy`.\n- **Testing**: `test/charger_profile_override.c` covers both branches of `test_flag_temp` and `test_flag_vtg` (`(0, 0)`, `(1, 0)`, and `(0, 1)`), verifying that target flags are set/cleared while unrelated flags (`BATT_FLAG_RESPONSIVE`, `BATT_FLAG_WANT_CHARGE`) are preserved and the expected charging current is selected.\n- **CL Size \u0026 Scope**: `Size: M (+116, -2)` (2 production lines modified in `common/charger_profile_override.c` and 114 lines of host unit test and test configuration). Focused on a single cohesive logical change.\n- **Commit Message**: Clear, accurate subject and body explaining the bug and fix, with valid `BUG\u003db:573997780`, `TEST\u003dmake run-charger_profile_override -j`, and `Change-Id` tags.\n\n[🔗](http://go/tj/552b6878-4bf5-4889-9aab-dec17bd17f24)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1e15b53fff511720bf5580831427ee27cfce810e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
