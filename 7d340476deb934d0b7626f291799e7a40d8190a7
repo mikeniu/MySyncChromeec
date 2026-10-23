@@ -16,6 +16,24 @@
       "message": "/tmp/tmpc4a_rbdc/shadow/src/platform/ec/zephyr/test/bluey/tests/pic/src/test_fan.c:27:28: error: invalid application of \u0027sizeof\u0027 to an incomplete type \u0027struct fan_data[]\u0027\n   27 |         memset(fan_data, 0, sizeof(fan_data));\n      |                                   ^~~~~~~~~~\n1 error generated.\n[174/213] Building C object CMakeFiles/app.dir/tmp/tmpc4a_rbdc/shadow/src/platform/ec/zephyr/program/bluey/pic/src/fan.c.obj\nninja: build stopped: subcommand failed.",
       "revId": "7d340476deb934d0b7626f291799e7a40d8190a7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de883a2f_21d94fe8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-23T01:27:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b8620ba_e8cfb4cf",
+      "revId": "7d340476deb934d0b7626f291799e7a40d8190a7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
