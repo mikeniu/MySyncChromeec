@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "859d4fc7_92bef87c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:59:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Unconditionally calling `watchdog_reload()` after each sector erase in `crec_flash_physical_erase()` prevents watchdog timeouts on non-KGD parts (`IT8320`) and on erase chunks `\u003c\u003d 64 KB`, while switching from `interrupt_disable()`/`interrupt_enable()` to `irq_lock()`/`irq_unlock()` ensures `watchdog_reload()`\u0027s internal `irq_lock()`/`irq_unlock()` pair does not prematurely re-enable interrupts on the first sector iteration.\n* **Architecture \u0026 Component Fit:** ✅ Uses the standard `irq_lock()`/`irq_unlock()` and `watchdog_reload()` APIs consistently with the rest of `platform/ec`.\n* **Code Simplicity:** ✅ Simplifies `crec_flash_physical_erase()` by removing the flawed `IS_ENABLED(IT83XX_CHIP_FLASH_IS_KGD) \u0026\u0026 (size \u003e 0x10000)` guard.\n* **Idiomaticity \u0026 Readability:** ✅ Follows local C conventions and removes the hardcoded `0x10000` size threshold.\n* **Security:** ✅ No security vulnerabilities introduced; prevents unexpected mid-erase watchdog resets and premature interrupt enabling during EC-indirect flash access.\n* **Testing:** ✅ Hardware-specific physical flash erase and watchdog behavior on IT83xx/IT8xxx2 MMIO registers (`FLASH_DMA_CODE`) is verified on physical hardware (`TEST\u003dApply patch and verify flash erase on IT83xx/IT8xxx2`).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+4, -8)` — Single cohesive bug fix in `crec_flash_physical_erase()`.\n* **Commit Message:** ✅ Clear, accurate, and well-structured subject line, rationale, and footers (`BUG\u003db:574033009`, `TEST\u003d...`, `Change-Id`).\n\n[[trajectory](https://goto.corp.google.com/traj/45885d03-0379-48ca-a200-d0edd702c17e)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "92bf5d1012c14efb516d09e8a6748314be7a831b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
