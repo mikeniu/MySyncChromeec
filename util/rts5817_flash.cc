@@ -16,6 +16,7 @@
 
 #include <libusb-1.0/libusb.h>
 #include <unistd.h>
+#include <vector>
 
 /* ---------------------------------------------------------------------------
  * Constants
@@ -29,6 +30,17 @@ constexpr uint16_t kRtsEnableDownloadMode = 1;
 
 /* DFU class-specific requests (bmRequestType = 0x21 or 0xA1) */
 constexpr uint8_t kDfuDetach = 0x00;
+constexpr uint8_t kDfuGetStatus = 0x03;
+constexpr uint8_t kDfuClrStatus = 0x04;
+
+/* DFU_GETSTATUS response: bStatus, bwPollTimeout[3], bState, iString */
+constexpr size_t kDfuGetStatusResponseLen = 6;
+
+/* DFU states (from USB DFU spec) */
+constexpr uint8_t kDfuStateDfuIdle = 2;
+constexpr uint8_t kDfuStateDfuDnloadIdle = 5;
+constexpr uint8_t kDfuStateDfuManifestWaitReset = 8;
+constexpr uint8_t kDfuStateDfuError = 10;
 
 /* DFU descriptor type */
 constexpr uint8_t kDfuDescriptorType = 0x21;
@@ -52,9 +64,11 @@ constexpr uint8_t kDfuSubclass = 0x01;
 constexpr uint8_t kBmReqD2hStdDev = 0x80;
 constexpr uint8_t kBmReqH2dStdDev = 0x00;
 constexpr uint8_t kBmReqH2dClsIf = 0x21;
+constexpr uint8_t kBmReqD2hClsIf = 0xA1;
 
 /* USB I/O timeouts */
 constexpr unsigned int kUsbCtrlTimeoutMs = 1000;
+constexpr unsigned int kUsbDfuTimeoutMs = 60000;
 
 /* Default transfer size if we cannot parse the DFU functional descriptor */
 constexpr uint16_t kDfuDefaultTransferSize = 1024;
@@ -112,6 +126,17 @@ class RtsUsbDevice {
 
 	/* Find the DFU interface and parse the DFU functional descriptor. */
 	bool find_dfu_interface();
+
+	/**
+	 * Poll DFU_GETSTATUS until the device is not busy.
+	 * Return: true if device reaches dfuIDLE or dfuDNLOAD_IDLE.
+	 */
+	bool dfu_poll_idle();
+
+	/**
+	 * Clear DFU error status (DFU_CLRSTATUS).
+	 */
+	bool dfu_clear_status();
 
 	libusb_device_handle *dev_handle_;
 	libusb_context *ctx_;
@@ -335,5 +360,104 @@ bool RtsUsbDevice::find_dfu_interface()
 		return false;
 	}
 
+	return true;
+}
+
+bool RtsUsbDevice::dfu_poll_idle()
+{
+	/*
+	 * Use a generous timeout (60 s) for the overall polling, since the
+	 * manifest phase (flash programming) can take tens of seconds.
+	 */
+	int timeout = kUsbDfuTimeoutMs;
+	int slept = 0;
+
+	while (slept < timeout) {
+		/*
+		 * bmRequestType = 0xA1: Device-to-Host, Class, Interface
+		 * bRequest = kDfuGetStatus (0x03)
+		 * Data (6 bytes): bStatus, bwPollTimeout[3], bState, iString
+		 */
+		uint8_t response[kDfuGetStatusResponseLen];
+		int ret = libusb_control_transfer(
+			dev_handle_, kBmReqD2hClsIf, kDfuGetStatus, 0,
+			static_cast<uint16_t>(dfu_interface_), response,
+			sizeof(response), kUsbDfuTimeoutMs);
+
+		if (ret < static_cast<int>(kDfuGetStatusResponseLen)) {
+			fprintf(stderr, "DFU_GETSTATUS failed: %s\n",
+				ret < 0 ? libusb_error_name(ret) : "short read");
+			return false;
+		}
+
+		uint8_t bStatus = response[0];
+		uint32_t poll_timeout = response[1] | (response[2] << 8) |
+					(response[3] << 16);
+		uint8_t bState = response[4];
+
+		/* Transition to sleep after processing the state. */
+		int delay_ms = (poll_timeout > 0) ?
+				       static_cast<int>(poll_timeout) :
+				       1;
+
+		switch (bState) {
+		case kDfuStateDfuIdle:
+		case kDfuStateDfuDnloadIdle:
+			/* Terminal success states. */
+			return true;
+
+		case kDfuStateDfuError:
+			fprintf(stderr, "DFU error: bStatus=%d, bState=%d\n",
+				bStatus, bState);
+			return false;
+
+		case kDfuStateDfuManifestWaitReset:
+			/*
+			 * Device completed manifest and requests a USB reset.
+			 * Try issuing one; this may invalidate the device
+			 * handle (if the device re-enumerates), which is OK.
+			 */
+			printf("Device requests USB reset after manifest.\n");
+			libusb_reset_device(dev_handle_);
+			return true;
+
+		default:
+			/*
+			 * Transient / busy states:
+			 *   DFU_DNLOAD_SYNC  (3)  — download request received
+			 *   DFU_DNLOAD_BUSY  (4)  — programming memory
+			 *   DFU_MANIFEST_SYNC (6) — ZLP received, enter
+			 * manifest DFU_MANIFEST      (7) — programming
+			 * completed, waiting for reset / done
+			 *
+			 * Sleep for the suggested poll interval and retry.
+			 */
+			break;
+		}
+
+		usleep(delay_ms * 1000);
+		slept += delay_ms;
+	}
+
+	fprintf(stderr, "Timed out waiting for DFU idle state.\n");
+	return false;
+}
+
+bool RtsUsbDevice::dfu_clear_status()
+{
+	/*
+	 * bmRequestType = 0x21: Host-to-Device, Class, Interface
+	 * bRequest = kDfuClrStatus (0x04)
+	 */
+	int ret = libusb_control_transfer(dev_handle_, kBmReqH2dClsIf,
+					  kDfuClrStatus, 0,
+					  static_cast<uint16_t>(dfu_interface_),
+					  nullptr, 0, kUsbCtrlTimeoutMs);
+
+	if (ret < 0) {
+		fprintf(stderr, "DFU_CLRSTATUS failed: %s\n",
+			libusb_error_name(ret));
+		return false;
+	}
 	return true;
 }
