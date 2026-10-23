@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a49290d_3d1046bb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:11:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Replace the numbered function-by-function diff narration with a concise prose paragraph summarizing *why* unchecked `raw_read16()` calls were problematic and *what* changed conceptually (or split into focused commits per function as noted in the review summary):\n\n**Option A (if kept as a single CL):**\n```text\nisl923x: Check raw_read16 errors in RAA489000 charger handlers\n\nSeveral RAA489000 charger callbacks in driver/charger/isl923x.c did not\ncheck the return status of raw_read16() before using the read value,\ncausing I2C read failures to report current calculated from an\nuninitialized stack variable or write uninitialized/stale values back to\nprimary charger control registers.\n\nCheck raw_read16() errors in raa489000_get_actual_current() and\nraa489000_enable_linear_charge(), and use raw_update16() in\nraa489000_set_vsys_compensation() so failed reads abort before modifying\nor writing back register state.\n\nBUG\u003db:573999103\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.isl923x -s drivers.raa489000\n\nChange-Id: Iacf5a3dffacdc03bb82e3f9a0296fb6103bb6c6b\n```\n\n**Option B (if split into independent CLs per function):**\n- **CL 1:**\n```text\nisl923x: Check raw_read16 error in raa489000_get_actual_current\n\nraa489000_get_actual_current() did not check the return status of\nraw_read16() before scaling the register value, causing I2C read\nfailures to populate the output current from an uninitialized stack\nvariable. Return early on read error to match isl923x_get_current() and\nraa489000_get_actual_voltage().\n\nBUG\u003db:573999103\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.isl923x -s drivers.raa489000\n```\n- **CL 2:**\n```text\nisl923x: Check raw_read16 error in raa489000_enable_linear_charge\n\nraa489000_enable_linear_charge() wrote ISL923X_REG_CONTROL2 back to the\nprimary charger even when reading its current value failed, corrupting\nthe register with an uninitialized stack variable. Only modify and write\nISL923X_REG_CONTROL2 when raw_read16() succeeds.\n\nBUG\u003db:573999103\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.isl923x -s drivers.raa489000\n```\n- **CL 3:**\n```text\nisl923x: Avoid writing CONTROL10 on read error in set_vsys_compensation\n\nraa489000_set_vsys_compensation() unconditionally wrote\nRAA489000_REG_CONTROL10 on the primary charger even when reading its\ncurrent value failed, overwriting it with the secondary charger register\nvalue. Use raw_update16() so the register is only written when the read\nsucceeds.\n\nBUG\u003db:573999103\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.isl923x -s drivers.raa489000\n```\n\n[🔗](http://go/tj/345dc698-67d3-4c2c-9623-427f20348fd3)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5083cb065e1f08053335a5971f78a967ecf01165",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be2b8202_d24dd80b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:11:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please address inline comments.**\n\n### Review Summary\n\n* **Functionality**: The three changes in `driver/charger/isl923x.c` properly prevent propagating or writing back uninitialized/stale I2C register values when `raw_read16()` fails in `raa489000_get_actual_current()`, `raa489000_enable_linear_charge()`, and `raa489000_set_vsys_compensation()`.\n* **Architecture \u0026 Component Fit**: The error handling changes and emulator-based unit tests fit cleanly within the existing `isl923x`/`raa489000` charger driver and Zephyr `i2c_common_emul` test framework.\n* **Code Simplicity**: In `raa489000_set_vsys_compensation()` (`driver/charger/isl923x.c`, lines 1621–1626), the manual `raw_read16()` / `if (!rv)` / bitwise-OR / `raw_write16()` sequence duplicates the existing `raw_update16()` helper and should be replaced with `rv \u003d raw_update16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10, RAA489000_C10_ENABLE_DVC_CHARGE_MODE, MASK_SET);`, matching `raa489000_enable_linear_charge()`.\n* **Idiomaticity \u0026 Readability**: Aside from simplifying the read-modify-write in `raa489000_set_vsys_compensation()`, the C code follows the surrounding driver conventions cleanly.\n* **Security**: No security vulnerabilities or unsafe memory accesses were identified; checking `raw_read16()` return values prevents acting on uninitialized stack data (`int reg` in `raa489000_enable_linear_charge()`).\n* **Testing**: In `zephyr/test/drivers/raa489000/src/raa489000.c` (`test_charger_read_errors`, lines 144–189):\n  * Both `raa489000_enable_linear_charge()` and `raa489000_set_vsys_compensation()` already returned `EC_ERROR_UNKNOWN` when `raw_read16()` failed prior to this CL (because `rv` was non-zero from `raw_read16()` and `i2c_common_emul_set_read_fail_reg()` only fails reads, so the subsequent `raw_write16()` succeeded and `rv |\u003d 0` remained non-zero). To verify the actual fix—that a failed read does not trigger a write that corrupts `ISL923X_REG_CONTROL2` or `RAA489000_REG_CONTROL10`—the test should inspect the emulator registers via `isl923x_emul_peek_reg()`.\n  * Assertions should verify exact return codes (`zassert_equal(EC_ERROR_INVAL, ...)` instead of `zassert_not_equal(EC_SUCCESS, ...)`) and verify `zassert_equal(0, current)` when `get_actual_current` succeeds.\n* **CL Size \u0026 Scope**: `gerrit info` reports `Size: M (+91, -9)` (~17 production lines modified in `driver/charger/isl923x.c` and ~83 lines in test/devicetree/config files). While the total line count is small, the CL bundles three independently revertible bug fixes across three distinct `isl923x_drv` API methods (`get_actual_current`, `enable_linear_charge`, and `set_vsys_compensation`), enumerated as a 3-item list in the commit message. Consider splitting this into three focused CLs so each fix can be reviewed and reverted independently:\n  1. **CL 1**: `isl923x: Check raw_read16 return value in raa489000_get_actual_current` (`driver/charger/isl923x.c` lines 536–542 and the `get_actual_current` test case in `zephyr/test/drivers/raa489000/src/raa489000.c`).\n  2. **CL 2**: `isl923x: Use raw_update16 in raa489000_enable_linear_charge` (`driver/charger/isl923x.c` lines 971–993, `zephyr/test/drivers/raa489000/prj.conf`, and the `enable_linear_charge` test case in `zephyr/test/drivers/raa489000/src/raa489000.c`).\n  3. **CL 3**: `isl923x: Avoid writing RAA489000_REG_CONTROL10 on read failure in raa489000_set_vsys_compensation` (`driver/charger/isl923x.c` lines 1621–1626, `zephyr/test/drivers/raa489000/raa489000.dts`, and the `set_vsys_compensation` test case in `zephyr/test/drivers/raa489000/src/raa489000.c`).\n* **Commit Message**: The commit message body uses a 3-item numbered list that narrates the diff function-by-function using raw C expressions; see the inline comment on `/COMMIT_MSG` for a concise prose replacement.\n\n[🔗](http://go/tj/345dc698-67d3-4c2c-9623-427f20348fd3)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5083cb065e1f08053335a5971f78a967ecf01165",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a20d61ee_fa08316e",
+        "filename": "driver/charger/isl923x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 1626,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:11:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Use the existing `raw_update16()` helper here instead of open-coding the `raw_read16()` / `if (!rv)` / bitwise-OR / `raw_write16()` sequence.\n\n`raw_update16()` (defined at line 129 and already used for `RAA489000_REG_CONTROL10` in `raa489000_enable_linear_charge()` at lines 1469, 1504, and 1515) delegates to `i2c_update16()`, which checks the `i2c_read16()` return status and returns early on read failure before setting the mask and writing the register back:\n\n```c\n\t/* Lastly, enable DVC fast charge mode for the primary charger IC. */\n\trv \u003d raw_update16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10,\n\t\t\t  RAA489000_C10_ENABLE_DVC_CHARGE_MODE, MASK_SET);\n```\n\n[🔗](http://go/tj/345dc698-67d3-4c2c-9623-427f20348fd3)",
+      "range": {
+        "startLine": 1621,
+        "startChar": 0,
+        "endLine": 1626,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5083cb065e1f08053335a5971f78a967ecf01165",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9519c3bc_ca0aea41",
+        "filename": "zephyr/test/drivers/raa489000/src/raa489000.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:11:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Strengthen `test_charger_read_errors` so that it verifies registers are not overwritten on read failure and asserts exact expected outputs on both error and success paths:\n\n1. **Verify no register write occurs on read failure in `enable_linear_charge` and `set_vsys_compensation`:** Even without the fixes in `driver/charger/isl923x.c`, a failed `raw_read16()` already set `rv` to `EC_ERROR_INVAL` while the subsequent `raw_write16()` succeeded, causing both functions to return `EC_ERROR_UNKNOWN`. As written, `zassert_equal(EC_ERROR_UNKNOWN, ...)` passes even if the fixes in `raa489000_enable_linear_charge()` and `raa489000_set_vsys_compensation()` are reverted. Reset `primary_emul` registers before testing and assert via `isl923x_emul_peek_reg()` that `ISL923X_REG_CONTROL2` and `RAA489000_REG_CONTROL10` remain `0` when the respective read fails, and are updated as expected when the read succeeds.\n2. **Assert exact error code and output values:**\n   - Replace `zassert_not_equal(EC_SUCCESS, ...)` on line 164 with `zassert_equal(EC_ERROR_INVAL, ...)` to match the exact error returned by `i2c_common_emul_set_read_fail_reg()`.\n   - After `zassert_ok(isl923x_drv.get_actual_current(CHARGER_PRIMARY, \u0026current))` on line 184, assert the resulting value of `current` (`zassert_equal(0, current)`).\n   - Use distinct values for `.rsys_mo` / `.rbatt_mo` and `current_ma` / `voltage_mv` in `set_vsys_compensation()` calls rather than identical `50, 50` and `0, 0` pairs.\n\n```c\nZTEST(tcpc_raa489000, test_charger_read_errors)\n{\n\tconst struct emul *primary_emul \u003d\n\t\tEMUL_DT_GET(DT_NODELABEL(isl923x_emul));\n\tconst struct emul *sec_emul \u003d\n\t\tEMUL_DT_GET(DT_NODELABEL(isl923x_sec_emul));\n\tstruct i2c_common_emul_data *primary_common \u003d\n\t\temul_isl923x_get_i2c_common_data(primary_emul);\n\tstruct ocpc_data ocpc \u003d {\n\t\t.rsys_mo \u003d 52,\n\t\t.rbatt_mo \u003d 40,\n\t};\n\tint current \u003d -1;\n\n\tisl923x_emul_reset_registers(primary_emul);\n\tisl923x_emul_reset_registers(sec_emul);\n\tcharge_set_active_chg_chip(CHARGER_SECONDARY);\n\n\t/* Fail reading RAA489000_REG_ADC_CHARGE_CURRENT in get_actual_current */\n\ti2c_common_emul_set_read_fail_reg(primary_common,\n\t\t\t\t\t  RAA489000_REG_ADC_CHARGE_CURRENT);\n\tzassert_equal(EC_ERROR_INVAL,\n\t\t      isl923x_drv.get_actual_current(CHARGER_PRIMARY,\n\t\t\t\t\t\t     \u0026current));\n\tzassert_equal(current, -1);\n\n\t/* Fail reading ISL923X_REG_CONTROL2 in enable_linear_charge */\n\ti2c_common_emul_set_read_fail_reg(primary_common, ISL923X_REG_CONTROL2);\n\tzassert_equal(EC_ERROR_UNKNOWN,\n\t\t      isl923x_drv.enable_linear_charge(CHARGER_PRIMARY, true));\n\tzassert_equal(0, isl923x_emul_peek_reg(primary_emul,\n\t\t\t\t\t       ISL923X_REG_CONTROL2));\n\n\t/* Fail reading primary RAA489000_REG_CONTROL10 in set_vsys_compensation */\n\tisl923x_emul_reset_registers(primary_emul);\n\tisl923x_emul_set_device_id(sec_emul, RAA489000_DEV_ID_B0);\n\ti2c_common_emul_set_read_fail_reg(primary_common,\n\t\t\t\t\t  RAA489000_REG_CONTROL10);\n\tzassert_equal(EC_ERROR_UNKNOWN,\n\t\t      isl923x_drv.set_vsys_compensation(CHARGER_SECONDARY,\n\t\t\t\t\t\t\t\u0026ocpc, 1000, 4200));\n\tzassert_equal(0, isl923x_emul_peek_reg(primary_emul,\n\t\t\t\t\t       RAA489000_REG_CONTROL10));\n\n\ti2c_common_emul_set_read_fail_reg(primary_common,\n\t\t\t\t\t  I2C_COMMON_EMUL_NO_FAIL_REG);\n\tzassert_ok(isl923x_drv.get_actual_current(CHARGER_PRIMARY, \u0026current));\n\tzassert_equal(0, current);\n\tzassert_ok(isl923x_drv.enable_linear_charge(CHARGER_PRIMARY, true));\n\tzassert_not_equal(0, isl923x_emul_peek_reg(primary_emul,\n\t\t\t\t\t\t   ISL923X_REG_CONTROL2) \u0026\n\t\t\t\t     GENMASK(15, 13));\n\tzassert_equal(EC_ERROR_UNIMPLEMENTED,\n\t\t      isl923x_drv.set_vsys_compensation(CHARGER_SECONDARY,\n\t\t\t\t\t\t\t\u0026ocpc, 1000, 4200));\n\tzassert_not_equal(0, isl923x_emul_peek_reg(primary_emul,\n\t\t\t\t\t\t   RAA489000_REG_CONTROL10) \u0026\n\t\t\t\t     RAA489000_C10_ENABLE_DVC_CHARGE_MODE);\n}\n```\n\n[🔗](http://go/tj/345dc698-67d3-4c2c-9623-427f20348fd3)",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 189,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5083cb065e1f08053335a5971f78a967ecf01165",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
