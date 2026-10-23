@@ -3023,8 +3023,16 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 				SNK_ATTACHED_SYNC_CHARGE_MGR;
 			break;
 		case EVAL_PDO_OUTCOME_SEND_NEW_RDO:
-			/* A new RDO was sent. Wait for the PD contract to be
-			 * negotiated by the PDC. */
+			/* A new RDO was sent. Clear any stale
+			 * negotiated_power_level bit from before SET_RDO and
+			 * wait for the PD contract to be negotiated by the PDC.
+			 */
+			conn_status_change_bits.raw_value =
+				port->connector_status
+					.raw_conn_status_change_bits;
+			conn_status_change_bits.negotiated_power_level = 0;
+			port->connector_status.raw_conn_status_change_bits =
+				conn_status_change_bits.raw_value;
 			port->new_contract_timeout =
 				sys_timepoint_calc(NEW_CONTRACT_TIMEOUT);
 			port->snk_attached_local_state =

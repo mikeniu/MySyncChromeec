@@ -139,8 +139,14 @@ static void *sink_policy_setup(void)
 static int connect_sink(const struct pdc_fixture *pdc)
 {
 	union connector_status_t cs = { 0 };
+	union conn_status_change_bits_t change_bits = {
+		.connect_change = 1,
+		.supported_provider_caps = 1,
+		.negotiated_power_level = 1,
+	};
 
 	emul_pdc_configure_snk(pdc->emul_pdc, &cs);
+	cs.raw_conn_status_change_bits = change_bits.raw_value;
 	clear_partner_pdos(pdc->emul_pdc, SOURCE_PDO);
 	zassert_ok(emul_pdc_set_pdos(pdc->emul_pdc, SOURCE_PDO, PDO_OFFSET_0,
 				     ARRAY_SIZE(pdc->pdos), PARTNER_PDO,
@@ -196,6 +202,7 @@ static void test_sink_policy_helper(struct sink_policy_fixture *fixture,
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
+	zassert_equal(RDO_POS(connector_status.rdo), 3);
 
 	/* Verify correct RDO is selected on PORT0 */
 	zassert_ok(emul_pdc_get_rdo(fixture->pdc[port_num].emul_pdc, &rdo));
@@ -293,6 +300,7 @@ ZTEST_USER_F(sink_policy, test_sink_policy_attach_better_charger)
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
+	zassert_equal(RDO_POS(connector_status.rdo), 3);
 
 	/* Verify correct RDO is selected */
 	zassert_ok(emul_pdc_get_rdo(better_charger->emul_pdc, &rdo));
@@ -320,6 +328,7 @@ ZTEST_USER_F(sink_policy, test_sink_policy_attach_worse_charger)
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
+	zassert_equal(RDO_POS(connector_status.rdo), 3);
 
 	/* Verify worse charger sink path is disabled */
 	zassert_ok(pdc_power_mgmt_get_connector_status(worse_charger->port,
@@ -362,6 +371,7 @@ ZTEST_USER_F(sink_policy, test_sink_policy_detach_better_charger)
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
+	zassert_equal(RDO_POS(connector_status.rdo), 3);
 
 	/* Verify correct RDO is selected */
 	zassert_ok(emul_pdc_get_rdo(better_charger->emul_pdc, &rdo));
@@ -380,6 +390,7 @@ ZTEST_USER_F(sink_policy, test_sink_policy_detach_better_charger)
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
+	zassert_equal(RDO_POS(connector_status.rdo), 3);
 
 	/* Verify correct RDO is selected */
 	zassert_ok(emul_pdc_get_rdo(charger->emul_pdc, &rdo));
@@ -403,6 +414,7 @@ ZTEST_USER_F(sink_policy, test_sink_policy_detach_worse_charger)
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
+	zassert_equal(RDO_POS(connector_status.rdo), 3);
 
 	/* Verify worse charger sink path is disabled */
 	zassert_ok(pdc_power_mgmt_get_connector_status(worse_charger->port,
@@ -420,6 +432,7 @@ ZTEST_USER_F(sink_policy, test_sink_policy_detach_worse_charger)
 	zassert_equal(connector_status.connect_status, 1);
 	zassert_equal(connector_status.power_direction, 0);
 	zassert_equal(connector_status.sink_path_status, 1);
+	zassert_equal(RDO_POS(connector_status.rdo), 3);
 
 	/* Verify correct RDO is selected */
 	zassert_ok(emul_pdc_get_rdo(charger->emul_pdc, &rdo));
