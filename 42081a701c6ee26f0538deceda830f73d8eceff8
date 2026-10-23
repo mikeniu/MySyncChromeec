@@ -1,0 +1,39 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99b2b34b_df7add90",
+        "filename": "chip/stm32/usart_rx_dma.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-10-23T03:59:49Z",
+      "side": 1,
+      "message": "increment rx_overrun only when STM32_USART_SR_ORE is set",
+      "fixSuggestions": [
+        {
+          "fixId": "3fd336df_c04eb66e",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "chip/stm32/usart_rx_dma.c",
+              "range": {
+                "startLine": 85,
+                "startChar": 0,
+                "endLine": 86,
+                "endChar": 0
+              },
+              "replacement": "\t\t\tif (status \u0026 STM32_USART_SR_ORE)\n\t\t\t\tatomic_add((atomic_t *)\u0026(config-\u003estate-\u003erx_overrun),\n\t\t\t\t\t   1);\n"
+            }
+          ]
+        }
+      ],
+      "revId": "42081a701c6ee26f0538deceda830f73d8eceff8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
