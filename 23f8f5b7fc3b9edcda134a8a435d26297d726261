@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12f1f56b_1ff97bb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T09:32:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:** All issues from the previous patchset have been resolved. `parse_vid_pid()` now validates the consumed character length and `uint16_t` bounds, and `read_file()` guards against negative `tellg()` results.\n\n**Architecture \u0026 Component Fit:** Separating the CLI and file helpers into `rts5817_flash_cli.{h,cc}` cleanly decouples argument and file handling from the `libusb` device logic in `rts5817_flash.cc` and integrates with `utils-test` in `util/build.mk`.\n\n**Code Simplicity:** The redundant manual `device.release()` error-path calls and duplicate default VID:PID string have been removed, leaving linear guard-clause control flow in `main()`.\n\n**Idiomaticity \u0026 Readability:** Clean C++ usage with `constexpr` named constants, explicit unit suffixes on timeout constants (`Ms`), and RAII resource management.\n\n**Testing:** Unit tests in `rts5817_flash_cli_test.cc` cover option parsing, valid/malformed/overflow VID:PID strings, and binary file reading.\n\n**Security:** N/A\n\n**CL Size \u0026 Scope:** `Size: L (+428, -3)`. The non-test production delta is ~245 lines implementing a single cohesive logical change (the `rts5817_flash` CLI entry point and CLI/file helpers), with 182 lines of unit test coverage in `util/rts5817_flash_cli_test.cc` and `util/build.mk`.\n\n**Commit Message:** Concise two-paragraph summary explaining the motivation and scope of the tool and its unit tests, with proper `BUG\u003d` and `TEST\u003d` tags. [🔗](http://go/tj/09d8331a-47f2-48dd-a395-84d8665c1016)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "23f8f5b7fc3b9edcda134a8a435d26297d726261",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
