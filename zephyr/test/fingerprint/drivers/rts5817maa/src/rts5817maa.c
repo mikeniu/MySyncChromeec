@@ -32,6 +32,7 @@ FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_get_hwid, uint8_t *);
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_power_down);
 FAKE_VALUE_FUNC(rts_fp_return_t, rts5817maa_sensor_configure_detect,
 		       rts_detect_mode_t);
+FAKE_VALUE_FUNC(rts_finger_sts_t, rts5817maa_sensor_finger_status);
 
 struct rts5817maa_fixture {
 	const struct device *dev;
@@ -89,11 +90,13 @@ static void rts5817maa_before(void *f)
 	RESET_FAKE(rts5817maa_sensor_get_hwid);
 	RESET_FAKE(rts5817maa_sensor_power_down);
 	RESET_FAKE(rts5817maa_sensor_configure_detect);
+	RESET_FAKE(rts5817maa_sensor_finger_status);
 
 	rts5817maa_sensor_init_fake.return_val = RTS_FP_SUCCESS;
 	rts5817maa_sensor_get_hwid_fake.custom_fake = fake_get_hwid;
 	rts5817maa_sensor_power_down_fake.return_val = RTS_FP_SUCCESS;
 	rts5817maa_sensor_configure_detect_fake.return_val = RTS_FP_SUCCESS;
+	rts5817maa_sensor_finger_status_fake.return_val = RTS_FINGER_NONE;
 
 	callback_count = 0;
 	callback_dev = NULL;
@@ -387,4 +390,26 @@ ZTEST_F(rts5817maa, test_maintenance)
 	zassert_equal(fingerprint_maintenance(fixture->dev, buffer,
 					      sizeof(buffer)),
 		      0);
+}
+
+ZTEST_F(rts5817maa, test_finger_status_present)
+{
+	rts5817maa_sensor_finger_status_fake.return_val = RTS_FINGER_PRESENT;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_PRESENT);
+}
+
+ZTEST_F(rts5817maa, test_finger_status_none)
+{
+	rts5817maa_sensor_finger_status_fake.return_val = RTS_FINGER_NONE;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_NONE);
+}
+
+ZTEST_F(rts5817maa, test_finger_status_unmapped)
+{
+	rts5817maa_sensor_finger_status_fake.return_val =
+		(rts_finger_sts_t)(RTS_FINGER_PRESENT + 1);
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_NONE);
 }
