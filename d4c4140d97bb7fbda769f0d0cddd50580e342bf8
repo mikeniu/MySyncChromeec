@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06cc71df_bf7976b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 55
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:33:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for details.\n\n### Review Summary\n* **Functionality:** `fp_command_template_v0` properly blocks legacy v0 template uploads with `EC_HOST_CMD_ACCESS_DENIED` at entry when `fingerprint_auth_enabled()` is true.\n* **Architecture \u0026 Component Fit:** Placing the `fingerprint_auth_enabled()` guard at the beginning of `fp_command_template_v0` aligns with the existing fingerprint auth command handlers.\n* **Code Simplicity:** In `zephyr/test/fingerprint/task/src/fpsensor_template.cc`, calling `reset_session()` in `fpsensor_before()` clears `FP_ENC_STATUS_SEED_SET` and wipes `global_context.tpm_seed`, which forced moving `fp_seed_params` and `ec_cmd_fp_seed()` out of `fpsensor_setup()` to re-seed the TPM before every test case. Clearing `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` directly (`global_context.fp_encryption_status \u0026\u003d ~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;`) avoids modifying `fpsensor_setup()` or calling `reset_session()`.\n* **Idiomaticity \u0026 Readability:** In `zephyr/test/fingerprint/task/src/fpsensor_template.cc`, `void reset_session(void);` introduces a `.cc` forward declaration with a C-style `(void)` parameter list. Clearing `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` directly eliminates the need for this declaration.\n* **Security:** Blocking unauthenticated v0 template modification paths when fingerprint auth is active prevents arbitrary template injection and forces template operations through the v1 channel.\n* **Testing:** Both `test_fp_command_template_v0_disabled_under_auth` (`fpsensor_auth_commands.cc`) and `test_fp_template_v0_disabled_under_auth` (`fpsensor_template.cc`) verify that v0 requests are rejected with `EC_RES_ACCESS_DENIED` when fingerprint auth is enabled.\n* **CL Size \u0026 Scope:** `Size: M (+58, -8)` (9 production lines and 57 test lines). Tightly scoped to a single logical security change and its unit tests.\n* **Commit Message:** Accurately and concisely explains the security rationale and change.\n\n[🔗](http://go/tj/b88d3d29-195f-4ad9-ad38-4a5781efe861)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d4c4140d97bb7fbda769f0d0cddd50580e342bf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ac1a605_f4ca6c0f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 55
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:33:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Avoid adding a `.cc` forward declaration for `reset_session` (which also uses a C-style `(void)` parameter list in a C++ file).\n\nNo test in `fpsensor_template.cc` establishes an auth session or modifies `session_nonce`, `session_key`, or `global_context.tpm_seed`—`test_fp_template_v0_disabled_under_auth` only sets `FP_CONTEXT_STATUS_SESSION_ESTABLISHED`. Clearing `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` directly in `fpsensor_before` (or at the end of `test_fp_template_v0_disabled_under_auth`) removes the need for `reset_session()` here.\n\n[🔗](http://go/tj/b88d3d29-195f-4ad9-ad38-4a5781efe861)",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d4c4140d97bb7fbda769f0d0cddd50580e342bf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9edb7ece_b4d1ba98",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 55
+      },
+      "lineNbr": 1599,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:33:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Because `reset_session()` also clears `FP_ENC_STATUS_SEED_SET` and wipes `global_context.tpm_seed`, calling it in `fpsensor_before()` undoes the one-time TPM seed setup in `fpsensor_setup()` and forces moving `fp_seed_params` and `ec_cmd_fp_seed(NULL, \u0026fp_seed_params)` into `fpsensor_before()` to re-seed before every test case.\n\nSince `test_fp_template_v0_disabled_under_auth` only sets `FP_CONTEXT_STATUS_SESSION_ESTABLISHED`, keep `fp_seed_params` and `ec_cmd_fp_seed(NULL, \u0026fp_seed_params)` in `fpsensor_setup()` and clear `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` directly here (or at the end of `test_fp_template_v0_disabled_under_auth`, matching `test_fp_template_v1_busy` at line 342 and `test_fp_template_v1_overflow` at line 432):\n\n```cpp\n\tglobal_context.fp_encryption_status \u0026\u003d\n\t\t~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n```\n\nOther affected locations in this file:\n* **Lines 47–48:** Remove `void reset_session(void);`.\n* **Lines 1530–1558:** Keep `fp_seed_params` and `ec_cmd_fp_seed(NULL, \u0026fp_seed_params);` in `fpsensor_setup()`.\n\n[🔗](http://go/tj/b88d3d29-195f-4ad9-ad38-4a5781efe861)",
+      "range": {
+        "startLine": 1575,
+        "startChar": 0,
+        "endLine": 1599,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d4c4140d97bb7fbda769f0d0cddd50580e342bf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
