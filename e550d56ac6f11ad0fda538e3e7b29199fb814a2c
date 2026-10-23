@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb7ef925_a7e26d91",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:45:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Emits `fence.i` with a compiler memory clobber in `data_serialization_barrier()` when `IS_ENABLED(CHIP_CORE_RISCV)` is true and enables `_ZIFENCEI_EXTENSION\u003d_zifencei` for `it8xxx2` RISC-V builds so the instruction fetch pipeline is synchronized after flash instruction-cache resets (`dma_reset_immu()`) and PLL state transitions (`clock_ec_pll_ctrl()`).\n* **Architecture \u0026 Component Fit:** ✅ Matches existing RISC-V patterns in `core/riscv-rv32i/build.mk` and `chip/mt_scp/rv32i_common/` for enabling the `Zifencei` extension and issuing `fence.i`.\n* **Code Simplicity:** ✅ Minimal, direct 3-line addition with no unnecessary complexity.\n* **Idiomaticity \u0026 Readability:** ✅ Uses `IS_ENABLED(CHIP_CORE_RISCV)` consistently with the adjacent `IS_ENABLED(CHIP_CORE_NDS32)` check and introduces no magic values.\n* **Security:** ✅ No security concerns; prevents executing stale instruction cache entries after flash erase/write operations.\n* **Testing:** ✅ Low-level RISC-V inline assembly barrier (`fence.i`) and target `-march` toolchain flag (`_zifencei`) specific to physical `it8xxx2` hardware builds (`CHIP_CORE_RISCV`).\n* **CL Size \u0026 Scope:** ✅ `Size: XS (+3, -0)` — Single, atomic logical change; `_ZIFENCEI_EXTENSION\u003d_zifencei` in `chip/it83xx/build.mk` is directly required to assemble `fence.i` in `chip/it83xx/intc.h`.\n* **Commit Message:** ✅ Clear, accurate subject line, concise prose explaining the *Why* and *What*, and valid ChromiumOS `BUG\u003d`, `TEST\u003d`, and `Change-Id:` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/f2348b05-4ddf-435f-bd76-adff5cd2d463)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e550d56ac6f11ad0fda538e3e7b29199fb814a2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
