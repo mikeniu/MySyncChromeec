@@ -65,6 +65,11 @@ config HW_TEST_FLASH_PHYSICAL
 	depends on ZTEST
 	depends on FLASH
 
+config HW_TEST_FLASH_PRE_INIT_PROTECT
+	bool "Flash pre-init protect test"
+	depends on ZTEST
+	depends on PLATFORM_EC_FLASH_CROS
+
 config HW_TEST_FLASH_PROTECTION
 	bool "Flash protection test"
 	depends on ZTEST

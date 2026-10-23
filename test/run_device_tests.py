@@ -582,6 +582,7 @@ class Renode(Platform):
             "benchmark",  # TODO(b/567670801)
             "boringssl_crypto",  # TODO(b/556233130)
             "flash_physical",  # TODO(b/485314159)
+            "flash_pre_init_protect",  # TODO(b/485316223)
             "flash_protection",  # TODO(b/508240888)
             "flash_protection_rw",  # TODO(b/508240888)
             "fp_buffer_clear",  # TODO(b/556401798)
@@ -651,6 +652,7 @@ class Renode(Platform):
     def _skip_test_sanok(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
             "benchmark",  # TODO(b/537717577)
+            "flash_pre_init_protect",  # TODO(b/567678305)
             "flash_protection",  # TODO(b/567678305)
             "flash_protection_rw",  # TODO(b/567678305)
             "flash_write_protect",  # TODO(b/567678305)
@@ -875,6 +877,16 @@ class AllTests:
                 test_name="flash_protection_rw",
                 enable_hw_write_protect=True,
                 skip_for_ec_legacy=True,
+            ),
+            TestConfig(
+                test_name="flash_pre_init_protect",
+                imagetype_to_use=ImageType.RO,
+                toggle_power=True,
+                enable_hw_write_protect=True,
+                exclude_boards=[
+                    BUCCANEER,
+                    HELIPILOT,
+                ],
             ),
             TestConfig(
                 test_name="flash_write_protect",
