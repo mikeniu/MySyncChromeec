@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aa27623_60121b22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:18:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comment on `zephyr/test/drivers/default/src/motion_sense/motion_sense.c`.\n\n### Review Summary\n* **Functionality:** ✅ `BASE_ODR(sensor-\u003econfig[SENSOR_CONFIG_AP].odr) \u003e 0` in `motion_sense_fifo_stage_data()` properly masks out `ROUND_UP_FLAG` before comparing the AP ODR against `0`.\n* **Architecture \u0026 Component Fit:** ✅ Uses the existing `BASE_ODR()` macro consistently with `common/motion_sense.c`.\n* **Code Simplicity:** ⚠️ In `test_fifo_ap_interval`, the trailing `motion_sense_fifo_reset()` and `motion_sensors[0].config[SENSOR_CONFIG_AP].odr \u003d 200000` statements at the end of the test are redundant with the `motion_sense_test_before()` suite fixture and can be removed.\n* **Idiomaticity \u0026 Readability:** ✅ Clean and idiomatic C.\n* **Security:** ✅ No security concerns.\n* **Testing:** ⚠️ Please expand `test_fifo_ap_interval` to also cover `odr \u003d 0` (base ODR `0` without `ROUND_UP_FLAG`) and the `\u003e 0` boundary with `ROUND_UP_FLAG` set (`odr \u003d 1 | ROUND_UP_FLAG`) to verify that `ROUND_UP_FLAG` is masked out rather than inverted.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+9, -1)` — Single, focused logical bug fix with its unit test.\n* **Commit Message:** ✅ Clear, concise explanation of the problem and fix with appropriate `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/1634df75-70d9-4021-8c1e-3588866bac8e)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb497a582ff8e7ba3a759f76ea5744a7b705cf69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a956a689_28157d85",
+        "filename": "zephyr/test/drivers/default/src/motion_sense/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:18:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two improvements for this test block:\n\n1. **Test both `BASE_ODR(odr) \u003d\u003d 0` and the `BASE_ODR(odr) \u003d\u003d 1` boundary with `ROUND_UP_FLAG`:** Currently the test checks `odr \u003d 200000` (without `ROUND_UP_FLAG`) and `odr \u003d ROUND_UP_FLAG` (base ODR `0`), which would also pass if the condition were inverted to `!(odr \u0026 ROUND_UP_FLAG)`. Testing `odr \u003d 0` alongside `odr \u003d ROUND_UP_FLAG` and the minimal positive boundary `odr \u003d 1 | ROUND_UP_FLAG` verifies both the `0` and `1` boundaries of `BASE_ODR(odr) \u003e 0` and confirms that `ROUND_UP_FLAG` does not suppress interrupts when the base ODR is non-zero.\n2. **Remove redundant teardown at the end of the test:** `motion_sense_test_before()` (registered as the `ZTEST_SUITE` `before` hook) already calls `motion_sense_fifo_reset()`, `motion_sense_fifo_reset_needed_flags()`, and resets `motion_sensors[i].config[SENSOR_CONFIG_AP].odr` before each test runs, so the trailing `motion_sense_fifo_reset()` and `odr \u003d 200000` assignment at the end of this test have no effect.\n\n```c\n\t/* Base ODR of 0 (with or without ROUND_UP_FLAG) must not trigger AP interrupt */\n\tmotion_sensors[0].config[SENSOR_CONFIG_AP].odr \u003d 0;\n\tmotion_sense_fifo_stage_data(\u0026data, \u0026motion_sensors[0], 1, now + 20000);\n\tmotion_sense_fifo_commit_data();\n\tzassert_equal(motion_sense_fifo_interrupt_needed(), 0);\n\n\tmotion_sensors[0].config[SENSOR_CONFIG_AP].odr \u003d ROUND_UP_FLAG;\n\tmotion_sense_fifo_stage_data(\u0026data, \u0026motion_sensors[0], 1, now + 30000);\n\tmotion_sense_fifo_commit_data();\n\tzassert_equal(motion_sense_fifo_interrupt_needed(), 0);\n\n\t/* Non-zero base ODR with ROUND_UP_FLAG set must trigger AP interrupt */\n\tmotion_sensors[0].config[SENSOR_CONFIG_AP].odr \u003d 1 | ROUND_UP_FLAG;\n\tmotion_sense_fifo_stage_data(\u0026data, \u0026motion_sensors[0], 1, now + 40000);\n\tmotion_sense_fifo_commit_data();\n\tzassert_equal(motion_sense_fifo_interrupt_needed(), 1);\n```\n\n[🔗](http://go/tj/1634df75-70d9-4021-8c1e-3588866bac8e)",
+      "range": {
+        "startLine": 378,
+        "startChar": 0,
+        "endLine": 384,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb497a582ff8e7ba3a759f76ea5744a7b705cf69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
