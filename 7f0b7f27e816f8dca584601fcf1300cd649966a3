@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f57f5445_42cf4cac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:18:26Z",
+      "side": 1,
+      "message": "Done in ps2: reworded the commit message as suggested.",
+      "parentUuid": "05c70f55_f4c7a367",
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "850e5362_eb343efd",
@@ -35,6 +53,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL.\n\n### Review Summary\n**Functionality:** Looks solid. Correctly implements the DFU download state machine over libusb.\n**Architecture \u0026 Component Fit:** The logic fits appropriately within `RtsUsbDevice`.\n**Code Simplicity:** Mostly clean, though some C-style casts and manual min calculations can be modernized. See inline comments.\n**Idiomaticity \u0026 Readability:** A few magic numbers (like the 6-byte response length) should be extracted into constants.\n**Security:** No obvious security vulnerabilities found.\n**Testing:** ❌ Missing automated tests. The commit message notes tests are handled \"end to end by the last change in this series.\" Unless this code strictly requires physical hardware behavior that cannot be mocked or tested via an interface, automated coverage for the chunking logic and state transitions is required in this CL.\n**CL Size \u0026 Scope:** ❌ `Size: L (+251, -3)`. The production (non-test) diff is \u003e\u003d 250 lines (251 lines). Per the strict size guidelines, this CL must be split into smaller, independently reviewable changes.\n*Split Plan:*\n1. **CL 1:** Introduce DFU constants, `dfu_poll_idle`, and `dfu_clear_status` helpers.\n2. **CL 2:** Implement the core `dfu_download` logic and integrate the chunking/flashing loop.\n**Commit Message:** ❌ The commit message currently narrates the step-by-step implementation details. See inline comment on `/COMMIT_MSG` for a higher-level prose suggestion.\n[🔗](http://go/tj/cd258020-7626-472f-abae-17b404f127f1)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e643af5_77b39e90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:18:26Z",
+      "side": 1,
+      "message": "Split done: dfu_poll_idle and dfu_clear_status moved to a new CL (https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8637072), this CL now only adds dfu_download. No automated tests yet: the code is built on libusb control transfers, so testing needs a USB abstraction layer that can be mocked. Leaving this open; happy to do that as a follow-up if desired.",
+      "parentUuid": "850e5362_eb343efd",
       "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -64,6 +100,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccda0e95_b119d70b",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:18:26Z",
+      "side": 1,
+      "message": "Done in ps2 (the constant now lives in the new status helpers CL).",
+      "parentUuid": "4cce9783_70e4d9bc",
+      "range": {
+        "startLine": 379,
+        "startChar": 0,
+        "endLine": 379,
+        "endChar": 9999
+      },
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00b4b937_029d2a69",
@@ -89,6 +149,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d618f491_3a98a891",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:18:26Z",
+      "side": 1,
+      "message": "Done in ps2: now uses std::min.",
+      "parentUuid": "00b4b937_029d2a69",
+      "range": {
+        "startLine": 498,
+        "startChar": 0,
+        "endLine": 500,
+        "endChar": 9999
+      },
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fcd6c1a3_d901add7",
@@ -110,6 +194,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92d19e63_9c937608",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T09:18:26Z",
+      "side": 1,
+      "message": "Done in ps2: uses static_cast.",
+      "parentUuid": "fcd6c1a3_d901add7",
+      "range": {
+        "startLine": 538,
+        "startChar": 0,
+        "endLine": 538,
+        "endChar": 9999
+      },
       "revId": "7f0b7f27e816f8dca584601fcf1300cd649966a3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
