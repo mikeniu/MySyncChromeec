@@ -69,6 +69,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1620d6a6_b80182fc",
+        "filename": "test/system.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T00:07:39Z",
+      "side": 1,
+      "message": "Please avoid `#undef`-ing hardware register/config macros (`MPU_*`, `CONFIG_PROGRAM_MEMORY_BASE`, `CONFIG_RO_MEM_OFF`) and `#include \"../core/cortex-m/mpu.c\"` directly into `test/system.c`.\n\nDoing this has several side effects across the tree:\n1. **Host `#ifndef BOARD_HOST` directives in ARM production code**: Including `core/cortex-m/mpu.c` on `BOARD\u003dhost` requires wrapping `asm volatile(\"isb; dsb;\");` in `#ifndef BOARD_HOST` (lines 79 and 97) and changing `(uint32_t)\u0026__iram_text_start` to `(uintptr_t)\u0026__iram_text_start` (line 285, which still truncates the 64-bit host pointer when passed to `uint32_t addr` in `mpu_unlock_region()`).\n2. **Cross-architecture include paths in `test/build.mk`**: Requires `includes-y +\u003d core/cortex-m/include chip/npcx` for `host-system`.\n3. **Breaks `test-system` on real Cortex-M boards**: None of the stubs or `#include \"../core/cortex-m/mpu.c\"` in `test/system.c` or the `CONFIG_*` overrides in `test/test_config.h` are guarded by `#ifdef BOARD_HOST`, which causes duplicate symbol definitions (`panic`, `crec_flash_lock_mapped_storage`, `cpu_enable_caches`, and all of `core/cortex-m/mpu.c`) on board test builds.\n4. **Unnecessary NPCX stubs**: Enabling `CONFIG_EXTERNAL_STORAGE` in `test/test_config.h` pulls NPCX external-storage paths into `common/system.c`, forcing `test/system.c` to stub out `system_get_shrspi_image_copy()`, `system_get_lfw_address()`, `system_set_image_copy()`, `panic()`, and `crec_flash_lock_mapped_storage()`.\n\n### How to make this unit test idiomatic\n\nIn `core/cortex-m/mpu.c`, only 4 low-level functions touch `MPU_*` MMIO registers or `asm volatile(\"isb; dsb;\")`:\n* `mpu_update_region()`\n* `mpu_enable()`\n* `mpu_disable()`\n* `mpu_get_type()`\n\nAll higher-level functions (`mpu_protect_data_ram()`, `mpu_protect_code_ram()`, `mpu_config_region()`, `mpu_pre_init()`) go through those 4 accessors. You can structure the test cleanly using the EC mock framework (`common/mock/` + `.mocklist`):\n\n#### Option 1: Mock the `mpu.h` interface in `test/system.c` and test MPU regions in `test/mpu.c`\n1. **In `test/system.c` (host test for `common/system.c:system_disable_jump()`)**:\n   * Add a mock in `common/mock/mpu_mock.c` + `include/mock/mpu_mock.h` (registered in `common/mock/build.mk` under `mock-$(MOCK_MPU)+\u003dmpu_mock.o` and enabled via `MOCK(MPU)` in `test/system.mocklist` under `#ifdef BOARD_HOST`) for the functions `system_disable_jump()` calls (`mpu_get_type()`, `mpu_protect_data_ram()`, `mpu_protect_code_ram()` / `mpu_lock_ro_flash()` / `mpu_lock_rw_flash()`, `mpu_enable()`).\n   * Verify in `test/system.c` that `system_disable_jump()` configures and enables the MPU even when `system_is_locked() \u003d\u003d 0`. No `core/cortex-m/include` or `chip/npcx` include paths, register `#undef`s, or `CONFIG_EXTERNAL_STORAGE` stubs are needed.\n2. **In `test/mpu.c` (existing MPU unit test suite)**:\n   * Add the assertions for the 256 MB `REGION_CODE_RAM` / `REGION_CODE_RAM2` `MPU_ATTR_XN | MPU_ATTR_NO_NO` aperture, `system_is_locked()` gating of `ram_lock_config_lock_region()`, and `HOOK_SYSJUMP` to `test/mpu.c` (`test_mpu_protect_code_ram()` / `test_mpu_protect_data_ram()`).\n\n#### Option 2: Mark the 4 low-level register accessors `test_mockable`\nIf you want to run `core/cortex-m/mpu.c`\u0027s region calculation logic on `BOARD\u003dhost`:\n1. Mark `mpu_update_region()`, `mpu_enable()`, `mpu_disable()`, and `mpu_get_type()` as `test_mockable` in `core/cortex-m/mpu.c` (matching `test_mockable int mpu_lock_rollback(bool lock)` in `core/cortex-m/include/mpu.h:142`).\n2. Override those 4 functions in `common/mock/mpu_mock.c` (`MOCK(MPU)` in `.mocklist`) to record region configurations (`region`, `addr`, `size_bit`, `attr`, `enable`, `subregion_disable`) and MPU enable state in a `mock_mpu` struct.\n3. Drop `#ifndef BOARD_HOST` from `core/cortex-m/mpu.c`, remove the `#undef MPU_*` and `#include \"../core/cortex-m/mpu.c\"` block from `test/system.c`, and guard host-only test configs in `test/test_config.h` with `#ifdef BOARD_HOST`.",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "49a8c29a_90375035",
         "filename": "test/system.c",
         "patchSetId": 4
