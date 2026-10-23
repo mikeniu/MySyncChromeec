@@ -12,6 +12,8 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/syscon.h>
 
+#include <soc.h>
+
 /* TODO (b:179900857) Make this implementation not npcx specific. */
 
 static const struct device *mdc_dev = DEVICE_DT_GET(DT_NODELABEL(mdc));
@@ -59,6 +61,16 @@ void system_jump_to_booter(void)
 	static uint32_t flash_offset;
 	static uint32_t flash_used;
 	static uint32_t addr_entry;
+
+	/*
+	 * Mask all interrupts (PRIMASK = 1) before the Boot ROM overwrites
+	 * code RAM, and clear BASEPRI so interrupts are not priority-masked
+	 * in the target image.
+	 */
+	__disable_irq();
+	__set_BASEPRI(0);
+	__DSB();
+	__ISB();
 
 	/*
 	 * Get memory offset and size for RO/RW regions.
