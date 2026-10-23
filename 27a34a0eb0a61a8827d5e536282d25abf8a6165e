@@ -62,6 +62,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "302cb839_5306c1e2",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:09:05Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "30f291ad_356c073b",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 9999
+      },
+      "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45b63b72_6f28a5cf",
@@ -87,6 +111,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b448068_be751c31",
+        "filename": "zephyr/test/drivers/host_command_thread/src/test_flood.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:09:05Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "45b63b72_6f28a5cf",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 9999
+      },
+      "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b07b7c0d_4cddaaf6",
@@ -108,6 +156,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf705837_6167520a",
+        "filename": "zephyr/test/drivers/host_command_thread/src/test_flood.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:09:05Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "b07b7c0d_4cddaaf6",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 9999
+      },
       "revId": "27a34a0eb0a61a8827d5e536282d25abf8a6165e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
