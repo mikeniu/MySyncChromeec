@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f8dc9d3_d25cc052",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:53:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please add a unit test covering the `command_ble_hci_adv` bounds checks.\n\n### Review Summary\n\n* **Functionality:** ✅ Replacing `\u003e sizeof(...)` with `\u003e\u003d ARRAY_SIZE(...)` for `adverts`, `adv_params`, and `scans` in `command_ble_hci_adv()` properly restricts `adv`, `p`, and `scan_rsp` to valid element indices (`[0, 1]`).\n* **Architecture \u0026 Component Fit:** ✅ Input bounds validation is co-located at the point where console arguments are parsed in `command_ble_hci_adv()` and follows standard ChromiumOS EC console command conventions.\n* **Code Simplicity:** ✅ The fix is minimal and direct, changing only the three bounds comparisons without introducing unnecessary state or control flow.\n* **Idiomaticity \u0026 Readability:** ✅ Using `ARRAY_SIZE(...)` instead of `sizeof(...)` on pointer arrays is the idiomatic ChromiumOS EC construct and avoids hardcoded array bounds.\n* **Security:** ✅ Prevents out-of-bounds pointer reads from `adverts`, `adv_params`, `scans`, `adv_lengths`, and `scan_lengths` when handling `ble_hci_adv` console arguments.\n* **Testing:** ❌ Missing automated unit test coverage for `command_ble_hci_adv()` boundary conditions (`0`, `1`, `-1`, `2`, `3`, and non-numeric inputs for `adv`, `p`, and `scan_rsp`); see inline comment on `common/btle_hci_controller.c`.\n* **CL Size \u0026 Scope:** ✅ `Size: XS (+3, -3)`. Single, cohesive logical change fixing the array bounds checks in `command_ble_hci_adv()`.\n* **Commit Message:** ✅ Concise and accurate explanation of the problem and fix, with proper ChromiumOS `BUG\u003d` and `TEST\u003d` tags. [🔗](http://go/tj/8c3caada-9a16-414b-975a-f42ec5be2044)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bb68a733c7ff7baf24b69ff116ef85784a8f0bf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4849cb8_dfb8aaae",
+        "filename": "common/btle_hci_controller.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:53:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please add a host unit test covering the `command_ble_hci_adv` bounds checks on `adv`, `p`, and `scan_rsp`—including the valid boundary indices (`0` and `1`), negative values (`-1`), the exact upper boundary (`2`, where `\u003e\u003d ARRAY_SIZE(...)` rejects the index), out-of-bounds values (`3`), and non-numeric arguments.\n\n`common/btle_hci_controller.o` has no hardware register dependencies and can be built for `BOARD\u003dhost` by adding `common-$(CONFIG_BLUETOOTH_HCI_DEBUG)+\u003dbtle_hci_controller.o` in `common/build.mk`, enabling `CONFIG_BLUETOOTH_LE` and `CONFIG_BLUETOOTH_HCI_DEBUG` for the test in `test/test_config.h`, and stubbing the `ll_*` link-layer callbacks in a new `test/btle_hci_controller.c` test:\n\n```c\n/* Copyright 2026 The ChromiumOS Authors\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n#include \"bluetooth_le_ll.h\"\n#include \"common.h\"\n#include \"console.h\"\n#include \"test_util.h\"\n#include \"util.h\"\n\nstatic int adv_enable_calls;\n\nuint8_t ll_reset(void)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_read_buffer_size(uint8_t *return_params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_read_local_supported_features(uint8_t *return_params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_read_supported_states(uint8_t *return_params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_set_host_channel_classification(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_set_random_address(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_set_advertising_enable(uint8_t *params)\n{\n\tadv_enable_calls++;\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_set_adv_data(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_set_advertising_params(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_read_tx_power(void)\n{\n\treturn 0;\n}\n\nuint8_t ll_set_scan_response_data(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_read_remote_used_features(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_set_scan_enable(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_set_scan_params(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_clear_allow_list(void)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_read_allow_list_size(uint8_t *return_params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_add_device_to_allow_list(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_remove_device_from_allow_list(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_receiver_test(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_transmitter_test(uint8_t *params)\n{\n\treturn HCI_SUCCESS;\n}\n\nuint8_t ll_test_end(uint8_t *return_params)\n{\n\treturn HCI_SUCCESS;\n}\n\nstatic int run_cmd(const char *cmd)\n{\n\tchar buf[64];\n\n\tstrzcpy(buf, cmd, sizeof(buf));\n\treturn test_send_console_command(buf);\n}\n\ntest_static int test_command_ble_hci_adv_bounds(void)\n{\n\t/* Valid boundary indices (0 and ARRAY_SIZE - 1 \u003d\u003d 1) */\n\tadv_enable_calls \u003d 0;\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0\"), EC_SUCCESS, \"%d\");\n\tTEST_EQ(adv_enable_calls, 1, \"%d\");\n\n\tTEST_EQ(run_cmd(\"ble_hci_adv 1\"), EC_SUCCESS, \"%d\");\n\tTEST_EQ(adv_enable_calls, 2, \"%d\");\n\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 0\"), EC_SUCCESS, \"%d\");\n\tTEST_EQ(adv_enable_calls, 3, \"%d\");\n\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 1\"), EC_SUCCESS, \"%d\");\n\tTEST_EQ(adv_enable_calls, 4, \"%d\");\n\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 0 0\"), EC_SUCCESS, \"%d\");\n\tTEST_EQ(adv_enable_calls, 5, \"%d\");\n\n\tTEST_EQ(run_cmd(\"ble_hci_adv 1 1 1\"), EC_SUCCESS, \"%d\");\n\tTEST_EQ(adv_enable_calls, 6, \"%d\");\n\n\t/* Invalid adv (argv[1]): negative, exact boundary (2), above boundary (3), non-numeric */\n\tadv_enable_calls \u003d 0;\n\tTEST_EQ(run_cmd(\"ble_hci_adv -1\"), EC_ERROR_PARAM1, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 2\"), EC_ERROR_PARAM1, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 3\"), EC_ERROR_PARAM1, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv invalid\"), EC_ERROR_PARAM1, \"%d\");\n\tTEST_EQ(adv_enable_calls, 0, \"%d\");\n\n\t/* Invalid p (argv[2]): negative, exact boundary (2), above boundary (3), non-numeric */\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 -1\"), EC_ERROR_PARAM2, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 2\"), EC_ERROR_PARAM2, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 3\"), EC_ERROR_PARAM2, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 invalid\"), EC_ERROR_PARAM2, \"%d\");\n\tTEST_EQ(adv_enable_calls, 0, \"%d\");\n\n\t/* Invalid scan_rsp (argv[3]): negative, exact boundary (2), above boundary (3), non-numeric */\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 0 -1\"), EC_ERROR_PARAM3, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 0 2\"), EC_ERROR_PARAM3, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 0 3\"), EC_ERROR_PARAM3, \"%d\");\n\tTEST_EQ(run_cmd(\"ble_hci_adv 0 0 invalid\"), EC_ERROR_PARAM3, \"%d\");\n\tTEST_EQ(adv_enable_calls, 0, \"%d\");\n\n\treturn EC_SUCCESS;\n}\n\nvoid run_test(int argc, const char **argv)\n{\n\ttest_reset();\n\tRUN_TEST(test_command_ble_hci_adv_bounds);\n\ttest_print_result();\n}\n```\n\n[🔗](http://go/tj/8c3caada-9a16-414b-975a-f42ec5be2044)",
+      "range": {
+        "startLine": 573,
+        "startChar": 0,
+        "endLine": 586,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bb68a733c7ff7baf24b69ff116ef85784a8f0bf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
