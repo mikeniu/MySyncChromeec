@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "311e991c_9ea335d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:00:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Split independent bug fixes and replace numbered diff narration with prose**\n\n1. **Single logical change per CL \u0026 subject/body alignment**: The commit message body lists two independent bug fixes (`1.` negative `port \u003c 0` validation in `command_pe()` and `command_cable()`, and `2.` sparse lookup table bounds and `NULL`-entry checks in `command_cable()`), while the subject line (`usb_pd_console_cmd: Fix cable table bounds and NULL checks`) only mentions the second fix. Because each fix and its corresponding unit test cases can be committed and reverted independently, please split them into two focused CLs.\n2. **Prose over numbered code-expression narration**: Rather than leading with a file header (`In common/usb_pd_console_cmd.c:`) and a numbered list that transcribes C expressions from the diff (`*e || port \u003e\u003d board_get_usb_pd_port_count()`, `vbus_cur \u003e ARRAY_SIZE(cable_curr)`, `\u003c ARRAY_SIZE(cable_curr)`, `3 \u003d\u003d ARRAY_SIZE(cable_curr)`), describe the problem and fix in concise prose paragraphs.\n\nSuggested commit messages when split:\n\n- **CL 1 (negative port validation):**\n```text\nusb_pd_console_cmd: Reject negative port numbers in pe and pdcable\n\ncommand_pe() and command_cable() validate that the parsed port index\ndoes not exceed the board USB PD port count, but do not check for\nnegative values. Passing a negative port number such as -1 bypasses\nthe bounds check and indexes port state out of bounds.\n\nReject negative port indices with EC_ERROR_PARAM1 in both console\ncommands.\n```\n\n- **CL 2 (lookup table bounds and `NULL` checks):**\n```text\nusb_pd_console_cmd: Fix cable lookup table bounds and NULL checks\n\ncommand_cable() uses an inverted bounds check on cable_curr, reading\npast the end of the array when vbus_cur is USB_VBUS_CUR_RES_3, and does\nnot check for NULL entries in the sparse cable_curr and dp21_cable_speed\nlookup tables before formatting output.\n\nCheck that table indices are within ARRAY_SIZE() and map to non-NULL\nentries before printing cable current and DP 2.1 speed strings.\n```\n\n*(If both fixes are kept in a single CL, update the subject and body to cover both changes in prose without the numbered list:)*\n```text\nusb_pd_console_cmd: Fix port and cable lookup table validation\n\ncommand_pe() and command_cable() allow negative port indices to bypass\nthe upper-bound port count check. Additionally, command_cable() uses an\ninverted bounds check on cable_curr, reading out of bounds for\nUSB_VBUS_CUR_RES_3, and does not check for NULL entries in the sparse\ncable_curr and dp21_cable_speed lookup tables.\n\nReject negative port indices in both commands, and verify that cable\nlookup indices are in bounds and non-NULL before printing.\n```\n\n[🔗](http://go/tj/3aaf00a0-ca27-4f84-a2b4-6d47a8c3028f)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b850b0e96fa5d9c30bd82ff195802a478e26fe29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fc04bb2_0c40b1c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:00:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split the two independent bug fixes into separate CLs, assert the console output across all `cable_curr` boundary and `NULL`-entry cases in `test_pdcable`, and tighten the commit message.\n\n### Review Summary\n- **Functionality**: The fixes in `common/usb_pd_console_cmd.c` accurately prevent negative port indexing in `command_pe()` and `command_cable()` and prevent out-of-bounds or `NULL`-pointer dereferences when indexing the sparse `cable_curr` and `dp21_cable_speed` arrays.\n- **Architecture \u0026 Component Fit**: The validation logic fits cleanly within the existing EC console command handlers and unit test suite.\n- **Code Simplicity**: Removing the unused `active_cable_t_str` array and consolidating the `\"Cable Current: %s\\n\"` print statement with a ternary expression simplifies `command_cable()`.\n- **Idiomaticity \u0026 Readability**: Using `ARRAY_SIZE()` and `enum usb_vbus_cur` enumerators (`USB_VBUS_CUR_3A`, `USB_VBUS_CUR_RES_3`) matches ChromiumOS EC C conventions.\n- **Security**: Prevents out-of-bounds memory reads and `NULL` string pointer dereferences triggered by console arguments or malformed/uninitialized cable discovery VDO fields.\n- **Testing**: `test_pdcable` in `zephyr/test/drivers/default/src/console_cmd/usb_pd_console.c` only checks that `shell_execute_cmd(..., \"pdcable 0\")` returns `EC_SUCCESS` (which `command_cable()` always returns for a valid port) and omits the `USB_VBUS_CUR_RES_0` (`NULL` entry) and `USB_VBUS_CUR_5A` (`ARRAY_SIZE(cable_curr) - 1` upper in-bounds boundary) cases. See the inline comment on `usb_pd_console.c` for a `CHECK_CONSOLE_CMD` replacement.\n- **CL Size \u0026 Scope**: Although this CL is small in line delta (`Size: S (+29, -14)`), it bundles 2 independent bug fixes that can be committed and reverted independently. Please split into:\n  1. **CL 1 — Reject negative port numbers in `command_pe()` and `command_cable()`**: `common/usb_pd_console_cmd.c` (lines 80 and 131) and `zephyr/test/drivers/default/src/console_cmd/usb_pd_console.c` (`\"pe -1 dump\"` at lines 380–382 and `\"pdcable -1\"` at lines 422–424).\n  2. **CL 2 — Fix sparse cable lookup table bounds and `NULL` checks in `command_cable()`**: `common/usb_pd_console_cmd.c` (`active_cable_t_str` removal at line 124, `cable_curr` check at lines 164–168, and `dp21_cable_speed` check at lines 215–218) and `zephyr/test/drivers/default/src/console_cmd/usb_pd_console.c` (`vbus_cur` test cases at lines 388 and 405–411).\n- **Commit Message**: See the inline comment on `/COMMIT_MSG` regarding aligning the subject line with the scope of the CL and replacing the numbered C-expression list with concise prose.\n\n[🔗](http://go/tj/3aaf00a0-ca27-4f84-a2b4-6d47a8c3028f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b850b0e96fa5d9c30bd82ff195802a478e26fe29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bdbb108_f0ed9e28",
+        "filename": "zephyr/test/drivers/default/src/console_cmd/usb_pd_console.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:00:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Assert console output and cover all `cable_curr` boundary and `NULL`-entry cases**\n\n`command_cable()` always returns `EC_SUCCESS` (`0`) for a valid port regardless of whether it prints `\"Cable Current: 3A\"`, `\"Cable Current: 5A\"`, or `\"Cable Current: Invalid\"`. As a result, `zassert_ok(shell_execute_cmd(get_ec_shell(), \"pdcable 0\"))` only checks the return code and would still pass even if the `\"Cable Current: ...\"` output regressed.\n\nAdditionally, `(vbus_cur \u003c ARRAY_SIZE(cable_curr) \u0026\u0026 cable_curr[vbus_cur])` has `ARRAY_SIZE(cable_curr) \u003d\u003d 3` (`{ NULL, \"3A\", \"5A\" }`), so testing only `USB_VBUS_CUR_3A` (`1`) and `USB_VBUS_CUR_RES_3` (`3`) leaves two key boundary/clause cases untested:\n- **`USB_VBUS_CUR_RES_0` (`0`)**: Isolates the `\u0026\u0026 cable_curr[vbus_cur]` `NULL`-entry check when `vbus_cur \u003c ARRAY_SIZE(cable_curr)` is true (`\"Cable Current: Invalid\"`).\n- **`USB_VBUS_CUR_5A` (`2`, i.e., `ARRAY_SIZE(cable_curr) - 1`)**: Tests the upper in-bounds boundary (`N - 1`) so an off-by-one bound would be caught (`\"Cable Current: 5A\"`).\n\nUse `CHECK_CONSOLE_CMD` (already included via `\"test/drivers/utils.h\"` and used earlier in this file) to assert both `EC_SUCCESS` and the printed `\"Cable Current: ...\"` substring across all four `enum usb_vbus_cur` values:\n\n```c\n\t/* Test valid, NULL-entry, and out-of-bounds vbus_cur values */\n\tdev_disc \u003d\n\t\tpd_get_am_discovery_and_notify_access(0, TCPCI_MSG_SOP_PRIME);\n\tdev_disc-\u003eidentity.product_t1.p_rev20.vbus_cur \u003d USB_VBUS_CUR_RES_0;\n\tCHECK_CONSOLE_CMD(\"pdcable 0\", \"Cable Current: Invalid\", EC_SUCCESS);\n\tdev_disc-\u003eidentity.product_t1.p_rev20.vbus_cur \u003d USB_VBUS_CUR_3A;\n\tCHECK_CONSOLE_CMD(\"pdcable 0\", \"Cable Current: 3A\", EC_SUCCESS);\n\tdev_disc-\u003eidentity.product_t1.p_rev20.vbus_cur \u003d USB_VBUS_CUR_5A;\n\tCHECK_CONSOLE_CMD(\"pdcable 0\", \"Cable Current: 5A\", EC_SUCCESS);\n\tdev_disc-\u003eidentity.product_t1.p_rev20.vbus_cur \u003d USB_VBUS_CUR_RES_3;\n\tCHECK_CONSOLE_CMD(\"pdcable 0\", \"Cable Current: Invalid\", EC_SUCCESS);\n```\n\n[🔗](http://go/tj/3aaf00a0-ca27-4f84-a2b4-6d47a8c3028f)",
+      "range": {
+        "startLine": 405,
+        "startChar": 0,
+        "endLine": 411,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b850b0e96fa5d9c30bd82ff195802a478e26fe29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
