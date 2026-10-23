@@ -208,6 +208,23 @@ static int rts5817maa_set_mode(const struct device *dev,
 	return ret;
 }
 
+static int rts5817maa_finger_status(const struct device *dev)
+{
+	if (!IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {
+		return -ENOTSUP;
+	}
+
+	rts_finger_sts_t ret = rts5817maa_sensor_finger_status();
+
+	switch (ret) {
+	case RTS_FINGER_PRESENT:
+		return FINGERPRINT_FINGER_STATE_PRESENT;
+	case RTS_FINGER_NONE:
+	default:
+		return FINGERPRINT_FINGER_STATE_NONE;
+	}
+}
+
 static DEVICE_API(fingerprint, cros_fp_rts5817maa_driver_api) = {
 	.init = rts5817maa_init,
 	.deinit = rts5817maa_deinit,
@@ -215,6 +232,7 @@ static DEVICE_API(fingerprint, cros_fp_rts5817maa_driver_api) = {
 	.get_info = rts5817maa_get_info,
 	.maintenance = rts5817maa_maintenance,
 	.set_mode = rts5817maa_set_mode,
+	.finger_status = rts5817maa_finger_status,
 };
 
 static void rts5817maa_irq(const struct device *dev, struct gpio_callback *cb,
