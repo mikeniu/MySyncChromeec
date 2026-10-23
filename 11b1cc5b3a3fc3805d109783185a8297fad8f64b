@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e01470e_041400d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-23T19:54:10Z",
+      "side": 1,
+      "message": "The only uncovered paths are from failed `gpio_is_ready_dt()` calls.  Adding test cases for these paths isn\u0027t very useful and requires lots of extra test code.",
+      "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d03fb478_8362adc8",
