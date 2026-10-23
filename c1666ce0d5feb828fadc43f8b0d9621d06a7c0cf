@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca5c3d33_1a9ddfc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:14:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/1be31127-4393-412c-81c7-4698832019a0)]\n\n### Review Summary\n- **Functionality**: Verified that `system_disable_jump()` unconditionally enables the MPU while `mpu_enable()` gates sticky NPCX RAM lock regions on `system_is_locked()` and `HOOK_SYSJUMP` disables fixed MPU regions prior to jumping on unlocked systems.\n- **Architecture \u0026 Component Fit**: The separation between common jump-disable logic and Cortex-M MPU hook handling fits the existing Zephyr shim architecture well; left one minor inline suggestion in `common/system.c` regarding the NPCX-specific RAM lock log message.\n- **Code Simplicity**: The implementation is concise and reuses `mpu_disable_fixed_regions()` cleanly for `HOOK_SYSJUMP`.\n- **Idiomaticity \u0026 Readability**: Adheres to ChromiumOS EC and Zephyr C conventions, Kconfig idioms, and hook declaration patterns.\n- **Security**: Improves defense-in-depth on unlocked Cortex-M systems by ensuring fixed MPU protections are active after `system_disable_jump()`.\n- **Testing \u0026 Test Coverage**: `zephyr/test/system_common` enables `CONFIG_MPU` and verifies `mpu_enable()` is invoked by `system_disable_jump()` in both unlocked and locked states.\n- **CL Size \u0026 Scope**: Focused, single logical change (`Size: M (+58, -18)`).\n- **Commit Message**: Clearly explains the problem, the sticky RAM lock constraint, and the `HOOK_SYSJUMP` requirement.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c1666ce0d5feb828fadc43f8b0d9621d06a7c0cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c6a3570_6e6cc0db",
+        "filename": "common/system.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:14:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `common/system.c` is shared across all `CONFIG_MPU` targets (including STM32, MCHP, and RISC-V), whereas RAM lock (`CONFIG_NPCX_RAM_LOCK`) is specific to NPCX and gated on `system_is_locked()` inside `mpu_enable()` in `zephyr/shim/core/cortex-m/mpu.c`.\n\nLogging `\"Skip RAM lock configuration\"` unconditionally here will print a misleading message on non-NPCX targets where RAM lock does not exist, and duplicates the `system_is_locked()` check. Consider gating this log on `IS_ENABLED(CONFIG_NPCX_RAM_LOCK)` or moving it into the `#if defined(CONFIG_NPCX_RAM_LOCK)` block in `mpu_enable()`.\n\n[🔗](http://go/tj/1be31127-4393-412c-81c7-4698832019a0)",
+      "range": {
+        "startLine": 441,
+        "startChar": 0,
+        "endLine": 442,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c1666ce0d5feb828fadc43f8b0d9621d06a7c0cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
