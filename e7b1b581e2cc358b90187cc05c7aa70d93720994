@@ -1,0 +1,28 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "509e4695_abba07ac",
+        "filename": "test/uptime.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T01:35:06Z",
+      "side": 1,
+      "message": "Please avoid `#undef`-ing register macros and `#include \"../chip/npcx/hwtimer.c\"` directly into `test/uptime.c`:\n\n1. **Why this is problematic**:\n   - `test/uptime.c` is a host test for `EC_CMD_GET_UPTIME_INFO` (`common/uptime.c`). Textually including an entire NPCX chip driver into it mixes unrelated units under test and registers NPCX hardware hooks (`HOOK_FREQ_CHANGE` for `update_prescaler` and `HOOK_SYSJUMP` for `hw_clock_sysjump_dis_sys_timer`) inside the host `uptime` test binary.\n   - Because `core/host/timer.c` already defines `__hw_clock_source_read()`, the test has to `#define __hw_clock_source_read npcx_hw_clock_source_read` and `#undef` `NPCX_ITIM32_CNT` / `NPCX_ITIM64_CNT_L` / `NPCX_ITIM64_CNT_H`, meaning it is not testing the symbol as linked by the build system.\n   - In the callback hooks, `mock_read_attempt \u003d\u003d 1` only injects a mismatch on the very first read, so these tests do not exercise the 8-iteration retry bound (`i \u003c 8`) when the register continues changing.\n\n2. **How to make this idiomatic**:\n   - Revert the changes to `test/uptime.c`.\n   - Extract the bounded consecutive-read polling loop into a small inline or mock-friendly helper (for example in `chip/npcx/hwtimer_chip.h` or `include/util.h`) that takes a register-read callback or reads via a `test_mockable` accessor, and unit-test that helper in its own dedicated test (covering stable read, transient glitch recovery, and hitting the 8-retry bound).",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "e7b1b581e2cc358b90187cc05c7aa70d93720994",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
