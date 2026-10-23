@@ -96,7 +96,11 @@ static int cros_flash_npcx_wait_ready(const struct device *dev)
 		if ((reg & SPI_NOR_WIP_BIT) == 0) {
 			return 0;
 		}
-		k_usleep(NPCX_WAIT_PERIOD_US);
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			k_busy_wait(NPCX_WAIT_PERIOD_US);
+		} else {
+			k_usleep(NPCX_WAIT_PERIOD_US);
+		}
 	} while (k_uptime_get() < timeout_time); /* Wait for busy bit clear */
 
 	return -ETIMEDOUT;
@@ -123,7 +127,11 @@ static int cros_flash_npcx_wait_write_enable_state(const struct device *dev,
 			return 0;
 		}
 
-		k_usleep(NPCX_WAIT_PERIOD_US);
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			k_busy_wait(NPCX_WAIT_PERIOD_US);
+		} else {
+			k_usleep(NPCX_WAIT_PERIOD_US);
+		}
 	} while (k_uptime_get() < timeout_time); /* Wait for busy bit clear */
 
 	return -ETIMEDOUT;
@@ -150,9 +158,16 @@ int cros_flash_npcx_set_write_enable(const struct device *dev)
 		return -EINVAL;
 	}
 
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_dra_block_enter();
+	}
+
 	/* Wait for previous operation to complete */
 	ret = cros_flash_npcx_wait_ready(dev);
 	if (ret != 0) {
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			npcx_fiu_dra_block_exit();
+		}
 		return ret;
 	}
 
@@ -160,10 +175,18 @@ int cros_flash_npcx_set_write_enable(const struct device *dev)
 	ret = flash_ex_op(data->flash_dev, FLASH_NPCX_EX_OP_EXEC_UMA,
 			  (uintptr_t)&op_in, NULL);
 	if (ret != 0) {
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			npcx_fiu_dra_block_exit();
+		}
 		return ret;
 	}
 
-	return cros_flash_npcx_wait_write_enabled(dev);
+	ret = cros_flash_npcx_wait_write_enabled(dev);
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_dra_block_exit();
+	}
+
+	return ret;
 }
 
 /* Check the BUSY bit is cleared and WE bit is disabled */
@@ -187,19 +210,34 @@ int __maybe_unused cros_flash_npcx_set_write_disable(const struct device *dev)
 		return -EINVAL;
 	}
 
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_dra_block_enter();
+	}
+
 	/* Wait for any previous operations to finish. */
 	ret = cros_flash_npcx_wait_ready(dev);
 	if (ret != 0) {
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			npcx_fiu_dra_block_exit();
+		}
 		return ret;
 	}
 
 	ret = flash_ex_op(data->flash_dev, FLASH_NPCX_EX_OP_EXEC_UMA,
 			  (uintptr_t)&write_disable_op, NULL);
 	if (ret != 0) {
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			npcx_fiu_dra_block_exit();
+		}
 		return ret;
 	}
 
-	return cros_flash_npcx_wait_write_disabled(dev);
+	ret = cros_flash_npcx_wait_write_disabled(dev);
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_dra_block_exit();
+	}
+
+	return ret;
 }
 
 static int cros_flash_npcx_set_status_reg(const struct device *dev,
@@ -218,9 +256,16 @@ static int cros_flash_npcx_set_status_reg(const struct device *dev,
 		return -EINVAL;
 	}
 
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_dra_block_enter();
+	}
+
 	/* Enable write first */
 	ret = cros_flash_npcx_set_write_enable(dev);
 	if (ret != 0) {
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			npcx_fiu_dra_block_exit();
+		}
 		return ret;
 	}
 
@@ -228,10 +273,18 @@ static int cros_flash_npcx_set_status_reg(const struct device *dev,
 	ret = flash_ex_op(data->flash_dev, FLASH_NPCX_EX_OP_EXEC_UMA,
 			  (uintptr_t)&op_in, NULL);
 	if (ret != 0) {
+		if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+			npcx_fiu_dra_block_exit();
+		}
 		return ret;
 	}
 
-	return cros_flash_npcx_wait_ready(dev);
+	ret = cros_flash_npcx_wait_ready(dev);
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_dra_block_exit();
+	}
+
+	return ret;
 }
 
 static int cros_flash_npcx_write_protection_set(const struct device *dev,

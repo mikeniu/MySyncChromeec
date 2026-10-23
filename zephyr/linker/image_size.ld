@@ -9,7 +9,10 @@
  * Somehow, the linker scripts of different architectures use different symbols
  * to indicate the image size.
  */
-#if defined(CONFIG_CPU_CORTEX_M) || defined(CONFIG_CPU_CORTEX_R) || \
+#if defined(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)
+__code_ram_end = ALIGN(__rom_region_start + _flash_used, 4);
+__image_size = (__flash_rodata_lma + SIZEOF(.flash_rodata)) - __rom_region_start;
+#elif defined(CONFIG_CPU_CORTEX_M) || defined(CONFIG_CPU_CORTEX_R) || \
 	defined(CONFIG_CPU_CORTEX_A)
 /* Defined in include/zephyr/arch/arm/cortex_m/scripts/linker.ld */
 __image_size = _flash_used;

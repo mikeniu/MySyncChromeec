@@ -58,6 +58,14 @@ menuconfig PLATFORM_EC
 
 if PLATFORM_EC
 
+config CROS_EC_RODATA_IN_SPI_FLASH
+	bool "Place mergeable string literals in memory-mapped SPI flash"
+	depends on SOC_FAMILY_NPCX && CROS_EC_RW
+	help
+	  Places mergeable string literals and cold rodata into memory-mapped
+	  SPI flash (0x6408xxxx) via FIU Direct Read Access instead of internal
+	  Code RAM, freeing tens of kilobytes of Code RAM for application code.
+
 rsource "shim/chip/egis/Kconfig.egis"
 rsource "shim/chip/ft90/Kconfig.ft90"
 rsource "shim/chip/npcx/Kconfig.npcx"

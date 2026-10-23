@@ -68,13 +68,21 @@ void system_jump_to_booter(void)
 	case EC_IMAGE_RW:
 		flash_offset =
 			CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_STORAGE_OFF;
+#if defined(CONFIG_SOC_FAMILY_NPCX)
+		flash_used = MIN(CONFIG_RW_SIZE, CONFIG_FLASH_SIZE * 1024);
+#else
 		flash_used = CONFIG_RW_SIZE;
+#endif
 		break;
 #ifdef CONFIG_RW_B
 	case EC_IMAGE_RW_B:
 		flash_offset = CONFIG_EC_WRITABLE_STORAGE_OFF +
 			       CONFIG_RW_B_STORAGE_OFF;
+#if defined(CONFIG_SOC_FAMILY_NPCX)
+		flash_used = MIN(CONFIG_RW_SIZE, CONFIG_FLASH_SIZE * 1024);
+#else
 		flash_used = CONFIG_RW_SIZE;
+#endif
 		break;
 #endif
 	case EC_IMAGE_RO:

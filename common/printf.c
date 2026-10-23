@@ -14,6 +14,8 @@
 
 #include <string.h>
 
+#include <zephyr/drivers/flash/npcx_flash_api_ex.h>
+
 static const char error_str[] = "ERROR";
 
 #define MAX_FORMAT 1024 /* Maximum chars in a single format field */
@@ -240,6 +242,11 @@ int snprintf_hex_buffer(char *str, size_t size,
 int vfnprintf(int (*addchar)(void *context, int c), void *context,
 	      const char *format, va_list args)
 {
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH) &&
+	    npcx_fiu_is_dra_blocked() &&
+	    npcx_fiu_is_in_spi_flash_rodata(format)) {
+		return 0;
+	}
 	/*
 	 * Longest uint64 in decimal = 20
 	 * Longest uint32 in binary  = 32
@@ -349,6 +356,11 @@ int vfnprintf(int (*addchar)(void *context, int c), void *context,
 			vstr = va_arg(args, char *);
 			if (vstr == NULL)
 				vstr = "(NULL)";
+			if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH) &&
+			    npcx_fiu_is_dra_blocked() &&
+			    npcx_fiu_is_in_spi_flash_rodata(vstr)) {
+				return 0;
+			}
 
 		} else {
 			int base = 10;

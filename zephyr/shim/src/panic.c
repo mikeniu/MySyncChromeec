@@ -14,6 +14,7 @@
 
 #include <zephyr/arch/cpu.h>
 #include <zephyr/cache.h>
+#include <zephyr/drivers/flash/npcx_flash_api_ex.h>
 #include <zephyr/fatal.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
@@ -168,6 +169,10 @@ void panic_data_print(const struct panic_data *pdata)
  */
 struct panic_data *panic_data_reset(struct panic_data *pdata)
 {
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_panic_suspend_uma();
+	}
+
 	if (!pdata) {
 		pdata = get_panic_data_write();
 	}
@@ -274,6 +279,10 @@ void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception)
 #if !defined(CONFIG_ZTEST_FATAL_HOOK)
 void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 {
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_panic_suspend_uma();
+	}
+
 	/*
 	 * If CONFIG_LOG is on, the exception details
 	 * have already been logged to the console.
@@ -315,6 +324,10 @@ FUNC_NORETURN
 #endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
+	if (IS_ENABLED(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)) {
+		npcx_fiu_panic_suspend_uma();
+	}
+
 	panic_data_write_assert(path, line);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))

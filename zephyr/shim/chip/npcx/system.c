@@ -7,6 +7,7 @@
 #include "system_chip.h"
 
 #include <zephyr/drivers/bbram.h>
+#include <zephyr/drivers/flash/npcx_flash_api_ex.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(shim_npcx_system, LOG_LEVEL_ERR);
@@ -93,3 +94,23 @@ static int chip_system_init(void)
 #endif
 SYS_INIT(chip_system_init, PRE_KERNEL_1,
 	 CONFIG_CROS_SYSTEM_NPCX_PRE_INIT_PRIORITY);
+
+#if defined(CONFIG_SOC_FAMILY_NPCX) && \
+	defined(CONFIG_CROS_EC_RODATA_IN_SPI_FLASH)
+__weak void npcx_fiu_dra_block_enter(void)
+{
+}
+
+__weak void npcx_fiu_dra_block_exit(void)
+{
+}
+
+__weak bool npcx_fiu_is_dra_blocked(void)
+{
+	return false;
+}
+
+__weak void npcx_fiu_panic_suspend_uma(void)
+{
+}
+#endif
