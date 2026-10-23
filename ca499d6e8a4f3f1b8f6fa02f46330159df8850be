@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5ca1554_a93b121c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 54
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:20:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for details.\n\n### Review Summary\n* **Functionality:** `fp_command_template_v0` properly blocks legacy v0 template uploads with `EC_HOST_CMD_ACCESS_DENIED` when `fingerprint_auth_enabled()` is true. However, in `zephyr/test/fingerprint/task/src/fpsensor_template.cc`, `test_fp_template_v0_disabled_under_auth` sets `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` without clearing it, and the added `fp_reset_and_clear_context()` call in `fpsensor_before` does not clear `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` (because `fp_reset_context()` intentionally preserves that bit), leaking the session state into subsequent tests.\n* **Architecture \u0026 Component Fit:** Enforcing `fingerprint_auth_enabled()` in `fp_command_template_v0` fits cleanly with the existing fingerprint auth command guards. Moving the guard clause to the very start of `fp_command_template_v0` avoids unpacking unused request fields on rejected calls.\n* **Code Simplicity:** In `zephyr/test/fingerprint/task/src/fpsensor_template.cc`, `fp_reset_and_clear_context()` in `fpsensor_before` is redundant with the `FP_CONTEXT_ASYNC` reset immediately below it, and `test_fp_template_v0_disabled_under_auth` can declare `struct ec_params_fp_template` directly instead of allocating and casting a raw byte buffer.\n* **Idiomaticity \u0026 Readability:** Avoid the C-style cast `(struct ec_params_fp_template *)params_buffer` and magic size literal `8` in `test_fp_template_v0_disabled_under_auth` by value-initializing `struct ec_params_fp_template` directly, matching `test_fp_template_v0_busy` in the same file.\n* **Security:** Blocking unauthenticated v0 template modification paths when fingerprint auth is active prevents arbitrary template injection and forces template operations through the v1 path.\n* **Testing:** In `test_fp_command_template_v0_disabled_under_auth` (`fpsensor_auth_commands.cc`), zero-initializing `test_v0_template_layout` leaves `params.size \u003d\u003d 0` with `sizeof(params) \u003e offsetof(ec_params_fp_template, data)`, which would fail the input size check with `EC_RES_INVALID_PARAM` even if auth were disabled; using `ec_params_fp_template params{}` (or populating `test_v0_template_layout`) ensures the test isolates the auth check.\n* **CL Size \u0026 Scope:** `Size: M (+51, -0)`. The CL is small and focused on a single logical security change with its corresponding unit tests.\n* **Commit Message:** The commit message clearly explains the security motivation and change.\n\n[🔗](http://go/tj/70b3cb3a-2f47-46d5-b38c-58b2bab865b1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ca499d6e8a4f3f1b8f6fa02f46330159df8850be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a6a5a20_c62a92ab",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 54
+      },
+      "lineNbr": 1002,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:20:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `fingerprint_auth_enabled()` does not depend on `params`, `size`, `xfer_complete`, `offset`, or `idx`, consider moving this check to the very beginning of `fp_command_template_v0` before casting and reading `args-\u003einput_buf` and `global_context.templ_valid`:\n\n```cpp\nstatic enum ec_host_cmd_status\nfp_command_template_v0(struct ec_host_cmd_handler_args *args)\n{\n\t/*\n\t * When fingerprint auth is enabled, legacy unauthenticated (un-MAC\u0027ed)\n\t * template modification paths must be disabled. Reject v0 requests\n\t * to prevent arbitrary template injection; high-security contexts\n\t * must route through the v1 secure channel.\n\t */\n\tif (fingerprint_auth_enabled())\n\t\treturn EC_HOST_CMD_ACCESS_DENIED;\n\n\tconst auto *params \u003d static_cast\u003cconst struct ec_params_fp_template *\u003e(\n\t\targs-\u003einput_buf);\n```\n\n[🔗](http://go/tj/70b3cb3a-2f47-46d5-b38c-58b2bab865b1)",
+      "range": {
+        "startLine": 995,
+        "startChar": 0,
+        "endLine": 1002,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ca499d6e8a4f3f1b8f6fa02f46330159df8850be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "669c8de5_3bdd4ced",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 54
+      },
+      "lineNbr": 1722,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:20:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Because `test_v0_template_layout` includes `metadata`, `template_data`, and `salt`, a zero-initialized `test_v0_template_layout params{}` has `params.size \u003d\u003d 0` while `sizeof(params) \u003e offsetof(ec_params_fp_template, data)`. If the `fingerprint_auth_enabled()` check were absent, this request would still fail the input size check (`args-\u003einput_buf_size !\u003d size + offsetof(struct ec_params_fp_template, data)`) with `EC_RES_INVALID_PARAM` rather than succeeding.\n\nUse `ec_params_fp_template params{};` (which is a valid 0-byte v0 request that succeeds with `EC_RES_SUCCESS` when auth is disabled), or populate `params` with `setup_and_encrypt_v0_template(params, kTestSaltNonTrivial, false, /*encrypt\u003d*/false)` and assert `zassert_equal(global_context.templ_valid, 0u);` to match the sibling tests above:\n\n```cpp\nZTEST(fpsensor_auth_commands, test_fp_command_template_v0_disabled_under_auth)\n{\n\tzassert_equal(establish_session(), EC_SUCCESS);\n\n\tec_params_fp_template params{};\n\n\tzassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, \u0026params,\n\t\t\t\t\t     sizeof(params), nullptr, 0),\n\t\t      EC_RES_ACCESS_DENIED);\n\tzassert_equal(global_context.templ_valid, 0u);\n}\n```\n\n[🔗](http://go/tj/70b3cb3a-2f47-46d5-b38c-58b2bab865b1)",
+      "range": {
+        "startLine": 1713,
+        "startChar": 0,
+        "endLine": 1722,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ca499d6e8a4f3f1b8f6fa02f46330159df8850be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4148239f_3ecd5102",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 54
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:20:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Instead of allocating a raw `uint8_t params_buffer[FP_TEMPLATE_PARAMS_BUFFER_SIZE]`, casting it with a C-style cast `(struct ec_params_fp_template *)params_buffer`, and setting the magic number `params-\u003esize \u003d 8`, declare `struct ec_params_fp_template params \u003d { .offset \u003d 0, .size \u003d 0 };` directly and pass `\u0026params, sizeof(params)` (matching `test_fp_template_v0_busy` at lines 347–357 of this file).\n\nAlso, clear `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` after the assertion (or in `fpsensor_before`) so the session flag does not leak into subsequent tests in this suite:\n\n```cpp\nZTEST_USER(fpsensor_template, test_fp_template_v0_disabled_under_auth)\n{\n\tstruct ec_params_fp_template params \u003d {\n\t\t.offset \u003d 0,\n\t\t.size \u003d 0,\n\t};\n\n\tglobal_context.fp_encryption_status |\u003d\n\t\tFP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n\n\tzassert_equal(\n\t\tEC_RES_ACCESS_DENIED,\n\t\tec_cmd_fp_template(NULL, \u0026params, sizeof(params)),\n\t\t\"Legacy template loading endpoint must be closed under fingerprint auth\");\n\n\tglobal_context.fp_encryption_status \u0026\u003d\n\t\t~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n}\n```\n\n[🔗](http://go/tj/70b3cb3a-2f47-46d5-b38c-58b2bab865b1)",
+      "range": {
+        "startLine": 1502,
+        "startChar": 0,
+        "endLine": 1528,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ca499d6e8a4f3f1b8f6fa02f46330159df8850be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b411570_beadf47f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 54
+      },
+      "lineNbr": 1600,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:20:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Calling `fp_reset_and_clear_context()` here has two issues:\n\n1. **It does not clear `FP_CONTEXT_STATUS_SESSION_ESTABLISHED`:** `fp_reset_and_clear_context()` calls `fp_reset_context()` (`common/fpsensor/fpsensor_state.cc`), which intentionally preserves the session flag (`global_context.fp_encryption_status \u0026\u003d FP_ENC_STATUS_SEED_SET | FP_CONTEXT_SESSION_NONCE_SET | FP_CONTEXT_STATUS_SESSION_ESTABLISHED;`). As a result, once `test_fp_template_v0_disabled_under_auth` sets `FP_CONTEXT_STATUS_SESSION_ESTABLISHED`, that flag remains set for all subsequent tests in the `fpsensor_template` suite (existing v0 tests only pass because their names sort alphabetically before `test_fp_template_v0_disabled_under_auth`).\n2. **It is redundant with `FP_CONTEXT_ASYNC` immediately below:** Lines 1603–1610 call `ec_cmd_fp_context_v1` with `FP_CONTEXT_ASYNC`, which already triggers `FP_MODE_RESET_SENSOR` and executes `fp_reset_and_clear_context()` on the `FPSENSOR` task. Calling `fp_reset_and_clear_context()` synchronously here after `RESET_FAKE(mock_alg_init)` / `RESET_FAKE(mock_alg_exit)` also increments `mock_alg_init` and `mock_alg_exit` call counts an extra time before every test.\n\nRemove `fp_reset_and_clear_context()` here and clear `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` instead (or clear it at the end of `test_fp_template_v0_disabled_under_auth`):\n\n```cpp\n\tglobal_context.fp_encryption_status \u0026\u003d\n\t\t~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n```\n\n[🔗](http://go/tj/70b3cb3a-2f47-46d5-b38c-58b2bab865b1)",
+      "range": {
+        "startLine": 1599,
+        "startChar": 0,
+        "endLine": 1600,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ca499d6e8a4f3f1b8f6fa02f46330159df8850be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
