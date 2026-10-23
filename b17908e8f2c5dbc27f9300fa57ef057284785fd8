@@ -18,6 +18,52 @@
       "isAi": true,
       "revId": "b17908e8f2c5dbc27f9300fa57ef057284785fd8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72c733db_2edcd72f",
+        "filename": "core/cortex-m/include/mpu.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:51:18Z",
+      "side": 1,
+      "message": "\"aperture\" doesn\u0027t seem like the right term. Can you use something clearer?",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 0
+      },
+      "revId": "b17908e8f2c5dbc27f9300fa57ef057284785fd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "558e076d_a00e09c1",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:51:18Z",
+      "side": 1,
+      "message": "Can we use the `IS_ENABLED()` style here?",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 30
+      },
+      "revId": "b17908e8f2c5dbc27f9300fa57ef057284785fd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
