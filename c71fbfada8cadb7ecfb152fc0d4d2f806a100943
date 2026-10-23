@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f5d0f72_e93a93b3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:39:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two commit message issues:\n\n1. **Bundled changes (`\"and also save SHCSR\"`):** The subject line (`zephyr: panic: save the active exception number in IPSR`) only describes the `IPSR` fix, while the second paragraph adds `\"and also save SHCSR\"` without explaining the motivation for saving `SHCSR`, and the commit message omits the `CONFIG_ARCH_POSIX` `esf_placeholder` test addition in `zephyr/test/drivers/panic/src/panic.c`.\n2. **Update after splitting:** Please split the independent changes into separate CLs and use the corresponding commit messages below.\n\n### Option A: Commit messages for the split CLs (Recommended)\n\n**CL 1 (Save active exception number in `IPSR`):**\n```text\nzephyr: panic: save the active exception number in IPSR\n\npanic_data_write_esf() stored the stacked xPSR in the IPSR slot. The\nIPSR field of a stacked xPSR holds the exception number of the\ninterrupted context, which is 0 for faults taken from thread mode, and\nZephyr also clears it for non-nested faults. As a result, panicinfo\nreported \"EXCEPTION: 00\" for CPU faults.\n\nSave the active exception number with __get_IPSR() instead, as legacy\ncros-ec does. The full stacked xPSR is still saved in the exception\nframe.\n\nBUG\u003db:573760632\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.panic.ro\n     -s drivers.panic.rw -s drivers.panic_output.ro\n     -s drivers.panic_output.rw -s drivers.panic_output.ec_host_cmd\n     -s drivers.panic_reason -s drivers.panic_log.minimal\n     -s drivers.panic_log.immediate\nTEST\u003dzmake build r2d2\n\nChange-Id: Iba726c561b8d431a3f2a382ad4ab4276b31692cc\n```\n\n**CL 2 (Save `SHCSR` in Cortex-M panic data):**\n```text\nzephyr: panic: save SHCSR on Cortex-M mainline\n\nZephyr does not include SCB-\u003eSHCSR in struct __extra_esf_info, leaving\ncm.shcsr unpopulated in panic_data on Cortex-M mainline targets.\n\nSave SCB-\u003eSHCSR via CORTEX_PANIC_SYS_REG_LIST when\nCONFIG_ARMV7_M_ARMV8_M_MAINLINE is enabled so panicinfo reports the\nsystem handler control and state register.\n\nBUG\u003db:573760632\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.panic.ro\n     -s drivers.panic.rw\nTEST\u003dzmake build r2d2\n```\n\n**CL 3 (Verify `esf_placeholder` in POSIX `test_panic_data_write_esf`):**\n```text\nzephyr: test: verify POSIX ESF copy in test_panic_data_write_esf\n\ntest_panic_data_write_esf() passed a zero-initialized struct arch_esf\nand only checked header fields populated by panic_data_reset() and\npanic_data_finalize().\n\nSet esf.dummy on CONFIG_ARCH_POSIX and assert that\npanic_data_write_esf() copies it to pdata-\u003eposix.esf_placeholder.\n\nBUG\u003db:573760632\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.panic.ro\n     -s drivers.panic.rw\n```\n\n### Option B: If keeping `IPSR` and `SHCSR` in a single CL\n\n```text\nzephyr: panic: save live Cortex-M IPSR and SHCSR in panic data\n\npanic_data_write_esf() stored the stacked xPSR in the IPSR slot and\nleft cm.shcsr unpopulated because Zephyr does not include SHCSR in\nextra_info. The IPSR field of a stacked xPSR holds the exception\nnumber of the interrupted context (0 in thread mode, and cleared by\nZephyr for non-nested faults), causing panicinfo to report\n\"EXCEPTION: 00\" for CPU faults.\n\nRead the active exception number with __get_IPSR() and capture\nSCB-\u003eSHCSR on Cortex-M mainline targets via CORTEX_PANIC_SYS_REG_LIST,\nmatching legacy cros-ec. The full stacked xPSR remains saved in the\nexception frame.\n\nBUG\u003db:573760632\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.panic.ro\n     -s drivers.panic.rw -s drivers.panic_output.ro\n     -s drivers.panic_output.rw -s drivers.panic_output.ec_host_cmd\n     -s drivers.panic_reason -s drivers.panic_log.minimal\n     -s drivers.panic_log.immediate\nTEST\u003dzmake build r2d2\n\nChange-Id: Iba726c561b8d431a3f2a382ad4ab4276b31692cc\n```\n\n[🔗](http://go/tj/84adf0a1-0b27-4ff3-b51d-27eb83e9e93b)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06d28a6b_cfb4b382",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:39:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:** ✅ Saving `__get_IPSR()` into `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` instead of the stacked `esf-\u003ebasic.xpsr` properly records the active fault exception number when `panic_data_write_esf()` runs in handler mode, while keeping `esf-\u003ebasic.xpsr` in `cm.frame[CORTEX_PANIC_FRAME_REGISTER_PSR]`. Updating `docs/panic_data.md` matches the new `PANIC_REG_LIST` print order.\n* **Architecture \u0026 Component Fit:** ✅ Extending `PANIC_REG_LIST` with `PANIC_SYS_REG` / `CORTEX_PANIC_SYS_REG_LIST` and `_VAL` macro variants cleanly integrates live CMSIS register reads alongside ESF field copies in `zephyr/shim/src/panic.c`.\n* **Code Simplicity:** ✅ The macro definitions (`PANIC_SYS_REG`, `PANIC_COPY_REGS_VAL`, and `PANIC_PRINT_REGS_VAL`) are concise and minimal.\n* **Idiomaticity \u0026 Readability:** ✅ Uses standard CMSIS intrinsics (`__get_IPSR()`, `SCB-\u003eSHCSR`), existing `CORTEX_PANIC_REGISTER_IPSR` enum constants, and appropriate `#if defined(CONFIG_CPU_CORTEX_M)` / `#if defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)` guards.\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ `test_panic_data_write_esf` in `zephyr/test/drivers/panic/src/panic.c` only adds a `CONFIG_ARCH_POSIX` assertion (`esf.dummy` -\u003e `pdata-\u003eposix.esf_placeholder`), which exercises the pre-existing POSIX `PANIC_COPY_REGS` macro rather than the Cortex-M `IPSR` fix. Please add Cortex-M test assertions verifying that `pdata-\u003ecm.regs[CORTEX_PANIC_REGISTER_IPSR]` captures `__get_IPSR()` rather than `esf.basic.xpsr` (see inline comment on `zephyr/test/drivers/panic/src/panic.c`).\n* **CL Size \u0026 Scope:** ❌ While the CL is `Size: S (+39, -7)`, it bundles three independently revertible changes across `zephyr/shim/src/panic.c`, `docs/panic_data.md`, and `zephyr/test/drivers/panic/src/panic.c`. Please split this CL into self-contained changes:\n  1. **CL 1:** Save the active exception number with `__get_IPSR()` in `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` via `PANIC_SYS_REG` / `CORTEX_PANIC_SYS_REG_LIST` in `zephyr/shim/src/panic.c`, update the `ipsr` line position in `docs/panic_data.md`, and add Cortex-M `IPSR` test assertions.\n  2. **CL 2:** Save and print `SCB-\u003eSHCSR` (`cm.shcsr`) via `CORTEX_PANIC_SYS_REG_SHCSR` on `CONFIG_ARMV7_M_ARMV8_M_MAINLINE` in `zephyr/shim/src/panic.c` and add the `shcsr` line to `docs/panic_data.md`.\n  3. **CL 3:** Add the `CONFIG_ARCH_POSIX` `esf.dummy` / `pdata-\u003eposix.esf_placeholder` verification in `zephyr/test/drivers/panic/src/panic.c`.\n* **Commit Message:** ❌ The subject line (`zephyr: panic: save the active exception number in IPSR`) omits the `SHCSR` addition mentioned in the body (`\"and also save SHCSR\"`), and the commit message omits the `CONFIG_ARCH_POSIX` test change in `zephyr/test/drivers/panic/src/panic.c`. Copy-pasteable commit messages are provided inline on `/COMMIT_MSG`. [🔗](http://go/tj/84adf0a1-0b27-4ff3-b51d-27eb83e9e93b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ea54711_82be39a7",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:39:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Saving `SCB-\u003eSHCSR` into `cm.shcsr` on `CONFIG_ARMV7_M_ARMV8_M_MAINLINE` is an independent functional change from fixing `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` to capture `__get_IPSR()` instead of the stacked `basic.xpsr`. This change can be committed and reverted independently of the `IPSR` bug fix (and is omitted from the CL subject line).\n\nPlease keep this CL focused solely on saving `__get_IPSR()` in `cm.regs[CORTEX_PANIC_REGISTER_IPSR]`:\n\n```c\n#define CORTEX_PANIC_SYS_REG_LIST(M) \\\n\tPANIC_SYS_REG(M, __get_IPSR(), cm.regs[CORTEX_PANIC_REGISTER_IPSR], ipsr)\n```\n\nand move `CORTEX_PANIC_SYS_REG_SHCSR(M)` (along with the `shcsr` line in `docs/panic_data.md`) into a separate follow-up CL.\n\n[🔗](http://go/tj/84adf0a1-0b27-4ff3-b51d-27eb83e9e93b)",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "929f4db3_375b13d2",
+        "filename": "zephyr/test/drivers/panic/src/panic.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:39:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two issues in `test_panic_data_write_esf`:\n\n1. **Unrelated POSIX test change (CL scope):** Setting `esf.dummy \u003d 0xdeadbeef` and asserting `pdata-\u003eposix.esf_placeholder \u003d\u003d 0xdeadbeef` under `CONFIG_ARCH_POSIX` tests the pre-existing `M(dummy, posix.esf_placeholder, placeholder)` (`PANIC_COPY_REGS`) path rather than the Cortex-M `IPSR` fix (`CORTEX_PANIC_SYS_REG_LIST` / `PANIC_COPY_REGS_VAL`), and can be committed independently on its own. Please move the `CONFIG_ARCH_POSIX` assertion addition to a separate standalone CL.\n2. **Missing test coverage for Cortex-M `IPSR`:** Before this fix, `panic_data_write_esf()` overwrote `pdata-\u003ecm.regs[CORTEX_PANIC_REGISTER_IPSR]` with `esf-\u003ebasic.xpsr` (e.g., `0x01000000` with the Thumb bit set and exception number `0`). Please verify that `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` stores `__get_IPSR()` rather than `esf.basic.xpsr` when compiled for Cortex-M (and in the on-device `zephyr/test/hwtest/src/panic.c` fault test):\n\n```c\nZTEST(panic, test_panic_data_write_esf)\n{\n\tstruct arch_esf esf \u003d { 0 };\n\tuint8_t expected_flags \u003d IS_ENABLED(CONFIG_CROS_EC_RW) ?\n\t\t\t\t\t PANIC_DATA_FLAG_RW_IMAGE :\n\t\t\t\t\t PANIC_DATA_FLAG_RO_IMAGE;\n\n#if defined(CONFIG_CPU_CORTEX_M)\n\t/*\n\t * Populate a non-zero stacked xPSR (Thumb bit set, IPSR \u003d 0) to\n\t * verify that cm.regs[CORTEX_PANIC_REGISTER_IPSR] records the live\n\t * __get_IPSR() value rather than esf.basic.xpsr.\n\t */\n\tesf.basic.xpsr \u003d 0x01000000;\n#endif\n\tif (IS_ENABLED(CONFIG_ARM)) {\n\t\texpected_flags |\u003d PANIC_DATA_FLAG_FRAME_VALID;\n\t}\n\n\tpanic_data_write_esf(\u0026esf);\n\n\tstruct panic_data *pdata \u003d panic_get_data();\n\n\tzassert_not_null(pdata, NULL);\n\tzassert_equal(pdata-\u003emagic, PANIC_DATA_MAGIC);\n\tzassert_equal(pdata-\u003estruct_version, PANIC_DATA_VERSION);\n\tzassert_equal(pdata-\u003estruct_size, CONFIG_PANIC_DATA_SIZE);\n\tzassert_equal(pdata-\u003eflags, expected_flags);\n#if defined(CONFIG_CPU_CORTEX_M)\n\tzassert_equal(pdata-\u003ecm.frame[CORTEX_PANIC_FRAME_REGISTER_PSR],\n\t\t      esf.basic.xpsr);\n\tzassert_equal(pdata-\u003ecm.regs[CORTEX_PANIC_REGISTER_IPSR], __get_IPSR());\n#endif\n}\n```\n\nAnd in `zephyr/test/hwtest/src/panic.c` (`test_panic_data`), where `udf #0` triggers a real Cortex-M fault in handler mode, please also assert that the saved exception number is non-zero (e.g. UsageFault `6` on ARMv7-M/ARMv8-M Mainline or HardFault `3` on Cortex-M0):\n\n```c\n\tif (IS_ENABLED(CONFIG_CPU_CORTEX_M)) {\n\t\tzassert_not_equal(pdata-\u003ecm.regs[CORTEX_PANIC_REGISTER_IPSR], 0);\n\t}\n```\n\n[🔗](http://go/tj/84adf0a1-0b27-4ff3-b51d-27eb83e9e93b)",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 367,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
