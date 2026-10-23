@@ -70,6 +70,30 @@
       },
       "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49c43c7a_7edc5a35",
+        "filename": "include/system.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-23T20:29:30Z",
+      "side": 1,
+      "message": "irq_lock() + __disable_irq() still leaves some cases uncovered. It results in `PRIMASK \u003d\u003d 1 \u0026\u0026 BASEPRI !\u003d 1`, which blocks priority interrupts from waking from WFI. This is problematic for hibernate (fixed in crrev/c/8623513). Also a problem for Zephyr -\u003e Legacy EC sysjumps because legacy EC does not clear BASEPRI (fixed by crrev/c/8645850 and crrev/c/8645849).\n\n`interrupt_disable_all()` is causing confusion. This CL replaces it with `irq_lock()` in most cases, except where special handling of interrupts is necessary (WFI and jumping to legacy EC).",
+      "parentUuid": "4d02322a_af53454c",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 29
+      },
+      "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
