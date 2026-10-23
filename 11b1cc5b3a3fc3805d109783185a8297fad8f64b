@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d03fb478_8362adc8",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-23T16:35:30Z",
+      "side": 1,
+      "message": "you probably want to use `GPIO_OUTPUT_ACTIVE` or `GPIO_OUTPUT_INACTIVE`, just to be explicit",
+      "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
