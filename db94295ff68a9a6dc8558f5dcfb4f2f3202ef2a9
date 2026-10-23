@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "864b8874_26318153",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:35:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please address two issues with the scope and commit description:\n\n1. **Split into two independent CLs:** This patch bundles two self-contained, independently revertible fixes in `chip/it83xx/flash.c`:\n   * **CL 1 (`dma_flash_fsce_high`, lines 203–208):** Add two consecutive `IT83XX_GCTRL_WNCKR` writes before driving `FSCE#` high so the last SPI byte is latched by internal e-flash before chip select is deasserted.\n   * **CL 2 (`dma_flash_cmd_read_status`, lines 248–262):** Keep `FSCE#` asserted after sending `FLASH_CMD_RS` (`cmd_end \u003d 0`), poll `IT83XX_SMFI_ECINDDR` with a `IT83XX_GCTRL_WNCKR` delay between reads instead of toggling `FSCE#` and resending `FLASH_CMD_RS` on every iteration, and drive `FSCE#` high once the target status is reached.\n2. **Use concise prose instead of a numbered file/register breakdown:** Replace the `In chip/it83xx/flash.c:` lead-in and numbered list (`1.`, `2.`) with 1–2 short prose paragraphs that state the problem and conceptual fix without narrating line-by-line register assignments.\n\n### Suggested Commit Messages (If Split — Recommended)\n\n**CL 1 (`dma_flash_fsce_high`):**\n```text\nchip/it83xx: Delay before driving flash FSCE# high\n\ndma_flash_fsce_high() drives FSCE# high immediately after selecting the\ndeassert address without waiting for internal e-flash to latch the last\ntransmitted SPI byte.\n\nPerform two consecutive writes to IT83XX_GCTRL_WNCKR (65.536 kHz) to\nguarantee at least ~15 us of delay before driving FSCE# high, matching\nZephyr\u0027s ramcode_flash_fsce_high().\n\nBUG\u003db:574033256\nTEST\u003dApply patch and verify flash write/erase operations\n\nChange-Id: I7e30b19284c549a681f3209c417b8291d4a8e303\n```\n\n**CL 2 (`dma_flash_cmd_read_status`):**\n```text\nchip/it83xx: Keep FSCE# asserted and delay during flash status polling\n\ndma_flash_cmd_read_status() repeatedly toggles FSCE# and resends\nFLASH_CMD_RS in a tight loop with no delay between status checks.\n\nSend FLASH_CMD_RS once while keeping FSCE# asserted, delay via\nIT83XX_GCTRL_WNCKR (~15 us) between status register reads, and drive\nFSCE# high after the expected status is observed, matching Zephyr\u0027s\nramcode_flash_cmd_read_status() (crrev.com/c/8119380).\n\nBUG\u003db:574033256\nTEST\u003dApply patch and verify flash write/erase status polling\n```\n\n### Suggested Commit Message (Single-CL Fallback)\n\n```text\nchip/it83xx: Align e-flash CS# deassertion and status polling with Zephyr\n\ndma_flash_fsce_high() drives FSCE# high immediately without waiting for\ninternal e-flash to latch the final SPI byte, and\ndma_flash_cmd_read_status() repeatedly toggles FSCE# and resends\nFLASH_CMD_RS in a tight loop with no delay between checks.\n\nGuarantee at least ~15 us of delay via two IT83XX_GCTRL_WNCKR writes\nbefore driving FSCE# high, and keep FSCE# asserted across status polling\nwith a WNCKR delay between reads before deasserting FSCE#, matching\nZephyr\u0027s IT8xxx2 flash driver (crrev.com/c/8119380).\n\nBUG\u003db:574033256\nTEST\u003dApply patch and verify flash write/erase status polling\n\nChange-Id: I7e30b19284c549a681f3209c417b8291d4a8e303\n```\n\n[🔗](http://go/tj/48e7138f-8604-40c8-9a6f-0fe9e644f941)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "db94295ff68a9a6dc8558f5dcfb4f2f3202ef2a9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd8ee0da_5ad1541f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:35:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:** ✅ The two consecutive `IT83XX_GCTRL_WNCKR` (65.536 kHz) writes in `dma_flash_fsce_high()` guarantee at least one full clock period (~15.25 us) before driving `FSCE#` high, and keeping `FSCE#` asserted (`cmd_end \u003d 0`) while polling `IT83XX_SMFI_ECINDDR` with a `WNCKR` delay between reads in `dma_flash_cmd_read_status()` matches the hardware follow-mode status polling sequence in Zephyr.\n* **Architecture \u0026 Component Fit:** ✅ The changes stay within the `.flash_direct_map` RAM-code layer in `chip/it83xx/flash.c` and align `ec-legacy` with the corresponding Zephyr IT8xxx2 flash driver (`ramcode_flash_fsce_high()` and `ramcode_flash_cmd_read_status()`).\n* **Code Simplicity:** ✅ Removing the single-element `status[1]` buffer and repeated `dma_flash_transaction()` calls in `dma_flash_cmd_read_status()` simplifies the polling loop.\n* **Idiomaticity \u0026 Readability:** ✅ Register accesses and comments follow the conventions in `chip/it83xx/flash.c`.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ✅ These changes control low-level IT83xx MMIO bus-stall timing (`IT83XX_GCTRL_WNCKR`) and physical SPI chip-select (`FSCE#`) signaling inside `.flash_direct_map` RAM code, which requires physical hardware verification.\n* **CL Size \u0026 Scope:** ❌ `Size: S (+14, -8)`. Although the line delta is small, this CL bundles two independent logical changes in `chip/it83xx/flash.c` that can each be committed and reverted on their own:\n  1. **CL 1 (`chip/it83xx/flash.c`, `dma_flash_fsce_high`, lines 203–208):** Add two consecutive `IT83XX_GCTRL_WNCKR` writes before driving `FSCE#` high so the last SPI byte is latched before chip select is deasserted.\n  2. **CL 2 (`chip/it83xx/flash.c`, `dma_flash_cmd_read_status`, lines 248–262):** Keep `FSCE#` asserted after sending `FLASH_CMD_RS`, poll `IT83XX_SMFI_ECINDDR` with a `IT83XX_GCTRL_WNCKR` delay between reads instead of toggling `FSCE#` and resending `FLASH_CMD_RS` on each iteration, and drive `FSCE#` high at the end of the transaction.\n* **Commit Message:** ❌ Please replace the `In chip/it83xx/flash.c:` prefix and numbered list (`1.`, `2.`) with concise prose paragraphs (see inline comment on `/COMMIT_MSG` for copy-pasteable replacements). [🔗](http://go/tj/48e7138f-8604-40c8-9a6f-0fe9e644f941)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "db94295ff68a9a6dc8558f5dcfb4f2f3202ef2a9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
