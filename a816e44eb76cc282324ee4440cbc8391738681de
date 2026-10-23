@@ -1,0 +1,173 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fbda299_15749a37",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:06:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Avoid starting the second paragraph with the filler pronoun `\"This translates...\"` and omit the third paragraph (`\"Add unit tests for...\"`), as routine unit test additions are already self-evident from the diff and `TEST\u003d` line:\n\n```text\nzephyr: fingerprint: Implement rts5817maa image capture\n\nImplement the image capture flow for the RTS5817MAA driver to support\nbiometric authentication by translating standard capture types to the\nvendor-specific format and mapping sensor response codes to standard\nfingerprint scan errors.\n\nBUG\u003db:478708415\nTEST\u003d./twister -T zephyr/test/fingerprint/drivers/rts5817maa \\\n     -s fingerprint.drivers.rts5817maa -p native_sim\n\nChange-Id: I8260635ab1fc9b0d8d9d14e35640df6bd16a0402\n```\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfab1cef_37d08f5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:06:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments on `zephyr/drivers/fingerprint/fingerprint_rts5817maa.c`, `zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c`, and `/COMMIT_MSG`.\n\n### Review Summary\n* **Functionality:** ❌ `rts5817maa_acquire_image` does not validate `image \u003d\u003d NULL` before forwarding the pointer to `rts5817maa_sensor_acquire_image`, and logs the already-mapped `ret` (`-EIO`) instead of the raw `rts_fp_return_t` status code on failure.\n* **Architecture \u0026 Component Fit:** ✅ Fits the Zephyr `cros_fingerprint` driver interface (`fingerprint_driver_api.acquire_image`) and matches the structure of existing `rts5817maa` operations.\n* **Code Simplicity:** ❌ `convert_fp_capture_type_to_rts_capture_type` lists 7 unsupported `FINGERPRINT_CAPTURE_TYPE_*` cases that fall through directly to `default: return RTS_CAPTURE_TYPE_INVALID;` (while omitting `FINGERPRINT_CAPTURE_TYPE_PATTERN2`). Removing the redundant fallthrough cases keeps the `switch` minimal and symmetric with `convert_rts_get_image_error_code` and `convert_rts_snr_init_error_code`.\n* **Idiomaticity \u0026 Readability:** ❌ Use `FINGERPRINT_SENSOR_SCAN_GOOD` instead of raw `0` in `convert_rts_get_image_error_code` for consistency with the other `enum fingerprint_sensor_scan` return values, add braces around the `if (size \u003c CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE)` block in `rts5817maa_acquire_image`, and remove the leading space before the tab on line 28.\n* **Security:** ⚠️ Validating `image \u003d\u003d NULL` in `rts5817maa_acquire_image` prevents passing a null pointer into the proprietary sensor library.\n* **Testing:** ❌ Add a unit test for `image \u003d\u003d NULL` (`test_acquire_image_null_buffer`) and include `FINGERPRINT_CAPTURE_TYPE_PATTERN2` in `test_convert_capture_type`.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+201, -0)` (~65 production lines and ~136 unit test lines). Single cohesive logical change implementing `.acquire_image` for `rts5817maa` with its unit tests.\n* **Commit Message:** ❌ Remove the redundant `\"Add unit tests for...\"` paragraph and `\"This translates...\"` filler opener (see inline replacement on `/COMMIT_MSG`).\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9d1e54f_2a094230",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:06:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `convert_fp_capture_type_to_rts_capture_type` explicitly lists 7 unsupported `FINGERPRINT_CAPTURE_TYPE_*` cases (`PATTERN0` through `RESET_TEST`) that simply fall through to `default: return RTS_CAPTURE_TYPE_INVALID;` (while still omitting `FINGERPRINT_CAPTURE_TYPE_PATTERN2` and `FINGERPRINT_CAPTURE_TYPE_MAX`). In addition, line 28 has a leading space before the tab character (` \\t`).\n\nTo keep the control flow minimal and consistent with `convert_rts_get_image_error_code` and `convert_rts_snr_init_error_code` below, list only the supported capture types and let `default:` handle all unsupported values:\n\n```c\nIF_DISABLED(CONFIG_ZTEST, (static))\nrts_capture_mode_t convert_fp_capture_type_to_rts_capture_type(\n\tenum fingerprint_capture_type capture_type)\n{\n\tswitch (capture_type) {\n\tcase FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT:\n\tcase FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE:\n\t\treturn RTS_CAPTURE_NORMAL_FORMAT;\n\tdefault:\n\t\treturn RTS_CAPTURE_TYPE_INVALID;\n\t}\n}\n```\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2487058_a5f7689f",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:06:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Per `zephyr/include/drivers/fingerprint.h`, non-negative return values from `fingerprint_acquire_image` represent `enum fingerprint_sensor_scan` values. Since the other non-error branches return `FINGERPRINT_SENSOR_SCAN_TOO_FAST` and `FINGERPRINT_SENSOR_SCAN_LOW_SENSOR_COVERAGE`, return the named enumerator `FINGERPRINT_SENSOR_SCAN_GOOD` instead of raw `0` for `RTS_FP_SUCCESS` (matching `convert_egis_get_image_error_code` in `fingerprint_egis630.c`):\n\n```c\nstatic int convert_rts_get_image_error_code(rts_fp_return_t code)\n{\n\tswitch (code) {\n\tcase RTS_FP_SUCCESS:\n\t\treturn FINGERPRINT_SENSOR_SCAN_GOOD;\n\tcase RTS_ERROR_FAST_FINGER_UP:\n\t\treturn FINGERPRINT_SENSOR_SCAN_TOO_FAST;\n\tcase RTS_ERROR_IMAGE_PARTIAL:\n\t\treturn FINGERPRINT_SENSOR_SCAN_LOW_SENSOR_COVERAGE;\n\tdefault:\n\t\treturn -EIO;\n\t}\n}\n```\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16a0355a_9accdc20",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:06:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Three issues in `rts5817maa_acquire_image`:\n\n1. **Missing `NULL` buffer check \u0026 braces:** If `image \u003d\u003d NULL` is passed with `size \u003e\u003d CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE`, `NULL` is forwarded directly to `rts5817maa_sensor_acquire_image`. Validate `image \u003d\u003d NULL` alongside `size \u003c CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE` (matching `rts5817maa_get_info` above and `rts5817_spi_xfer` in `fingerprint_rts5817maa_pal.c`), and wrap the `if` body in braces `{ ... }` for consistency with Zephyr style and the rest of this file.\n2. **Diagnostic error code lost in `LOG_ERR`:** Wrapping `rts5817maa_sensor_acquire_image(...)` inside `convert_rts_get_image_error_code(...)` before logging collapses all sensor/SPI failures (`RTS_ERROR_IO_EXCEPTION`, `RTS_ERROR_TIMEOUT`, `RTS_ERROR_INVALID_PARAMETER`) into `-EIO` (`-5`), so the log message loses the specific `rts_fp_return_t` failure code returned by the library. Capture the raw `rts_fp_return_t` status first and log it on failure (matching `rts5817maa_get_info` on lines 176–180).\n\n```c\nstatic int rts5817maa_acquire_image(const struct device *dev,\n\t\t\t\t    enum fingerprint_capture_type capture_type,\n\t\t\t\t    uint8_t *image, size_t size)\n{\n\tif (image \u003d\u003d NULL || size \u003c CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE) {\n\t\treturn -EINVAL;\n\t}\n\n\trts_capture_mode_t rts_capture_mode \u003d\n\t\tconvert_fp_capture_type_to_rts_capture_type(capture_type);\n\n\tif (rts_capture_mode \u003d\u003d RTS_CAPTURE_TYPE_INVALID) {\n\t\tLOG_ERR(\"Unsupported capture_type %d provided\", capture_type);\n\t\treturn -EINVAL;\n\t}\n\n\tif (!IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {\n\t\treturn -ENOTSUP;\n\t}\n\n\trts_fp_return_t res \u003d\n\t\trts5817maa_sensor_acquire_image(image, rts_capture_mode);\n\tif (res !\u003d RTS_FP_SUCCESS) {\n\t\tLOG_ERR(\"Failed to acquire image with capture_type %d: %d\",\n\t\t\tcapture_type, res);\n\t}\n\n\treturn convert_rts_get_image_error_code(res);\n}\n```\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
+      "range": {
+        "startLine": 245,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6488f37f_f98beae1",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:06:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Add a unit test verifying that passing a `NULL` image buffer to `fingerprint_acquire_image` is rejected with `-EINVAL` without invoking `rts5817maa_sensor_acquire_image` (matching `test_get_info_null_args` above):\n\n```c\nZTEST_F(rts5817maa, test_acquire_image_null_buffer)\n{\n\tzassert_equal(fingerprint_acquire_image(\n\t\t\t      fixture-\u003edev,\n\t\t\t      FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE, NULL,\n\t\t\t      CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE),\n\t\t      -EINVAL);\n\tzassert_equal(rts5817maa_sensor_acquire_image_fake.call_count, 0);\n}\n```\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
+      "range": {
+        "startLine": 484,
+        "startChar": 0,
+        "endLine": 494,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5f0f070_4a8cfd87",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:06:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `test_convert_capture_type` checks every enumerator in `enum fingerprint_capture_type` except `FINGERPRINT_CAPTURE_TYPE_PATTERN2` (defined in `zephyr/include/drivers/fingerprint.h`). Please include `FINGERPRINT_CAPTURE_TYPE_PATTERN2` so all declared capture type enumerators are covered:\n\n```c\n\tzassert_equal(\n\t\tconvert_fp_capture_type_to_rts_capture_type(\n\t\t\tFINGERPRINT_CAPTURE_TYPE_RESET_TEST),\n\t\tRTS_CAPTURE_TYPE_INVALID);\n\tzassert_equal(\n\t\tconvert_fp_capture_type_to_rts_capture_type(\n\t\t\tFINGERPRINT_CAPTURE_TYPE_PATTERN2),\n\t\tRTS_CAPTURE_TYPE_INVALID);\n\tzassert_equal(\n\t\tconvert_fp_capture_type_to_rts_capture_type(\n\t\t\tFINGERPRINT_CAPTURE_TYPE_MAX),\n\t\tRTS_CAPTURE_TYPE_INVALID);\n```\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
+      "range": {
+        "startLine": 496,
+        "startChar": 0,
+        "endLine": 538,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
