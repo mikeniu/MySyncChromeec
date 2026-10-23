@@ -3,6 +3,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a33d2034_49dd92a1",
+        "filename": "zephyr/test/system_common/include/cmsis_core.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T01:36:49Z",
+      "side": 1,
+      "message": "Please avoid creating a shadow `include/cmsis_core.h` header, adding `zephyr_include_directories(include)` to override `\u003ccmsis_core.h\u003e`, and duplicating Kconfig symbols (`NPCX_RAM_LOCK`, `FLASH_BASE_ADDRESS`, `FLASH_SIZE`, `SRAM_BASE_ADDRESS`, `SRAM_SIZE`) in `zephyr/test/system_common/Kconfig`:\n\n1. **Why this is problematic**:\n   - Putting a fake `cmsis_core.h` on the include path shadows the real CMSIS header for the entire test binary and couples `zephyr/test/system_common` (which tests `common/system.c`) to internal register layout details of `zephyr/shim/core/cortex-m/mpu.c`.\n   - Redefining SoC/arch Kconfig symbols in `zephyr/test/system_common/Kconfig` duplicates upstream definitions and can cause Kconfig symbol collisions if configs change.\n\n2. **How to make this idiomatic**:\n   - **To test `common/system.c` in `zephyr/test/system_common`**:\n     1. Keep only the `TEST_SYSTEM_MPU` Kconfig helper that selects `CPU_HAS_MPU` and `MPU` (needed on `native_sim` because Zephyr\u0027s `MPU` depends on `CPU_HAS_MPU`), so `CONFIG_ARM_MPU` is defined via `zephyr/shim/include/config_chip.h` without duplicating SoC Kconfig symbols.\n     2. Delete `zephyr/test/system_common/include/cmsis_core.h` and remove `zephyr/shim/core/cortex-m/mpu.c` and `zephyr_include_directories(include)` from `zephyr/test/system_common/CMakeLists.txt`.\n     3. Mock the MPU API in `zephyr/test/system_common/src/main.c` using FFF (e.g., `FAKE_VOID_FUNC(mpu_enable);`, `FAKE_VALUE_FUNC(int, mpu_protect_data_ram);`, `FAKE_VALUE_FUNC(int, mpu_lock_ro_flash);`) and assert that `system_common_pre_init()` calls `mpu_enable()` when `system_is_locked()` returns `0`.\n   - **To unit-test `zephyr/shim/core/cortex-m/mpu.c` on `native_sim`**:\n     - Isolate the 3 direct `MPU-\u003eRNR` / `MPU-\u003eRASR` accesses behind a small `test_mockable` helper (or conditionally defined register accessor for `CONFIG_ZTEST`) rather than shadowing `\u003ccmsis_core.h\u003e`.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "9c83eb3bf94dc50e5865901e84b65e4be9e7e451",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d031cfe5_33675551",
         "filename": "zephyr/test/system_common/include/kernel_arch_data.h",
         "patchSetId": 2
