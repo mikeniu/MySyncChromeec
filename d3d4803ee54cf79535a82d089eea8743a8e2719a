@@ -25,6 +25,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e93ea2b8_f3621baa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:55:29Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "09d70ad0_8ddb8c79",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9b6e0b2_40a39517",
@@ -39,6 +63,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** — See the `CL Size \u0026 Scope` section and inline comments below. [[trajectory](https://goto.corp.google.com/traj/34f9f031-2e2e-41f5-9bad-23cdbee60b93)]\n\n### Review Summary\n\n- **Functionality**: `system_disable_jump()` now configures and enables the MPU even when `system_is_locked()` is false, while gating sticky `ram_lock_config_lock_region()` calls on `system_is_locked()` and disabling the MPU in `HOOK_SYSJUMP` so unlocked systems can sysjump cleanly. Additionally, `mpu_protect_code_ram()` configures a 256 MB lower-priority `MPU_ATTR_XN | MPU_ATTR_NO_NO` region (`REGION_CODE_RAM` / `REGION_CODE_RAM2`) under `REGION_STORAGE` when `CONFIG_EXTERNAL_STORAGE` is enabled.\n- **Architecture \u0026 Component Fit**: Gating sticky `ram_lock` hardware configuration inside `mpu_protect_data_ram()` and `mpu_protect_code_ram()` while allowing `system_disable_jump()` to unconditionally configure the MPU fits cleanly with the existing Cortex-M MPU lifecycle (`mpu_pre_init()` -\u003e `HOOK_SYSJUMP` -\u003e `system_disable_jump()`).\n- **Code Simplicity**: The control flow in `common/system.c` and `core/cortex-m/mpu.c` is straightforward, and using `IS_ENABLED(CONFIG_EXTERNAL_STORAGE)` and `IS_ENABLED(CONFIG_ROLLBACK_MPU_PROTECT)` avoids additional `#ifdef` nesting.\n- **Idiomaticity \u0026 Readability**: In `core/cortex-m/mpu.c` (lines 327–331) and `test/system.c` (lines 89–131), replace bare numeric literals (`28` for the 256 MB code RAM aperture bit-width, plus raw register/address literals in `test/system.c`) with named constants and expressions.\n- **Security**: Keeping the MPU enabled on unlocked systems and marking unused code SRAM in the 256 MB aperture as `MPU_ATTR_XN | MPU_ATTR_NO_NO` strengthens defense-in-depth without locking out developer sysjumps when write-protect is disabled.\n- **Testing**: `test/system.c` adds host unit test coverage for `system_disable_jump()` and `HOOK_SYSJUMP`, but its `mock_mpu_size_attr` assertions only check `MPU_ATTR_XN` (missing `MPU_ATTR_NO_NO`, `MPU_ATTR_RO_NO`, `REGION_STORAGE2` XN, `REGION_DATA_RAM`, and the size/subregion fields) and do not cover the `ram_lock_config_lock_region()` failure path. See the inline comment on `test/system.c`.\n- **CL Size \u0026 Scope**: This CL (`Size: L (+229, -71)`) bundles two independent logical changes that can each be compiled, tested, and reverted on their own. Please split it into 2 focused CLs:\n  1. **CL 1 — Keep MPU enabled when unlocked (`common/system.c`, `core/cortex-m/mpu.c`, `test/system.c`, `test/build.mk`, `test/test_config.h`)**: Always configure and enable the MPU in `system_disable_jump()` regardless of `system_is_locked()`, gate `ram_lock_config_lock_region()` on `system_is_locked()` in `mpu_protect_data_ram()` and `mpu_protect_code_ram()`, register `mpu_Sysjump()` on `HOOK_SYSJUMP`, and add the unit test for unlocked vs. locked MPU behavior.\n  2. **CL 2 — Mark unused code SRAM XN and inaccessible (`core/cortex-m/mpu.c`, `test/system.c`)**: Configure the 256 MB `MPU_ATTR_XN | MPU_ATTR_NO_NO` background code RAM region (`REGION_CODE_RAM` / `REGION_CODE_RAM2`) in `mpu_protect_code_ram()` when `CONFIG_EXTERNAL_STORAGE` is enabled, along with the corresponding region assertions in `test/system.c`.\n- **Commit Message**: The commit message joins two independent changes (`\"... and ...\"`, `\"In addition, ...\"`) and narrates internal macro/enum names (`REGION_CODE_RAM`, `REGION_CODE_RAM2`, `CONFIG_ROLLBACK_MPU_PROTECT`, `REGION_STORAGE`, `HOOK_SYSJUMP`). See the inline comment on `/COMMIT_MSG` for copy-pasteable replacements for both the split CLs and the single-CL option.",
       "isAi": true,
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "175425af_2fd94fdf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:55:29Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "e9b6e0b2_40a39517",
       "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -67,6 +109,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6497c7cb_29933dfa",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:55:29Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "c3c93ddb_ae56ed0a",
+      "range": {
+        "startLine": 327,
+        "startChar": 0,
+        "endLine": 331,
+        "endChar": 9999
+      },
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1620d6a6_b80182fc",
@@ -91,6 +157,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66f0a3b6_01e79387",
+        "filename": "test/system.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:55:29Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "1620d6a6_b80182fc",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49a8c29a_90375035",
@@ -111,6 +201,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62181564_66569945",
+        "filename": "test/system.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:55:29Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "49a8c29a_90375035",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 9999
+      },
       "revId": "d3d4803ee54cf79535a82d089eea8743a8e2719a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
