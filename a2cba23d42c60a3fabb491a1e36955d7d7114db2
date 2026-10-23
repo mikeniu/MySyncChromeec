@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8789461_3c5ab772",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:35:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please update the commit message to use concise prose instead of a bulleted walkthrough of C macros/operators, and avoid joining distinct change categories in the subject line:\n\n1. **Prose Over Code Narration:** Instead of listing low-level expressions (`newrange`, `LSM6DSM_ACCEL_NORMALIZE_FS(newrange)`, `__fls()`, `\u003e` vs. `\u003c`, `s-\u003ecurrent_range`) in bullets, explain *why* the prior behavior failed and *what* changed conceptually in 1–2 short prose paragraphs.\n2. **Undocumented `prj.conf` Change \u0026 Scope Split:** `zephyr/test/drivers/lsm6dsm/prj.conf` (`CONFIG_SENSOR\u003dy`) is not mentioned in the commit message and should be either dropped (since `EMUL_LSM6DSM` already selects `SENSOR` in `zephyr/emul/Kconfig`) or moved to a separate test-config CL. Similarly, if splitting the normalization/round-up fix and the min/max clamping change into separate CLs, use focused descriptions for each.\n\n**Option A (If split into focused CLs):**\n\n- **CL 1 (Normalization and round-up fix):**\n```text\ndriver: accelgyro_lsm6dsm: Normalize rounded accel range in set_range\n\nPreviously, set_range() for MOTIONSENSE_TYPE_ACCEL compared the\nrequested range against the rounded-down power-of-two range using `\u003c`\ninstead of `\u003e`, preventing non-power-of-two ranges from rounding up\nwhen requested, and stored the un-normalized range in current_range.\n\nNormalize the accelerometer full-scale range to a supported power of\ntwo and double it when round-up is requested on a non-power-of-two\ninput.\n\nBUG\u003db:574009676\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dsm\n\nChange-Id: I7ef3dad4fb0cb5bba0ac26d5ea3be01ec8774188\n```\n\n- **CL 2 (Clamping out-of-bounds accelerometer ranges):**\n```text\ndriver: accelgyro_lsm6dsm: Clamp accel range in set_range\n\nAccelerometer full-scale ranges below 2G were passed directly into\n__fls() without lower-bound clamping, resulting in invalid bit shifts\nand register encodings.\n\nDefine LSM6DSM_ACCEL_FS_MIN_VAL (2G) and clamp requested accelerometer\nranges to [LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL] before\nnormalizing.\n\nBUG\u003db:574009676\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dsm\n```\n\n**Option B (If kept as a single CL after removing the unrelated `prj.conf` change):**\n```text\ndriver: accelgyro_lsm6dsm: Fix accel range normalization in set_range\n\nPreviously, set_range() for MOTIONSENSE_TYPE_ACCEL did not clamp\ninputs below the minimum 2G full-scale range, checked `\u003c` instead of\n`\u003e` when rounding up non-power-of-two ranges, and stored the\nun-normalized range in current_range.\n\nClamp requested accelerometer ranges to [2G, 16G], normalize to a\nsupported power-of-two full-scale value, and round up to the next\npower of two when requested.\n\nBUG\u003db:574009676\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dsm\n\nChange-Id: I7ef3dad4fb0cb5bba0ac26d5ea3be01ec8774188\n```\n\n[🔗](http://go/tj/0badb717-4734-4ea1-bdc8-e5eb907799f5)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4beabeb6_221e63a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:35:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comments for details.\n\n### Review Summary\n- **Functionality:** ✅ Clamping `range` to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]`, normalizing to a power-of-two full-scale value, and fixing the round-up relational check (`\u003e` instead of `\u003c`) fixes accelerometer range selection in `set_range()`.\n- **Architecture \u0026 Component Fit:** ✅ Defining `LSM6DSM_ACCEL_FS_MIN_VAL` (`2`) in `driver/accelgyro_lsm6dsm.h` and clamping inside `set_range()` aligns with sibling ST sensor drivers (`driver/accel_lis2dw12.c`).\n- **Code Simplicity:** ❌ In `driver/accelgyro_lsm6dsm.c`, once `range` is clamped to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]` (`[2, 16]`), normalizing `range` first (`newrange \u003d LSM6DSM_ACCEL_NORMALIZE_FS(range)`) and doubling `newrange` when `rnd \u0026\u0026 (range \u003e newrange)` eliminates the second `LSM6DSM_ACCEL_NORMALIZE_FS()` call and makes the `if (newrange \u003e LSM6DSM_ACCEL_FS_MAX_VAL)` branch unreachable.\n- **Idiomaticity \u0026 Readability:** ❌ In `zephyr/test/drivers/lsm6dsm/src/main.c`, boundary assertions in `test_set_range` should reference the named constants `LSM6DSM_ACCEL_FS_MIN_VAL` and `LSM6DSM_ACCEL_FS_MAX_VAL` (`LSM6DSM_ACCEL_FS_MIN_VAL - 1`, `LSM6DSM_ACCEL_FS_MAX_VAL + 1`) rather than raw numeric literals (`1`, `2`, `16`, `20`).\n- **Security:** ✅ Clamping non-positive inputs before invoking `LSM6DSM_ACCEL_NORMALIZE_FS()` prevents undefined bit shifts in `__fls()`.\n- **Testing:** ❌ `test_set_range` in `zephyr/test/drivers/lsm6dsm/src/main.c` is missing boundary and mutation test cases: exact power-of-two inputs (`2`, `4`, `8`, `16`) and clamped inputs with `rnd \u003d 1` (needed to distinguish `\u003e` from `\u003e\u003d`), the upper off-by-one boundary `LSM6DSM_ACCEL_FS_MAX_VAL - 1` (`15`) with `rnd \u003d 0` and `rnd \u003d 1`, `LSM6DSM_ACCEL_FS_MAX_VAL + 1` (`17`), and `0` / `-1` inputs.\n- **CL Size \u0026 Scope:** ❌ `Size: S (+31, -1)` (~9 production lines across `driver/accelgyro_lsm6dsm.c` and `driver/accelgyro_lsm6dsm.h`, 1 config line in `zephyr/test/drivers/lsm6dsm/prj.conf`, and 22 test lines in `zephyr/test/drivers/lsm6dsm/src/main.c`). While small in line count, this CL bundles an undocumented Kconfig change (`CONFIG_SENSOR\u003dy` in `zephyr/test/drivers/lsm6dsm/prj.conf`, which appears redundant with `select SENSOR` under `EMUL_LSM6DSM` in `zephyr/emul/Kconfig`) alongside two independently testable `set_range()` fixes described in the subject line (`\"clamping and round-up\"`) and multi-bullet commit body:\n  1. **CL 1 (or drop if redundant):** Remove `CONFIG_SENSOR\u003dy` from `zephyr/test/drivers/lsm6dsm/prj.conf` if redundant with `EMUL_LSM6DSM`, or move it to a standalone test-configuration CL if required.\n  2. **CL 2:** Normalize non-power-of-two accelerometer ranges and fix the round-up check (`\u003e` instead of `\u003c`) in `driver/accelgyro_lsm6dsm.c`, with rounding unit tests in `zephyr/test/drivers/lsm6dsm/src/main.c`.\n  3. **CL 3:** Add `LSM6DSM_ACCEL_FS_MIN_VAL` in `driver/accelgyro_lsm6dsm.h` and clamp out-of-bounds accelerometer ranges to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]` in `driver/accelgyro_lsm6dsm.c`, with min/max clamping unit tests in `zephyr/test/drivers/lsm6dsm/src/main.c`.\n- **Commit Message:** ❌ `/COMMIT_MSG` uses a 3-bullet walkthrough of code-level macro/variable expressions (`LSM6DSM_ACCEL_NORMALIZE_FS(newrange)`, `__fls()`, `s-\u003ecurrent_range`) instead of concise prose paragraphs and omits the `zephyr/test/drivers/lsm6dsm/prj.conf` change. [🔗](http://go/tj/0badb717-4734-4ea1-bdc8-e5eb907799f5)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36359ab3_90aa7753",
+        "filename": "driver/accelgyro_lsm6dsm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:35:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Once the requested range is clamped to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]` (`[2, 16]`), normalizing `range` up front eliminates the second `LSM6DSM_ACCEL_NORMALIZE_FS()` call and makes the `if (newrange \u003e LSM6DSM_ACCEL_FS_MAX_VAL)` branch unreachable:\n\n- Because `LSM6DSM_ACCEL_FS_MAX_VAL` (`16`) is already a power of two, `range \u003e newrange` (`16 \u003e 16`) is false at the upper bound, and for any clamped `range \u003c 16`, `LSM6DSM_ACCEL_NORMALIZE_FS(range)` is at most `8`, so doubling it when `rnd` is set produces at most `16` and already yields a normalized power-of-two value in `{2, 4, 8, 16}`.\n\nConsider simplifying this block to match the pattern in `driver/accel_lis2dw12.c`:\n\n```c\n\tcase MOTIONSENSE_TYPE_ACCEL:\n\t\trange \u003d CLAMP(range, LSM6DSM_ACCEL_FS_MIN_VAL,\n\t\t\t      LSM6DSM_ACCEL_FS_MAX_VAL);\n\t\tnewrange \u003d LSM6DSM_ACCEL_NORMALIZE_FS(range);\n\n\t\t/* Adjust and check rounded value for acc. */\n\t\tif (rnd \u0026\u0026 (range \u003e newrange))\n\t\t\tnewrange *\u003d 2;\n\n\t\treg_val \u003d LSM6DSM_ACCEL_FS_REG(newrange);\n\t\tbreak;\n```\n\n[🔗](http://go/tj/0badb717-4734-4ea1-bdc8-e5eb907799f5)",
+      "range": {
+        "startLine": 433,
+        "startChar": 0,
+        "endLine": 447,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "972447d6_7de08e21",
+        "filename": "zephyr/test/drivers/lsm6dsm/prj.conf",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:35:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Why is `CONFIG_SENSOR\u003dy` added here?\n\n1. `config EMUL_LSM6DSM` in `zephyr/emul/Kconfig` already includes `select SENSOR` (matching `config EMUL_LIS2DH`, where `zephyr/test/drivers/lis2dh/prj.conf` sets `CONFIG_SENSOR_LOG_LEVEL_DBG\u003dy` without `CONFIG_SENSOR\u003dy`), and `test_set_range` exercises the ChromiumOS EC `motion_sensor_t` driver rather than Zephyr\u0027s upstream `CONFIG_SENSOR` API.\n2. If `CONFIG_SENSOR\u003dy` is redundant, please remove this change; if it is needed to fix a Kconfig warning or build issue in `drivers.lsm6dsm`, please move it into a separate, self-contained test-configuration CL rather than bundling it with the `set_range()` driver changes.\n\n[🔗](http://go/tj/0badb717-4734-4ea1-bdc8-e5eb907799f5)",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d79511a_43ddd7ae",
+        "filename": "zephyr/test/drivers/lsm6dsm/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:35:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please expand `test_set_range` to cover the exact boundary conditions and reference the named constants `LSM6DSM_ACCEL_FS_MIN_VAL` and `LSM6DSM_ACCEL_FS_MAX_VAL` instead of magic literals (`1`, `2`, `16`, `20`):\n\n1. **Exact power-of-two boundaries with `rnd \u003d 1`:** `test_set_range` only passes `rnd \u003d 1` for `range \u003d 3`. If `\u003e` in `if (rnd \u0026\u0026 (newrange \u003e LSM6DSM_ACCEL_NORMALIZE_FS(newrange)))` were accidentally written as `\u003e\u003d`, calling `set_range()` with `rnd \u003d 1` on an exact power of two (`LSM6DSM_ACCEL_FS_MIN_VAL`, `4`, `8`) or a value clamped to `LSM6DSM_ACCEL_FS_MIN_VAL` would erroneously double the range (`2 -\u003e 4`, `4 -\u003e 8`, `8 -\u003e 16`) while this test would still pass.\n2. **Upper off-by-one boundary (`LSM6DSM_ACCEL_FS_MAX_VAL - 1` and `LSM6DSM_ACCEL_FS_MAX_VAL + 1`):** Test `LSM6DSM_ACCEL_FS_MAX_VAL - 1` (`15`) with `rnd \u003d 0` (rounds down to `8`) and `rnd \u003d 1` (rounds up to `LSM6DSM_ACCEL_FS_MAX_VAL`), `LSM6DSM_ACCEL_FS_MAX_VAL` (`16`), and `LSM6DSM_ACCEL_FS_MAX_VAL + 1` (`17`, instead of arbitrary `20`) with both `rnd \u003d 0` and `rnd \u003d 1`.\n3. **Zero and negative inputs (`0`, `-1`):** Prior to clamping, passing `\u003c\u003d 0` into `LSM6DSM_ACCEL_NORMALIZE_FS()` invoked `__fls()` (`31 - __builtin_clz(n)`) on non-positive values; testing `0` and `-1` directly guards against that regression.\n\n```c\nZTEST(lsm6dsm, test_set_range)\n{\n\tconst int orig_range \u003d acc-\u003ecurrent_range;\n\n\t/* Clamp \u003c\u003d minimum (-1G, 0G, and MIN - 1 -\u003e MIN) */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, -1, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MIN_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, 0, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MIN_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MIN_VAL - 1, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MIN_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MIN_VAL - 1, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MIN_VAL);\n\n\t/* Exact minimum power-of-two boundary (2G stays 2G with rnd \u003d 0 and 1) */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MIN_VAL, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MIN_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MIN_VAL, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MIN_VAL);\n\n\t/* Non-power-of-two 3G rounds down to 2G (rnd \u003d 0) and up to 4G (rnd \u003d 1) */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MIN_VAL + 1, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MIN_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MIN_VAL + 1, 1));\n\tzassert_equal(acc-\u003ecurrent_range, 4);\n\n\t/* Exact intermediate powers of two (4G and 8G stay unchanged with rnd \u003d 1) */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, 4, 1));\n\tzassert_equal(acc-\u003ecurrent_range, 4);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, 8, 1));\n\tzassert_equal(acc-\u003ecurrent_range, 8);\n\n\t/* Off-by-one below maximum (15G -\u003e 8G with rnd \u003d 0, 16G with rnd \u003d 1) */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MAX_VAL - 1, 0));\n\tzassert_equal(acc-\u003ecurrent_range, 8);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MAX_VAL - 1, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MAX_VAL);\n\n\t/* Exact maximum and off-by-one above maximum (16G and 17G -\u003e 16G) */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MAX_VAL, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MAX_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MAX_VAL + 1, 0));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MAX_VAL);\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, LSM6DSM_ACCEL_FS_MAX_VAL + 1, 1));\n\tzassert_equal(acc-\u003ecurrent_range, LSM6DSM_ACCEL_FS_MAX_VAL);\n\n\t/* Restore original range */\n\tzassert_ok(acc-\u003edrv-\u003eset_range(acc, orig_range, 0));\n\tzassert_equal(acc-\u003ecurrent_range, orig_range);\n}\n```\n\n[🔗](http://go/tj/0badb717-4734-4ea1-bdc8-e5eb907799f5)",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
