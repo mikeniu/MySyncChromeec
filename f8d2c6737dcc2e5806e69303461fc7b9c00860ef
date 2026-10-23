@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e682bcbf_b57777ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-23T14:59:27Z",
+      "side": 1,
+      "message": "Yes, futility swap_cbfs_file preserves the legacy EC RW image truncation logic in truncate_ec_rw_buf() and uses the exact same offsets to locate the image_data cookies:\n- COOKIE2_OFFSET \u003d 44U: https://chromium.googlesource.com/chromiumos/platform/vboot_reference/+/HEAD/futility/cmd_swap_cbfs_file.c#38\n- SIZE_OFFSET \u003d 36U: https://chromium.googlesource.com/chromiumos/platform/vboot_reference/+/HEAD/futility/cmd_swap_cbfs_file.c#39\n- Cookie matching in truncate_ec_rw_buf(): https://chromium.googlesource.com/chromiumos/platform/vboot_reference/+/HEAD/futility/cmd_swap_cbfs_file.c#110",
+      "parentUuid": "5c667ef5_5ae870a6",
+      "revId": "f8d2c6737dcc2e5806e69303461fc7b9c00860ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdb50f29_af600050",
         "filename": "util/dut_handlers/alos.py",
         "patchSetId": 1
@@ -31,6 +49,30 @@
       "writtenOn": "2026-10-23T03:20:26Z",
       "side": 1,
       "message": "{ec_rw_dut_path}",
+      "range": {
+        "startLine": 308,
+        "startChar": 39,
+        "endLine": 308,
+        "endChar": 72
+      },
+      "revId": "f8d2c6737dcc2e5806e69303461fc7b9c00860ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90ea1b36_9d441187",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-23T14:59:27Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "bdb50f29_af600050",
       "range": {
         "startLine": 308,
         "startChar": 39,
@@ -54,6 +96,30 @@
       "writtenOn": "2026-10-23T03:20:26Z",
       "side": 1,
       "message": "f\"{cfg_dut_path}\"",
+      "range": {
+        "startLine": 309,
+        "startChar": 16,
+        "endLine": 309,
+        "endChar": 55
+      },
+      "revId": "f8d2c6737dcc2e5806e69303461fc7b9c00860ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ad45d1_3b2c2241",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-23T14:59:27Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "8b2cc8d2_e0de2c02",
       "range": {
         "startLine": 309,
         "startChar": 16,
