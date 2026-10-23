@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54e588ba_6439d394",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T19:27:19Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "d8592a01_485b2d3a",
+      "revId": "e9c40906691d4cb717d2d75593c9ea62abe3ac8a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c0a0eac_8b1d1b86",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "e9c40906691d4cb717d2d75593c9ea62abe3ac8a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4062cf59_f85c1239",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T19:27:19Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "7c0a0eac_8b1d1b86",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 336,
+        "endChar": 9999
+      },
       "revId": "e9c40906691d4cb717d2d75593c9ea62abe3ac8a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
