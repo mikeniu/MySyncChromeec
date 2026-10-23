@@ -5,6 +5,7 @@
 
 #include "gpio_signal.h"
 #include "power.h"
+#include "timer.h"
 #include "usb_charge.h"
 #include "usb_mux.h"
 #include "usb_pd.h"
@@ -181,7 +182,8 @@ ZTEST(corsola_usb_pd_policy, test_svdm_dp_attention_dp_err)
 					     /* lp */ 0, /* conn */ 0x02) };
 	const int port = 0;
 
-	usb_mux_set(1, USB_PD_MUX_DP_ENABLED, USB_SWITCH_CONNECT, 0);
+	power_set_state(POWER_S3);
+	usb_mux_set(1, USB_PD_MUX_NONE, USB_SWITCH_CONNECT, 0);
 
 	zassert_equal(0, svdm_dp_attention(port, payload));
 }
@@ -197,11 +199,45 @@ ZTEST(corsola_usb_pd_policy, test_svdm_dp_attention_dp_lvl_high)
 		GPIO_DT_FROM_NODELABEL(dp_aux_path_sel);
 
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(ec_ap_dp_hpd_odl), 0);
+	svdm_hpd_deadline[0] = get_time().val + 500;
 	zassert_equal(1, svdm_dp_attention(port, payload));
 	zassert_equal(usb_mux_get(port), USB_PD_MUX_DOCK | USB_PD_MUX_HPD_LVL |
 						 USB_PD_MUX_HPD_IRQ);
 	zassert_equal(gpio_emul_output_get(aux_path->port, aux_path->pin),
 		      port);
+}
+
+ZTEST(corsola_usb_pd_policy, test_svdm_reset_aux_deferred)
+{
+	const struct gpio_dt_spec *aux_path =
+		GPIO_DT_FROM_NODELABEL(dp_aux_path_sel);
+
+	/* Set aux_path to 0 initially */
+	gpio_pin_set_dt(aux_path, 0);
+
+	/* Enable HPD on port 1 */
+	svdm_set_hpd_gpio(1, 1);
+	zassert_equal(active_aux_port, 1);
+
+	/* Disable HPD on port 1 -> schedules reset_aux_deferred in 1ms */
+	svdm_set_hpd_gpio(1, 0);
+	zassert_equal(active_aux_port, -1);
+
+	/* Wait for deferred function to execute (ticks = 10ms, wait 30ms) */
+	k_msleep(30);
+
+	/* Verify dp_aux_path_sel reset to 1 */
+	zassert_equal(gpio_emul_output_get(aux_path->port, aux_path->pin), 1);
+
+	/* Test branch when active_aux_port != -1 during reset_aux_deferred */
+	gpio_pin_set_dt(aux_path, 0);
+	svdm_set_hpd_gpio(1, 1);
+	svdm_set_hpd_gpio(1, 0);
+	/* Set active_aux_port to 0 before deferred runs */
+	active_aux_port = 0;
+	k_msleep(30);
+	zassert_equal(active_aux_port, 0);
+	zassert_equal(gpio_emul_output_get(aux_path->port, aux_path->pin), 0);
 }
 
 ZTEST(corsola_usb_pd_policy, test_svdm_dp_attention_dp_lvl_low)

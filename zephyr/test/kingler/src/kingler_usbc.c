@@ -484,3 +484,21 @@ ZTEST(kingler_usbc, test_board_nx20p348x_init)
 			     NX20P348X_DEVICE_CONTROL_REG, &reg));
 	zassert_true((reg & NX20P348X_CTRL_LDO_SD) != 0);
 }
+
+static bool mock_check_vbus_level(int port, enum vbus_level level)
+{
+	return (port == 0) && (level == VBUS_PRESENT);
+}
+
+ZTEST(kingler_usbc, test_pd_snk_is_vbus_provided)
+{
+	const struct tcpm_drv *saved_drv = tcpc_config[0].drv;
+	struct tcpm_drv mock_drv = *saved_drv;
+
+	mock_drv.check_vbus_level = mock_check_vbus_level;
+	tcpc_config[0].drv = &mock_drv;
+
+	zassert_true(pd_snk_is_vbus_provided(0));
+
+	tcpc_config[0].drv = saved_drv;
+}
