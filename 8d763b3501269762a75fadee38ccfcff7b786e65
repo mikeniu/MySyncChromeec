@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95c8ab28_6ae41a34",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The `int8_t` sign-extension fix in `read_temp()` is clean and accurate; please expand `test_read_temp` to cover the zero/positive sign boundary and `int8_t` domain extremes (`0x80`, `0x01`, `0x7f`, and `0x00`).\n\n### Review Summary\n* **Functionality:** ✅ Casting `raw[1]` (`OUT_TEMP_H`) to `int8_t` before integer promotion and addition with `25` properly sign-extends two\u0027s-complement negative temperature offsets below 25 °C.\n* **Architecture \u0026 Component Fit:** ✅ Fits the existing `accelgyro_lsm6dsm` driver and Zephyr `lsm6dsm` emulator test suite cleanly.\n* **Code Simplicity:** ✅ Minimal 1-line production fix with only required headers added in the test file.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C and Zephyr `ztest` conventions.\n* **Security:** ✅ No security, memory-safety, or integer-overflow concerns (`25 + (int8_t)raw[1]` is bounded within `[-103, 152]`).\n* **Testing:** ⚠️ `test_read_temp` currently tests only a single negative value (`0xff`); please also assert the `0` offset (`0x00`), positive offset (`0x01`), and `int8_t` limits (`0x80` and `0x7f`) (see inline comment on `zephyr/test/drivers/lsm6dsm/src/main.c`).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+17, -1)` — Single, self-contained bug fix and its corresponding unit test.\n* **Commit Message:** ✅ Clear, concise prose explaining the root cause and fix, with valid `BUG\u003db:574000612`, `TEST\u003d`, and `Change-Id:` trailers.\n\n[🔗](http://go/tj/996124c9-50fa-4d94-8642-3565fdc55671)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8d763b3501269762a75fadee38ccfcff7b786e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abc1e64a_79881e94",
+        "filename": "zephyr/test/drivers/lsm6dsm/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Expand `test_read_temp` to cover the zero/positive sign boundary and `int8_t` domain extremes**\n\nCurrently, `test_read_temp` only asserts a single negative value (`0xff` / `-1 C`) and writes `0x00` back to `LSM6DSM_OUT_TEMP_L_ADDR + 1` on lines 37–38 without verifying `read_temp` on `0x00`, positive offsets, or the signed 8-bit limits (`INT8_MIN` / `0x80` and `INT8_MAX` / `0x7f`). Testing only a single input point does not verify the sign transition around `0` or the full two\u0027s-complement `int8_t` range `[-128, 127]`.\n\nPlease also assert `read_temp` at `0x80` (`-128 C`), `0x01` (`+1 C`), `0x7f` (`+127 C`), and `0x00` (`0 C`, after the final reset write):\n\n```c\nZTEST(lsm6dsm, test_read_temp)\n{\n\tint temp \u003d 0;\n\n\t/* Negative temperature offset (-1 C from 25 C \u003d 24 C \u003d 297 K) */\n\tzassert_ok(i2c_write8(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t      LSM6DSM_OUT_TEMP_L_ADDR + 1, 0xff));\n\tzassert_ok(acc-\u003edrv-\u003eread_temp(acc, \u0026temp));\n\tzassert_equal(temp, C_TO_K(24));\n\n\t/* Minimum int8_t offset (-128 C from 25 C \u003d -103 C \u003d 170 K) */\n\tzassert_ok(i2c_write8(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t      LSM6DSM_OUT_TEMP_L_ADDR + 1, 0x80));\n\tzassert_ok(acc-\u003edrv-\u003eread_temp(acc, \u0026temp));\n\tzassert_equal(temp, C_TO_K(-103));\n\n\t/* Positive temperature offset (+1 C from 25 C \u003d 26 C \u003d 299 K) */\n\tzassert_ok(i2c_write8(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t      LSM6DSM_OUT_TEMP_L_ADDR + 1, 0x01));\n\tzassert_ok(acc-\u003edrv-\u003eread_temp(acc, \u0026temp));\n\tzassert_equal(temp, C_TO_K(26));\n\n\t/* Maximum int8_t offset (+127 C from 25 C \u003d 152 C \u003d 425 K) */\n\tzassert_ok(i2c_write8(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t      LSM6DSM_OUT_TEMP_L_ADDR + 1, 0x7f));\n\tzassert_ok(acc-\u003edrv-\u003eread_temp(acc, \u0026temp));\n\tzassert_equal(temp, C_TO_K(152));\n\n\t/* Zero temperature offset (0 C from 25 C \u003d 25 C \u003d 298 K) */\n\tzassert_ok(i2c_write8(acc-\u003eport, acc-\u003ei2c_spi_addr_flags,\n\t\t\t      LSM6DSM_OUT_TEMP_L_ADDR + 1, 0x00));\n\tzassert_ok(acc-\u003edrv-\u003eread_temp(acc, \u0026temp));\n\tzassert_equal(temp, C_TO_K(25));\n}\n```\n\n[🔗](http://go/tj/996124c9-50fa-4d94-8642-3565fdc55671)",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8d763b3501269762a75fadee38ccfcff7b786e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
