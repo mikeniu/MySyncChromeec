@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e0a1357_4af1750f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:44:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] 1. **Update `TEST\u003d` to run a suite that compiles and tests `accelgyro_lsm6dso.c`:** `drivers.default` does not enable `CONFIG_PLATFORM_EC_ACCELGYRO_LSM6DSO`, so `./twister -T zephyr/test/drivers -s drivers.default` does not compile `driver/accelgyro_lsm6dso.c` or exercise `push_fifo_data()`. Once a unit test is added, please update `TEST\u003d` to reflect the test target that exercises the `lsm6dso` driver.\n2. **Describe the change conceptually rather than transcribing code syntax:** Instead of repeating local variable and macro expressions from the diff (`tag`, `ARRAY_SIZE(ag_maps)`, `ag_maps[tag]`, `samples_to_discard[id]`), briefly explain why out-of-range FIFO tags can arrive (e.g., empty FIFO or non-accel/gyro sensor tags) and how `push_fifo_data()` handles them.\n\nSuggested replacement commit message:\n\n```text\ndriver: accelgyro_lsm6dso: Ignore out-of-bounds FIFO tags\n\nThe LSM6DSO hardware FIFO only maps gyroscope and accelerometer tags to\nmotion sensors in push_fifo_data(). If the FIFO reports any other tag\n(such as an empty FIFO tag or an auxiliary/temperature sensor tag), the\ncomputed sensor index falls outside the two-entry sensor map and causes\nout-of-bounds memory accesses.\n\nValidate that the FIFO tag maps to a supported sensor before indexing\ninto the sensor mapping and per-sensor state arrays, logging and\ndropping unexpected tags.\n\nBUG\u003db:574000039\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lsm6dso\n\nChange-Id: Ia95fb54084f114768af8d035e3eb213d678e0e0d\n```\n\n[🔗](http://go/tj/266e2cea-a6fa-4b22-8dad-f331f965864b)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19fbac26_c03a4958",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:44:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding the named FIFO tag bit-shift constant, unit test coverage for `push_fifo_data()`, and the commit message. [[trajectory](https://goto.corp.google.com/traj/266e2cea-a6fa-4b22-8dad-f331f965864b)]\n\n### Review Summary\n* **Functionality:** ✅ Checking `if (tag \u003e\u003d ARRAY_SIZE(ag_maps))` on the unsigned `uint8_t tag` (`(*fifo \u003e\u003e 3) - LSM6DSO_GYRO_TAG`) correctly rejects both `0x00` (which wraps to `0xff`) and tags `\u003e\u003d 0x03` (`tag \u003e\u003d 2`), preventing out-of-bounds accesses on `ag_maps`, `samples_to_discard`, and `main_s + id`.\n* **Architecture \u0026 Component Fit:** ✅ Validating the FIFO tag in `push_fifo_data()` before indexing `ag_maps` fits the driver structure cleanly. (Note: as mentioned in the existing review thread on this CL, consider coordinating with the related CL that also updates this path and adds emulator test support.)\n* **Code Simplicity:** ❌ Line 152 duplicates the `*fifo \u003e\u003e 3` bit-shift expression from line 149; extracting the shifted raw tag into a local variable avoids repeating the shift calculation.\n* **Idiomaticity \u0026 Readability:** ❌ Line 152 introduces a second instance of the magic bit-shift literal `3` for extracting the `TAG_SENSOR` field from `FIFO_DATA_OUT_TAG`. Please define `#define LSM6DSO_FIFO_TAG_SHIFT 3` in `driver/accelgyro_lsm6dso.h` and use it in `push_fifo_data()`.\n* **Security:** ✅ Prevents out-of-bounds array read/write and sensor pointer arithmetic when unexpected FIFO tag bytes are received over the sensor bus.\n* **Testing:** ❌ Missing automated unit tests for `push_fifo_data()`, and the `drivers.default` suite referenced in `TEST\u003d` does not enable `CONFIG_PLATFORM_EC_ACCELGYRO_LSM6DSO` or compile `driver/accelgyro_lsm6dso.c`. Please add unit test coverage exercising valid, exact-boundary, and off-by-one FIFO tag values (`LSM6DSO_GYRO_TAG - 1`, `LSM6DSO_GYRO_TAG`, `LSM6DSO_ACC_TAG`, `LSM6DSO_ACC_TAG + 1`, and `0x1f`).\n* **CL Size \u0026 Scope:** ✅ Size: XS (+5, -0). Focused on a single logical fix.\n* **Commit Message:** ❌ `TEST\u003d./twister -T zephyr/test/drivers -s drivers.default` does not compile `driver/accelgyro_lsm6dso.c`, and the body narrates diff expressions (`ARRAY_SIZE(ag_maps)`, `ag_maps[tag]`, `samples_to_discard[id]`). See the inline comment on `/COMMIT_MSG` for a suggested replacement.\n\n[🔗](http://go/tj/266e2cea-a6fa-4b22-8dad-f331f965864b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b03e84e_b3c0ec0c",
+        "filename": "driver/accelgyro_lsm6dso.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:44:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ### 1. Extract a named constant for the FIFO tag bit-shift \u0026 avoid duplicating `*fifo \u003e\u003e 3`\n\nLine 152 repeats the bit-shift expression `*fifo \u003e\u003e 3` from line 149 (`(*fifo \u003e\u003e 3)`), introducing a second instance of the unexplained literal `3` (the bit offset of the 5-bit `TAG_SENSOR` field in the `FIFO_DATA_OUT_TAG` `0x78` register).\n\nPlease define a named constant in `driver/accelgyro_lsm6dso.h` (alongside `LSM6DSO_TAG_SIZE` and `enum lsm6dso_tag_fifo`) and store the shifted tag in a local variable so the shift amount is self-documenting and computed once:\n\n```c\n/* In driver/accelgyro_lsm6dso.h */\n#define LSM6DSO_FIFO_TAG_SHIFT 3\n\n/* In push_fifo_data() in driver/accelgyro_lsm6dso.c */\n\tuint8_t raw_tag \u003d *fifo \u003e\u003e LSM6DSO_FIFO_TAG_SHIFT;\n\n\tptr \u003d fifo + LSM6DSO_TAG_SIZE;\n\ttag \u003d raw_tag - LSM6DSO_GYRO_TAG;\n\tif (tag \u003e\u003d ARRAY_SIZE(ag_maps)) {\n\t\tCPRINTS(\"%s Unexpected FIFO tag: 0x%02x\", main_s-\u003ename,\n\t\t\traw_tag);\n\t\treturn;\n\t}\n```\n\n---\n\n### 2. Add automated unit test coverage for `push_fifo_data()` boundary cases\n\n`CONFIG_PLATFORM_EC_ACCELGYRO_LSM6DSO` is not enabled in `drivers.default` (it requires an enabled `cros-ec,lsm6dso-accel` or `cros-ec,lsm6dso-gyro` devicetree node), so `./twister -T zephyr/test/drivers -s drivers.default` does not compile `driver/accelgyro_lsm6dso.c` or exercise `push_fifo_data()`.\n\nPlease add a unit test that exercises `push_fifo_data()` (via `lsm6dso_drv.irq_handler()` with mocked/emulated FIFO reads) across the valid range, exact boundary, and off-by-one FIFO tag values for `if (tag \u003e\u003d ARRAY_SIZE(ag_maps))`:\n* **`raw_tag \u003d LSM6DSO_GYRO_TAG - 1` (`0x00`, empty FIFO tag):** Underflows unsigned `uint8_t tag` to `0xff` (`\u003e\u003d ARRAY_SIZE(ag_maps)`) and returns early without out-of-bounds access.\n* **`raw_tag \u003d LSM6DSO_GYRO_TAG` (`0x01`, lower valid bound `tag \u003d\u003d 0`):** Processes the gyro sample (`MOTIONSENSE_TYPE_GYRO`).\n* **`raw_tag \u003d LSM6DSO_ACC_TAG` (`0x02`, upper valid bound `tag \u003d\u003d ARRAY_SIZE(ag_maps) - 1 \u003d\u003d 1`):** Processes the accel sample (`MOTIONSENSE_TYPE_ACCEL`).\n* **`raw_tag \u003d LSM6DSO_ACC_TAG + 1` (`0x03`, exact upper boundary `tag \u003d\u003d ARRAY_SIZE(ag_maps) \u003d\u003d 2`):** Rejected by `tag \u003e\u003d ARRAY_SIZE(ag_maps)` (ensuring an off-by-one `\u003e` check would fail the test).\n* **`raw_tag \u003d (0xff \u003e\u003e LSM6DSO_FIFO_TAG_SHIFT)` (`0x1f`, max 5-bit tag):** Rejected without out-of-bounds access.\n\nFor example, using parameterized boundary cases in a `ztest` suite:\n\n```c\nstruct fifo_tag_test_case {\n\tuint8_t raw_tag;\n\tbool expect_discard_decremented;\n\tenum motionsensor_type expected_type;\n};\n\nZTEST(lsm6dso, test_push_fifo_data_tag_bounds)\n{\n\tconst struct fifo_tag_test_case cases[] \u003d {\n\t\t/* Off-by-one below valid range (0x00 -\u003e uint8_t underflow to 0xff) */\n\t\t{ .raw_tag \u003d LSM6DSO_GYRO_TAG - 1,\n\t\t  .expect_discard_decremented \u003d false },\n\t\t/* Lower valid bound (tag \u003d\u003d 0 -\u003e GYRO) */\n\t\t{ .raw_tag \u003d LSM6DSO_GYRO_TAG,\n\t\t  .expect_discard_decremented \u003d true,\n\t\t  .expected_type \u003d MOTIONSENSE_TYPE_GYRO },\n\t\t/* Upper valid bound (tag \u003d\u003d ARRAY_SIZE(ag_maps) - 1 -\u003e ACCEL) */\n\t\t{ .raw_tag \u003d LSM6DSO_ACC_TAG,\n\t\t  .expect_discard_decremented \u003d true,\n\t\t  .expected_type \u003d MOTIONSENSE_TYPE_ACCEL },\n\t\t/* Exact upper boundary (tag \u003d\u003d ARRAY_SIZE(ag_maps) \u003d\u003d 2) */\n\t\t{ .raw_tag \u003d LSM6DSO_ACC_TAG + 1,\n\t\t  .expect_discard_decremented \u003d false },\n\t\t/* Max 5-bit FIFO tag (0x1f) */\n\t\t{ .raw_tag \u003d 0xff \u003e\u003e LSM6DSO_FIFO_TAG_SHIFT,\n\t\t  .expect_discard_decremented \u003d false },\n\t};\n\n\tfor (size_t i \u003d 0; i \u003c ARRAY_SIZE(cases); i++) {\n\t\tuint8_t fifo_frame[LSM6DSO_FIFO_SAMPLE_SIZE] \u003d {\n\t\t\t[0] \u003d cases[i].raw_tag \u003c\u003c LSM6DSO_FIFO_TAG_SHIFT,\n\t\t};\n\t\tstruct lsm6dso_data *priv \u003d main_sensor-\u003edrv_data;\n\n\t\tpriv-\u003esamples_to_discard[MOTIONSENSE_TYPE_GYRO] \u003d 1;\n\t\tpriv-\u003esamples_to_discard[MOTIONSENSE_TYPE_ACCEL] \u003d 1;\n\n\t\t/* Feed single FIFO frame via mock/emulator and run irq_handler */\n\t\tmock_lsm6dso_set_fifo_frame(fifo_frame, sizeof(fifo_frame));\n\t\tuint32_t event \u003d CONFIG_ACCEL_LSM6DSO_INT_EVENT;\n\t\tzassert_ok(lsm6dso_drv.irq_handler(main_sensor, \u0026event));\n\n\t\tif (cases[i].expect_discard_decremented) {\n\t\t\tzassert_equal(\n\t\t\t\tpriv-\u003esamples_to_discard[cases[i].expected_type],\n\t\t\t\t0, \"Case %zu (tag 0x%02x) was not processed\",\n\t\t\t\ti, cases[i].raw_tag);\n\t\t} else {\n\t\t\tzassert_equal(\n\t\t\t\tpriv-\u003esamples_to_discard[MOTIONSENSE_TYPE_GYRO],\n\t\t\t\t1, \"Case %zu (tag 0x%02x) modified gyro state\",\n\t\t\t\ti, cases[i].raw_tag);\n\t\t\tzassert_equal(\n\t\t\t\tpriv-\u003esamples_to_discard[MOTIONSENSE_TYPE_ACCEL],\n\t\t\t\t1, \"Case %zu (tag 0x%02x) modified accel state\",\n\t\t\t\ti, cases[i].raw_tag);\n\t\t}\n\t}\n}\n```\n\n[🔗](http://go/tj/266e2cea-a6fa-4b22-8dad-f331f965864b)",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
