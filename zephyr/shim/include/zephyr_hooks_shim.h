@@ -61,13 +61,15 @@ struct zephyr_shim_hook_list {
 /**
  * See include/hooks.h for documentation.
  */
-#define DECLARE_HOOK(_hooktype, _routine, _priority)                       \
-	BUILD_ASSERT(_hooktype == _hooktype, "Hook type is not defined."); \
-	static const STRUCT_SECTION_ITERABLE_ALTERNATE(                    \
-		zephyr_shim_hook_##_hooktype, zephyr_shim_hook_info,       \
-		_cros_hook_##_hooktype##_##_routine) = {                   \
-		.routine = _routine,                                       \
-		.priority = _priority,                                     \
+#define DECLARE_HOOK(_hooktype, _routine, _priority)                         \
+	BUILD_ASSERT(_hooktype == _hooktype, "Hook type is not defined.");   \
+	BUILD_ASSERT(IN_RANGE((_priority), HOOK_PRIO_FIRST, HOOK_PRIO_LAST), \
+		     "Hook priority is out of range.");                      \
+	static const STRUCT_SECTION_ITERABLE_ALTERNATE(                      \
+		zephyr_shim_hook_##_hooktype, zephyr_shim_hook_info,         \
+		_cros_hook_##_hooktype##_##_routine) = {                     \
+		.routine = _routine,                                         \
+		.priority = _priority,                                       \
 	}
 
 #ifdef __cplusplus

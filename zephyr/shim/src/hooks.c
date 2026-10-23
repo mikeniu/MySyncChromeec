@@ -150,11 +150,6 @@ void hook_notify(enum hook_type type)
 
 		for (const struct zephyr_shim_hook_info *p = start; p != end;
 		     p++) {
-			__ASSERT(
-				IN_RANGE(p->priority, HOOK_PRIO_FIRST,
-					 HOOK_PRIO_LAST),
-				"Hook priority %d (handler %p) is out of range",
-				p->priority, p->routine);
 			if (p->priority > last_prio)
 				prio = min(prio, p->priority);
 		}
