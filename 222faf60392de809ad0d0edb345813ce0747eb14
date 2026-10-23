@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f987cb8c_6b09b7ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:34:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — One remaining occurrence of `CONFIG_BODY_DETECTION_ALOGIRTHM_V2` in `zephyr/test/drivers/body_detection/src/body_detection.c` needs to be updated so the V2 test assertion is not compiled out.\n\n### Review Summary\n* **Functionality:** ❌ One `#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)` block at `zephyr/test/drivers/body_detection/src/body_detection.c:132` was missed in the rename, causing the immediate post-reset `BODY_DETECTION_ON_BODY` check in `test_setbodydetectionmode_forced` to be silently skipped during V2 test runs. All other occurrences across Kconfig, CMake, C sources, and project/test configs are updated accurately.\n* **Architecture \u0026 Component Fit:** ✅ Clean mechanical rename of the Kconfig symbols `BODY_DETECTION_ALGORITHM_V1` and `BODY_DETECTION_ALGORITHM_V2` across `Kconfig.body_detection`, `CMakeLists.txt`, `common/body_detect_common.c`, project config, and driver tests.\n* **Code Simplicity:** ✅ Direct symbol rename and removal of the obsolete typo note in `zephyr/test/drivers/body_detection/src/body_detection.c`.\n* **Idiomaticity \u0026 Readability:** ✅ Conforms to Zephyr Kconfig and ChromiumOS EC C conventions.\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ Updating line 132 in `zephyr/test/drivers/body_detection/src/body_detection.c` is needed to keep the V2 post-reset state assertion active in `drivers.body_detection`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+23, -24)` — Small, atomic CL focused on a single Kconfig typo fix across its definition and callers.\n* **Commit Message:** ✅ Clear, concise commit description with appropriate `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/c9be1db6-a857-4db6-b16b-d96222559f8a)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "222faf60392de809ad0d0edb345813ce0747eb14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f9fe13_daa9f1b0",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:34:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This `#if defined(...)` block still uses the old `CONFIG_BODY_DETECTION_ALOGIRTHM_V2` spelling. Now that the Kconfig symbol has been renamed to `CONFIG_BODY_DETECTION_ALGORITHM_V2`, this condition always evaluates to false and silently skips the immediate post-reset state assertion during V2 test runs.\n\n```c\n#if defined(CONFIG_BODY_DETECTION_ALGORITHM_V2)\n\tbody_detect_state \u003d body_detect_get_state();\n\tzassert_equal(body_detect_state, BODY_DETECTION_ON_BODY,\n\t\t      \"unexpected body detect mode: %d\", body_detect_state);\n#endif\n```\n\n[🔗](http://go/tj/c9be1db6-a857-4db6-b16b-d96222559f8a)",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "222faf60392de809ad0d0edb345813ce0747eb14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
