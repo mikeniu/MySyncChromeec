@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6de7c992_98e2df0a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T07:54:48Z",
+      "side": 1,
+      "message": "Done in ps4: rewrote the description to state the intent of finger status detection, using the suggested wording for both split CLs.",
+      "parentUuid": "623cf187_f7210e0d",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "revId": "d47e0b4725a06bffc6f656bdd79747cca7c17a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea13745e_b4e8fcb1",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\nThis CL violates the **Single Logical Change** rule by bundling two independent capabilities.\n\n### Review Summary\n* **Functionality:** Verified. The error mapping and boundary logic are correct.\n* **Architecture \u0026 Component Fit:** Verified.\n* **Code Simplicity:** Verified. The `ret` variable scoping has been fixed cleanly.\n* **Idiomaticity \u0026 Readability:** Verified.\n* **Testing:** Verified. Complete coverage with exact argument assertions.\n* **CL Size \u0026 Scope:** Size: M (+244, -0). ❌ **Changes Requested**. The CL implements two independent driver features. The subject line explicitly joins two distinct noun categories (\"image capture and finger status\") under the umbrella verb \"Add\", and the changes pass the independent-revert test. Please split this CL:\n  1. CL 1: Add `finger_status` support to the driver and its unit tests.\n  2. CL 2: Add `acquire_image` support to the driver and its unit tests.\n* **Commit Message:** ❌ **Changes Requested**. See inline comment on `/COMMIT_MSG` regarding missing high-level intent and diff narration.\n\n[🔗](http://go/tj/989fbd5c-657a-47db-a191-87105bef8574)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "d47e0b4725a06bffc6f656bdd79747cca7c17a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "213a9df4_63209b2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-23T07:54:48Z",
+      "side": 1,
+      "message": "Done in ps4: split the CL. This CL now only adds finger_status support and its unit tests; acquire_image and its unit tests moved to https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8640533.",
+      "parentUuid": "ea13745e_b4e8fcb1",
       "revId": "d47e0b4725a06bffc6f656bdd79747cca7c17a2d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
