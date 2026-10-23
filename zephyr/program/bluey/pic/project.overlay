@@ -50,6 +50,16 @@
 	};
 };
 
+wake_source_pgood: &psl_in4_gp02 {
+	/* PGOOD_ACOK_ODL */
+	psl-in-mode = "edge";
+	psl-in-pol = "low-falling";
+};
+
+&power_ctrl_psl {
+	pinctrl-0 = <&psl_in1_gpd2 &psl_in2_gp00 &psl_in3_gp01 &psl_in4_gp02>;
+};
+
 &binman {
 	wp-ro {
 		ec-ro {
