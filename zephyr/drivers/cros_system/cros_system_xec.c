@@ -577,6 +577,8 @@ static void system_xec_hibernate_by_dsleep(uint32_t seconds,
 	 */
 	__disable_irq();
 	__set_BASEPRI(0);
+	__DSB();
+	__ISB();
 	/* triggers sleep hardware */
 	__WFI();
 	__NOP();
