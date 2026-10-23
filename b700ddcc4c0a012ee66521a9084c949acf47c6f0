@@ -46,6 +46,30 @@
       },
       "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d02322a_af53454c",
+        "filename": "include/system.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-23T16:31:24Z",
+      "side": 1,
+      "message": "Looks like we\u0027ve run into issues before where interrupts are enabled across the sysjump boundary: b/397656402\n\nI think using this on cortex-m is a safer change.\n```\n#define interrupt_disable_all() \\\n    irq_lock();\n    __disable_irq();\n```",
+      "parentUuid": "f01a5f96_93aed71d",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 29
+      },
+      "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
