@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "807b0543_87055ca3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T19:43:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `ec_host_cmd_user_cb` properly resets the rate-limiting window when commands are separated by more than `HOST_CMD_MIN_REST_MS` (3ms) and sleeps for `HOST_CMD_RECESS_MS` (20ms) after `HOST_CMD_RATE_LIMIT_PERIOD_MS` (500ms) of sustained host commands, updating `t_now`, `t_recess`, and `t_last` after the recess.\n* **Architecture \u0026 Component Fit:** ✅ Fits cleanly in `ec_host_cmd_user_cb` within `zephyr/shim/src/host_command.c`, mirroring the legacy host command task rate-limiting behavior while using `test_export_static` for unit test access.\n* **Code Simplicity:** ✅ Both the callback implementation and the unit tests are concise, direct, and free of unnecessary branching or state.\n* **Idiomaticity \u0026 Readability:** ✅ Thresholds and test inputs are defined as named constants with explicit unit suffixes (`_MS`, `Us`, `Ms`).\n* **Security:** ✅ Mitigates host command flood denial-of-service against lower-priority EC threads and watchdog petting.\n* **Testing:** ✅ Covers sustained flood rate limiting, reset when commands are spaced beyond the minimum rest threshold, and the exact 500ms / 502ms period boundary.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+186, -2)` (~28 production lines and ~158 test lines). Implements a single cohesive logical change with its unit tests.\n* **Commit Message:** ✅ Clear problem statement and conceptual summary with valid `BUG\u003d`, `TEST\u003d`, and `Change-Id:` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/3e52ab04-6455-4a3a-912c-8321b605e235)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "43d55e26e24f99266d29c2575777abc2cf459c69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
