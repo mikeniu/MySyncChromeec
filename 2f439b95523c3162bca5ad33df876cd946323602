@@ -1,0 +1,173 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e31992e_aded1d6c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:07:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Update the commit message to use imperative mood (`Add a Ztest...`), state why the notifier reloads the watchdog on `PM_STATE_SUSPEND_TO_IDLE` (preventing watchdog starvation when entering heavy sleep), and update the `TEST\u003d` command to match the renamed `cros_system_rtk` test suite:\n\n```\nzephyr: test: Add test for Realtek cros_system watchdog reload\n\nWhen the RTS5912 EC enters heavy sleep (PM_STATE_SUSPEND_TO_IDLE), the\nRealtek cros_system PM notifier must reload the watchdog beforehand to\nprevent a spurious watchdog reset while suspended.\n\nAdd a Ztest suite for cros_system_rtk.c verifying that the PM state\nnotifier calls watchdog_reload() upon entering PM_STATE_SUSPEND_TO_IDLE\nand does not reload it on other power states such as PM_STATE_STANDBY.\n\nBUG\u003db:575573365\nTEST\u003d./twister -T zephyr/test/cros_system_rtk\n\nChange-Id: Ia781f79abc8d61e31a37e8660727e7e520a6402e\n```\n\n[🔗](http://go/tj/62854287-4042-4876-ace3-39be1dee64dd)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec57a0ea_4da39927",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:07:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Thank you for rewriting the test in Patchset 4 to directly link `cros_system_rtk.c` and exercise the Zephyr PM notifier via `pm_state_force()` and FFF instead of `#undef`-ing Devicetree/IRQ macros. Please address the remaining inline comments before submitting:\n\n### Review Summary\n- **Functionality:** ✅ The test exercises `cros_system_rtk_pm_notifier` via `pm_state_force()` and `k_sleep(K_MSEC(1))` and verifies that `watchdog_reload()` is invoked on `PM_STATE_SUSPEND_TO_IDLE` and not on `PM_STATE_STANDBY`.\n- **Architecture \u0026 Component Fit:** ❌ Standalone Zephyr test projects with their own `CMakeLists.txt` (`find_package(Zephyr ...)`), `Kconfig`, `prj.conf`, and `testcase.yaml` belong directly under `zephyr/test/` (e.g., `zephyr/test/cros_system_rtk/`) rather than inside `zephyr/test/drivers/` (which is a single multi-suite CMake project using `CONFIG_LINK_TEST_SUITE_*`). In addition, the directory, CMake project, file name, and Ztest suite still use the leftover `rts5912_rtmr` name from an earlier patchset even though the test now targets `cros_system_rtk.c`, and `CMakeLists.txt` duplicates `-DBBRAM_WP_FLAG_INVALID\u003d0xFFFFFFFF` instead of including `zephyr/shim/chip/rtk/include/flash_chip.h`.\n- **Code Simplicity:** ❌ Remove the unused `sccon` Devicetree node in `boards/native_sim.overlay`, replace the unused `\"drivers/cros_system.h\"` and `\"system.h\"` includes in `src/rts5912_rtmr_test.c` with `\"watchdog.h\"`, and remove the unnecessary `RESET_FAKE(rts5912_clock_get_sleep_ticks)` call in the `before` hook.\n- **Idiomaticity \u0026 Readability:** ❌ Extract the raw magic hex addresses, region sizes, and bitmask (`0x40010000`, `0x4000`, `0x40104000`, `0x1000`, `0x40010ea0`, `0x04`) and abbreviated pointer names (`p1`, `p2`) in `map_rtk_mmio_regs()` into descriptive local constants and variable names.\n- **Security:** ✅ No security concerns in this unit test addition.\n- **Testing:** ❌ Split the combined `PM_STATE_SUSPEND_TO_IDLE` and `PM_STATE_STANDBY` checks into two separate `ZTEST` cases so each test covers one power-state transition and relies on the `before` fixture rather than calling `RESET_FAKE(watchdog_reload)` mid-test.\n- **CL Size \u0026 Scope:** ✅ `Size: M (+219, -0)` (0 production lines, 219 test lines). Single, self-contained logical change adding a unit test suite for `cros_system_rtk.c`.\n- **Commit Message:** ❌ Update the commit message to use imperative mood, briefly state the motivation (preventing watchdog resets during heavy sleep entry), and update the `TEST\u003d` command to match the renamed `cros_system_rtk` test suite. [🔗](http://go/tj/62854287-4042-4876-ace3-39be1dee64dd)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff2b8c6e_e3ab4835",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:07:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two improvements for project placement, naming, and constant reuse:\n\n1. **Test location and naming:** `zephyr/test/drivers/` is a single multi-suite CMake project where subdirectories are linked via `CONFIG_LINK_TEST_SUITE_*` in `zephyr/test/drivers/CMakeLists.txt` and `zephyr/test/drivers/testcase.yaml`. Standalone test projects with their own `find_package(Zephyr ...)`, `Kconfig`, `prj.conf`, and `testcase.yaml` (such as `zephyr/test/system_shim/`, `zephyr/test/it8xxx2_shi/`, and `zephyr/test/hibernate_z5/`) live directly under `zephyr/test/`. In addition, `rts5912_rtmr` is a leftover name from an earlier patchset that targeted the slow timer driver; since this test compiles and exercises `zephyr/drivers/cros_system/cros_system_rtk.c`, please move and rename this directory/project to `zephyr/test/cros_system_rtk/` (with `src/cros_system_rtk_test.c` and `cros_system_rtk.default` in `testcase.yaml`).\n2. **Reuse `BBRAM_WP_FLAG_INVALID` from `flash_chip.h`:** Instead of duplicating `-DBBRAM_WP_FLAG_INVALID\u003d0xFFFFFFFF` in `target_compile_options`, include `${PLATFORM_EC}/zephyr/shim/chip/rtk/include/flash_chip.h` where `BBRAM_WP_FLAG_INVALID` is authoritatively defined:\n\n```cmake\nproject(cros_system_rtk_test)\n\nadd_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)\n\nzephyr_include_directories(\n\t\"${ZEPHYR_BASE}/soc/realtek/ec/rts5912\"\n\t\"${PLATFORM_EC}/zephyr/shim/chip/rtk/include\"\n)\n\ntarget_compile_options(app PRIVATE\n\t-include stdio.h\n\t-include flash_chip.h\n)\n\ntarget_sources(app PRIVATE\n\tsrc/cros_system_rtk_test.c\n\t${PLATFORM_EC}/zephyr/drivers/cros_system/cros_system_rtk.c\n)\n```\n\n[🔗](http://go/tj/62854287-4042-4876-ace3-39be1dee64dd)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c17f8ab4_82d07725",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/boards/native_sim.overlay",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:07:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Remove the unused `sccon` node. `RTK_SCCON_REG_BASE` in `zephyr/drivers/cros_system/cros_system_rtk.c` is an unreferenced preprocessor macro that is never expanded, so `DT_NODELABEL(sccon)` is never evaluated.\n\n[🔗](http://go/tj/62854287-4042-4876-ace3-39be1dee64dd)",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76539792_d2b5b592",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:07:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Neither `\"drivers/cros_system.h\"` nor `\"system.h\"` is used in this file. Replace them with `\"watchdog.h\"` so `FAKE_VOID_FUNC(watchdog_reload)` is type-checked against the canonical `watchdog_reload(void)` declaration:\n\n```c\n#include \"watchdog.h\"\n```\n\n[🔗](http://go/tj/62854287-4042-4876-ace3-39be1dee64dd)",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c20a79a_cb151791",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:07:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Replace the raw magic hex addresses, region sizes, and bitmask (`0x40010000`, `0x4000`, `0x40104000`, `0x1000`, `0x40010ea0`, `0x04`) and abbreviated variable names (`p1`, `p2`) with descriptive local constants and identifiers:\n\n```c\nstatic int map_rtk_mmio_regs(void)\n{\n\tconst uintptr_t periph_mmio_base \u003d 0x40010000;\n\tconst size_t periph_mmio_size \u003d 0x4000;\n\tconst uintptr_t vivo_mmio_base \u003d 0x40104000;\n\tconst size_t vivo_mmio_size \u003d 0x1000;\n\tconst uintptr_t otp_sts_reg \u003d 0x40010ea0;\n\tconst uint32_t otp_sts_pdstb_msk \u003d BIT(2);\n\n\tvoid *periph_map \u003d mmap((void *)periph_mmio_base, periph_mmio_size,\n\t\t\t\tPROT_READ | PROT_WRITE,\n\t\t\t\tMAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);\n\tvoid *vivo_map \u003d mmap((void *)vivo_mmio_base, vivo_mmio_size,\n\t\t\t      PROT_READ | PROT_WRITE,\n\t\t\t      MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);\n\n\t__ASSERT_NO_MSG(periph_map !\u003d MAP_FAILED);\n\t__ASSERT_NO_MSG(vivo_map !\u003d MAP_FAILED);\n\n\t*(volatile uint32_t *)otp_sts_reg \u003d otp_sts_pdstb_msk;\n\treturn 0;\n}\n```\n\n[🔗](http://go/tj/62854287-4042-4876-ace3-39be1dee64dd)",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74ea6ce7_cf836b79",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:07:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Rename the suite from `rts5912_rtmr` to `cros_system_rtk`, remove the unused `RESET_FAKE(rts5912_clock_get_sleep_ticks)` call from the `before` hook, and split the `PM_STATE_SUSPEND_TO_IDLE` and `PM_STATE_STANDBY` checks into separate `ZTEST` cases so each test covers a single state transition and relies on the `before` fixture rather than resetting `watchdog_reload` mid-test:\n\n```c\nstatic void cros_system_rtk_before(void *fixture)\n{\n\tARG_UNUSED(fixture);\n\n\tRESET_FAKE(watchdog_reload);\n}\n\nZTEST(cros_system_rtk, test_watchdog_reload_on_suspend_to_idle)\n{\n\tconst struct pm_state_info s2idle \u003d {\n\t\t.state \u003d PM_STATE_SUSPEND_TO_IDLE,\n\t};\n\n\tzassert_true(pm_state_force(0U, \u0026s2idle));\n\tk_sleep(K_MSEC(1));\n\tzassert_equal(watchdog_reload_fake.call_count, 1,\n\t\t      \"Expected watchdog_reload on PM_STATE_SUSPEND_TO_IDLE\");\n}\n\nZTEST(cros_system_rtk, test_no_watchdog_reload_on_standby)\n{\n\tconst struct pm_state_info standby \u003d {\n\t\t.state \u003d PM_STATE_STANDBY,\n\t};\n\n\tzassert_true(pm_state_force(0U, \u0026standby));\n\tk_sleep(K_MSEC(1));\n\tzassert_equal(watchdog_reload_fake.call_count, 0,\n\t\t      \"Unexpected watchdog_reload on PM_STATE_STANDBY\");\n}\n\nZTEST_SUITE(cros_system_rtk, NULL, NULL, cros_system_rtk_before, NULL, NULL);\n```\n\n[🔗](http://go/tj/62854287-4042-4876-ace3-39be1dee64dd)",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
