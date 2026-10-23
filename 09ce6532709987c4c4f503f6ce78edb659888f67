@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97d11c75_5d193049",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:07:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Blocking issues found; please see inline comments.\n\n### Review Summary\n- **Functionality**: `dump_pe()` in `common/usb_pd_console_cmd.c` now correctly uses outer SVID index `i` in `j \u003c disc-\u003esvids[i].mode_cnt` instead of inner mode index `j`.\n- **Architecture \u0026 Component Fit**: The fix and test update align with existing USB PD Policy Engine console command and Zephyr test driver conventions.\n- **Code Simplicity**: The production fix is minimal and direct.\n- **Idiomaticity \u0026 Readability**: Code follows ChromiumOS EC C conventions and Zephyr ztest patterns.\n- **Security**: No security or memory-safety concerns; `i \u003c pd_get_svid_count(...)` and `j \u003c disc-\u003esvids[i].mode_cnt` stay within fixed discovery array bounds.\n- **Testing**: `set_device_vdo()` adds a second SVID with two modes, but `test_pe` only asserts `zassert_ok(rv, ...)` on `\"pe 0 dump\"` without inspecting the console output, so the test passes even if the bug fix is reverted.\n- **CL Size \u0026 Scope**: `Size: XS (+7, -2)` — focused single-purpose bug fix and accompanying test update.\n- **Commit Message**: Clear and accurate description of the root cause and fix with `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/c6d38a72-22f8-4c8d-87f5-89f3e68d12ec)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "09ce6532709987c4c4f503f6ce78edb659888f67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00905b6d_91ba5244",
+        "filename": "zephyr/test/drivers/default/src/console_cmd/usb_pd_console.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:07:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While `set_device_vdo()` adds a second SVID with `mode_cnt \u003d 2`, `test_pe` below (lines 367–369) only checks `zassert_ok(rv, ...)` on `shell_execute_cmd(get_ec_shell(), \"pe 0 dump\")` and never inspects the console output. Because `command_pe()` always returns `EC_SUCCESS` after calling `dump_pe()`, the test still passes even if the fix in `common/usb_pd_console_cmd.c` is reverted.\n\nAdditionally, note that with `svids[0].mode_cnt \u003d 1` and `svids[1].mode_cnt \u003d 2`, the old buggy condition `j \u003c disc-\u003esvids[j].mode_cnt` evaluates `0 \u003c 1` (`true`) and `1 \u003c 2` (`true`), so `SVID[1]` still prints both of its modes under the old bug while `SVID[0]` erroneously prints a second mode (`[2] 00000000`).\n\nPlease assert the expected `pe 0 dump` console output in `test_pe` using `CHECK_CONSOLE_CMD` (already used in `test_dualrole` and `test_cc` above) across both `SVID[0]` and `SVID[1]`, and zero-initialize `device_resp` on line 327 so its reserved bitfields are deterministic:\n\n```c\nstatic void set_device_vdo(int port, enum tcpci_msg_type type)\n{\n\tunion tbt_mode_resp_device device_resp \u003d { 0 };\n\tstruct pd_discovery *dev_disc;\n...\n```\n\n```c\n\tset_device_vdo(0, TCPCI_MSG_SOP);\n\tCHECK_CONSOLE_CMD(\n\t\t\"pe 0 dump\",\n\t\t\"SVID[0]: 8087 MODES: [1] 00000001\\r\\n\"\n\t\t\"SVID[1]: ff01 MODES: [1] 11111111 [2] 22222222\\r\\n\",\n\t\tEC_SUCCESS);\n```\n\n[🔗](http://go/tj/c6d38a72-22f8-4c8d-87f5-89f3e68d12ec)",
+      "range": {
+        "startLine": 325,
+        "startChar": 0,
+        "endLine": 346,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "09ce6532709987c4c4f503f6ce78edb659888f67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
