@@ -135,38 +135,30 @@ void hook_notify(enum hook_type type)
 {
 	const struct zephyr_shim_hook_info *start = hook_registry[type].start;
 	const struct zephyr_shim_hook_info *end = hook_registry[type].end;
-	int last_prio = HOOK_PRIO_FIRST - 1;
 
 	__ASSERT(type >= 0 && type < HOOK_TYPE_COUNT,
 		 "hook type %d is out of range (maximum hook_type value %d)",
 		 type, HOOK_TYPE_COUNT);
 
-	while (1) {
-		/*
-		 * Find the lowest priority that is larger than the last pass'
-		 * priority. That is, the next highest uncalled priority.
-		 */
-		int prio = INT_MAX;
+	int prio = INT_MAX;
+
+	for (const struct zephyr_shim_hook_info *p = start; p != end; p++) {
+		prio = min(prio, (int)p->priority);
+	}
+
+	while (prio != INT_MAX) {
+		int next_prio = INT_MAX;
 
 		for (const struct zephyr_shim_hook_info *p = start; p != end;
 		     p++) {
-			if (p->priority > last_prio)
-				prio = min(prio, p->priority);
-		}
-
-		if (prio == INT_MAX) {
-			/* No more handlers of higher priority */
-			break;
-		}
-		last_prio = prio;
-
-		/* Call each handler with the located priority */
-		for (const struct zephyr_shim_hook_info *p = start; p != end;
-		     p++) {
-			if (p->priority == prio)
+			if (p->priority == prio) {
 				p->routine();
+			} else if (p->priority > prio) {
+				next_prio = min(next_prio, (int)p->priority);
+			}
 		}
-	};
+		prio = next_prio;
+	}
 }
 
 int hook_call_deferred(const struct deferred_data *data, int us)
