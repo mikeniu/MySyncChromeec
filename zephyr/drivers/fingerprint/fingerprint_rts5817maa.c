@@ -23,6 +23,33 @@
 
 LOG_MODULE_REGISTER(cros_fingerprint, LOG_LEVEL_INF);
 
+IF_DISABLED(CONFIG_ZTEST, (static))
+rts_capture_mode_t convert_fp_capture_type_to_rts_capture_type(
+	enum fingerprint_capture_type capture_type)
+{
+	switch (capture_type) {
+	case FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT:
+	case FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE:
+		return RTS_CAPTURE_NORMAL_FORMAT;
+	default:
+		return RTS_CAPTURE_TYPE_INVALID;
+	}
+}
+
+static int convert_rts_get_image_error_code(rts_fp_return_t code)
+{
+	switch (code) {
+	case RTS_FP_SUCCESS:
+		return FINGERPRINT_SENSOR_SCAN_GOOD;
+	case RTS_ERROR_FAST_FINGER_UP:
+		return FINGERPRINT_SENSOR_SCAN_TOO_FAST;
+	case RTS_ERROR_IMAGE_PARTIAL:
+		return FINGERPRINT_SENSOR_SCAN_LOW_SENSOR_COVERAGE;
+	default:
+		return -EIO;
+	}
+}
+
 static int convert_rts_snr_init_error_code(rts_fp_return_t code)
 {
 	switch (code) {
@@ -208,6 +235,37 @@ static int rts5817maa_set_mode(const struct device *dev,
 	return ret;
 }
 
+static int rts5817maa_acquire_image(const struct device *dev,
+				enum fingerprint_capture_type capture_type,
+				uint8_t *image, size_t size)
+{
+	if (image == NULL || size < CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE) {
+		return -EINVAL;
+	}
+
+	rts_capture_mode_t rts_capture_mode =
+		convert_fp_capture_type_to_rts_capture_type(capture_type);
+
+	if (rts_capture_mode == RTS_CAPTURE_TYPE_INVALID) {
+		LOG_ERR("Unsupported capture_type %d provided", capture_type);
+		return -EINVAL;
+	}
+
+	if (!IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {
+		return -ENOTSUP;
+	}
+
+	rts_fp_return_t res =
+		rts5817maa_sensor_acquire_image(image, rts_capture_mode);
+
+	if (res != RTS_FP_SUCCESS) {
+		LOG_ERR("Failed to acquire image with capture_type %d: %d",
+			capture_type, res);
+	}
+
+	return convert_rts_get_image_error_code(res);
+}
+
 static int rts5817maa_finger_status(const struct device *dev)
 {
 	if (!IS_ENABLED(CONFIG_HAVE_RTS5817MAA_PRIVATE_DRIVER)) {
@@ -232,6 +290,7 @@ static DEVICE_API(fingerprint, cros_fp_rts5817maa_driver_api) = {
 	.get_info = rts5817maa_get_info,
 	.maintenance = rts5817maa_maintenance,
 	.set_mode = rts5817maa_set_mode,
+	.acquire_image = rts5817maa_acquire_image,
 	.finger_status = rts5817maa_finger_status,
 };
 
