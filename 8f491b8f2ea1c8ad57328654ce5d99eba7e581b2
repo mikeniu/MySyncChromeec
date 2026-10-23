@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb06c785_3716b664",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:31:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Blocking issues found in `common/peripheral_charger.c` and `zephyr/test/drivers/pchg/src/main.c`; see inline comments.\n\n### Review Summary\n- **Functionality**: Correctly replaces `sizeof(event_names)` and `sizeof(state_names)` with `ARRAY_SIZE(event_names)` and `ARRAY_SIZE(state_names)` in `_text_event()` and `_text_state()` so out-of-bounds enum values return `\"UNDEF\"` instead of reading past the pointer arrays.\n- **Architecture \u0026 Component Fit**: In `zephyr/test/drivers/Kconfig`, `config LINK_TEST_SUITE_PCHG` should be placed before `source \"Kconfig.zephyr\"`. In `zephyr/test/drivers/testcase.yaml`, using the existing `common` tag and inline `extra_configs` avoids adding a bespoke `peripheral_charger` tag to `util/twister_tags.py` and a separate `pchg/prj.conf`.\n- **Code Simplicity**: In `common/peripheral_charger.c`, prefer marking `_text_event()` and `_text_state()` with `test_export_static` (from `include/common.h`) rather than adding `#ifdef CONFIG_ZTEST` pass-through wrapper functions (`test_text_event()` and `test_text_state()`).\n- **Idiomaticity \u0026 Readability**: Using `test_export_static` matches existing `common/` conventions across the repository.\n- **Security**: Fixes an out-of-bounds array read when logging or formatting invalid `enum pchg_event` or `enum pchg_state` values.\n- **Testing**: In `zephyr/test/drivers/pchg/src/main.c`, `zassert_not_null()` on valid inputs is vacuous because out-of-bounds inputs also return a non-null string (`\"UNDEF\"`); tests should assert the exact returned string and cover the lower bound (`0`), upper valid bound (`COUNT - 1`), and adjacent out-of-bounds values (`COUNT`, `COUNT + 1`, `-1`).\n- **CL Size \u0026 Scope**: `Size: M (+78, -2)` — Appropriately scoped to the bounds check fix and its unit test.\n- **Commit Message**: Clear explanation of the bug (byte size vs. element count of pointer arrays) and the fix.\n\n[[trajectory](https://goto.corp.google.com/traj/9000d1ca-6bef-40dd-ab48-1e4532742e86)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8f491b8f2ea1c8ad57328654ce5d99eba7e581b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e48db045_ca0680c9",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1221,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:31:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Use `test_export_static` (defined in `include/common.h`, which is already included in this file) on `_text_event()` (line 79) and `_text_state()` (line 191) instead of adding `#ifdef CONFIG_ZTEST` pass-through wrapper functions:\n\n```c\ntest_export_static const char *_text_event(enum pchg_event event)\n```\n\n```c\ntest_export_static const char *_text_state(enum pchg_state state)\n```\n\n`test_export_static` expands to `static` in production builds and exposes the symbol directly in test builds (the standard pattern across `common/`, e.g., in `common/fan.c` and `common/body_detection.c`), allowing this `#ifdef CONFIG_ZTEST` wrapper block to be removed.\n\n[🔗](http://go/tj/9000d1ca-6bef-40dd-ab48-1e4532742e86)",
+      "range": {
+        "startLine": 1211,
+        "startChar": 0,
+        "endLine": 1221,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8f491b8f2ea1c8ad57328654ce5d99eba7e581b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53a47021_39b016db",
+        "filename": "zephyr/test/drivers/Kconfig",
+        "patchSetId": 8
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:31:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Place `config LINK_TEST_SUITE_PCHG` above `source \"Kconfig.zephyr\"` (with a blank line separator) to match all other `config LINK_TEST_SUITE_*` symbols in this file.\n\n[🔗](http://go/tj/9000d1ca-6bef-40dd-ab48-1e4532742e86)",
+      "range": {
+        "startLine": 488,
+        "startChar": 0,
+        "endLine": 490,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8f491b8f2ea1c8ad57328654ce5d99eba7e581b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fba48be2_acb76535",
+        "filename": "zephyr/test/drivers/pchg/src/main.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:31:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two test coverage and assertion issues in these bounds tests:\n\n1. **Vacuous assertion for valid inputs (`zassert_not_null`)**: Because `_text_event()` and `_text_state()` return `\"UNDEF\"` (a non-null string literal) for out-of-bounds inputs, `zassert_not_null(...)` will pass even if the function returns `\"UNDEF\"` or the wrong entry name. Assert the exact returned string with `strcmp(...) \u003d\u003d 0`.\n2. **Missing boundary cases (`0`, `COUNT - 1`, `COUNT + 1`, and negative values)**: To thoroughly verify the `\u003c ARRAY_SIZE(...)` bounds check without arbitrary magic offsets (`+ 10`), test the lower boundary (`0`), the last valid element (`PCHG_EVENT_COUNT - 1` / `PCHG_STATE_COUNT - 1`), the exact upper boundary (`COUNT`), the adjacent out-of-bounds value (`COUNT + 1`), and `-1`:\n\n```c\nZTEST(pchg, test_text_event_bounds)\n{\n\t/* Valid boundary events (first and last valid indices) */\n\tzassert_equal(0, strcmp(\"NONE\", _text_event(PCHG_EVENT_NONE)));\n\tzassert_equal(0,\n\t\t      strcmp(\"INITIALIZED\", _text_event(PCHG_EVENT_INITIALIZED)));\n\tzassert_equal(0, strcmp(\"UPDATE_ERROR\",\n\t\t\t\t_text_event(PCHG_EVENT_UPDATE_ERROR)));\n\n\t/* Out-of-bounds events */\n\tzassert_equal(0, strcmp(\"UNDEF\", _text_event((enum pchg_event)-1)));\n\tzassert_equal(0, strcmp(\"UNDEF\", _text_event(PCHG_EVENT_COUNT)));\n\tzassert_equal(0, strcmp(\"UNDEF\", _text_event(PCHG_EVENT_COUNT + 1)));\n}\n\nZTEST(pchg, test_text_state_bounds)\n{\n\t/* Valid boundary states (first and last valid indices) */\n\tzassert_equal(0, strcmp(\"RESET\", _text_state(PCHG_STATE_RESET)));\n\tzassert_equal(0, strcmp(\"BIST\", _text_state(PCHG_STATE_BIST)));\n\n\t/* Out-of-bounds states */\n\tzassert_equal(0, strcmp(\"UNDEF\", _text_state((enum pchg_state)-1)));\n\tzassert_equal(0, strcmp(\"UNDEF\", _text_state(PCHG_STATE_COUNT)));\n\tzassert_equal(0, strcmp(\"UNDEF\", _text_state(PCHG_STATE_COUNT + 1)));\n}\n```\n\n[🔗](http://go/tj/9000d1ca-6bef-40dd-ab48-1e4532742e86)",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8f491b8f2ea1c8ad57328654ce5d99eba7e581b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81b48b24_3a9e2b59",
+        "filename": "zephyr/test/drivers/testcase.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 2421,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:31:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider simplifying this test suite configuration:\n\n1. **Tag**: Using the existing `common` tag (defined in `util/twister_tags.py` as `\"Directly test shared code in the ec/common dir\"`) or omitting `tags:` (like most `drivers.*` entries in this file) avoids introducing a one-off `peripheral_charger` tag in `util/twister_tags.py`.\n2. **Inline `extra_configs`**: Following adjacent lightweight suites such as `drivers.write_protection_external` (lines 2391–2394), placing `CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER\u003dy` and `CONFIG_HAS_TASK_PCHG\u003dy` directly under `extra_configs:` removes the need for a separate `pchg/prj.conf` file (where `CONFIG_ZTEST\u003dy` is already set by `zephyr/test/drivers/prj.conf`):\n\n```yaml\n  drivers.pchg:\n    tags:\n    - common\n    extra_configs:\n    - CONFIG_LINK_TEST_SUITE_PCHG\u003dy\n    - CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER\u003dy\n    - CONFIG_HAS_TASK_PCHG\u003dy\n```\n\n[🔗](http://go/tj/9000d1ca-6bef-40dd-ab48-1e4532742e86)",
+      "range": {
+        "startLine": 2413,
+        "startChar": 0,
+        "endLine": 2421,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8f491b8f2ea1c8ad57328654ce5d99eba7e581b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
