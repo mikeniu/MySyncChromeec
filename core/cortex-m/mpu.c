@@ -297,22 +297,44 @@ int mpu_protect_data_ram(void)
 #if defined(CONFIG_EXTERNAL_STORAGE) || !defined(CONFIG_FLASH_PHYSICAL)
 int mpu_protect_code_ram(void)
 {
+	int ret;
+
 #ifdef CONFIG_RAM_LOCK
 	if (system_is_locked()) {
-		int ret = ram_lock_config_lock_region(
-			REGION_STORAGE,
-			CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF,
-			CONFIG_CODE_RAM_SIZE);
+		ret = ram_lock_config_lock_region(REGION_STORAGE,
+						  CONFIG_PROGRAM_MEMORY_BASE +
+							  CONFIG_RO_MEM_OFF,
+						  CONFIG_CODE_RAM_SIZE);
 		if (ret != EC_SUCCESS)
 			return ret;
 	}
 #endif
 
 	/* Prevent write access to code RAM */
-	return mpu_config_region(REGION_STORAGE,
-				 CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF,
-				 CONFIG_CODE_RAM_SIZE,
-				 MPU_ATTR_RO_NO | MPU_ATTR_INTERNAL_SRAM, 1);
+	ret = mpu_config_region(REGION_STORAGE,
+				CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF,
+				CONFIG_CODE_RAM_SIZE,
+				MPU_ATTR_RO_NO | MPU_ATTR_INTERNAL_SRAM, 1);
+	if (!IS_ENABLED(CONFIG_EXTERNAL_STORAGE))
+		return ret;
+
+	if (ret != EC_SUCCESS)
+		return ret;
+
+	/*
+	 * Mark unused SRAM in the code RAM region execute-never and
+	 * inaccessible. Active code RAM is exempted above by higher-priority
+	 * REGION_STORAGE. When CONFIG_ROLLBACK_MPU_PROTECT is enabled on an
+	 * 8-region MPU, REGION_CODE_RAM is used for rollback protection, so use
+	 * REGION_CODE_RAM2 instead.
+	 */
+	return mpu_update_region(
+		IS_ENABLED(CONFIG_ROLLBACK_MPU_PROTECT) ? REGION_CODE_RAM2 :
+							  REGION_CODE_RAM,
+		align_down_to_bits(CONFIG_PROGRAM_MEMORY_BASE,
+				   MPU_CODE_RAM_REGION_BITS),
+		MPU_CODE_RAM_REGION_BITS,
+		MPU_ATTR_XN | MPU_ATTR_NO_NO | MPU_ATTR_INTERNAL_SRAM, 1, 0);
 }
 #else
 int mpu_lock_ro_flash(void)

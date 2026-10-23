@@ -111,6 +111,22 @@ static int test_mpu_when_unlocked(void)
 	TEST_EQ(mock_mpu.rasr[REGION_DATA_RAM_TEXT], 0x0, "0x%08x");
 
 	/*
+	 * Unused SRAM in code RAM region must be marked XN and no-access
+	 * (REGION_CODE_RAM).
+	 */
+	TEST_EQ(mock_mpu.base[REGION_CODE_RAM],
+		align_down_to_bits(CONFIG_PROGRAM_MEMORY_BASE,
+				   MPU_CODE_RAM_REGION_BITS),
+		"0x%08x");
+	TEST_EQ(mock_mpu.rasr[REGION_CODE_RAM],
+		EXPECTED_MPU_RASR(MPU_ATTR_XN | MPU_ATTR_NO_NO |
+					  MPU_ATTR_INTERNAL_SRAM,
+				  MPU_CODE_RAM_REGION_BITS, 0),
+		"0x%08x");
+	TEST_EQ(mock_mpu.base[REGION_CODE_RAM2], 0x0, "0x%08x");
+	TEST_EQ(mock_mpu.rasr[REGION_CODE_RAM2], 0x0, "0x%08x");
+
+	/*
 	 * Active code RAM must be marked read-only executable (REGION_STORAGE
 	 * and REGION_STORAGE2).
 	 */

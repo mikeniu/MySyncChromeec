@@ -66,6 +66,11 @@ enum mpu_region {
 #define MPU_SIZE_BITS_MIN 5
 
 /*
+ * 256 MB Cortex-M code RAM region (2^28 bytes)
+ */
+#define MPU_CODE_RAM_REGION_BITS 28
+
+/*
  * XN (execute never) bit. It's bit 12 if accessed by halfword.
  *   0: XN off
  *   1: XN on
