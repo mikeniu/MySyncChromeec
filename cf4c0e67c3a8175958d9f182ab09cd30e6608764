@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "546958ba_1e084b49",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:45:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two issues in the commit message:\n\n1. **Bundled Independent Fixes (Single Logical Change):** The subject line (`Fix FIFO chunk loop and spoof buffer overwrite`) and body bundle two independent bug fixes in `lis2dh_load_fifo()` that can each be committed and tested on their own:\n   - **CL 1:** Fixing the multi-chunk FIFO read loop (`left -\u003d length` placement and `read_count` initialization across chunks) with `test_lis2dh__samples_fifo_read_long`.\n   - **CL 2:** Fixing the spoof-mode buffer overwrite (`axis` pointer reset per sample) with `test_lis2dh__samples_fifo_read_spoof`.\n   Please split these into two separate atomic CLs.\n\n2. **Diff Syntax Narration:** The body narrates the mechanical line-by-line C syntax edits (`initialize read_count \u003d 0 before the outer do-while loop`, `move left -\u003d length; after the inner per-sample for loop`, `reset int *axis \u003d s-\u003eraw_xyz;`) rather than explaining the problem and conceptual fix at one level of abstraction above the diff.\n\nSuggested commit messages if split into two CLs:\n\n**CL 1 (Multi-chunk FIFO read fix):**\n```text\ndriver: accel_lis2dh: Fix multi-chunk FIFO reads\n\nlis2dh_load_fifo() decremented the remaining byte count on every sample\niteration instead of once per chunk and reset the sample read counter at\nthe start of each chunk. As a result, reads exceeding FIFO_READ_LEN\nterminated after the first chunk and miscalculated sample timestamps\nacross chunk boundaries.\n\nUpdate the remaining byte count once per chunk read and preserve the\nsample counter across the entire FIFO drain.\n\nBUG\u003db:574000611\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lis2dh\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lis2dh.interrupt\n\nChange-Id: Ic0aa87c8ef310eda9fb97eb688cb58bcfe47ac3a\n```\n\n**CL 2 (Spoof buffer overwrite fix):**\n```text\ndriver: accel_lis2dh: Preserve spoof buffer across FIFO samples\n\nWhen spoof mode is active, lis2dh_load_fifo() redirected the sample\nbuffer pointer to s-\u003espoof_xyz on the first sample without resetting it\nfor subsequent samples in the chunk, causing st_normalize() to overwrite\ns-\u003espoof_xyz with raw sensor data on subsequent samples.\n\nReset the target buffer pointer to s-\u003eraw_xyz at the start of each\nsample iteration so raw normalization never mutates s-\u003espoof_xyz.\n\nBUG\u003db:574000611\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lis2dh\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lis2dh.interrupt\n```\n\n(Or if kept in a single CL, use concise high-level prose without narrating variable assignments and loop statements:)\n```text\ndriver: accel_lis2dh: Fix FIFO chunk loop and spoof buffer overwrite\n\nlis2dh_load_fifo() decremented the remaining byte count on every sample\niteration rather than once per chunk, reset the sample counter on each\nchunk, and left the sample buffer pointer aimed at s-\u003espoof_xyz after\nthe first spoofed sample. This caused multi-chunk reads to exit after\nthe first chunk and caused st_normalize() to overwrite the spoof buffer\non subsequent samples.\n\nUpdate the remaining byte count once per chunk while preserving the\nsample counter across chunks, and reset the normalization target to\ns-\u003eraw_xyz on each sample iteration.\n\nBUG\u003db:574000611\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lis2dh\nTEST\u003d./twister -T zephyr/test/drivers -s drivers.lis2dh.interrupt\n\nChange-Id: Ic0aa87c8ef310eda9fb97eb688cb58bcfe47ac3a\n```\n\n[🔗](http://go/tj/f63fcbaf-6cca-40a5-b46a-e8ace9b3919e)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baa96fbe_eb5c8c7e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:45:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** — See inline comments for details.\n\n### Review Summary\n\n* **Functionality:** ✅ The fixes in `lis2dh_load_fifo()` (`driver/accel_lis2dh.c`) accurately resolve both the premature chunk-loop termination / `read_count` reset across chunks and the spoof-mode buffer overwrite on sample 1+.\n* **Architecture \u0026 Component Fit:** ✅ Moving `int *axis \u003d s-\u003eraw_xyz;` into the per-sample loop and `left -\u003d length;` to the outer chunk loop aligns `lis2dh_load_fifo()` with `lis2dw12_load_fifo()` in `driver/accel_lis2dw12.c`.\n* **Code Simplicity:** ✅ The production changes are minimal and declare `axis` in the narrowest lexical scope where it is used.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions and reuses existing driver constants (`FIFO_READ_LEN`, `OUT_XYZ_SIZE`, `LIS2DH_RESOLUTION`).\n* **Security:** ✅ No security vulnerabilities introduced.\n* **Testing:** ❌ `test_lis2dh__samples_fifo_read_long` in `zephyr/test/drivers/lis2dh/src/test_interrupt.c` currently passes even if both multi-chunk fixes in `lis2dh_load_fifo()` (`left -\u003d length;` and `int read_count \u003d 0;`) are reverted, because `acc-\u003ecollection_rate` is `0` (leaving `read_count` timestamp calculation untested) and `lis2dh_irq_handler()` silently re-polls `LIS2DH_FIFO_SRC_ADDR` if `lis2dh_load_fifo()` exits after the first chunk. Additionally, `test_lis2dh__samples_fifo_read_spoof` should assert that `acc-\u003eraw_xyz` is still updated with the normalized raw sample. See inline comments for ready-to-use test snippets.\n* **CL Size \u0026 Scope:** ❌ `Size: S (+20, -14)`. While the line delta is small, this CL bundles two independent bug fixes in `lis2dh_load_fifo()` that can each be committed, reverted, and tested independently. Please split into two focused CLs:\n  1. **CL 1:** Fix multi-chunk FIFO reads (`int read_count \u003d 0;` initialization before the `do-while` loop and moving `left -\u003d length;` after the per-sample `for` loop in `driver/accel_lis2dh.c`, plus the `test_lis2dh__samples_fifo_read_long` updates in `zephyr/test/drivers/lis2dh/src/test_interrupt.c`).\n  2. **CL 2:** Fix spoof-mode buffer overwrite (moving `int *axis \u003d s-\u003eraw_xyz;` inside the per-sample `for` loop in `driver/accel_lis2dh.c`, plus the `test_lis2dh__samples_fifo_read_spoof` updates in `zephyr/test/drivers/lis2dh/src/test_interrupt.c`).\n* **Commit Message:** ❌ The commit message bundles two independent fixes in the subject line (`Fix FIFO chunk loop and spoof buffer overwrite`) and narrates low-level C syntax edits line-by-line in the body rather than stating the problem and conceptual fix at one level of abstraction above the diff. See the inline comment on `/COMMIT_MSG` for copy-pasteable replacements. [🔗](http://go/tj/f63fcbaf-6cca-40a5-b46a-e8ace9b3919e)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06c61a1d_bea58612",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_interrupt.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:45:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `test_lis2dh__samples_fifo_read_long` currently passes even if both multi-chunk fixes in `lis2dh_load_fifo()` (`left -\u003d length;` and `int read_count \u003d 0;`) are reverted:\n\n1. **Untested `read_count` across chunks:** `acc-\u003ecollection_rate` is `0` in this test and `fifo_data[i * 2].timestamp` is never asserted. If `read_count \u003d 0` is reset at the start of the second chunk, `timestamp - s-\u003ecollection_rate * (nsamples - read_count)` still evaluates to `0` for every sample and the test passes.\n2. **Masked premature chunk-loop exit (`left -\u003d length`):** Because `lis2dh_irq_handler()` loops on `lis2dh_get_fifo_samples()` until `nsamples \u003d\u003d 0` and the emulator decrements `FIFO_SRC_ADDR` as each sample is read, returning early from `lis2dh_load_fifo()` after the first `FIFO_READ_LEN` chunk causes `lis2dh_irq_handler()` to issue an extra `LIS2DH_FIFO_SRC_ADDR` read (seeing the remaining 2 samples) and call `lis2dh_load_fifo()` a second time, still populating all 10 samples in `fifo_data`.\n\nPlease set a non-zero `acc-\u003ecollection_rate` (e.g., `100 * MSEC`), assert each staged sample timestamp (`fifo_data[i * 2].timestamp`), and verify via an I2C read callback (`i2c_common_emul_set_read_func`) that `LIS2DH_FIFO_SRC_ADDR` is read only twice (once returning `10` before `lis2dh_load_fifo()` and once returning `0` after `lis2dh_load_fifo()` drains both chunks in a single call):\n\n```c\nstatic int count_fifo_src_reads(const struct emul *target, int reg,\n\t\t\t\tuint8_t *val, int bytes, void *data)\n{\n\tint *fifo_src_reads \u003d data;\n\n\tARG_UNUSED(target);\n\tARG_UNUSED(val);\n\tARG_UNUSED(bytes);\n\n\tif (reg \u003d\u003d LIS2DH_FIFO_SRC_ADDR) {\n\t\t(*fifo_src_reads)++;\n\t}\n\treturn 1;\n}\n```\n\nAnd inside `test_lis2dh__samples_fifo_read_long`:\n\n```c\n\tstruct i2c_common_emul_data *common_data \u003d\n\t\temul_lis2dh_get_i2c_common_data(emul);\n\tconst size_t num_samples \u003d ARRAY_SIZE(fake_sample) / 3;\n\tint fifo_src_reads \u003d 0;\n...\n\tacc-\u003econfig[SENSOR_CONFIG_AP].odr \u003d 10000;\n\tacc-\u003edrv-\u003eset_data_rate(acc, 10000, 1);\n\tacc-\u003eoversampling_ratio \u003d 1;\n\tacc-\u003ecollection_rate \u003d 100 * MSEC;\n...\n\ti2c_common_emul_set_read_func(common_data, count_fifo_src_reads,\n\t\t\t\t      \u0026fifo_src_reads);\n\n\t/* Run interrupt handler */\n\tzassert_ok(lis2dh_drv.irq_handler(acc, \u0026evt));\n\n\t/*\n\t * lis2dh_load_fifo() should drain both chunks in a single call, so\n\t * LIS2DH_FIFO_SRC_ADDR is read only twice (10 samples, then 0).\n\t */\n\tzassert_equal(fifo_src_reads, 2);\n...\n\tfor (i \u003d 0; i \u003c num_samples; i++) {\n\t\tuint32_t expected_ts \u003d\n\t\t\tfifo_data[(num_samples - 1) * 2].timestamp -\n\t\t\tacc-\u003ecollection_rate * (num_samples - 1 - i);\n\n\t\tzassert_equal(fifo_data[i * 2].flags,\n\t\t\t      MOTIONSENSE_SENSOR_FLAG_TIMESTAMP);\n\t\tzassert_equal(fifo_data[i * 2].sensor_num, ACC_SENSOR_ID);\n\t\tzassert_equal(fifo_data[i * 2].timestamp, expected_ts);\n\t\tzassert_equal(fifo_data[i * 2 + 1].data[X], fake_sample[i * 3]);\n\t\tzassert_equal(fifo_data[i * 2 + 1].data[Y],\n\t\t\t      fake_sample[i * 3 + 1]);\n\t\tzassert_equal(fifo_data[i * 2 + 1].data[Z],\n\t\t\t      fake_sample[i * 3 + 2]);\n\t}\n```\n\n[🔗](http://go/tj/f63fcbaf-6cca-40a5-b46a-e8ace9b3919e)",
+      "range": {
+        "startLine": 156,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d9ad09a_f7178074",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_interrupt.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:45:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] In addition to verifying that the staged FIFO samples match `expected_spoof`, please also assert that `acc-\u003eraw_xyz` was updated with the last normalized raw sample (`fake_sample[3..5]`). This verifies that `st_normalize(s, axis, \u0026fifo[i])` wrote to `s-\u003eraw_xyz` on each iteration while leaving `s-\u003espoof_xyz` untouched:\n\n```c\n\t/* Data from fifo should match spoof values */\n\tfor (i \u003d 0; i \u003c ARRAY_SIZE(fake_sample) / 3; i++) {\n\t\tzassert_equal(fifo_data[i * 2 + 1].data[X], expected_spoof[X]);\n\t\tzassert_equal(fifo_data[i * 2 + 1].data[Y], expected_spoof[Y]);\n\t\tzassert_equal(fifo_data[i * 2 + 1].data[Z], expected_spoof[Z]);\n\t}\n\n\tzassert_equal(acc-\u003eraw_xyz[X], fake_sample[3]);\n\tzassert_equal(acc-\u003eraw_xyz[Y], fake_sample[4]);\n\tzassert_equal(acc-\u003eraw_xyz[Z], fake_sample[5]);\n```\n\n[🔗](http://go/tj/f63fcbaf-6cca-40a5-b46a-e8ace9b3919e)",
+      "range": {
+        "startLine": 301,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
