@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12014df2_576ce06e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:05:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding extracting the loop limit constant and simplifying/expanding the unit test.\n\n### Review Summary\n* **Functionality:** ✅ Bounding the `do-while` loop in `handle_irqs()` prevents the high-priority RTS54xx driver thread from spinning indefinitely and starving lower-priority threads when an IRQ line stays asserted while ARA continues responding.\n* **Architecture \u0026 Component Fit:** ✅ Bounding the IRQ loop inside `handle_irqs()` in `zephyr/drivers/usbc/pdc_rts54xx.c` fits the driver state machine and thread model.\n* **Code Simplicity:** ❌ In `zephyr/test/pdc/src/rts54xx/rts54xx.c`, `stuck_ara_read_cb()` includes an unreachable `STUCK_IRQ_MAX_ARA_READS` (`50`) guard and `-EIO` branch that can be removed once `handle_irqs()` is bounded.\n* **Idiomaticity \u0026 Readability:** ❌ In `zephyr/drivers/usbc/pdc_rts54xx.c`, the loop limit `10` (`int limit \u003d 10;`) is an inline magic number and is duplicated in the test as `STUCK_IRQ_EXPECTED_LIMIT`; it should be extracted to a named `#define` constant consistent with `N_I2C_TRANSACTION_COUNT` and other driver retry limits.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ❌ `test_handle_irqs_limit` verifies the upper bound when the IRQ stays asserted, but should assert `read_count` before test cleanup and also verify the `any_irq_gpio_asserted()` termination path below the limit (e.g., `RTS54XX_MAX_IRQ_LOOP_COUNT - 1`) so both clauses of `while (any_irq_gpio_asserted() \u0026\u0026 --limit \u003e 0)` are covered.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+55, -1)` (6 production lines, 49 test lines). Single, focused logical change.\n* **Commit Message:** ✅ Clear, concise prose explaining both the starvation root cause and the fix, with valid `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/d23afc59-c1db-4742-8f70-262543e846f7)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b54e391243c551d895e1eaaba3715167032dcb37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c8b2d66_51f00076",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:05:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Extract the magic number `10` (`int limit \u003d 10;`) to a named `#define` constant (for example, `#define RTS54XX_MAX_IRQ_LOOP_COUNT 10` in `zephyr/drivers/usbc/pdc_rts54xx.h`, or `#define N_MAX_IRQ_LOOP_COUNT 10` alongside `N_I2C_TRANSACTION_COUNT` and the other `N_*` retry limits at the top of this file).\n\nDefining `RTS54XX_MAX_IRQ_LOOP_COUNT` in `pdc_rts54xx.h` also allows `zephyr/test/pdc/src/rts54xx/rts54xx.c` to include `\"drivers/usbc/pdc_rts54xx.h\"` (as `zephyr/emul/emul_realtek_rts54xx.c` already does) and reference the same constant directly instead of duplicating `#define STUCK_IRQ_EXPECTED_LIMIT 10`:\n\n```c\n/* In zephyr/drivers/usbc/pdc_rts54xx.h: */\n#define RTS54XX_MAX_IRQ_LOOP_COUNT 10\n```\n\n```c\nstatic void handle_irqs(struct pdc_data_t *data)\n{\n\tuint8_t ara;\n\tint rv;\n\tint limit \u003d RTS54XX_MAX_IRQ_LOOP_COUNT;\n...\n\t} while (any_irq_gpio_asserted() \u0026\u0026 --limit \u003e 0);\n\n\tif (limit \u003d\u003d 0) {\n\t\tLOG_WRN(\"PDC IRQ loop limit reached, IRQ still asserted!\");\n\t}\n}\n```\n\n[🔗](http://go/tj/d23afc59-c1db-4742-8f70-262543e846f7)",
+      "range": {
+        "startLine": 967,
+        "startChar": 0,
+        "endLine": 1031,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b54e391243c551d895e1eaaba3715167032dcb37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3b95a4c_fb699d09",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T22:05:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please simplify `stuck_ara_read_cb` and strengthen `test_handle_irqs_limit`:\n\n1. **Remove dead branching and magic numbers in `stuck_ara_read_cb`**: With `handle_irqs()` bounded to 10 iterations, `*read_count \u003c STUCK_IRQ_MAX_ARA_READS` (`50`) is always true and the `return -EIO;` fallback branch is unreachable dead code. Removing `STUCK_IRQ_MAX_ARA_READS` and the `if` branch keeps the test callback minimal and branch-free.\n2. **Share the limit constant**: By defining `RTS54XX_MAX_IRQ_LOOP_COUNT` in `zephyr/drivers/usbc/pdc_rts54xx.h` and including `\"drivers/usbc/pdc_rts54xx.h\"`, you can drop the duplicated `#define STUCK_IRQ_EXPECTED_LIMIT 10`.\n3. **Assert before cleanup and verify early exit when IRQ deasserts (`any_irq_gpio_asserted()`)**: Assert `ara_read_count \u003d\u003d RTS54XX_MAX_IRQ_LOOP_COUNT` immediately after `k_msleep(TEST_WAIT_FOR_INTERVAL_MS)` before resetting the read callback and re-pulsing the IRQ. In addition, because `emul_pdc_pulse_irq()` leaves the active-low GPIO asserted (`0`), `any_irq_gpio_asserted()` never evaluates to `false` in existing tests; also testing that `handle_irqs()` stops before the limit when the IRQ GPIO deasserts (e.g., on the `(RTS54XX_MAX_IRQ_LOOP_COUNT - 1)`th ARA read) isolates both clauses of `while (any_irq_gpio_asserted() \u0026\u0026 --limit \u003e 0)`.\n\n```c\nstruct stuck_ara_ctx {\n\tint read_count;\n\tint deassert_after_reads;\n};\n\nstatic int stuck_ara_read_cb(const struct emul *target, int reg, uint8_t *val,\n\t\t\t     int bytes, void *data)\n{\n\tstruct stuck_ara_ctx *ctx \u003d data;\n\tconst struct i2c_dt_spec i2c_spec \u003d I2C_DT_SPEC_GET(RTS5453P_NODE);\n\tconst struct gpio_dt_spec irq_gpio \u003d\n\t\tGPIO_DT_SPEC_GET(RTS5453P_NODE, irq_gpios);\n\n\tARG_UNUSED(target);\n\tARG_UNUSED(reg);\n\tARG_UNUSED(bytes);\n\n\tctx-\u003eread_count++;\n\t*val \u003d i2c_spec.addr \u003c\u003c 1;\n\tif (ctx-\u003eread_count \u003d\u003d ctx-\u003edeassert_after_reads) {\n\t\tgpio_emul_input_set(irq_gpio.port, irq_gpio.pin, 1);\n\t}\n\treturn 0;\n}\n\nZTEST_USER(rts54xx, test_handle_irqs_limit)\n{\n\tconst struct emul *ara_emul \u003d EMUL_DT_GET(DT_NODELABEL(smbus_ara_emul));\n\tstruct i2c_common_emul_data *ara_common \u003d ara_emul-\u003edata;\n\tstruct stuck_ara_ctx ctx \u003d {\n\t\t.read_count \u003d 0,\n\t\t.deassert_after_reads \u003d RTS54XX_MAX_IRQ_LOOP_COUNT + 1,\n\t};\n\n\ti2c_common_emul_set_read_func(ara_common, stuck_ara_read_cb, \u0026ctx);\n\n\t/* Pulse IRQ (leaves active-low GPIO asserted) while ARA keeps\n\t * responding. Verify handle_irqs() bounds the loop to\n\t * RTS54XX_MAX_IRQ_LOOP_COUNT iterations.\n\t */\n\tzassert_ok(emul_pdc_pulse_irq(emul));\n\tk_msleep(TEST_WAIT_FOR_INTERVAL_MS);\n\tzassert_equal(ctx.read_count, RTS54XX_MAX_IRQ_LOOP_COUNT,\n\t\t      \"handle_irqs looped %d times without yielding\",\n\t\t      ctx.read_count);\n\n\t/* Verify handle_irqs() stops early as soon as the IRQ GPIO deasserts\n\t * before reaching RTS54XX_MAX_IRQ_LOOP_COUNT.\n\t */\n\tctx.read_count \u003d 0;\n\tctx.deassert_after_reads \u003d RTS54XX_MAX_IRQ_LOOP_COUNT - 1;\n\tzassert_ok(emul_pdc_pulse_irq(emul));\n\tk_msleep(TEST_WAIT_FOR_INTERVAL_MS);\n\tzassert_equal(ctx.read_count, RTS54XX_MAX_IRQ_LOOP_COUNT - 1);\n\n\t/* Restore normal ARA read handler and drain the queued ARA entry. */\n\ti2c_common_emul_set_read_func(ara_common, NULL, NULL);\n\tzassert_ok(emul_pdc_pulse_irq(emul));\n\tzassert_ok(emul_pdc_idle_wait(emul));\n}\n```\n\n[🔗](http://go/tj/d23afc59-c1db-4742-8f70-262543e846f7)",
+      "range": {
+        "startLine": 260,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b54e391243c551d895e1eaaba3715167032dcb37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
