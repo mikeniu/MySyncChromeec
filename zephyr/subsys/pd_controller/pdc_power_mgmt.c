@@ -934,9 +934,11 @@ struct pdc_port_t {
 	/** CCAPS temp variable used with CMD_PDC_GET_CONNECTOR_CAPABILITY
 	 * command */
 	union connector_capability_t ccaps;
+	/** Cached PDC connector status */
+	union connector_status_t connector_status;
 	/** CONNECTOR_STATUS temp variable used with CONNECTOR_GET_STATUS
 	 * command */
-	union connector_status_t connector_status;
+	union connector_status_t connector_status_cmd;
 	/* Sink path status of the port */
 	bool sink_path_status;
 	/** SINK_PATH_EN temp variable used with CMD_PDC_SET_SINK_PATH command
@@ -1502,6 +1504,8 @@ static void handle_connector_status(struct pdc_port_t *port)
 	int port_number = config->connector_num;
 	union conn_status_change_bits_t conn_status_change_bits;
 
+	/* Update the cached copy of connector status for the port */
+	*status = port->connector_status_cmd;
 	conn_status_change_bits.raw_value = status->raw_conn_status_change_bits;
 
 	LOG_INF("C%d: Connector Change: 0x%04x, RDO: %d", port_number,
@@ -3278,7 +3282,7 @@ static int send_pdc_cmd(struct pdc_port_t *port)
 		break;
 	case CMD_PDC_GET_CONNECTOR_STATUS:
 		rv = pdc_get_connector_status(port->pdc,
-					      &port->connector_status);
+					      &port->connector_status_cmd);
 		break;
 	case CMD_PDC_GET_CABLE_PROPERTY:
 		rv = pdc_get_cable_property(port->pdc, &port->cable_prop);
@@ -4218,6 +4222,9 @@ static void init_port_variables(struct pdc_port_t *port,
 	port->last_state = PDC_INIT;
 	port->next_state = PDC_INIT;
 	port->send_cmd_return_state = PDC_INVALID;
+	memset(&port->connector_status, 0, sizeof(port->connector_status));
+	memset(&port->connector_status_cmd, 0,
+	       sizeof(port->connector_status_cmd));
 	discovery_info_init(port);
 }
 
