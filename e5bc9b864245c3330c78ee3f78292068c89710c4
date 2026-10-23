@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c7cc543_5f5fcde8",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2185,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T21:30:22Z",
+      "side": 0,
+      "message": "IIRC, this file gets synced with copybot, so we shouldn\u0027t make downstream changes to it.",
+      "range": {
+        "startLine": 2185,
+        "startChar": 3,
+        "endLine": 2185,
+        "endChar": 34
+      },
+      "revId": "e5bc9b864245c3330c78ee3f78292068c89710c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
