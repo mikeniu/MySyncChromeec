@@ -23,6 +23,30 @@
       "isAi": true,
       "revId": "601a7f0b36681098ab156bb3d074aab765f3db89",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b7a6914_fb8d6952",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T19:17:18Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "35a03227_769747db",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 105,
+        "endChar": 9999
+      },
+      "revId": "601a7f0b36681098ab156bb3d074aab765f3db89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
