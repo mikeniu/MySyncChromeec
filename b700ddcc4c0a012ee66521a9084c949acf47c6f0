@@ -118,6 +118,30 @@
       },
       "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "568e0aa4_4c9f2937",
+        "filename": "include/system.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-23T21:22:09Z",
+      "side": 1,
+      "message": "Correction, irq_lock() + __disable_irq() results in `PRIMASK \u003d\u003d 1 \u0026\u0026 BASEPRI !\u003d 0`\n\nWFI being blocked is only an issue for system_npcx_hibernate_by_disable_ram() not system_npcx_hibernate_by_psl(). Fix for this is crrev/c/8623514.",
+      "parentUuid": "49c43c7a_7edc5a35",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 29
+      },
+      "revId": "b700ddcc4c0a012ee66521a9084c949acf47c6f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
