@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e32dd89a_78bebe29",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T07:48:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n**Functionality:** No issues found. The header properly declares the error codes, enums, struct, and function prototypes for the RTS5817MAA private library.\n**Architecture \u0026 Component Fit:** Follows the established pattern in `zephyr/drivers/fingerprint/` (`fingerprint_*_private.h`) by isolating vendor-specific sensor and biometric algorithm declarations in a dedicated private header.\n**Code Simplicity:** Declarations are minimal and direct.\n**Idiomaticity \u0026 Readability:** Uses standard C types (`\u003cstdint.h\u003e`, `\u003cstdbool.h\u003e`), include guards, and clear Doxygen documentation for parameters and return values.\n**Security:** No issues found.\n**Testing:** N/A (header-only declarations for the vendor library; build verification via `TEST\u003dzmake build realtekfp` is appropriate).\n**CL Size \u0026 Scope:** `Size: M (+220, -0)`. Single, self-contained logical change adding the RTS5817MAA private library API header.\n**Commit Message:** Clearly explains what the header provides and how it fits into the driver, PAL, and algorithm wrapper, with valid `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/7395c1e4-a5d3-4188-9b34-736258900aa8)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "502e923e937e0ab30ddde88e0d2bddb6cf182ab7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
