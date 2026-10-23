@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b46fbc5_3190b3a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:20:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/f20c561a-a74a-49cd-9a24-67f1867a245f)]\n\n### Review Summary\n*   **Functionality:** Looks good. Adds the devicetree binding and Kconfig options for the RTS5817MAA fingerprint sensor driver.\n*   **Architecture \u0026 Component Fit:** The new Kconfig file and devicetree binding follow the established pattern used by sibling fingerprint sensor drivers in Zephyr.\n*   **Code Simplicity:** Simple and direct declarative configuration additions.\n*   **Idiomaticity \u0026 Readability:** Clean Zephyr Kconfig and devicetree binding YAML definitions that match local conventions.\n*   **Security:** No security concerns.\n*   **Testing:** This CL adds declarative configuration (Kconfig and devicetree bindings) with no procedural runtime logic, so new unit tests are not applicable here.\n*   **CL Size \u0026 Scope:** `Size: M (+64, -0)`. This CL is focused on a single cohesive logical change.\n*   **Commit Message:** Concisely and accurately describes the changes and includes standard ChromiumOS `BUG\u003d` and `TEST\u003d` tags. [🔗](http://go/tj/f20c561a-a74a-49cd-9a24-67f1867a245f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "dd86f7e5eb3dfd8da89de5c1db96faa9a8ff5855",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
