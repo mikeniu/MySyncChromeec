@@ -16,11 +16,17 @@
 #include <zephyr/pm/policy.h>
 #include <zephyr/ztest.h>
 
+#include <cmsis_core.h>
+
 FAKE_VOID_FUNC(arm_core_mpu_disable);
 FAKE_VOID_FUNC(LL_TIM_DisableCounter, void *);
 FAKE_VALUE_FUNC(int, stm32_clock_control_off, const struct device *,
 		clock_control_subsys_t);
 FAKE_VALUE_FUNC(int, stm32_reset_line_toggle, const struct device *, uint32_t);
+FAKE_VOID_FUNC(__disable_irq);
+FAKE_VOID_FUNC(__set_BASEPRI, uint32_t);
+FAKE_VOID_FUNC(__DSB);
+FAKE_VOID_FUNC(__ISB);
 
 static struct clock_control_driver_api stm32_clock_control_api = {
 	.off = stm32_clock_control_off,
@@ -49,4 +55,28 @@ ZTEST(ec_quirks, test_tim2)
 		      (void *)DT_REG_ADDR(DT_NODELABEL(timers2)));
 	zassert_equal(stm32_clock_control_off_fake.arg0_history[0],
 		      DEVICE_DT_GET(STM32_CLOCK_CONTROL_NODE));
+}
+
+ZTEST(ec_quirks, test_prepare_for_sysjump_to_ec)
+{
+	RESET_FAKE(arm_core_mpu_disable);
+	RESET_FAKE(stm32_reset_line_toggle);
+	RESET_FAKE(__disable_irq);
+	RESET_FAKE(__set_BASEPRI);
+	RESET_FAKE(__DSB);
+	RESET_FAKE(__ISB);
+
+	hook_notify(HOOK_SYSJUMP);
+
+	zassert_equal(arm_core_mpu_disable_fake.call_count, 1);
+	zassert_equal(stm32_reset_line_toggle_fake.call_count, 1);
+	zassert_equal(stm32_reset_line_toggle_fake.arg0_history[0],
+		      DEVICE_DT_GET(DT_NODELABEL(rctl)));
+	zassert_equal(stm32_reset_line_toggle_fake.arg1_history[0],
+		      DT_RESET_ID(DT_NODELABEL(timers2)));
+	zassert_equal(__disable_irq_fake.call_count, 1);
+	zassert_equal(__set_BASEPRI_fake.call_count, 1);
+	zassert_equal(__set_BASEPRI_fake.arg0_history[0], 0);
+	zassert_equal(__DSB_fake.call_count, 1);
+	zassert_equal(__ISB_fake.call_count, 1);
 }
