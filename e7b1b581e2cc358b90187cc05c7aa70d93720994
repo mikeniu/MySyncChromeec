@@ -40,6 +40,30 @@
       "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
       "revId": "e7b1b581e2cc358b90187cc05c7aa70d93720994",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c88b61c6_6561b85e",
+        "filename": "test/uptime.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T19:24:45Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "509e4695_abba07ac",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 9999
+      },
+      "revId": "e7b1b581e2cc358b90187cc05c7aa70d93720994",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
