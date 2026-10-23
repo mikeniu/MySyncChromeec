@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3aab803_bd102c3c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T18:38:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:** ✅ Correctly removes the unreachable `!IS_ENABLED(CONFIG_HWTIMER_64BIT)` branch and unused `clksrc_high` variable from `common/timer.c`.\n**Architecture \u0026 Component Fit:** ✅ Aligns `common/timer.c` with the Zephyr shim configuration where `CONFIG_PLATFORM_EC_TIMER` unconditionally enables `CONFIG_HWTIMER_64BIT`.\n**Code Simplicity:** ✅ Eliminates dead conditional branching and unused state in `get_time()`.\n**Idiomaticity \u0026 Readability:** ✅ Clean, idiomatic C consistent with the surrounding codebase.\n**Security:** ✅ No security concerns identified.\n**Testing:** ✅ Pure dead-code removal; the active 64-bit timer path remains covered by the existing `drivers.timer` test suite.\n**CL Size \u0026 Scope:** ✅ Size: S (+1, -18). Single, self-contained logical change.\n**Commit Message:** ✅ Clear, concise prose explaining both why the 32-bit path is unreachable on `main` and what is removed, with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/98a550bd-7e2f-43a6-8589-63b9a3897856)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6058f528be7716efa3b2d710e15b14064f4d4d29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
