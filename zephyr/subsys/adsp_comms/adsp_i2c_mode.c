@@ -150,6 +150,7 @@ void board_chipset_startup_i2c_target(void)
 		LOG_ERR("Failed to register I2C target (err %d)", ret);
 		return;
 	}
+	disable_sleep(SLEEP_MASK_I2C_PERIPHERAL);
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_i2c_target,
 	     HOOK_PRIO_DEFAULT);
@@ -191,6 +192,7 @@ void board_chipset_shutdown_complete_i2c_controller(void)
 		LOG_ERR("Failed to re-configure I2C controller (err %d)", ret);
 		return;
 	}
+	enable_sleep(SLEEP_MASK_I2C_PERIPHERAL);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE,
 	     board_chipset_shutdown_complete_i2c_controller, HOOK_PRIO_DEFAULT);

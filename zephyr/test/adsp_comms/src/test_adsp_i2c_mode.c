@@ -10,6 +10,7 @@
 #include "hooks.h"
 #include "i2c.h"
 #include "stubs.h"
+#include "system.h"
 
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/kernel.h>
@@ -193,10 +194,13 @@ ZTEST_USER(adsp_i2c_mode, test_board_chipset_startup_i2c_target)
 	/* Hook notification */
 	hook_notify(HOOK_CHIPSET_STARTUP);
 	zassert_ok(i2c_target_unregister(i2c_dev, &target_cfg));
+	zassert_not_equal(atomic_get(&sleep_mask) & SLEEP_MASK_I2C_PERIPHERAL,
+			  0);
 
 	board_chipset_startup_i2c_target();
 	hook_notify(HOOK_CHIPSET_SHUTDOWN_COMPLETE);
 	zassert_not_equal(i2c_target_unregister(i2c_dev, &target_cfg), 0);
+	zassert_equal(atomic_get(&sleep_mask) & SLEEP_MASK_I2C_PERIPHERAL, 0);
 }
 
 /* Test initialization of ADSP I2C bus mode on HOOK_INIT for ON and OFF states
