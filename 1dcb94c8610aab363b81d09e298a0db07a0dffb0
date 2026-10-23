@@ -34,6 +34,23 @@
       "parentUuid": "f7b8274e_90d551fd",
       "revId": "1dcb94c8610aab363b81d09e298a0db07a0dffb0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01ff215f_69da8e73",
+        "filename": "chip/npcx/espi.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:23:48Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "revId": "1dcb94c8610aab363b81d09e298a0db07a0dffb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
