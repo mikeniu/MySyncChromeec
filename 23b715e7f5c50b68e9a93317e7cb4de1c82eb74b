@@ -19,6 +19,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b210a1d7_dfc2fc6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:28:22Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ad2fe44_d88fd456",
@@ -39,6 +56,23 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "482008ab_fabb8413",
+        "filename": "common/charger_profile_override.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-23T18:28:22Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
       "revId": "23b715e7f5c50b68e9a93317e7cb4de1c82eb74b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
