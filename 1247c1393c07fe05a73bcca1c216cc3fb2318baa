@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6276ce2e_1a08da8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T08:17:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/63a31dce-e419-4949-b1e5-ed871e75f5b5)]\n\n### Review Summary\n* **Functionality:** Verified. `rts5817maa_finger_status` returns `-ENOTSUP` when the private driver is disabled and maps `rts5817maa_sensor_finger_status()` responses (`RTS_FINGER_PRESENT`, `RTS_FINGER_NONE`, and unmapped default values) to the corresponding `enum fingerprint_finger_state` values.\n* **Architecture \u0026 Component Fit:** Verified. The implementation and `.finger_status` registration in `cros_fp_rts5817maa_driver_api` match the existing driver structure and sibling fingerprint sensor drivers.\n* **Code Simplicity:** Verified. Both the driver function and unit tests are minimal and direct.\n* **Idiomaticity \u0026 Readability:** Verified. Uses standard Zephyr macros (`IS_ENABLED`, `zassert_equal`) and named enum constants without magic values.\n* **Security:** Verified.\n* **Testing:** Verified. Unit tests cover `RTS_FINGER_PRESENT`, `RTS_FINGER_NONE`, and unmapped status values (`RTS_FINGER_PRESENT + 1`) with exact return value assertions.\n* **CL Size \u0026 Scope:** Size: S (+43, -0). Focused single logical change implementing `finger_status` support and its unit tests.\n* **Commit Message:** Verified.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1247c1393c07fe05a73bcca1c216cc3fb2318baa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
