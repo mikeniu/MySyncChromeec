@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ef7be6d_e2f0e972",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:01:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/ee04c723-4b62-475f-84ee-92ea177552d0)]\n\n### Review Summary\nThis CL updates `system_disable_jump()` to configure and enable the Cortex-M MPU regardless of write-protect state, gates sticky `RAM_LOCK` configuration in `mpu_protect_data_ram()` and `mpu_protect_code_ram()` on `system_is_locked()`, disables the MPU on `HOOK_SYSJUMP` so unlocked systems can jump between images, and adds a Cortex-M MPU mock and host unit test coverage in `test/system.c`. Thank you for splitting out the `REGION_CODE_RAM` background aperture change into a separate CL.\n\n### Key Findings\n* **`include/mock/mpu_mock.h` / `common/mock/mpu_mock.c` (Minor)**: Consider defining named constants (`MOCK_MPU_MAX_REGIONS` and `MOCK_MPU_DEFAULT_TYPE`) and a `MOCK_MPU_DEFAULT` initializer macro to avoid repeating magic literals (`16` and `0x00000800`) and to bound-check `region` against the mock array size.\n\n[🔗](http://go/tj/ee04c723-4b62-475f-84ee-92ea177552d0)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f9cfed6b73f8f185eeac15e2da6dc9e314cf97e6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23aeec74_ea879a12",
+        "filename": "include/mock/mpu_mock.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T20:01:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider defining named constants for the region array capacity (`16`) and the default `MPU_TYPE` register value (`0x00000800`), along with a `MOCK_MPU_DEFAULT` compound-literal initializer macro (matching the pattern in `common/mock/README.md`):\n\n```c\n#define MOCK_MPU_MAX_REGIONS 16\n#define MOCK_MPU_DEFAULT_TYPE 0x00000800 /* 8 unified regions */\n\nstruct mock_mpu_state {\n\tuint32_t type;\n\tuint32_t ctrl;\n\tuint32_t base[MOCK_MPU_MAX_REGIONS];\n\tuint32_t rasr[MOCK_MPU_MAX_REGIONS];\n};\n\n#define MOCK_MPU_DEFAULT \\\n\t((struct mock_mpu_state){ .type \u003d MOCK_MPU_DEFAULT_TYPE })\n```\n\nThis avoids repeating `16` here and `0x00000800` in `common/mock/mpu_mock.c`, allows `mock_mpu_reset()` to simply assign `mock_mpu \u003d MOCK_MPU_DEFAULT;`, and lets `mpu_update_region()` also bound-check `region \u003e\u003d MOCK_MPU_MAX_REGIONS` in case a test overrides `mock_mpu.type` with a region count larger than the mock arrays.\n\nOther locations:\n* **`common/mock/mpu_mock.c` (Lines 18-26, 34)**: Initialize `mock_mpu \u003d MOCK_MPU_DEFAULT;`, reset with `mock_mpu \u003d MOCK_MPU_DEFAULT;`, and check `region \u003e\u003d MOCK_MPU_MAX_REGIONS`.\n\n[🔗](http://go/tj/ee04c723-4b62-475f-84ee-92ea177552d0)",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f9cfed6b73f8f185eeac15e2da6dc9e314cf97e6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
