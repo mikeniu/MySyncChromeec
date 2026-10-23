@@ -13,6 +13,7 @@
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 
+#include <cmsis_core.h>
 #include <stm32f4xx_ll_tim.h>
 
 #define RESET_PERIPHERAL(idx) \
@@ -47,6 +48,17 @@ static void prepare_for_sysjump_to_ec(void)
 	 * unused in EC.
 	 */
 	sys_clock_disable();
+
+	/*
+	 * Legacy EC only uses PRIMASK for interrupt masking and does not
+	 * clear BASEPRI in its reset handler. Mask PRIMASK and clear
+	 * BASEPRI before jumping so Legacy EC enters init.S with
+	 * PRIMASK=1 and BASEPRI=0.
+	 */
+	__disable_irq();
+	__set_BASEPRI(0);
+	__DSB();
+	__ISB();
 }
 DECLARE_HOOK(HOOK_SYSJUMP, prepare_for_sysjump_to_ec, HOOK_PRIO_LAST);
 
