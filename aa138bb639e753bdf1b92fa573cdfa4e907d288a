@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3e23fba_e3faec4d",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-23T09:41:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "386a3cad_383cb77c",
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7fc16957_bf175de5",
@@ -120,6 +138,24 @@
       "side": 1,
       "message": "Actually, now I think using an additional mode was a bit cleaner. It identifies the LED state explicitly. Currently, led can be ON and OFF in the MATCH mode. Sorry for the confusion.",
       "parentUuid": "6b04c44c_4c2104b5",
+      "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bed5866_a7586cbf",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-23T09:41:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "322707f2_a4ff2e34",
       "revId": "aa138bb639e753bdf1b92fa573cdfa4e907d288a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },

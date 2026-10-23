@@ -43,6 +43,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bf06627a_30175300",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-23T09:41:05Z",
+      "side": 1,
+      "message": "Changed to \u0027init_lid_gpio()\u0027",
+      "parentUuid": "86482021_df2d6bcf",
+      "revId": "b2345733f26289f47fd10154bfbeaf8ce9eac9c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9e0b9e29_224143d5",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 2
@@ -54,6 +72,24 @@
       "writtenOn": "2026-10-22T13:02:45Z",
       "side": 1,
       "message": "Check return value.",
+      "revId": "b2345733f26289f47fd10154bfbeaf8ce9eac9c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6efb0d99_2c0d4286",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-23T09:41:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e0b9e29_224143d5",
       "revId": "b2345733f26289f47fd10154bfbeaf8ce9eac9c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
