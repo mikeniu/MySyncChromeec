@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf88758b_0efa934e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-23T23:53:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Rejects `EC_CMD_FP_FRAME` v0 template encryption (`FP_FRAME_INDEX_TEMPLATE`) and v1 `FP_FRAME_ENCRYPT_TEMPLATE` requests with `EC_HOST_CMD_BUSY` when `FP_MODE_ENROLL_SESSION` is set in `global_context.sensor_mode`.\n* **Architecture \u0026 Component Fit:** ✅ Aligns with the existing `(FP_MODES_CRYPTO_IN_PROGRESS | FP_MODE_ENROLL_SESSION)` guard pattern in `fp_command_template_v0` and `fp_command_template_v1`.\n* **Code Simplicity:** ✅ Minimal bitmask update at both guard sites and concise, focused unit tests.\n* **Idiomaticity \u0026 Readability:** ✅ Uses named mode/status constants and matches local C++/Zephyr conventions.\n* **Security:** ✅ Prevents concurrent host frame commands from accessing `fp_template`, modifying `fp_enc_buffer`, or overwriting `global_context.sensor_mode` during an active enrollment session.\n* **Testing:** ✅ Unit tests cover both the `EC_RES_BUSY` enrollment state and the non-blocking `FP_MODE_MATCH` state (`EC_RES_UNAVAILABLE`) for v0 and v1 template frame requests.\n* **CL Size \u0026 Scope:** Size: M (+78, -5). ✅ Single, self-contained logical change (15 production diff lines + 68 test lines).\n* **Commit Message:** ✅ Clear, accurate, and concise explanation of the problem and change.\n\n[[trajectory](https://goto.corp.google.com/traj/6dac9b66-ec18-4adb-851e-8b0f05d54218)] [🔗](http://go/tj/6dac9b66-ec18-4adb-851e-8b0f05d54218)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "576a7a506b817092d802e17a8600ad4c02ec0474",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
