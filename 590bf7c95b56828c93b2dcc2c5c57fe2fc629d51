@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea38b0e1_1ff4f4d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-24T15:31:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/a144ccc8-c744-45fb-9270-ccb3c4290512)]\n\n### Review Summary\n- **Functionality**: `system_disable_jump()` now unconditionally calls `mpu_enable()` so fixed Cortex-M MPU regions are enabled even when hardware write-protect is unlocked, while `mpu_enable()` gates sticky NPCX RAM lock configuration on `system_is_locked()` and `mpu_disable_on_sysjump()` disables the fixed MPU regions on `HOOK_SYSJUMP` before jumping to a target image or RAM loader.\n- **Architecture \u0026 Component Fit**: The NPCX RAM lock console message in `common/system.c` is properly gated on `IS_ENABLED(CONFIG_NPCX_RAM_LOCK) \u0026\u0026 !system_is_locked()`, and the `HOOK_SYSJUMP` teardown in `zephyr/shim/core/cortex-m/mpu.c` aligns with the existing `HOOK_PRIO_LAST` pattern used in the RISC-V MPU shim.\n- **Code Simplicity**: The changes are minimal and reuse `mpu_disable_fixed_regions()` cleanly for the `HOOK_SYSJUMP` handler.\n- **Idiomaticity \u0026 Readability**: Follows ChromiumOS EC and Zephyr C conventions (`IS_ENABLED`, `DECLARE_HOOK`, Kconfig, and FFF test fakes) with no magic values.\n- **Security**: Strengthens defense-in-depth on unlocked Cortex-M devices by ensuring MPU execute-never and write-protection regions are enabled when jumps are disabled.\n- **Testing**: `zephyr/test/system_common` enables `CONFIG_MPU` via `TEST_SYSTEM_MPU` and verifies in `test_syslock_console_cmd` that `system_disable_jump()` invokes `mpu_enable()` both when the system is unlocked and after locking via `syslock`.\n- **CL Size \u0026 Scope**: `Size: M (+58, -18)`. Focused, single logical change combining the `system_disable_jump()` MPU enablement with the required NPCX RAM lock guard, `HOOK_SYSJUMP` region teardown, and unit test.\n- **Commit Message**: Concisely explains the motivation and conceptual changes in two short prose paragraphs with valid `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "590bf7c95b56828c93b2dcc2c5c57fe2fc629d51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
