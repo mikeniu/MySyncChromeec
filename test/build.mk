@@ -40,6 +40,7 @@ test-list-host += is_enabled
 test-list-host += is_enabled_error
 test-list-host += kb_8042
 test-list-host += kb_mkbp
+test-list-host += panic_watchdog_warn
 #test-list-host += kb_scan	# crbug.com/976974
 test-list-host += lid_sw
 test-list-host += lightbar
@@ -178,3 +179,4 @@ is_enabled_error-y=is_enabled_error.o.cmd
 
 host-static_if_error: TEST_SCRIPT=static_if_error.sh
 static_if_error-y=static_if_error.o.cmd
+panic_watchdog_warn-y=panic_watchdog_warn.o

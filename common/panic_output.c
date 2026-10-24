@@ -378,6 +378,12 @@ enum ec_status host_command_panic_info(struct host_cmd_handler_args *args)
 	uintptr_t pdata_start = get_panic_data_start();
 	struct panic_data *pdata = panic_get_data();
 
+
+	/* Do not report watchdog warnings to AP to prevent false CPMH spikes */
+	if (pdata && pdata->reason == PANIC_SW_WATCHDOG_WARN) {
+		return EC_RES_SUCCESS;
+	}
+
 	if (pdata_start && pdata_size > 0) {
 		if (pdata_size > args->response_max) {
 			panic_printf("Panic data size %d is too "
