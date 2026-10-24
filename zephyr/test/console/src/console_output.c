@@ -6,6 +6,7 @@
 #include "common.h"
 #include "console.h"
 #include "ec_app_main.h"
+#include "uart.h"
 #include "zephyr/kernel.h"
 
 #include <zephyr/drivers/serial/uart_emul.h>
@@ -416,6 +417,15 @@ ZTEST_F(console_output, test_isr_output)
 	} else {
 		zassert_true(tx_bytes == 0);
 	}
+}
+
+ZTEST_F(console_output, test_uart_tx_flush_yield_locked)
+{
+	unsigned int key;
+
+	key = irq_lock();
+	uart_tx_flush();
+	irq_unlock(key);
 }
 
 void test_main(void)
