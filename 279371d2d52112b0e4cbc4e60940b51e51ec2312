@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6f385a0_89bc1f6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-24T18:05:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/84930fe3-40eb-4023-afcd-2092e1578c35)]\n\n### Review Summary\n- **Functionality**: `system_disable_jump()` now unconditionally invokes `mpu_enable()` when `CONFIG_MPU` is enabled so Cortex-M fixed MPU regions protect code and data RAM even when write-protect is unlocked, while `mpu_enable()` gates sticky NPCX RAM lock configuration on `system_is_locked()` and `mpu_disable_on_sysjump()` disables fixed MPU regions on `HOOK_SYSJUMP` before jumping to a target image or RAM loader.\n- **Architecture \u0026 Component Fit**: The NPCX RAM lock log in `common/system.c` is properly gated on `IS_ENABLED(CONFIG_NPCX_RAM_LOCK) \u0026\u0026 !system_is_locked()`, `zephyr/shim/include/mpu.h` includes `\u003cstdint.h\u003e` directly for `uint32_t`, and the `HOOK_SYSJUMP` teardown in `zephyr/shim/core/cortex-m/mpu.c` uses `HOOK_PRIO_LAST` consistently with the RISC-V MPU shim.\n- **Code Simplicity**: The changes are minimal and direct, reusing `mpu_disable_fixed_regions()` cleanly for the `HOOK_SYSJUMP` callback.\n- **Idiomaticity \u0026 Readability**: Follows ChromiumOS EC and Zephyr C conventions (`IS_ENABLED`, `DECLARE_HOOK`, Kconfig, and FFF fakes) with no unexplained literals.\n- **Security**: Strengthens defense-in-depth on unlocked Cortex-M systems by ensuring MPU write and execute-never protections are enabled when jumps are disabled.\n- **Testing**: `zephyr/test/system_common` enables `CONFIG_MPU` via `TEST_SYSTEM_MPU` and verifies in `test_syslock_console_cmd` that `system_disable_jump()` calls `mpu_enable()` both when `system_is_locked()` is false and after locking via `syslock`.\n- **CL Size \u0026 Scope**: `Size: M (+59, -18)`. Focused, single logical change combining the `system_disable_jump()` MPU enablement with the required NPCX RAM lock guard, `HOOK_SYSJUMP` region teardown, self-contained header include, and unit test.\n- **Commit Message**: Concisely explains the motivation and conceptual solution in two short prose paragraphs with valid `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "279371d2d52112b0e4cbc4e60940b51e51ec2312",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
