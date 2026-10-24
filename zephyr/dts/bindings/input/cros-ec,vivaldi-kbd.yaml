@@ -68,6 +68,12 @@ properties:
       Array of KBD_RC() entries corresponding to the (row, column) location of
       the top keys, starting from T1.
 
+  alt-vivaldi-keys:
+    type: array
+    description: |
+      Top key positions used after vivaldi_kbd_use_alternate(), must have
+      the same number of entries as vivaldi-keys.
+
 child-binding:
   properties:
     vivaldi-codes:

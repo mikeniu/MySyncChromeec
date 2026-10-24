@@ -52,3 +52,27 @@ properties:
     description: |
       Row-column position of the "volume up" key, only required when using the
       MKBP keyboard protocol.
+
+  alt-left-alt-rc:
+    type: int
+    description: |
+      Row-column position of the "left alt" key after
+      runtime_keys_use_alternate(), defaults to left-alt-rc.
+
+  alt-right-alt-rc:
+    type: int
+    description: |
+      Row-column position of the "right alt" key after
+      runtime_keys_use_alternate(), defaults to right-alt-rc.
+
+  alt-h-rc:
+    type: int
+    description: |
+      Row-column position of the "h" key after
+      runtime_keys_use_alternate(), defaults to h-rc.
+
+  alt-r-rc:
+    type: int
+    description: |
+      Row-column position of the "r" key after
+      runtime_keys_use_alternate(), defaults to r-rc.

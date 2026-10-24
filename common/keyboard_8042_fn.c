@@ -8,6 +8,7 @@
 #define DT_DRV_COMPAT cros_ec_fn_keys
 
 #include <stdint.h>
+#include <string.h>
 
 #include <zephyr/devicetree.h>
 #include <zephyr/input/input_keymap.h>
@@ -15,6 +16,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+#include <drivers/keyboard_alt.h>
 #include <dt-bindings/kbd.h>
 
 LOG_MODULE_REGISTER(fn_keys, LOG_LEVEL_INF);
@@ -29,7 +31,21 @@ static bool fn_key_triggered;
 static uint32_t fn_keys_status;
 static uint8_t normal_keys_status[KEYBOARD_COLS_MAX];
 
-static const uint16_t fn_key_rc = DT_INST_PROP(0, fn_rc);
+static uint16_t fn_key_rc = DT_INST_PROP(0, fn_rc);
+
+#if DT_INST_NODE_HAS_PROP(0, alt_keymap)
+static const uint32_t fn_keys_alt[] = DT_INST_PROP(0, alt_keymap);
+BUILD_ASSERT(ARRAY_SIZE(fn_keys_alt) == ARRAY_SIZE(fn_keys),
+	     "alt-keymap must have the same length as keymap");
+#endif
+
+void fn_keys_use_alternate(void)
+{
+	fn_key_rc = DT_INST_PROP_OR(0, alt_fn_rc, DT_INST_PROP(0, fn_rc));
+#if DT_INST_NODE_HAS_PROP(0, alt_keymap)
+	memcpy(fn_keys, fn_keys_alt, sizeof(fn_keys));
+#endif
+}
 
 static bool is_key(int row, int col, uint32_t rc)
 {
