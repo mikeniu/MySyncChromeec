@@ -12,6 +12,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+#include <drivers/keyboard_alt.h>
 #include <dt-bindings/kbd.h>
 #include <hooks.h>
 #include <host_command.h>
@@ -41,7 +42,7 @@ struct k_work_delayable boot_keys_timeout_dwork;
 		.col = KBD_RC_COL(DT_INST_PROP(0, prop)), \
 	}
 
-static const struct boot_keys {
+static struct boot_keys {
 	uint8_t row;
 	uint8_t col;
 } boot_keys[] = {
@@ -51,6 +52,23 @@ static const struct boot_keys {
 	[BOOT_KEY_REFRESH] = BOOT_KEY_INIT(refresh_rc),
 };
 BUILD_ASSERT(ARRAY_SIZE(boot_keys) == BOOT_KEY_COUNT);
+
+#define BOOT_KEY_ALT_RC(prop) \
+	DT_INST_PROP_OR(0, alt_##prop, DT_INST_PROP(0, prop))
+
+static void boot_key_set(uint8_t idx, uint32_t rc)
+{
+	boot_keys[idx].row = KBD_RC_ROW(rc);
+	boot_keys[idx].col = KBD_RC_COL(rc);
+}
+
+void boot_keys_use_alternate(void)
+{
+	boot_key_set(BOOT_KEY_DOWN_ARROW, BOOT_KEY_ALT_RC(down_arrow_rc));
+	boot_key_set(BOOT_KEY_ESC, BOOT_KEY_ALT_RC(esc_rc));
+	boot_key_set(BOOT_KEY_LEFT_SHIFT, BOOT_KEY_ALT_RC(left_shift_rc));
+	boot_key_set(BOOT_KEY_REFRESH, BOOT_KEY_ALT_RC(refresh_rc));
+}
 
 static bool ignore_key(uint8_t row, uint8_t col)
 {

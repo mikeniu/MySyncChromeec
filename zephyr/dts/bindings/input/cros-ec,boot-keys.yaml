@@ -44,3 +44,27 @@ properties:
     type: int
     required: true
     description: Row-column position of the "refresh" key.
+
+  alt-down-arrow-rc:
+    type: int
+    description: |
+      Row-column position of the "down arrow" key after
+      boot_keys_use_alternate(), defaults to down-arrow-rc.
+
+  alt-esc-rc:
+    type: int
+    description: |
+      Row-column position of the "esc" key after
+      boot_keys_use_alternate(), defaults to esc-rc.
+
+  alt-left-shift-rc:
+    type: int
+    description: |
+      Row-column position of the "left shift" key after
+      boot_keys_use_alternate(), defaults to left-shift-rc.
+
+  alt-refresh-rc:
+    type: int
+    description: |
+      Row-column position of the "refresh" key after
+      boot_keys_use_alternate(), defaults to refresh-rc.

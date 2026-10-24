@@ -62,21 +62,44 @@ BUILD_ASSERT(ARRAY_SIZE(action_scancodes) == TK_COUNT);
 		.col = DT_PROP_BY_IDX(node_id, prop, idx) & 0xff,        \
 	},
 
-static const struct {
+struct vivaldi_key {
 	uint8_t row;
 	uint8_t col;
-} vivaldi_keys[] = { DT_INST_FOREACH_PROP_ELEM(0, vivaldi_keys,
-					       VIVALDI_KEY_INIT) };
+};
+
+static const struct vivaldi_key vivaldi_keys[] = { DT_INST_FOREACH_PROP_ELEM(
+	0, vivaldi_keys, VIVALDI_KEY_INIT) };
+
+/* A configuration node can override vivaldi-keys for a different matrix. */
+#define VIVALDI_KEYS_NAME(node_id) UTIL_CAT(vivaldi_keys_, DT_DEP_ORD(node_id))
+
+#define VIVALDI_KEYS_DEFINE(node_id)                                     \
+	IF_ENABLED(DT_NODE_HAS_PROP(node_id, vivaldi_keys),              \
+		   (static const struct vivaldi_key VIVALDI_KEYS_NAME(   \
+			    node_id)[] = { DT_FOREACH_PROP_ELEM(         \
+			    node_id, vivaldi_keys, VIVALDI_KEY_INIT) };))
+DT_INST_FOREACH_CHILD(0, VIVALDI_KEYS_DEFINE)
+
+#define VIVALDI_KEY_RC(node_id, idx)                              \
+	COND_CODE_1(DT_NODE_HAS_PROP(node_id, vivaldi_keys),      \
+		    (DT_PROP_BY_IDX(node_id, vivaldi_keys, idx)), \
+		    (DT_INST_PROP_BY_IDX(0, vivaldi_keys, idx)))
 
 /* If cros_ec_boot_keys exists and is okay, validate that the vivaldi key
- * TK_REFRESH is the same keycode as boot-keys.refresh-rc.
+ * TK_REFRESH of every configuration is the same keycode as
+ * boot-keys.refresh-rc or boot-keys.alt-refresh-rc.
  */
 #if DT_HAS_COMPAT_STATUS_OKAY(cros_ec_boot_keys)
-#define BOOT_KEY_VALIDATE(node_id, prop, idx)                               \
-	BUILD_ASSERT(TK_REFRESH != DT_PROP_BY_IDX(node_id, prop, idx) ||    \
-			     DT_INST_PROP_BY_IDX(0, vivaldi_keys, idx) ==   \
-				     DT_PROP(DT_INST(0, cros_ec_boot_keys), \
-					     refresh_rc),                   \
+#define BOOT_KEYS_NODE DT_INST(0, cros_ec_boot_keys)
+#define BOOT_KEY_VALIDATE(node_id, prop, idx)                                 \
+	BUILD_ASSERT(TK_REFRESH != DT_PROP_BY_IDX(node_id, prop, idx) ||      \
+			     VIVALDI_KEY_RC(node_id, idx) ==                  \
+				     DT_PROP(BOOT_KEYS_NODE, refresh_rc) ||   \
+			     VIVALDI_KEY_RC(node_id, idx) ==                  \
+				     DT_PROP_OR(BOOT_KEYS_NODE,               \
+						alt_refresh_rc,               \
+						DT_PROP(BOOT_KEYS_NODE,       \
+							refresh_rc)),         \
 		     "Vivaldi TK_REFRESH key must match boot-key.refresh-rc");
 #else
 #define BOOT_KEY_VALIDATE(node_id, prop, idx)
@@ -86,14 +109,12 @@ static const struct {
  * on the correct row.
  */
 #ifdef KEYBOARD_ROW_REFRESH
-#define REFRESH_ROW_VALIDATE(node_id, prop, idx)                              \
-	BUILD_ASSERT(TK_REFRESH != DT_PROP_BY_IDX(node_id, prop, idx) ||      \
-			     (KBD_RC_ROW(DT_INST_PROP_BY_IDX(0, vivaldi_keys, \
-							     idx)) ==         \
-				      KEYBOARD_ROW_REFRESH &&                 \
-			      KBD_RC_COL(DT_INST_PROP_BY_IDX(0, vivaldi_keys, \
-							     idx)) ==         \
-				      KEYBOARD_COL_REFRESH),                  \
+#define REFRESH_ROW_VALIDATE(node_id, prop, idx)                          \
+	BUILD_ASSERT(TK_REFRESH != DT_PROP_BY_IDX(node_id, prop, idx) ||  \
+			     (KBD_RC_ROW(VIVALDI_KEY_RC(node_id, idx)) == \
+				      KEYBOARD_ROW_REFRESH &&             \
+			      KBD_RC_COL(VIVALDI_KEY_RC(node_id, idx)) == \
+				      KEYBOARD_COL_REFRESH),              \
 		     "Vivaldi TK_REFRESH key must match \
 KEYBOARD_ROW_REFRESH/KEYBOARD_COL_REFRESH");
 #else
@@ -109,6 +130,19 @@ KEYBOARD_ROW_REFRESH/KEYBOARD_COL_REFRESH");
 DT_INST_FOREACH_CHILD(0, KEYBD_CONFIG_VALIDATE)
 
 #define VIVALDI_CONFIG_COUNT DT_INST_CHILD_NUM(0)
+
+#define VIVALDI_KEYS_CONFIG_INIT(node_id)                                   \
+	[DT_NODE_CHILD_IDX(node_id)] = COND_CODE_1(                         \
+		DT_NODE_HAS_PROP(node_id, vivaldi_keys),                    \
+		({ VIVALDI_KEYS_NAME(node_id),                              \
+		   ARRAY_SIZE(VIVALDI_KEYS_NAME(node_id)) }),               \
+		({ vivaldi_keys, ARRAY_SIZE(vivaldi_keys) })),
+
+static const struct {
+	const struct vivaldi_key *keys;
+	uint8_t num_keys;
+} vivaldi_keys_configs[] = { DT_INST_FOREACH_CHILD(0,
+						   VIVALDI_KEYS_CONFIG_INIT) };
 
 #define KEYBD_CONFIG_INIT(node_id)                                       \
 	[DT_NODE_CHILD_IDX(node_id)] = {                                 \
@@ -161,6 +195,8 @@ bool vivaldi_kbd_is_vol_up(uint8_t row, uint8_t col)
 static void vivaldi_kbd_init(void)
 {
 	const struct ec_response_keybd_config *keybd_config;
+	const struct vivaldi_key *keys;
+	uint8_t num_keys;
 
 #if VIVALDI_CONFIG_COUNT > 1
 	int8_t config_idx;
@@ -178,11 +214,13 @@ static void vivaldi_kbd_init(void)
 #endif
 
 	keybd_config = &keybd_configs[vivaldi_kbd_active_config_idx];
+	keys = vivaldi_keys_configs[vivaldi_kbd_active_config_idx].keys;
+	num_keys = vivaldi_keys_configs[vivaldi_kbd_active_config_idx].num_keys;
 
 	LOG_INF("config: %d top keys: %d", vivaldi_kbd_active_config_idx,
 		keybd_config->num_top_row_keys);
 
-	for (uint8_t i = 0; i < ARRAY_SIZE(vivaldi_keys); i++) {
+	for (uint8_t i = 0; i < num_keys; i++) {
 		uint8_t row;
 		uint8_t col;
 		enum action_key key;
@@ -196,8 +234,8 @@ static void vivaldi_kbd_init(void)
 			continue;
 		}
 
-		col = vivaldi_keys[i].col;
-		row = vivaldi_keys[i].row;
+		col = keys[i].col;
+		row = keys[i].row;
 
 #if defined(CONFIG_PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB) || defined(CONFIG_ZTEST)
 		keyscan_config.actual_key_mask[col] |= BIT(row);

@@ -13,6 +13,7 @@
 #include <zephyr/sys/util.h>
 
 #include <chipset.h>
+#include <drivers/keyboard_alt.h>
 #include <drivers/vivaldi_kbd.h>
 #include <dt-bindings/kbd.h>
 #include <keyboard_protocol.h>
@@ -33,7 +34,7 @@ enum {
 	RUNTIME_KEY_R,
 };
 
-static const uint32_t runtime_keys[] = {
+static uint32_t runtime_keys[] = {
 	[RUNTIME_KEY_VOL_UP] = UINT32_MAX, /* placeholder, determined in runtime
 					    */
 	[RUNTIME_KEY_LEFT_ALT] = DT_INST_PROP(0, left_alt_rc),
@@ -41,6 +42,17 @@ static const uint32_t runtime_keys[] = {
 	[RUNTIME_KEY_H] = DT_INST_PROP(0, h_rc),
 	[RUNTIME_KEY_R] = DT_INST_PROP(0, r_rc),
 };
+
+#define RUNTIME_KEY_ALT_RC(prop) \
+	DT_INST_PROP_OR(0, alt_##prop, DT_INST_PROP(0, prop))
+
+void runtime_keys_use_alternate(void)
+{
+	runtime_keys[RUNTIME_KEY_LEFT_ALT] = RUNTIME_KEY_ALT_RC(left_alt_rc);
+	runtime_keys[RUNTIME_KEY_RIGHT_ALT] = RUNTIME_KEY_ALT_RC(right_alt_rc);
+	runtime_keys[RUNTIME_KEY_H] = RUNTIME_KEY_ALT_RC(h_rc);
+	runtime_keys[RUNTIME_KEY_R] = RUNTIME_KEY_ALT_RC(r_rc);
+}
 
 #define REBOOT_MASK_A                                          \
 	(BIT(RUNTIME_KEY_VOL_UP) | BIT(RUNTIME_KEY_LEFT_ALT) | \

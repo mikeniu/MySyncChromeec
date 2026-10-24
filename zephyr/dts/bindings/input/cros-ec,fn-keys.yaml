@@ -40,3 +40,14 @@ properties:
     description: |
       List of row, key and codes, using the MATRIX_KEY() macro.
 
+  alt-fn-rc:
+    type: int
+    description: |
+      Row-column position of the "Fn" key after
+      fn_keys_use_alternate(), defaults to fn-rc.
+
+  alt-keymap:
+    type: array
+    description: |
+      Keymap used after fn_keys_use_alternate(), must have the same number
+      of entries as keymap.

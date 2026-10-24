@@ -70,6 +70,12 @@ properties:
 
 child-binding:
   properties:
+    vivaldi-keys:
+      type: array
+      description: |
+        Array of KBD_RC() entries for the top keys of this configuration,
+        overrides the vivaldi-keys property of the parent node.
+
     vivaldi-codes:
       type: array
       required: true
