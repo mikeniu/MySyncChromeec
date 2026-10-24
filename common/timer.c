@@ -32,8 +32,13 @@ extern __error("k_usleep() should only be called from Zephyr code") int32_t
 
 #define USLEEP_WARNING_INTERVAL_MS (20 * MSEC)
 
-/* High 32-bits of the 64-bit timestamp counter. */
+/*
+ * High 32-bits of the 64-bit timestamp counter, and the next clksrc_high epoch
+ * (clksrc_high + 1) armed once the low 32-bit counter is observed in its upper
+ * half (BIT(31) set).
+ */
 STATIC_IF_NOT(CONFIG_HWTIMER_64BIT) volatile uint32_t clksrc_high;
+STATIC_IF_NOT(CONFIG_HWTIMER_64BIT) volatile uint32_t clksrc_msb_epoch;
 
 /* Hardware timer routine IRQ number */
 static int timer_irq;
@@ -227,16 +232,24 @@ timestamp_t get_time(void)
 	if (IS_ENABLED(CONFIG_HWTIMER_64BIT)) {
 		ts.val = __hw_clock_source_read64();
 	} else {
-		ts.le.hi = clksrc_high;
-		ts.le.lo = __hw_clock_source_read();
-		/*
-		 * TODO(b/213342294) If statement below doesn't catch overflows
-		 * when interrupts are disabled or currently processed interrupt
-		 * has higher priority.
-		 */
-		if (ts.le.hi != clksrc_high) {
+		uint32_t msb_epoch;
+
+		do {
 			ts.le.hi = clksrc_high;
+			msb_epoch = clksrc_msb_epoch;
 			ts.le.lo = __hw_clock_source_read();
+		} while (ts.le.hi != clksrc_high);
+
+		if (ts.le.lo & BIT(31)) {
+			clksrc_msb_epoch = ts.le.hi + 1;
+		} else if (msb_epoch == ts.le.hi + 1) {
+			/*
+			 * Hardware counter wrapped around while timer overflow
+			 * interrupt is still pending (e.g. interrupts disabled
+			 * or currently processed interrupt has higher
+			 * priority).
+			 */
+			ts.le.hi++;
 		}
 	}
 
@@ -267,6 +280,8 @@ void force_time(timestamp_t ts)
 		interrupt_disable();
 
 		clksrc_high = ts.le.hi;
+		clksrc_msb_epoch = (ts.le.lo & BIT(31)) ? (ts.le.hi + 1) :
+							  ts.le.hi;
 		__hw_clock_source_set(ts.le.lo);
 
 		/* Restore original interrupt state */
@@ -331,13 +346,19 @@ void timer_init(void)
 			timer_irq = __hw_clock_source_init64(ts->val);
 		} else {
 			clksrc_high = ts->le.hi;
+			clksrc_msb_epoch = (ts->le.lo & BIT(31)) ?
+						   (ts->le.hi + 1) :
+						   ts->le.hi;
 			timer_irq = __hw_clock_source_init(ts->le.lo);
 		}
 	} else {
-		if (IS_ENABLED(CONFIG_HWTIMER_64BIT))
+		if (IS_ENABLED(CONFIG_HWTIMER_64BIT)) {
 			timer_irq = __hw_clock_source_init64(0);
-		else
+		} else {
+			clksrc_high = 0;
+			clksrc_msb_epoch = 0;
 			timer_irq = __hw_clock_source_init(0);
+		}
 	}
 }
 

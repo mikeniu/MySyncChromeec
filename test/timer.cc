@@ -11,6 +11,10 @@
 
 #include "common.h"
 #include "compiler.h"
+#if defined(BOARD_HOST) && defined(CONFIG_COMMON_TIMER)
+#include "hwtimer.h"
+#include "mock/hwtimer_mock.h"
+#endif
 #include "math_util.h"
 #include "task.h"
 #include "test_util.h"
@@ -137,6 +141,71 @@ test_static int test_usleep_warning(void)
 	return EC_SUCCESS;
 }
 
+#if defined(BOARD_HOST) && defined(CONFIG_COMMON_TIMER)
+test_static int test_get_time_overflow_irq_disabled()
+{
+	timestamp_t init_ts = { .val = UINT64_C(0x000000017fffffff) };
+
+	mock_ctrl_hwtimer.auto_increment = false;
+	timer_init();
+
+	/* Start in lower half, just before upper half */
+	force_time(init_ts);
+	TEST_EQ(get_time().val, init_ts.val, "0x%016" PRIx64);
+
+	/*
+	 * Transition to the exact upper-half boundary (BIT(31) set), verifying
+	 * that get_time() updates clksrc_msb_epoch directly.
+	 */
+	mock_ctrl_hwtimer.clock_val = BIT(31);
+	TEST_EQ(get_time().val, UINT64_C(0x0000000180000000), "0x%016" PRIx64);
+
+	mock_ctrl_hwtimer.clock_val = 0xfffffff0;
+	TEST_EQ(get_time().val, UINT64_C(0x00000001fffffff0), "0x%016" PRIx64);
+
+	/*
+	 * Simulate 32-bit hardware counter wrapping to exact 0x00000000 and
+	 * 0x00000010 while interrupts are disabled (before process_timers(1)
+	 * can run and increment clksrc_high).
+	 */
+	interrupt_disable();
+	mock_ctrl_hwtimer.clock_val = 0x00000000;
+	TEST_EQ(get_time().val, UINT64_C(0x0000000200000000), "0x%016" PRIx64);
+
+	mock_ctrl_hwtimer.clock_val = 0x00000010;
+	TEST_EQ(get_time().val, UINT64_C(0x0000000200000010), "0x%016" PRIx64);
+
+	mock_ctrl_hwtimer.clock_val = 0x00000020;
+	TEST_EQ(get_time().val, UINT64_C(0x0000000200000020), "0x%016" PRIx64);
+	interrupt_enable();
+
+	/*
+	 * Once the timer overflow ISR runs process_timers(1), clksrc_high
+	 * advances to 2 and must not double-increment.
+	 */
+	mock_ctrl_hwtimer.clock_val = 0x00000030;
+	process_timers(1);
+	TEST_EQ(get_time().val, UINT64_C(0x0000000200000030), "0x%016" PRIx64);
+
+	/*
+	 * force_time() into the upper half (BIT(31) set) must arm
+	 * clksrc_msb_epoch itself, so a wrap with interrupts disabled is
+	 * caught without an intervening get_time() call in the upper half.
+	 */
+	init_ts.val = UINT64_C(0x0000000280000000);
+	force_time(init_ts);
+	interrupt_disable();
+	mock_ctrl_hwtimer.clock_val = 0x00000000;
+	TEST_EQ(get_time().val, UINT64_C(0x0000000300000000), "0x%016" PRIx64);
+	interrupt_enable();
+	process_timers(1);
+	TEST_EQ(get_time().val, UINT64_C(0x0000000300000000), "0x%016" PRIx64);
+
+	mock_ctrl_hwtimer.auto_increment = true;
+	return EC_SUCCESS;
+}
+#endif /* defined(BOARD_HOST) && defined(CONFIG_COMMON_TIMER) */
+
 void run_test(int argc, const char **argv)
 {
 	test_reset();
@@ -146,6 +215,9 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_timestamp_expired);
 	RUN_TEST(test_timestamp_expired_null);
 	RUN_TEST(test_usleep_warning);
+#if defined(BOARD_HOST) && defined(CONFIG_COMMON_TIMER)
+	RUN_TEST(test_get_time_overflow_irq_disabled);
+#endif
 
 	test_print_result();
 }
