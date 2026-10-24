@@ -667,6 +667,10 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_HOSTCMD_RTC
 #endif
 
+#ifdef TEST_SYSTEM
+#define CONFIG_FW_RESET_VECTOR
+#endif
+
 #ifdef TEST_VBOOT
 #define CONFIG_RWSIG
 #define CONFIG_SHA256_SW
