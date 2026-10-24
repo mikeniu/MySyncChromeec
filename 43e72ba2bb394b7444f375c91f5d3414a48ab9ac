@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "211a30e2_47834446",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-24T15:58:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5811e44f-f26b-46d6-b4b2-2424b909598b)]\n\n### Review Summary\n\n* **Functionality**: `system_disable_jump()` in `common/system.c` now configures and enables the Cortex-M MPU regardless of `system_is_locked()`, while `mpu_protect_data_ram()` and `mpu_protect_code_ram()` in `core/cortex-m/mpu.c` gate sticky `ram_lock_config_lock_region()` calls on `system_is_locked()`, and `DECLARE_HOOK(HOOK_SYSJUMP, mpu_disable, HOOK_PRIO_LAST)` disables the MPU before jumping to another image.\n* **Architecture \u0026 Component Fit**: Separating reversible MPU configuration from sticky `RAM_LOCK` hardware configuration keeps memory protection active on unlocked systems while still allowing `sysjump` and `lfw` execution. The new MPU mock (`common/mock/mpu_mock.c`, `include/mock/mpu_mock.h`) follows the repository\u0027s standard `common/mock` conventions (`MOCK_MPU_DEFAULT`, `mock_mpu_reset()`, `MOCK(MPU)`).\n* **Code Simplicity**: Removing the outer `if (system_is_locked())` branch in `system_disable_jump()` flattens the control flow, and the low-level `test_mockable` seam in `core/cortex-m/mpu.c` avoids `#ifdef BOARD_HOST` clutter in production logic.\n* **Idiomaticity \u0026 Readability**: `uintptr_t` casts in `core/cortex-m/cpu.h` (`CPUREG`) and `core/cortex-m/mpu.c` (`__iram_text_start`) cleanly support 64-bit `BOARD\u003dhost` builds, and named constants are used throughout `include/mock/mpu_mock.h` and `test/system.c`.\n* **Security**: Enabling MPU Execute-Never (`XN`) and read-only code RAM / inactive flash protections even when write-protect is unlocked improves defense-in-depth on unlocked devices without prematurely engaging sticky RAM locks.\n* **Testing**: `test/system.c` and `common/mock/mpu_mock.c` verify MPU `CTRL`, `BASE`, and `RASR` configuration for data and code RAM when unlocked, MPU disablement on `HOOK_SYSJUMP`, and `ram_lock_config_lock_region()` failure and success paths when locked.\n* **CL Size \u0026 Scope**: Although the total diff is `Size: L (+347, -73)`, the production change is small (`+83, -73` across 3 files, mostly unindentation in `common/system.c`) and paired with cohesive unit tests and mocks (`+264, -0`) for a single logical change.\n* **Commit Message**: The subject line, two-paragraph prose body explaining both the problem and mechanism, and `BUG\u003d`/`TEST\u003d` footers are clear, accurate, and well-formatted.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "43e72ba2bb394b7444f375c91f5d3414a48ab9ac",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
