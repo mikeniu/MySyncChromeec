@@ -400,3 +400,10 @@ if(CONFIG_TEST_NISSA_DIRKSON)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/usbc.c
     )
 endif()
+
+target_sources_ifdef(
+        CONFIG_TEST_NISSA_XIVU
+        app PRIVATE
+        src/xivu.c
+        ${PLATFORM_EC_PROGRAM_DIR}/nissa/xivu/src/usbc.c)
+

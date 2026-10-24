@@ -1,0 +1,41 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/thermistor/thermistor.dtsi>
+
+#include "generic_npcx.dts"
+
+/ {
+	adc0: adc {
+		compatible = "zephyr,adc-emul";
+		nchannels = <6>;
+		ref-internal-mv = <3300>;
+		#io-channel-cells = <1>;
+		status = "okay";
+	};
+	named-adc-channels {
+		compatible = "named-adc-channels";
+		adc_temp_sensor_3: temp_sensor_3 {
+			enum-name = "ADC_TEMP_SENSOR_3";
+			io-channels = <&adc0 3>;
+		};
+	};
+	temp_charger1: charger1 {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_51K1_47K_4050B>;
+		adc = <&adc_temp_sensor_3>;
+	};
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+		charger1 {
+			status = "okay";
+			sensor = <&temp_charger1>;
+		};
+	};
+};
+
+&thermistor_3V3_51K1_47K_4050B {
+	status = "okay";
+};
