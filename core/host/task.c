@@ -120,18 +120,37 @@ bool in_interrupt_context(void)
 	return in_interrupt;
 }
 
+static inline bool in_task_context(void)
+{
+	return !in_interrupt && my_task_id != TASK_ID_INVALID;
+}
+
+/*
+ * Only lock interrupt_lock from task or interrupt-generator threads. In an ISR
+ * (task_trigger_test_interrupt() holds it) or on the main/scheduler thread
+ * (my_task_id == TASK_ID_INVALID, where a sleeping task may hold it), locking
+ * it here would deadlock.
+ */
+static void set_interrupt_enabled(bool enabled)
+{
+	if (!in_task_context()) {
+		interrupt_disabled = !enabled;
+		return;
+	}
+
+	pthread_mutex_lock(&interrupt_lock);
+	interrupt_disabled = !enabled;
+	pthread_mutex_unlock(&interrupt_lock);
+}
+
 test_mockable void interrupt_disable(void)
 {
-	pthread_mutex_lock(&interrupt_lock);
-	interrupt_disabled = 1;
-	pthread_mutex_unlock(&interrupt_lock);
+	set_interrupt_enabled(false);
 }
 
 test_mockable void interrupt_enable(void)
 {
-	pthread_mutex_lock(&interrupt_lock);
-	interrupt_disabled = 0;
-	pthread_mutex_unlock(&interrupt_lock);
+	set_interrupt_enabled(true);
 }
 
 inline bool is_interrupt_enabled(void)
