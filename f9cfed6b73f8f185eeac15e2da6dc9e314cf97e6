@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "f9cfed6b73f8f185eeac15e2da6dc9e314cf97e6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7ab0feb_f59bb07f",
+        "filename": "include/mock/mpu_mock.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:24:20Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "23aeec74_ea879a12",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 9999
+      },
+      "revId": "f9cfed6b73f8f185eeac15e2da6dc9e314cf97e6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
