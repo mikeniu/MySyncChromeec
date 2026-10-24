@@ -612,6 +612,8 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_SHA256_SW
 #define CONFIG_RSA
 #define CONFIG_RWSIG_TYPE_RWSIG
+#define CONFIG_VBOOT_HASH
+#define CONFIG_VBOOT_EFS
 #define CONFIG_RW_B
 #define CONFIG_RW_B_MEM_OFF CONFIG_RO_MEM_OFF
 #undef CONFIG_RO_SIZE
