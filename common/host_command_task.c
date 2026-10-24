@@ -33,6 +33,7 @@
 /* Stop printing repeated host commands "+" after this count */
 #define HCDEBUG_MAX_REPEAT_COUNT 5
 
+static timestamp_t cmd_received_time;
 static struct host_cmd_handler_args *pending_args;
 
 static enum {
@@ -162,6 +163,7 @@ void host_command_received(struct host_cmd_handler_args *args)
 	} else {
 		/* Save the command */
 		pending_args = args;
+		cmd_received_time = get_time();
 
 		/* Wake up the task to handle the command */
 		task_set_event(TASK_ID_HOSTCMD, TASK_EVENT_CMD_PENDING);
@@ -372,10 +374,10 @@ const struct host_command *find_host_command(int command)
 
 void host_command_task(void *u)
 {
-	timestamp_t t0, t1, t_recess;
+	timestamp_t cmd_start_time, last_response_time, last_recess_time;
 
-	t_recess.val = 0;
-	t1.val = 0;
+	last_recess_time.val = 0;
+	last_response_time.val = 0;
 
 	host_command_init();
 #ifdef CONFIG_SUPPRESSED_HOST_COMMANDS
@@ -386,27 +388,54 @@ void host_command_task(void *u)
 		/* Wait for the next command event */
 		int evt = task_wait_event(-1);
 
-		t0 = get_time();
-
 		/* Process it */
 		if ((evt & TASK_EVENT_CMD_PENDING) && pending_args) {
+			timestamp_t rest_deadline, recess_deadline;
+
+			cmd_start_time = cmd_received_time.val ?
+						 cmd_received_time :
+						 get_time();
+			cmd_received_time.val = 0;
 			pending_args->result =
 				host_command_process(pending_args);
+
+			/*
+			 * Reset rate limiting only if the host actually paused
+			 * between the end of the previous command
+			 * (last_response_time) and the arrival of this command
+			 * (cmd_start_time). Preemption by higher priority tasks
+			 * (such as PD_C0) after the command is already pending
+			 * still starves lower-priority tasks like HOOKS
+			 * (b/412985688).
+			 */
+			rest_deadline.val =
+				last_response_time.val +
+				CONFIG_HOSTCMD_RATE_LIMITING_MIN_REST;
+			if (timestamp_expired(rest_deadline, &cmd_start_time)) {
+				last_recess_time = cmd_start_time;
+			}
+
+			last_response_time = get_time();
+			/*
+			 * Rate limiting: check how long we have gone without a
+			 * significant rest to avoid DoS from host. Sleep before
+			 * sending the response so the host is held off during
+			 * the recess and lower-priority tasks can run.
+			 */
+			recess_deadline.val =
+				last_recess_time.val +
+				CONFIG_HOSTCMD_RATE_LIMITING_PERIOD;
+			if (timestamp_expired(recess_deadline,
+					      &last_response_time)) {
+				crec_usleep(
+					CONFIG_HOSTCMD_RATE_LIMITING_RECESS);
+				last_response_time = get_time();
+				last_recess_time = last_response_time;
+			}
+
 			host_send_response(pending_args);
+			pending_args = NULL;
 		}
-
-		/* reset rate limiting if we have slept enough */
-		if (t0.val - t1.val > CONFIG_HOSTCMD_RATE_LIMITING_MIN_REST)
-			t_recess = t0;
-
-		t1 = get_time();
-		/*
-		 * rate limiting : check how long we have gone without a
-		 * significant interruption to avoid DoS from host
-		 */
-		if (t1.val - t_recess.val > CONFIG_HOSTCMD_RATE_LIMITING_PERIOD)
-			/* Short recess */
-			crec_usleep(CONFIG_HOSTCMD_RATE_LIMITING_RECESS);
 	}
 }
 
