@@ -22,6 +22,30 @@
       },
       "revId": "0780e44db035d57f5799d23c78152f5cd7014e90",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "129bb904_bb937b9a",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-24T17:42:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "424ca055_cfe58f9a",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 51
+      },
+      "revId": "0780e44db035d57f5799d23c78152f5cd7014e90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

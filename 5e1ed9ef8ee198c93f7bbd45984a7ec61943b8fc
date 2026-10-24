@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c307adb1_b51cbd4e",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-24T17:42:31Z",
+      "side": 1,
+      "message": "I wonder if we should leave this on the system workqueue only only use the dedicated queue for the recurring HOOK_SECOND and HOOK_TICK work?\n\nThe legacy EC deferred calls align with the normal system workqueue usage by Zephyr drivers and libraries.",
+      "range": {
+        "startLine": 214,
+        "startChar": 7,
+        "endLine": 214,
+        "endChar": 34
+      },
+      "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
