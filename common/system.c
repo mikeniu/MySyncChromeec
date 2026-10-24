@@ -701,6 +701,16 @@ system_run_image_copy_with_flags(enum ec_image copy, uint32_t add_reset_flags)
 	} else if (IS_ENABLED(CONFIG_FW_RESET_VECTOR)) {
 		/* Get reset vector */
 		init_addr = system_get_fw_reset_vector(base);
+
+		/*
+		 * Make sure the reset vector is inside the destination image
+		 * and does not point to erased flash (e.g. 0xffff decodes to
+		 * a valid 16-bit 'or33 $r7, $r7' NO-OP on Andes nds32).
+		 */
+		if (init_addr < base || init_addr >= base + get_size(copy) ||
+		    *(uint32_t *)init_addr == 0xffffffff) {
+			return EC_ERROR_UNKNOWN;
+		}
 	} else {
 		uintptr_t init = base + 4;
 		init_addr = *(uintptr_t *)(init);
