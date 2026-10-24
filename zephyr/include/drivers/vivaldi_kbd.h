@@ -20,6 +20,11 @@ int8_t board_vivaldi_keybd_idx(void);
  */
 bool vivaldi_kbd_is_vol_up(uint8_t row, uint8_t col);
 
+/* Use alt-vivaldi-keys for the top row positions, must be called before
+ * HOOK_INIT.
+ */
+void vivaldi_kbd_use_alternate(void);
+
 #define VIVALDI_CFG_IDX(nodelabel) DT_NODE_CHILD_IDX(DT_NODELABEL(nodelabel))
 
 #endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_VIVALDI_KBD_H_ */

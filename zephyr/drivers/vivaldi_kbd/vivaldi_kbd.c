@@ -62,11 +62,27 @@ BUILD_ASSERT(ARRAY_SIZE(action_scancodes) == TK_COUNT);
 		.col = DT_PROP_BY_IDX(node_id, prop, idx) & 0xff,        \
 	},
 
-static const struct {
+static struct {
 	uint8_t row;
 	uint8_t col;
 } vivaldi_keys[] = { DT_INST_FOREACH_PROP_ELEM(0, vivaldi_keys,
 					       VIVALDI_KEY_INIT) };
+
+#if DT_INST_NODE_HAS_PROP(0, alt_vivaldi_keys)
+static const uint32_t vivaldi_keys_alt[] = DT_INST_PROP(0, alt_vivaldi_keys);
+BUILD_ASSERT(ARRAY_SIZE(vivaldi_keys_alt) == ARRAY_SIZE(vivaldi_keys),
+	     "alt-vivaldi-keys must have the same length as vivaldi-keys");
+#endif
+
+void vivaldi_kbd_use_alternate(void)
+{
+#if DT_INST_NODE_HAS_PROP(0, alt_vivaldi_keys)
+	for (uint8_t i = 0; i < ARRAY_SIZE(vivaldi_keys); i++) {
+		vivaldi_keys[i].row = KBD_RC_ROW(vivaldi_keys_alt[i]);
+		vivaldi_keys[i].col = KBD_RC_COL(vivaldi_keys_alt[i]);
+	}
+#endif
+}
 
 /* If cros_ec_boot_keys exists and is okay, validate that the vivaldi key
  * TK_REFRESH is the same keycode as boot-keys.refresh-rc.

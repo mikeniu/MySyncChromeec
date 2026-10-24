@@ -8,6 +8,8 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+#include <drivers/keyboard_alt.h>
+
 LOG_MODULE_REGISTER(ghost_filter, CONFIG_INPUT_LOG_LEVEL);
 
 static const struct filter_mask {
@@ -22,10 +24,19 @@ static const struct filter_mask {
 	{ BIT(5) | BIT(7), 6, 8, BIT(5), 8 }, /* W Space E [X] */
 };
 
+__weak bool board_ghost_filter_enabled(void)
+{
+	return true;
+}
+
 static void input_kbd_matrix_ghost_filter(const struct device *dev)
 {
 	const struct input_kbd_matrix_common_config *cfg = dev->config;
 	kbd_row_t *state = cfg->matrix_new_state;
+
+	if (!board_ghost_filter_enabled()) {
+		return;
+	}
 
 	for (uint8_t i = 0; i < ARRAY_SIZE(filter_masks); i++) {
 		const struct filter_mask *mask = &filter_masks[i];
