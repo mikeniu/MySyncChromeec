@@ -429,3 +429,9 @@ target_sources_ifdef(
         src/epic_sub_board.c
         src/log_module.c
         ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/sub_board.c)
+
+target_sources_ifdef(
+        CONFIG_TEST_NISSA_XIVU
+        app PRIVATE
+        src/xivu.c
+        ${PLATFORM_EC_PROGRAM_DIR}/nissa/xivu/src/usbc.c)

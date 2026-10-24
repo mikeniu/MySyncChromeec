@@ -512,3 +512,15 @@ tests:
       - CONFIG_PLATFORM_EC_VBOOT_HASH=n
     extra_dtc_overlay_files:
       - "boards/dirkson.dts"
+  nissa.xivu:
+    extra_dtc_overlay_files:
+      - "boards/xivu.dts"
+      - "boards/battery.dts"
+    extra_conf_files:
+      - "prj.conf"
+    extra_configs:
+      - CONFIG_TEST_NISSA_XIVU=y
+      - CONFIG_PLATFORM_EC_TCPC_INTERRUPT=n
+      - CONFIG_PLATFORM_EC_HOSTCMD=y
+      - CONFIG_PLATFORM_EC_VBOOT_HASH=n
+      - CONFIG_ADC=y

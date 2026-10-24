@@ -186,6 +186,12 @@ choice TEST_TARGET
 	  select TEST_DISABLE_INLINE_CHIPSET_IN_STATE
 	  help
 		The test target that exercises nissa/dirkson/*.c
+
+	config TEST_NISSA_XIVU
+	  bool "Tests for Xivu-specific code"
+	  select TEST_DISABLE_INLINE_CHIPSET_IN_STATE
+	  help
+		The test target that exercises nissa/xivu/*.c
 endchoice
 
 config TEST_DISABLE_INLINE_CHIPSET_IN_STATE
