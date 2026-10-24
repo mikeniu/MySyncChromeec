@@ -8,6 +8,7 @@
 #include "common.h"
 #include "console.h"
 #include "host_command.h"
+#include "host_test.h"
 #include "system.h"
 #include "test_util.h"
 #include "timer.h"
@@ -15,6 +16,11 @@
 
 #define TEST_STATE_STEP_2 (1 << 0)
 #define TEST_STATE_FAIL (1 << 1)
+
+uintptr_t system_get_fw_reset_vector(uintptr_t base)
+{
+	return base;
+}
 
 static int test_reboot_on_shutdown(void)
 {
@@ -71,6 +77,17 @@ static int test_cancel_reboot(void)
 	return EC_SUCCESS;
 }
 
+static int test_sysjump_erased_rw(void)
+{
+	/* Simulate erased RW flash (0xff) */
+	memset(__host_flash + CONFIG_RW_MEM_OFF, 0xff, CONFIG_RW_SIZE);
+
+	/* Jumping to an erased RW image must fail with EC_ERROR_UNKNOWN */
+	TEST_EQ(system_run_image_copy(EC_IMAGE_RW), EC_ERROR_UNKNOWN, "%d");
+
+	return EC_SUCCESS;
+}
+
 static void run_test_step1(void)
 {
 	if (test_reboot_on_shutdown() != EC_SUCCESS)
@@ -80,6 +97,9 @@ static void run_test_step1(void)
 static void run_test_step2(void)
 {
 	if (test_cancel_reboot() != EC_SUCCESS)
+		test_fail();
+
+	if (test_sysjump_erased_rw() != EC_SUCCESS)
 		test_fail();
 
 	system_set_scratchpad(0);
