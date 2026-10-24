@@ -7,7 +7,6 @@
 /* NPCX-specific SIB module for Chrome EC */
 
 #include "console.h"
-#include "hwtimer_chip.h"
 #include "registers.h"
 #include "task.h"
 #include "timer.h"
@@ -48,8 +47,6 @@ static void sib_wait_host_read_done(void)
 			CPRINTS("Unexpected time of host read transaction");
 			break;
 		}
-		/* Handle ITIM32 overflow condition */
-		__hw_clock_handle_overflow(start.le.hi);
 	}
 }
 
@@ -67,8 +64,6 @@ static void sib_wait_host_write_done(void)
 			CPRINTS("Unexpected time of host write transaction");
 			break;
 		}
-		/* Handle ITIM32 overflow condition */
-		__hw_clock_handle_overflow(start.le.hi);
 	}
 }
 
