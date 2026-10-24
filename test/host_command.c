@@ -8,6 +8,7 @@
 #include "common.h"
 #include "console.h"
 #include "host_command.h"
+#include "mkbp_event.h"
 #include "printf.h"
 #include "task.h"
 #include "test_util.h"
@@ -306,6 +307,64 @@ static int test_hostcmd_clears_unused_data(void)
 	return EC_SUCCESS;
 }
 
+static int test_hostcmd_rate_limiting_under_preemption(void)
+{
+	int i;
+	uint32_t max_cmd_us = 0;
+
+	memset(req_buf, 0, BUFFER_SIZE);
+	memset(resp_buf, 0, BUFFER_SIZE);
+	req->struct_version = EC_HOST_REQUEST_VERSION;
+	req->checksum = 0;
+	req->command = EC_CMD_GET_NEXT_EVENT;
+	req->command_version = 0;
+	req->reserved = 0;
+	req->data_len = 0;
+
+	pkt.send_response = hostcmd_respond;
+	pkt.request = (const void *)req_buf;
+	pkt.request_temp = NULL;
+	pkt.request_max = BUFFER_SIZE;
+	pkt.request_size = sizeof(*req);
+	pkt.response = (void *)resp_buf;
+	pkt.response_max = BUFFER_SIZE;
+	pkt.driver_result = 0;
+
+	/*
+	 * Simulate sustained EC_CMD_GET_NEXT_EVENT flood across > 500ms
+	 * where each command arrives <= 1ms after the previous response (< 3ms
+	 * CONFIG_HOSTCMD_RATE_LIMITING_MIN_REST), but a higher-priority task
+	 * (such as PD_C0 on bookem in b/412985688) runs for 4ms before
+	 * HOSTCMD wakes from task_wait_event(). Verify that the 20ms
+	 * rate-limiting recess (CONFIG_HOSTCMD_RATE_LIMITING_RECESS) triggers
+	 * before host_send_response().
+	 */
+	for (i = 0; i < 120; i++) {
+		uint64_t t_start, t_end;
+		uint32_t dt;
+
+		if (i & 1)
+			udelay(1 * MSEC);
+		req->checksum = 0;
+		req->checksum = calculate_checksum(req_buf, pkt.request_size);
+		pkt.driver_result = 0;
+		t_start = get_time().val;
+		host_packet_receive(&pkt);
+		/* Higher-priority task runs for 4ms while HOSTCMD is ready */
+		udelay(4 * MSEC);
+		task_wait_event(-1);
+		t_end = get_time().val;
+		dt = (uint32_t)(t_end - t_start);
+		if (dt > max_cmd_us)
+			max_cmd_us = dt;
+	}
+
+	ccprintf("flood max_cmd_us=%u\n", max_cmd_us);
+	TEST_GE(max_cmd_us, (uint32_t)(20 * MSEC), "%u");
+
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	wait_for_task_started();
@@ -321,6 +380,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_hostcmd_invalid_checksum);
 	RUN_TEST(test_hostcmd_reuse_response_buffer);
 	RUN_TEST(test_hostcmd_clears_unused_data);
+	RUN_TEST(test_hostcmd_rate_limiting_under_preemption);
 
 	test_print_result();
 }
