@@ -42,6 +42,7 @@ static int key_state_change[KEYBOARD_COLS_MAX][KEYBOARD_ROWS];
 static int total_key_state_change;
 
 static int column_driven;
+static int raw_read_all_count;
 static int fifo_add_count;
 static int lid_open;
 #ifdef EMU_BUILD
@@ -78,6 +79,7 @@ int keyboard_raw_read_rows(void)
 	if (column_driven == KEYBOARD_COLUMN_NONE) {
 		return 0;
 	} else if (column_driven == KEYBOARD_COLUMN_ALL) {
+		raw_read_all_count++;
 		for (i = 0; i < KEYBOARD_COLS_MAX; ++i)
 			r |= mock_state[i];
 		return r;
@@ -603,6 +605,41 @@ static int power_button_mask_test(void)
 	return EC_SUCCESS;
 }
 
+static int power_button_held_no_livelock_test(void)
+{
+	/*
+	 * Hold the power button with no other key pressed while the GSC
+	 * asserts the power-button-masked row on every column (Ti50 pass-
+	 * through / PWRBTN_ASSERTS_KSI3). The scan task must keep sleeping
+	 * between scans instead of bouncing between wait and poll modes,
+	 * otherwise lower priority tasks (HOOK_TICK -> watchdog reload)
+	 * starve.
+	 */
+	ccprintf("\nTest power button held, masked row on all columns.\n");
+	reset_key_state();
+	crec_msleep(40);
+	power_button_counter_divider = 1;
+	power_button_counter = 0;
+	memset(mock_state, BIT(KEYBOARD_ROW_REFRESH), sizeof(mock_state));
+	raw_read_all_count = 0;
+	task_wake(TASK_ID_KEYSCAN);
+	crec_usleep(3 * keyscan_config.poll_timeout_us);
+	ccprintf("wait-mode row reads: %d\n", raw_read_all_count);
+
+	/*
+	 * At runtime (at_boot == false), read_matrix() does not mask
+	 * KEYBOARD_ROW_REFRESH, so keyboard_scan_task wakes from wait mode
+	 * once and remains in poll mode sleeping between scans.
+	 */
+	TEST_EQ(raw_read_all_count, 1, "%d");
+
+	power_button_counter_divider = 0;
+	reset_key_state();
+	crec_msleep(40);
+
+	return EC_SUCCESS;
+}
+
 static int test_check_boot_esc(void)
 {
 	TEST_ASSERT(keyboard_scan_get_boot_keys() == BIT(BOOT_KEY_ESC));
@@ -678,6 +715,7 @@ static void run_test_step1(void)
 #endif
 
 	RUN_TEST(power_button_mask_test);
+	RUN_TEST(power_button_held_no_livelock_test);
 
 	if (test_get_error_count())
 		test_reboot_to_next_step(TEST_STATE_FAILED);
