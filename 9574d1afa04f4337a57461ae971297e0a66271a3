@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1e20245_85a4e949",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-24T17:20:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `ec_host_cmd_user_cb` resets the rate-limiting window when consecutive host commands are separated by more than `HOST_CMD_MIN_REST_MS` (3ms) and sleeps for `HOST_CMD_RECESS_MS` (20ms) after `HOST_CMD_RATE_LIMIT_PERIOD_MS` (500ms) of sustained commands, refreshing `t_now`, `t_recess`, and `t_last` after the sleep.\n* **Architecture \u0026 Component Fit:** ✅ Places the rate-limiting check in `ec_host_cmd_user_cb` within `zephyr/shim/src/host_command.c` after `EC_CMD_REBOOT` handling, matching the legacy host command task behavior and exposing the callback via `test_export_static` for unit tests.\n* **Code Simplicity:** ✅ Both the production callback and unit tests are minimal and straightforward.\n* **Idiomaticity \u0026 Readability:** ✅ Uses descriptive named constants with explicit unit suffixes (`_MS`, `Ms`, `Us`), designated initializers, and `K_MSEC`.\n* **Security:** ✅ Prevents a flood of host commands from starving lower-priority threads and triggering watchdog resets.\n* **Testing:** ✅ Unit tests in `test_flood.c` cover the sustained flood recess, the reset path when commands are spaced beyond 3ms, and the exact 500ms / 502ms boundary.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+186, -2)` (~28 production lines and ~158 test lines), representing a single cohesive logical change with its unit tests.\n* **Commit Message:** ✅ Clearly explains the motivation and conceptual change with properly formatted `BUG\u003d`, `TEST\u003d`, and `Change-Id:` trailers.\n\n[[trajectory](https://goto.corp.google.com/traj/dc29aa8d-59b9-4365-a26d-98e1a1906246)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9574d1afa04f4337a57461ae971297e0a66271a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
