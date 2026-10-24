@@ -1,3 +1,4 @@
+#include "uart.h"
 /* Copyright 2017 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -252,6 +253,7 @@ __noreturn void _system_reset(int flags, int wake_from_hibernate)
 
 void system_reset(int flags)
 {
+	extern int uart_yield_disabled; uart_yield_disabled = 1;
 	_system_reset(flags, 0);
 }
 

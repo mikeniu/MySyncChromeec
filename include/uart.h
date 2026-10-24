@@ -115,6 +115,7 @@ int uart_tx_char_raw(void *context, int c);
  * Flush output.  Blocks until UART has transmitted all output.
  */
 void uart_flush_output(void);
+extern int uart_yield_disabled;
 
 /*
  * Input functions

@@ -1,3 +1,4 @@
+#include "uart.h"
 /* Copyright 2019 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -32,6 +33,7 @@ void system_pre_init(void)
 
 void system_reset(int flags)
 {
+	extern int uart_yield_disabled; uart_yield_disabled = 1;
 	MXC_GCR->rstr0 = MXC_F_GCR_RSTR0_SYSTEM;
 	while (1)
 		;

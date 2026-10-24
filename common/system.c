@@ -594,6 +594,8 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 {
 	void (*resetvec)(void);
 
+	uart_yield_disabled = 1;
+
 	/*
 	 * Jumping to any image asserts the signal to the Silego chip that that
 	 * EC is not in read-only firmware.  (This is not technically true if

@@ -1,3 +1,4 @@
+#include "uart.h"
 /* Copyright 2013 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -311,6 +312,7 @@ void chip_save_reset_flags(uint32_t save_flags)
 
 void system_reset(int flags)
 {
+	extern int uart_yield_disabled; uart_yield_disabled = 1;
 	uint32_t save_flags = 0;
 
 	/* We never get this warning message in normal case. */

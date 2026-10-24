@@ -180,6 +180,8 @@ void uart_process_output(void)
 
 #endif /* !CONFIG_UART_TX_DMA */
 
+int uart_yield_disabled = 0;
+
 #ifdef CONFIG_UART_RX_DMA
 #ifdef CONFIG_UART_INPUT_FILTER /* TODO(crosbug.com/p/36745): */
 #error "Filtering the UART input with DMA enabled is NOT SUPPORTED!"
@@ -279,6 +281,8 @@ void uart_flush_output(void)
 			 * us to another partial printf() and back.
 			 */
 			uart_tx_start();
+			if (!uart_yield_disabled && !in_interrupt_context())
+				crec_usleep(100);
 		}
 	}
 

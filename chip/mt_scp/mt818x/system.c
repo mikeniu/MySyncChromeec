@@ -1,3 +1,4 @@
+#include "uart.h"
 /* Copyright 2018 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -93,6 +94,7 @@ void system_pre_init(void)
 
 void system_reset(int flags)
 {
+	extern int uart_yield_disabled; uart_yield_disabled = 1;
 	uint32_t save_flags = 0;
 
 	/* Disable interrupts to avoid task swaps during reboot */
