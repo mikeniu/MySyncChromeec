@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57691621_8cd74c7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-24T15:31:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/af29e5cc-83c8-495f-9287-deb3ce71aeee)]\n\n### Review Summary\n\n* **Functionality**: Verified that `system_disable_jump()` in `common/system.c` unconditionally configures and enables the MPU when `CONFIG_MPU` is enabled, while `mpu_protect_data_ram()` and `mpu_protect_code_ram()` in `core/cortex-m/mpu.c` gate sticky `ram_lock_config_lock_region()` calls on `system_is_locked()`, and `DECLARE_HOOK(HOOK_SYSJUMP, mpu_disable, HOOK_PRIO_LAST)` disables the MPU prior to jumping to another image.\n* **Architecture \u0026 Component Fit**: Separating reversible MPU configuration from sticky `RAM_LOCK` register writes cleanly preserves `sysjump` and `lfw` support when write-protect is unlocked. The new MPU mock (`common/mock/mpu_mock.c`, `include/mock/mpu_mock.h`) conforms to the standard EC mock conventions (`MOCK_MPU_DEFAULT`, `mock_mpu_reset()`, `MOCK(MPU)`).\n* **Code Simplicity**: Removing the top-level `if (system_is_locked())` wrapper in `system_disable_jump()` flattens the control flow cleanly, and the MPU mock state and helper constants are minimal and self-contained.\n* **Idiomaticity \u0026 Readability**: `uintptr_t` casts in `core/cortex-m/cpu.h` (`CPUREG`) and `core/cortex-m/mpu.c` (`__iram_text_start`) properly support 64-bit `BOARD\u003dhost` unit test builds, and named constants in `include/mock/mpu_mock.h` and `test/system.c` make register expectations clear.\n* **Security**: Enabling MPU Execute-Never (`XN`) and read-only flash/RAM protections even when hardware write-protect is unlocked strengthens defense-in-depth during development and testing without prematurely locking sticky RAM regions.\n* **Testing**: `test/system.c` and `common/mock/mpu_mock.c` thoroughly verify MPU region base/RASR/CTRL configuration when unlocked, `HOOK_SYSJUMP` MPU disablement, and `CONFIG_RAM_LOCK` failure and success paths when locked.\n* **CL Size \u0026 Scope**: Although the total diff is `Size: L` (`+347, -73`), the production change is small (`+83, -73` across 3 files, largely unindentation) and paired with cohesive unit tests and mocks (`+264, -0`) for a single logical change.\n* **Commit Message**: The subject line, prose body explaining both the motivation and mechanism, and `BUG\u003d`/`TEST\u003d` footers are clear, accurate, and well-formatted.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "70a6eb7c6b220f4a326bb2b22e1b491922165bd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
