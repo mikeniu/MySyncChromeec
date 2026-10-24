@@ -28,6 +28,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4f5b9839_cd5aa7ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:25:03Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "6e31992e_aded1d6c",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ec57a0ea_4da39927",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -64,6 +88,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "778f32e2_09eea8dc",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:25:03Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "cc124563_c8870713",
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff2b8c6e_e3ab4835",
         "filename": "zephyr/test/drivers/rts5912_rtmr/CMakeLists.txt",
         "patchSetId": 4
@@ -89,6 +131,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80a39a62_34eba46c",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:25:03Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "ff2b8c6e_e3ab4835",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 9999
+      },
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c17f8ab4_82d07725",
         "filename": "zephyr/test/drivers/rts5912_rtmr/boards/native_sim.overlay",
         "patchSetId": 4
@@ -108,6 +174,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78d36317_de7935c6",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/boards/native_sim.overlay",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:25:03Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "c17f8ab4_82d07725",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
       "revId": "2f439b95523c3162bca5ad33df876cd946323602",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -164,6 +254,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "228d771a_b033d3f9",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:25:03Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "7c20a79a_cb151791",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 9999
+      },
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "74ea6ce7_cf836b79",
         "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
         "patchSetId": 4
@@ -183,6 +297,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54ebf713_052104ea",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:25:03Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "74ea6ce7_cf836b79",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 9999
+      },
       "revId": "2f439b95523c3162bca5ad33df876cd946323602",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
