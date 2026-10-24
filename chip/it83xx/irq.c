@@ -99,6 +99,9 @@ int chip_get_ec_int(void)
 
 int chip_get_intc_group(int irq)
 {
+	if (irq < 0 || irq >= ARRAY_SIZE(irq_groups) * 8)
+		return -1;
+
 	return irq_groups[irq / 8].cpu_int[irq % 8];
 }
 
@@ -106,6 +109,9 @@ void chip_enable_irq(int irq)
 {
 	int group = irq / 8;
 	int bit = irq % 8;
+
+	if (irq < 0 || irq >= ARRAY_SIZE(irq_groups) * 8)
+		return;
 
 	/* SOC's interrupts share CPU machine-mode external interrupt */
 	if (IS_ENABLED(CHIP_CORE_RISCV))
@@ -124,6 +130,9 @@ void chip_disable_irq(int irq)
 {
 	int group = irq / 8;
 	int bit = irq % 8;
+
+	if (irq < 0 || irq >= ARRAY_SIZE(irq_groups) * 8)
+		return;
 
 	/* SOC's interrupts share CPU machine-mode external interrupt */
 	if (IS_ENABLED(CHIP_CORE_RISCV)) {
@@ -158,6 +167,9 @@ void chip_clear_pending_irq(int irq)
 	int group = irq / 8;
 	int bit = irq % 8;
 
+	if (irq < 0 || irq >= ARRAY_SIZE(irq_groups) * 8)
+		return;
+
 	/* always write 1 clear, no | */
 	IT83XX_INTC_REG(irq_groups[group].isr_off) = BIT(bit);
 }
@@ -166,6 +178,9 @@ int chip_trigger_irq(int irq)
 {
 	int group = irq / 8;
 	int bit = irq % 8;
+
+	if (irq < 0 || irq >= ARRAY_SIZE(irq_groups) * 8)
+		return -1;
 
 	return irq_groups[group].cpu_int[bit];
 }
