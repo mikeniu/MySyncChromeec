@@ -41,6 +41,7 @@ struct vboot_hash_tag {
 
 #define CHUNK_SIZE 1024 /* Bytes to hash per deferred call */
 #define WORK_INTERVAL_US 100 /* Delay between deferred calls */
+#define WATCHDOG_RELOAD_CHUNKS 16 /* Chunks between watchdog reloads */
 
 /* Check that CHUNK_SIZE fits in shared memory. */
 SHARED_MEM_CHECK_SIZE(CHUNK_SIZE);
@@ -148,6 +149,8 @@ static void vboot_hash_all_chunks(void)
 	do {
 		size_t size = MIN(CHUNK_SIZE, data_size - curr_pos);
 		hash_next_chunk(size);
+		if ((curr_pos % (WATCHDOG_RELOAD_CHUNKS * CHUNK_SIZE)) == 0)
+			watchdog_reload();
 		curr_pos += size;
 	} while (curr_pos < data_size);
 
