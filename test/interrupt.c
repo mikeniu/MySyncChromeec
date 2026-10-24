@@ -16,6 +16,7 @@
 static int main_count;
 static int has_error;
 static int interrupt_count;
+static int critical_section_isr_count;
 
 /* period between 50us and 3.2ms */
 #define PERIOD_US(num) (((num % 64) + 1) * 50)
@@ -25,8 +26,20 @@ void my_isr(void)
 	int i = main_count;
 	udelay(3 * PERIOD_US(prng_no_seed()));
 	if (i != main_count || !in_interrupt_context())
-		has_error = 1;
+		has_error |= BIT(0);
 	interrupt_count++;
+}
+
+/* ISRs may enter a critical section with interrupt_disable(). */
+static void critical_section_isr(void)
+{
+	interrupt_disable();
+	if (is_interrupt_enabled())
+		has_error |= BIT(1);
+	critical_section_isr_count++;
+	interrupt_enable();
+	if (!is_interrupt_enabled())
+		has_error |= BIT(2);
 }
 
 static volatile uint32_t enable_ready_reg;
@@ -43,6 +56,7 @@ void interrupt_generator(void)
 		udelay(3 * PERIOD_US(prng_no_seed()));
 		task_trigger_test_interrupt(my_isr);
 		task_trigger_test_interrupt(set_ready_bit);
+		task_trigger_test_interrupt(critical_section_isr);
 	}
 }
 
@@ -56,7 +70,7 @@ static int interrupt_test(void)
 	ccprintf("Interrupt count: %d\n", interrupt_count);
 	ccprintf("Main thread tick: %d\n", main_count);
 
-	TEST_ASSERT(!has_error);
+	TEST_EQ(has_error, 0, "0x%x");
 	TEST_ASSERT(!in_interrupt_context());
 
 	return EC_SUCCESS;
@@ -80,6 +94,25 @@ static int interrupt_disable_test(void)
 	return EC_SUCCESS;
 }
 
+void test_init(void)
+{
+	interrupt_disable();
+	if (is_interrupt_enabled())
+		has_error |= BIT(3);
+	interrupt_enable();
+	if (!is_interrupt_enabled())
+		has_error |= BIT(4);
+}
+
+static int test_interrupt_disable_in_isr(void)
+{
+	TEST_GT(critical_section_isr_count, 0, "%d");
+	TEST_EQ(has_error, 0, "0x%x");
+	TEST_ASSERT(is_interrupt_enabled());
+
+	return EC_SUCCESS;
+}
+
 static int test_wait_for_ready(void)
 {
 	wait_for_ready(&enable_ready_reg, BIT(0), BIT(1));
@@ -94,6 +127,7 @@ void run_test(int argc, const char **argv)
 
 	RUN_TEST(interrupt_test);
 	RUN_TEST(interrupt_disable_test);
+	RUN_TEST(test_interrupt_disable_in_isr);
 	RUN_TEST(test_wait_for_ready);
 
 	test_print_result();
