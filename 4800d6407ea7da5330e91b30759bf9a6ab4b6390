@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9b8280f_6469f42e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-24T15:28:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. Thank you for moving and renaming the test suite to `zephyr/test/cros_system_rtk/`, cleaning up the Devicetree overlay and MMIO constants, splitting the power-state assertions into separate `ZTEST` cases, and updating the commit message.\n\n### Review Summary\n- **Functionality:** ✅ Exercises `cros_system_rtk_pm_notifier` via `pm_state_force()` and `k_sleep(K_MSEC(1))`, verifying that `watchdog_reload()` is called upon entering `PM_STATE_SUSPEND_TO_IDLE` and not called on `PM_STATE_STANDBY`.\n- **Architecture \u0026 Component Fit:** ✅ Structured as a standalone Zephyr test project under `zephyr/test/cros_system_rtk/`, linking `zephyr/drivers/cros_system/cros_system_rtk.c` directly and reusing `zephyr/shim/chip/rtk/include/flash_chip.h` for `BBRAM_WP_FLAG_INVALID`.\n- **Code Simplicity:** ✅ Minimal test harness and Devicetree overlay with no dead nodes or redundant setup.\n- **Idiomaticity \u0026 Readability:** ✅ Uses descriptive named constants and bitmasks (`BIT(2)`), designated initializers, and standard Zephyr/Ztest macros.\n- **Security:** ✅ No security concerns in this unit test suite.\n- **Testing:** ✅ Separate `ZTEST` cases cover both the `PM_STATE_SUSPEND_TO_IDLE` (reload) and `PM_STATE_STANDBY` (no reload) branches of `cros_system_rtk_pm_state_entry()`, with `RESET_FAKE(watchdog_reload)` in the suite `before` fixture.\n- **CL Size \u0026 Scope:** ✅ `Size: M (+224, -0)` (0 production lines, 224 test lines). Single, self-contained logical change adding a unit test suite for `cros_system_rtk.c`.\n- **Commit Message:** ✅ Clear imperative subject line, concise prose explaining both the motivation and the test coverage, and valid `BUG\u003d`, `TEST\u003d`, and `Change-Id:` footers. [[trajectory](https://goto.corp.google.com/traj/4b4b7db1-d7e9-4a36-a129-fbb2f8efe7ad)] [🔗](http://go/tj/4b4b7db1-d7e9-4a36-a129-fbb2f8efe7ad)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4800d6407ea7da5330e91b30759bf9a6ab4b6390",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
