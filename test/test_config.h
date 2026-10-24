@@ -71,6 +71,11 @@ enum battery_type {
 #define CONFIG_MKBP_USE_GPIO
 #endif
 
+#ifdef TEST_HOST_COMMAND
+#define CONFIG_MKBP_EVENT
+#define CONFIG_MKBP_USE_GPIO
+#endif
+
 #if defined(TEST_KB_SCAN) || defined(TEST_KB_SCAN_STRICT)
 #define CONFIG_KEYBOARD_PROTOCOL_MKBP
 #define CONFIG_MKBP_EVENT
