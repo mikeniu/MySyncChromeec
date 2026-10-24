@@ -60,9 +60,7 @@ test-list-host += host_command
 test-list-host += hyperdebug
 test-list-host += i2c_bitbang
 test-list-host += inductive_charging
-# This test times out in the CQ, and generally doesn't seem useful.
-# It is verifying the host test scheduler, which is never used in real boards.
-# test-list-host += interrupt
+test-list-host += interrupt
 test-list-host += irq_locking
 test-list-host += is_enabled
 ifeq ($(TEST_ASAN),)
