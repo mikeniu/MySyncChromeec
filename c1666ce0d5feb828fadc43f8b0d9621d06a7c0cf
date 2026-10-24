@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "c1666ce0d5feb828fadc43f8b0d9621d06a7c0cf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e97547f_90fca0e3",
+        "filename": "common/system.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-24T15:24:25Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "6c6a3570_6e6cc0db",
+      "range": {
+        "startLine": 441,
+        "startChar": 0,
+        "endLine": 442,
+        "endChar": 9999
+      },
+      "revId": "c1666ce0d5feb828fadc43f8b0d9621d06a7c0cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
