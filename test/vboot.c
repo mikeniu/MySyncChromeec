@@ -10,7 +10,16 @@
 #include "rsa2048-3.h"
 #include "rwsig.h"
 #include "test_util.h"
+#include "timer.h"
 #include "vboot.h"
+#include "vboot_hash.h"
+
+static int watchdog_reload_count;
+
+void watchdog_reload(void)
+{
+	watchdog_reload_count++;
+}
 
 struct vboot_key {
 	struct vb21_packed_key vb21_key;
@@ -131,11 +140,28 @@ static int test_vboot(void)
 	return EC_SUCCESS;
 }
 
+static int test_vboot_hash_watchdog_reload(void)
+{
+	const uint8_t *hash = NULL;
+
+	vboot_hash_abort();
+	while (vboot_hash_in_progress())
+		crec_usleep(100);
+	watchdog_reload_count = 0;
+
+	TEST_EQ(vboot_get_rw_hash(&hash), EC_SUCCESS, "%d");
+	TEST_ASSERT(hash != NULL);
+	TEST_EQ(watchdog_reload_count, 2, "%d");
+
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	test_reset();
 
 	RUN_TEST(test_vboot);
+	RUN_TEST(test_vboot_hash_watchdog_reload);
 
 	test_print_result();
 }
