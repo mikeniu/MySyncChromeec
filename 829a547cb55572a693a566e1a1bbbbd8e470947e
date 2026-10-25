@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3aa8608e_d8f63234",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-25T22:28:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **CL Scope \u0026 Commit Message**:\n\n1. **Bundled Independent Changes**: This CL (`Size: M (+106, -7)`) bundles two self-contained logical changes that can be landed and reverted independently:\n   - **CL 1 (64-bit format specifier fix in `common/timer.c`)**: Replacing `%llx` / `%lld` with `PRIx64` / `PRId64` in `timer_print_info()`, `command_force_time()`, and `command_get_time()` (`common/timer.c`). This is a standalone portability fix in production code with no dependency on the host hardware timer mock.\n   - **CL 2 (Host `MOCK(HWTIMER)` and `CONFIG_COMMON_TIMER` support for `test/timer`)**: Adding `MOCK(HWTIMER)` (`common/mock/hwtimer_mock.c`, `include/mock/hwtimer_mock.h`, `common/mock/build.mk`), supporting `CONFIG_COMMON_TIMER` on `BOARD_HOST` (`core/host/build.mk`, `core/host/disabled.c`), and enabling it for `test/timer` (`test/test_config.h`, `test/timer.mocklist`, `test/timer.cc`).\n\n2. **Avoid Narrating Low-Level Diff Mechanics**: Lines 15–18 (`\"Only link core/host/timer.o when CONFIG_COMMON_TIMER is disabled, stub task_trigger_irq() on host, and use PRIx64/PRId64 in common/timer.c so it builds on 64-bit hosts.\"`) list file-by-file and symbol-by-symbol mechanics rather than describing the high-level change and design intent.\n\nSuggested commit message for **CL 1** (64-bit format specifiers in `common/timer.c`):\n```text\ncommon/timer: Use PRIx64 and PRId64 for 64-bit timestamps\n\nuint64_t and int64_t map to long (rather than long long) on 64-bit\ntargets such as host builds, causing format-string warnings when printed\nwith %llx and %lld. Use standard inttypes.h format macros so\ncommon/timer.c compiles cleanly across 32-bit and 64-bit targets.\n\nBUG\u003db:213342294\nTEST\u003dmake run-timer\n```\n\nSuggested commit message for **CL 2** (or for this CL if kept together):\n```text\ntest/timer: Exercise common/timer.c on host with a mock hardware timer\n\nHost builds default to core/host/timer.c instead of common/timer.c, so\nhost unit tests do not exercise the production timer implementation and\nskip test_usleep_warning.\n\nIntroduce a mock hardware timer (MOCK(HWTIMER)) that backs the hardware\nclock hooks with an in-memory counter, allow host builds to opt into\nCONFIG_COMMON_TIMER, and enable both for the timer unit test.\n\nBUG\u003db:213342294\nTEST\u003dmake run-timer run-timer_dos run-interrupt run-irq_locking\n```\n\n[🔗](http://go/tj/3e2eef93-0d8b-41b1-bc23-9a621089b53e)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cff0138_279d3e04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-25T22:28:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comments and summary below.\n\n### Review Summary\n- **Functionality**: `MOCK(HWTIMER)` implements the `__hw_clock_*()` hooks required by `common/timer.c`, conditionally excludes `core/host/timer.o` when `CONFIG_COMMON_TIMER` is enabled on host, and updates `common/timer.c` format specifiers (`PRIx64` / `PRId64`) for 64-bit host compatibility.\n- **Architecture \u0026 Component Fit**: Wiring `MOCK(HWTIMER)` via `common/mock/build.mk` and `test/timer.mocklist` and guarding `core/host/timer.o` with `$(call not_cfg,$(CONFIG_COMMON_TIMER))` in `core/host/build.mk` aligns with existing ChromiumOS EC build and mock conventions.\n- **Code Simplicity**: `include/mock/hwtimer_mock.h` and `struct mock_ctrl_hwtimer` (`auto_increment`, `event_deadline`, `MOCK_CTRL_DEFAULT_HWTIMER`) are exposed publicly without any caller in `test/timer.cc`. Unless unit tests in `test/timer.cc` are added to exercise and reset `mock_ctrl_hwtimer`, `hwtimer_mock.c` should use file-local `static` state without a public header (similar to `common/mock/adc_mock.c`).\n- **Idiomaticity \u0026 Readability**: C/C++ style, naming, header guards, and `PRIx64` / `PRId64` format macros follow ChromiumOS EC conventions.\n- **Security**: No security, memory-safety, or integer-overflow concerns introduced in the host mock or format specifier updates.\n- **Testing**: `test/timer.cc` was not updated to reset `mock_ctrl_hwtimer` in `before_test()`, test the `mock_ctrl_hwtimer.auto_increment \u003d\u003d false` branch in `__hw_clock_source_read()`, exercise `__hw_clock_event_set()` / `__hw_clock_event_get()` / `__hw_clock_event_clear()`, or cover the modified `timer_print_info()` / `command_force_time()` / `command_get_time()` functions in `common/timer.c`.\n- **CL Size \u0026 Scope**: `Size: M (+106, -7)`. This CL bundles a standalone production portability fix in `common/timer.c` with the new host hardware timer mock and test configuration. Consider splitting into two focused CLs:\n  1. **CL 1 (`common/timer.c`)**: Replace `%llx` and `%lld` with `PRIx64` and `PRId64` in `timer_print_info()`, `command_force_time()`, and `command_get_time()`.\n  2. **CL 2 (`common/mock/hwtimer_mock.c`, `include/mock/hwtimer_mock.h`, `common/mock/build.mk`, `core/host/build.mk`, `core/host/disabled.c`, `test/test_config.h`, `test/timer.mocklist`, `test/timer.cc`)**: Add `MOCK(HWTIMER)`, support `CONFIG_COMMON_TIMER` on `BOARD_HOST`, and enable/test it in `test/timer`.\n- **Commit Message**: The second paragraph of the commit message narrates low-level file and symbol mechanics (`core/host/timer.o`, `task_trigger_irq()`, `PRIx64/PRId64`); see the inline comment on `/COMMIT_MSG` for copy-pasteable replacements.\n\n[[trajectory](https://goto.corp.google.com/traj/3e2eef93-0d8b-41b1-bc23-9a621089b53e)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82ae4434_c772f566",
+        "filename": "common/mock/hwtimer_mock.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-25T22:28:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Untested Mock Controls / YAGNI**:\n\n`common/mock/hwtimer_mock.c` and `include/mock/hwtimer_mock.h` expose `struct mock_ctrl_hwtimer` (`clock_val`, `event_deadline`, `auto_increment`), `MOCK_CTRL_DEFAULT_HWTIMER`, the `if (mock_ctrl_hwtimer.auto_increment)` branch in `__hw_clock_source_read()`, and the event deadline hooks (`__hw_clock_event_set()`, `__hw_clock_event_get()`, `__hw_clock_event_clear()`). However, `test/timer.cc` never includes `\"mock/hwtimer_mock.h\"`:\n\n- `mock_ctrl_hwtimer` is never reset to `MOCK_CTRL_DEFAULT_HWTIMER` in `before_test()` in `test/timer.cc`, so mock state leaks across test cases.\n- `mock_ctrl_hwtimer.auto_increment` is always `true`, leaving the `false` branch in `__hw_clock_source_read()` (line 32) completely untested.\n- `__hw_clock_event_set()`, `__hw_clock_event_get()`, and `__hw_clock_event_clear()` (as well as the `timer_print_info()`, `command_force_time()`, and `command_get_time()` paths modified in `common/timer.c`) are not exercised by `test/timer.cc`.\n\nPlease either:\n\n1. **Add unit tests in `test/timer.cc`** that reset `mock_ctrl_hwtimer` in `before_test()` and cover `auto_increment \u003d false`, hardware clock event deadline set/get/clear, and the modified `common/timer.c` functions:\n   ```cpp\n   #include \"mock/hwtimer_mock.h\"\n\n   void before_test(void)\n   {\n   \tmock_ctrl_hwtimer \u003d MOCK_CTRL_DEFAULT_HWTIMER;\n   \t__hw_clock_source_init(0);\n   }\n\n   test_static int test_hwtimer_mock_controls(void)\n   {\n   \tmock_ctrl_hwtimer.auto_increment \u003d false;\n   \t__hw_clock_source_set(100);\n   \tTEST_EQ(__hw_clock_source_read(), 100U, \"%u\");\n   \tTEST_EQ(__hw_clock_source_read(), 100U, \"%u\");\n\n   \tmock_ctrl_hwtimer.auto_increment \u003d true;\n   \tTEST_EQ(__hw_clock_source_read(), 101U, \"%u\");\n\n   \t__hw_clock_event_set(500);\n   \tTEST_EQ(__hw_clock_event_get(), 500U, \"%u\");\n   \t__hw_clock_event_clear();\n   \tTEST_EQ(__hw_clock_event_get(), 0U, \"%u\");\n\n   \treturn EC_SUCCESS;\n   }\n   ```\n2. **Or simplify `hwtimer_mock` to only what `test/timer` currently needs**: As noted in `common/mock/README.md`, a header in `include/mock/` is optional and only needed when tests manipulate mock control state. If no test needs `mock_ctrl_hwtimer` or `auto_increment` yet, remove `include/mock/hwtimer_mock.h` (similar to `common/mock/adc_mock.c`) and use file-local `static uint32_t` variables in `common/mock/hwtimer_mock.c`:\n   ```c\n   #include \"hwtimer.h\"\n\n   static uint32_t clock_val;\n   static uint32_t event_deadline;\n\n   void __hw_clock_event_set(uint32_t deadline)\n   {\n   \tevent_deadline \u003d deadline;\n   }\n\n   uint32_t __hw_clock_event_get(void)\n   {\n   \treturn event_deadline;\n   }\n\n   void __hw_clock_event_clear(void)\n   {\n   \tevent_deadline \u003d 0;\n   }\n\n   uint32_t __hw_clock_source_read(void)\n   {\n   \treturn ++clock_val;\n   }\n\n   void __hw_clock_source_set(uint32_t ts)\n   {\n   \tclock_val \u003d ts;\n   }\n\n   int __hw_clock_source_init(uint32_t start_t)\n   {\n   \tclock_val \u003d start_t;\n   \treturn 0;\n   }\n   ```\n\nOther affected locations:\n- **Lines 16–28** in `include/mock/hwtimer_mock.h`\n- **Lines 304–314, 413–414, 427** in `common/timer.c`\n\n[🔗](http://go/tj/3e2eef93-0d8b-41b1-bc23-9a621089b53e)",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
