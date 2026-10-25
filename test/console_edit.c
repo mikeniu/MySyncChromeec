@@ -314,6 +314,53 @@ static int test_buf_notify_null(void)
 	return EC_SUCCESS;
 }
 
+/*
+ * b/485895088: EC_CMD_CONSOLE_READ passes &args0.response_size as write_count.
+ * If an overlapping host command arrives, host_packet_receive() zeroes
+ * args0.response_size from ISR context while the copy loop is running. The
+ * loop must keep its own count, otherwise dest keeps advancing past dest_size
+ * and overwrites the globals behind the host command buffer (pkt0 on NPCX).
+ *
+ * Model the mid-copy reset deterministically: alias write_count onto dest[300]
+ * so that copying "\x01\x01" there rewrites the counter to 0x0101 while dest
+ * keeps advancing.
+ */
+static int test_console_read_write_count_reset_mid_copy(void)
+{
+	enum {
+		DEST_SIZE = 320,
+		ALIAS_OFFSET = 300,
+		CANARY_SIZE = 64,
+		CANARY_BYTE = 0x5a,
+		SRC_LEN = 400,
+	};
+	static uint8_t buf[DEST_SIZE + CANARY_SIZE] __aligned(4);
+	static char src[SRC_LEN + 1];
+	uint16_t *write_count = (uint16_t *)&buf[ALIAS_OFFSET];
+
+	memset(src, 'x', SRC_LEN);
+	src[ALIAS_OFFSET] = 0x01;
+	src[ALIAS_OFFSET + 1] = 0x01;
+	src[SRC_LEN] = '\0';
+
+	memset(buf, 0, DEST_SIZE);
+	memset(buf + DEST_SIZE, CANARY_BYTE, CANARY_SIZE);
+
+	cflush();
+	TEST_ASSERT(uart_console_read_buffer_init() == 0);
+	cputs(CC_SYSTEM, src);
+	cflush();
+	TEST_ASSERT(uart_console_read_buffer_init() == 0);
+
+	TEST_ASSERT(uart_console_read_buffer(CONSOLE_READ_RECENT, (char *)buf,
+					     DEST_SIZE, write_count) == 0);
+
+	TEST_ASSERT_MEMSET(buf + DEST_SIZE, CANARY_BYTE, CANARY_SIZE);
+	TEST_EQ(*write_count, DEST_SIZE, "%d");
+
+	return EC_SUCCESS;
+}
+
 static const char *large_string =
 	"This is a very long string, it will cause a buffer flush at "
 	"some point while printing to the shell. Long long text. Blah "
@@ -351,6 +398,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_history_list);
 	RUN_TEST(test_output_channel);
 	RUN_TEST(test_buf_notify_null);
+	RUN_TEST(test_console_read_write_count_reset_mid_copy);
 	RUN_TEST(test_cprints_overflow);
 
 	test_print_result();
