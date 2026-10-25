@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45f04571_5c5be200",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-25T22:29:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comment on `test/kb_scan.c` to tighten the test assertion and simplify the test setup.\n\n### Review Summary\n* **Functionality:** ✅ Simulates holding the power button while `KEYBOARD_ROW_REFRESH` is asserted across all columns at runtime and verifies that `keyboard_scan_task` does not livelock between wait mode and poll mode.\n* **Architecture \u0026 Component Fit:** ✅ Fits cleanly into `test/kb_scan.c` alongside `power_button_mask_test` in `run_test_step1()`.\n* **Code Simplicity:** ❌ `power_button_held_no_livelock_test()` can be simplified by asserting `raw_read_all_count` before cleanup (eliminating the temporary `reads` variable), using `memset(mock_state, BIT(KEYBOARD_ROW_REFRESH), sizeof(mock_state))` instead of a manual column loop, and removing the redundant `task_wake(TASK_ID_KEYSCAN)` call immediately after `reset_key_state()`.\n* **Idiomaticity \u0026 Readability:** ❌ Replace the magic `300` ms sleep duration and `10` read-count threshold with `crec_usleep(3 * keyscan_config.poll_timeout_us)` and an exact equality check (`TEST_EQ(raw_read_all_count, 1, \"%d\")`).\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ `TEST_LE(reads, 10, \"%d\")` is a weak inequality oracle that passes even when `reads \u003d\u003d 0` (the initial state of `raw_read_all_count`). Because `read_matrix(new_state, false)` does not mask `KEYBOARD_ROW_REFRESH` at runtime (`at_boot \u003d\u003d false`), `keyboard_scan_task` wakes from wait mode once (`raw_read_all_count \u003d\u003d 1`) and stays in poll mode sleeping between scans; please assert `TEST_EQ(raw_read_all_count, 1, \"%d\")`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+40, -0)`. Single, self-contained logical change adding a regression test for commit `9e6f494d76`.\n* **Commit Message:** ✅ Clear, accurate, and properly formatted with `BUG\u003d` and `TEST\u003d` tags. [🔗](http://go/tj/9eb2e5bb-14ba-4e1d-a34d-c628e928e6de)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b21528ffed5ba5a548053b0c5b9497d9b3de2da8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b725005_3e19d257",
+        "filename": "test/kb_scan.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-25T22:29:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please tighten the assertion and simplify `power_button_held_no_livelock_test`:\n\n1. **Assert the exact expected wait-mode read count (`TEST_EQ(raw_read_all_count, 1, \"%d\")`) before cleanup:**\n   * Because `raw_read_all_count` is initialized to `0` on line 628, `TEST_LE(reads, 10, \"%d\")` would pass even if `keyboard_scan_task` never woke or never performed a wait-mode read (`reads \u003d\u003d 0`).\n   * With commit `9e6f494d76`, `read_matrix(new_state, false)` only clears `KEYBOARD_MASKED_BY_POWERBTN` when `at_boot` is `true`. At runtime (`at_boot \u003d\u003d false`), `read_matrix()` returns `1` (`pressed !\u003d 0`) on every poll scan while `KEYBOARD_ROW_REFRESH` is asserted across all columns, which continuously refreshes `poll_deadline` and keeps `keyboard_scan_task` in poll mode (sleeping between scans) without ever expiring `poll_timeout_us` or re-entering wait mode. Thus `raw_read_all_count` is deterministically `1` (the single wait-mode read when exiting `task_wait_event(-1)`).\n   * Checking `TEST_EQ(raw_read_all_count, 1, \"%d\")` before cleanup (matching `power_button_mask_test()` above) also eliminates the intermediate `reads` variable and the magic threshold `10`.\n2. **Use `memset` to assert the row across all columns:** Since `reset_key_state()` just zeroed `mock_state`, `memset(mock_state, BIT(KEYBOARD_ROW_REFRESH), sizeof(mock_state));` sets the row across all columns directly without the loop variable `c` or per-column `mock_key()` console spam.\n3. **Derive the sleep duration from `keyscan_config.poll_timeout_us` and drop the redundant `task_wake()`:** Use `crec_usleep(3 * keyscan_config.poll_timeout_us);` instead of the magic `300` ms literal, and remove `task_wake(TASK_ID_KEYSCAN);` on line 636 since `reset_key_state()` already wakes `TASK_ID_KEYSCAN` after clearing `mock_state`.\n\n```c\nstatic int power_button_held_no_livelock_test(void)\n{\n\t/*\n\t * Hold the power button with no other key pressed while the GSC\n\t * asserts the power-button-masked row on every column (Ti50 pass-\n\t * through / PWRBTN_ASSERTS_KSI3). The scan task must keep sleeping\n\t * between scans instead of bouncing between wait and poll modes,\n\t * otherwise lower priority tasks (HOOK_TICK -\u003e watchdog reload)\n\t * starve.\n\t */\n\tccprintf(\"\\nTest power button held, masked row on all columns.\\n\");\n\treset_key_state();\n\tcrec_msleep(40);\n\tpower_button_counter_divider \u003d 1;\n\tpower_button_counter \u003d 0;\n\tmemset(mock_state, BIT(KEYBOARD_ROW_REFRESH), sizeof(mock_state));\n\traw_read_all_count \u003d 0;\n\ttask_wake(TASK_ID_KEYSCAN);\n\tcrec_usleep(3 * keyscan_config.poll_timeout_us);\n\tccprintf(\"wait-mode row reads: %d\\n\", raw_read_all_count);\n\n\t/*\n\t * At runtime (at_boot \u003d\u003d false), read_matrix() does not mask\n\t * KEYBOARD_ROW_REFRESH, so keyboard_scan_task wakes from wait mode\n\t * once and remains in poll mode sleeping between scans.\n\t */\n\tTEST_EQ(raw_read_all_count, 1, \"%d\");\n\n\tpower_button_counter_divider \u003d 0;\n\treset_key_state();\n\tcrec_msleep(40);\n\n\treturn EC_SUCCESS;\n}\n```\n\n[🔗](http://go/tj/9eb2e5bb-14ba-4e1d-a34d-c628e928e6de)",
+      "range": {
+        "startLine": 608,
+        "startChar": 0,
+        "endLine": 643,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b21528ffed5ba5a548053b0c5b9497d9b3de2da8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
