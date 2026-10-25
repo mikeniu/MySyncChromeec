@@ -219,6 +219,14 @@ ZTEST(yaviks, test_pd_check_vbus_level)
 	zassert_equal(sm5803_check_vbus_level_fake.call_count, 1);
 	zassert_equal(sm5803_check_vbus_level_fake.arg0_val, 1);
 	zassert_equal(sm5803_check_vbus_level_fake.arg1_val, VBUS_PRESENT);
+
+	/* Invalid port returns false without calling sm5803_check_vbus_level */
+	zassert_false(pd_check_vbus_level(-1, VBUS_PRESENT));
+	zassert_false(pd_check_vbus_level(2, VBUS_PRESENT));
+	yaviks_cached_sub_board = YAVIKS_SB_A;
+	board_usb_pd_count_init();
+	zassert_false(pd_check_vbus_level(1, VBUS_PRESENT));
+	zassert_equal(sm5803_check_vbus_level_fake.call_count, 1);
 }
 
 ZTEST(yaviks, test_chargers_suspend)
@@ -330,7 +338,13 @@ ZTEST(yaviks, test_pd_set_power_supply_ready)
 	sm5803_vbus_sink_enable_fake.return_val = EC_ERROR_UNKNOWN;
 	zassert_equal(pd_set_power_supply_ready(0), EC_ERROR_UNKNOWN);
 
-	zassert_equal(pd_set_power_supply_ready(31), EC_ERROR_INVAL);
+	zassert_equal(pd_set_power_supply_ready(-1), EC_ERROR_INVAL);
+	zassert_equal(pd_set_power_supply_ready(2), EC_ERROR_INVAL);
+
+	/* Sub-board without C1 rejects port 1 */
+	yaviks_cached_sub_board = YAVIKS_SB_A;
+	board_usb_pd_count_init();
+	zassert_equal(pd_set_power_supply_ready(1), EC_ERROR_INVAL);
 }
 
 ZTEST(yaviks, test_typec_set_source_current_limit)
@@ -344,6 +358,14 @@ ZTEST(yaviks, test_typec_set_source_current_limit)
 
 	/* Errors are logged but otherwise ignored */
 	charger_set_otg_current_voltage_fake.return_val = EC_ERROR_UNKNOWN;
+	typec_set_source_current_limit(1, TYPEC_RP_1A5);
+	zassert_equal(charger_set_otg_current_voltage_fake.call_count, 2);
+
+	/* Invalid or absent port does nothing */
+	typec_set_source_current_limit(-1, TYPEC_RP_1A5);
+	typec_set_source_current_limit(2, TYPEC_RP_1A5);
+	yaviks_cached_sub_board = YAVIKS_SB_A;
+	board_usb_pd_count_init();
 	typec_set_source_current_limit(1, TYPEC_RP_1A5);
 	zassert_equal(charger_set_otg_current_voltage_fake.call_count, 2);
 }
@@ -459,6 +481,14 @@ ZTEST(yaviks, test_pd_snk_is_vbus_provided)
 	zassert_true(pd_snk_is_vbus_provided(0));
 	zassert_equal(sm5803_get_chg_det_fake.call_count, 1);
 	zassert_equal(sm5803_get_chg_det_fake.arg0_val, 0);
+
+	/* Invalid or absent port returns 0 without querying charger */
+	zassert_equal(pd_snk_is_vbus_provided(-1), 0);
+	zassert_equal(pd_snk_is_vbus_provided(2), 0);
+	yaviks_cached_sub_board = YAVIKS_SB_A;
+	board_usb_pd_count_init();
+	zassert_equal(pd_snk_is_vbus_provided(1), 0);
+	zassert_equal(sm5803_get_chg_det_fake.call_count, 1);
 }
 
 static int kb_blight;

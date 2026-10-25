@@ -41,6 +41,9 @@ void board_pd_vconn_ctrl(int port, enum usbpd_cc_pin cc_pin, int enabled)
 
 __override bool pd_check_vbus_level(int port, enum vbus_level level)
 {
+	if (port < 0 || port >= board_get_usb_pd_port_count())
+		return false;
+
 	return sm5803_check_vbus_level(port, level);
 }
 
@@ -194,7 +197,7 @@ int pd_set_power_supply_ready(int port)
 {
 	enum ec_error_list rv;
 
-	if (port < 0 || port > board_get_usb_pd_port_count()) {
+	if (port < 0 || port >= board_get_usb_pd_port_count()) {
 		LOG_WRN("Port C%d does not exist, cannot enable VBUS", port);
 		return EC_ERROR_INVAL;
 	}
@@ -230,6 +233,9 @@ __override void typec_set_source_current_limit(int port, enum tcpc_rp_value rp)
 {
 	int rv;
 	const int current = rp == TYPEC_RP_3A0 ? 3000 : 1500;
+
+	if (port < 0 || port >= board_get_usb_pd_port_count())
+		return;
 
 	rv = charger_set_otg_current_voltage(port, current, 5000);
 	if (rv != EC_SUCCESS) {
@@ -406,6 +412,9 @@ void board_process_pd_alert(int port)
 int pd_snk_is_vbus_provided(int port)
 {
 	int chg_det = 0;
+
+	if (port < 0 || port >= board_get_usb_pd_port_count())
+		return 0;
 
 	sm5803_get_chg_det(port, &chg_det);
 
