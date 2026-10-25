@@ -8,3 +8,12 @@ tests:
       - CONFIG_SHIMMED_TASKS=y
     extra_dtc_overlay_files:
     - common.dtsi
+  rauru.hylia:
+    extra_configs:
+      - CONFIG_TEST_RAURU_HYLIA=y
+      - CONFIG_PLATFORM_EC_USB_PD_ALT_MODE_DFP=n
+      - CONFIG_PLATFORM_EC_USB_PD_DP_MODE=n
+      - CONFIG_PLATFORM_EC_USB_MUX_TASK=n
+      - CONFIG_SHIMMED_TASKS=y
+    extra_dtc_overlay_files:
+    - common.dtsi

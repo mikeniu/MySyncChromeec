@@ -10,6 +10,11 @@ config TEST_RAURU_USBC
     help
       Enable the Rauru USBC test suite.
 
+config TEST_RAURU_HYLIA
+    bool "Run the tests intended for Hylia"
+    help
+      Enable the Rauru Hylia board and USBC/DP test suite.
+
 endchoice
 
 config RAURU_BOARD_HAS_HDMI_SUPPORT

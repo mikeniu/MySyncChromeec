@@ -221,10 +221,10 @@
 			enum-name = "GPIO_PMIC_EC_RESETB";
 		};
 		gpio_usb_c0_dp_in_hpd: usb_c0_dp_in_hpd {
-			gpios = <&gpiof 2 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <&gpiof 2 (GPIO_OUTPUT | GPIO_INPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_usb_c1_dp_in_hpd: usb_c1_dp_in_hpd {
-			gpios = <&gpiof 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <&gpiof 4 (GPIO_OUTPUT | GPIO_INPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_usb_c0_frs_en: usb_c0_frs_en {
 			gpios = <&gpiof 0 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
