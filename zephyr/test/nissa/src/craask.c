@@ -67,6 +67,7 @@ FAKE_VALUE_FUNC(enum battery_present, battery_is_present);
 FAKE_VOID_FUNC(lpc_keyboard_resume_irq);
 
 FAKE_VALUE_FUNC(enum ec_error_list, charger_set_frequency, int);
+FAKE_VALUE_FUNC(uint8_t, board_get_usb_pd_port_count);
 
 static int board_version;
 
@@ -139,6 +140,8 @@ static void test_before(void *fixture)
 	RESET_FAKE(raa489000_is_acok);
 	RESET_FAKE(raa489000_hibernate);
 	RESET_FAKE(raa489000_enable_asgate);
+	RESET_FAKE(board_get_usb_pd_port_count);
+	board_get_usb_pd_port_count_fake.return_val = 2;
 	RESET_FAKE(raa489000_set_output_current);
 	RESET_FAKE(chipset_in_state);
 	RESET_FAKE(charger_discharge_on_ac);
@@ -711,6 +714,36 @@ ZTEST(craask, test_set_active_charge_port_none)
 	zassert_equal(reg, TCPC_REG_COMMAND_SNK_CTRL_LOW);
 }
 
+ZTEST(craask, test_set_active_charge_port_none_one_port)
+{
+	/*
+	 * HDMI sub-board SKUs have a single USB-C port and park the port 1
+	 * I2C pins. Port 1 must not be touched, otherwise each access times
+	 * out on k_sys_work_q and starves the watchdog.
+	 */
+	board_get_usb_pd_port_count_fake.return_val = 1;
+
+	zassert_ok(board_set_active_charge_port(CHARGE_PORT_NONE));
+	zassert_equal(raa489000_enable_asgate_fake.call_count, 1);
+	zassert_equal(raa489000_enable_asgate_fake.arg0_history[0], 0);
+	zassert_equal(raa489000_enable_asgate_fake.arg1_history[0], false);
+}
+
+ZTEST(craask, test_set_active_charge_port_one_port)
+{
+	board_get_usb_pd_port_count_fake.return_val = 1;
+
+	/* Port 1 does not exist on a 1-port SKU */
+	zassert_equal(board_set_active_charge_port(1), EC_ERROR_INVAL);
+	zassert_equal(raa489000_enable_asgate_fake.call_count, 0);
+
+	/* Enabling port 0 must not try to disable sinking on port 1 */
+	zassert_ok(board_set_active_charge_port(0));
+	zassert_equal(raa489000_enable_asgate_fake.call_count, 1);
+	zassert_equal(raa489000_enable_asgate_fake.arg0_history[0], 0);
+	zassert_equal(raa489000_enable_asgate_fake.arg1_history[0], true);
+}
+
 ZTEST(craask, test_set_active_charge_port_invalid_port)
 {
 	zassert_equal(board_set_active_charge_port(4), EC_ERROR_INVAL,
@@ -829,6 +862,11 @@ ZTEST(craask, test_set_source_current_limit)
 	/* A port that doesn't exist does nothing */
 	typec_set_source_current_limit(3, TYPEC_RP_USB);
 	zassert_equal(raa489000_set_output_current_fake.call_count, 1);
+
+	/* Port 1 does not exist on a 1-port SKU */
+	board_get_usb_pd_port_count_fake.return_val = 1;
+	typec_set_source_current_limit(1, TYPEC_RP_USB);
+	zassert_equal(raa489000_set_output_current_fake.call_count, 1);
 }
 
 static int chipset_in_state_break_tcpc_command(int state_mask)
@@ -878,6 +916,10 @@ ZTEST(craask, test_pd_set_power_supply_ready)
 
 	/* Invalid port number requested */
 	zassert_equal(pd_set_power_supply_ready(2), EC_ERROR_INVAL);
+
+	/* Port 1 is invalid on a 1-port SKU */
+	board_get_usb_pd_port_count_fake.return_val = 1;
+	zassert_equal(pd_set_power_supply_ready(1), EC_ERROR_INVAL);
 }
 
 ZTEST(craask, test_reset_pd_mcu)
