@@ -334,6 +334,10 @@ ZTEST(glassway, test_tcpc_get_alert_status)
 	gpio_emul_input_set(c0_int->port, c0_int->pin, 0);
 	gpio_emul_input_set(c1_int->port, c1_int->pin, 0);
 
+	/* Enable all TCPC Alerts */
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT_MASK, TCPC_REG_ALERT_MASK_ALL);
+	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT_MASK, TCPC_REG_ALERT_MASK_ALL);
+
 	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 1);
 	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_0);
 
@@ -344,6 +348,15 @@ ZTEST(glassway, test_tcpc_get_alert_status)
 	/* Port 1 works too */
 	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT, 0x8000);
 	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_1);
+
+	/* Disable all TCPC Alerts */
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT_MASK, 0);
+	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT_MASK, 0);
+
+	/* Expect no alert status when alert mask is 0 */
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 0xffff);
+	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT, 0xffff);
+	zassert_equal(tcpc_get_alert_status(), 0);
 }
 
 ZTEST(glassway, test_pd_power_supply_reset)
