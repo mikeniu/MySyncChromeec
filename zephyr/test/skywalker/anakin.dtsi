@@ -1,0 +1,22 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "../program/skywalker/anakin/cbi.dtsi"
+
+/ {
+	named-gpios {
+		gpio_imu_int_ec_l: imu_int_ec_l {
+			gpios = <&gpiod 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+	};
+
+	gpio-interrupts {
+		int_imu: ec-imu {
+			irq-pin = <&gpio_imu_int_ec_l>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "base_accel_gyro_interrupt";
+		};
+	};
+};

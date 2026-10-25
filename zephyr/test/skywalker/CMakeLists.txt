@@ -18,13 +18,15 @@ zephyr_include_directories(
 	include)
 
 target_sources(app PRIVATE
-	${PLATFORM_EC_PROGRAM_DIR}/skywalker/skywalker/src/sensor.c
-)
-
-target_sources(app PRIVATE
 	src/main.c
 )
 
 target_sources_ifdef(CONFIG_TEST_SKYWALKER app PRIVATE
+	${PLATFORM_EC_PROGRAM_DIR}/skywalker/skywalker/src/sensor.c
 	src/test_skywalker.c
+)
+
+target_sources_ifdef(CONFIG_TEST_ANAKIN app PRIVATE
+	${PLATFORM_EC_PROGRAM_DIR}/skywalker/anakin/src/sensor.c
+	src/test_anakin.c
 )

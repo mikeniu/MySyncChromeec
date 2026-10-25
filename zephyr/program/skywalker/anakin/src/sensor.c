@@ -63,6 +63,10 @@ static bool board_is_clamshell;
 static void sense_startup_hook(struct ap_power_ev_callback *cb,
 			       struct ap_power_ev_data data)
 {
+	if (board_is_clamshell) {
+		return;
+	}
+
 	switch (data.event) {
 	case AP_POWER_STARTUP:
 		gpio_enable_dt_interrupt(
@@ -90,10 +94,11 @@ static void board_setup_init(void)
 		LOG_ERR("Error retrieving CBI FW_CONFIG field %d", FORM_FACTOR);
 		return;
 	}
-	if (val == CLAMSHELL) {
-		board_is_clamshell = true;
+	board_is_clamshell = (val == CLAMSHELL);
+	if (board_is_clamshell) {
 		motion_sensor_count = 0;
 		gmr_tablet_switch_disable();
+		return;
 	}
 
 	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
