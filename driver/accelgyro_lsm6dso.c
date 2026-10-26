@@ -358,7 +358,7 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 	if (ret == EC_SUCCESS) {
 		data->base.odr = normalized_rate;
 		if (IS_ENABLED(ACCEL_LSM6DSO_INT_ENABLE))
-			accelgyro_config_fifo(s);
+			ret = accelgyro_config_fifo(s);
 	}
 
 	mutex_unlock(s->mutex);

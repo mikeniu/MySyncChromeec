@@ -209,3 +209,25 @@ ZTEST(lsm6dso, test_accelgyro_config_fifo_power_off)
 	zassert_equal(read_fifo_ctrl3() & LSM6DSO_FIFO_ODR_MASK(gyr),
 		      LSM6DSO_DIS_BIT);
 }
+
+ZTEST(lsm6dso, test_set_data_rate_fifo_error)
+{
+	struct i2c_common_emul_data *common =
+		emul_lsm6dso_get_i2c_common_data(emul);
+	const int fifo_regs[] = { LSM6DSO_FIFO_CTRL3_ADDR,
+				  LSM6DSO_FIFO_CTRL4_ADDR };
+
+	for (int i = 0; i < ARRAY_SIZE(fifo_regs); i++) {
+		/* Start powered off so the new ODR rewrites FIFO_CTRL3. */
+		zassert_ok(acc->drv->set_data_rate(acc, 0, 0));
+
+		i2c_common_emul_set_write_fail_reg(common, fifo_regs[i]);
+		zassert_not_equal(
+			acc->drv->set_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 0),
+			EC_SUCCESS, "reg 0x%02x", fifo_regs[i]);
+		i2c_common_emul_set_write_fail_reg(common,
+						   I2C_COMMON_EMUL_NO_FAIL_REG);
+	}
+
+	zassert_ok(acc->drv->set_data_rate(acc, 0, 0));
+}
