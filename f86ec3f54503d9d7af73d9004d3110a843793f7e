@@ -16,6 +16,24 @@
       "message": "`k_tid_t hc_thread \u003d (k_tid_t)\u0026hc-\u003ethread;` (matching `zephyr/shim/src/tasks.c`, since this branch does not have crrev.com/c/8296884 / crrev.com/c/8352763).",
       "revId": "f86ec3f54503d9d7af73d9004d3110a843793f7e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f00d99a3_098fb8d6",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-26T19:31:56Z",
+      "side": 1,
+      "message": "Done, updated to (k_tid_t)\u0026hc-\u003ethread.",
+      "parentUuid": "4ed22a8a_3b2c49c2",
+      "revId": "f86ec3f54503d9d7af73d9004d3110a843793f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
