@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d45e8055_5c298cfb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:37Z",
+      "side": 1,
+      "message": "Done in ps3, see the inline replies. dfu_download() now has gtest coverage through the RtsUsbBackend seam (see https://crrev.com/c/7911746) and the tests run in utils-test.",
+      "parentUuid": "dd197825_df88bcff",
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f82aa339_c2db138a",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d1c47b3_ceb5c162",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:37Z",
+      "side": 1,
+      "message": "Done in ps3 for the empty firmware, zero transfer_size_ and claim-failure cases. Not done: switching dfu_download() to std::span. It changes the signature that the CLI and its tests already use, so I\u0027d rather do it as a separate follow-up than in this change. Leaving this thread open for that.",
+      "parentUuid": "f82aa339_c2db138a",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 503,
+        "endChar": 9999
+      },
       "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffa502db_efdfebfe",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 550,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:37Z",
+      "side": 1,
+      "message": "Done in ps3: a short write is an error, and the early returns release the claimed interface and reset dfu_interface_.",
+      "parentUuid": "4629de58_600cf201",
+      "range": {
+        "startLine": 525,
+        "startChar": 0,
+        "endLine": 550,
+        "endChar": 9999
+      },
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e2fc407_eddf3cf0",
@@ -95,6 +161,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92be8e25_c6c9de07",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:37Z",
+      "side": 1,
+      "message": "Done in ps3: kDfuProgressStepPct and size_t for printed_pct and pct.",
+      "parentUuid": "3e2fc407_eddf3cf0",
+      "range": {
+        "startLine": 554,
+        "startChar": 0,
+        "endLine": 560,
+        "endChar": 9999
+      },
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ac999e9_812a9e77",
@@ -116,6 +206,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78437808_aaa2486b",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:37Z",
+      "side": 1,
+      "message": "Done in ps3: instead of virtual methods on RtsUsbDevice, the USB access goes through a RtsUsbBackend interface injected into the constructor (libusb implementation plus a gmock, like util/elan). dfu_download() tests cover chunking at the boundaries (smaller than, equal to, and one more than the transfer size, and an exact multiple), the final zero-length packet, block numbering, empty firmware, no device, no DFU interface, kernel driver detach failure, claim failure, transfer failure with DFU_CLRSTATUS and interface release, a short write, a poll failure, a failing ZLP and a manifest that never reaches idle.",
+      "parentUuid": "2ac999e9_812a9e77",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 594,
+        "endChar": 9999
+      },
       "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
