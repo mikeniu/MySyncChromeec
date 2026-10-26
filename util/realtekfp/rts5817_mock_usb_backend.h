@@ -23,6 +23,11 @@ class MockRtsUsbBackend : public RtsUsbBackend {
 		    (override));
 	MOCK_METHOD(int, get_interfaces, (std::vector<RtsUsbInterface> *),
 		    (override));
+	MOCK_METHOD(int, detach_kernel_driver, (int interface_number),
+		    (override));
+	MOCK_METHOD(int, claim_interface, (int interface_number), (override));
+	MOCK_METHOD(void, release_interface, (int interface_number),
+		    (override));
 	MOCK_METHOD(int, reset_device, (), (override));
 	MOCK_METHOD(const char *, error_name, (int error), (const, override));
 };

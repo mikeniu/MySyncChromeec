@@ -93,6 +93,31 @@ int RtsLibusbBackend::get_interfaces(std::vector<RtsUsbInterface> *interfaces)
 	return 0;
 }
 
+int RtsLibusbBackend::detach_kernel_driver(int interface_number)
+{
+	if (!dev_handle_)
+		return LIBUSB_ERROR_NO_DEVICE;
+
+	if (libusb_kernel_driver_active(dev_handle_, interface_number) != 1)
+		return 0;
+
+	return libusb_detach_kernel_driver(dev_handle_, interface_number);
+}
+
+int RtsLibusbBackend::claim_interface(int interface_number)
+{
+	if (!dev_handle_)
+		return LIBUSB_ERROR_NO_DEVICE;
+
+	return libusb_claim_interface(dev_handle_, interface_number);
+}
+
+void RtsLibusbBackend::release_interface(int interface_number)
+{
+	if (dev_handle_)
+		libusb_release_interface(dev_handle_, interface_number);
+}
+
 int RtsLibusbBackend::reset_device()
 {
 	if (!dev_handle_)
