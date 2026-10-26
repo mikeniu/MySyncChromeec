@@ -323,7 +323,7 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 
 	mutex_unlock(s->mutex);
 
-	return EC_SUCCESS;
+	return err;
 }
 
 /**
