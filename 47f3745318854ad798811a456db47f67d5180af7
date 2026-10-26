@@ -56,6 +56,29 @@
       "message": "[Gerrit AI Review] In `include/system.h` (lines 797–800 and 815–817), this CL documents the boundary between the two pre-jump callbacks:\n- `chip_pre_system_jump()`: *\"tear down chip peripherals and mappings (such as resetting timers/UARTs, disabling SoC caches/ILM mappings, or stopping the system clock) **while CPU memory protection is still active**.\"*\n- `arch_pre_system_jump()`: *\"tear down core-level state (such as **disabling ARM MPU** or clearing RISC-V PMP regions) immediately before jumping to the target image.\"*\nHowever, in this commit:\n1. `bloonchipper/src/ec_quirks.c` calls `arm_core_mpu_disable()` inside `chip_pre_system_jump()` (line 43) *before* `sys_clock_disable()` (line 49), so `sys_clock_disable()` runs with CPU memory protection already disabled.\n2. `helipilot/src/ec_quirks.c` defines `chip_pre_system_jump()` solely to call `arm_core_mpu_disable()`, which is then deleted in https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8635773 (`fpmcu, cortex-m: Move ARM MPU sysjump teardown to arch_pre_system_jump()`).\nPlease either:\n- Reorder/squash https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8635773 into this step so `arm_core_mpu_disable()` moves directly from `HOOK_SYSJUMP` into `arch_pre_system_jump()` in `zephyr/shim/core/cortex-m/mpu.c` (eliminating the transient `chip_pre_system_jump()` in `helipilot/src/ec_quirks.c` and keeping MPU active during `bloonchipper`\u0027s `chip_pre_system_jump()`), **or**\n- If keeping https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8635773 at the top of the stack, call `sys_clock_disable()` *before* `arm_core_mpu_disable()` here so peripheral and clock teardown finish before disabling the MPU:\n```c\nvoid chip_pre_system_jump(void)\n{\n\t/* Reset timers and UARTs to the defaults. */\n\tDT_FOREACH_STATUS_OKAY(st_stm32_timers, RESET_PERIPHERAL);\n\tDT_FOREACH_STATUS_OKAY(st_stm32_uart, RESET_PERIPHERAL);\n\t/*\n\t * Disable system clock (Cortex-M Systick in this case) because it\u0027s\n\t * unused in EC.\n\t */\n\tsys_clock_disable();\n\t/*\n\t * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then\n\t * the last 64 bytes of the stack is protected to detect stack\n\t * overflows. Size of protected region must be greater than exception\n\t * frame, so CPU won\u0027t overwrite some other data when exception occurs.\n\t *\n\t * EC uses different RAM layout than Zephyr, so it\u0027s possible that after\n\t * sysjump some variables are stored in the protected region. EC also\n\t * reconfigures MPU late (Zephyr does it in reset handler).\n\t *\n\t * Disable MPU protection to avoid problems after sysjump to EC.\n\t */\n\tarm_core_mpu_disable();\n}\n```",
       "revId": "47f3745318854ad798811a456db47f67d5180af7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82c63446_c35bd851",
+        "filename": "zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-26T18:16:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `zephyr/program/fpmcu/bloonchipper/src/ec_quirks.c` replaced `#include \"hooks.h\"` with `#include \"system.h\"`, and nothing in this test file uses `hooks.h`. Please remove this unused `#include \"hooks.h\"`:\n\n```c\n#include \"ec_commands.h\"\n#include \"fpsensor/fpsensor_detect.h\"\n#include \"gpio_signal.h\"\n#include \"system.h\"\n#include \"zephyr/kernel.h\"\n```",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 19
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
