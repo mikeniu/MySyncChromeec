@@ -3996,9 +3996,20 @@ static enum smf_state_result pdc_init_run(void *obj)
 			 * stops polling a dead PDC. Unlike PDC_SUSPENDED, this
 			 * state has no entry/run/exit handlers and will not
 			 * be auto-resumed by should_suspend()/late sysjump.
+			 *
+			 * Seed charge_manager for this port (zero current and
+			 * voltage) so charge_manager_is_seeded() can return
+			 * true once all other healthy ports have also reported.
+			 * Otherwise this disabled port would keep the global
+			 * seed flag false forever and stall the
+			 * SNK_ATTACHED_SYNC_CHARGE_MGR substate on every
+			 * healthy port (e.g. C0 keeps printing "Available
+			 * charging (unconstrained)" but never moves on to
+			 * SET_SINK_PATH, so PD never raises voltage).
 			 */
 			LOG_INF("C%d: PDC init failed, disabling port",
 				config->connector_num);
+			invalidate_charger_settings(port, true);
 			set_pdc_state(port, PDC_DISABLED);
 			return SMF_EVENT_HANDLED;
 		}
