@@ -1,0 +1,183 @@
+From 82dfaefb48d36339e4ecc903ce6482f0b9404425 Mon Sep 17 00:00:00 2001
+From: Jon Murphy <jpmurphy@google.com>
+Date: Mon, 26 Oct 2026 09:46:44 -0600
+Subject: [PATCH] drivers: i2c: npcx: rate-limit repeated bus error and recovery logs
+
+Repeated I2C bus errors and failed SDA/SCL recovery attempts on wedged
+peripheral buses flood the EC console at synchronous UART baud rates,
+contributing to long ISR/thread execution windows under fault storms.
+
+Replace the high-frequency LOG_ERR() calls in i2c_ctrl_recovery(),
+i2c_ctrl_isr(), npcx_i2c_ctrl_recover_bus(), and
+npcx_i2c_ctrl_transfer() with LOG_ERR_RATELIMIT() so each call site is
+throttled per CONFIG_LOG_RATELIMIT_INTERVAL_MS while emitting a skipped
+message count when logging resumes. Add test_err_ratelimit_burst to
+tests/subsys/logging/log_ratelimited to verify burst suppression and
+recovery summary emission.
+
+BUG=b:578025646, b:577495763
+TEST=./twister -p native_sim -T zephyr/tests/subsys/logging/log_ratelimited (4/4 configurations passed); nissa/pujjolo lab DUT servo stack telemetry routed via ESC-88
+
+Assisted-by: Gemini:gemini-launch-candidate-high
+Signed-off-by: Jon Murphy <jpmurphy@google.com>
+Change-Id: I8f9b4d7c3e2a10567890abcdef1234567890abcd
+---
+
+diff --git a/zephyr/drivers/i2c/i2c_npcx_controller.c b/zephyr/drivers/i2c/i2c_npcx_controller.c
+index ca041c3..504f0e3 100644
+--- a/zephyr/drivers/i2c/i2c_npcx_controller.c
++++ b/zephyr/drivers/i2c/i2c_npcx_controller.c
+@@ -366,7 +366,8 @@
+ 	ret = i2c_ctrl_wait_stop_completed(dev, I2C_MAX_TIMEOUT);
+ 	inst->SMBCST |= BIT(NPCX_SMBCST_BB);
+ 	if (ret != 0) {
+-		LOG_ERR("Abort i2c %s::%02x fail! Bus might be stalled.", dev->name, data->port);
++		LOG_ERR_RATELIMIT("Abort i2c %s::%02x fail! Bus might be stalled.",
++				  dev->name, data->port);
+ 	}
+ 
+ 	/*
+@@ -378,7 +379,8 @@
+ 	inst->SMBCTL2 &= ~BIT(NPCX_SMBCTL2_ENABLE);
+ 	ret = i2c_ctrl_wait_idle_completed(dev, I2C_MAX_TIMEOUT);
+ 	if (ret != 0) {
+-		LOG_ERR("Reset i2c %s::%02x fail! Bus might be stalled.", dev->name, data->port);
++		LOG_ERR_RATELIMIT("Reset i2c %s::%02x fail! Bus might be stalled.",
++				  dev->name, data->port);
+ 		return -EIO;
+ 	}
+ 
+@@ -669,7 +671,8 @@
+ 		/* Make sure slave doesn't hold bus by reading FIFO again */
+ 		tmp = i2c_ctrl_data_read(dev);
+ 
+-		LOG_ERR("Bus error occurred on i2c %s::%02x!", dev->name, data->port);
++		LOG_ERR_RATELIMIT("Bus error occurred on i2c %s::%02x!",
++				  dev->name, data->port);
+ 		data->oper_state = NPCX_I2C_ERROR_RECOVERY;
+ 
+ 		/* I/O error occurred */
+@@ -836,11 +839,11 @@
+ 	}
+ 
+ 	if (!IS_BIT_SET(inst->SMBCTL3, NPCX_SMBCTL3_SDA_LVL)) {
+-		LOG_ERR("Recover SDA fail");
++		LOG_ERR_RATELIMIT("Recover SDA fail");
+ 		ret = -EBUSY;
+ 	}
+ 	if (!IS_BIT_SET(inst->SMBCTL3, NPCX_SMBCTL3_SCL_LVL)) {
+-		LOG_ERR("Recover SCL fail");
++		LOG_ERR_RATELIMIT("Recover SCL fail");
+ 		ret = -EBUSY;
+ 	}
+ 
+@@ -1066,7 +1069,8 @@
+ 		    data->oper_state == NPCX_I2C_ERROR_RECOVERY) {
+ 			ret = npcx_i2c_ctrl_recover_bus(i2c_dev);
+ 			if (ret != 0) {
+-				LOG_ERR("Recover Bus failed: %s::%d", i2c_dev->name, port);
++				LOG_ERR_RATELIMIT("Recover Bus failed: %s::%d",
++						  i2c_dev->name, port);
+ 				goto out;
+ 			}
+ 
+@@ -1107,8 +1111,8 @@
+ 		if (data->trans_err == 0) {
+ 			data->oper_state = NPCX_I2C_IDLE;
+ 		} else {
+-			LOG_ERR("STOP fail! bus is held on i2c %s::%02x!\n", i2c_dev->name,
+-				data->port);
++			LOG_ERR_RATELIMIT("STOP fail! bus is held on i2c %s::%02x!\n",
++					  i2c_dev->name, data->port);
+ 			data->oper_state = NPCX_I2C_ERROR_RECOVERY;
+ 		}
+ 	}
+diff --git a/zephyr/tests/subsys/logging/log_ratelimited/test_log_ratelimited.c b/zephyr/tests/subsys/logging/log_ratelimited/test_log_ratelimited.c
+index 8a472dc..1c2a5e9 100644
+--- a/zephyr/tests/subsys/logging/log_ratelimited/test_log_ratelimited.c
++++ b/zephyr/tests/subsys/logging/log_ratelimited/test_log_ratelimited.c
+@@ -6,10 +6,34 @@
+ 
+ #include <zephyr/kernel.h>
+ #include <zephyr/logging/log.h>
++#include <zephyr/logging/log_backend.h>
++#include <zephyr/logging/log_ctrl.h>
+ #include <zephyr/ztest.h>
+ 
+ LOG_MODULE_REGISTER(test_log_ratelimited, CONFIG_LOG_DEFAULT_LEVEL);
+ 
++static uint32_t backend_msg_count;
++
++static void test_backend_process(const struct log_backend *const backend,
++				 union log_msg_generic *msg)
++{
++	ARG_UNUSED(backend);
++	ARG_UNUSED(msg);
++	backend_msg_count++;
++}
++
++static void test_backend_panic(const struct log_backend *const backend)
++{
++	ARG_UNUSED(backend);
++}
++
++static const struct log_backend_api test_backend_api = {
++	.process = test_backend_process,
++	.panic = test_backend_panic,
++};
++
++LOG_BACKEND_DEFINE(test_ratelimit_backend, test_backend_api, true);
++
+ /* Test data for hexdump */
+ static uint8_t test_data[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+ 
+@@ -50,6 +74,49 @@
+ 	zassert_true(true, "All rate-limited macros compile successfully");
+ }
+ 
++static void log_test_i2c_err(uint32_t idx)
++{
++	LOG_ERR_RATELIMIT("Bus error occurred on i2c %s::%02x!", "i2c0", idx);
++}
++
++ZTEST(log_ratelimited, test_err_ratelimit_burst)
++{
++	const uint32_t burst_count = 20U;
++
++	k_sleep(K_MSEC(10));
++	while (log_process()) {
++	}
++	backend_msg_count = 0U;
++
++	for (uint32_t i = 0U; i < burst_count; i++) {
++		log_test_i2c_err(i);
++	}
++	while (log_process()) {
++	}
++
++	if (IS_ENABLED(CONFIG_LOG_RATELIMIT)) {
++		zassert_equal(backend_msg_count, 1U, "Expected 1 logged error in burst, got %u",
++			      backend_msg_count);
++
++		k_sleep(K_MSEC(LOG_RATELIMIT_INTERVAL_MS + 10));
++		log_test_i2c_err(burst_count);
++		while (log_process()) {
++		}
++
++		/* Expect "Skipped 19 messages" + the new error message. */
++		zassert_equal(backend_msg_count, 3U,
++			      "Expected skipped summary + new error (3 total), got %u",
++			      backend_msg_count);
++	} else if (IS_ENABLED(CONFIG_LOG_RATELIMIT_FALLBACK_DROP)) {
++		zassert_equal(backend_msg_count, 0U, "Expected all messages dropped, got %u",
++			      backend_msg_count);
++	} else {
++		zassert_equal(backend_msg_count, burst_count,
++			      "Expected %u unthrottled messages, got %u", burst_count,
++			      backend_msg_count);
++	}
++}
++
+ /* Define the test suite and specify the setup function to be called before each
+  * test case.
+  */
