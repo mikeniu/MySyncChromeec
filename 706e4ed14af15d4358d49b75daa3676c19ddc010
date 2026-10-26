@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0182d503_38a186b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T20:13:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Blocking issues must be resolved before approval.\n\n### Review Summary\n- **Functionality**: ✅ Pre-validating `rate` before locking `s-\u003emutex` and placing the FIFO into bypass mode prevents permanent mutex lockup on rejected rates, rejects negative and sub-minimum (`!rnd`) rates, avoids shift overflow on large rates, and unifies the register write path while only restarting the FIFO in stream mode when `rate \u003e 0`.\n- **Architecture \u0026 Component Fit**: ✅ Validating ODR parameters before mutating hardware FIFO state or acquiring the sensor mutex aligns with the ChromiumOS EC motion sensor driver contract.\n- **Code Simplicity**: ✅ Unifying the `rate \u003d\u003d 0` and `rate \u003e 0` register write paths and removing the unreachable post-normalization bounds check keeps `set_data_rate()` minimal and linear.\n- **Idiomaticity \u0026 Readability**: ✅ Uses existing driver constants and Zephyr/ChromiumOS EC idioms cleanly.\n- **Security**: ✅ Prevents signed bit-shift overflow in `LIS2DH_ODR_TO_REG()` / `LIS2DH_ODR_TO_NORMALIZE()` and mutex deadlock on out-of-range ODR inputs.\n- **Testing**: ❌ `test_lis2dh__set_data_rate` in `zephyr/test/drivers/lis2dh/src/test_common.c` calls `set_data_rate(acc, 0, 1)` with `rnd \u003d 1` on power-off (which short-circuits `!rnd` on line 292 so `rate \u003e 0` is not tested at `rate \u003d\u003d 0`), omits the lower sub-minimum boundary `{ 1, 0 }` and `{ LIS2DH_ODR_MAX_VAL + 1, 0 }`, and does not assert that the FIFO remains disabled (`!lis2dh_emul_is_fifo_enabled(emul)`) when powered off (`rate \u003d\u003d 0`).\n- **CL Size \u0026 Scope**: ✅ `Size: M (+58, -25)` — Single cohesive bug fix in `driver/accel_lis2dh.c` (+17, -25 lines) paired with its unit test updates in `zephyr/test/drivers/lis2dh/src/test_common.c` (+41 lines).\n- **Commit Message**: ✅ Clear, concise 3-paragraph prose description accurately documenting the problem, fix, and boundary behavior changes with `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/99622247-b9a1-4476-a194-59410a43d7b2)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "706e4ed14af15d4358d49b75daa3676c19ddc010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f3ecd62_99e20d9c",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_common.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T20:13:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Add coverage for the remaining boundary conditions and the power-off FIFO state in `test_lis2dh__set_data_rate`:\n\n1. **`rate \u003e 0` boundary when `rnd \u003d\u003d 0` (`rate \u003d 0` and `rate \u003d 1`):** Calling `set_data_rate(acc, 0, 1)` on line 166 passes `rnd \u003d 1`, which short-circuits `!rnd` in `(!rnd \u0026\u0026 rate \u003e 0 \u0026\u0026 rate \u003c LIS2DH_ODR_MIN_VAL)` so `rate \u003e 0` is never evaluated at `rate \u003d\u003d 0` (even though `motion_sense_set_data_rate()` passes `rnd \u003d 0` when powering off). Likewise, `invalid[]` only checks the upper end of the sub-minimum range (`LIS2DH_ODR_MIN_VAL - 1`), omitting the lower off-by-one boundary `{ 1, 0 }`.\n2. **Above-maximum rate with `rnd \u003d\u003d 0` (`{ LIS2DH_ODR_MAX_VAL + 1, 0 }`):** As noted in the commit message, requests between the maximum and twice the maximum with `rnd \u003d\u003d 0` previously clamped to `LIS2DH_ODR_MAX_VAL`, whereas `invalid[]` only tests `LIS2DH_ODR_MAX_VAL + 1` with `rnd \u003d 1`.\n3. **FIFO disabled on power-off (`rate \u003d\u003d 0`):** Line 335 of `driver/accel_lis2dh.c` guards the stream-mode FIFO restart with `\u0026\u0026 rate \u003e 0`, but lines 165–167 do not verify that the FIFO stays in bypass mode (`!lis2dh_emul_is_fifo_enabled(emul)`) after powering off.\n\n```c\n\tconst struct {\n\t\tint rate;\n\t\tint rnd;\n\t} invalid[] \u003d {\n\t\t{ -1, 0 },\n\t\t{ LIS2DH_ODR_MAX_VAL + 1, 0 },\n\t\t{ LIS2DH_ODR_MAX_VAL + 1, 1 },\n\t\t{ INT_MAX, 1 },\n\t\t/* Below the minimum rate cannot be rounded down. */\n\t\t{ 1, 0 },\n\t\t{ LIS2DH_ODR_MIN_VAL - 1, 0 },\n\t};\n```\n\nAnd in the power-off check on lines 165–167:\n\n```c\n\t/* Set data rate to 0 (Power Off) */\n\tzassert_ok(acc-\u003edrv-\u003eset_data_rate(acc, 0, 0));\n\tzassert_equal(drvdata-\u003ebase.odr, 0);\n\tif (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {\n\t\tzassert_false(lis2dh_emul_is_fifo_enabled(emul));\n\t}\n```\n\n- **Lines 165–167**: Power-off (`rate \u003d\u003d 0`) test case missing `rnd \u003d\u003d 0` and FIFO bypass-mode verification.\n\n[🔗](http://go/tj/99622247-b9a1-4476-a194-59410a43d7b2)",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "706e4ed14af15d4358d49b75daa3676c19ddc010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
