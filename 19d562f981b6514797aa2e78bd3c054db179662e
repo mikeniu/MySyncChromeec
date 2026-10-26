@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06c473da_b18020f7",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-26T18:21:26Z",
+      "side": 1,
+      "message": "Consider using `timestamp_expired()` with `rest_deadline` (`t1.val + CONFIG_HOSTCMD_RATE_LIMITING_MIN_REST`) and `recess_deadline` (`t_recess.val + CONFIG_HOSTCMD_RATE_LIMITING_PERIOD`) instead of raw unsigned `.val` subtraction. Since `timestamp_expired()` casts the 64-bit difference to `int64_t`, it also avoids unsigned underflow if a new command arrives in `host_command_received()` before `t1` is sampled.",
+      "revId": "19d562f981b6514797aa2e78bd3c054db179662e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
