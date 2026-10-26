@@ -430,6 +430,7 @@ static void flash_uma_lock(const struct device *dev, int enable)
 static int flash_set_status_for_prot(const struct device *dev, int reg1,
 				     int reg2)
 {
+	uint8_t sr1, sr2;
 	int rv;
 
 	/*
@@ -451,9 +452,17 @@ static int flash_set_status_for_prot(const struct device *dev, int reg1,
 	 */
 	flash_protect_int_flash(dev, write_protect_is_asserted());
 
-	rv = flash_set_status(dev, reg1, reg2);
-	if (rv != EC_SUCCESS) {
-		return rv;
+	/*
+	 * Only write the status registers if they are actually changing;
+	 * writing when WP_IF and SRP0 are already asserted will fail with
+	 * EC_ERROR_ACCESS_DENIED.
+	 */
+	flash_get_status(dev, &sr1, &sr2);
+	if (sr1 != reg1 || sr2 != reg2) {
+		rv = flash_set_status(dev, reg1, reg2);
+		if (rv != EC_SUCCESS) {
+			return rv;
+		}
 	}
 
 	spi_flash_reg_to_protect(reg1, reg2, &addr_prot_start,
