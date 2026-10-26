@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57b52fa5_14107b09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:00Z",
+      "side": 1,
+      "message": "Done in ps2, see the inline replies.",
+      "parentUuid": "03c6396d_73d78446",
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d3376f2_4bfef9d5",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6c0eb3f_fa5918c3",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:00Z",
+      "side": 1,
+      "message": "Done in ps2: removed \u003cvector\u003e and added \u003calgorithm\u003e and \u003ccstddef\u003e.",
+      "parentUuid": "8d3376f2_4bfef9d5",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
       "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ec9d545_67347655",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:00Z",
+      "side": 1,
+      "message": "Done in ps2: RtsUsbDevice goes through a small RtsUsbBackend interface (see https://crrev.com/c/7911746), and dfu_poll_idle()/dfu_clear_status() are now covered by gtest wired into utils-test. Covered: idle and dnload-idle without sleeping, manifest-wait-reset resetting the device, the four busy states, 24-bit little-endian bwPollTimeout, the 1 ms fallback, clamping to the remaining timeout, the timeout boundary, short read and transfer error, dfuERROR, non-zero bStatus, unexpected states, and dfu_clear_status() success and error. The tests use a gmock backend and an injected sleep rather than virtual methods on RtsUsbDevice.",
+      "parentUuid": "901b4903_3adc309c",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 9999
+      },
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b54c25c_007fcb8b",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d6f4b5b_2491a4e4",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:00Z",
+      "side": 1,
+      "message": "Done in ps2: only the four busy states are retried, bStatus !\u003d 0 and unexpected states fail immediately, the delay is clamped to the remaining timeout and computed after the switch, and the response offsets are named constants.",
+      "parentUuid": "8b54c25c_007fcb8b",
+      "range": {
+        "startLine": 366,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 9999
+      },
       "revId": "ae8b3755fe6e8a3bb2565d6369fd721e2de882c4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
