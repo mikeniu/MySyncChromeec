@@ -273,6 +273,8 @@ static int i2c_common_emul_read_byte(const struct emul *target,
 		if (ret) {
 			return -EIO;
 		}
+	} else if (val) {
+		*val = 0;
 	}
 
 	return 0;
