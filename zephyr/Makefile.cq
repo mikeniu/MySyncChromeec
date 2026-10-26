@@ -73,13 +73,19 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 
 .PHONY: test test_host test_llvm twister_host twister_llvm test_host_utils
 
-test_host: zmake_unit_tests test_host_utils twister_host twister_coreboot_sdk \
+ifeq ($(filter 1/%,$(TWISTER_SUBSET)),$(TWISTER_SUBSET))
+test_host: zmake_unit_tests test_host_utils \
 	zephyr_check_compliance_unittest run_device_tests_unittest
 
-test_llvm: zmake_unit_tests test_host_utils twister_llvm
+test_llvm: zmake_unit_tests test_host_utils
 
 test: zmake_unit_tests
 test: test_host_utils
+endif
+
+test_host: twister_host twister_coreboot_sdk
+
+test_llvm: twister_llvm
 ifdef COVERAGE
 # List all of the files expected by firmware_builder.py
 test: $(PLATFORM_EC)/twister-out-llvm/coverage.info # EC_ZEPHYR_TESTS_LLVM
