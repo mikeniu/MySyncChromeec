@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf3528be_937df8cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T19:42:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality**: `raa489000_get_actual_current()` now checks the return status of `raw_read16()` and returns early on error before scaling `reg` and populating `*current`, matching `isl923x_get_current()` and `raa489000_get_actual_voltage()`.\n* **Architecture \u0026 Component Fit**: The error handling in `driver/charger/isl923x.c` and the emulator-based unit test in `zephyr/test/drivers/raa489000/` follow the established driver and test conventions.\n* **Code Simplicity**: Both the driver fix and the unit test are minimal, direct, and free of unnecessary state or control flow.\n* **Idiomaticity \u0026 Readability**: The C code adheres to ChromiumOS EC conventions and matches sibling functions in `driver/charger/isl923x.c`.\n* **Security**: Checking the `raw_read16()` return status prevents scaling and returning an uninitialized stack variable (`int reg`) when an I2C read fails.\n* **Testing**: `test_get_actual_current_read_error` in `zephyr/test/drivers/raa489000/src/raa489000.c` resets emulator state and covers both the I2C read failure path (verifying `EC_ERROR_INVAL` and that `current` remains untouched) and the success path.\n* **CL Size \u0026 Scope**: `Size: S (+35, -1)` (4 production lines changed in `driver/charger/isl923x.c` and 31 lines in test configuration and test code). The CL is a single, self-contained logical change.\n* **Commit Message**: Concisely explains the problem and fix in prose with valid `BUG\u003d` and `TEST\u003d` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/a463a14a-dc62-4f59-baf0-da14051a5f46)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b98464cc7af1b4c1f49ab647a83cf4ba2eac418d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
