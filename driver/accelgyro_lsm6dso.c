@@ -296,12 +296,13 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 
 	ctrl_reg = LSM6DSO_RANGE_REG(s->type);
 	if (s->type == MOTIONSENSE_TYPE_ACCEL) {
-		/* Adjust and check rounded value for Acc. */
-		if (rnd && (newrange < LSM6DSO_ACCEL_NORMALIZE_FS(newrange)))
-			newrange *= 2;
+		range = clamp(range, LSM6DSO_ACCEL_FS_MIN_VAL,
+			      LSM6DSO_ACCEL_FS_MAX_VAL);
+		newrange = LSM6DSO_ACCEL_NORMALIZE_FS(range);
 
-		if (newrange > LSM6DSO_ACCEL_FS_MAX_VAL)
-			newrange = LSM6DSO_ACCEL_FS_MAX_VAL;
+		/* Adjust and check rounded value for Acc. */
+		if (rnd && (range > newrange))
+			newrange *= 2;
 
 		reg_val = lsm6dso_accel_fs_reg(newrange);
 	} else {
