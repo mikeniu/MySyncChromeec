@@ -50,12 +50,18 @@ test_export_static void board_init(void)
 		/* Base accel is not stuffed, don't allow line to float */
 		gpio_pin_configure_dt(GPIO_DT_FROM_NODELABEL(gpio_imu_int_l),
 				      GPIO_INPUT | GPIO_PULL_DOWN);
-		LOG_INF("Clameshell: Disable motion sensors and gmr sensor!");
+		gpio_disable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_acc));
+		/* Lid accel is not stuffed, don't allow line to float */
+		gpio_pin_configure_dt(GPIO_DT_FROM_NODELABEL(gpio_acc_int_l),
+				      GPIO_INPUT | GPIO_PULL_DOWN);
+		LOG_INF("Clamshell: Disable motion sensors and gmr sensor!");
 	} else {
 		if (cros_cbi_ssfc_check_match(
 			    CBI_SSFC_VALUE_ID(DT_NODELABEL(lid_sensor_1)))) {
 			LOG_INF("Lid accel sensor is BMA422");
 		} else {
+			gpio_disable_dt_interrupt(
+				GPIO_INT_FROM_NODELABEL(int_acc));
 			LOG_INF("Lid accel sensor is KX022");
 		}
 		motion_sensors_check_ssfc();
