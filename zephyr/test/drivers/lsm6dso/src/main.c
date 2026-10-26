@@ -242,3 +242,20 @@ ZTEST(lsm6dso, test_set_data_rate_fifo_error)
 
 	zassert_ok(acc->drv->set_data_rate(acc, 0, 0));
 }
+
+ZTEST(lsm6dso, test_set_range_write_error)
+{
+	struct i2c_common_emul_data *common =
+		emul_lsm6dso_get_i2c_common_data(emul);
+	const int orig_range = acc->current_range;
+
+	zassert_ok(acc->drv->set_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL / 2, 0));
+
+	i2c_common_emul_set_write_fail_reg(common, LSM6DSO_ACCEL_FS_ADDR);
+	zassert_equal(acc->drv->set_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL, 0),
+		      EC_ERROR_INVAL);
+	zassert_equal(acc->current_range, LSM6DSO_ACCEL_FS_MAX_VAL / 2);
+	i2c_common_emul_set_write_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+
+	zassert_ok(acc->drv->set_range(acc, orig_range, 0));
+}
