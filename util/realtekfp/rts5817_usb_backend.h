@@ -53,6 +53,9 @@ class RtsUsbBackend {
 	 */
 	virtual int get_interfaces(std::vector<RtsUsbInterface> *interfaces) = 0;
 
+	/** Reset the device; the handle may become invalid afterwards. */
+	virtual int reset_device() = 0;
+
 	/** Name of a negative libusb error code, for diagnostics. */
 	virtual const char *error_name(int error) const = 0;
 };

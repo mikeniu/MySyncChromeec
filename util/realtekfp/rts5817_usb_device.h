@@ -35,6 +35,30 @@ inline constexpr uint8_t kBmReqH2dStdDev = 0x00;
 
 /* DFU class-specific requests (bmRequestType = 0x21 or 0xA1) */
 inline constexpr uint8_t kDfuDetach = 0x00;
+inline constexpr uint8_t kDfuGetStatus = 0x03;
+inline constexpr uint8_t kDfuClrStatus = 0x04;
+
+/* DFU_GETSTATUS response: bStatus, bwPollTimeout[3], bState, iString */
+inline constexpr size_t kDfuGetStatusResponseLen = 6;
+inline constexpr size_t kDfuStatusOff = 0;
+inline constexpr size_t kDfuPollTimeoutOff = 1;
+inline constexpr size_t kDfuStateOff = 4;
+
+/* DFU status codes (from USB DFU spec) */
+inline constexpr uint8_t kDfuStatusOk = 0x00;
+
+/* DFU states (from USB DFU spec) */
+inline constexpr uint8_t kDfuStateDfuIdle = 2;
+inline constexpr uint8_t kDfuStateDfuDnloadSync = 3;
+inline constexpr uint8_t kDfuStateDfuDnloadBusy = 4;
+inline constexpr uint8_t kDfuStateDfuDnloadIdle = 5;
+inline constexpr uint8_t kDfuStateDfuManifestSync = 6;
+inline constexpr uint8_t kDfuStateDfuManifest = 7;
+inline constexpr uint8_t kDfuStateDfuManifestWaitReset = 8;
+inline constexpr uint8_t kDfuStateDfuError = 10;
+
+/* Poll delay used when the device reports bwPollTimeout == 0 */
+inline constexpr int kDfuMinPollDelayMs = 1;
 
 /* DFU descriptor type */
 inline constexpr uint8_t kDfuDescriptorType = 0x21;
@@ -49,9 +73,12 @@ inline constexpr uint8_t kDfuSubclass = 0x01;
 
 /* bmRequestType: 0x21 = Host-to-device, Class, Interface */
 inline constexpr uint8_t kBmReqH2dClsIf = 0x21;
+/* bmRequestType: 0xA1 = Device-to-host, Class, Interface */
+inline constexpr uint8_t kBmReqD2hClsIf = 0xA1;
 
 /* USB I/O timeouts */
 inline constexpr unsigned int kUsbCtrlTimeoutMs = 1000;
+inline constexpr unsigned int kUsbDfuTimeoutMs = 60000;
 
 /* Default transfer size if we cannot parse the DFU functional descriptor */
 inline constexpr uint16_t kDfuDefaultTransferSize = 1024;
@@ -109,6 +136,18 @@ class RtsUsbDevice {
 	{
 		return transfer_size_;
 	}
+
+    protected:
+	/**
+	 * Poll DFU_GETSTATUS until the device is not busy.
+	 * Return: true if device reaches dfuIDLE or dfuDNLOAD_IDLE.
+	 */
+	bool dfu_poll_idle();
+
+	/**
+	 * Clear DFU error status (DFU_CLRSTATUS).
+	 */
+	bool dfu_clear_status();
 
     private:
 	static void default_sleep_ms(int ms);

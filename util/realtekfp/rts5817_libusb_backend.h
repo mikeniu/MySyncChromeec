@@ -25,6 +25,7 @@ class RtsLibusbBackend : public RtsUsbBackend {
 			     uint16_t value, uint16_t index, uint8_t *data,
 			     uint16_t length, unsigned int timeout_ms) override;
 	int get_interfaces(std::vector<RtsUsbInterface> *interfaces) override;
+	int reset_device() override;
 	const char *error_name(int error) const override;
 
     private:
