@@ -3,6 +3,50 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "69345f59_c0dc0040",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:33:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The subject line joins two distinct changes with `\" and \"` (`Add emulator support and unit test suite`), and the body summarizes *what* changed without stating *why* (enabling hermetic Zephyr unit tests for the `lsm6dso` driver\u0027s FIFO and interrupt handling).\n\nIf you split the emulator changes and unit test suite into separate CLs as suggested in the top-level summary:\n\n**CL 1 (emulator):**\n```text\nlsm6dso: Support FIFO and interrupts in Zephyr emulator\n\nMigrate emul_lsm6dso to i2c_common_emul and add FIFO buffer, interrupt\npin, and sample injection support so Zephyr tests can hermetically\nexercise the LSM6DSO driver\u0027s interrupt-driven FIFO path.\n\nBUG\u003db:516268563\nTEST\u003dtwister -c -s drivers.lsm6dso\n```\n\n**CL 2 (unit tests):**\n```text\nlsm6dso: Add Zephyr driver unit test suite\n\nAdd the drivers.lsm6dso test suite to verify interrupt enable/disable\ngating and accelerometer/gyroscope FIFO sample reads against\nemul_lsm6dso.\n\nBUG\u003db:516268563\nTEST\u003dtwister -c -s drivers.lsm6dso\n```\n\nIf kept as a single CL:\n```text\nlsm6dso: Add FIFO emulator support for driver unit tests\n\nExtend emul_lsm6dso with i2c_common_emul, FIFO buffering, and interrupt\npin emulation to enable hermetic Zephyr unit tests for the LSM6DSO\ndriver\u0027s FIFO and interrupt paths.\n\nBUG\u003db:516268563\nTEST\u003dtwister -c -s drivers.lsm6dso\n```\n\n[🔗](http://go/tj/599ad52f-7519-45b2-a8a9-d96a1f962167)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cc0a745_2843177a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:33:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the blocking emulator assertion bug, strengthen the unit test assertions, and consider splitting the emulator update from the new test suite.\n\n### Review Summary\n* **Functionality**: `lsm6dso_emul_init` unconditionally asserts `config-\u003egpio_spec.dt_flags \u0026 GPIO_ACTIVE_LOW`, which fails whenever the optional `int-gpios` property is omitted from devicetree (`config-\u003egpio_spec.port \u003d\u003d NULL`). (In addition to the FIFO wrap-around and multi-byte read indexing issues already noted by another reviewer on `zephyr/emul/emul_lsm6dso.c`.)\n* **Architecture \u0026 Component Fit**: Migrating `emul_lsm6dso` to `i2c_common_emul` aligns well with other motion sensor emulators (`emul_lsm6dsm`, `emul_bmi160`, `emul_lis2dw12`). However, `emul_lsm6dso_append_raw_tag` is exposed in `zephyr/include/emul/emul_lsm6dso.h` without any external callers; it should either be `static` inside `zephyr/emul/emul_lsm6dso.c` or directly tested.\n* **Code Simplicity**: Watermark status and interrupt pin updates are duplicated across `emul_lsm6dso_set_fifo_count`, `emul_lsm6dso_append_raw_tag`, `lsm6dso_emul_reset`, and `lsm6dso_emul_read_byte`, and `emul_lsm6dso_append_sample` branches twice on `MOTIONSENSE_TYPE_ACCEL` to write the X/Y/Z output registers.\n* **Idiomaticity \u0026 Readability**: Use the newly defined `LSM6DSO_FIFO_STS2_DIFF_MASK` and `LSM6DSO_FIFO_DIFF_MSB_SHIFT` macros in `emul_lsm6dso_set_fifo_count` instead of `LSM6DSO_FIFO_DIFF_MASK \u0026 ~0xff`, and use `LSM6DSO_ODR_MIN_VAL` and `ARRAY_SIZE(data)` in `zephyr/test/drivers/lsm6dso/src/main.c` instead of raw `13000` and `4` literals.\n* **Security**: No security or memory-exposure concerns beyond the emulator FIFO bounds handling in test code.\n* **Testing**: `test_gyro_sample` in `zephyr/test/drivers/lsm6dso/src/main.c` never asserts the X, Y, or Z sample values in `data[count - 1].data`, and both tests pass `0.0f` for both `y` and `z`, which would allow an axis-swap or scaling regression to pass unnoticed.\n* **CL Size \u0026 Scope**: At `Size: L (+585, -74)` (387 non-test lines and 276 test lines), this CL exceeds the 250-line non-test threshold and bundles the `emul_lsm6dso` overhaul with the new `drivers.lsm6dso` test suite. Please split into two focused CLs:\n  1. **CL 1 (Emulator)**: Migrate `emul_lsm6dso` to `i2c_common_emul` and add FIFO/interrupt/sample injection support (`driver/accelgyro_lsm6dso.h`, `zephyr/dts/bindings/emul/cros,lsm6dso-emul.yaml`, `zephyr/emul/Kconfig`, `zephyr/emul/emul_lsm6dso.c`, `zephyr/include/emul/emul_lsm6dso.h`).\n  2. **CL 2 (Unit Test Suite)**: Add the `drivers.lsm6dso` test suite (`zephyr/test/drivers/CMakeLists.txt`, `zephyr/test/drivers/Kconfig`, `zephyr/test/drivers/testcase.yaml`, `zephyr/test/drivers/lsm6dso/CMakeLists.txt`, `zephyr/test/drivers/lsm6dso/prj.conf`, `zephyr/test/drivers/lsm6dso/sensor.dts`, `zephyr/test/drivers/lsm6dso/src/main.c`).\n* **Commit Message**: See the inline comment on `/COMMIT_MSG` for updated commit messages that avoid joining distinct changes with `\" and \"` in the subject line and explain the motivation for the change.\n\n[[trajectory](https://goto.corp.google.com/traj/599ad52f-7519-45b2-a8a9-d96a1f962167)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6bd19e3_f388c784",
         "filename": "zephyr/emul/emul_lsm6dso.c",
         "patchSetId": 1
@@ -20,6 +64,56 @@
         "endLine": 124,
         "endChar": 0
       },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adfa32b8_df4bce45",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:33:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `emul_lsm6dso_set_fifo_count` (lines 95–97) and `emul_lsm6dso_append_raw_tag` (lines 133–135) both check `count \u003e\u003d wm \u0026\u0026 wm !\u003d 0` and set `LSM6DSO_FIFO_STS2_WTM`. Driving `lsm6dso_emul_set_interrupt_pin` directly inside `emul_lsm6dso_set_fifo_count` (and using the `LSM6DSO_FIFO_STS2_DIFF_MASK` and `LSM6DSO_FIFO_DIFF_MSB_SHIFT` macros added in `driver/accelgyro_lsm6dso.h` instead of `LSM6DSO_FIFO_DIFF_MASK \u0026 ~0xff`) centralizes watermark status and interrupt state so `emul_lsm6dso_append_raw_tag`, `lsm6dso_emul_reset` (**line 204**), and `lsm6dso_emul_read_byte` (**lines 228–230**) do not need to duplicate watermark checks:\n\n```c\nstatic void emul_lsm6dso_set_fifo_count(const struct emul *emul, int count)\n{\n\tstruct lsm6dso_emul_data *data \u003d emul-\u003edata;\n\tint wm \u003d emul_lsm6dso_get_fifo_wm(emul);\n\tbool watermark_reached \u003d count \u003e\u003d wm \u0026\u0026 wm !\u003d 0;\n\n\tdata-\u003ereg[LSM6DSO_FIFO_STS1_ADDR] \u003d 0;\n\tdata-\u003ereg[LSM6DSO_FIFO_STS2_ADDR] \u003d 0;\n\n\tif (watermark_reached) {\n\t\tdata-\u003ereg[LSM6DSO_FIFO_STS2_ADDR] |\u003d LSM6DSO_FIFO_STS2_WTM;\n\t}\n\tif (count \u003d\u003d 0) {\n\t\tdata-\u003ereg[LSM6DSO_FIFO_STS2_ADDR] |\u003d LSM6DSO_FIFO_STS2_EMPTY;\n\t} else {\n\t\tdata-\u003ereg[LSM6DSO_FIFO_STS2_ADDR] |\u003d FIELD_GET(\n\t\t\tLSM6DSO_FIFO_STS2_DIFF_MASK,\n\t\t\tcount \u003e\u003e LSM6DSO_FIFO_DIFF_MSB_SHIFT);\n\t\tdata-\u003ereg[LSM6DSO_FIFO_STS1_ADDR] \u003d\n\t\t\tFIELD_GET(LSM6DSO_FIFO_STS1_DIFF_MASK, count);\n\t}\n\tlsm6dso_emul_set_interrupt_pin(emul, watermark_reached);\n\tLOG_DBG(\"FIFO_STATUS (%d): 0x%02x %02x\", count,\n\t\tdata-\u003ereg[LSM6DSO_FIFO_STS1_ADDR],\n\t\tdata-\u003ereg[LSM6DSO_FIFO_STS2_ADDR]);\n}\n```\n\n[🔗](http://go/tj/599ad52f-7519-45b2-a8a9-d96a1f962167)",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85bb879a_0c310cee",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:33:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two simplifications here:\n\n1. `emul_lsm6dso_append_sample` branches on `type \u003d\u003d MOTIONSENSE_TYPE_ACCEL` twice (lines 153–161 and lines 171–185) and duplicates the three `sys_put_le16` calls. Selecting `out_reg` and `status_bit` in the first branch eliminates the duplicate block:\n\n```c\n\tuint8_t out_reg;\n\tuint8_t status_bit;\n\n\tif (type \u003d\u003d MOTIONSENSE_TYPE_ACCEL) {\n\t\tfs \u003d la_fs[FIELD_GET(LSM6DSO_ACCEL_FS_MASK,\n\t\t\t\t     data-\u003ereg[LSM6DSO_CTRL1_ADDR])];\n\t\traw_tag \u003d LSM6DSO_ACC_TAG;\n\t\tout_reg \u003d LSM6DSO_ACCEL_OUT_X_L_ADDR;\n\t\tstatus_bit \u003d LSM6DSO_STS_XLDA_UP;\n\t} else {\n\t\tfs \u003d g_fs[FIELD_GET(LSM6DSO_GYRO_FS_MASK,\n\t\t\t\t    data-\u003ereg[LSM6DSO_CTRL2_ADDR])];\n\t\traw_tag \u003d LSM6DSO_GYRO_TAG;\n\t\tout_reg \u003d LSM6DSO_GYRO_OUT_X_L_ADDR;\n\t\tstatus_bit \u003d LSM6DSO_STS_GDA_UP;\n\t}\n\n\t__ASSERT_NO_MSG(ABS(x) \u003c (float)fs);\n\t__ASSERT_NO_MSG(ABS(y) \u003c (float)fs);\n\t__ASSERT_NO_MSG(ABS(z) \u003c (float)fs);\n\n\treg_x \u003d (int16_t)((x / fs) * INT16_MAX);\n\treg_y \u003d (int16_t)((y / fs) * INT16_MAX);\n\treg_z \u003d (int16_t)((z / fs) * INT16_MAX);\n\n\tdata-\u003ereg[LSM6DSO_STATUS_REG] |\u003d status_bit;\n\tsys_put_le16(reg_x, \u0026data-\u003ereg[out_reg]);\n\tsys_put_le16(reg_y, \u0026data-\u003ereg[out_reg + sizeof(uint16_t)]);\n\tsys_put_le16(reg_z, \u0026data-\u003ereg[out_reg + 2 * sizeof(uint16_t)]);\n```\n\n2. `emul_lsm6dso_append_raw_tag` (**line 111**) has no callers outside `zephyr/emul/emul_lsm6dso.c`. If it is only an internal helper for `emul_lsm6dso_append_sample`, make it `static` and remove it from `zephyr/include/emul/emul_lsm6dso.h`; if it is intended as a public test API (e.g., to inject arbitrary/invalid tags), add a test in `zephyr/test/drivers/lsm6dso/src/main.c` that exercises it directly.\n\n[🔗](http://go/tj/599ad52f-7519-45b2-a8a9-d96a1f962167)",
+      "range": {
+        "startLine": 139,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
       "revId": "39504da7aa9def03e88576dd529810265d428d31",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +160,56 @@
         "endLine": 250,
         "endChar": 0
       },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "beea8984_1c40748e",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:33:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two issues in `lsm6dso_emul_init`:\n\n1. **Assertion failure when optional `int-gpios` is omitted**: `LSM6DSO_EMUL` (**line 293**) uses `GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {})` and `lsm6dso_emul_set_interrupt_pin` (**line 67**) checks `if (config-\u003egpio_spec.port \u003d\u003d NULL)` because `int-gpios` is optional in `cros,lsm6dso-emul.yaml` (and omitted in existing devicetree overlays). When `int-gpios` is omitted, `config-\u003egpio_spec.dt_flags` is `0`, causing `__ASSERT(config-\u003egpio_spec.dt_flags \u0026 GPIO_ACTIVE_LOW, ...)` on line 273 to fail at init. Guard the assertion on `config-\u003egpio_spec.port !\u003d NULL`:\n   ```c\n   __ASSERT(config-\u003egpio_spec.port \u003d\u003d NULL ||\n   \t\t (config-\u003egpio_spec.dt_flags \u0026 GPIO_ACTIVE_LOW) !\u003d 0,\n   \t \"The lsm6dso driver only supports active low configuration\");\n   ```\n   (And since active-low is enforced whenever `port !\u003d NULL`, lines 77–84 in `lsm6dso_emul_set_interrupt_pin` can also be simplified to `gpio_emul_input_set(config-\u003egpio_spec.port, config-\u003egpio_spec.pin, !active);`.)\n2. **Redundant `parent` assignment**: `data-\u003ei2c.i2c \u003d parent;` on line 269 is redundant because `.i2c \u003d DEVICE_DT_GET(DT_INST_PARENT(inst))` is already initialized statically in `LSM6DSO_EMUL` (**line 284**).\n\n[🔗](http://go/tj/599ad52f-7519-45b2-a8a9-d96a1f962167)",
+      "range": {
+        "startLine": 263,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c150ce80_dd356f8a",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:33:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] A few improvements to strengthen the test assertions and readability:\n\n1. **Missing sample value assertions in `test_gyro_sample` (lines 122–126)**: `test_gyro_sample` checks `sensor_num` and `flags`, but never verifies `data[count - 1].data[X]`, `data[count - 1].data[Y]`, or `data[count - 1].data[Z]`. If gyroscope data scaling or endianness is broken, the test will still pass.\n2. **Identical `0.0f` values for `y` and `z` mask axis-swap bugs (lines 45, 57, 76, 106, 116)**: Both tests pass `0.0f` for both `y` and `z`. Passing distinct non-zero values for all three axes (e.g., `(1.0f, 0.5f, -0.25f)` for accel and `(100.0f, 50.0f, -25.0f)` for gyro) ensures any swap between X, Y, and Z in `emul_lsm6dso_append_sample` or FIFO unpacking is caught:\n   ```c\n   emul_lsm6dso_append_sample(emul, MOTIONSENSE_TYPE_GYRO, 100.0f, 50.0f,\n   \t\t\t   -25.0f);\n   k_msleep(100);\n\n   count \u003d motion_sense_fifo_read(sizeof(data), ARRAY_SIZE(data), data,\n   \t\t\t       \u0026read_byte_count);\n   zassert_true(count \u003e\u003d 1, \"Expected at least 1 entry, got %d\", count);\n   zassert_equal(GYR_SENSOR_ID, data[count - 1].sensor_num);\n   zassert_equal(0, data[count - 1].flags);\n   zassert_within((100 * INT16_MAX) / gyr-\u003ecurrent_range,\n   \t       data[count - 1].data[X], 1);\n   zassert_within((50 * INT16_MAX) / gyr-\u003ecurrent_range,\n   \t       data[count - 1].data[Y], 1);\n   zassert_within((-25 * INT16_MAX) / gyr-\u003ecurrent_range,\n   \t       data[count - 1].data[Z], 1);\n   ```\n3. **Use named constants instead of raw literals (lines 36–37, 62, 81, 101–102, 122)**: Use `LSM6DSO_ODR_MIN_VAL` (from `driver/accelgyro_lsm6dso_public.h`) instead of `13000`, and `ARRAY_SIZE(data)` instead of `4` in `motion_sense_fifo_read`.\n\n[🔗](http://go/tj/599ad52f-7519-45b2-a8a9-d96a1f962167)",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
       "revId": "39504da7aa9def03e88576dd529810265d428d31",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
