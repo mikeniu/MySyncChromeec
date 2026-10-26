@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "202a44b5_21d07c78",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T16:07:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/7d6f5a57-a13a-4033-b57e-8bd86d4e320b)]\n\n### Review Summary\n* **Functionality**: Format specifiers in `timer_print_info`, `command_force_time`, and `command_get_time` are accurately updated to use `PRIx64` and `PRId64` while preserving existing field widths and `.6` fixed-point precision.\n* **Architecture \u0026 Component Fit**: Uses standard `\u003cinttypes.h\u003e` format macros already transitively provided via `common.h` and supported by the EC `vfnprintf` implementation across 32-bit and 64-bit targets.\n* **Code Simplicity**: Direct, minimal substitution of hardcoded length modifiers with standard format macros.\n* **Idiomaticity \u0026 Readability**: Follows standard C `\u003cinttypes.h\u003e` conventions and codebase line-wrapping style.\n* **Security**: Format strings remain compile-time string literals with no untrusted format input.\n* **Testing**: Existing `printf` unit tests already cover `PRIx64` and `PRId64` formatting with fixed-point precision, and this change introduces no behavioral changes to timer logic.\n* **CL Size \u0026 Scope**: Small (`+8, -6` lines) and focused on a single file (`common/timer.c`).\n* **Commit Message**: Clearly states both what is changing and why (`uint64_t` and `int64_t` mapping to `long` on 64-bit targets causing format warnings with `%llx` and `%lld`).",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f176e8d34908f3d9178266df5abea63ca881595b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
