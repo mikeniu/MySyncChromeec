@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27368b31_a1e44474",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T19:42:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Casting `raw[1]` (`OUT_TEMP_H`) to `int8_t` before integer promotion and addition with `25` properly sign-extends two\u0027s-complement negative temperature offsets below 25 °C.\n* **Architecture \u0026 Component Fit:** ✅ Fits the `accelgyro_lsm6dsm` driver and the Zephyr `lsm6dsm` emulator test suite cleanly.\n* **Code Simplicity:** ✅ Minimal 1-line fix in `read_temp()` paired with a concise table-driven unit test in `test_read_temp`.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C and Zephyr `ztest` conventions (`ARRAY_SIZE`, `C_TO_K`, `zassert_ok`, `zassert_equal`), with direct headers included for used symbols.\n* **Security:** ✅ No memory-safety or integer-overflow concerns (`25 + (int8_t)raw[1]` is bounded within `[-103, 152]`).\n* **Testing:** ✅ `test_read_temp` covers the negative/zero/positive sign boundary (`0xff`, `0x00`, `0x01`) as well as the `int8_t` domain extremes (`0x80` / `INT8_MIN` and `0x7f` / `INT8_MAX`) and restores the register to `0x00`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+29, -1)` — Single, self-contained bug fix and its corresponding unit test.\n* **Commit Message:** ✅ Clear, accurate summary and rationale with valid `BUG\u003db:574000612`, `TEST\u003d`, and `Change-Id:` trailers.\n\n[[trajectory](https://goto.corp.google.com/traj/a051fc9e-0875-4e8c-9519-d5cad1ae9212)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ee80f7cbfce8e44799020bdb34cbc498be7e2d81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
