@@ -786,6 +786,22 @@ int pdc_power_mgmt_set_bbr_cts(int port, bool enable);
 bool pdc_power_mgmt_is_pdc_port_valid(int port);
 
 /**
+ * @brief Check if a PDC port exists (regardless of disabled state)
+ *
+ * Like pdc_power_mgmt_is_pdc_port_valid() but also returns true for ports
+ * that have entered the PDC_DISABLED state. Useful for console commands
+ * that need to report the disabled state to the user.
+ *
+ * @note  Do not use for internal checks since port counts are not known until
+ *        all pdc_power_mgmt devices initialize.
+ *
+ * @param port Port number to check
+ * @return true if the port exists (including disabled ports)
+ * @return false otherwise
+ */
+bool pdc_power_mgmt_pdc_port_exists(int port);
+
+/**
  * @brief Manually notify the PDCs of the given AP power state
  *
  * Notify all PDC drivers that the AP is in the given power state. This

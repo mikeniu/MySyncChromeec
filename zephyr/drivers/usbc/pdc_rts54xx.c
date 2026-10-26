@@ -1570,8 +1570,9 @@ static void st_disable_entry(void *o)
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
 	print_current_state(data);
-	/* If entering from ST_INIT state */
-	data->init_done = true;
+	/* Port is disabled. pdc_is_init_done() returns FAILED so the upper
+	 * layer stops polling GET_CONNECTOR_STATUS on this dead port.
+	 */
 	data->error_status.port_disabled = 1;
 }
 
@@ -2695,6 +2696,10 @@ static void rts54_start_thread(const struct device *dev)
 static enum pdc_driver_init_state_t rts54_is_init_done(const struct device *dev)
 {
 	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) == ST_DISABLE) {
+		return PDC_DRIVER_INIT_STATE_FAILED;
+	}
 
 	return data->init_done ? PDC_DRIVER_INIT_STATE_SUCCESS :
 				 PDC_DRIVER_INIT_STATE_WAIT;

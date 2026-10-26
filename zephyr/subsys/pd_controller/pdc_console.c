@@ -23,7 +23,7 @@ static int cmd_get_pd_port(const struct shell *sh, char *arg_val, uint8_t *port)
 	char *e;
 
 	*port = strtoul(arg_val, &e, 0);
-	if (*e || !pdc_power_mgmt_is_pdc_port_valid(*port)) {
+	if (*e || !pdc_power_mgmt_pdc_port_exists(*port)) {
 		shell_error(sh, "Invalid port");
 		return -EINVAL;
 	}

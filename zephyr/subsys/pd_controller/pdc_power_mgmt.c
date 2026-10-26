@@ -3967,7 +3967,12 @@ static bool pdc_all_ports_ready(void)
 	int num_ports = pdc_power_mgmt_get_usb_pd_port_count();
 
 	for (uint8_t i = 0; i < num_ports; i++) {
-		if (!pdc_is_init_done(pdc_data[i]->port.pdc)) {
+		/* Treat both SUCCESS and FAILED as "no longer waiting".
+		 * A disabled/failed port must not keep healthy ports
+		 * stuck in INIT_WAIT_FOR_READY.
+		 */
+		if (pdc_is_init_done(pdc_data[i]->port.pdc) ==
+		    PDC_DRIVER_INIT_STATE_WAIT) {
 			return false;
 		}
 	}
@@ -3981,7 +3986,24 @@ static enum smf_state_result pdc_init_run(void *obj)
 
 	switch (port->init_local_state) {
 	case INIT_WAIT_FOR_READY:
-		if (!pdc_is_init_done(port->pdc)) {
+		if (pdc_is_init_done(port->pdc) ==
+		    PDC_DRIVER_INIT_STATE_FAILED) {
+			/* PDC driver init failed and the port is permanently
+			 * disabled. Skip the rest of the init sequence
+			 * (SET_SINK_PDOS, SET_SRC_PDOS, SET_FRS, SET_MAX_PDP,
+			 * GET_CONNECTOR_STATUS) and move the port to the
+			 * inert PDC_DISABLED state so the upper state machine
+			 * stops polling a dead PDC. Unlike PDC_SUSPENDED, this
+			 * state has no entry/run/exit handlers and will not
+			 * be auto-resumed by should_suspend()/late sysjump.
+			 */
+			LOG_INF("C%d: PDC init failed, disabling port",
+				config->connector_num);
+			set_pdc_state(port, PDC_DISABLED);
+			return SMF_EVENT_HANDLED;
+		}
+
+		if (pdc_is_init_done(port->pdc) == PDC_DRIVER_INIT_STATE_WAIT) {
 			/* Still waiting on driver to be ready */
 			return SMF_EVENT_HANDLED;
 		}
@@ -4127,6 +4149,11 @@ bool pdc_power_mgmt_is_pdc_port_valid(int port)
 {
 	return (port >= 0) && (port < pdc_power_mgmt_get_usb_pd_port_count()) &&
 	       (get_pdc_state(&pdc_data[port]->port) != PDC_DISABLED);
+}
+
+bool pdc_power_mgmt_pdc_port_exists(int port)
+{
+	return (port >= 0) && (port < pdc_power_mgmt_get_usb_pd_port_count());
 }
 
 /**
@@ -4837,7 +4864,7 @@ test_mockable int pdc_power_mgmt_reset(int port)
 {
 	int rv;
 
-	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
+	if (!pdc_power_mgmt_pdc_port_exists(port)) {
 		return -ERANGE;
 	}
 

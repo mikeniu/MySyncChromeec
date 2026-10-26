@@ -1106,13 +1106,17 @@ static void st_disable_entry(void *o)
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
 	print_current_state(data);
-	/* Mark init done so the upper-layer INIT_WAIT_FOR_READY state can
-	 * proceed past this port. Without this, the upper-layer state machine
-	 * would block forever waiting for a dead PDC.
-	 */
-	data->init_done = true;
-	/* Mark the port as permanently disabled so the upper-layer state
-	 * machine can react.
+	/* Mark the port as permanently disabled. The upper-layer state
+	 * machine will observe PDC_DRIVER_INIT_STATE_FAILED from
+	 * tps_is_init_done() in its INIT_WAIT_FOR_READY substate and
+	 * transition the port to the inert PDC_DISABLED state so the
+	 * upper layer stops polling GET_CONNECTOR_STATUS on this dead port.
+	 *
+	 * Do NOT set init_done=true here. Doing so would make
+	 * tps_is_init_done() report PDC_DRIVER_INIT_STATE_SUCCESS, causing
+	 * the upper layer to continue past INIT_WAIT_FOR_READY and issue
+	 * subsequent init subcommands (SET_SINK_PDOS, SET_SRC_PDOS, ...,
+	 * GET_CONNECTOR_STATUS) against a dead PDC.
 	 */
 	data->error_status.port_disabled = 1;
 }
@@ -3236,6 +3240,10 @@ static void tps_start_thread(const struct device *dev)
 static enum pdc_driver_init_state_t tps_is_init_done(const struct device *dev)
 {
 	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) == ST_DISABLE) {
+		return PDC_DRIVER_INIT_STATE_FAILED;
+	}
 
 	return data->init_done ? PDC_DRIVER_INIT_STATE_SUCCESS :
 				 PDC_DRIVER_INIT_STATE_WAIT;
