@@ -28,6 +28,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d228237f_7925debf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T15:58:44Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "3aa8608e_d8f63234",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4cff0138_279d3e04",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comments and summary below.\n\n### Review Summary\n- **Functionality**: `MOCK(HWTIMER)` implements the `__hw_clock_*()` hooks required by `common/timer.c`, conditionally excludes `core/host/timer.o` when `CONFIG_COMMON_TIMER` is enabled on host, and updates `common/timer.c` format specifiers (`PRIx64` / `PRId64`) for 64-bit host compatibility.\n- **Architecture \u0026 Component Fit**: Wiring `MOCK(HWTIMER)` via `common/mock/build.mk` and `test/timer.mocklist` and guarding `core/host/timer.o` with `$(call not_cfg,$(CONFIG_COMMON_TIMER))` in `core/host/build.mk` aligns with existing ChromiumOS EC build and mock conventions.\n- **Code Simplicity**: `include/mock/hwtimer_mock.h` and `struct mock_ctrl_hwtimer` (`auto_increment`, `event_deadline`, `MOCK_CTRL_DEFAULT_HWTIMER`) are exposed publicly without any caller in `test/timer.cc`. Unless unit tests in `test/timer.cc` are added to exercise and reset `mock_ctrl_hwtimer`, `hwtimer_mock.c` should use file-local `static` state without a public header (similar to `common/mock/adc_mock.c`).\n- **Idiomaticity \u0026 Readability**: C/C++ style, naming, header guards, and `PRIx64` / `PRId64` format macros follow ChromiumOS EC conventions.\n- **Security**: No security, memory-safety, or integer-overflow concerns introduced in the host mock or format specifier updates.\n- **Testing**: `test/timer.cc` was not updated to reset `mock_ctrl_hwtimer` in `before_test()`, test the `mock_ctrl_hwtimer.auto_increment \u003d\u003d false` branch in `__hw_clock_source_read()`, exercise `__hw_clock_event_set()` / `__hw_clock_event_get()` / `__hw_clock_event_clear()`, or cover the modified `timer_print_info()` / `command_force_time()` / `command_get_time()` functions in `common/timer.c`.\n- **CL Size \u0026 Scope**: `Size: M (+106, -7)`. This CL bundles a standalone production portability fix in `common/timer.c` with the new host hardware timer mock and test configuration. Consider splitting into two focused CLs:\n  1. **CL 1 (`common/timer.c`)**: Replace `%llx` and `%lld` with `PRIx64` and `PRId64` in `timer_print_info()`, `command_force_time()`, and `command_get_time()`.\n  2. **CL 2 (`common/mock/hwtimer_mock.c`, `include/mock/hwtimer_mock.h`, `common/mock/build.mk`, `core/host/build.mk`, `core/host/disabled.c`, `test/test_config.h`, `test/timer.mocklist`, `test/timer.cc`)**: Add `MOCK(HWTIMER)`, support `CONFIG_COMMON_TIMER` on `BOARD_HOST`, and enable/test it in `test/timer`.\n- **Commit Message**: The second paragraph of the commit message narrates low-level file and symbol mechanics (`core/host/timer.o`, `task_trigger_irq()`, `PRIx64/PRId64`); see the inline comment on `/COMMIT_MSG` for copy-pasteable replacements.\n\n[[trajectory](https://goto.corp.google.com/traj/3e2eef93-0d8b-41b1-bc23-9a621089b53e)]",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f11622a7_e78c0b65",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T15:58:44Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "4cff0138_279d3e04",
       "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b26ab09_3797d222",
+        "filename": "common/mock/hwtimer_mock.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T15:58:44Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "82ae4434_c772f566",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
       "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
