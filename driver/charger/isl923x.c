@@ -1612,9 +1612,8 @@ static enum ec_error_list raa489000_set_vsys_compensation(int chgnum,
 	}
 
 	/* Lastly, enable DVC fast charge mode for the primary charger IC. */
-	rv = raw_read16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10, &regval);
-	regval |= RAA489000_C10_ENABLE_DVC_CHARGE_MODE;
-	rv |= raw_write16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10, regval);
+	rv = raw_update16(CHARGER_PRIMARY, RAA489000_REG_CONTROL10,
+			  RAA489000_C10_ENABLE_DVC_CHARGE_MODE, MASK_SET);
 	if (rv) {
 		CPRINTS("%s Failed to enable DVC on primary charger!",
 			__func__);

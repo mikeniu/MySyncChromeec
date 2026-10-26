@@ -13,6 +13,7 @@
 #include "emul/emul_isl923x.h"
 #include "emul/tcpc/emul_raa489000.h"
 #include "emul/tcpc/emul_tcpci.h"
+#include "ocpc.h"
 #include "test/drivers/charger_utils.h"
 #include "test/drivers/tcpci_test_common.h"
 #include "test/drivers/test_state.h"
@@ -185,6 +186,37 @@ ZTEST(tcpc_raa489000, test_enable_linear_charge_read_error)
 			  0);
 
 	charge_set_active_chg_chip(prev_chg);
+}
+
+ZTEST(tcpc_raa489000, test_set_vsys_compensation_read_error)
+{
+	const struct emul *emul = EMUL_DT_GET(DT_NODELABEL(isl923x_emul));
+	const struct emul *sec_emul =
+		EMUL_DT_GET(DT_NODELABEL(isl923x_sec_emul));
+	struct i2c_common_emul_data *common =
+		emul_isl923x_get_i2c_common_data(emul);
+	struct ocpc_data ocpc = {
+		.rsys_mo = 52,
+		.rbatt_mo = 40,
+	};
+
+	isl923x_emul_reset_registers(emul);
+	isl923x_emul_reset_registers(sec_emul);
+	isl923x_emul_set_device_id(sec_emul, RAA489000_DEV_ID_B0);
+
+	/* A failed read must not write the primary CONTROL10 back. */
+	i2c_common_emul_set_read_fail_reg(common, RAA489000_REG_CONTROL10);
+	zassert_equal(EC_ERROR_UNKNOWN,
+		      isl923x_drv.set_vsys_compensation(CHARGER_SECONDARY,
+							&ocpc, 1000, 4200));
+	zassert_equal(isl923x_emul_peek_reg(emul, RAA489000_REG_CONTROL10), 0);
+
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+	zassert_equal(EC_ERROR_UNIMPLEMENTED,
+		      isl923x_drv.set_vsys_compensation(CHARGER_SECONDARY,
+							&ocpc, 1000, 4200));
+	zassert_equal(isl923x_emul_peek_reg(emul, RAA489000_REG_CONTROL10),
+		      RAA489000_C10_ENABLE_DVC_CHARGE_MODE);
 }
 
 ZTEST_SUITE(tcpc_raa489000, drivers_predicate_post_main, NULL, NULL, NULL,
