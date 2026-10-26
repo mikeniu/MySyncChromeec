@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ebae9ca_3fffd3a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T20:23:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `npcx_itim_read_stable16()` and `npcx_itim_read_stable32()` bound the consecutive-read polling loops in `__hw_clock_event_count()` and `__hw_clock_source_read()` to `NPCX_HWTIMER_MAX_RETRIES` (8 retries), preventing unbounded hangs under clock-domain crossing metastability while preserving two-consecutive-equal-read semantics.\n* **Architecture \u0026 Component Fit:** ✅ Extracting the register-polling logic into `static inline` helpers in `chip/npcx/hwtimer_chip.h` taking a register-read callback cleanly decouples the retry loop from direct MMIO register macros (`NPCX_ITCNT` and `NPCX_ITCNT_SYSTEM`), allowing host unit tests to exercise the production helpers directly.\n* **Code Simplicity:** ✅ The inline helpers in `chip/npcx/hwtimer_chip.h` and static register-reader callbacks (`read_itcnt_event` and `read_itcnt_system`) in `chip/npcx/hwtimer.c` are minimal, direct, and free of redundant state or control flow.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions, defines a clear named constant (`NPCX_HWTIMER_MAX_RETRIES`), and scopes loop variables narrowly.\n* **Security:** ✅ No security vulnerabilities introduced; bounding hardware register polling loops mitigates EC hang / watchdog reset risks.\n* **Testing:** ✅ `test/npcx_hwtimer.c` covers immediate two-read stability, transient multi-read glitch recovery, and bounded termination at `NPCX_HWTIMER_MAX_RETRIES` for both 16-bit and 32-bit helpers.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+143, -17)` (~40 production lines across `chip/npcx/hwtimer.c` and `chip/npcx/hwtimer_chip.h`, and ~103 test/build lines in `test/`). Self-contained single logical change.\n* **Commit Message:** ✅ Clear imperative subject line, concise prose explanation of the problem and solution, and valid `BUG\u003d` / `TEST\u003d` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/1e6f8e4d-9b8b-4bd3-ad86-aed8f3cbd95c)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ae867cf039893dd585c3d378f83eb79f4cae6e7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
