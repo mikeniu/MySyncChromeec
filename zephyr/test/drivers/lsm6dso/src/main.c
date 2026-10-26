@@ -6,6 +6,7 @@
 #include "driver/accelgyro_lsm6dso.h"
 #include "driver/accelgyro_lsm6dso_public.h"
 #include "emul/emul_lsm6dso.h"
+#include "i2c.h"
 #include "motion_sense.h"
 #include "motion_sense_fifo.h"
 #include "test/drivers/test_state.h"
@@ -177,4 +178,34 @@ ZTEST(lsm6dso, test_push_fifo_data_tag_bounds)
 	zassert_ok(acc->drv->set_data_rate(acc, 0, 0));
 	zassert_ok(gyr->drv->set_data_rate(gyr, 0, 0));
 	acc->drv->enable_interrupt(acc, true);
+}
+
+static int read_fifo_ctrl3(void)
+{
+	int ctrl3;
+
+	zassert_ok(i2c_read8(acc->port, acc->i2c_spi_addr_flags,
+			     LSM6DSO_FIFO_CTRL3_ADDR, &ctrl3));
+	return ctrl3;
+}
+
+ZTEST(lsm6dso, test_accelgyro_config_fifo_power_off)
+{
+	zassert_ok(acc->drv->set_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 0));
+	zassert_ok(gyr->drv->set_data_rate(gyr, LSM6DSO_ODR_MIN_VAL, 0));
+	zassert_not_equal(read_fifo_ctrl3() & LSM6DSO_FIFO_ODR_MASK(acc),
+			  LSM6DSO_DIS_BIT);
+	zassert_not_equal(read_fifo_ctrl3() & LSM6DSO_FIFO_ODR_MASK(gyr),
+			  LSM6DSO_DIS_BIT);
+
+	/* Powering off one sensor only disables its own FIFO batching. */
+	zassert_ok(acc->drv->set_data_rate(acc, 0, 0));
+	zassert_equal(read_fifo_ctrl3() & LSM6DSO_FIFO_ODR_MASK(acc),
+		      LSM6DSO_DIS_BIT);
+	zassert_not_equal(read_fifo_ctrl3() & LSM6DSO_FIFO_ODR_MASK(gyr),
+			  LSM6DSO_DIS_BIT);
+
+	zassert_ok(gyr->drv->set_data_rate(gyr, 0, 0));
+	zassert_equal(read_fifo_ctrl3() & LSM6DSO_FIFO_ODR_MASK(gyr),
+		      LSM6DSO_DIS_BIT);
 }
