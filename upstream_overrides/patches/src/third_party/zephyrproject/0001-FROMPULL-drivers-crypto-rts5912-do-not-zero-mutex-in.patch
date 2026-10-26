@@ -1,0 +1,62 @@
+From a55c87dd2caa05fb7424793e372263a2dc01df11 Mon Sep 17 00:00:00 2001
+From: Rob Barnes <robbarnes@google.com>
+Date: Wed, 21 Oct 2026 17:29:51 -0600
+Subject: [PATCH] FROMPULL: drivers: crypto: rts5912: do not zero mutex in
+ hash_begin_session
+
+In rts5912_hash_begin_session(), memset() zeroes the entire
+rts5912_sha256_context structure while holding crypto_rts5912_in_use.
+This zeroes out the locked k_mutex structure (setting owner to NULL and
+lock_count to 0) as well as the in_use flag.
+
+When k_mutex_unlock() is subsequently called, it sees owner == NULL and
+returns -EINVAL without removing crypto_rts5912_in_use.held_node from
+the calling thread's held_mutexes list. Subsequent acquisitions of
+crypto_rts5912_in_use and other mutexes cross-link held_mutexes across
+threads and create a circular self-loop in held_mutexes, causing
+sys_slist_find_and_remove() in z_impl_k_mutex_unlock() to spin
+indefinitely under mutex_lock until the hardware watchdog resets the EC.
+
+Only zero the hash state buffer fields preceding crypto_rts5912_in_use
+in rts5912_sha256_context.
+
+Signed-off-by: Rob Barnes <robbarnes@google.com>
+(cherry picked from commit https://github.com/zephyrproject-rtos/zephyr/pull/123227)
+
+BUG=b:559056045, b:572071275
+TEST=zmake build -a; verified S0ix suspend/resume stress on RTS5912
+
+Change-Id: Idb7149b336d9faf3edfeca17ffce4f9183edbc67
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/zephyrproject/+/8616870
+Reviewed-by: Jeremy Bettis <jbettis@chromium.org>
+Tested-by: Rob Barnes <robbarnes@google.com>
+Commit-Queue: Rob Barnes <robbarnes@google.com>
+---
+ zephyr/drivers/crypto/crypto_rts5912_sha.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/zephyr/drivers/crypto/crypto_rts5912_sha.c b/zephyr/drivers/crypto/crypto_rts5912_sha.c
+index b125a876094..a95e5621db5 100644
+--- a/zephyr/drivers/crypto/crypto_rts5912_sha.c
++++ b/zephyr/drivers/crypto/crypto_rts5912_sha.c
+@@ -8,6 +8,7 @@
+ #define DT_DRV_COMPAT realtek_rts5912_sha
+ 
+ #include <errno.h>
++#include <stddef.h>
+ #include <string.h>
+ #include <zephyr/init.h>
+ #include <zephyr/crypto/crypto.h>
+@@ -261,7 +262,8 @@ static int rts5912_hash_begin_session(const struct device *dev, struct hash_ctx
+ 	case CRYPTO_HASH_ALGO_SHA224:
+ 	case CRYPTO_HASH_ALGO_SHA256:
+ 		k_mutex_lock(&(rts5912_sha256_ctx->crypto_rts5912_in_use), K_FOREVER);
+-		memset((void *)(rts5912_sha256_ctx), 0x0, sizeof(struct rts5912_sha256_context));
++		memset((void *)(rts5912_sha256_ctx), 0x0,
++		       offsetof(struct rts5912_sha256_context, crypto_rts5912_in_use));
+ 		rts5912_sha256_ctx->is224 = (algo == CRYPTO_HASH_ALGO_SHA224);
+ 		k_mutex_unlock(&(rts5912_sha256_ctx->crypto_rts5912_in_use));
+ 		ctx->hash_hndlr = rts5912_sha256_handler;
+-- 
+2.56.0.257.gf7497c7d27-goog
+
