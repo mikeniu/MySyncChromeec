@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a189ac5_173324c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T20:31:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/50b3afb7-bff4-4c3f-8fc5-35deb4fc296e)]\n\n### Review Summary\n* **Functionality:** ✅ Extracting `raw_tag \u003d *fifo \u003e\u003e LSM6DSO_FIFO_TAG_SHIFT` and checking `if (tag \u003e\u003d ARRAY_SIZE(ag_maps))` on the unsigned `uint8_t tag` (`raw_tag - LSM6DSO_GYRO_TAG`) rejects both `0x00` (which wraps to `0xff`) and tags `\u003e\u003d 0x03` (`tag \u003e\u003d 2`), preventing out-of-bounds accesses on `ag_maps`, `samples_to_discard`, and `main_s + id`.\n* **Architecture \u0026 Component Fit:** ✅ Validating the FIFO tag directly inside `push_fifo_data()` before indexing `ag_maps` keeps precondition enforcement co-located with the consumer and reuses `LSM6DSO_FIFO_TAG_SHIFT` from `driver/accelgyro_lsm6dso.h`.\n* **Code Simplicity:** ✅ Minimal guard clause in `push_fifo_data()` with a single bit-shift computation and a table-driven unit test.\n* **Idiomaticity \u0026 Readability:** ✅ Uses named constants and codebase macros (`LSM6DSO_FIFO_TAG_SHIFT`, `LSM6DSO_GYRO_TAG`, `LSM6DSO_ACC_TAG`, `ARRAY_SIZE`, `LSM6DSO_ODR_MIN_VAL`, `LSM6DSO_DISCARD_SAMPLES`) with no magic numbers.\n* **Security:** ✅ Prevents out-of-bounds array reads/writes and invalid sensor pointer arithmetic when unexpected FIFO tags are received from the sensor.\n* **Testing:** ✅ `ZTEST(lsm6dso, test_push_fifo_data_tag_bounds)` exercises the lower off-by-one (`LSM6DSO_GYRO_TAG - 1`), valid gyroscope and accelerometer tags (`LSM6DSO_GYRO_TAG`, `LSM6DSO_ACC_TAG`), exact upper boundary (`LSM6DSO_ACC_TAG + 1`), and maximum 5-bit tag (`0xff \u003e\u003e LSM6DSO_FIFO_TAG_SHIFT`).\n* **CL Size \u0026 Scope:** ✅ Size: M (+62, -1). Single cohesive logical fix (8 production lines added, 1 removed) accompanied by its unit test (54 lines added).\n* **Commit Message:** ✅ Clear, concise prose explaining the problem and fix with accurate `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/50b3afb7-bff4-4c3f-8fc5-35deb4fc296e)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "adda1500b66d6c198d3fd0d807523f414f6fb13d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
