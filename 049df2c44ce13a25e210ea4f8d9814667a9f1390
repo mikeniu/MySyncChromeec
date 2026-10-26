@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d8885bf_11b1cfed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T20:12:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `BASE_ODR(sensor-\u003econfig[SENSOR_CONFIG_AP].odr) \u003e 0` in `motion_sense_fifo_stage_data()` masks out `ROUND_UP_FLAG` before comparing the AP ODR against `0`, preventing false AP interrupts when the base ODR is `0` with `ROUND_UP_FLAG` set.\n* **Architecture \u0026 Component Fit:** ✅ Uses the `BASE_ODR()` macro from `include/motion_sense.h` consistently with `common/motion_sense.c`.\n* **Code Simplicity:** ✅ Minimal, direct fix and clean linear test additions in `test_fifo_ap_interval`.\n* **Idiomaticity \u0026 Readability:** ✅ Idiomatic C matching the surrounding codebase conventions.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ `test_fifo_ap_interval` covers `BASE_ODR(odr) \u003d\u003d 0` with and without `ROUND_UP_FLAG` (`odr \u003d 0` and `odr \u003d ROUND_UP_FLAG`) as well as the `\u003e 0` boundary with `ROUND_UP_FLAG` set (`odr \u003d 1 | ROUND_UP_FLAG`).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+18, -1)` — Single, focused bug fix and its corresponding unit test.\n* **Commit Message:** ✅ Clear, concise two-paragraph summary of the problem and fix with valid `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/85919005-5b57-4e05-aafe-184e362403c2)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "049df2c44ce13a25e210ea4f8d9814667a9f1390",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
