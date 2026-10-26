@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9411d634_4e572d6b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:46Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "a1e4c5e6_c34def77",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69a37338_35779a6e",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL into focused changes, simplify the accelerometer normalization control flow in `set_range()`, expand unit test coverage, and update the commit message.\n\n### Review Summary\n- **Functionality:** ✅ Clamping accelerometer ranges to `[LSM6DSO_ACCEL_FS_MIN_VAL, LSM6DSO_ACCEL_FS_MAX_VAL]`, fixing the round-up comparison to `\u003e`, normalizing to a power of two, and propagating `err` from `set_range()` address the underlying driver defects.\n- **Architecture \u0026 Component Fit:** ✅ Defining `LSM6DSO_ACCEL_FS_MIN_VAL` in `driver/accelgyro_lsm6dso.h` aligns with sibling ST motion sensor drivers (`accelgyro_lsm6dsm.h`).\n- **Code Simplicity:** ❌ In `set_range()`, normalizing the clamped `range` via `LSM6DSO_ACCEL_NORMALIZE_FS(range)` before checking `rnd` avoids calling `__fls()` twice and eliminates the subsequent `if (newrange \u003e LSM6DSO_ACCEL_FS_MAX_VAL) ... else ...` branch. In `zephyr/test/drivers/Kconfig`, `default n` on a `bool` symbol is redundant.\n- **Idiomaticity \u0026 Readability:** ❌ `test_set_range_rounding_clamping` passes a magic number (`10000000`) instead of deriving from `LSM6DSO_GYRO_NORMALIZE_FS(LSM6DSO_GYRO_FS_MAX_REG_VAL)`, and `test_push_fifo_data_oob_tags` uses a magic `0xFF` tag literal instead of deriving from `enum lsm6dso_tag_fifo`.\n- **Security:** ✅ No security vulnerabilities introduced.\n- **Testing:** ❌ `test_set_range_rounding_clamping` is missing test cases for: (1) `set_range()` I2C write error propagation (`return err`), (2) clamping below/at `LSM6DSO_ACCEL_FS_MIN_VAL`, (3) rounding down (`rnd \u003d 0`) on non-power-of-two inputs, (4) `rnd \u003d 1` on exact power-of-two boundaries and `LSM6DSO_ACCEL_FS_MAX_VAL - 1`, and (5) asserting `gyro-\u003ecurrent_range` after clamping gyro range to max.\n- **CL Size \u0026 Scope:** ❌ `Size: M (+59, -2)` (7 lines production diff, 54 lines test/config diff). While small in line count, this CL bundles four independent logical changes that should be split into separate CLs:\n  1. **CL 1:** Wire up `CONFIG_LINK_TEST_SUITE_LSM6DSO` in `zephyr/test/drivers/Kconfig` and register `drivers.lsm6dso` in `zephyr/test/drivers/testcase.yaml`.\n  2. **CL 2:** Add `test_push_fifo_data_oob_tags` in `zephyr/test/drivers/lsm6dso/src/main.c` covering out-of-bounds FIFO tag handling in `push_fifo_data()`.\n  3. **CL 3:** Fix `set_range()` in `driver/accelgyro_lsm6dso.c` to return `err` instead of `EC_SUCCESS`, with its unit test in `zephyr/test/drivers/lsm6dso/src/main.c`.\n  4. **CL 4:** Fix `set_range()` accelerometer full-scale clamping, rounding, and normalization in `driver/accelgyro_lsm6dso.h` and `driver/accelgyro_lsm6dso.c`, with boundary unit tests in `zephyr/test/drivers/lsm6dso/src/main.c`.\n- **Commit Message:** ❌ The commit message narrates the code diff without stating the *Why* (problem statement), omits the `Kconfig`/`testcase.yaml` and `test_push_fifo_data_oob_tags` changes, and lists `TEST\u003d./twister -T zephyr/test/drivers -s drivers.default` instead of `drivers.lsm6dso`. [🔗](http://go/tj/e6dd4432-46cd-4def-bb54-ce54a455b610)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5a619bb_3b96414f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:46Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "69a37338_35779a6e",
       "revId": "2763082d469c03a1ef636e3f646265760d467d61",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f76620e_9c6c2b00",
+        "filename": "driver/accelgyro_lsm6dso.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:46Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "9d2ef4b1_b4630dfd",
+      "range": {
+        "startLine": 296,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 9999
+      },
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e58bd2c_ceebf8ba",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4320333_a120d5e5",
+        "filename": "zephyr/test/drivers/Kconfig",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:46Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "9e58bd2c_ceebf8ba",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 9999
+      },
       "revId": "2763082d469c03a1ef636e3f646265760d467d61",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91adb6a3_b50e46bb",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:46Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "081ff2a1_077983e8",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 9999
+      },
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cd6d690c_44aebaec",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "2763082d469c03a1ef636e3f646265760d467d61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4f045ea_769e5249",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:46Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "cd6d690c_44aebaec",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 9999
+      },
       "revId": "2763082d469c03a1ef636e3f646265760d467d61",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
