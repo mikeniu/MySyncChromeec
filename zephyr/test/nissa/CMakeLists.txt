@@ -44,7 +44,7 @@ target_sources_ifdef(
         src/nivviks.c
         ${PLATFORM_EC_PROGRAM_DIR}/nissa/nivviks/src/fan.c
         ${PLATFORM_EC_PROGRAM_DIR}/nissa/nivviks/src/form_factor.c
-        ${PLATFORM_EC_PROGRAM_DIR}/nissa/nivviks/src/led.c
+        ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/nivviks_led.c
 )
 
 if(CONFIG_TEST_NISSA_NIVVIKS_CHARGER)

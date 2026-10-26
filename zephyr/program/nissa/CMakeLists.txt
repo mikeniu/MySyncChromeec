@@ -16,7 +16,7 @@ zephyr_library_sources_ifdef(CONFIG_AP_PWRSEQ "src/board_power.c")
 if(DEFINED CONFIG_BOARD_NIVVIKS)
 	project(nivviks)
 	zephyr_library_sources(
-			"nivviks/src/led.c"
+			"src/nivviks_led.c"
 			"nivviks/src/form_factor.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "nivviks/src/fan.c")
@@ -35,7 +35,7 @@ endif()
 if(DEFINED CONFIG_BOARD_NOKRIS)
 	project(nokris)
 	zephyr_library_sources(
-			"nokris/src/led.c"
+			"src/nivviks_led.c"
 			"nokris/src/form_factor.c"
 			"nokris/src/hdmi.c"
 	)
