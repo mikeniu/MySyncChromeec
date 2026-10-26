@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75125879_b334014c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-26T20:50:37Z",
+      "side": 1,
+      "message": "I don\u0027t know where this value is coming from.  Default value is [52 bytes](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/pigweed/pw_tokenizer/public/pw_tokenizer/config.h;l\u003d61;drc\u003d33e797c3c0380161307b0798132d9a0b78c0b61f) and is overriden to [80 bytes](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h;l\u003d16;drc\u003ddce3480b76cc821862bf61dfaf9421e9601e048a) on Zephyr EC projects.\n\nSince there is room to increase the ISR stack size, I\u0027m okay with this change.  But the commit message needs updating.",
+      "range": {
+        "startLine": 11,
+        "startChar": 25,
+        "endLine": 11,
+        "endChar": 33
+      },
+      "revId": "6069c53deacd41f78006b05107bbfc36629e62cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df6f6d5c_abde2284",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-26T20:50:37Z",
+      "side": 1,
+      "message": "Actual symbol name is `PW_LOG_TOKENIZED_ENCODING_BUFFER_SIZE_BYTES`",
+      "range": {
+        "startLine": 11,
+        "startChar": 34,
+        "endLine": 11,
+        "endChar": 75
+      },
+      "revId": "6069c53deacd41f78006b05107bbfc36629e62cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
