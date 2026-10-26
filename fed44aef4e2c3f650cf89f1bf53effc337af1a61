@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2f2457d_3b21778f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:24:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Moving `int *axis \u003d s-\u003eraw_xyz;` inside the per-sample loop in `lis2dh_load_fifo()` ensures each FIFO sample is normalized into `s-\u003eraw_xyz` before switching `axis` to `s-\u003espoof_xyz` when spoof mode is active, preventing subsequent samples in a multi-sample read from overwriting `s-\u003espoof_xyz`.\n* **Architecture \u0026 Component Fit:** ✅ Matches the FIFO spoof-mode handling pattern in sibling ST MEMS drivers (`lis2dw12_load_fifo()` in `driver/accel_lis2dw12.c`) and resets `MOTIONSENSE_FLAG_IN_SPOOF_MODE` in `lis2dh_before()` for test isolation.\n* **Code Simplicity:** ✅ Minimal, narrowly scoped change with no redundant state or control flow.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions and declares `axis` in the narrowest lexical scope where it is used.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ `test_lis2dh__samples_fifo_read_spoof` is updated to queue two FIFO samples, verify that all staged FIFO frames preserve `expected_spoof`, and verify that `acc-\u003eraw_xyz` tracks the latest sensor sample.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+20, -8)` — Single, self-contained bug fix and corresponding unit test update.\n* **Commit Message:** ✅ Concise, accurate summary of both the root cause and the fix with proper `BUG\u003d`, `TEST\u003d`, and `Change-Id:` trailers.\n\n[[trajectory](https://goto.corp.google.com/traj/0c4dbadf-98a5-46db-83cd-651f1a2e6166)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "fed44aef4e2c3f650cf89f1bf53effc337af1a61",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
