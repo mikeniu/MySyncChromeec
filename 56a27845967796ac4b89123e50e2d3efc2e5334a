@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fedbcd9_0632bb90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:53:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please tighten the register assertion in `test_enable_linear_charge_read_error` (see inline comment).\n\n### Review Summary\n* **Functionality:** ✅ `raa489000_enable_linear_charge()` now uses `i2c_field_update16()` so an `ISL923X_REG_CONTROL2` read error no longer writes an uninitialized `regval` back to the primary charger.\n* **Architecture \u0026 Component Fit:** ✅ Reuses the existing `i2c_field_update16()` helper and OCPC test configuration cleanly.\n* **Code Simplicity:** ⚠️ In `zephyr/test/drivers/raa489000/src/raa489000.c`, the masked `zassert_not_equal(..., 0)` check can be simplified to a direct `zassert_equal` against the expected register value.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC and Zephyr `ztest` conventions.\n* **Security:** ✅ Eliminates use of an uninitialized stack variable (`regval`) on I2C read failure.\n* **Testing:** ❌ In `test_enable_linear_charge_read_error`, please assert the exact expected `ISL923X_REG_CONTROL2` value (`GENMASK(15, 13)`) with `zassert_equal` rather than `zassert_not_equal(..., 0)` so the test verifies both the exact trickle current encoding for the 256 mA precharge current and that no other bits in `ISL923X_REG_CONTROL2` were modified.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+45, -7)` (~12 production lines, ~40 test/config lines) — single cohesive bug fix and its unit test.\n* **Commit Message:** ✅ Clear, accurate, and concise rationale and summary with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/6cbb93f6-8f37-4df9-9235-1d4946a01a81)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "56a27845967796ac4b89123e50e2d3efc2e5334a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6cdbf6f_da307816",
+        "filename": "zephyr/test/drivers/raa489000/src/raa489000.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:53:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Assert the exact expected `ISL923X_REG_CONTROL2` register value (`GENMASK(15, 13)`, corresponding to `(256 / 32 - 1) \u003c\u003c 13` for the emulated battery\u0027s 256 mA `precharge_current`) with `zassert_equal` rather than checking `!\u003d 0` on the masked field. A `zassert_not_equal(..., 0)` check would still pass if an incorrect non-zero trickle current code (`1..6`) were written or if lower bits (`GENMASK(12, 0)`) of `ISL923X_REG_CONTROL2` were inadvertently modified:\n\n```c\n\tzassert_equal(isl923x_emul_peek_reg(emul, ISL923X_REG_CONTROL2),\n\t\t      GENMASK(15, 13));\n```\n\n[🔗](http://go/tj/6cbb93f6-8f37-4df9-9235-1d4946a01a81)",
+      "range": {
+        "startLine": 183,
+        "startChar": 0,
+        "endLine": 185,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "56a27845967796ac4b89123e50e2d3efc2e5334a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
