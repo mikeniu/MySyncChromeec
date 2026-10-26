@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "598fdf62_19caf882",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:30:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n- **Functionality:** ✅ `dfu_poll_idle()` and `dfu_clear_status()` properly handle terminal states (`dfuIDLE`, `dfuDNLOAD-IDLE`, `dfuMANIFEST-WAIT-RESET`), transient busy states, non-zero `bStatus` and `dfuERROR`, unexpected DFU states, short reads, and 24-bit `bwPollTimeout` clamping against the remaining timeout budget.\n- **Architecture \u0026 Component Fit:** ✅ Hardware operations (`control_transfer` and `reset_device`) and sleep delays are cleanly routed through `RtsUsbBackend` and `SleepFn`, matching the existing `RtsUsbDevice` design and enabling fast, deterministic host unit tests.\n- **Code Simplicity:** ✅ Control flow in `dfu_poll_idle()`, `dfu_clear_status()`, and `RtsLibusbBackend::reset_device()` is minimal and direct, with all includes used.\n- **Idiomaticity \u0026 Readability:** ✅ DFU request codes, response offsets, state values, and minimum poll delay are defined as typed `constexpr` constants with clear names and units.\n- **Security:** ✅ Bounds and response length checks prevent out-of-bounds reads and integer overflow on 24-bit `bwPollTimeout` values.\n- **Testing:** ✅ Comprehensive GoogleTest unit tests in `util/rts5817_usb_device_test.cc` cover idle/terminal states, device reset on `dfuMANIFEST-WAIT-RESET`, all four busy states, 24-bit little-endian timeout decoding, zero-timeout fallback, timeout clamping and exact boundary behavior, short reads, transfer errors, `dfuERROR`, non-zero `bStatus`, unexpected states, and `dfu_clear_status()`.\n- **CL Size \u0026 Scope:** ✅ `Size: L (+362, -0)` (~164 production lines and ~198 unit test lines). Implements a single cohesive logical change adding DFU status polling and clearing helpers with thorough unit test coverage.\n- **Commit Message:** ✅ Accurate, concise subject and prose summary with valid `BUG\u003d` and `TEST\u003d` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/a2607285-ca09-4d35-bfc8-497b2d06594d)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b7346f9b7136558315dd070ac3b023129f4ab704",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
