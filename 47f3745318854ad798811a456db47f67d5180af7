@@ -60,6 +60,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "85f41901_b65dabf8",
+        "filename": "zephyr/fake/system_fake.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-26T18:19:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `ztest_interrupt_disable_all()` discards the lock key returned by `irq_lock()`, and `system_jump_to_booter()` passes a hardcoded `0` to `irq_unlock(0)`. To match Zephyr\u0027s `irq_lock()` / `irq_unlock(key)` contract, save the key returned by `irq_lock()` and pass it to `irq_unlock()`:\n\n```c\nstatic unsigned int irq_lock_key;\nstatic bool irq_locked;\n\nvoid ztest_interrupt_disable_all(void)\n{\n\tif (!irq_locked) {\n\t\tirq_lock_key \u003d irq_lock();\n\t\tirq_locked \u003d true;\n\t}\n}\n\nvoid system_fake_setenv(jmp_buf *env)\n{\n\tjump_env \u003d env;\n}\n\nvoid system_jump_to_booter(void)\n{\n\tif (irq_locked) {\n\t\tirq_locked \u003d false;\n\t\tirq_unlock(irq_lock_key);\n\t}\n\tif (jump_env)\n\t\tlongjmp(*jump_env, 1);\n}\n```",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 1
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "861b38d1_85403064",
+        "filename": "zephyr/shim/core/riscv/mpu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-26T18:19:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `arch_pre_system_jump()` here replaces `prepare_for_sysjump_to_ec()`, but there is no unit test verifying that `arch_pre_system_jump()` calls `z_riscv_pmp_clear_all()`. Please add a unit test (using `FAKE_VOID_FUNC(z_riscv_pmp_clear_all)`) asserting that `arch_pre_system_jump()` invokes `z_riscv_pmp_clear_all()` once.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 1
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "82c63446_c35bd851",
         "filename": "zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c",
         "patchSetId": 9
@@ -76,6 +122,29 @@
         "startChar": 0,
         "endLine": 10,
         "endChar": 19
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb1952af_03750d38",
+        "filename": "zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-26T18:19:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Unlike `test_tim2` above (lines 49–52), `test_chip_pre_system_jump` only asserts `stm32_reset_line_toggle_fake.call_count \u003d\u003d 1` without verifying the reset controller device (`arg0_history[0]`) or reset bit (`arg1_history[0]`), and does not verify that `sys_clock_disable()` was called.\n\nPlease add `FAKE_VOID_FUNC(sys_clock_disable);` alongside the other fakes at line 20 and assert the exact reset arguments and clock disable call:\n\n```c\nZTEST(ec_quirks, test_chip_pre_system_jump)\n{\n\tRESET_FAKE(stm32_reset_line_toggle);\n\tRESET_FAKE(arm_core_mpu_disable);\n\tRESET_FAKE(sys_clock_disable);\n\n\tchip_pre_system_jump();\n\n\tzassert_equal(stm32_reset_line_toggle_fake.call_count, 1);\n\tzassert_equal(stm32_reset_line_toggle_fake.arg0_history[0],\n\t\t      DEVICE_DT_GET(DT_NODELABEL(rctl)));\n\tzassert_equal(stm32_reset_line_toggle_fake.arg1_history[0],\n\t\t      DT_RESETS_CELL(DT_NODELABEL(timers2), bits));\n\tzassert_equal(arm_core_mpu_disable_fake.call_count, 1);\n\tzassert_equal(sys_clock_disable_fake.call_count, 1);\n}\n```",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 1
       },
       "revId": "47f3745318854ad798811a456db47f67d5180af7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
