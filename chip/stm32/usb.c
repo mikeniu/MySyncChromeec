@@ -18,6 +18,9 @@
 #include "usb_api.h"
 #include "usb_descriptor.h"
 #include "usb_hw.h"
+#if defined(SECTION_IS_RO) && defined(USB_EP_BRIDGE)
+#include "usb_bridge.h"
+#endif
 #include "util.h"
 
 /* Console output macro */
@@ -173,23 +176,36 @@ void set_descriptor_patch(enum usb_desc_patch_type type, const void *address,
 
 void *memcpy_to_usbram_ep0_patch(const void *src, size_t n)
 {
+	uint8_t buf[EP0_MAX_PACKET_SIZE];
+	uintptr_t src_start = (uintptr_t)src;
+	uintptr_t src_end;
 	int i;
-	void *ret;
+	int b;
 
-	ret = memcpy_to_usbram((void *)usb_sram_addr(ep0_buf_tx), src, n);
+	if (n > sizeof(buf))
+		n = sizeof(buf);
+
+	src_end = src_start + n;
+	memcpy(buf, src, n);
 
 	for (i = 0; i < USB_DESC_PATCH_COUNT; i++) {
-		unsigned int offset = desc_patches[i].address - src;
+		uintptr_t patch_addr = (uintptr_t)desc_patches[i].address;
 
-		if (offset >= n)
+		if (!patch_addr)
 			continue;
 
-		memcpy_to_usbram((void *)(usb_sram_addr(ep0_buf_tx) + offset),
-				 &desc_patches[i].data,
-				 sizeof(desc_patches[i].data));
+		for (b = 0; b < 2; b++) {
+			uintptr_t byte_addr = patch_addr + b;
+
+			if (byte_addr >= src_start && byte_addr < src_end) {
+				buf[byte_addr - src_start] =
+					(desc_patches[i].data >> (8 * b)) &
+					0xff;
+			}
+		}
 	}
 
-	return ret;
+	return memcpy_to_usbram((void *)usb_sram_addr(ep0_buf_tx), buf, n);
 }
 
 static void ep0_send_descriptor(const uint8_t *desc, int len,
@@ -223,6 +239,16 @@ static void ep0_rx(void)
 	/* reset any incomplete descriptor transfer */
 	desc_ptr = NULL;
 	iface_next = USB_IFACE_COUNT;
+
+#if defined(SECTION_IS_RO) && defined(USB_EP_BRIDGE)
+	if (req == (USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_ENDPOINT |
+		    (USB_REQ_CLEAR_FEATURE << 8)) &&
+	    ep0_buf_rx[1] == 0 && (ep0_buf_rx[2] & 0x7f) == USB_EP_BRIDGE) {
+		if (usb_bridge_clear_halt(ep0_buf_rx[2] & 0xff) == 0)
+			return;
+		goto unknown_req;
+	}
+#endif
 
 	/* interface specific requests */
 	if ((req & USB_RECIP_MASK) == USB_RECIP_INTERFACE) {
@@ -389,7 +415,11 @@ static void ep0_tx(void)
 	if (desc_ptr) {
 		/* we have an on-going descriptor transfer */
 		int len = min(desc_left, EP0_MAX_PACKET_SIZE);
+#ifdef SECTION_IS_RO
+		memcpy_to_usbram_ep0_patch(desc_ptr, len);
+#else
 		memcpy_to_usbram(EP0_BUF_TX_SRAM_ADDR, desc_ptr, len);
+#endif
 		btable_ep[0].tx_count = len;
 		desc_left -= len;
 		desc_ptr += len;

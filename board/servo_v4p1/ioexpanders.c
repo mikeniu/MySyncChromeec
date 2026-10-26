@@ -8,6 +8,11 @@
 #include "i2c.h"
 #include "ioexpander.h"
 #include "ioexpanders.h"
+#if defined(SECTION_IS_RO) && defined(USB_EP_BRIDGE)
+#include "driver/ioexpander/tca64xxa.h"
+#include "timer.h"
+#include "usb_bridge.h"
+#endif
 
 #define CPRINTF(format, args...) cprintf(CC_SYSTEM, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
@@ -33,11 +38,52 @@ static enum servo_board_id board_id_val = BOARD_ID_UNSET;
 static int dut_chg_en_state;
 static int bc12_charger;
 
+#ifdef USB_EP_BRIDGE
+#define ATMEL_RESET_MIN_HOLD_MS 10
+#define ATMEL_RESET_MIN_HOLD_US (ATMEL_RESET_MIN_HOLD_MS * MSEC)
+
+static struct ioexpander_drv servo_v4p1_tca6416a_drv;
+static uint64_t atmel_reset_asserted_us;
+
+static int servo_v4p1_tca6416a_set_level(int ioex, int port, int mask, int val)
+{
+	bool is_atmel_reset = (ioex == 0 && port == 0 && (mask & BIT(1)));
+
+	if (is_atmel_reset && val) {
+		uint64_t now_us = get_time().val;
+
+		if (atmel_reset_asserted_us != 0 &&
+		    (now_us - atmel_reset_asserted_us) <
+			    ATMEL_RESET_MIN_HOLD_US)
+			crec_msleep(ATMEL_RESET_MIN_HOLD_MS);
+	}
+
+	int rv = tca64xxa_ioexpander_drv.set_level(ioex, port, mask, val);
+
+	if (rv == EC_SUCCESS && is_atmel_reset) {
+		if (!val)
+			atmel_reset_asserted_us = get_time().val;
+		usb_bridge_notify_atmel_reset(val);
+	}
+
+	return rv;
+}
+#endif
+
 /* Enable all ioexpander outputs. */
 int init_ioexpanders(void)
 {
 	int fault, irqs;
 	uint8_t dat[3];
+
+#ifdef USB_EP_BRIDGE
+	servo_v4p1_tca6416a_drv = tca64xxa_ioexpander_drv;
+	servo_v4p1_tca6416a_drv.set_level = servo_v4p1_tca6416a_set_level;
+	ioex_config[0].drv = &servo_v4p1_tca6416a_drv;
+	/* ATMEL_RESET_L is held low (GPIO_OUT_LOW) until atmel_reset_l(1) */
+	atmel_reset_asserted_us = get_time().val;
+	usb_bridge_notify_atmel_reset(0);
+#endif
 
 	/*
 	 * Due to shortages of the TI TCA6424 device, the NXP PCAL6524HE

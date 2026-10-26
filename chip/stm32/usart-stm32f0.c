@@ -174,5 +174,5 @@ static void usart3_4_interrupt(void)
 		usart_interrupt(configs[3]);
 }
 
-DECLARE_IRQ(STM32_IRQ_USART3_4, usart3_4_interrupt, 2);
+DECLARE_IRQ(STM32_IRQ_USART3_4, usart3_4_interrupt, 1);
 #endif

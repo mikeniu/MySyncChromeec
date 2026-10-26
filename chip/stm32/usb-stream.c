@@ -9,12 +9,23 @@
 #include "link_defs.h"
 #include "printf.h"
 #include "registers.h"
+#include "system.h"
 #include "task.h"
 #include "timer.h"
 #include "usart.h"
 #include "usb-stream.h"
 #include "usb_hw.h"
 #include "util.h"
+
+#ifndef EP_CTR_RX
+#define EP_CTR_RX BIT(15)
+#endif
+#ifndef EP_CTR_TX
+#define EP_CTR_TX BIT(7)
+#endif
+#ifndef EP_CTR_BOTH
+#define EP_CTR_BOTH (EP_CTR_RX | EP_CTR_TX)
+#endif
 
 static size_t rx_read(struct usb_stream_config const *config)
 {
@@ -135,28 +146,38 @@ void usb_stream_clear_tx(struct usb_stream_config const *config)
 	/* Remove any data in the queue for USB transmission. */
 	queue_advance_head(config->consumer.queue, (size_t)-1);
 	/* Revoke any data already in USB memory marked as ready for sending. */
-	STM32_TOGGLE_EP(config->endpoint, EP_TX_MASK, EP_TX_NAK, 0);
+	interrupt_disable();
+	STM32_TOGGLE_EP(config->endpoint, EP_TX_MASK, EP_TX_NAK, EP_CTR_BOTH);
+	interrupt_enable();
 }
 
 void usb_stream_deferred(struct usb_stream_config const *config)
 {
-	if (!tx_valid(config) && tx_write(config))
-		STM32_TOGGLE_EP(config->endpoint, EP_TX_MASK, EP_TX_VALID, 0);
+	if (!tx_valid(config) && tx_write(config)) {
+		interrupt_disable();
+		STM32_TOGGLE_EP(config->endpoint, EP_TX_MASK, EP_TX_VALID,
+				EP_CTR_BOTH);
+		interrupt_enable();
+	}
 
-	if (!rx_valid(config) && rx_read(config))
-		STM32_TOGGLE_EP(config->endpoint, EP_RX_MASK, EP_RX_VALID, 0);
+	if (!rx_valid(config) && rx_read(config)) {
+		interrupt_disable();
+		STM32_TOGGLE_EP(config->endpoint, EP_RX_MASK, EP_RX_VALID,
+				EP_CTR_BOTH);
+		interrupt_enable();
+	}
 }
 
 void usb_stream_tx(struct usb_stream_config const *config)
 {
-	STM32_TOGGLE_EP(config->endpoint, 0, 0, 0);
+	STM32_TOGGLE_EP(config->endpoint, 0, 0, EP_CTR_RX);
 
 	hook_call_deferred(config->deferred, 0);
 }
 
 void usb_stream_rx(struct usb_stream_config const *config)
 {
-	STM32_TOGGLE_EP(config->endpoint, 0, 0, 0);
+	STM32_TOGGLE_EP(config->endpoint, 0, 0, EP_CTR_TX);
 
 	hook_call_deferred(config->deferred, 0);
 }

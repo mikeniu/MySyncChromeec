@@ -29,5 +29,6 @@ board-ro+=fusb302b.o
 board-ro+=usb_sm.o
 board-ro+=usb_tc_snk_sm.o
 board-ro+=poweron_conf.o
+board-ro+=usb_bridge.o
 
 all_deps=$(patsubst ro,,$(def_all_deps))
