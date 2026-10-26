@@ -313,12 +313,13 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #ifndef CONFIG_ASSERT_TEST
 FUNC_NORETURN
 #endif
-__override void zassert_post_action(const char *path, unsigned int line)
+__override void zassert_fail(const char *cond, const char *file,
+			     unsigned int line, const char *fmt, ...)
 {
 	static bool in_assert;
 
 	/*
-	 * Upstream Zephyr calls zassert_post_action() with interrupts unlocked
+	 * Upstream Zephyr runs zassert_fail() with interrupts unlocked
 	 * because assertions can be configured as recoverable. On EC, asserts
 	 * are fatal, so lock interrupts immediately to prevent preemption and
 	 * force synchronous console/log output.
@@ -337,8 +338,30 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	}
 	in_assert = true;
 
-	/* Save assert panic data first before logging or stack walking. */
-	panic_data_write_assert(path, line);
+	/*
+	 * Save assert panic data first before printing, logging, or stack
+	 * walking.
+	 */
+	panic_data_write_assert(file, line);
+
+	if (cond != NULL && file != NULL) {
+		zassert_print("ASSERTION FAIL [%s] @ %s:%d\n", cond, file,
+			      line);
+	} else if (file != NULL) {
+		zassert_print("ASSERTION FAIL @ %s:%d\n", file, line);
+	} else {
+		zassert_print("ASSERTION FAIL\n");
+	}
+
+	if (fmt != NULL) {
+		va_list ap;
+
+		zassert_print("\t");
+		va_start(ap, fmt);
+		zassert_vprint(fmt, ap);
+		va_end(ap);
+		zassert_print("\n");
+	}
 
 	/*
 	 * Switch the logger to panic mode and flush queued log messages

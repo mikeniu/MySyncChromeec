@@ -7,10 +7,13 @@
 #include "task.h"
 
 #include <zephyr/fff.h>
+#include <zephyr/sys/printk-hooks.h>
 #include <zephyr/ztest.h>
 
 DECLARE_FAKE_VOID_FUNC(system_reset, int);
 DEFINE_FAKE_VOID_FUNC(system_reset, int);
+
+static printk_hook_fn_t orig_printk_hook;
 
 static void verify_assert_panic_data(int linenum)
 {
@@ -74,9 +77,36 @@ ZTEST(debug_assert, test_assert_recursive_post_action)
 	verify_assert_panic_data(linenum);
 }
 
+static int recursive_printk_hook(int c)
+{
+	/* Trigger a second assert while zassert_fail() is printing. */
+	if (system_reset_fake.call_count == 0) {
+		__ASSERT(false, "Second assert");
+	}
+	return c;
+}
+
+ZTEST(debug_assert, test_assert_recursive_print)
+{
+	int linenum;
+
+	orig_printk_hook = __printk_get_hook();
+	__printk_hook_install(recursive_printk_hook);
+
+	linenum = __LINE__ + 1;
+	__ASSERT(false, "First assert");
+
+	zassert_equal(system_reset_fake.call_count, 2);
+	verify_assert_panic_data(linenum);
+}
+
 static void reset(void *data)
 {
 	ARG_UNUSED(data);
+	if (orig_printk_hook != NULL) {
+		__printk_hook_install(orig_printk_hook);
+		orig_printk_hook = NULL;
+	}
 	system_reset_fake.custom_fake = NULL;
 	/* clear panic data */
 	memset(get_panic_data_write(), 0, sizeof(struct panic_data));
