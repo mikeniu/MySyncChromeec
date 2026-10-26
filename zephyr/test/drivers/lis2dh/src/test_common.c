@@ -24,6 +24,7 @@ static void lis2dh_before(void *state)
 	ARG_UNUSED(state);
 	lis2dh_emul_reset(emul);
 	acc->collection_rate = 0;
+	acc->flags &= ~MOTIONSENSE_FLAG_IN_SPOOF_MODE;
 }
 
 ZTEST_USER(lis2dh, test_init)
