@@ -211,17 +211,21 @@ enum ec_host_cmd_status port80_last_boot(struct ec_host_cmd_handler_args *args)
 static enum ec_host_cmd_status
 port80_command_read(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_port80_read *p = args->input_buf;
-	uint32_t offset = p->read_buffer.offset;
-	uint32_t entries = p->read_buffer.num_entries;
-	int i;
+	const struct ec_params_port80_read *p;
 	struct ec_response_port80_read *rsp = args->output_buf;
+	uint32_t offset;
+	uint32_t entries;
+	int i;
 
 	if (args->version == 0)
 		return port80_last_boot(args);
 
 	if (args->input_buf_size < sizeof(struct ec_params_port80_read))
 		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
+	p = args->input_buf;
+	offset = p->read_buffer.offset;
+	entries = p->read_buffer.num_entries;
 
 	if (p->subcmd == EC_PORT80_GET_INFO) {
 		if (args->output_buf_max < sizeof(rsp->get_info))
@@ -250,10 +254,8 @@ port80_command_read(struct ec_host_cmd_handler_args *args)
 
 	return EC_HOST_CMD_INVALID_PARAM;
 }
-EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_PORT80_READ, port80_command_read,
-			      EC_VER_MASK(0) | EC_VER_MASK(1),
-			      SMALLEST_TYPE(struct ec_response_port80_last_boot,
-					    struct ec_response_port80_read));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_PORT80_READ, port80_command_read,
+			    EC_VER_MASK(0) | EC_VER_MASK(1));
 
 static void port80_log_resume(void)
 {

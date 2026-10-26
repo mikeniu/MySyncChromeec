@@ -142,6 +142,38 @@ ZTEST(port80, test_port80_offset)
 }
 
 /**
+ * @brief TestPurpose: Verify port 80 read with truncated / zero-length
+ * parameters
+ *
+ * @details
+ * Validate that the EC_CMD_PORT80_READ v1 host command gracefully rejects
+ * truncated or zero-sized input parameters with EC_RES_REQUEST_TRUNCATED
+ * without out-of-bounds memory access.
+ */
+ZTEST(port80, test_port80_read_truncated)
+{
+	struct ec_response_port80_read response;
+	uint8_t truncated_buf[1] = { 0 };
+	struct host_cmd_handler_args args = {
+		.version = 1,
+		.command = EC_CMD_PORT80_READ,
+		.output_buf = &response,
+		.output_buf_max = sizeof(response),
+		.input_buf = truncated_buf,
+		.input_buf_size = 0,
+	};
+
+	zassert_equal(
+		host_command_process(&args), EC_RES_REQUEST_TRUNCATED,
+		"Zero-sized payload to v1 must return EC_RES_REQUEST_TRUNCATED");
+
+	args.input_buf_size = sizeof(struct ec_params_port80_read) - 1;
+	zassert_equal(
+		host_command_process(&args), EC_RES_REQUEST_TRUNCATED,
+		"Truncated payload to v1 must return EC_RES_REQUEST_TRUNCATED");
+}
+
+/**
  * @brief TestPurpose: Verify port 80 reset event
  *
  * @details
