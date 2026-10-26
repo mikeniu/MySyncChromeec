@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69f0cba9_3d828222",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T16:13:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality**: `MOCK(HWTIMER)` (`common/mock/hwtimer_mock.c`) implements the `__hw_clock_*()` hooks required by `common/timer.c` using an in-memory counter, `core/host/build.mk` conditionally excludes `core/host/timer.o` when `CONFIG_COMMON_TIMER` is enabled, `core/host/disabled.c` stubs `task_trigger_irq()`, and `test/timer` enables `CONFIG_COMMON_TIMER` and `MOCK(HWTIMER)` on `BOARD_HOST`.\n- **Architecture \u0026 Component Fit**: Registering `MOCK(HWTIMER)` in `common/mock/build.mk`, enabling it via `test/timer.mocklist`, and guarding `core/host/timer.o` with `$(call not_cfg,$(CONFIG_COMMON_TIMER))` in `core/host/build.mk` align cleanly with existing ChromiumOS EC build and mock conventions.\n- **Code Simplicity**: `common/mock/hwtimer_mock.c` uses minimal file-local `static uint32_t` state without unnecessary public headers or unused control flags.\n- **Idiomaticity \u0026 Readability**: C/C++ style, naming, types, and `#ifndef TEST_BUILD` guards follow ChromiumOS EC conventions with no magic numbers or unexplained literals.\n- **Security**: No security or memory-safety concerns introduced; mock code is guarded by `#ifndef TEST_BUILD`.\n- **Testing**: Enabling `CONFIG_COMMON_TIMER` and `MOCK(HWTIMER)` on `BOARD_HOST` allows `test/timer.cc` (`make run-timer`) to exercise `common/timer.c` on host, including `test_usleep_warning`.\n- **CL Size \u0026 Scope**: `Size: M (+68, -1)`. The change is a single, self-contained logical change enabling `common/timer.c` in host `test/timer` builds with a mock hardware timer.\n- **Commit Message**: Clearly states the problem (*Why*) and conceptual solution (*What*) in concise prose with `BUG\u003db:213342294` and `TEST\u003d` trailers.\n\n[[trajectory](https://goto.corp.google.com/traj/4b2c5215-fe21-4513-8b1e-1d22670c2419)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b37cb45228045f574b0cbfbb28b1deb826bd9b5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
