@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a037778d_e5584607",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:37:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comment on `zephyr/test/drivers/lsm6dso/src/main.c`.\n\n### Review Summary\n* **Functionality:** ✅ `set_range()` in `driver/accelgyro_lsm6dso.c` now properly returns `err` from `st_write_data_with_mask()` after unlocking `s-\u003emutex` instead of unconditionally returning `EC_SUCCESS`.\n* **Architecture \u0026 Component Fit:** ✅ Error handling and mutex unlocking in `set_range()` match `set_data_rate()` in the same file and `set_range()` in sibling ST sensor drivers.\n* **Code Simplicity:** ✅ The fix and test setup are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Uses existing register and range constants (`LSM6DSO_ACCEL_FS_ADDR`, `LSM6DSO_ACCEL_FS_MAX_VAL`, `I2C_COMMON_EMUL_NO_FAIL_REG`) cleanly.\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ In `test_set_range_write_error`, assert the exact deterministic error code returned when `i2c_common_emul_set_write_fail_reg()` fails (`zassert_equal(..., EC_ERROR_INVAL)`) rather than `zassert_not_equal(..., EC_SUCCESS)`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+18, -1)` — Single, atomic bug fix with its unit test.\n* **Commit Message:** ✅ Concise, accurate prose explaining the problem and fix with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/710abf15-252b-4723-bb0a-8c0fcb67a289)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ab90d15fa879a6ddc374ce7dabcdee87b32c35c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "771fc748_29ae3b83",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:37:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Assert the exact expected error code (`EC_ERROR_INVAL`) rather than `!\u003d EC_SUCCESS`. When `i2c_common_emul_set_write_fail_reg()` triggers a write failure (`-EIO`), `i2c_xfer_unlocked()` deterministically maps it to `EC_ERROR_INVAL`. Checking only `zassert_not_equal(..., EC_SUCCESS)` would pass even if `set_range()` returned an unexpected non-zero status instead of propagating the exact error from `st_write_data_with_mask()`:\n\n```c\n\tzassert_equal(acc-\u003edrv-\u003eset_range(acc, LSM6DSO_ACCEL_FS_MAX_VAL, 0),\n\t\t      EC_ERROR_INVAL);\n```\n\n[🔗](http://go/tj/710abf15-252b-4723-bb0a-8c0fcb67a289)",
+      "range": {
+        "startLine": 244,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ab90d15fa879a6ddc374ce7dabcdee87b32c35c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
