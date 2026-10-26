@@ -1454,7 +1454,6 @@ static enum ec_error_list raa489000_enable_linear_charge(int chgnum,
 	const struct battery_info *batt_info;
 	int trickle_regval;
 	int precharge_current;
-	int regval;
 	enum ec_error_list rv;
 	int act_chg = charge_get_active_chg_chip();
 
@@ -1489,12 +1488,11 @@ static enum ec_error_list raa489000_enable_linear_charge(int chgnum,
 		precharge_current = max(64, batt_info->precharge_current);
 		trickle_regval = precharge_current / 32;
 		trickle_regval--; /* convert to 0-based field */
-		rv |= raw_read16(CHARGER_PRIMARY, ISL923X_REG_CONTROL2,
-				 &regval);
-		regval &= ~(GENMASK(15, 13));
-		regval |= trickle_regval << 13;
-		rv |= raw_write16(CHARGER_PRIMARY, ISL923X_REG_CONTROL2,
-				  regval);
+		rv |= i2c_field_update16(
+			chg_chips[CHARGER_PRIMARY].i2c_port,
+			chg_chips[CHARGER_PRIMARY].i2c_addr_flags,
+			ISL923X_REG_CONTROL2, GENMASK(15, 13),
+			trickle_regval << 13);
 
 		/* Enable DVC trickle charge and DVC charge mode. */
 		rv |= raw_update16(
