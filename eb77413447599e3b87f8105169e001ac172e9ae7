@@ -18,6 +18,42 @@
       "isAi": true,
       "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff78503b_48690fbd",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:53:52Z",
+      "side": 1,
+      "message": "Nit (optional): Consider adding a brief comment explaining why `log_output` uses a 1-byte `raw_char` buffer alongside `line_ctx.buf`, e.g.:\n```c\n\t/*\n\t * log_output.c ignores .buf in CONFIG_LOG_MODE_IMMEDIATE (calling\n\t * char_out 1 byte at a time), but requires .size \u003e\u003d 1 in\n\t * CONFIG_LOG_MODE_DEFERRED. Using a 1-byte buffer here unifies both\n\t * modes into char_out() -\u003e line_ctx.buf.\n\t */\n\tuint8_t raw_char;\n```",
+      "isAi": true,
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a810955_d3ac714d",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:53:52Z",
+      "side": 1,
+      "message": "Nit (optional): Since this backend only supports `LOG_OUTPUT_TEXT` (`.format_set \u003d NULL`) and selects `CONFIG_LOG_OUTPUT`, this can call `log_output_msg_process(\u0026log_output, \u0026msg-\u003elog, flags);` directly instead of looking it up at runtime via `log_format_func_t_get(LOG_OUTPUT_TEXT)` (similar to upstream `shell_log_backend.c`):\n```c\n\tline_ctx.len \u003d 0;\n\tlog_output_msg_process(\u0026log_output, \u0026msg-\u003elog, flags);\n\tflush_line_buf(\u0026line_ctx);\n```",
+      "isAi": true,
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
