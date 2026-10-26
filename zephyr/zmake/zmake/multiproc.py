@@ -53,15 +53,21 @@ class LogWriter:
     _log_job_names = False
 
     @classmethod
-    def reset(cls):
+    def reset(cls) -> None:
         """Reset this module to its starting state (useful for tests)"""
         with LogWriter._logging_cv:
             LogWriter._logging_map.clear()
+            cls._log_job_names = False
             if len(LogWriter._logging_interrupt_pipe) > 1:
                 os.write(LogWriter._logging_interrupt_pipe[1], b"x")
             else:
                 cls._logging_interrupt_pipe = os.pipe()
-            LogWriter._logging_thread = None
+                os.set_blocking(cls._logging_interrupt_pipe[0], False)
+            if (
+                LogWriter._logging_thread is not None
+                and not LogWriter._logging_thread.is_alive()
+            ):
+                LogWriter._logging_thread = None
             LogWriter._logging_cv.notify_all()
 
     @classmethod
@@ -137,7 +143,18 @@ class LogWriter:
             self._tee_output = None
 
     @classmethod
-    def _log_fd(cls, file_descriptor: io.TextIOBase):
+    def _is_fd_closed(cls, file_descriptor: io.TextIOBase) -> bool:
+        """Check whether a file descriptor or its underlying OS fd is closed."""
+        try:
+            if file_descriptor.closed:
+                return True
+            os.fstat(file_descriptor.fileno())
+            return False
+        except (ValueError, OSError):
+            return True
+
+    @classmethod
+    def _log_fd(cls, file_descriptor: io.TextIOBase) -> None:
         """Log information from a single file descriptor.
 
         This function is BLOCKING. It will read from the given file descriptor until
@@ -150,11 +167,14 @@ class LogWriter:
         with LogWriter._logging_cv:
             if file_descriptor in LogWriter._logging_map:
                 writer = LogWriter._logging_map[file_descriptor]
-                if file_descriptor.closed:
+                if cls._is_fd_closed(file_descriptor):
                     del LogWriter._logging_map[file_descriptor]
                     LogWriter._logging_cv.notify_all()
                     return
-                line = file_descriptor.readline()
+                try:
+                    line = file_descriptor.readline()
+                except (ValueError, OSError):
+                    line = ""
                 if not line:
                     # EOF
                     del LogWriter._logging_map[file_descriptor]
@@ -165,7 +185,7 @@ class LogWriter:
                     writer.log_line(line)
 
     @classmethod
-    def _prune_logging_fds(cls):
+    def _prune_logging_fds(cls) -> None:
         """Prune the current file descriptors under _logging_map.
 
         This function will iterate over the logging map and check for closed file
@@ -175,7 +195,7 @@ class LogWriter:
             remove = [
                 file_descriptor
                 for file_descriptor in LogWriter._logging_map
-                if file_descriptor.closed
+                if cls._is_fd_closed(file_descriptor)
             ]
             for file_descriptor in remove:
                 del LogWriter._logging_map[file_descriptor]
@@ -183,7 +203,7 @@ class LogWriter:
                 LogWriter._logging_cv.notify_all()
 
     @classmethod
-    def _logging_loop(cls):
+    def _logging_loop(cls) -> None:
         """The primary logging thread loop.
 
         This is the entry point of the logging thread. It will listen for (1) any
@@ -199,7 +219,7 @@ class LogWriter:
                 keys.append(LogWriter._logging_interrupt_pipe[0])
             try:
                 fds, _, _ = select.select(keys, [], [])
-            except ValueError:
+            except (ValueError, OSError):
                 # One of the file descriptors must be closed, prune them and try
                 # again.
                 LogWriter._prune_logging_fds()
@@ -210,7 +230,10 @@ class LogWriter:
                 # file descriptor set has changed. We just need to read the byte and
                 # remove this descriptor from the list. If we actually have data
                 # that should be read it will be read in the for loop below.
-                os.read(LogWriter._logging_interrupt_pipe[0], 1)
+                try:
+                    os.read(LogWriter._logging_interrupt_pipe[0], 1024)
+                except BlockingIOError:
+                    pass
                 fds.remove(LogWriter._logging_interrupt_pipe[0])
             for file in fds:
                 LogWriter._log_fd(file)
@@ -239,6 +262,9 @@ class LogWriter:
             LogWriter object for the resulting output
         """
         with LogWriter._logging_cv:
+            if len(cls._logging_interrupt_pipe) < 2:
+                cls._logging_interrupt_pipe = os.pipe()
+                os.set_blocking(cls._logging_interrupt_pipe[0], False)
             if (
                 LogWriter._logging_thread is None
                 or not LogWriter._logging_thread.is_alive()

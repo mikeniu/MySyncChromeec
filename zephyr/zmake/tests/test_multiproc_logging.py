@@ -4,17 +4,28 @@
 
 """Tests for zmake multiproc logging code."""
 
+from collections.abc import Iterator
 import io
 import logging
 import os
 import threading
 from unittest import mock
 
+import pytest
+
 # pylint:disable=import-error
 import zmake.multiproc
 
 
-def test_read_output_from_pipe():
+@pytest.fixture(autouse=True)
+def reset_log_writer() -> Iterator[None]:
+    """Reset LogWriter state before and after each test."""
+    zmake.multiproc.LogWriter.reset()
+    yield
+    zmake.multiproc.LogWriter.reset()
+
+
+def test_read_output_from_pipe() -> None:
     """Test reading output from a pipe."""
     semaphore = threading.Semaphore(0)
     pipe = os.pipe()
@@ -25,11 +36,13 @@ def test_read_output_from_pipe():
         logger, logging.DEBUG, file_desc, job_id=""
     )
     os.write(pipe[1], "Hello\n".encode("utf-8"))
-    semaphore.acquire()  # pylint: disable=consider-using-with
+    assert semaphore.acquire(timeout=10)  # pylint: disable=consider-using-with
     logger.log.assert_called_with(logging.DEBUG, "Hello")
+    os.close(pipe[1])
+    file_desc.close()
 
 
-def test_read_output_change_log_level():
+def test_read_output_change_log_level() -> None:
     """Test changing the log level."""
     semaphore = threading.Semaphore(0)
     pipe = os.pipe()
@@ -49,11 +62,11 @@ def test_read_output_change_log_level():
         job_id="",
     )
     os.write(pipe[1], "Hello\n".encode("utf-8"))
-    semaphore.acquire()  # pylint: disable=consider-using-with
+    assert semaphore.acquire(timeout=10)  # pylint: disable=consider-using-with
     os.write(pipe[1], "World\n".encode("utf-8"))
-    semaphore.acquire()  # pylint: disable=consider-using-with
+    assert semaphore.acquire(timeout=10)  # pylint: disable=consider-using-with
     os.write(pipe[1], "Bye\n".encode("utf-8"))
-    semaphore.acquire()  # pylint: disable=consider-using-with
+    assert semaphore.acquire(timeout=10)  # pylint: disable=consider-using-with
     logger.log.assert_has_calls(
         [
             mock.call(logging.DEBUG, "Hello"),
@@ -61,9 +74,11 @@ def test_read_output_change_log_level():
             mock.call(logging.CRITICAL, "Bye"),
         ]
     )
+    os.close(pipe[1])
+    file_desc.close()
 
 
-def test_read_output_from_second_pipe():
+def test_read_output_from_second_pipe() -> None:
     """Test that we can read from more than one pipe.
 
     This is particularly important since we will block on a read/select once we
@@ -90,11 +105,14 @@ def test_read_output_from_second_pipe():
     )
 
     os.write(pipes[1][1], "Hello\n".encode("utf-8"))
-    semaphore.acquire()  # pylint: disable=consider-using-with
+    assert semaphore.acquire(timeout=10)  # pylint: disable=consider-using-with
     logger.log.assert_called_with(logging.ERROR, "[%s] %s", "1", "Hello")
+    for pipe, file_desc in zip(pipes, fds):
+        os.close(pipe[1])
+        file_desc.close()
 
 
-def test_read_output_after_another_pipe_closed():
+def test_read_output_after_another_pipe_closed() -> None:
     """Test processing output from a pipe after closing another.
 
     Since we don't want to complicate the API. File descriptors are
@@ -122,5 +140,8 @@ def test_read_output_after_another_pipe_closed():
 
     fds[0].close()
     os.write(pipes[1][1], "Hello\n".encode("utf-8"))
-    semaphore.acquire()  # pylint: disable=consider-using-with
+    assert semaphore.acquire(timeout=10)  # pylint: disable=consider-using-with
     logger.log.assert_called_with(logging.ERROR, "[%s] %s", "1", "Hello")
+    os.close(pipes[0][1])
+    os.close(pipes[1][1])
+    fds[1].close()
