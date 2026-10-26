@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e03c54a_53ac88f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T21:08:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality**: ✅ Pre-validating `rate` before locking `s-\u003emutex` and placing the FIFO into bypass mode prevents permanent mutex lockup and FIFO stoppage on rejected rates, rejects negative and sub-minimum (`!rnd`) rates, avoids shift overflow on large rates, and unifies the register write path while restarting the FIFO in stream mode only when `rate \u003e 0`.\n- **Architecture \u0026 Component Fit**: ✅ Validating ODR parameters before acquiring the sensor mutex or mutating hardware FIFO state matches the ChromiumOS EC motion sensor driver contract.\n- **Code Simplicity**: ✅ Unifying the `rate \u003d\u003d 0` and `rate \u003e 0` register write paths and removing the unreachable post-normalization bounds check keeps `set_data_rate()` linear and minimal.\n- **Idiomaticity \u0026 Readability**: ✅ Follows Zephyr and ChromiumOS EC C idioms cleanly and reuses existing driver constants.\n- **Security**: ✅ Prevents signed bit-shift overflow in `LIS2DH_ODR_TO_REG()` / `LIS2DH_ODR_TO_NORMALIZE()` and task deadlock on out-of-range ODR inputs.\n- **Testing**: ✅ `test_lis2dh__set_data_rate` thoroughly covers negative, above-maximum (`LIS2DH_ODR_MAX_VAL + 1`, `INT_MAX`), and sub-minimum (`1`, `LIS2DH_ODR_MIN_VAL - 1` with `rnd \u003d 0`) rates, exact boundaries (`0`, `LIS2DH_ODR_MIN_VAL`, `LIS2DH_ODR_MAX_VAL`), rounding up and down (`rnd \u003d 1` and `rnd \u003d 0`), mutex lock count, ODR preservation, and FIFO state both on rejected rates and power-off (`rate \u003d\u003d 0`).\n- **CL Size \u0026 Scope**: ✅ `Size: M (+70, -27)` — Single cohesive bug fix in `driver/accel_lis2dh.c` (+17, -25 lines) paired with its unit tests in `zephyr/test/drivers/lis2dh/src/test_common.c` (+53, -2 lines).\n- **Commit Message**: ✅ Clear, concise 3-paragraph prose description explaining the problem, solution, and boundary behavior changes with `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/1c685a80-6519-4890-84b2-c9809ebc541f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "063c3e4d4d810208fb3c5ea2481d2ba69b52a60a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
