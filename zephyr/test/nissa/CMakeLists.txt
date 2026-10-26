@@ -171,7 +171,7 @@ if(CONFIG_TEST_NISSA_CRAASK)
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/charger.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/form_factor.c
-	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/kb_backlight.c
+	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/kb_backlight.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/keyboard.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/led.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/thermal.c
@@ -223,7 +223,7 @@ if(CONFIG_TEST_NISSA_ULDREN)
 	    src/uldren.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/uldren/src/charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/uldren/src/form_factor.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/uldren/src/kb_backlight.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/kb_backlight.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/uldren/src/mp2964_update.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/uldren/src/sensor.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/uldren/src/sub_board.c

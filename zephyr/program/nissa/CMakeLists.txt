@@ -48,7 +48,7 @@ if(DEFINED CONFIG_BOARD_CRAASK)
 			"src/fan.c"
 			"craask/src/form_factor.c"
 			"craask/src/keyboard.c"
-			"craask/src/kb_backlight.c"
+			"src/kb_backlight.c"
 			"craask/src/led.c"
 			"craask/src/thermal.c"
 			"craask/src/touch_panel.c"
@@ -132,7 +132,7 @@ if(DEFINED CONFIG_BOARD_ULDREN)
 	project(uldren)
 	zephyr_library_sources(
 			"uldren/src/form_factor.c"
-			"uldren/src/kb_backlight.c"
+			"src/kb_backlight.c"
 			"uldren/src/sub_board.c"
 			"uldren/src/mp2964_update.c"
 			"uldren/src/sensor.c"
@@ -225,7 +225,7 @@ if(DEFINED CONFIG_BOARD_GLASSWAY)
 	project(glassway)
 	zephyr_library_sources(
 			"glassway/src/sub_board.c"
-			"glassway/src/kb_backlight.c"
+			"src/glassway_kb_backlight.c"
 			"glassway/src/board.c"
 			"glassway/src/usb_mux_config.c"
 			"glassway/src/keyboard.c"
@@ -355,7 +355,7 @@ if(DEFINED CONFIG_BOARD_GUREN)
 	project(guren)
 	zephyr_library_sources(
 			"guren/src/sub_board.c"
-			"guren/src/kb_backlight.c"
+			"src/glassway_kb_backlight.c"
 			"guren/src/board.c"
 			"guren/src/usb_mux_config.c"
 			"guren/src/keyboard.c"
