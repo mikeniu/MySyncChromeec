@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34b12338_9e51d8ea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "0f5aed73_2c09c499",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0569b220_981441ec",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline issues (in particular, wiring `CONFIG_LINK_TEST_SUITE_LSM6DSO` into `Kconfig` and `testcase.yaml`, ensuring state transitions before assertions in the new tests, and splitting out the unrelated emulator FIFO read change).\n\n### Review Summary\n* **Functionality**: The fixes in `driver/accelgyro_lsm6dso.c` (`accelgyro_config_fifo()` using `LSM6DSO_DIS_BIT` when `data-\u003ebase.odr \u003d\u003d 0` instead of invoking `LSM6DSO_ODR_TO_REG(0)`, and `set_data_rate()` propagating the return value of `accelgyro_config_fifo(s)`) are sound. However, the new test suite in `zephyr/test/drivers/lsm6dso` is never built or executed because `CONFIG_LINK_TEST_SUITE_LSM6DSO` is missing from `zephyr/test/drivers/Kconfig` and `drivers.lsm6dso` is missing from `zephyr/test/drivers/testcase.yaml`.\n* **Architecture \u0026 Component Fit**: The new test directory structure mirrors `zephyr/test/drivers/lsm6dsm`, and adding an emulator fault-injection helper in `zephyr/include/emul/emul_lsm6dso.h` fits the existing Zephyr driver test architecture.\n* **Code Simplicity**: Remove the unused `#include \u003czephyr/drivers/gpio.h\u003e` in `zephyr/test/drivers/lsm6dso/src/main.c`.\n* **Idiomaticity \u0026 Readability**:\n  * Replace the reserved double-underscore include guard `__EMUL_LSM6DSO_H` in `zephyr/include/emul/emul_lsm6dso.h` with `PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSO_H_`.\n  * Replace raw magic literals (`0x78` in `zephyr/emul/emul_lsm6dso.c`, `13000` and `0` in `zephyr/test/drivers/lsm6dso/src/main.c`) with the existing named constants (`LSM6DSO_FIFO_DATA_ADDR_TAG`, `LSM6DSO_ODR_MIN_VAL`, `LSM6DSO_DIS_BIT`).\n* **Security**: N/A — No untrusted inputs, credentials, or sensitive data paths are modified.\n* **Testing**:\n  * Register `LINK_TEST_SUITE_LSM6DSO` in `zephyr/test/drivers/Kconfig` and `drivers.lsm6dso` in `zephyr/test/drivers/testcase.yaml`.\n  * In `test_accelgyro_config_fifo_power_off`, configure a non-zero ODR and verify non-zero `LSM6DSO_FIFO_CTRL3_ADDR` bits before powering off, and test both `ACC_SENSOR_ID` and `GYR_SENSOR_ID` (`LSM6DSO_FIFO_ODR_MASK(s)` branches on sensor type).\n  * In `test_set_data_rate_fifo_error`, ensure `LSM6DSO_FIFO_CTRL3_ADDR` starts from a different value (`0`) before calling `set_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 1)` so `st_write_data_with_mask()` does not short-circuit on `new_data \u003d\u003d old_data`, and also cover `LSM6DSO_FIFO_CTRL4_ADDR` write failure.\n* **CL Size \u0026 Scope**: `Size: M (+239, -2)`. This CL bundles three independent logical changes and should be split into focused CLs:\n  1. **CL 1 (`driver/accelgyro_lsm6dso.c`, `zephyr/test/drivers/CMakeLists.txt`, `zephyr/test/drivers/Kconfig`, `zephyr/test/drivers/testcase.yaml`, `zephyr/test/drivers/lsm6dso/*`)**: Fix `accelgyro_config_fifo()` to write `LSM6DSO_DIS_BIT` when `data-\u003ebase.odr \u003d\u003d 0` and add the `drivers.lsm6dso` unit test suite (`test_accelgyro_config_fifo_power_off`).\n  2. **CL 2 (`driver/accelgyro_lsm6dso.c`, `zephyr/emul/emul_lsm6dso.c`, `zephyr/include/emul/emul_lsm6dso.h`, `zephyr/test/drivers/lsm6dso/src/main.c`)**: Propagate the return value of `accelgyro_config_fifo()` in `set_data_rate()`, add `lsm6dso_emul_set_write_fail_reg()`, and add `test_set_data_rate_fifo_error`.\n  3. **CL 3 (`zephyr/emul/emul_lsm6dso.c`, `zephyr/test/drivers/lsm6dso/src/main.c`)**: Decrement the unread FIFO sample count in `LSM6DSO_FIFO_STS1_ADDR`/`LSM6DSO_FIFO_STS2_ADDR` when reading `LSM6DSO_FIFO_DATA_ADDR_TAG` in `lsm6dso_emul_transfer_i2c()`, along with a unit test exercising FIFO reads.\n* **Commit Message**: See inline comment on `/COMMIT_MSG` to avoid joining independent actions with `\" and \"` in the subject, avoid narrating C expressions, and update `TEST\u003d` to `-s drivers.lsm6dso`.\n\n[🔗](http://go/tj/692e539d-70a2-4e12-81e8-26af5690dda6)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7400f76_3aa084dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "0569b220_981441ec",
       "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd279bd0_d4c48867",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "1dc1bdd7_ab96e677",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 9999
+      },
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3450ff26_d4f4e4d2",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "845b60aa_d0177465",
+        "filename": "zephyr/include/emul/emul_lsm6dso.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "3450ff26_d4f4e4d2",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
       "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91c587d8_5b30eeb6",
+        "filename": "zephyr/test/drivers/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "84305a5c_ce08a7cc",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0dafdbc0_6e8e77d4",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d65bbbdd_1f817de3",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "0dafdbc0_6e8e77d4",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
       "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -170,6 +308,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eafbb2cf_d802b99e",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "5e3244c7_42265c7c",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34c29ab0_a3da5418",
@@ -191,6 +353,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a49727d_658a200d",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:27Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "34c29ab0_a3da5418",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 9999
+      },
       "revId": "cd7b59b01fc3f7c66bbf6500559c548c5029572d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
