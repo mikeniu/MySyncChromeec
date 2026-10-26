@@ -603,6 +603,10 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #undef CONFIG_USB_PD_HOST_CMD
 #endif
 
+#if defined(TEST_TIMER) && defined(BOARD_HOST)
+#define CONFIG_COMMON_TIMER
+#endif
+
 #ifdef TEST_RTC
 #define CONFIG_HOSTCMD_RTC
 #endif
