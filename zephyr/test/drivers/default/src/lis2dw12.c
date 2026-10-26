@@ -45,6 +45,7 @@ static inline void lis2dw12_setup(void)
 	struct motion_sensor_t *ms = &motion_sensors[LIS2DW12_SENSOR_ID];
 
 	ms->current_range = 0;
+	ms->flags &= ~MOTIONSENSE_FLAG_IN_SPOOF_MODE;
 }
 
 static void lis2dw12_before(void *state)
@@ -576,4 +577,19 @@ ZTEST(lis2dw12, test_lis2dw12_irq_handler_errors)
 	i2c_common_emul_set_read_fail_reg(common_data,
 					  LIS2DW12_OUT_X_L_ADDR | BIT(7));
 	zassert_equal(lis2dw12_run_fifo_irq(2, fake_sample), EC_ERROR_INVAL);
+}
+
+ZTEST(lis2dw12, test_lis2dw12_irq_handler_fifo_spoof_mode)
+{
+	struct motion_sensor_t *ms = &motion_sensors[LIS2DW12_SENSOR_ID];
+	intv3_t fake_sample = { 10, -20, 30 };
+	const intv3_t spoof_sample = { 100, -200, 300 };
+
+	ms->flags |= MOTIONSENSE_FLAG_IN_SPOOF_MODE;
+	memcpy(ms->spoof_xyz, spoof_sample, sizeof(spoof_sample));
+
+	zassert_ok(lis2dw12_run_fifo_irq(2, fake_sample));
+
+	CHECK_XYZ_EQUALS(ms->spoof_xyz, spoof_sample);
+	zassert_equal(lis2dw12_check_fifo_frames(spoof_sample), 2);
 }
