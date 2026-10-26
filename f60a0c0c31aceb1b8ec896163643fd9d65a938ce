@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed513ffd_4353d446",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T19:29:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n* **Functionality**: Correctly restores the `EC_CMD_GET_PROTOCOL_INFO` host command handler (`spi_get_protocol_info`) on non-FPMCU STM32 boards with `CONFIG_SPI` enabled (`kukui` family, `elm`, `nucleo-f412zg`, `nucleo-h743zi`), while preserving runtime `TRANSPORT_SEL` detection (`UART` vs `SPI`) on `CONFIG_FINGERPRINT_MCU` boards.\n* **Architecture \u0026 Component Fit**: Fits the existing `chip/stm32` build and host command dispatch model (`$(or $(CONFIG_FINGERPRINT_MCU),$(CONFIG_SPI))` in `chip/stm32/build.mk` alongside `#ifndef CONFIG_I2C_PERIPHERAL` in `chip/stm32/host_command_common.c`).\n* **Code Simplicity**: Minor optional suggestion on `chip/stm32/host_command_common.c` to use early returns and deduplicate the `IS_ENABLED(CONFIG_SPI)` / `spi_get_protocol_info(args)` path.\n* **Idiomaticity \u0026 Readability**: Consistent with ChromiumOS EC C conventions (`IS_ENABLED(...)` compile-time config checks and kernel-style formatting).\n* **Security**: No security or memory-safety concerns identified.\n* **Testing**: Verified via board builds across affected STM32 targets and on-device protocol v3 verification (`ectool protoinfo`) on `kakadu`.\n* **CL Size \u0026 Scope**: Focused, single-purpose cherry-pick (`+16, -13`).\n* **Commit Message**: Clear and thorough explanation of the regression history, impact on kernel protocol v3/v2 probing, and fix. [[trajectory](https://goto.corp.google.com/traj/79b97f82-80df-4199-9b51-c2b7b91d1261)] [🔗](http://go/tj/79b97f82-80df-4199-9b51-c2b7b91d1261)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f60a0c0c31aceb1b8ec896163643fd9d65a938ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6eb400a3_9e8c032f",
+        "filename": "chip/stm32/host_command_common.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T19:29:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Optional (Code Simplicity)**: Both the `CONFIG_FINGERPRINT_MCU` and non-`CONFIG_FINGERPRINT_MCU` branches duplicate the `IS_ENABLED(CONFIG_SPI)` check and `spi_get_protocol_info(args)` call, and accumulate the result in a mutable `ret_status` variable.\n\nUsing early returns inside the `CONFIG_FINGERPRINT_MCU` block allows both paths to share a single `IS_ENABLED(CONFIG_SPI)` check and eliminates the `ret_status` local variable (since this is a cherry-pick to a release branch, feel free to keep the cherry-pick identical to the upstream commit and consider this on `main`):\n\n```c\nstatic enum ec_status\nhost_command_protocol_info(struct host_cmd_handler_args *args)\n{\n\tif (IS_ENABLED(CONFIG_FINGERPRINT_MCU)) {\n\t\t/*\n\t\t * Read transport type from TRANSPORT_SEL bootstrap pin the\n\t\t * first time this function is called.\n\t\t */\n\t\tif (curr_transport_type \u003d\u003d FP_TRANSPORT_TYPE_UNKNOWN)\n\t\t\tcurr_transport_type \u003d get_fp_transport_type();\n\n\t\tif (IS_ENABLED(CONFIG_USART_HOST_COMMAND) \u0026\u0026\n\t\t    curr_transport_type \u003d\u003d FP_TRANSPORT_TYPE_UART)\n\t\t\treturn usart_get_protocol_info(args);\n\n\t\tif (curr_transport_type !\u003d FP_TRANSPORT_TYPE_SPI)\n\t\t\treturn EC_RES_INVALID_COMMAND;\n\t}\n\n\tif (IS_ENABLED(CONFIG_SPI))\n\t\treturn spi_get_protocol_info(args);\n\n\treturn EC_RES_INVALID_COMMAND;\n}\n```\n\n[🔗](http://go/tj/79b97f82-80df-4199-9b51-c2b7b91d1261)",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f60a0c0c31aceb1b8ec896163643fd9d65a938ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
