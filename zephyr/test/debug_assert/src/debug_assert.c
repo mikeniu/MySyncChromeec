@@ -6,7 +6,10 @@
 #include "panic.h"
 #include "task.h"
 
+#include <stdarg.h>
+
 #include <zephyr/fff.h>
+#include <zephyr/sys/zassert.h>
 #include <zephyr/ztest.h>
 
 DECLARE_FAKE_VOID_FUNC(system_reset, int);
@@ -45,6 +48,21 @@ ZTEST(debug_assert, test_assert_true)
 
 	zassert_equal(system_reset_fake.call_count, 0);
 	zassert_is_null(panic_get_data());
+}
+
+static void test_zassert_vprint_helper(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	zassert_vprint(fmt, ap);
+	va_end(ap);
+}
+
+ZTEST(debug_assert, test_zassert_vprint)
+{
+	zassert_print("Testing zassert_print: %d\n", 123);
+	test_zassert_vprint_helper("Testing zassert_vprint: %s\n", "ok");
 }
 
 static void reset(void *data)

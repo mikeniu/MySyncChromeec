@@ -11,6 +11,7 @@
 #include "panic_utils.h"
 #include "system.h"
 #include "task.h"
+#include "uart.h"
 
 #include <zephyr/arch/cpu.h>
 #include <zephyr/cache.h>
@@ -19,6 +20,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
+#include <zephyr/sys/printk.h>
 
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
@@ -310,6 +312,15 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #endif /* CONFIG_ZTEST_FATAL_HOOK */
 
 #ifdef CONFIG_PLATFORM_EC_DEBUG_ASSERT
+void zassert_vprint(const char *fmt, va_list ap)
+{
+	unsigned int key = irq_lock();
+
+	uart_tx_flush();
+	vprintk_unlocked(fmt, ap);
+	irq_unlock(key);
+}
+
 #ifndef CONFIG_ASSERT_TEST
 FUNC_NORETURN
 #endif
