@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4513113f_b9e029cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T20:22:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality:** ✅ Clamping requested accelerometer ranges to `[LSM6DSO_ACCEL_FS_MIN_VAL, LSM6DSO_ACCEL_FS_MAX_VAL]`, normalizing to the floor power of two via `LSM6DSO_ACCEL_NORMALIZE_FS()`, and doubling when `rnd \u0026\u0026 (range \u003e newrange)` properly handles sub-minimum, non-power-of-two, and above-maximum requests and stores the normalized range in `s-\u003ecurrent_range`.\n- **Architecture \u0026 Component Fit:** ✅ Defining `LSM6DSO_ACCEL_FS_MIN_VAL` in `driver/accelgyro_lsm6dso.h` and clamping in `set_range()` aligns with the driver\u0027s existing full-scale macros and `set_data_rate()` normalization flow.\n- **Code Simplicity:** ✅ The normalization and round-up logic in `set_range()` is minimal and linear, and `test_set_range` uses a clean table-driven structure.\n- **Idiomaticity \u0026 Readability:** ✅ Uses the standard `clamp()` and `ARRAY_SIZE()` macros and derives test boundary inputs from `LSM6DSO_ACCEL_FS_MIN_VAL` and `LSM6DSO_ACCEL_FS_MAX_VAL`.\n- **Security:** ✅ Prevents passing zero or negative values to `__fls()` (`__builtin_clz()`).\n- **Testing:** ✅ `test_set_range` covers negative/zero/sub-minimum clamping, exact power-of-two values (`2`, `4`, `8`, `16`) with `rnd \u003d 1`, non-power-of-two rounding down (`rnd \u003d 0`) and up (`rnd \u003d 1`), above-maximum clamping, and restoring `acc-\u003ecurrent_range`.\n- **CL Size \u0026 Scope:** ✅ `Size: M (+47, -5)` (8 lines production diff, 44 lines unit test diff) representing a single, focused logical fix and its unit test.\n- **Commit Message:** ✅ Clear problem statement and summary of changes with accurate `BUG\u003d` and `TEST\u003d` footers. [[trajectory](https://goto.corp.google.com/traj/f6847860-cf5f-4224-abd9-7251ec8b09c8)] [🔗](http://go/tj/f6847860-cf5f-4224-abd9-7251ec8b09c8)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b4b2d2565745605950c42ab170b1c790c6235048",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
