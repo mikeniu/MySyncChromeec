@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "554939aa_19ad85d0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:40Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "546958ba_1e084b49",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "baa96fbe_eb5c8c7e",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** — See inline comments for details.\n\n### Review Summary\n\n* **Functionality:** ✅ The fixes in `lis2dh_load_fifo()` (`driver/accel_lis2dh.c`) accurately resolve both the premature chunk-loop termination / `read_count` reset across chunks and the spoof-mode buffer overwrite on sample 1+.\n* **Architecture \u0026 Component Fit:** ✅ Moving `int *axis \u003d s-\u003eraw_xyz;` into the per-sample loop and `left -\u003d length;` to the outer chunk loop aligns `lis2dh_load_fifo()` with `lis2dw12_load_fifo()` in `driver/accel_lis2dw12.c`.\n* **Code Simplicity:** ✅ The production changes are minimal and declare `axis` in the narrowest lexical scope where it is used.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions and reuses existing driver constants (`FIFO_READ_LEN`, `OUT_XYZ_SIZE`, `LIS2DH_RESOLUTION`).\n* **Security:** ✅ No security vulnerabilities introduced.\n* **Testing:** ❌ `test_lis2dh__samples_fifo_read_long` in `zephyr/test/drivers/lis2dh/src/test_interrupt.c` currently passes even if both multi-chunk fixes in `lis2dh_load_fifo()` (`left -\u003d length;` and `int read_count \u003d 0;`) are reverted, because `acc-\u003ecollection_rate` is `0` (leaving `read_count` timestamp calculation untested) and `lis2dh_irq_handler()` silently re-polls `LIS2DH_FIFO_SRC_ADDR` if `lis2dh_load_fifo()` exits after the first chunk. Additionally, `test_lis2dh__samples_fifo_read_spoof` should assert that `acc-\u003eraw_xyz` is still updated with the normalized raw sample. See inline comments for ready-to-use test snippets.\n* **CL Size \u0026 Scope:** ❌ `Size: S (+20, -14)`. While the line delta is small, this CL bundles two independent bug fixes in `lis2dh_load_fifo()` that can each be committed, reverted, and tested independently. Please split into two focused CLs:\n  1. **CL 1:** Fix multi-chunk FIFO reads (`int read_count \u003d 0;` initialization before the `do-while` loop and moving `left -\u003d length;` after the per-sample `for` loop in `driver/accel_lis2dh.c`, plus the `test_lis2dh__samples_fifo_read_long` updates in `zephyr/test/drivers/lis2dh/src/test_interrupt.c`).\n  2. **CL 2:** Fix spoof-mode buffer overwrite (moving `int *axis \u003d s-\u003eraw_xyz;` inside the per-sample `for` loop in `driver/accel_lis2dh.c`, plus the `test_lis2dh__samples_fifo_read_spoof` updates in `zephyr/test/drivers/lis2dh/src/test_interrupt.c`).\n* **Commit Message:** ❌ The commit message bundles two independent fixes in the subject line (`Fix FIFO chunk loop and spoof buffer overwrite`) and narrates low-level C syntax edits line-by-line in the body rather than stating the problem and conceptual fix at one level of abstraction above the diff. See the inline comment on `/COMMIT_MSG` for copy-pasteable replacements. [🔗](http://go/tj/f63fcbaf-6cca-40a5-b46a-e8ace9b3919e)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13957306_dad9fb21",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:40Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "baa96fbe_eb5c8c7e",
       "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6be5cc3a_522ca1a9",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_interrupt.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:40Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "06c61a1d_bea58612",
+      "range": {
+        "startLine": 156,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 9999
+      },
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d9ad09a_f7178074",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cdbe687_47e3a539",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_interrupt.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:40Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "2d9ad09a_f7178074",
+      "range": {
+        "startLine": 301,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 9999
+      },
       "revId": "cf4c0e67c3a8175958d9f182ab09cd30e6608764",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
