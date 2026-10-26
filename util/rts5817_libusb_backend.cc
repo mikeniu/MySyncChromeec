@@ -89,6 +89,14 @@ int RtsLibusbBackend::get_interfaces(std::vector<RtsUsbInterface> *interfaces)
 	return 0;
 }
 
+int RtsLibusbBackend::reset_device()
+{
+	if (!dev_handle_)
+		return LIBUSB_ERROR_NO_DEVICE;
+
+	return libusb_reset_device(dev_handle_);
+}
+
 void RtsLibusbBackend::release_interface(int interface_number)
 {
 	if (dev_handle_)

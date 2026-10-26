@@ -53,6 +53,9 @@ class RtsUsbBackend {
 	 */
 	virtual int get_interfaces(std::vector<RtsUsbInterface> *interfaces) = 0;
 
+	/** Reset the device; the handle may become invalid afterwards. */
+	virtual int reset_device() = 0;
+
 	/** Release a claimed interface. */
 	virtual void release_interface(int interface_number) = 0;
 
