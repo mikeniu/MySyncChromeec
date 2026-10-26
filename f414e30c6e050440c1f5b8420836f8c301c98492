@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27670936_08b8f46e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-26T14:29:49Z",
+      "side": 1,
+      "message": "This isn\u0027t being associated with the ec-legacy|main cherry-pick.",
+      "revId": "f414e30c6e050440c1f5b8420836f8c301c98492",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
