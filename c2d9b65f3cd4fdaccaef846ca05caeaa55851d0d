@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1ed356a_5784d4a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:40:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Replaces the separate `raw_read16()` and `raw_write16()` calls on `RAA489000_REG_CONTROL10` for `CHARGER_PRIMARY` in `raa489000_set_vsys_compensation()` with `raw_update16(..., MASK_SET)`, preventing a failed primary register read from writing the stale secondary charger value into the primary charger.\n* **Architecture \u0026 Component Fit:** ✅ Matches the existing `raw_update16()` pattern used elsewhere in `driver/charger/isl923x.c` (such as `raa489000_enable_linear_charge()`).\n* **Code Simplicity:** ✅ Simplifies the read-modify-write sequence into a single `raw_update16()` call with no redundant state or branching.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC driver and Zephyr `ztest` conventions, using named register and bitmask constants throughout.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ Adds `test_set_vsys_compensation_read_error` in `zephyr/test/drivers/raa489000/src/raa489000.c` verifying both the read-failure path (asserting `EC_ERROR_UNKNOWN` and that `RAA489000_REG_CONTROL10` on the primary emulator remains `0`) and the subsequent success path (asserting `RAA489000_C10_ENABLE_DVC_CHARGE_MODE` is set).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+34, -3)`. Small, atomic change addressing a single bug fix with its unit test.\n* **Commit Message:** ✅ Clear, accurate subject and prose body explaining the bug and fix, with valid `BUG\u003d`, `TEST\u003d`, and `Change-Id:` footers. [[trajectory](https://goto.corp.google.com/traj/0f74b1f9-7ab3-4b31-83f4-a9282177bbbf)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c2d9b65f3cd4fdaccaef846ca05caeaa55851d0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
