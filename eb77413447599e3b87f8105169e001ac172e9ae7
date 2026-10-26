@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3ddc047_3c720e92",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T12:47:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** `log_backend_cros_ec` formats log messages into a stack-allocated `CONFIG_SHELL_PRINTF_BUFF_SIZE` line buffer, strips `\\r` characters emitted by `LOG_PRINTK` (`cr_out_func`), NUL-terminates each chunk without writing the NUL byte to size-based outputs, and flushes once per chunk via `zephyr_print()`. Panic handling switches the shell transport to blocking mode via `zephyr_console_panic()`, and deferred mode reports dropped messages via `notify_dropped()`.\n* **Architecture \u0026 Component Fit:** Fits cleanly alongside `zephyr/shim/src/console.c` and `zephyr/Kconfig.console`, defaulting `SHELL_LOG_BACKEND` to `n`, preventing simultaneous selection with `PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER`, and enforcing `!CONFIG_PIGWEED_LOG_TOKENIZED_LIB` via `BUILD_ASSERT` to avoid Kconfig dependency cycles.\n* **Code Simplicity:** Each helper (`flush_line_buf`, `char_out`, `process`, `panic`, and `notify_dropped`) is concise, direct, and free of unnecessary state or locking.\n* **Idiomaticity \u0026 Readability:** Adheres to Zephyr and ChromiumOS EC C conventions (`IS_ENABLED`, `BUILD_ASSERT`, `MIN`, `ARG_UNUSED`, `snprintk`, and designated initializers), and updates the comments in `zephyr/shim/src/console.c` to document `CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC`.\n* **Security:** Buffer bounds and NUL termination in `char_out()`, `flush_line_buf()`, and `notify_dropped()` are properly enforced.\n* **Testing:** `zephyr/test/hostcmd_console` adds the `hostcmd_console.log_cros_ec` test configuration and verifies standard log output, non-yielding context logging, empty flushes, multi-chunk flushes exceeding `CONFIG_SHELL_PRINTF_BUFF_SIZE - 1`, and `\\r` stripping for `LOG_PRINTK`.\n* **CL Size \u0026 Scope:** `Size: M (+203, -3)` (~173 production lines, ~33 test lines). Single, cohesive logical change introducing the `CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC` backend and its unit tests.\n* **Commit Message:** Clearly explains the blocking UART TX and 1-byte `char_out()` problem in immediate mode, summarizes the new backend design, and includes valid `BUG\u003d` and `TEST\u003d` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/bf7fe326-b7f6-4db2-807d-7c348c82576b)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
