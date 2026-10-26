@@ -1,0 +1,148 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3511b528_db1d9acb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the remaining test oracle issue in `test_disable_interrupt`, make `emul_lsm6dso_append_raw_tag` internal to `emul_lsm6dso.c`, and split the emulator changes from the new test suite.\n\n### Review Summary\n* **Functionality**: The FIFO wrap-around, multi-byte read/write indexing, and optional `int-gpios` assertion issues from Patchset 1 are resolved. In `lsm6dso_emul_set_interrupt_pin`, returning early when `active` is `true` and FIFO interrupts are disabled in `LSM6DSO_INT1_CTRL` leaves the GPIO pin in its previous state rather than deasserting it.\n* **Architecture \u0026 Component Fit**: `emul_lsm6dso_append_raw_tag` is still exported in `zephyr/include/emul/emul_lsm6dso.h` without any external callers; make it `static` in `zephyr/emul/emul_lsm6dso.c` and remove it from the public header (matching `zephyr/include/emul/emul_lsm6dsm.h`) until a follow-up CL adds a caller or test for raw tags.\n* **Code Simplicity**: In `lsm6dso_emul_set_interrupt_pin`, computing `int_enabled` and passing `!(active \u0026\u0026 int_enabled)` to `gpio_emul_input_set` eliminates the early-return branch while ensuring the pin is deasserted when interrupts are disabled. In `emul_lsm6dso_append_raw_tag`, remove the unused `fifo_pos +\u003d sizeof(uint16_t);` assignment on line 132.\n* **Idiomaticity \u0026 Readability**: The new `LSM6DSO_FIFO_*` bitfield macros and named constants (`LSM6DSO_ODR_MIN_VAL`, `ARRAY_SIZE(data)`) are used cleanly across the emulator and tests.\n* **Security**: No security concerns.\n* **Testing**: In `test_disable_interrupt` (`zephyr/test/drivers/lsm6dso/src/main.c`), the manual `acc-\u003edrv-\u003eirq_handler(acc, \u0026event)` flush on line 71 commits the disabled-interrupt sample `(1.0f, 0.5f, -0.25f)` into `motion_sense_fifo` without calling `motion_sense_fifo_reset()` afterward, and line 77 appends the identical `(1.0f, 0.5f, -0.25f)` sample while line 85 only checks `count \u003e\u003d 1`. As a result, the test would still pass even if `acc-\u003edrv-\u003eenable_interrupt(acc, true)` on line 74 were a no-op and the interrupt never fired. Please reset `motion_sense_fifo` after the manual flush, use distinct sample values for the discard/disabled steps, assert `zassert_equal(1, gpio_pin_get_dt(\u0026spec))` before sleeping, and assert the exact 2 FIFO entries (timestamp + data) in both `test_disable_interrupt` and `test_gyro_sample`.\n* **CL Size \u0026 Scope**: At `Size: L (+595, -74)` (388 non-test lines across the header/emulator and 285 test lines across `zephyr/test/drivers/`), the non-test delta exceeds the 250-line limit and bundles the `emul_lsm6dso` overhaul with the new `drivers.lsm6dso` test suite. Please split this CL into two focused CLs:\n  1. **CL 1 (Emulator)**: Migrate `emul_lsm6dso` to `i2c_common_emul` and add FIFO buffering, interrupt pin control, and sample injection (`driver/accelgyro_lsm6dso.h`, `zephyr/dts/bindings/emul/cros,lsm6dso-emul.yaml`, `zephyr/emul/Kconfig`, `zephyr/emul/emul_lsm6dso.c`, `zephyr/include/emul/emul_lsm6dso.h`).\n  2. **CL 2 (Unit Test Suite)**: Add the `drivers.lsm6dso` test suite (`zephyr/test/drivers/CMakeLists.txt`, `zephyr/test/drivers/Kconfig`, `zephyr/test/drivers/testcase.yaml`, `zephyr/test/drivers/lsm6dso/CMakeLists.txt`, `zephyr/test/drivers/lsm6dso/prj.conf`, `zephyr/test/drivers/lsm6dso/sensor.dts`, `zephyr/test/drivers/lsm6dso/src/main.c`).\n* **Commit Message**: The updated commit message on Patchset 2 is concise and clearly states both what changed and why.\n\n[[trajectory](https://goto.corp.google.com/traj/6004e2b7-5414-4dac-a398-e759d39999f4)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30e67279_10f2a3bf",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] In `lsm6dso_emul_set_interrupt_pin`, returning early on lines 73–77 when `active` is `true` and FIFO interrupts are disabled in `LSM6DSO_INT1_CTRL` leaves the GPIO pin in its previous state (so if the interrupt pin was already asserted before `LSM6DSO_INT1_CTRL` was cleared, a subsequent `emul_lsm6dso_set_fifo_count` call leaves the pin stuck asserted).\n\nComputing `int_enabled` and driving `!(active \u0026\u0026 int_enabled)` both ensures the active-low pin is deasserted whenever interrupts are disabled and eliminates the early-return branch:\n\n```c\nstatic void lsm6dso_emul_set_interrupt_pin(const struct emul *emul, bool active)\n{\n\tconst struct lsm6dso_emul_cfg *config \u003d emul-\u003ecfg;\n\tstruct lsm6dso_emul_data *data \u003d emul-\u003edata;\n\n\tif (config-\u003egpio_spec.port \u003d\u003d NULL) {\n\t\treturn;\n\t}\n\n\tbool int_enabled \u003d (data-\u003ereg[LSM6DSO_INT1_CTRL] \u0026\n\t\t\t    (LSM6DSO_INT_FIFO_TH | LSM6DSO_INT_FIFO_FULL |\n\t\t\t     LSM6DSO_INT_FIFO_OVR)) !\u003d 0;\n\n\tgpio_emul_input_set(config-\u003egpio_spec.port, config-\u003egpio_spec.pin,\n\t\t\t    !(active \u0026\u0026 int_enabled));\n}\n```\n\n[🔗](http://go/tj/6004e2b7-5414-4dac-a398-e759d39999f4)",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59737c29_5a6a4cef",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two cleanups in `emul_lsm6dso_append_raw_tag`:\n\n1. Make `emul_lsm6dso_append_raw_tag` `static` since it is only called within `zephyr/emul/emul_lsm6dso.c`.\n2. Remove the dead `fifo_pos +\u003d sizeof(uint16_t);` increment on **line 132** after writing `z`, as `fifo_pos` is not read again.\n\n```c\nstatic void emul_lsm6dso_append_raw_tag(const struct emul *emul,\n\t\t\t\t\tuint8_t raw_tag, int16_t x, int16_t y,\n\t\t\t\t\tint16_t z)\n{\n\tstruct lsm6dso_emul_data *data \u003d emul-\u003edata;\n\tint current_fifo_count \u003d emul_lsm6dso_get_fifo_count(emul);\n\tsize_t fifo_pos;\n\n\tif (current_fifo_count \u003e\u003d LSM6DSO_FIFO_MAX_SAMPLES) {\n\t\tLOG_ERR(\"FIFO full\");\n\t\treturn;\n\t}\n\n\tfifo_pos \u003d (data-\u003efifo_head +\n\t\t    (size_t)current_fifo_count * LSM6DSO_FIFO_SAMPLE_SIZE) %\n\t\t   sizeof(data-\u003efifo);\n\n\tdata-\u003efifo[fifo_pos++] \u003d raw_tag \u003c\u003c LSM6DSO_FIFO_TAG_SHIFT;\n\tsys_put_le16(x, \u0026data-\u003efifo[fifo_pos]);\n\tfifo_pos +\u003d sizeof(uint16_t);\n\tsys_put_le16(y, \u0026data-\u003efifo[fifo_pos]);\n\tfifo_pos +\u003d sizeof(uint16_t);\n\tsys_put_le16(z, \u0026data-\u003efifo[fifo_pos]);\n\n\temul_lsm6dso_set_fifo_count(emul, current_fifo_count + 1);\n}\n```\n\n[🔗](http://go/tj/6004e2b7-5414-4dac-a398-e759d39999f4)",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2eaad6f1_38a7c528",
+        "filename": "zephyr/include/emul/emul_lsm6dso.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `emul_lsm6dso_append_raw_tag` has no callers outside `zephyr/emul/emul_lsm6dso.c` (and `driver/accelgyro_lsm6dso.c` does not yet handle arbitrary/invalid FIFO tags in this CL). Please remove this declaration from the public header and make `emul_lsm6dso_append_raw_tag` `static` in `zephyr/emul/emul_lsm6dso.c` (matching `zephyr/include/emul/emul_lsm6dsm.h`) until a follow-up CL adds a caller or test that exercises raw tags directly.\n\n[🔗](http://go/tj/6004e2b7-5414-4dac-a398-e759d39999f4)",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b42e11d2_2da937d7",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] In `test_disable_interrupt`, because the 3 discard samples were already consumed during `k_msleep(100)` on **line 48**, the manual `acc-\u003edrv-\u003eirq_handler(acc, \u0026event)` call on **line 71** stages and commits the sample from **line 57** (`(1.0f, 0.5f, -0.25f)`) into `motion_sense_fifo` (adding 2 entries: timestamp + data). Because `motion_sense_fifo_reset()` is not called after line 71, line 77 appends the identical `(1.0f, 0.5f, -0.25f)` sample, and line 85 only checks `count \u003e\u003d 1`, **the second half of this test would still pass even if `acc-\u003edrv-\u003eenable_interrupt(acc, true)` on line 74 were a no-op and the interrupt never fired** (reading back the 2 entries committed by the manual `irq_handler` flush at line 71).\n\nTo ensure the test deterministically verifies interrupt re-enabling and FIFO staging:\n1. Pass `(0.0f, 0.0f, 0.0f)` for the discard samples (**lines 45–46**) and distinct values while interrupts are disabled (**lines 57–58**) so leaked samples cannot be mistaken for the post-enable sample.\n2. Call `motion_sense_fifo_reset()` after the manual `acc-\u003edrv-\u003eirq_handler(acc, \u0026event)` flush on **line 71**.\n3. Assert `zassert_equal(1, gpio_pin_get_dt(\u0026spec))` immediately after `emul_lsm6dso_append_sample` (**line 78**, before `k_msleep(100)`) to verify the interrupt pin is asserted.\n4. Size `data` to `2` and assert the exact 2 FIFO entries (timestamp at `data[0]` with `MOTIONSENSE_SENSOR_FLAG_TIMESTAMP`, and accel data at `data[1]` with `flags \u003d\u003d 0`), matching `zephyr/test/drivers/lsm6dsm/src/main.c`:\n\n```c\nZTEST(lsm6dso, test_disable_interrupt)\n{\n\tstatic struct ec_response_motion_sensor_data data[2];\n\n\tconst struct gpio_dt_spec spec \u003d\n\t\tGPIO_DT_SPEC_GET(LSM6DSO_NODE, int_gpios);\n\tint count;\n\tuint16_t read_byte_count;\n\n\t/* Set data rate to 13Hz, without this the FIFO will never be enabled */\n\tacc-\u003econfig[SENSOR_CONFIG_AP].odr \u003d LSM6DSO_ODR_MIN_VAL;\n\tacc-\u003edrv-\u003eset_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 1);\n\tk_msleep(100);\n\n\t/* The lsm6dso throws away a few samples after an ODR change, burn\n\t * through those so that the next sample would get on the FIFO if\n\t * enabled.\n\t */\n\tfor (int i \u003d 0; i \u003c LSM6DSO_DISCARD_SAMPLES; ++i) {\n\t\temul_lsm6dso_append_sample(emul, MOTIONSENSE_TYPE_ACCEL, 0.0f,\n\t\t\t\t\t   0.0f, 0.0f);\n\t}\n\tk_msleep(100);\n\n\t/* Disable the interrupts */\n\tacc-\u003edrv-\u003eenable_interrupt(acc, false);\n\n\t/* Clear out the soft motionsense FIFO */\n\tmotion_sense_fifo_reset();\n\n\t/* Add an accel sample while interrupts are disabled */\n\temul_lsm6dso_append_sample(emul, MOTIONSENSE_TYPE_ACCEL, 0.5f, -0.5f,\n\t\t\t\t   0.25f);\n\tk_msleep(100);\n\n\t/* Interrupt should be deasserted and no events should be on the FIFO */\n\tcount \u003d motion_sense_fifo_read(sizeof(data), ARRAY_SIZE(data), data,\n\t\t\t\t       \u0026read_byte_count);\n\tzassert_equal(0, gpio_pin_get_dt(\u0026spec));\n\tzassert_equal(0, count, \"FIFO had %d entries\", count);\n\tzassert_equal(0, read_byte_count, \"FIFO read %u bytes\",\n\t\t      read_byte_count);\n\n\t/* Flush the hardware FIFO and reset the soft motionsense FIFO */\n\tuint32_t event \u003d CONFIG_ACCEL_LSM6DSO_INT_EVENT;\n\tzassert_equal(EC_SUCCESS, acc-\u003edrv-\u003eirq_handler(acc, \u0026event));\n\tmotion_sense_fifo_reset();\n\n\t/* Enable the interrupts */\n\tacc-\u003edrv-\u003eenable_interrupt(acc, true);\n\n\t/* Add another accel sample (1g, 0.5g, -0.25g) */\n\temul_lsm6dso_append_sample(emul, MOTIONSENSE_TYPE_ACCEL, 1.0f, 0.5f,\n\t\t\t\t   -0.25f);\n\tzassert_equal(1, gpio_pin_get_dt(\u0026spec));\n\n\t/* After we sleep, the motion sense loop should read the sample */\n\tk_msleep(100);\n\tcount \u003d motion_sense_fifo_read(sizeof(data), ARRAY_SIZE(data), data,\n\t\t\t\t       \u0026read_byte_count);\n\tzassert_equal(0, gpio_pin_get_dt(\u0026spec));\n\tzassert_equal(2, count, \"FIFO had %d entries\", count);\n\tzassert_equal(sizeof(data), read_byte_count, \"FIFO read %u bytes\",\n\t\t      read_byte_count);\n\tzassert_equal(MOTIONSENSE_SENSOR_FLAG_TIMESTAMP, data[0].flags);\n\tzassert_equal(ACC_SENSOR_ID, data[0].sensor_num);\n\tzassert_equal(0, data[1].flags);\n\tzassert_equal(ACC_SENSOR_ID, data[1].sensor_num,\n\t\t      \"Sensor # expected %d, was %u\", ACC_SENSOR_ID,\n\t\t      data[1].sensor_num);\n\tzassert_within(INT16_MAX / acc-\u003ecurrent_range, data[1].data[X], 1);\n\tzassert_within(INT16_MAX / (2 * acc-\u003ecurrent_range), data[1].data[Y],\n\t\t       1);\n\tzassert_within(-INT16_MAX / (4 * acc-\u003ecurrent_range), data[1].data[Z],\n\t\t       1);\n}\n```\n\n[🔗](http://go/tj/6004e2b7-5414-4dac-a398-e759d39999f4)",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ec69318_8fafec2a",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T23:59:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similarly in `test_gyro_sample`, pass `(0.0f, 0.0f, 0.0f)` for the discarded samples (**lines 110–111**) so a leaked discard sample cannot match the sample under test, and assert the exact 2 FIFO entries (`zassert_equal(2, count)` and `zassert_equal(sizeof(data), read_byte_count)`, checking both the `data[0]` timestamp entry and `data[1]` sample entry) instead of `zassert_true(count \u003e\u003d 1)`:\n\n```c\nZTEST(lsm6dso, test_gyro_sample)\n{\n\tstatic struct ec_response_motion_sensor_data data[2];\n\tint count;\n\tuint16_t read_byte_count;\n\n\t/* Configure Gyro ODR and burn discard samples */\n\tgyr-\u003econfig[SENSOR_CONFIG_AP].odr \u003d LSM6DSO_ODR_MIN_VAL;\n\tgyr-\u003edrv-\u003eset_data_rate(gyr, LSM6DSO_ODR_MIN_VAL, 1);\n\tgyr-\u003eoversampling_ratio \u003d 1;\n\tk_msleep(100);\n\tfor (int i \u003d 0; i \u003c LSM6DSO_DISCARD_SAMPLES; ++i) {\n\t\temul_lsm6dso_append_sample(emul, MOTIONSENSE_TYPE_GYRO, 0.0f,\n\t\t\t\t\t   0.0f, 0.0f);\n\t}\n\tk_msleep(100);\n\tmotion_sense_fifo_reset();\n\n\t/* Enable interrupts */\n\tacc-\u003edrv-\u003eenable_interrupt(acc, true);\n\n\t/* Append gyro sample (100 dps, 50 dps, -25 dps) */\n\temul_lsm6dso_append_sample(emul, MOTIONSENSE_TYPE_GYRO, 100.0f, 50.0f,\n\t\t\t\t   -25.0f);\n\n\t/* Motion sense loop processes the FIFO */\n\tk_msleep(100);\n\n\tcount \u003d motion_sense_fifo_read(sizeof(data), ARRAY_SIZE(data), data,\n\t\t\t\t       \u0026read_byte_count);\n\tzassert_equal(2, count, \"Expected 2 entries, got %d\", count);\n\tzassert_equal(sizeof(data), read_byte_count, \"FIFO read %u bytes\",\n\t\t      read_byte_count);\n\tzassert_equal(MOTIONSENSE_SENSOR_FLAG_TIMESTAMP, data[0].flags);\n\tzassert_equal(GYR_SENSOR_ID, data[0].sensor_num);\n\tzassert_equal(0, data[1].flags);\n\tzassert_equal(GYR_SENSOR_ID, data[1].sensor_num);\n\tzassert_within((100 * INT16_MAX) / gyr-\u003ecurrent_range, data[1].data[X],\n\t\t       1);\n\tzassert_within((50 * INT16_MAX) / gyr-\u003ecurrent_range, data[1].data[Y],\n\t\t       1);\n\tzassert_within((-25 * INT16_MAX) / gyr-\u003ecurrent_range, data[1].data[Z],\n\t\t       1);\n}\n```\n\n[🔗](http://go/tj/6004e2b7-5414-4dac-a398-e759d39999f4)",
+      "range": {
+        "startLine": 98,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
