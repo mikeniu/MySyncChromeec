@@ -16,6 +16,24 @@
       "message": "Nit: `bool`",
       "revId": "6e323dd28680d09399213d636f7488de9920ccad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56dd70a0_58acb93b",
+        "filename": "chip/stm32/dma.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2026-10-26T17:45:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aeb56e9_884eb6da",
+      "revId": "6e323dd28680d09399213d636f7488de9920ccad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
