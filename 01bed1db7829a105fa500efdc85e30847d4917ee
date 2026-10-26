@@ -39,6 +39,30 @@
       },
       "revId": "01bed1db7829a105fa500efdc85e30847d4917ee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3b9d16b_32fcd243",
+        "filename": "zephyr/program/dougie/bandit/generated.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1562687
+      },
+      "writtenOn": "2026-10-26T11:14:20Z",
+      "side": 1,
+      "message": "I wasn\u0027t aware of the typical setting and initially used pull-downs based on tanjiro/sapphire. Changed all 3.3V unused inputs to pull-ups instead (kept GPIO_PULL_DOWN only on the 1.8V pins, since gpio_ite_it8xxx2.c asserts against GPIO_PULL_UP with GPIO_VOLTAGE_1P8)",
+      "parentUuid": "885416e7_b8521703",
+      "range": {
+        "startLine": 192,
+        "startChar": 27,
+        "endLine": 192,
+        "endChar": 41
+      },
+      "revId": "01bed1db7829a105fa500efdc85e30847d4917ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
