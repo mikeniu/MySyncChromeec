@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7d378ef_60a1e95a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:19:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Restores the `EC_CMD_GET_PROTOCOL_INFO` host command handler on non-FPMCU STM32 boards that use SPI (`CONFIG_SPI`) by building `chip/stm32/host_command_common.o` when either `CONFIG_FINGERPRINT_MCU` or `CONFIG_SPI` is enabled and dispatching directly to `spi_get_protocol_info(args)` when `CONFIG_FINGERPRINT_MCU` is disabled.\n* **Architecture \u0026 Component Fit:** ✅ Aligns `chip/stm32/host_command_common.c` with the transport dispatch structure in `chip/npcx/host_command_common.c` and uses the established `$(or ...)` Makefile idiom in `chip/stm32/build.mk`.\n* **Code Simplicity:** ✅ `host_command_protocol_info()` cleanly scopes the `TRANSPORT_SEL` bootstrap pin check and UART/SPI runtime selection inside `if (IS_ENABLED(CONFIG_FINGERPRINT_MCU))`, falling back to `spi_get_protocol_info(args)` when `CONFIG_SPI` is enabled.\n* **Idiomaticity \u0026 Readability:** ✅ Uses `IS_ENABLED()` and existing `fp_transport_type` / `ec_status` enums with no magic values.\n* **Security:** ✅ No security vulnerabilities identified.\n* **Testing:** ✅ Verified across affected STM32 board builds (`kakadu`, `kukui`, `krane`, `elm`, `nucleo-f412zg`, `nucleo-h743zi`) and on-device `ectool protoinfo` testing (`chip/stm32` transport code is not compiled into `BOARD\u003dhost` emulator unit tests).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+16, -13)`. Single, self-contained bug fix cherry-picked to the release branch.\n* **Commit Message:** ✅ Clear root-cause explanation, impact description, and `BUG\u003d`/`TEST\u003d` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/3d3350fb-5e83-4d8e-ba1d-fa57294b2d4f)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cbcfb7d33e4b1b083bd824fc526607cd394be146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
