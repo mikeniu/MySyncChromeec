@@ -213,7 +213,7 @@ if(DEFINED CONFIG_BOARD_ANRAGGAR)
 	zephyr_library_sources(
 			"anraggar/src/board.c"
 			"anraggar/src/sub_board.c"
-			"anraggar/src/prochot.c"
+			"src/prochot.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "anraggar/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "anraggar/src/charger.c")
@@ -301,7 +301,7 @@ if(DEFINED CONFIG_BOARD_TELIKS)
 	zephyr_library_sources(
 			"teliks/src/board.c"
 			"teliks/src/sub_board.c"
-			"teliks/src/prochot.c"
+			"src/prochot.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "teliks/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "teliks/src/charger.c")
@@ -330,7 +330,7 @@ if(DEFINED CONFIG_BOARD_TELITH)
 	zephyr_library_sources(
 			"telith/src/board_als.c"
 			"telith/src/board.c"
-			"telith/src/prochot.c"
+			"src/prochot.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "telith/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "telith/src/charger.c")
