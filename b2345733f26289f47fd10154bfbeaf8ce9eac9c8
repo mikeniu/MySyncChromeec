@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e922d4c_1fa16bc5",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-26T09:35:19Z",
+      "side": 1,
+      "message": "Added check in match() to make sure that LED doesn\u0027t get on when the lid is closed.",
+      "parentUuid": "94e1c45c_ecf68ff3",
+      "range": {
+        "startLine": 243,
+        "startChar": 5,
+        "endLine": 243,
+        "endChar": 16
+      },
+      "revId": "b2345733f26289f47fd10154bfbeaf8ce9eac9c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "86482021_df2d6bcf",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 2
