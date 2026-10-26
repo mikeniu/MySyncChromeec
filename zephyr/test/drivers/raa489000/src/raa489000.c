@@ -3,11 +3,16 @@
  * found in the LICENSE file.
  */
 
+#include "driver/charger/isl923x.h"
+#include "driver/charger/isl923x_public.h"
 #include "driver/tcpm/raa489000.h"
 #include "driver/tcpm/tcpci.h"
 #include "ec_commands.h"
+#include "emul/emul_common_i2c.h"
+#include "emul/emul_isl923x.h"
 #include "emul/tcpc/emul_raa489000.h"
 #include "emul/tcpc/emul_tcpci.h"
+#include "test/drivers/charger_utils.h"
 #include "test/drivers/tcpci_test_common.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -132,6 +137,28 @@ ZTEST(tcpc_raa489000, test_init_error)
 	zassert_not_equal(EC_SUCCESS, drv->init(RAA489000_PORT));
 	i2c_common_emul_set_read_fail_reg(common_data,
 					  I2C_COMMON_EMUL_NO_FAIL_REG);
+}
+
+ZTEST(tcpc_raa489000, test_get_actual_current_read_error)
+{
+	const struct emul *emul = EMUL_DT_GET(DT_NODELABEL(isl923x_emul));
+	struct i2c_common_emul_data *common =
+		emul_isl923x_get_i2c_common_data(emul);
+	const int chgnum = get_charger_num(&isl923x_drv);
+	int current = -1;
+
+	isl923x_emul_reset_registers(emul);
+
+	/* A failed ADC read must not update the output current. */
+	i2c_common_emul_set_read_fail_reg(common,
+					  RAA489000_REG_ADC_CHARGE_CURRENT);
+	zassert_equal(EC_ERROR_INVAL,
+		      isl923x_drv.get_actual_current(chgnum, &current));
+	zassert_equal(current, -1);
+
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+	zassert_ok(isl923x_drv.get_actual_current(chgnum, &current));
+	zassert_equal(current, 0);
 }
 
 ZTEST_SUITE(tcpc_raa489000, drivers_predicate_post_main, NULL, NULL, NULL,

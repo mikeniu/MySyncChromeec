@@ -498,12 +498,15 @@ static enum ec_error_list raa489000_get_actual_current(int chgnum, int *current)
 	int reg;
 
 	rv = raw_read16(chgnum, RAA489000_REG_ADC_CHARGE_CURRENT, &reg);
+	if (rv)
+		return rv;
+
 	/* The value is in 22.2mA increments. */
 	reg *= 222;
 	reg /= 10;
 
 	*current = REG_TO_CURRENT(reg);
-	return rv;
+	return EC_SUCCESS;
 }
 #endif /* CONFIG_CHARGER_RAA489000 */
 
