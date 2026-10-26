@@ -439,6 +439,25 @@ void uart_flush_output(void)
 
 void uart_tx_flush(void)
 {
+	if (!k_can_yield() &&
+	    IS_ENABLED(CONFIG_SHELL_BACKEND_SERIAL_API_INTERRUPT_DRIVEN) &&
+	    shell_zephyr != NULL) {
+		struct shell_uart_int_driven *sh_uart =
+			(struct shell_uart_int_driven *)shell_zephyr->iface->ctx;
+
+		shell_zephyr->iface->api->enable(shell_zephyr->iface, true);
+		if (ring_buf_size_get(&sh_uart->tx_ringbuf) <=
+		    ring_buf_capacity_get(&sh_uart->tx_ringbuf)) {
+			uint8_t c;
+
+			while (ring_buf_get(&sh_uart->tx_ringbuf, &c, 1) > 0) {
+				uart_poll_out(uart_shell_dev, c);
+			}
+		} else {
+			ring_buf_reset(&sh_uart->tx_ringbuf);
+		}
+	}
+
 #if defined(CONFIG_UART_INTERRUPT_DRIVEN)
 	while (!uart_irq_tx_complete(uart_shell_dev))
 		;

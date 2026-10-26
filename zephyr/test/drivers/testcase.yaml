@@ -560,6 +560,15 @@ tests:
     - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE=y
+  drivers.console.uart_tx_flush:
+    tags:
+    - host_cmd
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_CONSOLE=y
+    - CONFIG_SHELL_BACKEND_DUMMY=n
+    - CONFIG_SHELL_BACKEND_SERIAL=y
+    - CONFIG_SHELL_BACKEND_SERIAL_API_INTERRUPT_DRIVEN=y
+    - CONFIG_SHELL_BACKEND_SERIAL_API_POLLING=n
   drivers.console.ec_host_cmd:
     tags:
     - host_cmd

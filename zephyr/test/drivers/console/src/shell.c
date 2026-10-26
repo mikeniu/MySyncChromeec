@@ -32,6 +32,10 @@ ZTEST(shell, test_shell_stop_read_raw_data)
 {
 	const char uart_data[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+	if (IS_ENABLED(CONFIG_SHELL_BACKEND_SERIAL)) {
+		ztest_test_skip();
+	}
+
 	uart_shell_stop();
 	k_msleep(500);
 	zassert_true(uart_irq_tx_ready(uart_shell_dev) != 0);
@@ -86,3 +90,45 @@ ZTEST(shell, test_rx_bypass)
 	 */
 	zassert_equal(-1, uart_getc());
 }
+
+#if IS_ENABLED(CONFIG_SHELL_BACKEND_SERIAL_API_INTERRUPT_DRIVEN)
+#include <zephyr/shell/shell_uart.h>
+#include <zephyr/sys/ring_buffer.h>
+
+ZTEST(shell, test_uart_tx_flush_interrupt_driven)
+{
+	const struct shell *sh = get_ec_shell();
+	struct shell_uart_int_driven *sh_uart;
+	uint8_t test_data[] = "flush_drain_test";
+	unsigned int key;
+
+	zassert_not_null(sh);
+	sh_uart = (struct shell_uart_int_driven *)sh->iface->ctx;
+	zassert_not_null(sh_uart);
+
+	/* 1. Normal drain test */
+	ring_buf_put(&sh_uart->tx_ringbuf, test_data, sizeof(test_data));
+	zassert_true(ring_buf_size_get(&sh_uart->tx_ringbuf) > 0);
+
+	key = irq_lock();
+	zassert_false(k_can_yield());
+	uart_tx_flush();
+	irq_unlock(key);
+
+	zassert_equal(ring_buf_size_get(&sh_uart->tx_ringbuf), 0);
+
+	/* 2. Corrupted ring buffer reset test (size > capacity) */
+	sh_uart->tx_ringbuf.read_idx = 1;
+	sh_uart->tx_ringbuf.write_idx = 0;
+	zassert_true(ring_buf_size_get(&sh_uart->tx_ringbuf) >
+		     ring_buf_capacity_get(&sh_uart->tx_ringbuf));
+
+	key = irq_lock();
+	zassert_false(k_can_yield());
+	uart_tx_flush();
+	irq_unlock(key);
+
+	zassert_equal(ring_buf_size_get(&sh_uart->tx_ringbuf), 0);
+	zassert_true(ring_buf_is_empty(&sh_uart->tx_ringbuf));
+}
+#endif
