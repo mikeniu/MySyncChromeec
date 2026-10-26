@@ -32,3 +32,23 @@
 		};
 	};
 };
+
+/ {
+	aliases {
+		/*
+		 * CONFIG_ACCEL_LIS2DW12_INT_EVENT is derived from the aliased
+		 * sensor's index, and only motion sensors 0-7 have interrupt
+		 * event bits. lis2dw12 is index 8 here, so borrow bma255's
+		 * bit 0 (force mode, never raised).
+		 */
+		lis2dw12-int = &ms_bma255;
+	};
+
+	/*
+	 * lis2dw12_irq_handler() ignores sensors in forced mode, so keep
+	 * the LIS2DW12 interrupt driven for the FIFO tests.
+	 */
+	motionsense-sensor-info {
+		accel-force-mode-sensors = <&ms_bma255>;
+	};
+};

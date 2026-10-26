@@ -89,6 +89,14 @@ int lis2dw12_emul_set_accel_reading(const struct emul *emul, intv3_t reading);
 void lis2dw12_emul_clear_accel_reading(const struct emul *emul);
 
 /**
+ * @brief Set the FIFO sample count returned by LIS2DW12_FIFO_SAMPLES_ADDR
+ *
+ * @param emul Reference to current LIS2DW12 emulator.
+ * @param nsamples Number of samples (0-32)
+ */
+void lis2dw12_emul_set_fifo_samples(const struct emul *emul, uint8_t nsamples);
+
+/**
  * @brief Returns pointer to i2c_common_emul_data for argument emul
  *
  * @param emul Pointer to LIS2DW12 emulator

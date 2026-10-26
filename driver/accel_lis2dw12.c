@@ -129,8 +129,8 @@ static int lis2dw12_load_fifo(struct motion_sensor_t *s, int nsamples,
 			} else {
 				motion_sense_push_raw_xyz(s);
 			}
-			left -= length;
 		}
+		left -= length;
 	} while (left > 0);
 
 	return EC_SUCCESS;

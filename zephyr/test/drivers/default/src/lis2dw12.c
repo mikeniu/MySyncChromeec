@@ -6,6 +6,7 @@
 #include "driver/accel_lis2dw12.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_lis2dw12.h"
+#include "motion_sense_fifo.h"
 #include "test/drivers/test_state.h"
 
 #include <zephyr/drivers/emul.h>
@@ -470,3 +471,109 @@ ZTEST(lis2dw12, test_lis2dw12_read)
 
 ZTEST_SUITE(lis2dw12, drivers_predicate_post_main, NULL, lis2dw12_before,
 	    lis2dw12_after, NULL);
+
+static int count_fifo_samples_reads(const struct emul *target, int reg,
+				    uint8_t *val, int bytes, void *data)
+{
+	int *reads = data;
+
+	ARG_UNUSED(target);
+	ARG_UNUSED(val);
+
+	if (reg == LIS2DW12_FIFO_SAMPLES_ADDR && bytes == 0) {
+		(*reads)++;
+	}
+	return 1;
+}
+
+/* Run the FIFO interrupt handler with nsamples copies of sample queued. */
+static int lis2dw12_run_fifo_irq(int nsamples, intv3_t sample)
+{
+	const struct emul *emul = EMUL_DT_GET(LIS2DW12_EMUL_NODE);
+	struct motion_sensor_t *ms = &motion_sensors[LIS2DW12_SENSOR_ID];
+	struct stprivate_data *drvdata = ms->drv_data;
+	uint32_t event = CONFIG_ACCEL_LIS2DW12_INT_EVENT;
+
+	/* Use range 1 so scaling has no effect on the samples. */
+	zassert_ok(ms->drv->set_range(ms, 1, 0));
+	drvdata->resol = LIS2DW12_RESOLUTION;
+	/* Stage every sample instead of dropping them. */
+	ms->oversampling_ratio = 1;
+	ms->oversampling = 0;
+	motion_sense_fifo_reset();
+
+	lis2dw12_emul_set_fifo_samples(emul, nsamples);
+	lis2dw12_emul_set_accel_reading(emul, sample);
+
+	return ms->drv->irq_handler(ms, &event);
+}
+
+/* Return the number of LIS2DW12 data frames in the FIFO, checking values. */
+static int lis2dw12_check_fifo_frames(const intv3_t expected)
+{
+	struct ec_response_motion_sensor_data out[64];
+	uint16_t out_size;
+	int frames = 0;
+	int count = motion_sense_fifo_read(sizeof(out), ARRAY_SIZE(out), out,
+					   &out_size);
+
+	for (int i = 0; i < count; i++) {
+		if (out[i].flags & MOTIONSENSE_SENSOR_FLAG_TIMESTAMP ||
+		    out[i].sensor_num != LIS2DW12_SENSOR_ID) {
+			continue;
+		}
+		CHECK_XYZ_EQUALS(out[i].data, expected);
+		frames++;
+	}
+	return frames;
+}
+
+ZTEST(lis2dw12, test_lis2dw12_irq_handler_fifo_multi_chunk)
+{
+	const struct emul *emul = EMUL_DT_GET(LIS2DW12_EMUL_NODE);
+	/* One more sample than fits in a single FIFO_READ_LEN burst. */
+	const int nsamples = FIFO_BUFFER_NUM_PATTERN + 1;
+	intv3_t fake_sample = { 10, -20, 30 };
+	intv3_t expected;
+	int fifo_samples_reads = 0;
+
+	for (int i = X; i <= Z; i++) {
+		expected[i] =
+			fake_sample[i] * (1 << (16 - LIS2DW12_RESOLUTION));
+	}
+	i2c_common_emul_set_read_func(emul_lis2dw12_get_i2c_common_data(emul),
+				      count_fifo_samples_reads,
+				      &fifo_samples_reads);
+
+	zassert_ok(lis2dw12_run_fifo_irq(nsamples, fake_sample));
+
+	zassert_equal(lis2dw12_emul_peek_reg(emul, LIS2DW12_FIFO_SAMPLES_ADDR),
+		      0);
+	/*
+	 * One read finds the queued samples and one read finds the FIFO
+	 * empty, so a single lis2dw12_load_fifo() call drained both bursts.
+	 */
+	zassert_equal(fifo_samples_reads, 2);
+	zassert_equal(lis2dw12_check_fifo_frames(expected), nsamples);
+}
+
+ZTEST(lis2dw12, test_lis2dw12_irq_handler_errors)
+{
+	const struct emul *emul = EMUL_DT_GET(LIS2DW12_EMUL_NODE);
+	struct i2c_common_emul_data *common_data =
+		emul_lis2dw12_get_i2c_common_data(emul);
+	struct motion_sensor_t *ms = &motion_sensors[LIS2DW12_SENSOR_ID];
+	intv3_t fake_sample = { 10, -20, 30 };
+	uint32_t event = 0;
+
+	zassert_equal(ms->drv->irq_handler(ms, &event), EC_ERROR_NOT_HANDLED);
+
+	i2c_common_emul_set_read_fail_reg(common_data,
+					  LIS2DW12_FIFO_SAMPLES_ADDR);
+	zassert_equal(lis2dw12_run_fifo_irq(2, fake_sample), EC_ERROR_INVAL);
+
+	/* FIFO bursts set the auto-increment bit in the register address. */
+	i2c_common_emul_set_read_fail_reg(common_data,
+					  LIS2DW12_OUT_X_L_ADDR | BIT(7));
+	zassert_equal(lis2dw12_run_fifo_irq(2, fake_sample), EC_ERROR_INVAL);
+}

@@ -20,6 +20,9 @@
 
 #define DT_DRV_COMPAT cros_lis2dw12_emul
 
+/* Register address MSB set by the driver to request auto-increment. */
+#define LIS2DW12_AUTOINC_ADDR_MASK BIT(7)
+
 LOG_MODULE_REGISTER(lis2dw12_emul, CONFIG_LIS2DW12_EMUL_LOG_LEVEL);
 
 struct lis2dw12_emul_data {
@@ -45,6 +48,8 @@ struct lis2dw12_emul_data {
 	int16_t accel_data[3];
 	/** FIFO control register */
 	uint8_t fifo_ctrl;
+	/** Emulated fifo samples register */
+	uint8_t fifo_samples_reg;
 };
 
 struct lis2dw12_emul_cfg {
@@ -68,6 +73,7 @@ void lis2dw12_emul_reset(const struct emul *emul)
 	data->ctrl3_reg = 0;
 	data->ctrl6_reg = 0;
 	data->status_reg = 0;
+	data->fifo_samples_reg = 0;
 	data->soft_reset_count = 0;
 
 	memset(data->accel_data, 0, sizeof(data->accel_data));
@@ -91,6 +97,8 @@ static int lis2dw12_emul_read_byte(const struct emul *emul, int reg,
 				   uint8_t *val, int bytes)
 {
 	struct lis2dw12_emul_data *data = emul->data;
+
+	reg &= ~LIS2DW12_AUTOINC_ADDR_MASK;
 
 	switch (reg) {
 	case LIS2DW12_WHO_AM_I_REG:
@@ -122,21 +130,24 @@ static int lis2dw12_emul_read_byte(const struct emul *emul, int reg,
 	case LIS2DW12_OUT_Y_L_ADDR:
 	case LIS2DW12_OUT_Y_H_ADDR:
 	case LIS2DW12_OUT_Z_L_ADDR:
-	case LIS2DW12_OUT_Z_H_ADDR:
+	case LIS2DW12_OUT_Z_H_ADDR: {
 		/* Allow multi-byte reads within this range of registers.
 		 * `bytes` is actually an offset past the starting register
-		 * `reg`.
+		 * `reg`. Wrap at each sample so a burst can read several
+		 * FIFO samples.
 		 */
 
-		__ASSERT_NO_MSG(LIS2DW12_OUT_X_L_ADDR + bytes <=
-				LIS2DW12_OUT_Z_H_ADDR);
-
-		/* 0 is OUT_X_L_ADDR .. 5 is OUT_Z_H_ADDR */
-		int offset_into_odrs = reg - LIS2DW12_OUT_X_L_ADDR + bytes;
+		int offset_into_odrs =
+			(reg - LIS2DW12_OUT_X_L_ADDR + bytes) % OUT_XYZ_SIZE;
 
 		/* Which of the 3 channels we're reading. 0 = X, 1 = Y, 2 = Z */
 		int channel = offset_into_odrs / 2;
 
+		/* The last byte of a sample pops it from the FIFO. */
+		if (offset_into_odrs == OUT_XYZ_SIZE - 1 &&
+		    data->fifo_samples_reg > 0) {
+			data->fifo_samples_reg--;
+		}
 		if (offset_into_odrs % 2 == 0) {
 			/* Get the LSB (L reg) */
 			*val = data->accel_data[channel] & 0xFF;
@@ -144,6 +155,11 @@ static int lis2dw12_emul_read_byte(const struct emul *emul, int reg,
 			/* Get the MSB (H reg) */
 			*val = (data->accel_data[channel] >> 8) & 0xFF;
 		}
+		break;
+	}
+	case LIS2DW12_FIFO_SAMPLES_ADDR:
+		__ASSERT_NO_MSG(bytes == 0);
+		*val = data->fifo_samples_reg;
 		break;
 	case LIS2DW12_FIFO_CTRL_ADDR:
 		__ASSERT_NO_MSG(bytes == 0);
@@ -207,6 +223,8 @@ static int lis2dw12_emul_write_byte(const struct emul *emul, int reg,
 {
 	struct lis2dw12_emul_data *data = emul->data;
 
+	reg &= ~LIS2DW12_AUTOINC_ADDR_MASK;
+
 	switch (reg) {
 	case LIS2DW12_WHO_AM_I_REG:
 		LOG_ERR("Can't write to who-am-i register");
@@ -240,6 +258,10 @@ static int lis2dw12_emul_write_byte(const struct emul *emul, int reg,
 	case LIS2DW12_OUT_Z_H_ADDR:
 		__ASSERT(false,
 			 "Attempt to write to data output register 0x%02x",
+			 reg);
+		return -EINVAL;
+	case LIS2DW12_FIFO_SAMPLES_ADDR:
+		__ASSERT(false, "Attempt to write to read-only register 0x%02x",
 			 reg);
 		return -EINVAL;
 	case LIS2DW12_FIFO_CTRL_ADDR:
@@ -322,4 +344,12 @@ struct i2c_common_emul_data *
 emul_lis2dw12_get_i2c_common_data(const struct emul *emul)
 {
 	return emul->data;
+}
+
+void lis2dw12_emul_set_fifo_samples(const struct emul *emul, uint8_t nsamples)
+{
+	__ASSERT(emul, "emul is NULL");
+	struct lis2dw12_emul_data *data = emul->data;
+
+	data->fifo_samples_reg = nsamples & LIS2DW12_FIFO_DIFF_MASK;
 }
