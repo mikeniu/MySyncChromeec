@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45d33f23_40b31a84",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T19:15:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Restores the `EC_CMD_GET_PROTOCOL_INFO` host command handler on non-FPMCU STM32 boards using SPI (`CONFIG_SPI`) by compiling `chip/stm32/host_command_common.o` when either `CONFIG_FINGERPRINT_MCU` or `CONFIG_SPI` is enabled and routing non-FPMCU SPI boards directly to `spi_get_protocol_info()`.\n* **Architecture \u0026 Component Fit:** ✅ Matches the existing transport-dispatch pattern in `chip/npcx/host_command_common.c` and the `$(or ...)` Makefile idiom in `chip/stm32/build.mk`.\n* **Code Simplicity:** ✅ Control flow in `host_command_protocol_info()` cleanly separates FPMCU runtime transport pin detection from the non-FPMCU `CONFIG_SPI` path.\n* **Idiomaticity \u0026 Readability:** ✅ Uses `IS_ENABLED()` and existing `fp_transport_type` / `ec_status` enums with no magic values.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ✅ Verified across affected STM32 board builds (`kakadu`, `kukui`, `krane`, `elm`, `nucleo-f412zg`, `nucleo-h743zi`) and on-device `ectool protoinfo` testing (`chip/stm32` host command transport is not built under `BOARD\u003dhost` emulator tests).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+16, -13)`. Single, atomic bug fix cherry-picked to the release branch.\n* **Commit Message:** ✅ Clear problem statement, historical context, and `BUG\u003d`/`TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/99640566-547c-44f1-ab15-b0e04e2b357f)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f9eb94fd037930bc57dd01ae3b5c821a227ecd50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
