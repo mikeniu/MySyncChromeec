@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54c93113_9102aa6f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T21:37:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments in `core/host/task.c` and `test/interrupt.c`.\n\n### Review Summary\n\n* **Functionality:** ❌ In `core/host/task.c`, checking `!task_started` in `set_interrupt_disabled()` causes `TASK_ID_HOOKS` (which unlocks `interrupt_lock` upon exiting `task_wait_event(1)` at line 243 and runs `HOOK_INIT`, `HOOK_TICK`, `HOOK_SECOND`, and two `interrupt_disable()` / `interrupt_enable()` critical sections before `task_scheduler()` sets `task_started \u003d 1`) to modify `interrupt_disabled` without locking `interrupt_lock` while `interrupt_thread` (spawned at line 534) is already running.\n* **Architecture \u0026 Component Fit:** ✅ Extracting `set_interrupt_disabled()` as a file-scoped helper in `core/host/task.c` cleanly centralizes the host emulator interrupt lock guard for `interrupt_disable()` and `interrupt_enable()`.\n* **Code Simplicity:** ⚠️ Removing the redundant `!task_started` check from `set_interrupt_disabled()` (since pre-scheduler execution on the main thread already has `my_task_id \u003d\u003d TASK_ID_INVALID`) simplifies the condition to `if (in_interrupt || my_task_id \u003d\u003d TASK_ID_INVALID)`.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions and naming.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ❌ In `test/interrupt.c`, `critical_section_isr()` does not verify that `interrupt_disable()` and `interrupt_enable()` actually toggle `is_interrupt_enabled()`, and `interrupt_disable_test()` calls `interrupt_enable()` right before `test_interrupt_disable_in_isr()` runs. In addition, the `my_task_id \u003d\u003d TASK_ID_INVALID` branch of `set_interrupt_disabled()` is not exercised by the test.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+41, -9)` (24 lines in `core/host/task.c`, 22 lines in `test/interrupt.c`, 4 lines in `test/build.mk`). Single cohesive bug fix paired with its unit test.\n* **Commit Message:** ✅ Clear problem statement, rationale, and footer tags (`BUG\u003d`, `TEST\u003d`, `Change-Id:`); once `!task_started` is removed in `core/host/task.c`, update the second paragraph accordingly if needed.\n\n[🔗](http://go/tj/d1b82277-a56b-4537-9524-1e9ebfe27e69)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "902c1cd2_c6947b4b",
+        "filename": "core/host/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T21:37:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `!task_started` should be removed from this guard:\n\n1. **`task_start()` does not hold `interrupt_lock` while `TASK_ID_HOOKS` initializes:** In `task_start()` (lines 532–541), `interrupt_lock` is locked while `TASK_ID_HOOKS` is parked inside `task_wait_event(1)` (line 478). As soon as `task_start()` signals `tasks[TASK_ID_HOOKS].resume`, `TASK_ID_HOOKS` wakes up at line 239 and unlocks `interrupt_lock` at line 243 before returning from `task_wait_event(1)` and invoking `hook_task()`.\n2. **Skipping `interrupt_lock` when `!task_started` races with `interrupt_thread` during `hook_task()` initialization:** `task_start()` spawns `interrupt_thread` at line 534 *before* resuming `TASK_ID_HOOKS` at line 541, while `task_started` is not set to `1` until `task_scheduler()` starts at line 439. During that window, `hook_task()` runs `HOOK_INIT`, `HOOK_TICK`, `HOOK_SECOND`, and two `interrupt_disable()` / `interrupt_enable()` critical sections (`common/hooks.c` lines 183–247). With `!task_started` in the condition, `TASK_ID_HOOKS` (`my_task_id \u003d\u003d TASK_ID_HOOKS`) updates `interrupt_disabled` without holding `interrupt_lock` while `interrupt_thread` is already running and reading `interrupt_disabled` under `interrupt_lock` in `task_trigger_test_interrupt()`.\n3. **Pre-scheduler calls on the main thread are already covered:** Any call before `task_start()` (e.g., in `test_main()` or `HOOK_INIT_EARLY`) or inside `task_start()` / `task_scheduler()` executes on the main thread, where `my_task_id \u003d\u003d TASK_ID_INVALID` is already true.\n\n```c\n/*\n * Only lock interrupt_lock from task or interrupt-generator threads. In an ISR\n * (task_trigger_test_interrupt() holds it) or on the main/scheduler thread\n * (my_task_id \u003d\u003d TASK_ID_INVALID, where a sleeping task may hold it), locking\n * it here would deadlock.\n */\nstatic void set_interrupt_disabled(int disabled)\n{\n\tif (in_interrupt || my_task_id \u003d\u003d TASK_ID_INVALID) {\n\t\tinterrupt_disabled \u003d disabled;\n\t\treturn;\n\t}\n\n\tpthread_mutex_lock(\u0026interrupt_lock);\n\tinterrupt_disabled \u003d disabled;\n\tpthread_mutex_unlock(\u0026interrupt_lock);\n}\n```\n\n[🔗](http://go/tj/d1b82277-a56b-4537-9524-1e9ebfe27e69)",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82030e21_f8e11d19",
+        "filename": "test/interrupt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T21:37:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Strengthen this test to verify both the interrupt state transitions inside the ISR and the `my_task_id \u003d\u003d TASK_ID_INVALID` branch of `set_interrupt_disabled()`:\n\n1. **Verify `is_interrupt_enabled()` inside `critical_section_isr()` (lines **34–39**):** Currently, `critical_section_isr()` never checks that `interrupt_disable()` actually disabled interrupts (`!is_interrupt_enabled()`), and because `interrupt_disable_test()` runs immediately before `test_interrupt_disable_in_isr()` and calls `interrupt_enable()` from task context at line 86, `TEST_ASSERT(is_interrupt_enabled())` here would still pass even if `critical_section_isr()` ran once during `interrupt_test()` and failed to re-enable interrupts (or if `set_interrupt_disabled()` returned early on `in_interrupt` without updating `interrupt_disabled`).\n2. **Exercise the `my_task_id \u003d\u003d TASK_ID_INVALID` branch:** During `interrupt`, `interrupt_disable()` and `interrupt_enable()` are only called from `TASK_ID_HOOKS`, `TASK_ID_TEST_RUNNER`, and `critical_section_isr()` (`in_interrupt \u003d\u003d true`), leaving `my_task_id \u003d\u003d TASK_ID_INVALID` untested. Toggling `interrupt_disable()` / `interrupt_enable()` in `test_init()` (which `test_main()` runs on the main thread where `my_task_id \u003d\u003d TASK_ID_INVALID`) covers that branch as well.\n\n```c\n/* ISRs may enter a critical section with interrupt_disable(). */\nstatic void critical_section_isr(void)\n{\n\tinterrupt_disable();\n\tif (is_interrupt_enabled())\n\t\thas_error \u003d 1;\n\tcritical_section_isr_count++;\n\tinterrupt_enable();\n\tif (!is_interrupt_enabled())\n\t\thas_error \u003d 1;\n}\n```\n\n```c\nvoid test_init(void)\n{\n\tinterrupt_disable();\n\tif (is_interrupt_enabled())\n\t\thas_error \u003d 1;\n\tinterrupt_enable();\n\tif (!is_interrupt_enabled())\n\t\thas_error \u003d 1;\n}\n\nstatic int test_interrupt_disable_in_isr(void)\n{\n\tTEST_GT(critical_section_isr_count, 0, \"%d\");\n\tTEST_ASSERT(!has_error);\n\tTEST_ASSERT(is_interrupt_enabled());\n\n\treturn EC_SUCCESS;\n}\n```\n\n[🔗](http://go/tj/d1b82277-a56b-4537-9524-1e9ebfe27e69)",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
