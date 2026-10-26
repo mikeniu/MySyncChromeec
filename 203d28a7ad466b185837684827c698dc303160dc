@@ -1,0 +1,223 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df1b5d1b_3cdfeb3c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Commit Message — Single Logical Change, Uncompiled Backend Claim \u0026 Series Narration:**\n\n1. **Subject line `\" and \"` \u0026 bundled scope:** The subject line (`rts5817: Add RtsUsbDevice lifecycle and download-mode control`) joins two distinct responsibilities with `\" and \"`, and the CL also bundles a third component (`RtsLibusbBackend`) that is not yet compiled in `util/build.mk`.\n2. **Avoid patch-series staging narration:** Drop the third paragraph (`\"The DFU interface handling, the download protocol and the command line entry point follow in later changes.\"`), which narrates the patch stack rather than describing this commit.\n\n### Copy-Pasteable Commit Messages (Recommended Split)\n\n**CL 1 (`RtsUsbDevice` lifecycle management):**\n```text\nrts5817: Add RtsUsbDevice lifecycle management\n\nIntroduce RtsUsbDevice and the RtsUsbBackend transport interface to\nmanage USB device initialization, re-enumeration polling, and resource\ncleanup for the self-contained RTS5817 flashing utility without an\nexternal dfu-util dependency. Include a gmock backend and unit tests\nwired into utils-test.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n**CL 2 (RTS5817 vendor download-mode control):**\n```text\nrts5817: Support enabling download mode on RtsUsbDevice\n\nExtend RtsUsbDevice and RtsUsbBackend with control transfer support to\nquery the RTS5817 runtime status and enable download mode via vendor\ncontrol requests when inactive. Add unit tests covering active,\ninactive, short-read, and error paths.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n**CL 3 (`RtsLibusbBackend` implementation, or fold into the CLI binary CL):**\n```text\nrts5817: Add libusb backend for RtsUsbDevice\n\nImplement RtsLibusbBackend using libusb-1.0 to provide hardware USB\ncontext management, device opening by VID:PID, and control transfers for\nRtsUsbDevice.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n### Copy-Pasteable Commit Message (Single-CL Alternative)\n```text\nrts5817: Add RtsUsbDevice wrapper for RTS5817 flashing utility\n\nIntroduce RtsUsbDevice and the RtsUsbBackend transport interface to\nmanage USB device lifecycles and enable download mode for the\nself-contained RTS5817 flashing utility, removing the external dfu-util\ndependency. Support opening devices by VID:PID, polling for device\nre-enumeration, releasing USB resources, and issuing RTS5817 vendor\ncontrol requests, with gmock unit tests wired into utils-test.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "625d1c3c_ff3bb35a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:**\n  * **`timeout_ms \u003d\u003d 0` Boundary Bug (`util/rts5817_usb_device.cc`, line 56):** `wait_for_device()` checks `if (timeout_ms \u003c 0 || poll_interval_ms \u003c\u003d 0)`, which allows `timeout_ms \u003d\u003d 0` through. Because the polling loop condition is `for (int waited \u003d 0; waited \u003c timeout_ms; ...)`, passing `timeout_ms \u003d\u003d 0` still releases existing resources and calls `backend_-\u003einit()`, executes zero `open()` attempts, and immediately fails. Check `timeout_ms \u003c\u003d 0` up front.\n  * **Device Handle Leak on Repeated `open()` (`util/rts5817_libusb_backend.cc`, lines 19–26):** Unlike `RtsLibusbBackend::init()`, `RtsLibusbBackend::open()` overwrites `dev_handle_` without closing an already-open handle if called again before `close()`.\n  * **Uncompiled Source Files (`util/build.mk`, lines 50–61):** `util/rts5817_libusb_backend.h` and `util/rts5817_libusb_backend.cc` are added in this CL, but `util/build.mk` only compiles `rts5817_usb_device.o` and `rts5817_usb_device_test.o`, leaving `rts5817_libusb_backend.{h,cc}` uncompiled by `make BOARD\u003dhost utils-test` and `make BOARD\u003dhost utils-host`.\n* **Architecture \u0026 Component Fit:**\n  * Introducing `RtsUsbBackend` and `MockRtsUsbBackend` cleanly decouples `RtsUsbDevice` from physical `libusb` hardware and aligns well with sibling host utilities in `util/` (such as `util/elan`). However, `RtsLibusbBackend` should be introduced in the CL that wires `rts5817_libusb_backend.o` into `util/build.mk` so it is compiled in the commit that adds it.\n* **Code Simplicity:**\n  * The control flow in `RtsUsbDevice::init()`, `wait_for_device()`, `release()`, and `enable_download()` is concise and direct, with injectable `SleepFn` avoiding real-time sleeps in unit tests.\n* **Idiomaticity \u0026 Readability:**\n  * **Header Constants (`util/rts5817_usb_device.h`, lines 19–35):** Use `inline constexpr` for namespace-scope constants defined in headers so they share a single definition across translation units.\n  * **Namespace Qualifications \u0026 Named Test Constants (`util/rts5817_usb_device_test.cc`):** Keep leading `::` on `using` declarations at namespace scope and drop redundant `::testing::` prefixes inside class and test bodies; extract the repeated `1000` and `100` polling intervals into named constants (`kTimeoutMs`, `kPollIntervalMs`).\n* **Security:**\n  * `enable_download()` properly checks `ret \u003c static_cast\u003cint\u003e(sizeof(status))` on `GET_STATUS` before reading `status`.\n* **Testing:**\n  * **Error-Path `close()` Verification Masked by Destructor (`util/rts5817_usb_device_test.cc`, lines 65–73, 107–116, 200–205):** Because `~RtsUsbDevice()` calls `release()` -\u003e `backend_-\u003eclose()` at teardown, `Times(AtLeast(2))` in `InitReleasesWhenDeviceNotFound` and `Times(AtLeast(1))` in `ReleaseClosesBackend` would still pass even if the failure-path `release()` in `init()` or `device_-\u003erelease()` in the test body were deleted, and `WaitForDeviceTimesOut` does not verify `close()` on timeout. Use `InSequence` with exact `close()` counts.\n  * **Missing `timeout_ms \u003d\u003d 0` Boundary Case (`util/rts5817_usb_device_test.cc`, lines 118–123):** Add `timeout_ms \u003d\u003d 0` to `WaitForDeviceRejectsInvalidIntervals` and assert `EXPECT_CALL(*backend_, init()).Times(0)`.\n  * **Wildcard Matchers on Deterministic Control Transfer Arguments (`util/rts5817_usb_device_test.cc`, lines 158–198):** Specify the exact expected control-transfer parameters in the remaining `EnableDownload*` tests rather than wildcard `_` matchers.\n* **CL Size \u0026 Scope:**\n  * This CL has `Size: L (+590, -0)`, consisting of **343 lines of production code** (`rts5817_usb_backend.h`: 44, `rts5817_libusb_backend.h`: 34, `rts5817_libusb_backend.cc`: 60, `rts5817_usb_device.h`: 75, `rts5817_usb_device.cc`: 130), **13 lines of build rules** (`util/build.mk`), and **234 lines of test/mock code** (`rts5817_mock_usb_backend.h`: 27, `rts5817_usb_device_test.cc`: 207). Because the non-test production diff exceeds the 250-line limit (`343 \u003e\u003d 250`) and bundles three distinct logical components (`RtsUsbDevice` lifecycle, RTS5817 vendor download-mode control, and an uncompiled `RtsLibusbBackend`), please split this CL:\n    1. **CL 1:** Add `RtsUsbBackend` (`init`, `open`, `close`, `error_name`), `MockRtsUsbBackend`, `RtsUsbDevice` lifecycle management (`init`, `wait_for_device`, `release`), lifecycle unit tests in `util/rts5817_usb_device_test.cc`, and `util/build.mk` (~185 non-test lines).\n    2. **CL 2:** Add `is_open()` and `control_transfer()` to `RtsUsbBackend`/`MockRtsUsbBackend`, RTS5817 vendor download-mode control (`enable_download()` and request constants), and the `EnableDownload*` unit tests (~75 non-test lines).\n    3. **CL 3:** Add `RtsLibusbBackend` (`util/rts5817_libusb_backend.h` and `util/rts5817_libusb_backend.cc`, ~94 lines) and wire `rts5817_libusb_backend.o` into `util/build.mk` (or fold it into the `rts5817_flash` CLI CL where `rts5817_libusb_backend.o` is linked).\n* **Commit Message:**\n  * Avoid joining multiple responsibilities with `\" and \"` in the subject line and remove the patch-series staging narration in the third paragraph. See the inline comment on `/COMMIT_MSG` for copy-pasteable commit messages.\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d60918d_25786d97",
+        "filename": "util/build.mk",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Uncompiled Source Files (`rts5817_libusb_backend.{h,cc}`):**\n\nThis CL adds `util/rts5817_libusb_backend.h` and `util/rts5817_libusb_backend.cc` (94 lines), but `util/build.mk` only compiles `rts5817_usb_device.o` and `rts5817_usb_device_test.o`. Nothing in this CL `#include`s `rts5817_libusb_backend.h` or compiles `rts5817_libusb_backend.cc`, so `make BOARD\u003dhost utils-test` and `make BOARD\u003dhost utils-host` never compile-check those files in this commit.\n\nPlease move `util/rts5817_libusb_backend.h` and `util/rts5817_libusb_backend.cc` to the CL where `rts5817_libusb_backend.o` is wired into `util/build.mk` (or if introduced in a dedicated backend CL, add `rts5817_libusb_backend.o` and `--cflags`/`--libs libusb-1.0` to `util/build.mk` in that CL so every source file in the commit is compiled).\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40c11bec_5ca937dd",
+        "filename": "util/rts5817_libusb_backend.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Prevent Handle Leak If `open()` Is Called While Already Open:**\n\nUnlike `init()` (which calls `close()` before re-initializing `ctx_`), calling `open()` when `dev_handle_` is already non-null overwrites `dev_handle_` without calling `libusb_close(dev_handle_)`, leaking the existing device handle. Close any existing `dev_handle_` before opening a new one:\n\n```cpp\nbool RtsLibusbBackend::open(uint16_t vid, uint16_t pid)\n{\n\tif (!ctx_)\n\t\treturn false;\n\n\tif (dev_handle_) {\n\t\tlibusb_close(dev_handle_);\n\t\tdev_handle_ \u003d nullptr;\n\t}\n\n\tdev_handle_ \u003d libusb_open_device_with_vid_pid(ctx_, vid, pid);\n\treturn dev_handle_ !\u003d nullptr;\n}\n```\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ff2c70d_38c996b3",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Reject `timeout_ms \u003c\u003d 0` Up Front in `wait_for_device()`:**\n\nLine 56 checks `timeout_ms \u003c 0`, which allows `timeout_ms \u003d\u003d 0` through. However, because the loop condition on line 68 is `for (int waited \u003d 0; waited \u003c timeout_ms; ...)`, passing `timeout_ms \u003d\u003d 0` still calls `release()` and `backend_-\u003einit()`, executes zero `open()` attempts, and then immediately calls `release()` and fails.\n\nReject `timeout_ms \u003c\u003d 0` in the precondition guard so non-positive timeouts fail fast without touching the USB backend:\n\n```cpp\nbool RtsUsbDevice::wait_for_device(uint16_t vid, uint16_t pid, int timeout_ms,\n\t\t\t\t   int poll_interval_ms)\n{\n\tif (timeout_ms \u003c\u003d 0 || poll_interval_ms \u003c\u003d 0)\n\t\treturn false;\n```\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd269e6c_713eb637",
+        "filename": "util/rts5817_usb_device.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Use `inline constexpr` for Header-Scope Constants:**\n\nIn C++17+ header files, use `inline constexpr` for namespace-scope constants so each constant has a single shared definition across translation units rather than internal linkage duplicated in every `.cc` file that includes the header:\n\n```cpp\n/* RTS5817 vendor-specific USB control requests (same as rtsflash.py) */\ninline constexpr uint8_t kRtsStdGetStatus \u003d 0x1A;\ninline constexpr uint8_t kRtsStdSetStatus \u003d 0x1B;\n/* wValue for kRtsStdSetStatus: enable download mode */\ninline constexpr uint16_t kRtsEnableDownloadMode \u003d 1;\n\n/*\n * Pre-computed bmRequestType values (raw uint8_t values per USB spec).\n * Avoids -Wdeprecated-enum-enum-conversion when OR\u0027ing different libusb\n * enum types.\n *   0x80 \u003d Device-to-host, Standard, Device\n *   0x00 \u003d Host-to-device, Standard, Device\n */\ninline constexpr uint8_t kBmReqD2hStdDev \u003d 0x80;\ninline constexpr uint8_t kBmReqH2dStdDev \u003d 0x00;\n\n/* USB I/O timeouts */\ninline constexpr unsigned int kUsbCtrlTimeoutMs \u003d 1000;\n```\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d8d4283_7c569963",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Avoid Redundant Leading `::testing::` Qualifications \u0026 Extract Named Polling Constants:**\n\n1. **Namespace qualification:** Keep leading `::` on `using` declarations at namespace scope (`using ::testing::AnyNumber;`, `using ::testing::InSequence;`, `using ::testing::Test;`), and drop the redundant `::testing::` prefixes inside class and test bodies (note that `using ::testing::SetArgPointee;` is already declared on line 22, yet lines 148, 164, and 193 still write `::testing::SetArgPointee`).\n2. **Named test constants:** Extract the repeated `1000` and `100` polling arguments into named constants (`kTimeoutMs`, `kPollIntervalMs`) so boundary and timeout tests can reference them symbolically:\n\n```cpp\nusing ::testing::_;\nusing ::testing::AnyNumber;\nusing ::testing::DoAll;\nusing ::testing::InSequence;\nusing ::testing::Return;\nusing ::testing::SetArgPointee;\nusing ::testing::StrictMock;\nusing ::testing::Test;\n\nconstexpr uint16_t kVid \u003d 0x0BDA;\nconstexpr uint16_t kPid \u003d 0x5817;\nconstexpr int kTimeoutMs \u003d 1000;\nconstexpr int kPollIntervalMs \u003d 100;\n\nclass RtsUsbDeviceTest : public Test {\n    protected:\n\tvoid SetUp() override\n\t{\n\t\tauto backend \u003d std::make_unique\u003cStrictMock\u003cMockRtsUsbBackend\u003e\u003e();\n\n\t\tbackend_ \u003d backend.get();\n\t\tEXPECT_CALL(*backend_, error_name(_))\n\t\t\t.WillRepeatedly(Return(\"error\"));\n\t\t/* The destructor releases the backend. */\n\t\tEXPECT_CALL(*backend_, close()).Times(AnyNumber());\n\t\tdevice_ \u003d std::make_unique\u003cRtsUsbDevice\u003e(\n\t\t\tstd::move(backend),\n\t\t\t[this](int ms) { slept_.push_back(ms); });\n\t}\n```\n\n* **Lines 70, 77, 142, 148, 164, 189, 193, 202**: Drop redundant `::testing::` prefixes.\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad7191de_d94777ef",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Verify Error-Path `close()` Calls Precisely \u0026 Cover the `timeout_ms \u003d\u003d 0` Boundary:**\n\n1. **Error-path `close()` count masked by `~RtsUsbDevice()`:** Because `~RtsUsbDevice()` also calls `release()` -\u003e `backend_-\u003eclose()` when `device_` is destroyed at teardown, `init()` on failure triggers **3** `close()` calls in total (once before `backend_-\u003einit()`, once on the `open()` failure path, and once in `~RtsUsbDevice()`). Using `Times(::testing::AtLeast(2))` in `InitReleasesWhenDeviceNotFound` (line 70) would still pass even if the failure-path `release()` in `init()` were deleted (since entry `release()` + destructor `release()` \u003d 2). Using `InSequence` and expecting the exact call sequence ensures both `release()` calls in `init()` and `wait_for_device()` are verified (and similarly in `ReleaseClosesBackend` on line 202, expecting `Times(2)` distinguishes `device_-\u003erelease()` from the destructor call).\n2. **`timeout_ms \u003d\u003d 0` boundary in `WaitForDeviceRejectsInvalidIntervals`:** Add `timeout_ms \u003d\u003d 0` alongside `-1` and verify `backend_-\u003einit()` is never called:\n\n```cpp\nTEST_F(RtsUsbDeviceTest, InitReleasesWhenDeviceNotFound)\n{\n\tInSequence seq;\n\n\tEXPECT_CALL(*backend_, close());\n\tEXPECT_CALL(*backend_, init()).WillOnce(Return(0));\n\tEXPECT_CALL(*backend_, open(kVid, kPid)).WillOnce(Return(false));\n\t/* Once on the failure path and once in ~RtsUsbDevice(). */\n\tEXPECT_CALL(*backend_, close()).Times(2);\n\n\tEXPECT_FALSE(device_-\u003einit(kVid, kPid));\n}\n\nTEST_F(RtsUsbDeviceTest, InitReleasesPreviousResourcesFirst)\n{\n\tInSequence seq;\n\n\tEXPECT_CALL(*backend_, close());\n\tEXPECT_CALL(*backend_, init()).WillOnce(Return(0));\n\tEXPECT_CALL(*backend_, open(kVid, kPid)).WillOnce(Return(true));\n\tEXPECT_CALL(*backend_, close());\n\n\tEXPECT_TRUE(device_-\u003einit(kVid, kPid));\n}\n\nTEST_F(RtsUsbDeviceTest, WaitForDeviceOpensImmediately)\n{\n\tEXPECT_CALL(*backend_, init()).WillOnce(Return(0));\n\tEXPECT_CALL(*backend_, open(kVid, kPid)).WillOnce(Return(true));\n\n\tEXPECT_TRUE(\n\t\tdevice_-\u003ewait_for_device(kVid, kPid, kTimeoutMs, kPollIntervalMs));\n\tEXPECT_TRUE(slept_.empty());\n}\n\nTEST_F(RtsUsbDeviceTest, WaitForDevicePollsUntilDeviceAppears)\n{\n\tEXPECT_CALL(*backend_, init()).WillOnce(Return(0));\n\tEXPECT_CALL(*backend_, open(kVid, kPid))\n\t\t.WillOnce(Return(false))\n\t\t.WillOnce(Return(false))\n\t\t.WillOnce(Return(true));\n\n\tEXPECT_TRUE(\n\t\tdevice_-\u003ewait_for_device(kVid, kPid, kTimeoutMs, kPollIntervalMs));\n\tEXPECT_EQ(slept_,\n\t\t  (std::vector\u003cint\u003e{ kPollIntervalMs, kPollIntervalMs }));\n}\n\nTEST_F(RtsUsbDeviceTest, WaitForDeviceTimesOut)\n{\n\tInSequence seq;\n\n\tEXPECT_CALL(*backend_, close());\n\tEXPECT_CALL(*backend_, init()).WillOnce(Return(0));\n\tEXPECT_CALL(*backend_, open(kVid, kPid))\n\t\t.Times(3)\n\t\t.WillRepeatedly(Return(false));\n\t/* Once on the timeout path and once in ~RtsUsbDevice(). */\n\tEXPECT_CALL(*backend_, close()).Times(2);\n\n\tEXPECT_FALSE(device_-\u003ewait_for_device(\n\t\tkVid, kPid, 3 * kPollIntervalMs, kPollIntervalMs));\n\tEXPECT_EQ(slept_,\n\t\t  (std::vector\u003cint\u003e{ kPollIntervalMs, kPollIntervalMs,\n\t\t\t\t     kPollIntervalMs }));\n}\n\nTEST_F(RtsUsbDeviceTest, WaitForDeviceRejectsInvalidIntervals)\n{\n\tEXPECT_CALL(*backend_, init()).Times(0);\n\n\tEXPECT_FALSE(device_-\u003ewait_for_device(kVid, kPid, kTimeoutMs, 0));\n\tEXPECT_FALSE(device_-\u003ewait_for_device(kVid, kPid, kTimeoutMs, -1));\n\tEXPECT_FALSE(device_-\u003ewait_for_device(kVid, kPid, 0, kPollIntervalMs));\n\tEXPECT_FALSE(device_-\u003ewait_for_device(kVid, kPid, -1, kPollIntervalMs));\n}\n```\n\n* **Line 202 (`ReleaseClosesBackend`)**: Use `EXPECT_CALL(*backend_, close()).Times(2);` (1 from `device_-\u003erelease()` + 1 from `~RtsUsbDevice()`) so the assertion is not satisfied by the destructor alone.\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 123,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a410a20_20f541b4",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:35:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Specify Exact Control Transfer Arguments Instead of Wildcard `_` Matchers:**\n\nIn `EnableDownloadSendsSetStatusWhenInactive` (lines 145–153), `control_transfer` expectations assert the exact protocol arguments (`kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _, sizeof(uint8_t), kUsbCtrlTimeoutMs` and `kBmReqH2dStdDev, kRtsStdSetStatus, kRtsEnableDownloadMode, 0, nullptr, 0, kUsbCtrlTimeoutMs`). In the remaining `EnableDownload*` tests below, wildcard `_` matchers are used for the request type, request code, `wValue`, `wIndex`, length, and timeout. Please specify the exact expected control-transfer parameters (using `_` only for the local `\u0026status` output pointer):\n\n```cpp\nTEST_F(RtsUsbDeviceTest, EnableDownloadSkipsSetStatusWhenAlreadyActive)\n{\n\tEXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,\n\t\t\t\t    sizeof(uint8_t), kUsbCtrlTimeoutMs))\n\t\t.WillOnce(DoAll(SetArgPointee\u003c4\u003e(1), Return(1)));\n\n\tEXPECT_TRUE(device_-\u003eenable_download());\n}\n\nTEST_F(RtsUsbDeviceTest, EnableDownloadFailsOnGetStatusError)\n{\n\tEXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,\n\t\t\t\t    sizeof(uint8_t), kUsbCtrlTimeoutMs))\n\t\t.WillOnce(Return(-1));\n\n\tEXPECT_FALSE(device_-\u003eenable_download());\n}\n\nTEST_F(RtsUsbDeviceTest, EnableDownloadFailsOnGetStatusShortRead)\n{\n\tEXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,\n\t\t\t\t    sizeof(uint8_t), kUsbCtrlTimeoutMs))\n\t\t.WillOnce(Return(0));\n\n\tEXPECT_FALSE(device_-\u003eenable_download());\n}\n\nTEST_F(RtsUsbDeviceTest, EnableDownloadFailsOnSetStatusError)\n{\n\tInSequence seq;\n\n\tEXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,\n\t\t\t\t    sizeof(uint8_t), kUsbCtrlTimeoutMs))\n\t\t.WillOnce(DoAll(SetArgPointee\u003c4\u003e(0), Return(1)));\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqH2dStdDev, kRtsStdSetStatus,\n\t\t\t\t    kRtsEnableDownloadMode, 0, nullptr, 0,\n\t\t\t\t    kUsbCtrlTimeoutMs))\n\t\t.WillOnce(Return(-1));\n\n\tEXPECT_FALSE(device_-\u003eenable_download());\n}\n```\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 198,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
