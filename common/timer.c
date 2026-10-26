@@ -341,8 +341,8 @@ void timer_print_info(void)
 	timestamp_t t = get_time();
 	uint64_t deadline = (uint64_t)t.le.hi << 32 | __hw_clock_event_get();
 
-	ccprintf("Time:     0x%016llx us, %11.6lld s\n"
-		 "Deadline: 0x%016llx -> %11.6lld s from now\n"
+	ccprintf("Time:     0x%016" PRIx64 " us, %11.6" PRId64 " s\n"
+		 "Deadline: 0x%016" PRIx64 " -> %11.6" PRId64 " s from now\n"
 		 "Active timers:\n",
 		 t.val, t.val, deadline, deadline - t.val);
 	cflush();
@@ -350,8 +350,9 @@ void timer_print_info(void)
 #ifndef CONFIG_ZEPHYR
 	for (int tskid = 0; tskid < TASK_ID_COUNT; tskid++) {
 		if (timer_running & BIT(tskid)) {
-			ccprintf("  Tsk %2d  0x%016llx -> %11.6lld\n", tskid,
-				 timer_deadline[tskid].val,
+			ccprintf("  Tsk %2d  0x%016" PRIx64 " -> %11.6" PRId64
+				 "\n",
+				 tskid, timer_deadline[tskid].val,
 				 timer_deadline[tskid].val - t.val);
 			cflush();
 		}
@@ -457,7 +458,8 @@ static int command_force_time(int argc, const char **argv)
 	if (*e)
 		return EC_ERROR_PARAM2;
 
-	ccprintf("Time: 0x%016llx = %.6lld s\n", new.val, new.val);
+	ccprintf("Time: 0x%016" PRIx64 " = %.6" PRId64 " s\n", new.val,
+		 new.val);
 	force_time(new);
 
 	return EC_SUCCESS;
@@ -470,7 +472,7 @@ DECLARE_CONSOLE_COMMAND(forcetime, command_force_time, "hi lo",
 static int command_get_time(int argc, const char **argv)
 {
 	timestamp_t ts = get_time();
-	ccprintf("Time: 0x%016llx = %.6lld s\n", ts.val, ts.val);
+	ccprintf("Time: 0x%016" PRIx64 " = %.6" PRId64 " s\n", ts.val, ts.val);
 
 	return EC_SUCCESS;
 }
