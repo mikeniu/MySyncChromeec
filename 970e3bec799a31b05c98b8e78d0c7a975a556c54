@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c5e727c_1c044ab8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:52Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "8520020b_9bc53f78",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 9999
+      },
+      "revId": "970e3bec799a31b05c98b8e78d0c7a975a556c54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79f79d19_d3589c50",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Blocking issues must be resolved before approval.\n\n### Review Summary\n- **Functionality**: ❌ Moving the ODR validation before `k_mutex_lock(s-\u003emutex, K_FOREVER)` and `lis2dh_enable_fifo(s, LIS2DH_FIFO_BYPASS_MODE)` fixes the mutex leak and FIFO bypass issue on rejected rates, and pre-checking `rate \u003c 0 || rate \u003e LIS2DH_ODR_MAX_VAL` avoids signed shift overflow in `LIS2DH_ODR_TO_REG()`. However, `LIS2DH_ODR_TO_NORMALIZE()` clamps any rate `\u003c\u003d 1000` up to `1000` (`LIS2DH_ODR_MIN_VAL`), so positive rates below `LIS2DH_ODR_MIN_VAL` with `rnd \u003d\u003d 0` (e.g., `rate \u003d 500, rnd \u003d 0`) silently round up to `1000` mHz instead of failing with `EC_RES_INVALID_PARAM`.\n- **Architecture \u0026 Component Fit**: ✅ Pre-validating ODR parameters before acquiring the sensor mutex and reconfiguring the hardware FIFO matches the ChromiumOS EC motion sensor driver contract (`EC_RES_INVALID_PARAM` on invalid rates without mutating hardware state).\n- **Code Simplicity**: ⚠️ Adding `rate \u003e LIS2DH_ODR_MAX_VAL` at line 291 makes the post-normalization bounds check (`normalized_rate \u003e LIS2DH_ODR_MAX_VAL || normalized_rate \u003c LIS2DH_ODR_MIN_VAL`) on lines 303–305 completely unreachable. In addition, initializing `normalized_rate \u003d 0` and `reg_val \u003d LIS2DH_ODR_0HZ_VAL` on lines 287–289 is redundant as long as lines 328–336 retain a separate `if (rate \u003d\u003d 0)` branch that hardcodes `LIS2DH_ODR_0HZ_VAL` and `0`.\n- **Idiomaticity \u0026 Readability**: ✅ Follows Zephyr/ChromiumOS EC C conventions and error-return idioms.\n- **Security**: ✅ Preventing signed shift overflow in `1 \u003c\u003c (31 - __builtin_clz(_odr / 25000))` for large `rate` values and preventing permanent mutex lockup on invalid input hardens the host-command/sensor path against out-of-range parameters.\n- **Testing**: ❌ `test_lis2dh__set_data_rate` only tests `LIS2DH_ODR_MAX_VAL * 2` and `-1`, missing exact boundary values (`LIS2DH_ODR_MAX_VAL`, `LIS2DH_ODR_MAX_VAL + 1`, `INT_MAX`, and `LIS2DH_ODR_MIN_VAL`), the `rnd \u003d\u003d 0` rounding-down path when `normalized_rate \u003c rate`, and verification that the FIFO remains enabled when an invalid rate is rejected under `ACCEL_LIS2DH_INT_ENABLE`.\n- **CL Size \u0026 Scope**: ✅ Small, focused bug fix (+33, -14 lines across 2 files).\n- **Commit Message**: ⚠️ Clearly states the motivation, `BUG\u003d`, and `TEST\u003d` lines, though the body narrates internal macro/variable names and omits mentioning that negative rates are now rejected rather than clamped to 1 Hz.\n\n[🔗](http://go/tj/a1a4e189-07cd-4c38-8653-eb5563cb57ac)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "970e3bec799a31b05c98b8e78d0c7a975a556c54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f6b1556_1e8c6311",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:52Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "79f79d19_d3589c50",
       "revId": "970e3bec799a31b05c98b8e78d0c7a975a556c54",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30694963_e68f5ee1",
+        "filename": "driver/accel_lis2dh.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:52Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "dd59a131_456571c2",
+      "range": {
+        "startLine": 287,
+        "startChar": 0,
+        "endLine": 289,
+        "endChar": 9999
+      },
+      "revId": "970e3bec799a31b05c98b8e78d0c7a975a556c54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0db20e6_70d961a0",
@@ -95,6 +161,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f75fe4a5_488f162a",
+        "filename": "driver/accel_lis2dh.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:52Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "a0db20e6_70d961a0",
+      "range": {
+        "startLine": 291,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 9999
+      },
+      "revId": "970e3bec799a31b05c98b8e78d0c7a975a556c54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "faf2c69f_7caa5536",
@@ -116,6 +206,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "970e3bec799a31b05c98b8e78d0c7a975a556c54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "386266b7_90c418ed",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_common.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:52Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "faf2c69f_7caa5536",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 9999
+      },
       "revId": "970e3bec799a31b05c98b8e78d0c7a975a556c54",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
