@@ -18,6 +18,23 @@
       "isAi": true,
       "revId": "ae867cf039893dd585c3d378f83eb79f4cae6e7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "434e22a6_6078d2cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:24:32Z",
+      "side": 1,
+      "message": "This might be good to send to Nuvoton for review.",
+      "revId": "ae867cf039893dd585c3d378f83eb79f4cae6e7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
