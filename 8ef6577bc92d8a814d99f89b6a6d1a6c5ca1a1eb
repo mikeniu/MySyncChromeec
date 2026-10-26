@@ -1,0 +1,173 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bead568_eed340b0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please split this CL into smaller, single-purpose CLs (see the top-level review summary for the suggested 3-CL breakdown) and revise the commit message so that it:\n\n1. Avoids joining multiple distinct change categories with `\" and \"` in the subject line.\n2. Leads with a brief rationale explaining *why* the change is needed before summarizing *what* changed conceptually.\n3. Omits narration about unit test coverage (`\"The descriptor parser is a standalone helper with unit test coverage of its boundary cases.\"`), since test coverage is already visible in the diff and `TEST\u003d` line.\n\n**Suggested commit messages if split into 3 CLs:**\n\n* **CL 1 (DFU functional descriptor parser):**\n```text\nrts5817: Add DFU functional descriptor transfer size parser\n\nDetermining the payload chunk size for RTS5817 USB DFU firmware\ndownloads requires reading wTransferSize from the class-specific DFU\nfunctional descriptor (type 0x21) attached to the DFU interface.\n\nAdd parse_dfu_transfer_size() and the associated USB DFU descriptor\nconstants to extract the little-endian wTransferSize field, falling back\nto the 1024-byte default when the descriptor is absent, malformed, or\nreports a zero transfer size.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n\nChange-Id: I653afa87a5b89071ab2f0dcdce2d52b7e8372354\n```\n\n* **CL 2 (USB interface enumeration in `RtsUsbBackend`):**\n```text\nrts5817: Support enumerating active USB configuration interfaces\n\nLocating the RTS5817 DFU interface requires inspecting the interface\nalternate settings and class-specific extra descriptors exposed by the\nactive USB configuration.\n\nAdd RtsUsbInterface and get_interfaces() to RtsUsbBackend,\nRtsLibusbBackend, and MockRtsUsbBackend to query the active\nconfiguration descriptor via libusb.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n* **CL 3 (DFU interface discovery and `DFU_DETACH`):**\n```text\nrts5817: Support transitioning to DFU mode via DFU_DETACH\n\nTransitioning the RTS5817 from runtime mode into DFU mode for firmware\nupdates requires locating the device\u0027s USB DFU interface (class 0xFE,\nsubclass 0x01) and issuing a class-specific DFU_DETACH control request.\n\nExtend RtsUsbDevice with DFU interface discovery and dfu_detach() to\nlocate the DFU interface, record its transfer size, and send DFU_DETACH\nto trigger USB re-enumeration.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4c1ee81_aeb5fc3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n* **Functionality:** `RtsUsbDevice::release()` calls `backend_-\u003erelease_interface(dfu_interface_)` even though `find_dfu_interface()` only reads the active configuration descriptor and never claims the interface via `libusb_claim_interface()`, which causes `libusb_release_interface()` to fail with `LIBUSB_ERROR_NOT_FOUND`. In addition, `dfu_interface_` is not reset to `-1` if `release()` is called when `backend_-\u003eis_open()` is `false`.\n* **Architecture \u0026 Component Fit:** `RtsUsbDevice` stores `transfer_size_` as a private member that is never read outside `printf`, making `find_dfu_transfer_size()`\u0027s integration in `find_dfu_interface()` dead state in this CL and untestable via `RtsUsbDeviceDfuTest`. Either expose an accessor (`uint16_t transfer_size() const`) or defer `transfer_size_` to the CL that uses it.\n* **Code Simplicity:** `parse_dfu_transfer_size()` can be simplified by accepting `std::span\u003cconst uint8_t\u003e` and advancing via `extra \u003d extra.subspan(desc_len)` instead of tracking manual `off`, `desc`, and `sz` pointers. In `RtsLibusbBackend::get_interfaces()`, constructing `RtsUsbInterface` in place via `interfaces-\u003eemplace_back(...)` with designated initializers avoids the temporary variable, `std::move`, and `#include \u003cutility\u003e`.\n* **Idiomaticity \u0026 Readability:** Prefer C++20/C++23 `std::span\u003cconst uint8_t\u003e` over raw `(const uint8_t *, int)` pointer/length pairs, and replace magic literals and multi-line field-by-field struct initialization in the unit tests with named constants and designated initializers.\n* **Security:** Bounds checks in `parse_dfu_transfer_size()` properly guard against zero-length and truncated descriptors.\n* **Testing:** Good unit test structure, but `ParseDfuTransferSizeTest` is missing boundary tests for a 1-byte buffer (`extra.size() \u003d\u003d kDfuDescTypeOff`) and for a descriptor longer than the minimum length (`desc_len \u003d\u003d kDfuDescMinLen + 1`), and `RtsUsbDeviceDfuTest` does not assert on the parsed transfer size.\n* **CL Size \u0026 Scope:** `Size: L (+406, -0)` (+211 production/mock lines across 6 files, +195 test lines). This CL bundles three independently reviewable logical changes that should be split into smaller stacked CLs:\n  1. **CL 1:** Add the standalone `parse_dfu_transfer_size()` descriptor parser and DFU descriptor constants (`util/rts5817_usb_device.h`, `util/rts5817_usb_device.cc`) with its `ParseDfuTransferSizeTest` unit tests (`util/rts5817_usb_device_test.cc`).\n  2. **CL 2:** Add `RtsUsbInterface` and `get_interfaces()` to `RtsUsbBackend`, `RtsLibusbBackend`, and `MockRtsUsbBackend` (`util/rts5817_usb_backend.h`, `util/rts5817_libusb_backend.h`, `util/rts5817_libusb_backend.cc`, `util/rts5817_mock_usb_backend.h`), deferring `release_interface()` to the CL that adds `claim_interface()`.\n  3. **CL 3:** Add DFU interface discovery and `RtsUsbDevice::dfu_detach()` (`util/rts5817_usb_device.h`, `util/rts5817_usb_device.cc`) with `RtsUsbDeviceDfuTest` (`util/rts5817_usb_device_test.cc`).\n* **Commit Message:** Please update the commit message for each split CL to avoid joining distinct change categories with `\" and \"` in the subject line, lead with the *Why* rationale, and omit test-suite narration.\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2f25c46_f8fbf246",
+        "filename": "util/rts5817_libusb_backend.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Instead of default-constructing a temporary `RtsUsbInterface info`, assigning each field individually, and calling `interfaces-\u003epush_back(std::move(info))`, construct the element directly in place with `emplace_back` and designated initializers. This also makes `#include \u003cutility\u003e` on line 8 unnecessary:\n\n```cpp\n\tinterfaces-\u003eclear();\n\tfor (uint8_t i \u003d 0; i \u003c config-\u003ebNumInterfaces; i++) {\n\t\tfor (int j \u003d 0; j \u003c config-\u003einterface[i].num_altsetting; j++) {\n\t\t\tconst libusb_interface_descriptor \u0026alt \u003d\n\t\t\t\tconfig-\u003einterface[i].altsetting[j];\n\t\t\tRtsUsbInterface \u0026info \u003d interfaces-\u003eemplace_back(\n\t\t\t\tRtsUsbInterface{\n\t\t\t\t\t.number \u003d alt.bInterfaceNumber,\n\t\t\t\t\t.usb_class \u003d alt.bInterfaceClass,\n\t\t\t\t\t.usb_subclass \u003d alt.bInterfaceSubClass,\n\t\t\t\t});\n\t\t\tif (alt.extra \u0026\u0026 alt.extra_length \u003e 0)\n\t\t\t\tinfo.extra.assign(alt.extra,\n\t\t\t\t\t\t  alt.extra + alt.extra_length);\n\t\t}\n\t}\n```\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec5328fb_95f4abb1",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two issues in `RtsUsbDevice::release()`:\n\n1. **Releasing an interface that was never claimed:** `find_dfu_interface()` only reads the active configuration descriptor via `backend_-\u003eget_interfaces()` (`libusb_get_active_config_descriptor`) and sets `dfu_interface_ \u003d alt.number`; neither `find_dfu_interface()` nor `RtsLibusbBackend` ever claims the interface with `libusb_claim_interface()`. Calling `libusb_release_interface()` on an unclaimed interface returns `LIBUSB_ERROR_NOT_FOUND` (and after `DFU_DETACH`, the device is already re-enumerating). Unless `claim_interface()` is also added and called here, defer `release_interface()` to the CL that introduces `claim_interface()`.\n2. **Stale `dfu_interface_` when `!backend_-\u003eis_open()`:** Because `dfu_interface_ \u003d -1;` is inside the `if (dfu_interface_ \u003e\u003d 0 \u0026\u0026 backend_-\u003eis_open())` block, calling `release()` when the backend is already closed leaves `dfu_interface_` set to the old interface number.\n\n```cpp\nvoid RtsUsbDevice::release()\n{\n\tdfu_interface_ \u003d -1;\n\ttransfer_size_ \u003d kDfuDefaultTransferSize;\n\tbackend_-\u003eclose();\n}\n```\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 91,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caf8f693_3dd61e44",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two improvements across `parse_dfu_transfer_size()` and `find_dfu_interface()`:\n\n1. **Simplify descriptor traversal with `std::span::subspan()`:** Accepting `std::span\u003cconst uint8_t\u003e extra` allows advancing `extra \u003d extra.subspan(desc_len)` directly instead of maintaining `int off`, `const uint8_t *desc`, and `const uint8_t *sz` pointers, and simplifies the call in `find_dfu_interface()` to `parse_dfu_transfer_size(alt.extra)`.\n2. **Untested / write-only `transfer_size_` member:** `find_dfu_interface()` writes `transfer_size_`, but `RtsUsbDevice` never reads `transfer_size_` (outside `printf`) and exposes no accessor, making the integration of `parse_dfu_transfer_size()` inside `find_dfu_interface()` unverifiable in `RtsUsbDeviceDfuTest`. Please either expose a `uint16_t transfer_size() const { return transfer_size_; }` accessor (and assert on it in `RtsUsbDeviceDfuTest`) or defer `transfer_size_` to the CL that uses it for `DFU_DNLOAD` transfers.\n\n```cpp\nuint16_t parse_dfu_transfer_size(std::span\u003cconst uint8_t\u003e extra)\n{\n\t/*\n\t * Walk the descriptor stream.  The DFU functional descriptor has type\n\t * 0x21 and contains wTransferSize at byte offset 5-6.\n\t */\n\twhile (extra.size() \u003e kDfuDescTypeOff) {\n\t\tuint8_t desc_len \u003d extra[0];\n\n\t\tif (desc_len \u003d\u003d 0 || desc_len \u003e extra.size())\n\t\t\tbreak;\n\n\t\tif (extra[kDfuDescTypeOff] \u003d\u003d kDfuDescriptorType \u0026\u0026\n\t\t    desc_len \u003e\u003d kDfuDescMinLen) {\n\t\t\tuint16_t size \u003d extra[kDfuDescXferSizeOff] |\n\t\t\t\t\t(extra[kDfuDescXferSizeOff + 1] \u003c\u003c 8);\n\n\t\t\treturn size !\u003d 0 ? size : kDfuDefaultTransferSize;\n\t\t}\n\t\textra \u003d extra.subspan(desc_len);\n\t}\n\n\treturn kDfuDefaultTransferSize;\n}\n```\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 233,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2faedcc_6ebb234e",
+        "filename": "util/rts5817_usb_device.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since host utilities in `util/` are compiled with `-std\u003dgnu++23` and every caller holds a `std::vector\u003cuint8_t\u003e`, prefer taking `std::span\u003cconst uint8_t\u003e extra` (with `size_t` offset/length constants) instead of a raw `(const uint8_t *extra, int extra_length)` pair.\n\nUsing `std::span\u003cconst uint8_t\u003e` eliminates the `nullptr` and negative-length edge cases via the type system and avoids `.data()` and `static_cast\u003cint\u003e(.size())` boilerplate at every call site:\n\n```cpp\n#include \u003ccstddef\u003e\n...\n#include \u003cspan\u003e\n\n/* DFU functional descriptor layout (byte offsets and minimum length) */\nconstexpr size_t kDfuDescTypeOff \u003d 1;\nconstexpr size_t kDfuDescXferSizeOff \u003d 5;\nconstexpr size_t kDfuDescMinLen \u003d 9;\n...\nuint16_t parse_dfu_transfer_size(std::span\u003cconst uint8_t\u003e extra);\n```\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7c90541_69924da8",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please address the following test coverage and readability items in the new test suites:\n\n1. **Missing boundary cases in `ParseDfuTransferSizeTest`:**\n   * **Exact 1-byte buffer boundary (`extra.size() \u003d\u003d kDfuDescTypeOff`):** `NullOrEmptyUsesDefault` tests length `0`, and other tests use `\u003e\u003d 3` bytes, leaving the exact loop-condition boundary `extra.size() \u003d\u003d kDfuDescTypeOff` (`1` byte, e.g. `{ 0x01 }`) untested. Testing a 1-byte buffer ensures `extra[kDfuDescTypeOff]` is not read out of bounds if `\u003c` were accidentally written as `\u003c\u003d`.\n   * **Descriptor longer than `kDfuDescMinLen` (`desc_len \u003d\u003d kDfuDescMinLen + 1`):** `desc_len \u003e\u003d kDfuDescMinLen` is tested at `kDfuDescMinLen - 1` and `kDfuDescMinLen`, but never at `kDfuDescMinLen + 1` (e.g. an extended DFU descriptor with trailing byte).\n2. **Verify `transfer_size` parsing in `RtsUsbDeviceDfuTest`:** In `DetachSendsRequestToDfuInterface`, pass a non-default transfer size (e.g. `dfu_interface(2, 2048)`) and assert `EXPECT_EQ(device_-\u003etransfer_size(), 2048);` so that `find_dfu_interface()`\u0027s call to `parse_dfu_transfer_size()` is verified.\n3. **Avoid magic numbers and multi-line field-by-field struct initialization in tests:**\n   * Replace magic literals (`9` on line 234, `0x03`/`0x01` on lines 347-348, and unexplained descriptor bytes in `dfu_func_desc`) with named constants or inline field comments.\n   * Use designated initializers when constructing `RtsUsbInterface` in `dfu_interface()`, `DetachFailsWithoutDfuInterface`, and `DetachSendsRequestToDfuInterface`:\n\n```cpp\nTEST(ParseDfuTransferSizeTest, SingleByteBufferUsesDefault)\n{\n\tconst std::vector\u003cuint8_t\u003e extra \u003d { 0x01 };\n\n\tEXPECT_EQ(parse_dfu_transfer_size(extra), kDfuDefaultTransferSize);\n}\n\nTEST(ParseDfuTransferSizeTest, ValidDescriptorLongerThanMinLength)\n{\n\tauto extra \u003d dfu_func_desc(2048);\n\n\textra[0] \u003d kDfuDescMinLen + 1;\n\textra.push_back(0x00);\n\tEXPECT_EQ(parse_dfu_transfer_size(extra), 2048);\n}\n```\n\nAnd in `RtsUsbDeviceDfuTest`:\n\n```cpp\n\tRtsUsbInterface dfu_interface(int number, uint16_t transfer_size)\n\t{\n\t\treturn {\n\t\t\t.number \u003d number,\n\t\t\t.usb_class \u003d kDfuClass,\n\t\t\t.usb_subclass \u003d kDfuSubclass,\n\t\t\t.extra \u003d dfu_func_desc(transfer_size),\n\t\t};\n\t}\n...\nTEST_F(RtsUsbDeviceDfuTest, DetachFailsWithoutDfuInterface)\n{\n\tconstexpr uint8_t kHidClass \u003d 0x03;\n\n\texpect_interfaces({\n\t\tRtsUsbInterface{\n\t\t\t.number \u003d 0,\n\t\t\t.usb_class \u003d kHidClass,\n\t\t\t.usb_subclass \u003d kDfuSubclass,\n\t\t},\n\t});\n\tEXPECT_CALL(*backend_, control_transfer(_, _, _, _, _, _, _)).Times(0);\n\n\tEXPECT_FALSE(device_-\u003edfu_detach(1000));\n}\n```\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 378,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
