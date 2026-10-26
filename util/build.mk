@@ -17,6 +17,7 @@ endif
 host-util-bin-cxx-y += lbcc
 host-util-bin-cxx-y += iteflash
 host-util-bin-cxx-y += itecomdbgr
+host-util-bin-cxx-y += rts5817_flash
 host-util-bin-cxx-y += cbi-util
 
 host-util-bin-cxx-y += rtkupdate
@@ -47,8 +48,14 @@ include util/focaltech/build.mk
 
 include util/elan/build.mk
 
+rts5817_flash-objs = rts5817_flash.o rts5817_flash_cli.o
+rts5817_flash-objs += rts5817_usb_device.o rts5817_libusb_backend.o
+$(out)/util/rts5817_flash: HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) \
+	--libs libusb-1.0)
+
 host-util-bin-cxx-y += rts5817_flash_test
 rts5817_flash_test-objs = rts5817_usb_device.o rts5817_usb_device_test.o
+rts5817_flash_test-objs += rts5817_flash_cli.o rts5817_flash_cli_test.o
 $(out)/util/rts5817_flash_test: HOST_CXXFLAGS+=-Iutil
 $(out)/util/rts5817_flash_test: HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) \
 	--cflags gtest gmock)
