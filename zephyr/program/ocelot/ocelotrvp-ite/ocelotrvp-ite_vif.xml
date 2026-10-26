@@ -203,6 +203,35 @@
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20598">5076</vif:PID_SOP>
     <vif:bcdDevice_SOP value="4896">1320</vif:bcdDevice_SOP>
+    <!--Non-USB Content-->
+    <opt:OptionalContent identifier="DPAM" xml:space="preserve">
+      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+      <!--;DisplayPort Alternate Mode-->
+      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+      <vif:VIF_App>
+        <vif:Vendor>VESA</vif:Vendor>
+        <vif:Name>DPAM VIF Generator</vif:Name>
+        <vif:Version>2.12.5</vif:Version>
+        <vif:VESA_VIF_Specification>0.6.0</vif:VESA_VIF_Specification>
+      </vif:VIF_App>
+      <opt:DisplayPort_Product_Summary>
+        <opt:DP_Alt_Mode_Device_Type value="2">DisplayPort Source (Notebook)</opt:DP_Alt_Mode_Device_Type>
+        <opt:DPAM_Version value="0">DPAM Version 2.0 or earlier</opt:DPAM_Version>
+        <opt:Max_DP_Signaling_Rate_Support value="4">HBR3 Supported</opt:Max_DP_Signaling_Rate_Support>
+      </opt:DisplayPort_Product_Summary>
+      <opt:SOP_DP_Capabilities>
+        <opt:SOP_DP_Capability value="2">DP_Source_Capable</opt:SOP_DP_Capability>
+        <opt:SOP_DP_Receptacle_Indication value="1">DP on USB-C Receptacle</opt:SOP_DP_Receptacle_Indication>
+        <opt:SOP_USB2_Not_Used value="0">USB2.0 may be needed</opt:SOP_USB2_Not_Used>
+        <opt:SOP_DP_Source_Pin_Assignments value="28">DP_Src_Pin_Assignments_C, DP_Src_Pin_Assignments_D, DP_Src_Pin_Assignments_E</opt:SOP_DP_Source_Pin_Assignments>
+        <opt:SOP_DP_Alt_Mode_Version value="0">DPAM Version 2.0 or earlier</opt:SOP_DP_Alt_Mode_Version>
+      </opt:SOP_DP_Capabilities>
+      <opt:DisplayPort_Status>
+        <opt:SOP_DP_Src_Sink_Device_Connected value="1">DP Source Connected</opt:SOP_DP_Src_Sink_Device_Connected>
+        <opt:SOP_DP_Multifunction_Preferred value="1">Multifunction is preferred</opt:SOP_DP_Multifunction_Preferred>
+        <opt:SOP_DP_Suspend_Support value="1">DPAM Suspend Support</opt:SOP_DP_Suspend_Support>
+      </opt:DisplayPort_Status>
+    </opt:OptionalContent>
   </vif:Component>
   <vif:Component>
     <!--Component 1: Port 1-->
@@ -388,5 +417,34 @@
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20598">5076</vif:PID_SOP>
     <vif:bcdDevice_SOP value="4896">1320</vif:bcdDevice_SOP>
+    <!--Non-USB Content-->
+    <opt:OptionalContent identifier="DPAM" xml:space="preserve">
+      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+      <!--;DisplayPort Alternate Mode-->
+      <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+      <vif:VIF_App>
+        <vif:Vendor>VESA</vif:Vendor>
+        <vif:Name>DPAM VIF Generator</vif:Name>
+        <vif:Version>2.12.5</vif:Version>
+        <vif:VESA_VIF_Specification>0.6.0</vif:VESA_VIF_Specification>
+      </vif:VIF_App>
+      <opt:DisplayPort_Product_Summary>
+        <opt:DP_Alt_Mode_Device_Type value="2">DisplayPort Source (Notebook)</opt:DP_Alt_Mode_Device_Type>
+        <opt:DPAM_Version value="0">DPAM Version 2.0 or earlier</opt:DPAM_Version>
+        <opt:Max_DP_Signaling_Rate_Support value="4">HBR3 Supported</opt:Max_DP_Signaling_Rate_Support>
+      </opt:DisplayPort_Product_Summary>
+      <opt:SOP_DP_Capabilities>
+        <opt:SOP_DP_Capability value="2">DP_Source_Capable</opt:SOP_DP_Capability>
+        <opt:SOP_DP_Receptacle_Indication value="1">DP on USB-C Receptacle</opt:SOP_DP_Receptacle_Indication>
+        <opt:SOP_USB2_Not_Used value="0">USB2.0 may be needed</opt:SOP_USB2_Not_Used>
+        <opt:SOP_DP_Source_Pin_Assignments value="28">DP_Src_Pin_Assignments_C, DP_Src_Pin_Assignments_D, DP_Src_Pin_Assignments_E</opt:SOP_DP_Source_Pin_Assignments>
+        <opt:SOP_DP_Alt_Mode_Version value="0">DPAM Version 2.0 or earlier</opt:SOP_DP_Alt_Mode_Version>
+      </opt:SOP_DP_Capabilities>
+      <opt:DisplayPort_Status>
+        <opt:SOP_DP_Src_Sink_Device_Connected value="1">DP Source Connected</opt:SOP_DP_Src_Sink_Device_Connected>
+        <opt:SOP_DP_Multifunction_Preferred value="1">Multifunction is preferred</opt:SOP_DP_Multifunction_Preferred>
+        <opt:SOP_DP_Suspend_Support value="1">DPAM Suspend Support</opt:SOP_DP_Suspend_Support>
+      </opt:DisplayPort_Status>
+    </opt:OptionalContent>
   </vif:Component>
 </vif:VIF>
