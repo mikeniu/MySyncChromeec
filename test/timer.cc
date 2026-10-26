@@ -11,12 +11,18 @@
 
 #include "common.h"
 #include "compiler.h"
+#include "hwtimer.h"
 #include "math_util.h"
 #include "task.h"
 #include "test_util.h"
 #include "timer.h"
 #include "uart.h"
 #include "watchdog.h"
+
+void before_test(void)
+{
+	__hw_clock_source_init(0);
+}
 
 test_static int test_usleep(void)
 {

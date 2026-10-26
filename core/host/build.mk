@@ -8,4 +8,5 @@
 
 CFLAGS_CPU=-fno-builtin
 
-core-y=main.o task.o timer.o panic.o disabled.o stack_trace.o
+core-y=main.o task.o panic.o disabled.o stack_trace.o
+core-$(call not_cfg,$(CONFIG_COMMON_TIMER))+=timer.o
