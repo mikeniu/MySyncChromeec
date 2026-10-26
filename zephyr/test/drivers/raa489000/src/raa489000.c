@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "charge_state.h"
 #include "driver/charger/isl923x.h"
 #include "driver/charger/isl923x_public.h"
 #include "driver/tcpm/raa489000.h"
@@ -159,6 +160,30 @@ ZTEST(tcpc_raa489000, test_get_actual_current_read_error)
 	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
 	zassert_ok(isl923x_drv.get_actual_current(chgnum, &current));
 	zassert_equal(current, 0);
+}
+
+ZTEST(tcpc_raa489000, test_enable_linear_charge_read_error)
+{
+	const struct emul *emul = EMUL_DT_GET(DT_NODELABEL(isl923x_emul));
+	struct i2c_common_emul_data *common =
+		emul_isl923x_get_i2c_common_data(emul);
+	const int prev_chg = charge_get_active_chg_chip();
+
+	isl923x_emul_reset_registers(emul);
+	charge_set_active_chg_chip(CHARGER_SECONDARY);
+
+	/* A failed read must not write CONTROL2 back. */
+	i2c_common_emul_set_read_fail_reg(common, ISL923X_REG_CONTROL2);
+	zassert_equal(EC_ERROR_UNKNOWN,
+		      isl923x_drv.enable_linear_charge(CHARGER_PRIMARY, true));
+	zassert_equal(isl923x_emul_peek_reg(emul, ISL923X_REG_CONTROL2), 0);
+
+	i2c_common_emul_set_read_fail_reg(common, I2C_COMMON_EMUL_NO_FAIL_REG);
+	zassert_ok(isl923x_drv.enable_linear_charge(CHARGER_PRIMARY, true));
+	zassert_equal(isl923x_emul_peek_reg(emul, ISL923X_REG_CONTROL2),
+		      GENMASK(15, 13));
+
+	charge_set_active_chg_chip(prev_chg);
 }
 
 ZTEST_SUITE(tcpc_raa489000, drivers_predicate_post_main, NULL, NULL, NULL,
