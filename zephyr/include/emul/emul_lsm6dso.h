@@ -7,6 +7,7 @@
 #define __EMUL_LSM6DSO_H
 
 #include "ec_commands.h"
+#include "emul/emul_common_i2c.h"
 
 #include <zephyr/drivers/emul.h>
 
@@ -37,5 +38,14 @@ void emul_lsm6dso_append_sample(const struct emul *target,
  */
 void emul_lsm6dso_append_raw_tag(const struct emul *target, uint8_t raw_tag,
 				 int16_t x, int16_t y, int16_t z);
+
+/**
+ * Get the I2C common data of the emulator, e.g. to inject I2C errors.
+ *
+ * @param target The emulated target
+ * @return Pointer to the I2C common emulator data
+ */
+struct i2c_common_emul_data *
+emul_lsm6dso_get_i2c_common_data(const struct emul *target);
 
 #endif /* __EMUL_LSM6DSO_H */

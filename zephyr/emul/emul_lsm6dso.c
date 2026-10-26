@@ -192,6 +192,14 @@ void emul_lsm6dso_append_sample(const struct emul *emul,
 	}
 }
 
+struct i2c_common_emul_data *
+emul_lsm6dso_get_i2c_common_data(const struct emul *emul)
+{
+	struct lsm6dso_emul_data *data = emul->data;
+
+	return &data->i2c;
+}
+
 static void lsm6dso_emul_reset(const struct emul *emul)
 {
 	struct lsm6dso_emul_data *data = emul->data;
