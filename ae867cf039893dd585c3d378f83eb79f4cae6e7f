@@ -35,6 +35,23 @@
       "message": "This might be good to send to Nuvoton for review.",
       "revId": "ae867cf039893dd585c3d378f83eb79f4cae6e7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bb213df_7d52d448",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-26T22:32:05Z",
+      "side": 1,
+      "message": "Not sure if this is an actual issue that needs to be fixed. Posted an updated in the bug based on some extra testing.",
+      "revId": "ae867cf039893dd585c3d378f83eb79f4cae6e7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
