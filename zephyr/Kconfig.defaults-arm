@@ -19,3 +19,6 @@ configdefault CORTEX_M_NULL_POINTER_EXCEPTION_PAGE_SIZE
 # Stackwalk on ARM causes build problems on many platforms, disable for now.
 configdefault ARCH_HAS_STACKWALK
 	default n
+
+configdefault INIT_ARCH_HW_AT_BOOT
+	default y
