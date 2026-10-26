@@ -57,6 +57,15 @@ ZTEST(timer, test_console_cmd_timerinfo)
 	/* Task timer information not printed here if running in a Zephyr EC */
 }
 
+ZTEST(timer, test_get_time_microsecond_resolution)
+{
+	timestamp_t start = get_time();
+
+	k_busy_wait(10);
+
+	zassert_equal(time_since32(start), 10);
+}
+
 static void reset(void *data)
 {
 	ARG_UNUSED(data);
