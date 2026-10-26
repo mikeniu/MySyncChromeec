@@ -18,6 +18,23 @@
       "isAi": true,
       "revId": "c7ef7f8cc84d019f9df5a01baf3df3a065f002cc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9eba35b_928a4329",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_interrupt.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-26T20:44:14Z",
+      "side": 1,
+      "message": "nit: Use USEC_PER_MSEC instead of MSEC (flagged by check_zephyr_for_ec_symbols).",
+      "revId": "c7ef7f8cc84d019f9df5a01baf3df3a065f002cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
