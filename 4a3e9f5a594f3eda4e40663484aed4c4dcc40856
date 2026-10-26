@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f6624cd_e9c82a2c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done in ps6: the commit message now states the motivation (no external dfu-util dependency) and drops the implementation narration. TEST\u003d points at make BOARD\u003dhost utils-test, which now runs the RtsUsbDevice unit tests.",
+      "parentUuid": "678ab238_3c662e84",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b82dc40_b5cbce52",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:**\n  * **Short Read on `GET_STATUS` (`enable_download`, lines 204–213):** `libusb_control_transfer` returns the byte count transferred on success (`\u003e\u003d 0`). Checking only `if (ret \u003c 0)` misses a 0-byte short read (`ret \u003d\u003d 0`), leaving `status` at its initial `0` value and misinterpreting an empty response as status `0`. Check `if (ret \u003c static_cast\u003cint\u003e(sizeof(status)))`.\n  * **Missing Null-Handle Precondition Guard (`find_dfu_interface`, line 273):** Unlike `enable_download()`, `find_dfu_interface()` (and its caller `dfu_detach()`) does not check `if (!dev_handle_) return false;` before calling `libusb_get_device(dev_handle_)`, which dereferences a null pointer if called before `init()` or after `release()`.\n  * **Zero `wTransferSize` Validation (`find_dfu_interface`, lines 314–318):** If a malformed DFU functional descriptor specifies `wTransferSize \u003d\u003d 0`, overwriting `transfer_size_` with `0` causes the chunking loop in `dfu_download()` to stall with 0-byte transfers; fall back to `kDfuDefaultTransferSize` when the parsed transfer size is `0`.\n  * **Resource Leak on Repeated Initialization (`init` / `wait_for_device`, lines 128–176):** Calling `init()` or `wait_for_device()` when `ctx_` or `dev_handle_` is already active overwrites `ctx_` without releasing the existing USB handle or context, and `wait_for_device()` loops forever if `poll_interval_ms \u003c\u003d 0`. Call `release()` before re-initializing.\n* **Architecture \u0026 Component Fit:**\n  * Extracting the pure DFU functional descriptor TLV parser out of `find_dfu_interface()` into a standalone helper function separates pure byte-buffer parsing from `libusb` device I/O so it can be unit-tested independently.\n* **Code Simplicity:**\n  * **Unreachable Post-Loop Code (`find_dfu_interface`, lines 333–338):** Because the loop body unconditionally returns `true` at line 327 upon finding a DFU interface, reaching line 331 guarantees `dfu_interface_` is `-1`. The `if (dfu_interface_ \u003c 0)` check is redundant and `return true;` at line 338 is unreachable dead code.\n  * **Duplicated Cleanup (`init` / `wait_for_device`, lines 142–143, 171–172):** Reuse `release()` on failure paths instead of manually repeating `libusb_exit(ctx_); ctx_ \u003d nullptr;`.\n* **Idiomaticity \u0026 Readability:**\n  * **In-Class Member Initializers (lines 68–74, 116–119):** Initialize `dev_handle_`, `ctx_`, `dfu_interface_`, and `transfer_size_` at their member declarations and use `RtsUsbDevice() \u003d default;`.\n  * **Typed Durations / No Magic Multipliers (line 167):** Replace `usleep(poll_interval_ms * 1000)` (which uses a raw `1000` conversion factor and `\u003cunistd.h\u003e`) with `std::this_thread::sleep_for(std::chrono::milliseconds(poll_interval_ms))` (or a named constant).\n  * **Type Alignment \u0026 C++ Style (lines 106, 239, 289):** Change `detach_timeout_ms` in `dfu_detach()` from `unsigned int` to `uint16_t` to match the 16-bit USB `wValue` parameter of `libusb_control_transfer`, and drop the redundant `struct` keyword on `const libusb_interface_descriptor *alt`.\n* **Security:**\n  * Bounds checks in `find_dfu_interface()` (`off + 1 \u003c alt-\u003eextra_length`, `desc_len \u003d\u003d 0`, `off + desc_len \u003e alt-\u003eextra_length`, `desc_len \u003e\u003d kDfuDescMinLen`) properly prevent out-of-bounds reads on malformed USB extra descriptors.\n* **Testing:**\n  * **Missing Unit Tests for DFU Functional Descriptor Parsing:** While hardware control transfers require a physical or mocked USB device, the DFU functional descriptor TLV parser (lines 298–323) is pure buffer-parsing logic and has no automated unit tests. Please extract it into a helper and add `gtest` coverage for exact minimum length (`kDfuDescMinLen`), off-by-one short descriptors (`kDfuDescMinLen - 1`), truncated descriptors (`off + desc_len \u003e extra_length`), zero-length descriptors (`desc_len \u003d\u003d 0`), multiple TLV entries, and `wTransferSize \u003d\u003d 0`.\n* **CL Size \u0026 Scope:**\n  * This CL has `Size: L (+339, -0)` with 339 lines of production code and 0 lines of tests, exceeding the 250-line limit for non-test changes and combining vendor-specific runtime control with USB DFU descriptor discovery and detachment (including parsing `transfer_size_`, which is only consumed in the follow-up `dfu_download` CL).\n  * **Proposed Split Plan:**\n    1. **CL 1:** Add the base `RtsUsbDevice` USB lifecycle management (`init`, `wait_for_device`, `open_silent`, `release`) and RTS5817 vendor-specific download-mode control (`enable_download`).\n    2. **CL 2:** Add USB DFU interface discovery (`find_dfu_interface`), `dfu_detach()`, and the extracted DFU functional descriptor parser helper with its `gtest` unit tests.\n* **Commit Message:**\n  * State the high-level motivation (\"why\" a self-contained `libusb` tool is needed rather than external `dfu-util`), remove low-level diff narration (`\"The class owns the libusb context and device handle, so copying is disabled\"`), and update `TEST\u003d` to reflect the unit tests. See the inline comment on `/COMMIT_MSG` for copy-pasteable descriptions.\n\n[🔗](http://go/tj/46b34316-d342-48c7-a7f3-1c5d7cf82dbc)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5018d0d_a22ac5f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done in ps6: split as suggested. This change now only has the lifecycle and download-mode control; DFU interface discovery, descriptor parsing and DFU_DETACH moved to https://crrev.com/c/8656278. Both changes now carry unit tests: RtsUsbDevice talks to the hardware through a small RtsUsbBackend interface (libusb implementation plus a gmock), like util/elan, and the tests are wired into utils-test in util/build.mk. The null-handle guard, the short-read check and the release()-before-reinit fixes are covered by tests.",
+      "parentUuid": "5b82dc40_b5cbce52",
       "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5613c254_5661f544",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done in ps6: RtsUsbDevice now takes the backend in its constructor, and the member state uses in-class initializers.",
+      "parentUuid": "1b456fd3_548f6d92",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 9999
+      },
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5c01d89_1e6f7fe5",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29341b04_06c58cc3",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done in ps6: init() and wait_for_device() call release() first and on the failure paths, wait_for_device() rejects poll_interval_ms \u003c\u003d 0, and the sleep is injectable instead of usleep(), so the polling loop is unit tested without waiting.",
+      "parentUuid": "b5c01d89_1e6f7fe5",
+      "range": {
+        "startLine": 128,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 9999
+      },
       "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0b7a7c4_656c1301",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done in ps6: GET_STATUS now fails on a short read, with tests for both the error and the 0-byte case.",
+      "parentUuid": "05c5852b_15800ff9",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 213,
+        "endChar": 9999
+      },
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90870787_0e958c3f",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78cced5d_998aac66",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done, moved with dfu_detach() to https://crrev.com/c/8656278: the timeout is now uint16_t.",
+      "parentUuid": "90870787_0e958c3f",
+      "range": {
+        "startLine": 239,
+        "startChar": 0,
+        "endLine": 260,
+        "endChar": 9999
+      },
       "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -170,6 +308,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7d06ba1_c425ce85",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done, moved to https://crrev.com/c/8656278: the parser is extracted as parse_dfu_transfer_size() with a zero-wTransferSize fallback, and gtest coverage for the cases you listed (exact and short minimum length, truncated, zero-length, multiple descriptors, zero transfer size, little-endian decoding).",
+      "parentUuid": "beca9b0c_908337f1",
+      "range": {
+        "startLine": 298,
+        "startChar": 0,
+        "endLine": 323,
+        "endChar": 9999
+      },
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9c41850_2def1a1a",
@@ -191,6 +353,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15d12168_33a738ec",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T06:18:57Z",
+      "side": 1,
+      "message": "Done, moved to https://crrev.com/c/8656278: null-handle guard added, the struct keyword and the unreachable post-loop code removed.",
+      "parentUuid": "a9c41850_2def1a1a",
+      "range": {
+        "startLine": 271,
+        "startChar": 0,
+        "endLine": 339,
+        "endChar": 9999
+      },
       "revId": "4a3e9f5a594f3eda4e40663484aed4c4dcc40856",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
