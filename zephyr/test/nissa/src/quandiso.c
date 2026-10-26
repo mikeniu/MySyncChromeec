@@ -15,6 +15,8 @@
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 #include "keyboard_protocol.h"
+#include "motion_sense.h"
+#include "motionsense_sensors.h"
 #include "quandiso.h"
 #include "quandiso_sub_board.h"
 #include "system.h"
@@ -26,6 +28,7 @@
 #include "usb_charge.h"
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
+#include "watchdog.h"
 
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
@@ -119,6 +122,9 @@ static void test_before(void *fixture)
 	RESET_FAKE(extpower_handle_update);
 	RESET_FAKE(schedule_deferred_pd_interrupt);
 	RESET_FAKE(cros_cbi_get_fw_config);
+	RESET_FAKE(cbi_get_ssfc);
+	RESET_FAKE(bmi3xx_interrupt);
+	RESET_FAKE(bma4xx_interrupt);
 	RESET_FAKE(set_scancode_set2);
 	RESET_FAKE(get_scancode_set2);
 	RESET_FAKE(chipset_in_state);
@@ -902,21 +908,31 @@ ZTEST(quandiso, test_clamshell)
 		DT_GPIO_CTLR(DT_NODELABEL(gpio_imu_int_l), gpios));
 	const gpio_port_pins_t base_imu_pin =
 		DT_GPIO_PIN(DT_NODELABEL(gpio_imu_int_l), gpios);
+	const struct device *lid_accel_gpio = DEVICE_DT_GET(
+		DT_GPIO_CTLR(DT_NODELABEL(gpio_acc_int_l), gpios));
+	const gpio_port_pins_t lid_accel_pin =
+		DT_GPIO_PIN(DT_NODELABEL(gpio_acc_int_l), gpios);
 	int interrupt_count;
 
 	/* reset tablet mode for initialize status.
-	 * enable int_imu and int_tablet_mode before clashell_init
+	 * enable int_imu, int_acc, and int_tablet_mode before clamshell_init
 	 * for the priorities of sensor_enable_irqs and
 	 * gmr_tablet_switch_init is earlier.
 	 */
 	tablet_reset();
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_tablet_mode));
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_imu));
+	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_acc));
 
 	cros_cbi_get_fw_config_fake.custom_fake = cros_cbi_get_fw_config_tablet;
 
 	tablet = 0;
 	board_init();
+
+	ASSERT_GPIO_FLAGS(GPIO_DT_FROM_NODELABEL(gpio_imu_int_l),
+			  GPIO_INPUT | GPIO_PULL_DOWN);
+	ASSERT_GPIO_FLAGS(GPIO_DT_FROM_NODELABEL(gpio_acc_int_l),
+			  GPIO_INPUT | GPIO_PULL_DOWN);
 
 	/* Verify gmr_tablet_switch is disabled, by checking the side effects
 	 * of calling tablet_set_mode, and setting gpio_tablet_mode_l.
@@ -937,15 +953,21 @@ ZTEST(quandiso, test_clamshell)
 	tablet_set_mode(1, TABLET_TRIGGER_LID);
 	zassert_equal(0, tablet_get_mode(), NULL);
 
-	/* Clear base_imu_irq call count before test */
+	/* Clear base_imu_irq and lid_accel_irq call counts before test */
 	bmi3xx_interrupt_fake.call_count = 0;
+	bma4xx_interrupt_fake.call_count = 0;
 
-	/* Verify base_imu_irq is disabled. */
+	/* Verify base_imu_irq and lid_accel_irq are disabled. */
 	zassert_ok(gpio_emul_input_set(base_imu_gpio, base_imu_pin, 1), NULL);
 	k_sleep(K_MSEC(100));
 	zassert_ok(gpio_emul_input_set(base_imu_gpio, base_imu_pin, 0), NULL);
 	k_sleep(K_MSEC(100));
-	interrupt_count = bmi3xx_interrupt_fake.call_count;
+	zassert_ok(gpio_emul_input_set(lid_accel_gpio, lid_accel_pin, 1), NULL);
+	k_sleep(K_MSEC(100));
+	zassert_ok(gpio_emul_input_set(lid_accel_gpio, lid_accel_pin, 0), NULL);
+	k_sleep(K_MSEC(100));
+	interrupt_count = bmi3xx_interrupt_fake.call_count +
+			  bma4xx_interrupt_fake.call_count;
 	zassert_equal(interrupt_count, 0);
 }
 
@@ -955,6 +977,56 @@ static int cbi_get_ssfc_mock(uint32_t *ssfc)
 {
 	*ssfc = ssfc_data;
 	return 0;
+}
+
+ZTEST(quandiso, test_alt_sensor_lid_kx022)
+{
+	const struct device *lid_accel_gpio = DEVICE_DT_GET(
+		DT_GPIO_CTLR(DT_NODELABEL(gpio_acc_int_l), gpios));
+	const gpio_port_pins_t lid_accel_pin =
+		DT_GPIO_PIN(DT_NODELABEL(gpio_acc_int_l), gpios);
+	struct k_mutex *lid_mutex =
+		motion_sensors[SENSOR_ID(DT_NODELABEL(lid_accel))].mutex;
+	struct k_mutex *base_mutex =
+		motion_sensors[SENSOR_ID(DT_NODELABEL(base_accel))].mutex;
+
+	/* Initial ssfc data for default KX022 lid sensor (polled force-mode).
+	 */
+	cbi_get_ssfc_fake.custom_fake = cbi_get_ssfc_mock;
+	ssfc_data = 0x00;
+	cros_cbi_ssfc_init();
+
+	/* sensor_enable_irqs enables int_acc at HOOK_PRIO_DEFAULT */
+	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_acc));
+
+	cros_cbi_get_fw_config_fake.custom_fake = cros_cbi_get_fw_config_tablet;
+	tablet = 1;
+	board_init();
+
+	bma4xx_interrupt_fake.call_count = 0;
+
+	/*
+	 * Simulate concurrent motion_sense sensor mutex lock/unlock cycles and
+	 * watchdog reload while gpio_acc_int_l toggles. With KX022 selected,
+	 * int_acc must be disabled so floating gpio_acc_int_l transitions do
+	 * not fire bma4xx_interrupt or starve mutex acquisition / watchdog.
+	 */
+	for (int i = 0; i < 5; i++) {
+		zassert_ok(
+			gpio_emul_input_set(lid_accel_gpio, lid_accel_pin, 1));
+		k_sleep(K_MSEC(10));
+		zassert_ok(
+			gpio_emul_input_set(lid_accel_gpio, lid_accel_pin, 0));
+		k_sleep(K_MSEC(10));
+
+		zassert_ok(k_mutex_lock(lid_mutex, K_NO_WAIT));
+		zassert_ok(k_mutex_lock(base_mutex, K_NO_WAIT));
+		watchdog_reload();
+		zassert_ok(k_mutex_unlock(base_mutex));
+		zassert_ok(k_mutex_unlock(lid_mutex));
+	}
+
+	zassert_equal(bma4xx_interrupt_fake.call_count, 0);
 }
 
 ZTEST(quandiso, test_alt_sensor_lid_bma422)
@@ -975,6 +1047,7 @@ ZTEST(quandiso, test_alt_sensor_lid_bma422)
 	/* make sure cros_cbi_get_fw_config is handled */
 	cros_cbi_get_fw_config_fake.custom_fake = cros_cbi_get_fw_config_tablet;
 
+	tablet = 1;
 	board_init();
 
 	/* Clear irq call count before test */
