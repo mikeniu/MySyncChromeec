@@ -19,3 +19,7 @@ configdefault CORTEX_M_NULL_POINTER_EXCEPTION_PAGE_SIZE
 # Stackwalk on ARM causes build problems on many platforms, disable for now.
 configdefault ARCH_HAS_STACKWALK
 	default n
+
+# Reset core registers, MPU, and NVIC state on entry for RO <-> RW sysjumps.
+configdefault INIT_ARCH_HW_AT_BOOT
+	default y
