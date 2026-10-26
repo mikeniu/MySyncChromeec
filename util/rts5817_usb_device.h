@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <vector>
 
 #include "rts5817_usb_backend.h"
 
@@ -34,6 +35,7 @@ constexpr uint8_t kBmReqH2dStdDev = 0x00;
 
 /* DFU class-specific requests (bmRequestType = 0x21 or 0xA1) */
 constexpr uint8_t kDfuDetach = 0x00;
+constexpr uint8_t kDfuDownload = 0x01;
 constexpr uint8_t kDfuGetStatus = 0x03;
 constexpr uint8_t kDfuClrStatus = 0x04;
 
@@ -55,6 +57,9 @@ constexpr uint8_t kDfuStateDfuManifestSync = 6;
 constexpr uint8_t kDfuStateDfuManifest = 7;
 constexpr uint8_t kDfuStateDfuManifestWaitReset = 8;
 constexpr uint8_t kDfuStateDfuError = 10;
+
+/* Print download progress every this many percent */
+constexpr size_t kDfuProgressStepPct = 10;
 
 /* Poll delay used when the device reports bwPollTimeout == 0 */
 constexpr int kDfuMinPollDelayMs = 1;
@@ -129,6 +134,13 @@ class RtsUsbDevice {
 	 * @detach_timeout_ms  Time the device waits before detaching (ms).
 	 */
 	bool dfu_detach(uint16_t detach_timeout_ms);
+
+	/**
+	 * Perform the full DFU firmware download.
+	 * Must be called after init() and enable_download().
+	 * @firmware:  Complete firmware blob (including DFU suffix).
+	 */
+	bool dfu_download(const std::vector<uint8_t> &firmware);
 
     protected:
 	/**
