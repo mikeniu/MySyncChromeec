@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ed13992_18c77cb5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:28:03Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "95c8ab28_6ae41a34",
+      "revId": "8d763b3501269762a75fadee38ccfcff7b786e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "abc1e64a_79881e94",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8d763b3501269762a75fadee38ccfcff7b786e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e712be9_2afb2982",
+        "filename": "zephyr/test/drivers/lsm6dsm/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:28:03Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "abc1e64a_79881e94",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 9999
+      },
       "revId": "8d763b3501269762a75fadee38ccfcff7b786e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
