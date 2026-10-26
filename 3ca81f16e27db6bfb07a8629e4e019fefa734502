@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b59b65a9_85779538",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T21:17:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality:** ✅ Initializing `read_count \u003d 0` before the `do-while` chunk loop and moving `left -\u003d length;` outside the per-sample `for` loop in `lis2dh_load_fifo()` (`driver/accel_lis2dh.c`) ensures that multi-chunk FIFO reads drain all queued samples in a single call and maintain a continuous sample counter for timestamp derivation across chunk boundaries. Resetting `acc-\u003ecollection_rate \u003d 0` in `lis2dh_before()` (`zephyr/test/drivers/lis2dh/src/test_common.c`) prevents collection-rate state from leaking across tests.\n* **Architecture \u0026 Component Fit:** ✅ Updating `left -\u003d length;` once per chunk read aligns `lis2dh_load_fifo()` with the chunk-loop structure in `lis2dw12_load_fifo()` (`driver/accel_lis2dw12.c`), and using `USEC_PER_MSEC` in the Zephyr test suite adheres to Zephyr symbol conventions.\n* **Code Simplicity:** ✅ The production fix (`+2, -2` lines) and test updates are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC and Zephyr C conventions, uses explicit time unit macros (`100 * USEC_PER_MSEC`), and reuses existing driver constants (`FIFO_READ_LEN`, `OUT_XYZ_SIZE`, `LIS2DH_FIFO_SRC_ADDR`).\n* **Security:** ✅ No security vulnerabilities introduced; chunk read lengths remain bounded by `FIFO_READ_LEN`.\n* **Testing:** ✅ `test_lis2dh__samples_fifo_read_long` in `zephyr/test/drivers/lis2dh/src/test_interrupt.c` verifies both that a single `lis2dh_load_fifo()` call drains both chunks (`zassert_equal(fifo_src_reads, 2)`) and that all `num_samples` across both chunks receive timestamps spaced by `acc-\u003ecollection_rate`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+37, -6)`. Small, atomic CL focused on a single logical fix (`+2, -2` production lines in `driver/accel_lis2dh.c` and `+35, -4` unit test lines).\n* **Commit Message:** ✅ Clear, concise subject line and two-paragraph prose summary explaining the problem and conceptual fix with appropriate `BUG\u003d`, `TEST\u003d`, and `Change-Id:` footers. [[trajectory](https://goto.corp.google.com/traj/e2176f7b-ccb8-480c-96d8-aab48f4bbb69)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ca81f16e27db6bfb07a8629e4e019fefa734502",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
