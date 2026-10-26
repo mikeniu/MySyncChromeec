@@ -22,6 +22,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6355c6ae_f11f1d37",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T15:58:39Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "45f04571_5c5be200",
+      "revId": "b21528ffed5ba5a548053b0c5b9497d9b3de2da8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b725005_3e19d257",
         "filename": "test/kb_scan.c",
         "patchSetId": 1
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "b21528ffed5ba5a548053b0c5b9497d9b3de2da8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b65fa4ec_b6eaa203",
+        "filename": "test/kb_scan.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T15:58:39Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "7b725005_3e19d257",
+      "range": {
+        "startLine": 608,
+        "startChar": 0,
+        "endLine": 643,
+        "endChar": 9999
+      },
       "revId": "b21528ffed5ba5a548053b0c5b9497d9b3de2da8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
