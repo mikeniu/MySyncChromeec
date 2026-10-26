@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5770104d_ac43bcbd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:28:23Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "a8789461_3c5ab772",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4beabeb6_221e63a6",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comments for details.\n\n### Review Summary\n- **Functionality:** ✅ Clamping `range` to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]`, normalizing to a power-of-two full-scale value, and fixing the round-up relational check (`\u003e` instead of `\u003c`) fixes accelerometer range selection in `set_range()`.\n- **Architecture \u0026 Component Fit:** ✅ Defining `LSM6DSM_ACCEL_FS_MIN_VAL` (`2`) in `driver/accelgyro_lsm6dsm.h` and clamping inside `set_range()` aligns with sibling ST sensor drivers (`driver/accel_lis2dw12.c`).\n- **Code Simplicity:** ❌ In `driver/accelgyro_lsm6dsm.c`, once `range` is clamped to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]` (`[2, 16]`), normalizing `range` first (`newrange \u003d LSM6DSM_ACCEL_NORMALIZE_FS(range)`) and doubling `newrange` when `rnd \u0026\u0026 (range \u003e newrange)` eliminates the second `LSM6DSM_ACCEL_NORMALIZE_FS()` call and makes the `if (newrange \u003e LSM6DSM_ACCEL_FS_MAX_VAL)` branch unreachable.\n- **Idiomaticity \u0026 Readability:** ❌ In `zephyr/test/drivers/lsm6dsm/src/main.c`, boundary assertions in `test_set_range` should reference the named constants `LSM6DSM_ACCEL_FS_MIN_VAL` and `LSM6DSM_ACCEL_FS_MAX_VAL` (`LSM6DSM_ACCEL_FS_MIN_VAL - 1`, `LSM6DSM_ACCEL_FS_MAX_VAL + 1`) rather than raw numeric literals (`1`, `2`, `16`, `20`).\n- **Security:** ✅ Clamping non-positive inputs before invoking `LSM6DSM_ACCEL_NORMALIZE_FS()` prevents undefined bit shifts in `__fls()`.\n- **Testing:** ❌ `test_set_range` in `zephyr/test/drivers/lsm6dsm/src/main.c` is missing boundary and mutation test cases: exact power-of-two inputs (`2`, `4`, `8`, `16`) and clamped inputs with `rnd \u003d 1` (needed to distinguish `\u003e` from `\u003e\u003d`), the upper off-by-one boundary `LSM6DSM_ACCEL_FS_MAX_VAL - 1` (`15`) with `rnd \u003d 0` and `rnd \u003d 1`, `LSM6DSM_ACCEL_FS_MAX_VAL + 1` (`17`), and `0` / `-1` inputs.\n- **CL Size \u0026 Scope:** ❌ `Size: S (+31, -1)` (~9 production lines across `driver/accelgyro_lsm6dsm.c` and `driver/accelgyro_lsm6dsm.h`, 1 config line in `zephyr/test/drivers/lsm6dsm/prj.conf`, and 22 test lines in `zephyr/test/drivers/lsm6dsm/src/main.c`). While small in line count, this CL bundles an undocumented Kconfig change (`CONFIG_SENSOR\u003dy` in `zephyr/test/drivers/lsm6dsm/prj.conf`, which appears redundant with `select SENSOR` under `EMUL_LSM6DSM` in `zephyr/emul/Kconfig`) alongside two independently testable `set_range()` fixes described in the subject line (`\"clamping and round-up\"`) and multi-bullet commit body:\n  1. **CL 1 (or drop if redundant):** Remove `CONFIG_SENSOR\u003dy` from `zephyr/test/drivers/lsm6dsm/prj.conf` if redundant with `EMUL_LSM6DSM`, or move it to a standalone test-configuration CL if required.\n  2. **CL 2:** Normalize non-power-of-two accelerometer ranges and fix the round-up check (`\u003e` instead of `\u003c`) in `driver/accelgyro_lsm6dsm.c`, with rounding unit tests in `zephyr/test/drivers/lsm6dsm/src/main.c`.\n  3. **CL 3:** Add `LSM6DSM_ACCEL_FS_MIN_VAL` in `driver/accelgyro_lsm6dsm.h` and clamp out-of-bounds accelerometer ranges to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]` in `driver/accelgyro_lsm6dsm.c`, with min/max clamping unit tests in `zephyr/test/drivers/lsm6dsm/src/main.c`.\n- **Commit Message:** ❌ `/COMMIT_MSG` uses a 3-bullet walkthrough of code-level macro/variable expressions (`LSM6DSM_ACCEL_NORMALIZE_FS(newrange)`, `__fls()`, `s-\u003ecurrent_range`) instead of concise prose paragraphs and omits the `zephyr/test/drivers/lsm6dsm/prj.conf` change. [🔗](http://go/tj/0badb717-4734-4ea1-bdc8-e5eb907799f5)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6a6709a_eee2b61e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:28:23Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "4beabeb6_221e63a6",
       "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "687ff22f_45a1d027",
+        "filename": "driver/accelgyro_lsm6dsm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:28:23Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "36359ab3_90aa7753",
+      "range": {
+        "startLine": 433,
+        "startChar": 0,
+        "endLine": 447,
+        "endChar": 9999
+      },
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "972447d6_7de08e21",
@@ -95,6 +161,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4651ebe6_c3124a86",
+        "filename": "zephyr/test/drivers/lsm6dsm/prj.conf",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:28:23Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "972447d6_7de08e21",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d79511a_43ddd7ae",
@@ -116,6 +206,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0de98397_b144ad06",
+        "filename": "zephyr/test/drivers/lsm6dsm/src/main.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:28:23Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "9d79511a_43ddd7ae",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 143,
+        "endChar": 9999
+      },
       "revId": "a2cba23d42c60a3fabb491a1e36955d7d7114db2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
