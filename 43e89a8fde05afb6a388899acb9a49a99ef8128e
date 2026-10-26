@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36e6c8e3_5de2927f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T16:08:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Simulates holding the power button while `KEYBOARD_ROW_REFRESH` is asserted across all columns at runtime and verifies that `keyboard_scan_task` wakes from wait mode once and remains in poll mode sleeping between scans rather than livelocking.\n* **Architecture \u0026 Component Fit:** ✅ Fits cleanly into `test/kb_scan.c` alongside `power_button_mask_test()` in `run_test_step1()`.\n* **Code Simplicity:** ✅ Minimal, linear test setup and teardown using `memset(mock_state, BIT(KEYBOARD_ROW_REFRESH), sizeof(mock_state))` and direct assertion before cleanup.\n* **Idiomaticity \u0026 Readability:** ✅ Uses `BIT(KEYBOARD_ROW_REFRESH)`, `sizeof(mock_state)`, `keyscan_config.poll_timeout_us`, and `TEST_EQ` consistently with the surrounding test suite.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ Deterministically asserts `TEST_EQ(raw_read_all_count, 1, \"%d\")` after `3 * keyscan_config.poll_timeout_us`, verifying both that the scan task woke from wait mode and that it did not bounce back into wait mode.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+38, -0)`. Single, self-contained logical change adding a regression test for commit `9e6f494d76`.\n* **Commit Message:** ✅ Clear, accurate, and properly formatted with `BUG\u003d` and `TEST\u003d` tags. [🔗](http://go/tj/7873c843-0974-43d2-ad96-c421b3bdcd8b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "43e89a8fde05afb6a388899acb9a49a99ef8128e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
