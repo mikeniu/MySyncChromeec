@@ -42,7 +42,7 @@ target_sources_ifdef(
         CONFIG_TEST_NISSA_NIVVIKS
         app PRIVATE
         src/nivviks.c
-        ${PLATFORM_EC_PROGRAM_DIR}/nissa/nivviks/src/fan.c
+        ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
         ${PLATFORM_EC_PROGRAM_DIR}/nissa/nivviks/src/form_factor.c
         ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/nivviks_led.c
 )
@@ -100,7 +100,7 @@ if(CONFIG_TEST_NISSA_GOTHRAX)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/usbc.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/form_factor.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/thermal.c
     )
 endif()
@@ -169,7 +169,7 @@ if(CONFIG_TEST_NISSA_CRAASK)
 	    app PRIVATE
 	    src/craask.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/charger.c
-	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/fan.c
+	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/form_factor.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/kb_backlight.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/keyboard.c
@@ -240,7 +240,7 @@ if(CONFIG_TEST_NISSA_YAVIKS)
             src/yaviks.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/sub_board.c
@@ -257,7 +257,7 @@ if(CONFIG_TEST_NISSA_QUANDISO)
             src/quandiso.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/sub_board.c
@@ -274,7 +274,7 @@ if(CONFIG_TEST_NISSA_QUANDISO2)
             src/quandiso2.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/sub_board.c
@@ -291,7 +291,7 @@ if(CONFIG_TEST_NISSA_YAVILLA)
             src/yavilla.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/usbc.c
@@ -303,7 +303,7 @@ if(CONFIG_TEST_NISSA_GLASSWAY)
     target_sources(
             app PRIVATE
             src/glassway.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/usbc.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/charger.c
@@ -336,7 +336,7 @@ if(CONFIG_TEST_NISSA_DOMIKA)
             src/domika.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/usbc.c
@@ -372,7 +372,7 @@ if(CONFIG_TEST_NISSA_GUREN)
     target_sources(
             app PRIVATE
             src/guren.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/usbc.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/charger.c
@@ -392,7 +392,7 @@ if(CONFIG_TEST_NISSA_EPIC)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/usbc.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/form_factor.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/fan.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/thermal.c
     )
 endif()
