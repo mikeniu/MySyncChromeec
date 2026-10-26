@@ -88,6 +88,7 @@ config USBC_PDC_RTS54XX_CONSOLE_FW_UPDATER
 config USBC_PDC_TRACE_MSG
 	bool "USB-C PDC message tracing"
 	depends on USBC_PDC_RTS54XX
+	depends on PLATFORM_EC_SYSTEM_UNLOCKED
 	help
 	  Enable communication tracing between the EC and the PDC.
 	  Messages between the EC and PDC are saved in a pre-allocated
