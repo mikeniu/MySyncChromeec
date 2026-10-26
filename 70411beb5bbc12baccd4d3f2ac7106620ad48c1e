@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef536ca6_6e68cbcb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:19:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:** All checks pass. `parse_args()`, `parse_vid_pid()`, and `read_file()` validate inputs and handle error conditions cleanly, and `main()` orchestrates device initialization, download-mode enablement, `DFU_DETACH`, re-enumeration polling, and firmware download.\n\n**Architecture \u0026 Component Fit:** Separating the CLI and file helpers into `rts5817_flash_cli.{h,cc}` cleanly decouples argument and file handling from the `libusb` device logic in `rts5817_flash.cc` and integrates with `utils-test` in `util/build.mk`.\n\n**Code Simplicity:** Functions are concise and use linear guard-clause control flow and RAII resource management via `RtsUsbDevice`.\n\n**Idiomaticity \u0026 Readability:** Clean C++ usage with `constexpr` named constants, explicit unit suffixes on timeout constants (`Ms`), and clear error reporting.\n\n**Testing:** Unit tests in `rts5817_flash_cli_test.cc` cover option parsing, valid/malformed/overflow VID:PID strings, and binary file reading (full, empty, and missing files).\n\n**Security:** N/A\n\n**CL Size \u0026 Scope:** `Size: L (+441, -0)`. The non-test delta is ~269 lines (including ~45 lines of file/function header comments, leaving ~224 lines of code) implementing a single cohesive logical change (the `rts5817_flash` CLI entry point and CLI/file helpers), accompanied by 172 lines of unit test coverage in `util/rts5817_flash_cli_test.cc` and `util/build.mk`.\n\n**Commit Message:** Concise two-paragraph summary explaining the motivation and scope of the tool and its unit tests, with proper `BUG\u003d` and `TEST\u003d` tags. [🔗](http://go/tj/fdb43912-78e7-4efb-b6d1-e79eca59e55a)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "70411beb5bbc12baccd4d3f2ac7106620ad48c1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
