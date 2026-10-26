@@ -11,3 +11,4 @@
 	}
 
 DISABLED(void clock_init(void));
+DISABLED(void task_trigger_irq(int irq));
