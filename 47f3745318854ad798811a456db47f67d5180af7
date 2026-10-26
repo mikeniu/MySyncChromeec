@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "29d0593b_d3e534d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-26T18:12:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The commit message has two accuracy/completeness gaps against the diff and signals multi-concern bundling:\n1. **Inaccurate description of `helipilot` and `bloonchipper` changes**: This paragraph states:\n   \u003e *\"Move STM32 timers, UARTs, and Cortex-M Systick teardown in bloonchipper and helipilot to chip_pre_system_jump().\"*\n   `helipilot` uses a Nuvoton NPCX797FC SoC (not STM32), and `zephyr/program/fpmcu/helipilot/src/ec_quirks.c` only calls `arm_core_mpu_disable()`—it does not touch STM32 timers, UARTs, or Cortex-M SysTick. Meanwhile, both `bloonchipper` and `helipilot` move `arm_core_mpu_disable()` to `chip_pre_system_jump()` in this patchset, which the body does not mention.\n2. **Undocumented `system_fake` refactoring**: The commit message does not mention removing `system_fake_is_interrupt_disabled()` and `system_fake_reset_interrupt_disabled()` from `zephyr/fake/include/system_fake.h` and `zephyr/fake/system_fake.c` and switching `zephyr/test/jump_tags/src/jump_tags.c` to `irq_lock()` / `irq_unlock()` and `arch_cpu_irqs_are_enabled()`.\nIf keeping this as a single CL, please update the commit message so it accurately describes the changes:\n```text\nfpmcu, riscv: Move MPU/PMP sysjump teardown out of HOOK_SYSJUMP\nHardware and memory protection teardown before a sysjump must execute\nafter interrupts are disabled so an incoming interrupt cannot preempt\nthe sysjump path while MPU or PMP protection is disabled.\nAdd arch_pre_system_jump() alongside chip_pre_system_jump() in\njump_to_image(), and move RISC-V PMP teardown out of HOOK_SYSJUMP to\narch_pre_system_jump(). Move bloonchipper peripheral, Systick, and ARM\nMPU teardown and helipilot ARM MPU teardown out of HOOK_SYSJUMP to\nchip_pre_system_jump() so both callbacks run immediately after\ninterrupt_disable_all() in jump_to_image().\nAlso update ztest_interrupt_disable_all() and system_jump_to_booter() in\nsystem_fake.c to lock and unlock Zephyr IRQs directly, allowing\njump_tags tests to assert IRQ state via arch_cpu_irqs_are_enabled().\nBUG\u003db:519694070, b:575868788\nTEST\u003d./twister -v -i -T zephyr/test/jump_tags -T zephyr/test/jump_data\nTEST\u003d./twister -v -i -s zephyr/test/fpmcu/fpmcu.bloonchipper.ec_quirks\n```\nIf splitting this CL as recommended in the review summary:\n* **CL 1 (`system_fake` IRQ locking refactor)**:\n```text\nzephyr: fake: Use Zephyr irq_lock/irq_unlock in system_fake\nReplace the custom system_fake_interrupts_disabled boolean flag and\nhelper functions in system_fake with real irq_lock() and irq_unlock()\ncalls in ztest_interrupt_disable_all() and system_jump_to_booter().\nUpdate jump_tags tests to check arch_cpu_irqs_are_enabled() directly.\nBUG\u003db:519694070, b:575868788\nTEST\u003d./twister -v -i -T zephyr/test/jump_tags\n```\n* **CL 2 (`arch_pre_system_jump()` + RISC-V PMP teardown)**:\n```text\nsystem, riscv: Add arch_pre_system_jump() and move PMP teardown\nMemory protection teardown before a sysjump must execute after\ninterrupts are disabled and after chip-level peripheral teardown so an\nincoming interrupt cannot preempt the sysjump path while PMP protection\nis cleared.\nAdd an overridable arch_pre_system_jump() callback in jump_to_image()\nimmediately after chip_pre_system_jump(), and move RISC-V PMP teardown\nin zephyr/shim/core/riscv/mpu.c out of HOOK_SYSJUMP to\narch_pre_system_jump().\nBUG\u003db:519694070, b:575868788\nTEST\u003d./twister -v -i -T zephyr/test/jump_tags -T zephyr/test/jump_data\n```\n* **CL 3 (`fpmcu` pre-sysjump teardown)**:\n```text\nfpmcu: Move pre-sysjump teardown out of HOOK_SYSJUMP\nMove bloonchipper timer, UART, Systick, and MPU teardown and helipilot\nMPU teardown out of HOOK_SYSJUMP into chip_pre_system_jump() so hardware\nteardown executes with interrupts disabled in jump_to_image().\nBUG\u003db:519694070, b:575868788\nTEST\u003d./twister -v -i -s zephyr/test/fpmcu/fpmcu.bloonchipper.ec_quirks\n```",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 0
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "82fe0f00_ed06c91c",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 9
