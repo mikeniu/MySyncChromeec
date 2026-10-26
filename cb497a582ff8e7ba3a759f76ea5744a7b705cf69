@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1429efee_5d571499",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:14Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "5aa27623_60121b22",
+      "revId": "cb497a582ff8e7ba3a759f76ea5744a7b705cf69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a956a689_28157d85",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "cb497a582ff8e7ba3a759f76ea5744a7b705cf69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ce4d8cc_1b03292e",
+        "filename": "zephyr/test/drivers/default/src/motion_sense/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:53:14Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "a956a689_28157d85",
+      "range": {
+        "startLine": 378,
+        "startChar": 0,
+        "endLine": 384,
+        "endChar": 9999
+      },
       "revId": "cb497a582ff8e7ba3a759f76ea5744a7b705cf69",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
