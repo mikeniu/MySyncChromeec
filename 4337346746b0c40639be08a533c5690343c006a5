@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1794023e_0bc85438",
+        "filename": "docker/Dockerfile",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-26T17:56:33Z",
+      "side": 1,
+      "message": "I believe that this is semantically equivalent to the previous version, and it produces a checkout with the same files in it.",
+      "revId": "4337346746b0c40639be08a533c5690343c006a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

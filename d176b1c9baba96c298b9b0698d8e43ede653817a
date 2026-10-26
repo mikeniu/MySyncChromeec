@@ -22,6 +22,30 @@
       },
       "revId": "d176b1c9baba96c298b9b0698d8e43ede653817a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "beab53a7_a3e93155",
+        "filename": "docker/entrypoint.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-26T17:56:33Z",
+      "side": 1,
+      "message": "Fixed, with a caveat. In patchset 6, `Dockerfile` sets up each repo to appropriately prune branches, commits, and paths. `entrypoint.sh` then does a plain old `pull`. This means that a workspace created by the patchset-4 `Dockerfile`, using the patchset-6 `entrypoint.sh`, would still pull in the un-pruned repo on `--update`.",
+      "parentUuid": "c7a03d4d_24f3a1a7",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 52
+      },
+      "revId": "d176b1c9baba96c298b9b0698d8e43ede653817a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
