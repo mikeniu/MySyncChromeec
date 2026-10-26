@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34d6187d_bf561658",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T19:45:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality:** ✅ Clamping `range` to `[LSM6DSM_ACCEL_FS_MIN_VAL, LSM6DSM_ACCEL_FS_MAX_VAL]`, normalizing via `LSM6DSM_ACCEL_NORMALIZE_FS(range)`, and doubling `newrange` when `rnd \u0026\u0026 (range \u003e newrange)` properly normalizes and rounds accelerometer full-scale ranges in `set_range()`.\n- **Architecture \u0026 Component Fit:** ✅ Defining `LSM6DSM_ACCEL_FS_MIN_VAL` (`2`) in `driver/accelgyro_lsm6dsm.h` and enforcing bounds inside `set_range()` aligns with sibling ST sensor drivers (`driver/accel_lis2dw12.c`).\n- **Code Simplicity:** ✅ Both the `MOTIONSENSE_TYPE_ACCEL` branch in `driver/accelgyro_lsm6dsm.c` and the table-driven `test_set_range` test in `zephyr/test/drivers/lsm6dsm/src/main.c` are concise and free of redundant branches or state.\n- **Idiomaticity \u0026 Readability:** ✅ Uses `clamp()`, `ARRAY_SIZE()`, and the named range constants `LSM6DSM_ACCEL_FS_MIN_VAL` and `LSM6DSM_ACCEL_FS_MAX_VAL` consistently.\n- **Security:** ✅ Clamping non-positive inputs before invoking `LSM6DSM_ACCEL_NORMALIZE_FS()` prevents invalid bit shifts in `__fls()`.\n- **Testing:** ✅ `test_set_range` in `zephyr/test/drivers/lsm6dsm/src/main.c` covers negative/zero inputs (`-1`, `0`), off-by-one boundaries (`LSM6DSM_ACCEL_FS_MIN_VAL - 1`, `LSM6DSM_ACCEL_FS_MIN_VAL + 1`, `LSM6DSM_ACCEL_FS_MAX_VAL - 1`, `LSM6DSM_ACCEL_FS_MAX_VAL + 1`), and exact powers of two (`2`, `4`, `8`, `16`) across `rnd \u003d 0` and `rnd \u003d 1`.\n- **CL Size \u0026 Scope:** ✅ `Size: M (+47, -5)` (6 production lines across `driver/accelgyro_lsm6dsm.c` and `driver/accelgyro_lsm6dsm.h`, and 40 unit test lines in `zephyr/test/drivers/lsm6dsm/src/main.c`), focused on a single logical fix.\n- **Commit Message:** ✅ Concisely explains the prior defects and conceptual fix in prose with `BUG\u003d` and `TEST\u003d` footers. [🔗](http://go/tj/6d98660b-dc59-49d6-99df-1156bdbf7cb5)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d51ee027ec5089541b3b89c262e7c81218e22f15",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
