@@ -740,6 +740,32 @@ ZTEST(amd_power, test_power_chipset_throttle_g3)
 	zassert_ok(gpio_emul_input_set(gpio_dev, PGOOD_S0_PIN, 1));
 }
 
+ZTEST(amd_power, test_power_chipset_throttle_release_in_s3)
+{
+	static const struct device *gpio_dev = GPIO_DEVICE;
+	const int asserted = !IS_ENABLED(CONFIG_CPU_PROCHOT_ACTIVE_LOW);
+
+	amd_power_s0_on();
+
+	chipset_throttle_cpu(1);
+	zassert_equal(gpio_emul_output_get(gpio_dev, PROCHOT_PIN), asserted);
+
+	/* Suspend to S3 while still throttling */
+	zassert_ok(gpio_emul_input_set(gpio_dev, PGOOD_S0_PIN, 0));
+	zassert_ok(gpio_emul_input_set(gpio_dev, SLP_S3_PIN, 0));
+	k_sleep(K_MSEC(500));
+	zassert_equal(power_get_state(), POWER_S3, "power_state=%d",
+		      power_get_state());
+
+	/* Releasing the throttle must not be dropped while suspended */
+	chipset_throttle_cpu(0);
+	zassert_equal(gpio_emul_output_get(gpio_dev, PROCHOT_PIN), !asserted);
+
+	/* but asserting it must still wait for S0 */
+	chipset_throttle_cpu(1);
+	zassert_equal(gpio_emul_output_get(gpio_dev, PROCHOT_PIN), !asserted);
+}
+
 ZTEST(amd_power, test_sysjump_s0)
 {
 	/* Simulate a "sysjump" in S0 */

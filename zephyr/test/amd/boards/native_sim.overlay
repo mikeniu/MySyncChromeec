@@ -85,7 +85,8 @@
 			enum-name = "GPIO_SYS_RESET_L";
 		};
 		gpio_prochot_odl: prochot_odl {
-			gpios = <&gpio0 13 (GPIO_ODR_HIGH | GPIO_INPUT)>;
+			/* gpio emul doesn't support open-drain, use push-pull */
+			gpios = <&gpio0 13 (GPIO_OUTPUT_HIGH | GPIO_INPUT)>;
 			enum-name = "GPIO_CPU_PROCHOT";
 		};
 		pch-sys-prwok {

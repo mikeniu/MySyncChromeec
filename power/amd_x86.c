@@ -97,11 +97,17 @@ void chipset_reset(enum chipset_shutdown_reason reason)
 void chipset_throttle_cpu(int throttle)
 {
 	CPRINTS("%s(%d)", __func__, throttle);
+
+	/*
+	 * Only assert PROCHOT while the AP is on, but always allow releasing
+	 * it. Dropping a release that arrives while the AP is suspended or off
+	 * would leave the AP throttled after it resumes.
+	 */
+	if (throttle && !chipset_in_state(CHIPSET_STATE_ON))
+		return;
+
 	if (IS_ENABLED(CONFIG_CPU_PROCHOT_ACTIVE_LOW))
 		throttle = !throttle;
-
-	if (!chipset_in_state(CHIPSET_STATE_ON))
-		return;
 
 	if (IS_ENABLED(CONFIG_THROTTLE_AP_INTERRUPT_SINGLE)) {
 		if (throttle == IS_ENABLED(CONFIG_CPU_PROCHOT_ACTIVE_LOW)) {
