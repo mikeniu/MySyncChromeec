@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fc9d01e_ea0c34a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:05Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "9e0a1357_4af1750f",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19fbac26_c03a4958",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding the named FIFO tag bit-shift constant, unit test coverage for `push_fifo_data()`, and the commit message. [[trajectory](https://goto.corp.google.com/traj/266e2cea-a6fa-4b22-8dad-f331f965864b)]\n\n### Review Summary\n* **Functionality:** ✅ Checking `if (tag \u003e\u003d ARRAY_SIZE(ag_maps))` on the unsigned `uint8_t tag` (`(*fifo \u003e\u003e 3) - LSM6DSO_GYRO_TAG`) correctly rejects both `0x00` (which wraps to `0xff`) and tags `\u003e\u003d 0x03` (`tag \u003e\u003d 2`), preventing out-of-bounds accesses on `ag_maps`, `samples_to_discard`, and `main_s + id`.\n* **Architecture \u0026 Component Fit:** ✅ Validating the FIFO tag in `push_fifo_data()` before indexing `ag_maps` fits the driver structure cleanly. (Note: as mentioned in the existing review thread on this CL, consider coordinating with the related CL that also updates this path and adds emulator test support.)\n* **Code Simplicity:** ❌ Line 152 duplicates the `*fifo \u003e\u003e 3` bit-shift expression from line 149; extracting the shifted raw tag into a local variable avoids repeating the shift calculation.\n* **Idiomaticity \u0026 Readability:** ❌ Line 152 introduces a second instance of the magic bit-shift literal `3` for extracting the `TAG_SENSOR` field from `FIFO_DATA_OUT_TAG`. Please define `#define LSM6DSO_FIFO_TAG_SHIFT 3` in `driver/accelgyro_lsm6dso.h` and use it in `push_fifo_data()`.\n* **Security:** ✅ Prevents out-of-bounds array read/write and sensor pointer arithmetic when unexpected FIFO tag bytes are received over the sensor bus.\n* **Testing:** ❌ Missing automated unit tests for `push_fifo_data()`, and the `drivers.default` suite referenced in `TEST\u003d` does not enable `CONFIG_PLATFORM_EC_ACCELGYRO_LSM6DSO` or compile `driver/accelgyro_lsm6dso.c`. Please add unit test coverage exercising valid, exact-boundary, and off-by-one FIFO tag values (`LSM6DSO_GYRO_TAG - 1`, `LSM6DSO_GYRO_TAG`, `LSM6DSO_ACC_TAG`, `LSM6DSO_ACC_TAG + 1`, and `0x1f`).\n* **CL Size \u0026 Scope:** ✅ Size: XS (+5, -0). Focused on a single logical fix.\n* **Commit Message:** ❌ `TEST\u003d./twister -T zephyr/test/drivers -s drivers.default` does not compile `driver/accelgyro_lsm6dso.c`, and the body narrates diff expressions (`ARRAY_SIZE(ag_maps)`, `ag_maps[tag]`, `samples_to_discard[id]`). See the inline comment on `/COMMIT_MSG` for a suggested replacement.\n\n[🔗](http://go/tj/266e2cea-a6fa-4b22-8dad-f331f965864b)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8be1a49_1cee033d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:05Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "19fbac26_c03a4958",
       "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "109439bb_53775bd0",
+        "filename": "driver/accelgyro_lsm6dso.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T18:35:05Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "5b03e84e_b3c0ec0c",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 9999
+      },
       "revId": "818cc90a65e4340ac4720c6f5c54641ae34a73ea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
