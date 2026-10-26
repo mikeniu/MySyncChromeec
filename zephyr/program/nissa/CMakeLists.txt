@@ -27,7 +27,7 @@ if(DEFINED CONFIG_BOARD_NEREID)
 	project(nereid)
 	zephyr_library_sources(
 			"src/led.c"
-			"nereid/src/hdmi.c"
+			"src/hdmi.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "nereid/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "nereid/src/charger.c")
@@ -37,7 +37,7 @@ if(DEFINED CONFIG_BOARD_NOKRIS)
 	zephyr_library_sources(
 			"src/nivviks_led.c"
 			"nokris/src/form_factor.c"
-			"nokris/src/hdmi.c"
+			"src/hdmi.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/fan.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "nokris/src/usbc.c")
@@ -144,7 +144,7 @@ endif()
 if(DEFINED CONFIG_BOARD_GOTHRAX)
 	project(gothrax)
 	zephyr_library_sources(
-			"gothrax/src/hdmi.c"
+			"src/hdmi.c"
 			"gothrax/src/usb_mux_config.c"
 			"gothrax/src/form_factor.c"
 			"gothrax/src/sub_board.c"
@@ -370,7 +370,7 @@ if(DEFINED CONFIG_BOARD_DIRKS)
 	zephyr_library_sources(
 			"dirks/src/barrel_jack.c"
 			"dirks/src/led.c"
-			"dirks/src/hdmi.c"
+			"src/hdmi.c"
 			"dirks/src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "dirks/src/usbc.c")
@@ -389,7 +389,7 @@ endif()
 if(DEFINED CONFIG_BOARD_EPIC)
 	project(epic)
 	zephyr_library_sources(
-			"epic/src/hdmi.c"
+			"src/hdmi.c"
 			"epic/src/usb_mux_config.c"
 			"epic/src/form_factor.c"
 			"epic/src/sub_board.c"
@@ -418,7 +418,7 @@ if(DEFINED CONFIG_BOARD_DIRKSON)
 	zephyr_library_sources(
 			"dirkson/src/barrel_jack.c"
 			"dirkson/src/led.c"
-			"dirkson/src/hdmi.c"
+			"src/hdmi.c"
 			"dirkson/src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "dirkson/src/usbc.c")

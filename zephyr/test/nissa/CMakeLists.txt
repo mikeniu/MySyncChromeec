@@ -63,7 +63,7 @@ if(CONFIG_TEST_NISSA_NEREID)
             app PRIVATE
             src/nereid.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/nereid/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/nereid/src/hdmi.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/nereid/src/usbc.c
     )
 endif()
@@ -74,7 +74,7 @@ if(CONFIG_TEST_NISSA_NOKRIS)
             app PRIVATE
             src/nokris.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/nokris/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/nokris/src/hdmi.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/nokris/src/usbc.c
     )
 endif()
@@ -96,7 +96,7 @@ if(CONFIG_TEST_NISSA_GOTHRAX)
             app PRIVATE
             src/gothrax.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/hdmi.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/usbc.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/form_factor.c
@@ -361,7 +361,7 @@ if(CONFIG_TEST_NISSA_DIRKS)
             src/dirks.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/barrel_jack.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/hdmi.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/usbc.c
     )
@@ -388,7 +388,7 @@ if(CONFIG_TEST_NISSA_EPIC)
             app PRIVATE
             src/epic.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/hdmi.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/usbc.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/form_factor.c
@@ -417,7 +417,7 @@ if(CONFIG_TEST_NISSA_DIRKSON)
             src/dirkson.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/barrel_jack.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/hdmi.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/usbc.c
     )
