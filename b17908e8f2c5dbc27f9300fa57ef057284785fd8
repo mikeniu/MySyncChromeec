@@ -91,6 +91,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "790fd556_914d525e",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T16:04:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc13cb71_b9b800a9",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 0
+      },
+      "revId": "b17908e8f2c5dbc27f9300fa57ef057284785fd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "558e076d_a00e09c1",
@@ -152,6 +176,30 @@
       "side": 1,
       "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
       "parentUuid": "558e076d_a00e09c1",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 30
+      },
+      "revId": "b17908e8f2c5dbc27f9300fa57ef057284785fd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99921b4c_3f946f52",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T16:04:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef4fcc0e_3c467521",
       "range": {
         "startLine": 318,
         "startChar": 0,
