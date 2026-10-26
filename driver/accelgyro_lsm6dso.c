@@ -125,6 +125,7 @@ static void push_fifo_data(struct motion_sensor_t *main_s, uint8_t *fifo,
 			   uint32_t saved_ts)
 {
 	struct motion_sensor_t *sensor;
+	uint8_t raw_tag;
 	uint8_t tag;
 	int id;
 	int *axis;
@@ -146,7 +147,13 @@ static void push_fifo_data(struct motion_sensor_t *main_s, uint8_t *fifo,
 	 * FIFO threshold is related to sample data (7 byte).
 	 */
 	ptr = fifo + LSM6DSO_TAG_SIZE;
-	tag = (*fifo >> 3) - LSM6DSO_GYRO_TAG;
+	raw_tag = *fifo >> LSM6DSO_FIFO_TAG_SHIFT;
+	tag = raw_tag - LSM6DSO_GYRO_TAG;
+	if (tag >= ARRAY_SIZE(ag_maps)) {
+		CPRINTS("%s Unexpected FIFO tag: 0x%02x", main_s->name,
+			raw_tag);
+		return;
+	}
 	id = ag_maps[tag];
 
 	/* Discard samples every ODR changes. */
