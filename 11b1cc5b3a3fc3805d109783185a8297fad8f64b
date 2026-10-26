@@ -51,6 +51,24 @@
       "parentUuid": "d03fb478_8362adc8",
       "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af1ffb97_3e3de833",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-26T12:46:57Z",
+      "side": 1,
+      "message": "The init state is intentional left as is since it differ between cold boot and sysjump scenario. Setting it in switchcap init would interfere with the driver logic so the initial state is manually set by the driver when needed.",
+      "parentUuid": "df26a432_a0610069",
+      "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
