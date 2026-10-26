@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "706e4ed14af15d4358d49b75daa3676c19ddc010",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3407eb8_96f9a9e9",
+        "filename": "zephyr/test/drivers/lis2dh/src/test_common.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-26T21:03:08Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "3f3ecd62_99e20d9c",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 9999
+      },
+      "revId": "706e4ed14af15d4358d49b75daa3676c19ddc010",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
