@@ -18,6 +18,23 @@
       "isAi": true,
       "revId": "61a76c8f674f17db280b96716f0ee07994096e36",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f35a1b45_98b16dd6",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-26T19:46:24Z",
+      "side": 1,
+      "message": "Two questions on calling `mpu_disable()` from `HOOK_SYSJUMP` here:\n1. In `ec-legacy`\u0027s `jump_to_image()`, `hook_notify(HOOK_SYSJUMP)` runs before `interrupt_disable_all()` and `dma_disable_all()`. Should MPU teardown happen after interrupts/DMA are disabled (similar to `arch_pre_system_jump()` in crrev/c/8634173)?\n2. Does clearing `MPU_CTRL` globally interfere with regions configured during early boot (`mpu_pre_init()` / `system_mpu_config()`, such as `REGION_CHIP_RESERVED` for NPCX5 LPRAM or `REGION_UNCACHED_RAM`)? Would it be safer to only disable the regions configured by `system_disable_jump()`?",
+      "revId": "61a76c8f674f17db280b96716f0ee07994096e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
