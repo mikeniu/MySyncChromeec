@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c73eb468_460859e9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T03:35:53Z",
+      "side": 1,
+      "message": "Done in ps2: reworded the commit message and dropped the unit-test paragraph.",
+      "parentUuid": "7fbda299_15749a37",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfab1cef_37d08f5a",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments on `zephyr/drivers/fingerprint/fingerprint_rts5817maa.c`, `zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c`, and `/COMMIT_MSG`.\n\n### Review Summary\n* **Functionality:** ❌ `rts5817maa_acquire_image` does not validate `image \u003d\u003d NULL` before forwarding the pointer to `rts5817maa_sensor_acquire_image`, and logs the already-mapped `ret` (`-EIO`) instead of the raw `rts_fp_return_t` status code on failure.\n* **Architecture \u0026 Component Fit:** ✅ Fits the Zephyr `cros_fingerprint` driver interface (`fingerprint_driver_api.acquire_image`) and matches the structure of existing `rts5817maa` operations.\n* **Code Simplicity:** ❌ `convert_fp_capture_type_to_rts_capture_type` lists 7 unsupported `FINGERPRINT_CAPTURE_TYPE_*` cases that fall through directly to `default: return RTS_CAPTURE_TYPE_INVALID;` (while omitting `FINGERPRINT_CAPTURE_TYPE_PATTERN2`). Removing the redundant fallthrough cases keeps the `switch` minimal and symmetric with `convert_rts_get_image_error_code` and `convert_rts_snr_init_error_code`.\n* **Idiomaticity \u0026 Readability:** ❌ Use `FINGERPRINT_SENSOR_SCAN_GOOD` instead of raw `0` in `convert_rts_get_image_error_code` for consistency with the other `enum fingerprint_sensor_scan` return values, add braces around the `if (size \u003c CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE)` block in `rts5817maa_acquire_image`, and remove the leading space before the tab on line 28.\n* **Security:** ⚠️ Validating `image \u003d\u003d NULL` in `rts5817maa_acquire_image` prevents passing a null pointer into the proprietary sensor library.\n* **Testing:** ❌ Add a unit test for `image \u003d\u003d NULL` (`test_acquire_image_null_buffer`) and include `FINGERPRINT_CAPTURE_TYPE_PATTERN2` in `test_convert_capture_type`.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+201, -0)` (~65 production lines and ~136 unit test lines). Single cohesive logical change implementing `.acquire_image` for `rts5817maa` with its unit tests.\n* **Commit Message:** ❌ Remove the redundant `\"Add unit tests for...\"` paragraph and `\"This translates...\"` filler opener (see inline replacement on `/COMMIT_MSG`).\n\n[🔗](http://go/tj/903e4fcd-0251-4c23-b245-b5856bb66f78)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8546cf7a_523e571c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T03:35:53Z",
+      "side": 1,
+      "message": "Done in ps2, see the inline replies.",
+      "parentUuid": "bfab1cef_37d08f5a",
       "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7d5e78c_88848103",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T03:35:53Z",
+      "side": 1,
+      "message": "Done in ps2: removed the unsupported cases so default: handles them, and fixed the stray space.",
+      "parentUuid": "f9d1e54f_2a094230",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2487058_a5f7689f",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9997f44_8e99c325",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T03:35:53Z",
+      "side": 1,
+      "message": "Done in ps2: RTS_FP_SUCCESS now returns FINGERPRINT_SENSOR_SCAN_GOOD.",
+      "parentUuid": "e2487058_a5f7689f",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 9999
+      },
       "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d75a385c_0f2c9e01",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T03:35:53Z",
+      "side": 1,
+      "message": "Done in ps2: added the image \u003d\u003d NULL check and braces, and LOG_ERR now logs the raw rts_fp_return_t status.",
+      "parentUuid": "16a0355a_9accdc20",
+      "range": {
+        "startLine": 245,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 9999
+      },
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6488f37f_f98beae1",
@@ -145,6 +259,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c25e6e9f_d49c119c",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T03:35:53Z",
+      "side": 1,
+      "message": "Done in ps2: added test_acquire_image_null_buffer.",
+      "parentUuid": "6488f37f_f98beae1",
+      "range": {
+        "startLine": 484,
+        "startChar": 0,
+        "endLine": 494,
+        "endChar": 9999
+      },
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5f0f070_4a8cfd87",
@@ -166,6 +304,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3681e1f_b9c10b50",
+        "filename": "zephyr/test/fingerprint/drivers/rts5817maa/src/rts5817maa.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-26T03:35:53Z",
+      "side": 1,
+      "message": "Done in ps2: added FINGERPRINT_CAPTURE_TYPE_PATTERN2 to test_convert_capture_type.",
+      "parentUuid": "b5f0f070_4a8cfd87",
+      "range": {
+        "startLine": 496,
+        "startChar": 0,
+        "endLine": 538,
+        "endChar": 9999
+      },
       "revId": "a816e44eb76cc282324ee4440cbc8391738681de",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
