@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b857465_b8e1808a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T12:38:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** `log_backend_cros_ec` formats log messages into a stack-allocated `CONFIG_SHELL_PRINTF_BUFF_SIZE` buffer, strips `\\r` characters added by `LOG_PRINTK` (`cr_out_func`), NUL-terminates each chunk without writing the NUL byte to size-based outputs, and flushes through `zephyr_print()`, while switching the shell transport to blocking mode on panic via `zephyr_console_panic()` and reporting dropped messages in deferred mode via `notify_dropped()`.\n* **Architecture \u0026 Component Fit:** Integrates cleanly with `zephyr/shim/src/console.c` and `zephyr/Kconfig.console`, disabling `SHELL_LOG_BACKEND` by default and preventing simultaneous activation with `PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER`, while enforcing `!CONFIG_PIGWEED_LOG_TOKENIZED_LIB` via `BUILD_ASSERT` to avoid Kconfig dependency cycles.\n* **Code Simplicity:** Functions (`flush_line_buf`, `char_out`, `process`, `panic`, and `notify_dropped`) are concise, minimal, and free of redundant state or locking.\n* **Idiomaticity \u0026 Readability:** Follows Zephyr and ChromiumOS EC C conventions, using standard helpers (`IS_ENABLED`, `BUILD_ASSERT`, `MIN`, `ARG_UNUSED`, `snprintk`) and designated initializers.\n* **Security:** No security issues identified; buffer bounds and NUL termination in `char_out()`, `flush_line_buf()`, and `notify_dropped()` are properly enforced.\n* **Testing:** `zephyr/test/hostcmd_console` adds the `hostcmd_console.log_cros_ec` test configuration and verifies standard log output, non-yielding context logging, empty flushes, multi-chunk flushes exceeding `CONFIG_SHELL_PRINTF_BUFF_SIZE - 1`, and `\\r` stripping for `LOG_PRINTK`.\n* **CL Size \u0026 Scope:** `Size: M (+198, -0)`. Single, cohesive logical change introducing the `CONFIG_PLATFORM_EC_LOG_BACKEND_CROS_EC` backend and its unit tests.\n* **Commit Message:** Clear problem statement, accurate summary of the stack-buffered backend design, and proper `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/55e18b48-7f3d-49c3-a731-a18d32ebfd49)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "30075a8c0c453503b37fa0a255604b2ac4a6d754",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
