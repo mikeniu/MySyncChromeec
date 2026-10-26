@@ -72,6 +72,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fa9fa25_66b5dbd2",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-26T20:19:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "62aa741f_9a4b574c",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b0fc3c3_8c044a4a",
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "It doesn\u0027t change the current behavior. After actions like `fp_process_finger`, the host sends a FP_MODE command to detect FINGER_UP event.",
       "parentUuid": "0b0fc3c3_8c044a4a",
+      "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b212b096_ced4682c",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-26T20:19:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1ab97ff6_f45fb556",
       "revId": "8ca06a6cfb1c299d696109d11a2bc1c0a0ce104d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
