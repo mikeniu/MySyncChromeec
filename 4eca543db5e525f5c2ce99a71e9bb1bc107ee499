@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4070729_c51692ce",
+        "filename": "zephyr/Kconfig.console",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-26T12:27:34Z",
+      "side": 1,
+      "message": "Added a build ASSERT to avoid dependency loop.",
+      "parentUuid": "185d6b3e_3dfb3ad5",
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ca624ba_a09751f0",
@@ -77,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "773e665f_390eef22",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-26T12:27:34Z",
+      "side": 1,
+      "message": "Good suggestion, thanks.",
+      "parentUuid": "537b7681_da31442f",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 9999
+      },
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b58026cb_12d57b6d",
@@ -97,6 +139,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53725d75_b644c4a8",
+        "filename": "zephyr/test/hostcmd_console/src/hostcmd_console.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-26T12:27:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b58026cb_12d57b6d",
+      "range": {
+        "startLine": 280,
+        "startChar": 0,
+        "endLine": 290,
+        "endChar": 9999
+      },
       "revId": "4eca543db5e525f5c2ce99a71e9bb1bc107ee499",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
