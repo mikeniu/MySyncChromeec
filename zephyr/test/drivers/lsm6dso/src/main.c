@@ -135,3 +135,57 @@ ZTEST(lsm6dso, test_gyro_sample)
 	zassert_within((-25 * INT16_MAX) / gyr->current_range,
 		       data[count - 1].data[Z], 1);
 }
+
+ZTEST(lsm6dso, test_push_fifo_data_tag_bounds)
+{
+	static struct ec_response_motion_sensor_data data[4];
+	const struct {
+		uint8_t raw_tag;
+		int sensor_num; /* -1 if the sample must be dropped */
+	} cases[] = {
+		{ LSM6DSO_GYRO_TAG - 1, -1 },
+		{ LSM6DSO_GYRO_TAG, GYR_SENSOR_ID },
+		{ LSM6DSO_ACC_TAG, ACC_SENSOR_ID },
+		{ LSM6DSO_ACC_TAG + 1, -1 },
+		{ 0xff >> LSM6DSO_FIFO_TAG_SHIFT, -1 },
+	};
+	uint32_t event = CONFIG_ACCEL_LSM6DSO_INT_EVENT;
+	uint16_t read_byte_count;
+	int count;
+
+	/* Enable the FIFO for both sensors and handle it manually. */
+	acc->drv->enable_interrupt(acc, false);
+	zassert_ok(acc->drv->set_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 0));
+	zassert_ok(gyr->drv->set_data_rate(gyr, LSM6DSO_ODR_MIN_VAL, 0));
+	acc->oversampling_ratio = 1;
+	gyr->oversampling_ratio = 1;
+
+	/* Burn the samples discarded after an ODR change. */
+	for (int i = 0; i < LSM6DSO_DISCARD_SAMPLES; i++) {
+		emul_lsm6dso_append_raw_tag(emul, LSM6DSO_GYRO_TAG, 0, 0, 0);
+		emul_lsm6dso_append_raw_tag(emul, LSM6DSO_ACC_TAG, 0, 0, 0);
+	}
+	zassert_ok(acc->drv->irq_handler(acc, &event));
+
+	for (int i = 0; i < ARRAY_SIZE(cases); i++) {
+		motion_sense_fifo_reset();
+		emul_lsm6dso_append_raw_tag(emul, cases[i].raw_tag, 0, 0, 0);
+		zassert_ok(acc->drv->irq_handler(acc, &event));
+
+		count = motion_sense_fifo_read(sizeof(data), ARRAY_SIZE(data),
+					       data, &read_byte_count);
+		if (cases[i].sensor_num < 0) {
+			zassert_equal(count, 0, "tag 0x%02x", cases[i].raw_tag);
+		} else {
+			zassert_true(count >= 1, "tag 0x%02x",
+				     cases[i].raw_tag);
+			zassert_equal(data[count - 1].sensor_num,
+				      cases[i].sensor_num, "tag 0x%02x",
+				      cases[i].raw_tag);
+		}
+	}
+
+	zassert_ok(acc->drv->set_data_rate(acc, 0, 0));
+	zassert_ok(gyr->drv->set_data_rate(gyr, 0, 0));
+	acc->drv->enable_interrupt(acc, true);
+}
