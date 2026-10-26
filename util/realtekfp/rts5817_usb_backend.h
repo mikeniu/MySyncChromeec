@@ -11,6 +11,16 @@
 #define PLATFORM_EC_UTIL_RTS5817_USB_BACKEND_H_
 
 #include <cstdint>
+#include <vector>
+
+/* One alternate setting of a USB interface of the active configuration. */
+struct RtsUsbInterface {
+	int number = 0;
+	uint8_t usb_class = 0;
+	uint8_t usb_subclass = 0;
+	/* Class-specific descriptors that follow the interface descriptor. */
+	std::vector<uint8_t> extra;
+};
 
 class RtsUsbBackend {
     public:
@@ -36,6 +46,12 @@ class RtsUsbBackend {
 				     uint16_t value, uint16_t index,
 				     uint8_t *data, uint16_t length,
 				     unsigned int timeout_ms) = 0;
+
+	/**
+	 * List the interfaces of the active configuration.
+	 * Returns 0 or a negative libusb error.
+	 */
+	virtual int get_interfaces(std::vector<RtsUsbInterface> *interfaces) = 0;
 
 	/** Name of a negative libusb error code, for diagnostics. */
 	virtual const char *error_name(int error) const = 0;

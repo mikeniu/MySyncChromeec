@@ -24,6 +24,7 @@ class RtsLibusbBackend : public RtsUsbBackend {
 	int control_transfer(uint8_t request_type, uint8_t request,
 			     uint16_t value, uint16_t index, uint8_t *data,
 			     uint16_t length, unsigned int timeout_ms) override;
+	int get_interfaces(std::vector<RtsUsbInterface> *interfaces) override;
 	const char *error_name(int error) const override;
 
     private:

@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <thread>
 #include <utility>
+#include <vector>
 
 void RtsUsbDevice::default_sleep_ms(int ms)
 {
@@ -82,6 +83,8 @@ bool RtsUsbDevice::wait_for_device(uint16_t vid, uint16_t pid, int timeout_ms,
 
 void RtsUsbDevice::release()
 {
+	dfu_interface_ = -1;
+	transfer_size_ = kDfuDefaultTransferSize;
 	backend_->close();
 }
 
@@ -127,4 +130,95 @@ bool RtsUsbDevice::enable_download()
 	}
 
 	return true;
+}
+
+bool RtsUsbDevice::dfu_detach(uint16_t detach_timeout_ms)
+{
+	/*
+	 * DFU_DETACH tells the device to switch from Runtime mode to DFU
+	 * mode.  The device responds by re-enumerating on the USB bus.
+	 */
+
+	/* Find the DFU interface first. */
+	if (!find_dfu_interface())
+		return false;
+
+	/*
+	 * bmRequestType = 0x21: Host-to-Device, Class, Interface
+	 * bRequest = kDfuDetach (0x00)
+	 * wValue = detach_timeout_ms
+	 * wIndex = interface number
+	 */
+	int ret = backend_->control_transfer(
+		kBmReqH2dClsIf, kDfuDetach, detach_timeout_ms,
+		static_cast<uint16_t>(dfu_interface_), nullptr, 0,
+		kUsbCtrlTimeoutMs);
+
+	if (ret < 0) {
+		fprintf(stderr, "DFU_DETACH failed: %s\n",
+			backend_->error_name(ret));
+		return false;
+	}
+
+	printf("DFU_DETACH sent.  Waiting for re-enumeration...\n");
+	return true;
+}
+
+uint16_t parse_dfu_transfer_size(std::span<const uint8_t> extra)
+{
+	/*
+	 * Walk the descriptor stream.  The DFU functional descriptor has type
+	 * 0x21 and contains wTransferSize at byte offset 5-6.
+	 */
+	while (extra.size() > kDfuDescTypeOff) {
+		uint8_t desc_len = extra[0];
+
+		if (desc_len == 0 || desc_len > extra.size())
+			break;
+
+		if (extra[kDfuDescTypeOff] == kDfuDescriptorType &&
+		    desc_len >= kDfuDescMinLen) {
+			uint16_t size = extra[kDfuDescXferSizeOff] |
+					(extra[kDfuDescXferSizeOff + 1] << 8);
+
+			return size != 0 ? size : kDfuDefaultTransferSize;
+		}
+		extra = extra.subspan(desc_len);
+	}
+
+	return kDfuDefaultTransferSize;
+}
+
+bool RtsUsbDevice::find_dfu_interface()
+{
+	if (!backend_->is_open())
+		return false;
+
+	std::vector<RtsUsbInterface> interfaces;
+	int ret = backend_->get_interfaces(&interfaces);
+
+	if (ret < 0) {
+		fprintf(stderr, "Error: cannot get config descriptor: %s\n",
+			backend_->error_name(ret));
+		return false;
+	}
+
+	dfu_interface_ = -1;
+	transfer_size_ = kDfuDefaultTransferSize;
+
+	/* Walk all interfaces and alternate settings. */
+	for (const RtsUsbInterface &alt : interfaces) {
+		if (alt.usb_class != kDfuClass ||
+		    alt.usb_subclass != kDfuSubclass)
+			continue;
+
+		dfu_interface_ = alt.number;
+		transfer_size_ = parse_dfu_transfer_size(alt.extra);
+		printf("DFU transfer size: %u bytes\n", transfer_size_);
+		printf("DFU interface found: #%d\n", dfu_interface_);
+		return true;
+	}
+
+	fprintf(stderr, "Error: no DFU interface found on device.\n");
+	return false;
 }

@@ -59,6 +59,40 @@ int RtsLibusbBackend::control_transfer(uint8_t request_type, uint8_t request,
 				       value, index, data, length, timeout_ms);
 }
 
+int RtsLibusbBackend::get_interfaces(std::vector<RtsUsbInterface> *interfaces)
+{
+	if (!dev_handle_)
+		return LIBUSB_ERROR_NO_DEVICE;
+
+	libusb_config_descriptor *config = nullptr;
+	int ret = libusb_get_active_config_descriptor(
+		libusb_get_device(dev_handle_), &config);
+
+	if (ret < 0)
+		return ret;
+
+	interfaces->clear();
+	for (uint8_t i = 0; i < config->bNumInterfaces; i++) {
+		for (int j = 0; j < config->interface[i].num_altsetting; j++) {
+			const libusb_interface_descriptor &alt =
+				config->interface[i].altsetting[j];
+			RtsUsbInterface &info =
+				interfaces->emplace_back(RtsUsbInterface{
+					.number = alt.bInterfaceNumber,
+					.usb_class = alt.bInterfaceClass,
+					.usb_subclass = alt.bInterfaceSubClass,
+				});
+
+			if (alt.extra && alt.extra_length > 0)
+				info.extra.assign(alt.extra,
+						  alt.extra + alt.extra_length);
+		}
+	}
+
+	libusb_free_config_descriptor(config);
+	return 0;
+}
+
 const char *RtsLibusbBackend::error_name(int error) const
 {
 	return libusb_error_name(error);
