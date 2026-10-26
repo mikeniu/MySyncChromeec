@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26a03568_a686dc1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:37:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please tighten the error assertion in the unit test.\n\n### Review Summary\n\n* **Functionality:** ✅ `set_data_rate()` in `driver/accelgyro_lsm6dso.c` now captures and returns the error from `accelgyro_config_fifo(s)`.\n* **Architecture \u0026 Component Fit:** ✅ `emul_lsm6dso_get_i2c_common_data()` follows the established `emul_*_get_i2c_common_data()` pattern used across sibling Zephyr I2C sensor emulators.\n* **Code Simplicity:** ✅ The implementation is minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Uses existing register and ODR constants (`LSM6DSO_FIFO_CTRL3_ADDR`, `LSM6DSO_FIFO_CTRL4_ADDR`, `LSM6DSO_ODR_MIN_VAL`, `I2C_COMMON_EMUL_NO_FAIL_REG`) and `ARRAY_SIZE`.\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ In `zephyr/test/drivers/lsm6dso/src/main.c` (lines 225–227), `test_set_data_rate_fifo_error` uses `zassert_not_equal(..., EC_SUCCESS, ...)`. Because `i2c_common_emul` write failures (`-EIO`) deterministically map to `EC_ERROR_INVAL`, please use `zassert_equal(..., EC_ERROR_INVAL, ...)` to verify the exact propagated error code.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+41, -1)`. Focused single logical change pairing the 1-line bug fix with its emulator error-injection accessor and unit test.\n* **Commit Message:** ✅ Clear, accurate problem statement and solution summary with proper `BUG\u003d` and `TEST\u003d` tags. [🔗](http://go/tj/30d3f642-cace-4b19-a5cd-780aaea2c300)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0ee44fa9334d7933ecf25ed6ffd41c2119960d2a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13f47d25_c5d03ec4",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T22:37:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Assert the exact expected error code (`EC_ERROR_INVAL`) rather than `!\u003d EC_SUCCESS`. When `i2c_common_emul_set_write_fail_reg()` triggers a write failure (`-EIO`), the Zephyr I2C shim deterministically translates it to `EC_ERROR_INVAL`. Checking only `!\u003d EC_SUCCESS` would still pass if `set_data_rate()` failed early with an unrelated error such as `EC_RES_INVALID_PARAM`:\n\n```c\n\t\tzassert_equal(\n\t\t\tacc-\u003edrv-\u003eset_data_rate(acc, LSM6DSO_ODR_MIN_VAL, 0),\n\t\t\tEC_ERROR_INVAL, \"reg 0x%02x\", fifo_regs[i]);\n```\n\n[🔗](http://go/tj/30d3f642-cace-4b19-a5cd-780aaea2c300)",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0ee44fa9334d7933ecf25ed6ffd41c2119960d2a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
