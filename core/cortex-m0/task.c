@@ -620,6 +620,7 @@ void task_print_profiling(void)
 #endif
 }
 
+#ifdef CONFIG_CMD_TASKINFO
 static int command_task_info(int argc, const char **argv)
 {
 	task_print_list();
@@ -629,6 +630,7 @@ static int command_task_info(int argc, const char **argv)
 	return EC_SUCCESS;
 }
 DECLARE_CONSOLE_COMMAND(taskinfo, command_task_info, NULL, "Print task info");
+#endif
 
 #ifdef CONFIG_CMD_TASKREADY
 static int command_task_ready(int argc, const char **argv)

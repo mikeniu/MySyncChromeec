@@ -25,6 +25,9 @@
 #include "usart-stm32f0.h"
 #include "usart_rx_dma.h"
 #include "usart_tx_dma.h"
+#ifdef SECTION_IS_RO
+#include "usb_bridge.h"
+#endif
 #include "usb-stream.h"
 #include "usb_gpio.h"
 #include "usb_i2c.h"
@@ -40,6 +43,7 @@
  * GPIO interrupt handlers.
  */
 
+#ifdef SECTION_IS_RO
 static void vbus0_evt(enum gpio_signal signal)
 {
 	task_wake(TASK_ID_PD_C0);
@@ -105,12 +109,12 @@ DECLARE_DEFERRED(hpd_lvl_deferred);
 
 void hpd_evt(enum gpio_signal signal)
 {
-	timestamp_t now = get_time();
 	int level = gpio_get_level(signal);
-	uint64_t cur_delta = now.val - hpd_prev_ts;
+	uint64_t now_val = get_time().val;
+	uint64_t cur_delta = now_val - hpd_prev_ts;
 
 	/* Store current time */
-	hpd_prev_ts = now.val;
+	hpd_prev_ts = now_val;
 
 	/* All previous hpd level events need to be re-triggered */
 	hook_call_deferred(&hpd_lvl_deferred_data, -1);
@@ -130,6 +134,17 @@ void hpd_evt(enum gpio_signal signal)
 
 	hpd_prev_level = level;
 }
+#else /* !SECTION_IS_RO */
+static void vbus0_evt(enum gpio_signal signal)
+{
+}
+static void vbus1_evt(enum gpio_signal signal)
+{
+}
+void hpd_evt(enum gpio_signal signal)
+{
+}
+#endif /* SECTION_IS_RO */
 
 /* Must come after other header files and interrupt handler declarations */
 #include "gpio_list.h"
@@ -210,6 +225,51 @@ USB_STREAM_CONFIG(usart3_usb, USB_IFACE_USART3_STREAM,
  * Forward USART4 as a simple USB serial interface.
  */
 
+#ifdef SECTION_IS_RO
+/*
+ * In RO, usart4 connects to the ATmega32U4 over 1.000 Mbps UART (8N1).
+ * Shared queues are non-static so usb_bridge.c can bind consumers/producers
+ * and dequeue/enqueue data directly.
+ * Keyboard queues use 16 bytes (matching USB_STREAM_RX/TX_SIZE = 16) to
+ * save 96 bytes of RO SRAM, while UART queues use 128 bytes (holding a
+ * 68-byte FRAME_DATA plus SERVO_CTRL_TX_HEADROOM per Target 2).
+ */
+struct usart_config const usart4;
+struct usb_stream_config const usart4_usb;
+
+struct queue const usart4_to_bridge =
+	QUEUE_DIRECT(128, uint8_t, usart4.producer, usb_bridge_uart_consumer);
+struct queue const bridge_to_usart4 =
+	QUEUE_DIRECT(128, uint8_t, usb_bridge_uart_producer, usart4.consumer);
+
+struct queue const usb_to_bridge_kbd =
+	QUEUE_DIRECT(16, uint8_t, usart4_usb.producer, usb_bridge_kbd_consumer);
+struct queue const bridge_kbd_to_usb =
+	QUEUE_DIRECT(16, uint8_t, usb_bridge_kbd_producer, usart4_usb.consumer);
+
+static struct usart_rx_dma const usart4_rx_dma =
+	USART_RX_DMA(STM32_DMAC_CH6, 80);
+static struct usart_tx_dma const usart4_tx_dma =
+	USART_TX_DMA(STM32_DMAC_CH7, 34);
+
+struct usart_config const usart4 =
+	USART_CONFIG(usart4_hw, usart4_rx_dma.usart_rx, usart4_tx_dma.usart_tx,
+		     1000000, 0, usart4_to_bridge, bridge_to_usart4);
+
+/*
+ * Expand usart4_usb using USB_STREAM_CONFIG instead of
+ * USB_STREAM_CONFIG_USART_IFACE. USB_STREAM_CONFIG expands to
+ * USB_STREAM_CONFIG_FULL without binding the default usb_usart_interface,
+ * allowing usart4_iface_request to absorb baud changes.
+ */
+USB_STREAM_CONFIG(usart4_usb, USB_IFACE_USART4_STREAM,
+		  USB_STR_USART4_STREAM_NAME, USB_EP_USART4_STREAM,
+		  USB_STREAM_RX_SIZE, USB_STREAM_TX_SIZE, usb_to_bridge_kbd,
+		  bridge_kbd_to_usb)
+
+/* usart4_iface_request is registered via USB_DECLARE_IFACE in usb_bridge.c */
+#else /* !SECTION_IS_RO */
+/* Stock 9600-baud direct UART-to-USB wiring for RW fallback image */
 static struct usart_config const usart4;
 struct usb_stream_config const usart4_usb;
 
@@ -226,11 +286,13 @@ USB_STREAM_CONFIG(usart4_usb, USB_IFACE_USART4_STREAM,
 		  USB_STR_USART4_STREAM_NAME, USB_EP_USART4_STREAM,
 		  USB_STREAM_RX_SIZE, USB_STREAM_TX_SIZE, usb_to_usart4,
 		  usart4_to_usb)
+#endif /* SECTION_IS_RO */
 
 /*
  * Define usb interface descriptor for the `EMPTY` usb interface, to satisfy
  * UEFI and kernel requirements (see b/183857501).
  */
+#ifndef SECTION_IS_RO
 const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_EMPTY) = {
 	.bLength = USB_DT_INTERFACE_SIZE,
 	.bDescriptorType = USB_DT_INTERFACE,
@@ -242,6 +304,7 @@ const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_EMPTY) = {
 	.bInterfaceProtocol = 0,
 	.iInterface = 0,
 };
+#endif
 
 /******************************************************************************
  * Define the strings used in our USB descriptors.
@@ -258,6 +321,9 @@ const void *const usb_strings[] = {
 	[USB_STR_USART3_STREAM_NAME] = USB_STRING_DESC("DUT UART"),
 	[USB_STR_USART4_STREAM_NAME] = USB_STRING_DESC("Atmega UART"),
 	[USB_STR_UPDATE_NAME] = USB_STRING_DESC("Firmware update"),
+#ifdef SECTION_IS_RO
+	[USB_STR_BRIDGE_NAME] = USB_STRING_DESC("Android ADB/Fastboot"),
+#endif
 };
 
 BUILD_ASSERT(ARRAY_SIZE(usb_strings) == USB_STR_COUNT);
@@ -296,66 +362,81 @@ int usb_i2c_board_is_enabled(void)
 #define GPIOX_DIR_PORT_A 0x6
 #define GPIOX_DIR_PORT_B 0x7
 
-/* Write a GPIO output on the tca6416 I2C ioexpander. */
-static void write_ioexpander(int bank, int gpio, int val)
+#ifdef SECTION_IS_RO
+static timestamp_t atmel_reset_assert_time;
+#define ATMEL_RESET_MIN_HOLD_MS 10
+#define ATMEL_RESET_MIN_HOLD_US (ATMEL_RESET_MIN_HOLD_MS * 1000)
+
+static inline bool is_ioexp_atmel_reset(int port, uint16_t addr_flags,
+					const uint8_t *out, int write_count)
+{
+	return port == I2C_PORT_MASTER && addr_flags == GPIOX_I2C_ADDR_FLAGS &&
+	       write_count >= 2 && out[0] == GPIOX_OUT_PORT_A;
+}
+
+static void atmel_reset_pre_write(int val)
+{
+	if (val && atmel_reset_assert_time.val &&
+	    (get_time().val - atmel_reset_assert_time.val) <
+		    ATMEL_RESET_MIN_HOLD_US)
+		crec_msleep(ATMEL_RESET_MIN_HOLD_MS);
+}
+
+static void atmel_reset_post_write(int val)
+{
+	if (!val)
+		atmel_reset_assert_time = get_time();
+	usb_bridge_notify_atmel_reset(val);
+}
+
+void usb_i2c_board_xfer_pre(int port, uint16_t addr_flags, const uint8_t *out,
+			    int write_count)
+{
+	if (is_ioexp_atmel_reset(port, addr_flags, out, write_count))
+		atmel_reset_pre_write(out[1] & BIT(1));
+}
+
+void usb_i2c_board_xfer_post(int port, uint16_t addr_flags, const uint8_t *out,
+			     int write_count, int ret)
+{
+	if (ret == EC_SUCCESS &&
+	    is_ioexp_atmel_reset(port, addr_flags, out, write_count))
+		atmel_reset_post_write(out[1] & BIT(1));
+}
+#endif
+
+/* Write a Port A GPIO output on the tca6416 I2C ioexpander. */
+static void write_ioexpander(int gpio, int val)
 {
 	int tmp;
 
 	/* Read output port register */
-	i2c_read8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_OUT_PORT_A + bank, &tmp);
+	i2c_read8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_OUT_PORT_A, &tmp);
 	if (val)
 		tmp |= BIT(gpio);
 	else
 		tmp &= ~BIT(gpio);
 	/* Write back modified output port register */
-	i2c_write8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_OUT_PORT_A + bank, tmp);
-}
-
-/* Read a single GPIO input on the tca6416 I2C ioexpander. */
-static int read_ioexpander_bit(int bank, int bit)
-{
-	int tmp;
-	int mask = 1 << bit;
-
-	/* Read input port register */
-	i2c_read8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_IN_PORT_A + bank, &tmp);
-
-	return (tmp & mask) >> bit;
-}
-
-/* Enable uservo USB. */
-static void init_uservo_port(void)
-{
-	/* Write USERVO_POWER_EN */
-	write_ioexpander(0, 7, 1);
-	/* Write USERVO_FASTBOOT_MUX_SEL */
-	write_ioexpander(1, 0, 0);
-}
-
-/* Enable blue USB port to DUT. */
-static void init_usb3_port(void)
-{
-	/* Write USB3.0_TYPEA_MUX_SEL */
-	write_ioexpander(0, 3, 1);
-	/* Write USB3.0_TYPEA_MUX_EN_L */
-	write_ioexpander(0, 4, 0);
-	/* Write USB3.0_TYPE_A_PWR_EN */
-	write_ioexpander(0, 5, 1);
+	i2c_write8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_OUT_PORT_A, tmp);
 }
 
 /* Enable all ioexpander outputs. */
 static void init_ioexpander(void)
 {
-	/* Write all GPIO to output 0 */
-	i2c_write8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_OUT_PORT_A, 0x0);
-	i2c_write8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_OUT_PORT_B, 0x0);
+	static const uint8_t init_cmds[][2] = {
+		{ GPIOX_OUT_PORT_A, 0xa8 },
+		{ GPIOX_OUT_PORT_B, 0x00 },
+		{ GPIOX_DIR_PORT_A, 0x00 },
+		{ GPIOX_DIR_PORT_B, 0x18 },
+	};
+	int i;
 
-	/*
-	 * Write GPIO direction: strap resistors to input,
-	 * all others to output.
-	 */
-	i2c_write8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_DIR_PORT_A, 0x0);
-	i2c_write8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_DIR_PORT_B, 0x18);
+	for (i = 0; i < ARRAY_SIZE(init_cmds); i++)
+		i2c_write8(1, GPIOX_I2C_ADDR_FLAGS, init_cmds[i][0],
+			   init_cmds[i][1]);
+#ifdef SECTION_IS_RO
+	atmel_reset_post_write(0);
+#endif
 }
 
 /*
@@ -390,49 +471,23 @@ static void ccd_measure_sbu(void)
 	sbu2 = adc_read_channel(ADC_SBU2_DET);
 	mux_en = gpio_get_level(GPIO_SBU_MUX_EN);
 
-	/*
-	 * While SBU_MUX is disabled (SuzyQ unplugged), we'll poll the SBU lines
-	 * to check if an idling, unconfigured USB device is present.
-	 * USB FS pulls one line high for connect request.
-	 * If so, and it persists for 500ms, we'll enable the SuzyQ in that
-	 * orientation.
-	 */
-	if ((!mux_en) && (sbu1 > USB_HIGH_MV) && (sbu2 < GND_MAX_MV)) {
-		/* Check flip connection polarity. */
-		if (last != MODE_SBU_FLIP) {
-			last = MODE_SBU_FLIP;
-			polarity = SBU_FLIP;
-			count = 0;
-		} else {
-			count++;
-		}
-	} else if ((!mux_en) && (sbu2 > USB_HIGH_MV) && (sbu1 < GND_MAX_MV)) {
-		/* Check direct connection polarity. */
-		if (last != MODE_SBU_CONNECT) {
-			last = MODE_SBU_CONNECT;
-			polarity = SBU_DIRECT;
-			count = 0;
-		} else {
-			count++;
-		}
-		/*
-		 * If SuzyQ is enabled, we'll poll for a persistent no-signal
-		 * for 500ms. Since USB is differential, we should never see
-		 * GND/GND while the device is connected. If disconnected,
-		 * electrically remove SuzyQ.
-		 */
-	} else if ((mux_en) && (sbu1 < GND_MAX_MV) && (sbu2 < GND_MAX_MV)) {
-		/* Check for SBU disconnect if connected. */
-		if (last != MODE_SBU_DISCONNECT) {
-			last = MODE_SBU_DISCONNECT;
-			count = 0;
-		} else {
-			count++;
-		}
-	} else {
-		/* Didn't find anything, reset state. */
-		last = MODE_SBU_OTHER;
+	int mode = MODE_SBU_OTHER;
+
+	if (!mux_en && sbu1 > USB_HIGH_MV && sbu2 < GND_MAX_MV) {
+		mode = MODE_SBU_FLIP;
+		polarity = SBU_FLIP;
+	} else if (!mux_en && sbu2 > USB_HIGH_MV && sbu1 < GND_MAX_MV) {
+		mode = MODE_SBU_CONNECT;
+		polarity = SBU_DIRECT;
+	} else if (mux_en && sbu1 < GND_MAX_MV && sbu2 < GND_MAX_MV) {
+		mode = MODE_SBU_DISCONNECT;
+	}
+
+	if (last != mode) {
+		last = mode;
 		count = 0;
+	} else {
+		count++;
 	}
 
 	/*
@@ -443,34 +498,37 @@ static void ccd_measure_sbu(void)
 		if (mux_en) {
 			/* Disable mux as it's disconnected now. */
 			gpio_set_level(GPIO_SBU_MUX_EN, 0);
-			crec_msleep(10);
 			CPRINTS("CCD: disconnected.");
 		} else {
 			/* SBU flip = polarity */
-			write_ioexpander(0, 2, polarity);
+			write_ioexpander(2, polarity);
 			gpio_set_level(GPIO_SBU_MUX_EN, 1);
-			crec_msleep(10);
 			CPRINTS("CCD: connected %s",
 				polarity ? "flip" : "noflip");
 		}
+		crec_msleep(10);
 	}
 
 	/* Measure every 100ms, forever. */
 	hook_call_deferred(&ccd_measure_sbu_data, 100 * MSEC);
 }
 
+#ifdef SECTION_IS_RO
 void ext_hpd_detection_enable(int enable)
 {
 	if (enable) {
-		timestamp_t now = get_time();
-
 		hpd_prev_level = gpio_get_level(GPIO_DP_HPD);
-		hpd_prev_ts = now.val;
+		hpd_prev_ts = get_time().val;
 		gpio_enable_interrupt(GPIO_DP_HPD);
 	} else {
 		gpio_disable_interrupt(GPIO_DP_HPD);
 	}
 }
+#else
+void ext_hpd_detection_enable(int enable)
+{
+}
+#endif
 
 void ccd_enable(int enable)
 {
@@ -487,12 +545,10 @@ int board_get_version(void)
 	static int ver = -1;
 
 	if (ver < 0) {
-		uint8_t id0, id1;
+		int tmp = 0;
 
-		id0 = read_ioexpander_bit(1, 3);
-		id1 = read_ioexpander_bit(1, 4);
-
-		ver = (id1 * 2) + id0;
+		i2c_read8(1, GPIOX_I2C_ADDR_FLAGS, GPIOX_IN_PORT_B, &tmp);
+		ver = (tmp >> 3) & 3;
 		CPRINTS("Board ID = %d", ver);
 	}
 
@@ -501,15 +557,27 @@ int board_get_version(void)
 
 static void board_init(void)
 {
-	/* USB to serial queues */
-	queue_init(&usart3_to_usb);
-	queue_init(&usb_to_usart3);
-	queue_init(&usart4_to_usb);
-	queue_init(&usb_to_usart4);
+	struct queue const *const qs[] = {
+		&usart3_to_usb,	    &usb_to_usart3,
+#ifdef SECTION_IS_RO
+		&usart4_to_bridge,  &bridge_to_usart4,
+		&usb_to_bridge_kbd, &bridge_kbd_to_usb,
+#else
+		&usart4_to_usb,
+		&usb_to_usart4,
+#endif
+	};
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(qs); i++)
+		queue_init(qs[i]);
 
 	/* UART init */
 	usart_init(&usart3);
 	usart_init(&usart4);
+#ifdef SECTION_IS_RO
+	usb_bridge_init();
+#endif
 
 	/* Delay DUT hub to avoid brownout. */
 	crec_usleep(1000);
@@ -522,12 +590,18 @@ static void board_init(void)
 
 	/* Enable uservo USB by default. */
 	init_ioexpander();
-	init_uservo_port();
-	init_usb3_port();
+#ifdef SECTION_IS_RO
+	atmel_reset_pre_write(1);
+	write_ioexpander(1, 1);
+	atmel_reset_post_write(1);
+#else
+	write_ioexpander(1, 1);
+#endif
 
+#ifdef SECTION_IS_RO
 	/* Clear BBRAM, we don't want any PD state carried over on reset. */
-	system_set_bbram(SYSTEM_BBRAM_IDX_PD0, 0);
-	system_set_bbram(SYSTEM_BBRAM_IDX_PD1, 0);
+	for (i = SYSTEM_BBRAM_IDX_PD0; i <= SYSTEM_BBRAM_IDX_PD1; i++)
+		system_set_bbram(i, 0);
 
 	/*
 	 * Disable SBU mux. The polarity is set each time a presense is detected
@@ -547,5 +621,6 @@ static void board_init(void)
 	gpio_enable_interrupt(GPIO_USB_DET_PP_DUT);
 
 	hook_call_deferred(&ccd_measure_sbu_data, 1000 * MSEC);
+#endif /* SECTION_IS_RO */
 }
 DECLARE_HOOK(HOOK_INIT, board_init, HOOK_PRIO_DEFAULT);

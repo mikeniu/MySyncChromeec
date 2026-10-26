@@ -95,25 +95,25 @@ static uint8_t vbus_rp = TYPEC_RP_RESERVED;
 static int cc_config = CC_ALLOW_SRC;
 
 /* Voltage thresholds for no connect in DTS mode */
-static int pd_src_vnc_dts[TYPEC_RP_RESERVED][2] = {
+static const uint16_t pd_src_vnc_dts[TYPEC_RP_RESERVED][2] = {
 	{ PD_SRC_3_0_VNC_MV, PD_SRC_1_5_VNC_MV },
 	{ PD_SRC_1_5_VNC_MV, PD_SRC_DEF_VNC_MV },
 	{ PD_SRC_3_0_VNC_MV, PD_SRC_DEF_VNC_MV },
 };
 /* Voltage thresholds for Ra attach in DTS mode */
-static int pd_src_rd_threshold_dts[TYPEC_RP_RESERVED][2] = {
+static const uint16_t pd_src_rd_threshold_dts[TYPEC_RP_RESERVED][2] = {
 	{ PD_SRC_3_0_RD_THRESH_MV, PD_SRC_1_5_RD_THRESH_MV },
 	{ PD_SRC_1_5_RD_THRESH_MV, PD_SRC_DEF_RD_THRESH_MV },
 	{ PD_SRC_3_0_RD_THRESH_MV, PD_SRC_DEF_RD_THRESH_MV },
 };
 /* Voltage thresholds for no connect in normal SRC mode */
-static int pd_src_vnc[TYPEC_RP_RESERVED] = {
+static const uint16_t pd_src_vnc[TYPEC_RP_RESERVED] = {
 	PD_SRC_DEF_VNC_MV,
 	PD_SRC_1_5_VNC_MV,
 	PD_SRC_3_0_VNC_MV,
 };
 /* Voltage thresholds for Ra attach in normal SRC mode */
-static int pd_src_rd_threshold[TYPEC_RP_RESERVED] = {
+static const uint16_t pd_src_rd_threshold[TYPEC_RP_RESERVED] = {
 	PD_SRC_DEF_RD_THRESH_MV,
 	PD_SRC_1_5_RD_THRESH_MV,
 	PD_SRC_3_0_RD_THRESH_MV,
@@ -1020,17 +1020,23 @@ __override int pd_custom_vdm(int port, int cnt, uint32_t *payload,
 __override const struct svdm_amode_fx supported_modes[] = {};
 __override const int supported_modes_cnt = ARRAY_SIZE(supported_modes);
 
+static const char *on_off(int on)
+{
+	return on ? "on" : "off";
+}
+
 static void print_cc_mode(void)
 {
 	/* Get current CCD status */
-	ccprintf("cc: %s\n", cc_config & CC_DETACH ? "off" : "on");
-	ccprintf("dts mode: %s\n", cc_config & CC_DISABLE_DTS ? "off" : "on");
-	ccprintf("chg mode: %s\n",
-		 gpio_get_level(GPIO_DUT_CHG_EN) ? "on" : "off");
-	ccprintf("chg allowed: %s\n", cc_config & CC_ALLOW_SRC ? "on" : "off");
-	ccprintf("drp enabled: %s\n", cc_config & CC_ENABLE_DRP ? "on" : "off");
-	ccprintf("cc polarity: %s\n", cc_config & CC_POLARITY ? "cc2" : "cc1");
-	ccprintf("pd enabled: %s\n", pd_comm_is_enabled(DUT) ? "on" : "off");
+	ccprintf("cc: %s\ndts mode: %s\nchg mode: %s\nchg allowed: %s\n"
+		 "drp enabled: %s\ncc polarity: %s\npd enabled: %s\n",
+		 on_off(!(cc_config & CC_DETACH)),
+		 on_off(!(cc_config & CC_DISABLE_DTS)),
+		 on_off(gpio_get_level(GPIO_DUT_CHG_EN)),
+		 on_off(cc_config & CC_ALLOW_SRC),
+		 on_off(cc_config & CC_ENABLE_DRP),
+		 cc_config & CC_POLARITY ? "cc2" : "cc1",
+		 on_off(pd_comm_is_enabled(DUT)));
 }
 
 static void do_cc(int cc_config_new)
@@ -1116,28 +1122,35 @@ static int command_cc(int argc, const char **argv)
 	} else if (!strcasecmp(argv[1], "on")) {
 		cc_config_new &= ~CC_DETACH;
 	} else {
+		static const struct {
+			char name[9];
+			uint8_t set;
+			uint8_t mask;
+		} modes[] = {
+			{ "src", CC_DISABLE_DTS | CC_ALLOW_SRC, 0x1e },
+			{ "snk", CC_DISABLE_DTS, 0x1e },
+			{ "pdsnk", CC_DISABLE_DTS | CC_SNK_WITH_PD, 0x1e },
+			{ "drp", CC_DISABLE_DTS | CC_ALLOW_SRC | CC_ENABLE_DRP,
+			  0x1e },
+			{ "srcdts", CC_ALLOW_SRC, 0x1e },
+			{ "snkdts", 0, 0x1e },
+			{ "pdsnkdts", CC_SNK_WITH_PD, 0x1e },
+			{ "drpdts", CC_ALLOW_SRC | CC_ENABLE_DRP, 0x1e },
+			{ "dtsoff", CC_DISABLE_DTS, CC_DISABLE_DTS },
+			{ "dtson", 0, CC_DISABLE_DTS },
+		};
+		int m;
+
 		cc_config_new &= ~CC_DETACH;
-		if (!strcasecmp(argv[1], "src"))
-			cc_config_new = CONF_SRC(cc_config_new);
-		else if (!strcasecmp(argv[1], "snk"))
-			cc_config_new = CONF_SNK(cc_config_new);
-		else if (!strcasecmp(argv[1], "pdsnk"))
-			cc_config_new = CONF_PDSNK(cc_config_new);
-		else if (!strcasecmp(argv[1], "drp"))
-			cc_config_new = CONF_DRP(cc_config_new);
-		else if (!strcasecmp(argv[1], "srcdts"))
-			cc_config_new = CONF_SRCDTS(cc_config_new);
-		else if (!strcasecmp(argv[1], "snkdts"))
-			cc_config_new = CONF_SNKDTS(cc_config_new);
-		else if (!strcasecmp(argv[1], "pdsnkdts"))
-			cc_config_new = CONF_PDSNKDTS(cc_config_new);
-		else if (!strcasecmp(argv[1], "drpdts"))
-			cc_config_new = CONF_DRPDTS(cc_config_new);
-		else if (!strcasecmp(argv[1], "dtsoff"))
-			cc_config_new = CONF_DTSOFF(cc_config_new);
-		else if (!strcasecmp(argv[1], "dtson"))
-			cc_config_new = CONF_DTSON(cc_config_new);
-		else
+		for (m = 0; m < ARRAY_SIZE(modes); m++) {
+			if (!strcasecmp(argv[1], modes[m].name)) {
+				cc_config_new =
+					(cc_config_new & ~modes[m].mask) |
+					modes[m].set;
+				break;
+			}
+		}
+		if (m == ARRAY_SIZE(modes))
 			return EC_ERROR_PARAM2;
 	}
 
@@ -1229,185 +1242,150 @@ static int cmd_ada_srccaps(int argc, const char *argv[])
 DECLARE_CONSOLE_COMMAND(ada_srccaps, cmd_ada_srccaps, "",
 			"Print adapter SrcCap");
 
+#ifndef SECTION_IS_RO
 static int cmd_dp_action(int argc, const char *argv[])
 {
 	int i;
-	char *e;
+	char c0, c1;
 
 	if (argc < 1)
 		return EC_ERROR_PARAM_COUNT;
 
 	if (argc == 1) {
-		CPRINTS("DP alt-mode: %s",
-			(alt_dp_config & ALT_DP_ENABLE) ? "enable" : "disable");
+		ccprintf("DP alt-mode: %s\n", (alt_dp_config & ALT_DP_ENABLE) ?
+						      "enable" :
+						      "disable");
+		return EC_SUCCESS;
 	}
 
-	if (!strcasecmp(argv[1], "enable")) {
+	c0 = argv[1][0] | 0x20;
+	c1 = argv[1][1] | 0x20;
+
+	if (c0 == 'e') {
 		alt_dp_config |= ALT_DP_ENABLE;
-	} else if (!strcasecmp(argv[1], "disable")) {
+	} else if (c0 == 'd' && c1 == 'i') {
 		alt_dp_config &= ~ALT_DP_ENABLE;
-	} else if (!strcasecmp(argv[1], "pins")) {
+	} else if (c0 == 'p' && c1 == 'i') {
 		if (argc >= 3) {
 			alt_dp_config &=
 				~(ALT_DP_PIN_C | ALT_DP_PIN_D | ALT_DP_PIN_E);
-			for (i = 0; i < 3; i++) {
-				if (!argv[2][i])
-					break;
+			for (i = 0; argv[2][i] && i < 3; i++) {
+				unsigned char c = (argv[2][i] | 0x20) - 'c';
 
-				switch (argv[2][i]) {
-				case 'c':
-				case 'C':
-					alt_dp_config |= ALT_DP_PIN_C;
-					break;
-				case 'd':
-				case 'D':
-					alt_dp_config |= ALT_DP_PIN_D;
-					break;
-				case 'e':
-				case 'E':
-					alt_dp_config |= ALT_DP_PIN_E;
-					break;
-				}
+				if (c <= 2)
+					alt_dp_config |= BIT(c + 1);
 			}
 		}
-		CPRINTS("Pins: %s%s%s",
-			(alt_dp_config & ALT_DP_PIN_C) ? "C" : "",
-			(alt_dp_config & ALT_DP_PIN_D) ? "D" : "",
-			(alt_dp_config & ALT_DP_PIN_E) ? "E" : "");
-	} else if (!strcasecmp(argv[1], "mf")) {
+		ccprintf("Pins: %s%s%s\n",
+			 (alt_dp_config & ALT_DP_PIN_C) ? "C" : "",
+			 (alt_dp_config & ALT_DP_PIN_D) ? "D" : "",
+			 (alt_dp_config & ALT_DP_PIN_E) ? "E" : "");
+	} else if (c0 == 'm' || (c0 == 'p' && c1 == 'l')) {
+		int mask = (c0 == 'm') ? ALT_DP_MF_PREF : ALT_DP_PLUG;
+
 		if (argc >= 3) {
-			i = strtoi(argv[2], &e, 10);
-			if (*e)
-				return EC_ERROR_PARAM3;
-			if (i)
-				alt_dp_config |= ALT_DP_MF_PREF;
+			if (atoi(argv[2]))
+				alt_dp_config |= mask;
 			else
-				alt_dp_config &= ~ALT_DP_MF_PREF;
+				alt_dp_config &= ~mask;
 		}
-		CPRINTS("MF pref: %d", (alt_dp_config & ALT_DP_MF_PREF) != 0);
-	} else if (!strcasecmp(argv[1], "plug")) {
-		if (argc >= 3) {
-			i = strtoi(argv[2], &e, 10);
-			if (*e)
-				return EC_ERROR_PARAM3;
-			if (i)
-				alt_dp_config |= ALT_DP_PLUG;
-			else
-				alt_dp_config &= ~ALT_DP_PLUG;
-		}
-		CPRINTS("Plug or receptacle: %d",
-			(alt_dp_config & ALT_DP_PLUG) != 0);
-	} else if (!strcasecmp(argv[1], "hpd")) {
+		ccprintf(c0 == 'm' ? "MF pref: %d\n" :
+				     "Plug or receptacle: %d\n",
+			 (alt_dp_config & mask) != 0);
+	} else if (c0 == 'h' && c1 == 'p') {
 		if (argc >= 3) {
 			if (!strncasecmp(argv[2], "ext", 3)) {
 				alt_dp_config &= ~ALT_DP_OVERRIDE_HPD;
 				ext_hpd_detection_enable(1);
-			} else if (!strncasecmp(argv[2], "h", 1)) {
-				alt_dp_config |= ALT_DP_OVERRIDE_HPD;
-				alt_dp_config |= ALT_DP_HPD_LVL;
-				/*
-				 * Modify the HPD to high. Need to enable the
-				 * external HPD signal monitoring. A monitor
-				 * may send a IRQ at any time to notify DUT.
-				 */
-				ext_hpd_detection_enable(1);
-				pd_send_hpd(DUT, hpd_high);
-			} else if (!strncasecmp(argv[2], "l", 1)) {
-				alt_dp_config |= ALT_DP_OVERRIDE_HPD;
-				alt_dp_config &= ~ALT_DP_HPD_LVL;
-				ext_hpd_detection_enable(0);
-				pd_send_hpd(DUT, hpd_low);
 			} else if (!strcasecmp(argv[2], "irq")) {
 				pd_send_hpd(DUT, hpd_irq);
+			} else {
+				int lvl = (argv[2][0] | 0x20) == 'h';
+
+				alt_dp_config =
+					(alt_dp_config & ~ALT_DP_HPD_LVL) |
+					ALT_DP_OVERRIDE_HPD |
+					(lvl ? ALT_DP_HPD_LVL : 0);
+				ext_hpd_detection_enable(lvl);
+				pd_send_hpd(DUT, lvl ? hpd_high : hpd_low);
 			}
 		}
-		CPRINTS("HPD source: %s",
-			(alt_dp_config & ALT_DP_OVERRIDE_HPD) ? "overridden" :
-								"external");
-		CPRINTS("HPD level: %d", get_hpd_level());
-	} else if (!strcasecmp(argv[1], "help")) {
-		CPRINTS("Usage: usbc_action dp [enable|disable|hpd|mf|pins|"
-			"plug]");
+		ccprintf("HPD source: %s\nHPD level: %d\n",
+			 (alt_dp_config & ALT_DP_OVERRIDE_HPD) ? "overridden" :
+								 "external",
+			 get_hpd_level());
+	} else if (c0 == 'h' && c1 == 'e') {
+		ccprintf(
+			"Usage: usbc_action dp [enable|disable|hpd|mf|pins|plug]\n");
 	}
 
 	return EC_SUCCESS;
 }
+#endif
 
 static int cmd_usbc_action(int argc, const char *argv[])
 {
+	char c0, c1;
+
+#ifndef SECTION_IS_RO
 	if (argc >= 2 && !strcasecmp(argv[1], "dp"))
 		return cmd_dp_action(argc - 1, &argv[1]);
+#else
+	if (argc >= 2 && !strcasecmp(argv[1], "dp"))
+		return EC_ERROR_PARAM1;
+#endif
 
 	if (argc != 2 && argc != 3)
 		return EC_ERROR_PARAM_COUNT;
 
+	c0 = argv[1][0] | 0x20;
+	c1 = argv[1][1] | 0x20;
+
 	/* TODO(b:140256624): drop *v command if we migrate to chg cmd. */
-	if (!strcasecmp(argv[1], "5v")) {
+	if ((c0 >= '0' && c0 <= '9') || c0 == 'c') {
+		int v = atoi(c0 == 'c' ? argv[2] : argv[1]) * 1000;
+
+		if (c0 == 'c') {
+			if (argc != 3 || !v)
+				return EC_ERROR_PARAM2;
+		}
+		user_limited_max_mv = v;
 		do_cc(CONF_SRC(cc_config));
-		user_limited_max_mv = 5000;
 		update_ports();
-	} else if (!strcasecmp(argv[1], "12v")) {
-		do_cc(CONF_SRC(cc_config));
-		user_limited_max_mv = 12000;
-		update_ports();
-	} else if (!strcasecmp(argv[1], "20v")) {
-		do_cc(CONF_SRC(cc_config));
-		user_limited_max_mv = 20000;
-		update_ports();
-	} else if (!strcasecmp(argv[1], "dev")) {
+		if (c0 == 'c') {
+			/*
+			 * TODO(b:140256624): servod captures 'chg SRC' keyword
+			 * to recognize if this command is supported in the
+			 * firmware. Drop this message if when we phase out the
+			 * usbc_role control.
+			 */
+			ccprintf("CHG SRC %dmV\n", v);
+		}
+	} else if (c0 == 'd' && c1 == 'e') {
 		/* Set the limit back to original */
 		user_limited_max_mv = 20000;
 		do_cc(CONF_PDSNK(cc_config));
-	} else if (!strcasecmp(argv[1], "pol0")) {
-		do_cc(cc_config & ~CC_POLARITY);
-	} else if (!strcasecmp(argv[1], "pol1")) {
-		do_cc(cc_config | CC_POLARITY);
-	} else if (!strcasecmp(argv[1], "drp")) {
+	} else if (c0 == 'p' && c1 == 'o') {
+		do_cc(argv[1][3] == '1' ? (cc_config | CC_POLARITY) :
+					  (cc_config & ~CC_POLARITY));
+	} else if (c0 == 'd' && c1 == 'r' && (argv[1][2] | 0x20) == 'p') {
 		/* Toggle the DRP state, compatible with Plankton. */
 		do_cc(cc_config ^ CC_ENABLE_DRP);
-		CPRINTF("DRP = %d, host_mode = %d\n",
-			!!(cc_config & CC_ENABLE_DRP),
-			!!(cc_config & CC_ALLOW_SRC));
-	} else if (!strcasecmp(argv[1], "chg")) {
-		int sink_v;
-
-		if (argc != 3)
-			return EC_ERROR_PARAM2;
-
-		sink_v = atoi(argv[2]);
-		if (!sink_v)
-			return EC_ERROR_PARAM2;
-
-		user_limited_max_mv = sink_v * 1000;
-		do_cc(CONF_SRC(cc_config));
-		update_ports();
-		/*
-		 * TODO(b:140256624): servod captures 'chg SRC' keyword to
-		 * recognize if this command is supported in the firmware.
-		 * Drop this message if when we phase out the usbc_role control.
-		 */
-		ccprintf("CHG SRC %dmV\n", user_limited_max_mv);
-	} else if (!strcasecmp(argv[1], "drswap")) {
+		ccprintf("DRP = %d, host_mode = %d\n",
+			 !!(cc_config & CC_ENABLE_DRP),
+			 !!(cc_config & CC_ALLOW_SRC));
+	} else if ((c0 == 'd' || c0 == 'p') && c1 == 'r') {
+		uint8_t *swap_var = (c0 == 'd') ? &allow_dr_swap :
+						  &allow_pr_swap;
 		if (argc == 2) {
-			CPRINTF("allow_dr_swap = %d\n", allow_dr_swap);
+			ccprintf("allow_%cr_swap = %d\n", c0, *swap_var);
 			return EC_SUCCESS;
 		}
 
 		if (argc != 3)
 			return EC_ERROR_PARAM2;
 
-		allow_dr_swap = !!atoi(argv[2]);
-
-	} else if (!strcasecmp(argv[1], "prswap")) {
-		if (argc == 2) {
-			CPRINTF("allow_pr_swap = %d\n", allow_pr_swap);
-			return EC_SUCCESS;
-		}
-
-		if (argc != 3)
-			return EC_ERROR_PARAM2;
-
-		allow_pr_swap = !!atoi(argv[2]);
+		*swap_var = !!atoi(argv[2]);
 	} else {
 		return EC_ERROR_PARAM1;
 	}
@@ -1415,6 +1393,8 @@ static int cmd_usbc_action(int argc, const char *argv[])
 	return EC_SUCCESS;
 }
 DECLARE_CONSOLE_COMMAND(usbc_action, cmd_usbc_action,
-			"5v|12v|20v|dev|pol0|pol1|drp|dp|chg x(x=voltage)|"
+			"5v|12v|20v|dev|pol0|pol1|drp|"
+			"dp|"
+			"chg x(x=voltage)|"
 			"drswap [1|0]|prswap [1|0]",
 			"Set Servo v4 type-C port state");

@@ -100,6 +100,17 @@ static uint8_t usb_i2c_executable(struct usb_i2c_config const *config)
 	return 0;
 }
 
+__overridable void usb_i2c_board_xfer_pre(int port, uint16_t addr_flags,
+					  const uint8_t *out, int write_count)
+{
+}
+
+__overridable void usb_i2c_board_xfer_post(int port, uint16_t addr_flags,
+					   const uint8_t *out, int write_count,
+					   int ret)
+{
+}
+
 static void usb_i2c_execute(struct usb_i2c_config const *config)
 {
 	/* Payload is ready to execute. */
@@ -146,17 +157,14 @@ static void usb_i2c_execute(struct usb_i2c_config const *config)
 							     read_count);
 	} else {
 		int ret;
+		int port = i2c_ports[portindex].port;
+		uint8_t *out = (uint8_t *)(config->buffer + 2) + offset;
 
-		/*
-		 * TODO (crbug.com/750397): Add security.  This currently
-		 * blindly passes through ALL I2C commands on any bus the EC
-		 * knows about.  It should behave closer to
-		 * EC_CMD_I2C_PASSTHRU, which can protect ports and ranges.
-		 */
-		ret = i2c_xfer(i2c_ports[portindex].port, addr_flags,
-			       (uint8_t *)(config->buffer + 2) + offset,
-			       write_count, (uint8_t *)(config->buffer + 2),
-			       read_count);
+		usb_i2c_board_xfer_pre(port, addr_flags, out, write_count);
+		ret = i2c_xfer(port, addr_flags, out, write_count,
+			       (uint8_t *)(config->buffer + 2), read_count);
+		usb_i2c_board_xfer_post(port, addr_flags, out, write_count,
+					ret);
 		config->buffer[0] = usb_i2c_map_error(ret);
 	}
 	usb_i2c_write_packet(config, read_count + 4);

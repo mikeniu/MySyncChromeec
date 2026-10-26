@@ -22,6 +22,7 @@
 static uint32_t channel_mask = CC_DEFAULT;
 static uint32_t channel_mask_saved = CC_DEFAULT;
 
+#ifndef CONFIG_CONSOLE_DISABLE_CPRINTS
 /*
  * List of channel names;
  *
@@ -37,9 +38,11 @@ static const char *const channel_names[] = {
 #undef CONSOLE_CHANNEL
 };
 BUILD_ASSERT(ARRAY_SIZE(channel_names) == CC_CHANNEL_COUNT);
+#endif /* !CONFIG_CONSOLE_DISABLE_CPRINTS */
 /* ensure that we are not silently masking additional channels */
 BUILD_ASSERT(CC_CHANNEL_COUNT <= 8 * sizeof(uint32_t));
 
+#ifndef CONFIG_CONSOLE_DISABLE_CPRINTS
 static int console_channel_name_to_index(const char *name)
 {
 	int i;
@@ -67,6 +70,7 @@ void console_channel_disable(const char *name)
 	if (index >= 0 && index != CC_COMMAND)
 		channel_mask &= ~CC_MASK(index);
 }
+#endif /* !CONFIG_CONSOLE_DISABLE_CPRINTS */
 
 bool console_channel_is_disabled(enum console_channel channel)
 {
@@ -78,6 +82,9 @@ bool console_channel_is_disabled(enum console_channel channel)
 
 /*****************************************************************************/
 /* Channel-based console output */
+
+#undef cputs
+#undef cprintf
 
 int cputs(enum console_channel channel, const char *outstr)
 {
@@ -125,6 +132,7 @@ int cprintf(enum console_channel channel, const char *format, ...)
 	return rv;
 }
 
+#ifndef CONFIG_CONSOLE_DISABLE_CPRINTS
 int cvprints(enum console_channel channel, const char *format, va_list args)
 {
 	int r, rv;
@@ -155,6 +163,7 @@ int cprints(enum console_channel channel, const char *format, ...)
 
 	return rv;
 }
+#endif /* !CONFIG_CONSOLE_DISABLE_CPRINTS */
 
 void cflush(void)
 {
@@ -168,7 +177,9 @@ void cflush(void)
 /* Set active channels */
 static int command_ch(int argc, const char **argv)
 {
+#ifndef CONFIG_CONSOLE_DISABLE_CPRINTS
 	int i;
+#endif
 	char *e;
 
 	/* If one arg, save / restore, or set the mask */
@@ -182,6 +193,7 @@ static int command_ch(int argc, const char **argv)
 
 		} else {
 			/* Set the mask */
+#ifndef CONFIG_CONSOLE_DISABLE_CPRINTS
 			int index = console_channel_name_to_index(argv[1]);
 
 			if (index >= 0) {
@@ -192,7 +204,9 @@ static int command_ch(int argc, const char **argv)
 					console_channel_disable(argv[1]);
 					ccprintf("chan %s disabled\n", argv[1]);
 				}
-			} else {
+			} else
+#endif
+			{
 				int m = strtoi(argv[1], &e, 0);
 				if (*e) {
 					return EC_ERROR_PARAM1;
@@ -205,6 +219,7 @@ static int command_ch(int argc, const char **argv)
 		}
 	}
 
+#ifndef CONFIG_CONSOLE_DISABLE_CPRINTS
 	/* Print the list of channels */
 	ccputs(" # Mask     E Channel\n");
 	for (i = 0; i < CC_CHANNEL_COUNT; i++) {
@@ -213,6 +228,7 @@ static int command_ch(int argc, const char **argv)
 			 channel_names[i]);
 		cflush();
 	}
+#endif
 	return EC_SUCCESS;
 };
 DECLARE_SAFE_CONSOLE_COMMAND(chan, command_ch,

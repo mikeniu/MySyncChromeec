@@ -12,8 +12,17 @@
 
 /* Free up flash space */
 #ifdef SECTION_IS_RO
-#define CONFIG_DEBUG_ASSERT_BRIEF
+#define CONFIG_CONSOLE_DISABLE_CPRINTS
+#define CONFIG_CMD_PD_REDUCED
+#undef CONFIG_FLASH_PROTECT_DEFERRED
+#undef CONFIG_DEBUG_ASSERT
+#undef CONFIG_DEBUG_EXCEPTIONS
+#undef CONFIG_DEBUG_STACK_OVERFLOW
 #undef CONFIG_USB_PD_TCPMV1_DEBUG
+#undef CONFIG_USB_PD_DEBUG_LEVEL
+#define CONFIG_USB_PD_DEBUG_LEVEL 0
+#undef CONFIG_CONSOLE_VERBOSE
+#undef CONFIG_TASKINFO_CONTEXT_REGS
 #endif
 
 /*
@@ -61,22 +70,40 @@
 
 /* USB interface indexes (use define rather than enum to expand them) */
 #define USB_IFACE_CONSOLE 0
+#ifdef SECTION_IS_RO
+#define USB_IFACE_MSC 1
+#else
 #define USB_IFACE_EMPTY 1
+#endif
 #define USB_IFACE_I2C 2
 #define USB_IFACE_USART3_STREAM 3
 #define USB_IFACE_USART4_STREAM 4
 #define USB_IFACE_UPDATE 5
+#ifdef SECTION_IS_RO
+#define USB_IFACE_BRIDGE 6
+#define USB_IFACE_COUNT 7
+#else
 #define USB_IFACE_COUNT 6
+#endif
 
 /* USB endpoint indexes (use define rather than enum to expand them) */
 #define USB_EP_CONTROL 0
 #define USB_EP_CONSOLE 1
+#ifdef SECTION_IS_RO
+#define USB_EP_MSC 2
+#else
 #define USB_EP_EMPTY 2
+#endif
 #define USB_EP_I2C 3
 #define USB_EP_USART3_STREAM 4
 #define USB_EP_USART4_STREAM 5
 #define USB_EP_UPDATE 6
+#ifdef SECTION_IS_RO
+#define USB_EP_BRIDGE 7
+#define USB_EP_COUNT 8
+#else
 #define USB_EP_COUNT 7
+#endif
 
 /* Enable console recasting of GPIO type. */
 #define CONFIG_CMD_GPIO_EXTENDED
@@ -106,6 +133,29 @@
 #undef CONFIG_CMD_WAITMS
 #undef CONFIG_CMD_USART_INFO
 #undef CONFIG_CMD_CHARGE_SUPPLIER_INFO
+#undef CONFIG_CMD_CHARGER
+#undef CONFIG_CMD_HASH
+#undef CONFIG_CMD_IDLE_STATS
+#undef CONFIG_CMD_MD
+#undef CONFIG_CMD_MFALLOW
+#undef CONFIG_CMD_MMAPINFO
+#undef CONFIG_CMD_PWR_AVG
+#undef CONFIG_CMD_REGULATOR
+#undef CONFIG_CMD_RW
+#undef CONFIG_CMD_SLEEPMASK
+#undef CONFIG_CMD_SLEEPMASK_SET
+#undef CONFIG_CMD_TYPEC
+#undef CONFIG_HOSTCMD_CONSOLE_PRINT
+#undef CONFIG_CONSOLE_ENABLE_READ_V1
+#undef CONFIG_CMD_FLASH
+#undef CONFIG_CMD_JUMPTAGS
+#undef CONFIG_CMD_RESET_FLAGS
+#undef CONFIG_CMD_SCRATCHPAD
+#undef CONFIG_CONSOLE_CMD_WATCHDOG_INFO
+#undef CONFIG_HOSTCMD_WATCHDOG_INFO
+#undef CONFIG_CMD_TCPC
+#undef CONFIG_CMD_TASKINFO
+#undef CONFIG_CMD_CHGOVERRIDE
 #define CONFIG_CMD_PD_SRCCAPS_REDUCED_SIZE
 
 /* Enable control of I2C over USB */
@@ -124,6 +174,7 @@
  */
 #undef CONFIG_TASK_PROFILING
 
+#ifdef SECTION_IS_RO
 #define CONFIG_CHARGE_MANAGER
 #undef CONFIG_CHARGE_MANAGER_SAFE_MODE
 #define CONFIG_USB_POWER_DELIVERY
@@ -172,6 +223,9 @@
  * all the PDOs could be advertised by servo-v4.
  */
 #define CONFIG_USB_PD_PREFER_HIGH_VOLTAGE
+#else /* !SECTION_IS_RO */
+#undef CONFIG_USB_POWER_DELIVERY
+#endif /* SECTION_IS_RO */
 
 /*
  * Allow dangerous commands all the time, since we don't have a write protect
@@ -199,6 +253,9 @@ enum usb_strings {
 	USB_STR_USART3_STREAM_NAME,
 	USB_STR_USART4_STREAM_NAME,
 	USB_STR_UPDATE_NAME,
+#ifdef SECTION_IS_RO
+	USB_STR_BRIDGE_NAME,
+#endif
 	USB_STR_COUNT
 };
 

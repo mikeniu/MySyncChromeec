@@ -1770,6 +1770,7 @@ DECLARE_HOST_COMMAND(EC_CMD_OVERRIDE_DEDICATED_CHARGER_LIMIT,
 		     hc_override_dedicated_charger_limit, EC_VER_MASK(0));
 #endif
 
+#ifdef CONFIG_CMD_CHGOVERRIDE
 static int command_charge_port_override(int argc, const char **argv)
 {
 	int port = OVERRIDE_OFF;
@@ -1790,6 +1791,7 @@ static int command_charge_port_override(int argc, const char **argv)
 DECLARE_CONSOLE_COMMAND(
 	chgoverride, command_charge_port_override, "[port | -1 | -2]",
 	"Force charging from a given port (-1 = off, -2 = disable charging)");
+#endif
 
 #ifdef CONFIG_CHARGE_MANAGER_EXTERNAL_POWER_LIMIT
 static void charge_manager_set_external_power_limit(int current_lim,

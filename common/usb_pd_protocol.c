@@ -5042,6 +5042,7 @@ static int remote_flashing(int argc, char **argv)
 }
 #endif /* defined(CONFIG_CMD_PD) && defined(CONFIG_CMD_PD_FLASH) */
 
+#ifdef CONFIG_CMD_PD
 static int command_pd(int argc, const char **argv)
 {
 	int port;
@@ -5050,6 +5051,7 @@ static int command_pd(int argc, const char **argv)
 	if (argc < 2)
 		return EC_ERROR_PARAM_COUNT;
 
+#ifndef CONFIG_CMD_PD_REDUCED
 	if (!strcasecmp(argv[1], "dump")) {
 		if (argc >= 3) {
 #ifdef CONFIG_USB_PD_DEBUG_LEVEL
@@ -5097,6 +5099,7 @@ static int command_pd(int argc, const char **argv)
 		ccprintf("%d\n", PD_STACK_VERSION);
 		return EC_SUCCESS;
 	}
+#endif /* !CONFIG_CMD_PD_REDUCED */
 
 	/* command: pd <port> <subcmd> [args] */
 	port = strtoi(argv[1], &e, 10);
@@ -5106,6 +5109,7 @@ static int command_pd(int argc, const char **argv)
 		return EC_ERROR_PARAM2;
 #if defined(CONFIG_CMD_PD) && defined(CONFIG_USB_PD_DUAL_ROLE)
 
+#ifndef CONFIG_CMD_PD_REDUCED
 	if (!strcasecmp(argv[2], "tx")) {
 		set_state(port, PD_STATE_SNK_DISCOVERY);
 		task_wake(PD_PORT_TO_TASK_ID(port));
@@ -5122,7 +5126,9 @@ static int command_pd(int argc, const char **argv)
 		tcpm_set_cc(port, TYPEC_CC_RP);
 		set_state(port, PD_STATE_SRC_DISCONNECTED);
 		task_wake(PD_PORT_TO_TASK_ID(port));
-	} else if (!strncasecmp(argv[2], "dev", 3)) {
+	} else
+#endif
+		if (!strncasecmp(argv[2], "dev", 3)) {
 		int max_volt;
 		if (argc >= 4)
 			max_volt = strtoi(argv[3], &e, 10) * 1000;
@@ -5131,26 +5137,18 @@ static int command_pd(int argc, const char **argv)
 
 		pd_request_source_voltage(port, max_volt);
 		ccprintf("max req: %dmV\n", max_volt);
-	} else if (!strcasecmp(argv[2], "disable")) {
-		pd_comm_enable(port, 0);
-		ccprintf("Port C%d disable\n", port);
+	} else if (!strcasecmp(argv[2], "disable") ||
+		   !strcasecmp(argv[2], "enable")) {
+		int en = (argv[2][0] == 'e' || argv[2][0] == 'E');
+
+		pd_comm_enable(port, en);
+		ccprintf("Port C%d %s\n", port, en ? "enabled" : "disable");
 		return EC_SUCCESS;
-	} else if (!strcasecmp(argv[2], "enable")) {
-		pd_comm_enable(port, 1);
-		ccprintf("Port C%d enabled\n", port);
-		return EC_SUCCESS;
-	} else if (!strncasecmp(argv[2], "hard", 4)) {
-		set_state(port, PD_STATE_HARD_RESET_SEND);
-		task_wake(PD_PORT_TO_TASK_ID(port));
-	} else if (!strncasecmp(argv[2], "info", 4)) {
-		int i;
-		ccprintf("Hash ");
-		for (i = 0; i < PD_RW_HASH_SIZE / 4; i++)
-			ccprintf("%08x ", pd[port].dev_rw_hash[i]);
-		ccprintf("\nImage %s\n",
-			 ec_image_to_string(pd[port].current_image));
-	} else if (!strncasecmp(argv[2], "soft", 4)) {
-		set_state(port, PD_STATE_SOFT_RESET);
+	} else if (!strncasecmp(argv[2], "hard", 4) ||
+		   !strncasecmp(argv[2], "soft", 4)) {
+		set_state(port, (argv[2][0] == 'h' || argv[2][0] == 'H') ?
+					PD_STATE_HARD_RESET_SEND :
+					PD_STATE_SOFT_RESET);
 		task_wake(PD_PORT_TO_TASK_ID(port));
 	} else if (!strncasecmp(argv[2], "swap", 4)) {
 		if (argc < 4)
@@ -5166,8 +5164,11 @@ static int command_pd(int argc, const char **argv)
 #endif
 		else
 			return EC_ERROR_PARAM3;
+#ifndef CONFIG_CMD_PD_REDUCED
 	} else if (!strncasecmp(argv[2], "srccaps", 7)) {
 		pd_srccaps_dump(port);
+#endif
+#ifndef CONFIG_CMD_PD_REDUCED
 	} else if (!strncasecmp(argv[2], "ping", 4)) {
 		int enable;
 
@@ -5207,27 +5208,19 @@ static int command_pd(int argc, const char **argv)
 	} else if (!strncasecmp(argv[2], "flash", 4)) {
 		return remote_flashing(argc, argv);
 #endif
+#endif /* !CONFIG_CMD_PD_REDUCED */
 #if defined(CONFIG_CMD_PD) && defined(CONFIG_USB_PD_DUAL_ROLE)
 	} else if (!strcasecmp(argv[2], "dualrole")) {
 		if (argc < 4) {
-			ccprintf("dual-role toggling: ");
-			switch (drp_state[port]) {
-			case PD_DRP_TOGGLE_ON:
-				ccprintf("on\n");
-				break;
-			case PD_DRP_TOGGLE_OFF:
-				ccprintf("off\n");
-				break;
-			case PD_DRP_FREEZE:
-				ccprintf("freeze\n");
-				break;
-			case PD_DRP_FORCE_SINK:
-				ccprintf("force sink\n");
-				break;
-			case PD_DRP_FORCE_SOURCE:
-				ccprintf("force source\n");
-				break;
-			}
+			static const char *const drp_str[] = { "on", "off",
+							       "freeze",
+							       "force sink",
+							       "force source" };
+			const char *s =
+				(drp_state[port] < ARRAY_SIZE(drp_str)) ?
+					drp_str[drp_state[port]] :
+					"unknown";
+			ccprintf("dual-role toggling: %s\n", s);
 		} else {
 			if (!strcasecmp(argv[3], "on"))
 				pd_set_dual_role(port, PD_DRP_TOGGLE_ON);
@@ -5264,6 +5257,7 @@ static int command_pd(int argc, const char **argv)
 	return EC_SUCCESS;
 }
 DECLARE_CONSOLE_COMMAND(pd, command_pd,
+#ifndef CONFIG_CMD_PD_REDUCED
 			"version"
 			"|dump"
 #ifdef CONFIG_USB_PD_TRY_SRC
@@ -5273,19 +5267,36 @@ DECLARE_CONSOLE_COMMAND(pd, command_pd,
 #ifdef CONFIG_CMD_PD_DEV_DUMP_INFO
 			"|rwhashtable"
 #endif
+#endif
 			"\n\t<port> state"
 #ifdef CONFIG_USB_PD_DUAL_ROLE
-			"|tx|bist_rx|bist_tx|charger|dev"
-			"\n\t<port> disable|enable|soft|info|hard|ping"
+#ifndef CONFIG_CMD_PD_REDUCED
+			"|tx|bist_rx|bist_tx|charger"
+#endif
+			"|dev"
+			"\n\t<port> disable|enable|soft"
+#ifndef CONFIG_CMD_PD_REDUCED
+			"|info"
+#endif
+			"|hard"
+#ifndef CONFIG_CMD_PD_REDUCED
+			"|ping"
+#endif
 			"\n\t<port> dualrole [on|off|freeze|sink|source]"
 			"\n\t<port> swap [power|data|vconn]"
+#ifndef CONFIG_CMD_PD_REDUCED
 			"\n\t<port> vdm [ping|curr|vers]"
 #ifdef CONFIG_CMD_PD_FLASH
 			"\n\t<port> flash [erase|reboot|signature|info|version]"
 #endif /* CONFIG_CMD_PD_FLASH */
+#endif /* !CONFIG_CMD_PD_REDUCED */
 #endif /* CONFIG_USB_PD_DUAL_ROLE */
-			"\n\t<port> srccaps",
+#ifndef CONFIG_CMD_PD_REDUCED
+			"\n\t<port> srccaps"
+#endif
+			,
 			"USB PD");
+#endif /* CONFIG_CMD_PD */
 
 #ifdef HAS_TASK_HOSTCMD
 

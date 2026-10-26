@@ -1405,7 +1405,7 @@ void tcpc_i2c_process(int read, int port, int len, uint8_t *payload,
 }
 #endif
 
-#ifdef CONFIG_COMMON_RUNTIME
+#if defined(CONFIG_COMMON_RUNTIME) && defined(CONFIG_CMD_TCPC)
 static int command_tcpc(int argc, const char **argv)
 {
 	int port;

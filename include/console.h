@@ -185,8 +185,29 @@ cprintf(enum console_channel channel, const char *format, ...);
  *
  * @return non-zero if output was truncated.
  */
+#ifdef CONFIG_CONSOLE_DISABLE_CPRINTS
+static inline int cprints_disabled_stub(void)
+{
+	return EC_SUCCESS;
+}
+
+#define cprints(channel, format, ...)                                \
+	((channel) == CC_COMMAND ?                                   \
+		 (cprintf)(CC_COMMAND, format "\n", ##__VA_ARGS__) : \
+		 cprints_disabled_stub())
+
+#define cprintf(channel, format, ...)                           \
+	((channel) == CC_COMMAND ?                              \
+		 (cprintf)(CC_COMMAND, format, ##__VA_ARGS__) : \
+		 cprints_disabled_stub())
+
+#define cputs(channel, outstr)                                   \
+	((channel) == CC_COMMAND ? (cputs)(CC_COMMAND, outstr) : \
+				   cprints_disabled_stub())
+#else
 __attribute__((__format__(__printf__, 2, 3))) int
 cprints(enum console_channel channel, const char *format, ...);
+#endif
 
 /**
  * Print formatted output to the console channel.

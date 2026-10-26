@@ -207,6 +207,16 @@ void usb_i2c_deferred(struct usb_i2c_config const *config);
  */
 
 /**
+ * Optional board hooks called immediately before and after executing a
+ * USB-I2C transfer via i2c_xfer().
+ */
+__overridable void usb_i2c_board_xfer_pre(int port, uint16_t addr_flags,
+					  const uint8_t *out, int write_count);
+__overridable void usb_i2c_board_xfer_post(int port, uint16_t addr_flags,
+					   const uint8_t *out, int write_count,
+					   int ret);
+
+/**
  * Check if the I2C device is enabled
  *
  * @return 1 if enabled, 0 if disabled.
