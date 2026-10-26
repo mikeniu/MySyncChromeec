@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39e06d64_1fdeda22",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "I opted to keep this as a single CL, and updated the commit message.",
+      "parentUuid": "69345f59_c0dc0040",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 9999
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cc0a745_2843177a",
@@ -45,6 +69,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a509772e_864de17c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "I addressed all the comments summarized here, except kept the first CL and didn\u0027t opt to split the emmulator from the test suite.",
+      "parentUuid": "6cc0a745_2843177a",
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6bd19e3_f388c784",
@@ -58,6 +100,30 @@
       "writtenOn": "2026-10-23T01:04:30Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: Potential Heap Buffer Overflow or Segmentation Fault: This assumes the FIFO is completely linear, but `fifo_head` wraps around in `lsm6dso_emul_read_byte`. If `fifo_head` is near the end of `data-\u003efifo` and `fifo_pos` exceeds the remaining bytes, `data-\u003efifo_head[fifo_pos]` will write past the allocated buffer size (`sizeof(data-\u003efifo)`). You need to handle wrap-around here as well if this is simulating a circular buffer.",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 0
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7debf9c6_13ed31cf",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6bd19e3_f388c784",
       "range": {
         "startLine": 124,
         "startChar": 0,
@@ -93,6 +159,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43970c3d_d26a2015",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "adfa32b8_df4bce45",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 9999
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85bb879a_0c310cee",
@@ -114,6 +204,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a980c5a7_e2ab2465",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85bb879a_0c310cee",
+      "range": {
+        "startLine": 139,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 9999
+      },
       "revId": "39504da7aa9def03e88576dd529810265d428d31",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -141,6 +255,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "039d47e7_e112b6bd",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a66eb28_ee858741",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 0
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e76ac52_2dc2f3de",
@@ -154,6 +292,30 @@
       "writtenOn": "2026-10-23T01:04:30Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: There is an index counting inconsistency here. In `lsm6dso_emul_read_byte` line 239, you read using `data-\u003ereg[reg + bytes]`, implying `bytes` is 0-indexed. But here you write using `data-\u003ereg[reg + bytes - 1]`, implying `bytes` is 1-indexed. \n\nSince both come from standard Zephyr `i2c_common_emul` callbacks, the `bytes` parameter behavior should be consistent. One of these indexing approaches is likely buggy. If `bytes` is 0-indexed, this code will write to `reg - 1`. If `reg` is 0 and `bytes` is 0, `reg + bytes - 1` becomes -1, which when converted to unsigned (due to `sizeof`) will yield a very large value and falsely trigger the `-ENOTSUP` bounds check blocking legitimate writes to register 0.",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 0
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a01bf83_57cfb21a",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e76ac52_2dc2f3de",
       "range": {
         "startLine": 250,
         "startChar": 0,
@@ -189,6 +351,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51ea7d9a_77930c67",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "beea8984_1c40748e",
+      "range": {
+        "startLine": 263,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 9999
+      },
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c150ce80_dd356f8a",
@@ -210,6 +396,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "39504da7aa9def03e88576dd529810265d428d31",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "542ca0f6_a0a12125",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-26T23:45:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c150ce80_dd356f8a",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 9999
+      },
       "revId": "39504da7aa9def03e88576dd529810265d428d31",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
