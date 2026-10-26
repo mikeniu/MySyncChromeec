@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff7aa7bc_856ec197",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T20:29:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality**: `accelgyro_config_fifo()` in `driver/accelgyro_lsm6dso.c` now checks `data-\u003ebase.odr` before calling `LSM6DSO_ODR_TO_REG()` and writes `LSM6DSO_DIS_BIT` to the sensor\u0027s `LSM6DSO_FIFO_CTRL3_ADDR` batch-rate field when the ODR is zero, avoiding the undefined `__fls(0)` evaluation on power-off.\n* **Architecture \u0026 Component Fit**: The fix is localized to `accelgyro_config_fifo()` and uses the existing `LSM6DSO_DIS_BIT` and `LSM6DSO_FIFO_ODR_MASK` definitions consistent with the rest of the LSM6DSO driver.\n* **Code Simplicity**: Both the production fix and the `read_fifo_ctrl3()` test helper are minimal and direct.\n* **Idiomaticity \u0026 Readability**: Named constants (`LSM6DSO_DIS_BIT`, `LSM6DSO_ODR_MIN_VAL`, `LSM6DSO_FIFO_CTRL3_ADDR`, `LSM6DSO_FIFO_ODR_MASK`) and `zassert_ok` / `zassert_equal` / `zassert_not_equal` macros are used idiomatically throughout.\n* **Security**: N/A — No untrusted inputs, credentials, or sensitive data paths are modified.\n* **Testing**: `test_accelgyro_config_fifo_power_off` in `zephyr/test/drivers/lsm6dso/src/main.c` configures both accelerometer and gyroscope to a non-zero ODR, verifies non-zero `FIFO_CTRL3` batch-rate fields for each sensor, and verifies that powering off each sensor clears only its own batch-rate field to `LSM6DSO_DIS_BIT`.\n* **CL Size \u0026 Scope**: `Size: S (+33, -1)`. Single, self-contained logical change with its corresponding unit test.\n* **Commit Message**: Concisely explains the problem and solution in prose with accurate `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/5d589a73-91bc-44ad-b8a5-91ce44f25d59)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "edb0f3eb58e0d10b9788ce410b2128348aa90926",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
