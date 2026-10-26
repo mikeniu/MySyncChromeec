@@ -87,6 +87,24 @@
       "isAi": true,
       "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8acac681_9edcad52",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-26T08:48:52Z",
+      "side": 1,
+      "message": "\u003e In future we need to work on FINGER_UP implementation on both drivers and fpsensor task side. I believe it could be improved.\n\nI agree. Basically, we need to define if the detect mode is needed for FINGER_UP event + be more precise about IDLE mode, or even remove it. However, I think we need to do this after full migration to Zephyr.",
+      "parentUuid": "b30f8853_3ef9fd1a",
+      "revId": "843f970ce500dbfa53032711cdbbd29480fc52d1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

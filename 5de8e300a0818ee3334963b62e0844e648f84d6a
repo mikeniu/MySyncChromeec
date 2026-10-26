@@ -117,6 +117,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93cf2c4a_90c7d1aa",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-26T08:48:52Z",
+      "side": 1,
+      "message": "Ok, I see your point now. I thought you are saying that the fp_task disables interrupt, after IRQ is triggered. I guess it\u0027s hard to change this behavior, because some sensors trigger IRQ on finger presence and some sensors on finger presence change only.",
+      "parentUuid": "bff93806_c2327d6f",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 388,
+        "endChar": 9999
+      },
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5960447c_b8272e22",
