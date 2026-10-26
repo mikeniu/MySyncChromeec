@@ -1,0 +1,148 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed3b306e_61348bf3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:36:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Commit Message \u0026 Scope:**\n\n1. If `detach_kernel_driver` and `claim_interface` on `RtsUsbBackend` / `RtsLibusbBackend` / `MockRtsUsbBackend` are moved into the prerequisite `RtsUsbBackend` CL (or split into a separate prerequisite CL), `RtsUsbDevice::dfu_download` in this CL operates through `RtsUsbBackend` rather than calling `libusb` directly.\n2. Below are copy-pasteable commit messages for both the split-CL approach and the single-CL option:\n\n**Option A — If split into 2 CLs (or if `RtsUsbBackend` methods are folded into the parent `RtsUsbBackend` CL):**\n\n*CL 1 (Backend interface \u0026 implementations):*\n```text\nrts5817: Add kernel driver detach and interface claim to RtsUsbBackend\n\nExtend RtsUsbBackend, RtsLibusbBackend, and MockRtsUsbBackend with\ndetach_kernel_driver() and claim_interface() hooks so RtsUsbDevice can\nacquire the USB DFU interface before transferring firmware blocks.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n*CL 2 (This CL — `RtsUsbDevice::dfu_download`):*\n```text\nrts5817: Implement DFU download in RtsUsbDevice\n\nAdd firmware flashing support to RtsUsbDevice by implementing the USB\nDFU Specification (Interface Class 0xFE) download sequence over\nRtsUsbBackend control transfers, handling interface claiming, block\nchunking, status polling, and manifest completion without external\ntools like dfu-util.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n**Option B — Single-CL description (if kept together):**\n```text\nrts5817: Implement DFU download in RtsUsbDevice\n\nAdd firmware flashing support to RtsUsbDevice by implementing the USB\nDFU Specification (Interface Class 0xFE) download sequence over\nRtsUsbBackend, including backend hooks to detach the kernel driver and\nclaim the DFU interface, block chunking, status polling, and manifest\ncompletion without external tools like dfu-util.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n[🔗](http://go/tj/c4d18987-0543-4539-89be-1c0e912698a4)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdfa31e3_06431ed4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:36:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Thank you for adding the `RtsUsbBackend` test suite and addressing the edge cases from the previous patchset. Please split the `RtsUsbBackend` interface additions into the prerequisite backend CL and address the remaining test/precondition simplifications noted inline.\n\n### Review Summary\n**Functionality:** ✅ `RtsUsbDevice::dfu_download` properly handles empty payloads, kernel driver detachment, interface claiming/releasing on all error and completion paths, short writes, block status polling, and the trailing zero-length packet.\n**Architecture \u0026 Component Fit:** ✅ Routing USB operations through `RtsUsbBackend` cleanly decouples the DFU state machine from `libusb` and integrates with `utils-test`.\n**Code Simplicity:** ❌ A few simplifications are needed (see inline comments):\n- In `RtsUsbDevice::dfu_download` (`util/rts5817_usb_device.cc`), `find_dfu_interface()` already checks `backend_-\u003eis_open()` at entry and `parse_dfu_transfer_size()` already substitutes `kDfuDefaultTransferSize` when `wTransferSize \u003d\u003d 0`, so the entry checks can be simplified to `if (firmware.empty() || !find_dfu_interface()) return false;`.\n- In `RtsUsbDeviceDownloadTest` (`util/rts5817_usb_device_test.cc`), inherit from `RtsUsbDeviceDfuTest` to reuse `dfu_interface()`, and drop `::testing::Mock::VerifyAndClearExpectations(backend_)` and the repeated mock setup boilerplate in `FailsWithoutOpenDevice`, `FailsWhenNoDfuInterface`, `ContinuesWhenKernelDriverDetachFails`, and `ClaimFailureLeavesNothingToRelease`.\n**Idiomaticity \u0026 Readability:** ✅ Naming, constants (`kDfuDownload`, `kDfuProgressStepPct`), and C++ types follow codebase conventions.\n**Security:** ✅ No security vulnerabilities identified.\n**Testing:** ❌ Comprehensive boundary and failure scenarios are covered, with a couple of assertion/matcher refinements needed in `util/rts5817_usb_device_test.cc`:\n- Assert the exact block payload bytes in `ImageExactlyOneBlock` (`rec_.blocks[0].data`) and `ImageOfExactMultipleOfBlockSize` (`rec_.blocks[0].data` and `rec_.blocks[2].data.empty()`).\n- Replace wildcard `_` matchers with the exact contract arguments (`kDfuGetStatusResponseLen`, `kUsbDfuTimeoutMs`, and `kUsbCtrlTimeoutMs`) in the `kDfuGetStatus` and `kDfuClrStatus` expectations.\n**CL Size \u0026 Scope:** ❌ `Size: L (+453, -0)` (162 production lines across `rts5817_usb_backend.h`, `rts5817_libusb_backend.{h,cc}`, and `rts5817_usb_device.{h,cc}`, plus 291 test/mock lines in `rts5817_mock_usb_backend.h` and `rts5817_usb_device_test.cc`). While the production line count is under 250 lines, this CL bundles adding new interface methods (`detach_kernel_driver` and `claim_interface`) across `RtsUsbBackend`, `RtsLibusbBackend`, and `MockRtsUsbBackend` with implementing `RtsUsbDevice::dfu_download`. Adding new interface methods along with their concrete and mock implementations should live in a prerequisite CL (or be folded into the parent `RtsUsbBackend` CL in the stack) separate from the caller that consumes them:\n1. **CL 1 (Prerequisite / fold into parent `RtsUsbBackend` CL):** Add `detach_kernel_driver` and `claim_interface` to `RtsUsbBackend` (`util/rts5817_usb_backend.h`), `RtsLibusbBackend` (`util/rts5817_libusb_backend.h`, `util/rts5817_libusb_backend.cc`), and `MockRtsUsbBackend` (`util/rts5817_mock_usb_backend.h`).\n2. **CL 2 (This CL):** Add `kDfuDownload`, `kDfuProgressStepPct`, and `RtsUsbDevice::dfu_download` (`util/rts5817_usb_device.h`, `util/rts5817_usb_device.cc`) along with its `RtsUsbDeviceDownloadTest` unit tests (`util/rts5817_usb_device_test.cc`).\n**Commit Message:** ❌ Please update the commit message so it reflects that `RtsUsbDevice::dfu_download` operates over `RtsUsbBackend` rather than calling `libusb` directly (see inline comment on `/COMMIT_MSG` for copy-pasteable options).\n\n[🔗](http://go/tj/c4d18987-0543-4539-89be-1c0e912698a4)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbe73269_7347509b",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:36:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity (Redundant Precondition Checks):** `find_dfu_interface()` (line 203) already checks `if (!backend_-\u003eis_open()) return false;` at entry (which is why sibling `dfu_detach()` at line 146 calls `find_dfu_interface()` directly without a separate `is_open()` check), and `parse_dfu_transfer_size()` (line 193) already substitutes `kDfuDefaultTransferSize` whenever a descriptor is missing or reports `wTransferSize \u003d\u003d 0`, making `transfer_size_ \u003d\u003d 0` unreachable here.\n\nThese two guards can be unified into a single check:\n\n```cpp\n\tif (firmware.empty() || !find_dfu_interface())\n\t\treturn false;\n```\n\n[🔗](http://go/tj/c4d18987-0543-4539-89be-1c0e912698a4)",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 355,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa8582ad_eb26231f",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:36:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity (Fixture Reuse \u0026 Avoiding `VerifyAndClearExpectations` Boilerplate):**\n\n1. `RtsUsbDeviceDfuTest` (line 303) already provides `dfu_interface(int number, uint16_t transfer_size)`. Inheriting `RtsUsbDeviceDownloadTest` from `RtsUsbDeviceDfuTest` and using `DoAll(SetArgPointee\u003c0\u003e(...), Return(0))` avoids repeating the 10-line `RtsUsbInterface` construction lambda in `SetUp()`, `ContinuesWhenKernelDriverDetachFails`, and `ClaimFailureLeavesNothingToRelease`.\n2. In GoogleMock, `EXPECT_CALL` expectations are matched in reverse registration order (newest first), and `.WillRepeatedly(...)` expectations without `.Times(...)` have cardinality `AnyNumber()` (0 or more calls). Overriding a single method with `.WillOnce(...)` in a test body works directly without calling `::testing::Mock::VerifyAndClearExpectations(backend_)` or re-registering `is_open()`, `close()`, `error_name(_)`, `get_interfaces(_)`, and `detach_kernel_driver(_)`:\n\n```cpp\nclass RtsUsbDeviceDownloadTest : public RtsUsbDeviceDfuTest {\n    protected:\n\tvoid SetUp() override\n\t{\n\t\tRtsUsbDeviceDfuTest::SetUp();\n\t\tEXPECT_CALL(*backend_, is_open()).WillRepeatedly(Return(true));\n\t\tEXPECT_CALL(*backend_, get_interfaces(_))\n\t\t\t.WillRepeatedly(DoAll(\n\t\t\t\tSetArgPointee\u003c0\u003e(std::vector\u003cRtsUsbInterface\u003e{\n\t\t\t\t\tdfu_interface(kDfuIf, kTransferSize) }),\n\t\t\t\tReturn(0)));\n\t\tEXPECT_CALL(*backend_, detach_kernel_driver(kDfuIf))\n\t\t\t.WillRepeatedly(Return(0));\n\t\tEXPECT_CALL(*backend_, claim_interface(kDfuIf))\n\t\t\t.WillRepeatedly(Return(0));\n\t}\n```\n\nAnd the four setup-override tests simplify to:\n\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, FailsWithoutOpenDevice)\n{\n\tEXPECT_CALL(*backend_, is_open()).WillOnce(Return(false));\n\n\tEXPECT_FALSE(device_-\u003edfu_download({ 1 }));\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, FailsWhenNoDfuInterface)\n{\n\tEXPECT_CALL(*backend_, get_interfaces(_)).WillOnce(Return(0));\n\tEXPECT_CALL(*backend_, claim_interface(_)).Times(0);\n\n\tEXPECT_FALSE(device_-\u003edfu_download({ 1 }));\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, ContinuesWhenKernelDriverDetachFails)\n{\n\tEXPECT_CALL(*backend_, detach_kernel_driver(kDfuIf))\n\t\t.WillOnce(Return(-1));\n\trecord_downloads();\n\tstatus_always_idle();\n\tEXPECT_CALL(*backend_, release_interface(kDfuIf));\n\n\tEXPECT_TRUE(device_-\u003edfu_download({ 1, 2 }));\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, ClaimFailureLeavesNothingToRelease)\n{\n\tEXPECT_CALL(*backend_, claim_interface(kDfuIf)).WillOnce(Return(-1));\n\tEXPECT_CALL(*backend_, release_interface(_)).Times(0);\n\n\tEXPECT_FALSE(device_-\u003edfu_download({ 1, 2 }));\n}\n```\n\nOther locations in this file:\n- **Lines 739–747** (`FailsWithoutOpenDevice`)\n- **Lines 749–759** (`FailsWhenNoDfuInterface`)\n- **Lines 761–786** (`ContinuesWhenKernelDriverDetachFails`)\n- **Lines 788–811** (`ClaimFailureLeavesNothingToRelease`)\n\n[🔗](http://go/tj/c4d18987-0543-4539-89be-1c0e912698a4)",
+      "range": {
+        "startLine": 614,
+        "startChar": 0,
+        "endLine": 635,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0afb2149_1fac14a9",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:36:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity \u0026 Test Oracle Specificity (`DFU_GETSTATUS` Expectations):**\n\n1. `status_always_idle()` and `ManifestNotIdleStillSucceeds` (lines 876–881) duplicate the same lambda body filling the 6-byte status response. Extracting a small static helper lets both tests share it.\n2. Please specify the expected `kDfuGetStatusResponseLen` length and `kUsbDfuTimeoutMs` timeout arguments instead of wildcard `_` matchers in the `kDfuGetStatus` expectations (matching `RtsUsbDeviceStatusTest::expect_status` at line 446):\n\n```cpp\n\tstatic int fill_idle_status(uint8_t, uint8_t, uint16_t, uint16_t,\n\t\t\t\t    uint8_t *data, uint16_t, unsigned int)\n\t{\n\t\tstd::fill_n(data, kDfuGetStatusResponseLen, 0);\n\t\tdata[kDfuStateOff] \u003d kDfuStateDfuDnloadIdle;\n\t\treturn static_cast\u003cint\u003e(kDfuGetStatusResponseLen);\n\t}\n\n\t/* Every DFU_GETSTATUS reports dfuDNLOAD-IDLE. */\n\tvoid status_always_idle()\n\t{\n\t\tEXPECT_CALL(*backend_,\n\t\t\t    control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0,\n\t\t\t\t\t    kDfuIf, _, kDfuGetStatusResponseLen,\n\t\t\t\t\t    kUsbDfuTimeoutMs))\n\t\t\t.WillRepeatedly(fill_idle_status);\n\t}\n```\n\nAnd in `PollFailureReleasesInterface` and `ManifestNotIdleStillSucceeds`:\n\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, PollFailureReleasesInterface)\n{\n\trecord_downloads();\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, kDfuIf,\n\t\t\t\t    _, kDfuGetStatusResponseLen,\n\t\t\t\t    kUsbDfuTimeoutMs))\n\t\t.WillOnce(Return(-1));\n\tEXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);\n\n\tEXPECT_FALSE(device_-\u003edfu_download({ 1, 2, 3, 4, 5, 6 }));\n\tASSERT_EQ(rec_.blocks.size(), 1u);\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, ManifestNotIdleStillSucceeds)\n{\n\trecord_downloads();\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, kDfuIf,\n\t\t\t\t    _, kDfuGetStatusResponseLen,\n\t\t\t\t    kUsbDfuTimeoutMs))\n\t\t.WillOnce(fill_idle_status)\n\t\t.WillOnce(Return(-1));\n\tEXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);\n\n\tEXPECT_TRUE(device_-\u003edfu_download({ 1, 2 }));\n}\n```\n\nOther locations in this file:\n- **Lines 843–846** (`PollFailureReleasesInterface`)\n- **Lines 873–882** (`ManifestNotIdleStillSucceeds`)\n\n[🔗](http://go/tj/c4d18987-0543-4539-89be-1c0e912698a4)",
+      "range": {
+        "startLine": 658,
+        "startChar": 0,
+        "endLine": 671,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c1bf756_62b5abd9",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-26T06:36:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing (Exact Block Payload \u0026 `DFU_CLRSTATUS` Contract Assertions):**\n\n1. In `ImageExactlyOneBlock`, please assert the actual block contents (`EXPECT_EQ(rec_.blocks[0].data, (std::vector\u003cuint8_t\u003e{ 1, 2, 3, 4 }));`) rather than only checking `.size()`.\n2. In `ImageOfExactMultipleOfBlockSize`, please also assert `rec_.blocks[0].data` and `rec_.blocks[2].data.empty()` so both payload blocks and the trailing ZLP are verified.\n3. In `TransferFailureClearsStatusAndReleases` (lines 817–819) and `ShortWriteIsAnError` (lines 832–834), please specify the exact `wValue` (`0`) and timeout (`kUsbCtrlTimeoutMs`) arguments in the `kDfuClrStatus` expectation instead of `_` (matching `ClearStatusSendsRequest` at line 598):\n\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, ImageExactlyOneBlock)\n{\n\trecord_downloads();\n\tstatus_always_idle();\n\tEXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);\n\n\tASSERT_TRUE(device_-\u003edfu_download({ 1, 2, 3, 4 }));\n\tASSERT_EQ(rec_.blocks.size(), 2u);\n\tEXPECT_EQ(rec_.blocks[0].data, (std::vector\u003cuint8_t\u003e{ 1, 2, 3, 4 }));\n\tEXPECT_TRUE(rec_.blocks[1].data.empty());\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, ImageOfExactMultipleOfBlockSize)\n{\n\trecord_downloads();\n\tstatus_always_idle();\n\tEXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);\n\n\tASSERT_TRUE(device_-\u003edfu_download({ 1, 2, 3, 4, 5, 6, 7, 8 }));\n\tASSERT_EQ(rec_.blocks.size(), 3u);\n\tEXPECT_EQ(rec_.blocks[0].data, (std::vector\u003cuint8_t\u003e{ 1, 2, 3, 4 }));\n\tEXPECT_EQ(rec_.blocks[1].data, (std::vector\u003cuint8_t\u003e{ 5, 6, 7, 8 }));\n\tEXPECT_EQ(rec_.blocks[2].number, 2);\n\tEXPECT_TRUE(rec_.blocks[2].data.empty());\n}\n```\n\nAnd in `TransferFailureClearsStatusAndReleases` / `ShortWriteIsAnError`:\n\n```cpp\n\tEXPECT_CALL(*backend_,\n\t\t    control_transfer(kBmReqH2dClsIf, kDfuClrStatus, 0, kDfuIf,\n\t\t\t\t    nullptr, 0, kUsbCtrlTimeoutMs))\n\t\t.WillOnce(Return(0));\n```\n\nOther locations in this file:\n- **Lines 817–819** (`TransferFailureClearsStatusAndReleases`)\n- **Lines 832–834** (`ShortWriteIsAnError`)\n\n[🔗](http://go/tj/c4d18987-0543-4539-89be-1c0e912698a4)",
+      "range": {
+        "startLine": 708,
+        "startChar": 0,
+        "endLine": 730,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
