@@ -37,6 +37,12 @@
 
 #include <pthread.h>
 
+#ifndef USB_IFACE_MSC
+#define USB_IFACE_MSC 1
+#endif
+#ifndef USB_EP_MSC
+#define USB_EP_MSC 2
+#endif
 #ifndef USB_IFACE_USART4_STREAM
 #define USB_IFACE_USART4_STREAM 4
 #endif
@@ -151,14 +157,25 @@ struct stm32_endpoint btable_ep[8];
 static bool mock_in_isr;
 static bool mock_irq_depth_violation;
 static int mock_ep7_toggle_count;
+static int mock_ep2_toggle_count;
+
+static const char *mock_serial_str = "SN12345";
+
+const char *board_read_serial(void)
+{
+	return mock_serial_str;
+}
 
 static void mock_stm32_toggle_ep(int ep, uint16_t mask, uint16_t val,
 				 uint16_t flags)
 {
-	if (ep == USB_EP_BRIDGE && !mock_in_isr) {
+	if ((ep == USB_EP_BRIDGE || ep == USB_EP_MSC) && !mock_in_isr) {
 		if (irq_disable_depth <= 0)
 			mock_irq_depth_violation = true;
-		mock_ep7_toggle_count++;
+		if (ep == USB_EP_BRIDGE)
+			mock_ep7_toggle_count++;
+		else if (ep == USB_EP_MSC)
+			mock_ep2_toggle_count++;
 	}
 
 	uint16_t old = mock_usb_ep[ep];
@@ -456,6 +473,8 @@ static void drain_queue(struct queue const *q)
 #define SERVO_FRAME_RESET_ACK 0x1050U
 #define SERVO_FRAME_KEY_CMD 0x1060U
 #define SERVO_FRAME_KEY_ACK 0x1070U
+#define SERVO_FRAME_MSC_REQ 0x1080U
+#define SERVO_FRAME_MSC_DATA 0x1090U
 #define SERVO_FRAME_WAIT(epoch) (SERVO_FRAME_WAIT_OP | ((epoch) & 0x03U))
 
 #define SERVO_RX_RING_BYTES 256U
@@ -531,6 +550,12 @@ static void queue_feed_frame(struct queue const *q, uint16_t type,
 		wire_type = SERVO_MAKE_TYPE(SERVO_CHAN_KBD, SERVO_OP_CREDIT,
 					    (type >> 2) & 0x03U);
 		break;
+	case SERVO_FRAME_MSC_REQ:
+		wire_type = SERVO_MAKE_TYPE(SERVO_CHAN_MSC, SERVO_OP_DATA, 0);
+		break;
+	case SERVO_FRAME_MSC_DATA:
+		wire_type = SERVO_MAKE_TYPE(SERVO_CHAN_MSC, SERVO_OP_DATA, 0);
+		break;
 	default:
 		wire_type = (uint8_t)type;
 		break;
@@ -563,6 +588,8 @@ static int test_crc8_and_structural_validation(void)
 			bool rst_arg_ok =
 				((arg & ~SERVO_RESET_VALID_ARG_MASK) == 0U &&
 				 (arg & SERVO_RESET_PROTO_MASK) != 0x02U);
+			bool msc_rst_ok =
+				((arg & ~SERVO_RESET_FLAG_HOST_ACTIVE) == 0U);
 
 			switch (ch) {
 			case SERVO_CHAN_SYS:
@@ -595,7 +622,22 @@ static int test_crc8_and_structural_validation(void)
 					    op == SERVO_OP_CREDIT);
 				break;
 			case SERVO_CHAN_MSC:
-				expected = false;
+				switch (op) {
+				case SERVO_OP_DATA:
+					expected = (arg >= 1U &&
+						    arg <= SERVO_MAX_DATA_LEN);
+					break;
+				case SERVO_OP_CREDIT:
+					expected = (arg == 0U);
+					break;
+				case SERVO_OP_RESET_REQ:
+				case SERVO_OP_RESET_ACK:
+					expected = msc_rst_ok;
+					break;
+				default:
+					expected = false;
+					break;
+				}
 				break;
 			default:
 				expected = false;
@@ -3487,6 +3529,451 @@ static int test_servo_adb_session_filter_rx_data_awaiting_cnxn(void)
 	return EC_SUCCESS;
 }
 
+/* 12. Test MSC Request Forwarding to EP2 IN & Unread Overwrite */
+static int test_msc_req_forwards_to_ep2_in_and_overwrites_unread(void)
+{
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+	mock_irq_depth_violation = false;
+	mock_ep2_toggle_count = 0;
+
+	usb_bridge_init();
+	usb_msc_event(USB_EVENT_RESET);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_RX_MASK) == EP_RX_VALID);
+	bridge_arbiter_deferred();
+	drain_queue(&bridge_to_usart4);
+	bridge.msc_awaiting_reset_ack = false;
+
+	/* Set Alt 1 to activate MSC host session */
+	usb_uint rx_alt1[4] = { (USB_DIR_OUT | USB_TYPE_STANDARD |
+				 USB_RECIP_INTERFACE) |
+					(USB_REQ_SET_INTERFACE << 8),
+				1, /* Alt 1 */
+				USB_IFACE_MSC, 0 };
+	usb_uint tx_alt1[4] = { 0 };
+	TEST_ASSERT(msc_iface_request(rx_alt1, tx_alt1) == 0);
+	bridge.msc_awaiting_reset_ack = false;
+	drain_queue(&bridge_to_usart4);
+
+	/* 1. ATmega sends SERVO_FRAME_MSC_REQ for Capacity query */
+	struct servo_msc_req req1 = {
+		.cmd = SERVO_MSC_CMD_CAP,
+		.req_tag = 0x42,
+		.media_gen = 1,
+		.rsvd = 0,
+		.lba_be = 0,
+	};
+	queue_feed_frame(&usart4_to_bridge, SERVO_FRAME_MSC_REQ, sizeof(req1),
+			 (const uint8_t *)&req1);
+	bridge_arbiter_deferred();
+
+	/* Verify EP2 IN armed with 8 bytes */
+	TEST_ASSERT(btable_ep[USB_EP_MSC].tx_count == 8);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_VALID);
+	TEST_ASSERT(latest_msc_req_tag == 0x42);
+	TEST_ASSERT(!mock_irq_depth_violation);
+	TEST_ASSERT(mock_ep2_toggle_count > 0);
+
+	struct servo_msc_req tx_buf;
+	memcpy(&tx_buf, ep_msc_tx_buffer, sizeof(tx_buf));
+	TEST_ASSERT(tx_buf.cmd == SERVO_MSC_CMD_CAP);
+	TEST_ASSERT(tx_buf.req_tag == 0x42);
+	TEST_ASSERT(tx_buf.media_gen == 1);
+
+	/*
+	 * 2. Unread overwrite test:
+	 * Stage a pending MSC DATA frame with stale tag 0x42 in
+	 * bridge.pending_msc_len.
+	 */
+	uint8_t stale_data[16];
+	stale_data[0] = SERVO_MSC_RSP_CAP;
+	stale_data[1] = 0x42;
+	memset(&stale_data[2], 0x55, sizeof(stale_data) - 2);
+	TEST_ASSERT(servo_bridge_send_msc_data(&bridge, stale_data,
+					       sizeof(stale_data)));
+	TEST_ASSERT(bridge.pending_msc_len == sizeof(stale_data));
+	TEST_ASSERT(bridge.pending_msc_buf[1] == 0x42);
+
+	/*
+	 * ATmega sends a NEW SERVO_FRAME_MSC_REQ with tag 0x43
+	 * (Host hasn't read req1 yet!).
+	 */
+	struct servo_msc_req req2 = {
+		.cmd = SERVO_MSC_CMD_READ,
+		.req_tag = 0x43,
+		.media_gen = 1,
+		.rsvd = 0,
+		.lba_be = 0x00000100, /* LBA 256 */
+	};
+	queue_feed_frame(&usart4_to_bridge, SERVO_FRAME_MSC_REQ, sizeof(req2),
+			 (const uint8_t *)&req2);
+	bridge_arbiter_deferred();
+
+	/* Verify stale bridge.pending_msc_len was purged! */
+	TEST_ASSERT(bridge.pending_msc_len == 0);
+	TEST_ASSERT(latest_msc_req_tag == 0x43);
+
+	/* Verify EP2 IN overwritten with req2 */
+	TEST_ASSERT(btable_ep[USB_EP_MSC].tx_count == 8);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_VALID);
+	memcpy(&tx_buf, ep_msc_tx_buffer, sizeof(tx_buf));
+	TEST_ASSERT(tx_buf.cmd == SERVO_MSC_CMD_READ);
+	TEST_ASSERT(tx_buf.req_tag == 0x43);
+	TEST_ASSERT(tx_buf.lba_be == 0x00000100);
+
+	/* 3. Host reads EP2 IN: usb_msc_tx clears CTR_TX and leaves CTR_RX
+	 * intact */
+	mock_usb_ep[USB_EP_MSC] = EP_CTR_RX | EP_CTR_TX | EP_TX_VALID;
+	mock_in_isr = true;
+	usb_msc_tx();
+	mock_in_isr = false;
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_CTR_TX) == 0);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_CTR_RX) != 0);
+
+	return EC_SUCCESS;
+}
+
+/* 12. Test EP2 OUT Stale-Tag Fast-Drain & Unconditional Availability */
+static int test_msc_ep2_out_stale_tag_fast_drain(void)
+{
+	usb_bridge_init();
+	bridge.state = SERVO_STATE_ACTIVE;
+	bridge.pending_reset_req = false;
+	bridge.epoch = 1;
+	bridge.tx_credits = 4;
+	pending_serial_sync = false;
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+
+	/*
+	 * 1. Verify Unconditional EP2 Availability when
+	 * effective_usb_protocol == SERVO_PROTO_NONE.
+	 */
+	effective_usb_protocol = SERVO_PROTO_NONE;
+	dppu_pulse_active = false;
+	usb_msc_event(USB_EVENT_RESET);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_RX_MASK) == EP_RX_VALID);
+	bridge_arbiter_deferred();
+	drain_queue(&bridge_to_usart4);
+	bridge.msc_awaiting_reset_ack = false;
+
+	/*
+	 * Interface SET_INTERFACE on USB_IFACE_MSC succeeds even when
+	 * SERVO_PROTO_NONE.
+	 */
+	usb_uint rx_buf[4], tx_buf[4];
+	rx_buf[0] = (USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_INTERFACE) |
+		    (USB_REQ_SET_INTERFACE << 8);
+	rx_buf[1] = 0;
+	rx_buf[2] = USB_IFACE_MSC;
+	rx_buf[3] = 0;
+	mock_in_isr = true;
+	int ret = msc_iface_request(rx_buf, tx_buf);
+	mock_in_isr = false;
+	TEST_ASSERT(ret == 0);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_RX_MASK) == EP_RX_VALID);
+	bridge_arbiter_deferred();
+	drain_queue(&bridge_to_usart4);
+	bridge.msc_awaiting_reset_ack = false;
+
+	/*
+	 * CLEAR_FEATURE(ENDPOINT_HALT) on EP2 IN and OUT succeeds even when
+	 * SERVO_PROTO_NONE.
+	 */
+	mock_in_isr = true;
+	ret = usb_bridge_clear_halt(USB_EP_MSC | 0x80);
+	TEST_ASSERT(ret == 0);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+
+	ret = usb_bridge_clear_halt(USB_EP_MSC);
+	TEST_ASSERT(ret == 0);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_RX_MASK) == EP_RX_VALID);
+	mock_in_isr = false;
+
+	/* 2. Stale-tag fast drain:
+	 * latest_msc_req_tag is set to 0x77.
+	 * Host writes a packet with tag 0x22 (stale tag).
+	 */
+	latest_msc_req_tag = 0x77;
+	uint8_t stale_pkt[64];
+	stale_pkt[0] = SERVO_MSC_RSP_CAP;
+	stale_pkt[1] = 0x22; /* Mismatched tag */
+	memset(&stale_pkt[2], 0xAA, sizeof(stale_pkt) - 2);
+
+	memcpy(ep_msc_rx_buffer, stale_pkt, sizeof(stale_pkt));
+	btable_ep[USB_EP_MSC].rx_count = sizeof(stale_pkt);
+	mock_in_isr = true;
+	usb_msc_rx();
+	mock_in_isr = false;
+	TEST_ASSERT(ep2_out_pending == 1);
+
+	bridge_arbiter_deferred();
+
+	/* Must be dropped immediately at USB speed:
+	 * ep2_out_pending cleared, EP2 OUT re-armed with EP_RX_VALID,
+	 * btable rx_count reset to 64, and ZERO bytes queued to usart4!
+	 */
+	TEST_ASSERT(ep2_out_pending == 0);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_RX_MASK) == EP_RX_VALID);
+	TEST_ASSERT(queue_is_empty(&bridge_to_usart4));
+	TEST_ASSERT(bridge.pending_msc_len == 0);
+
+	/* 3. Valid packet staging:
+	 * Host writes a packet with matching tag 0x77.
+	 */
+	uint8_t valid_pkt[64];
+	valid_pkt[0] = SERVO_MSC_RSP_CAP;
+	valid_pkt[1] = 0x77; /* Matches latest_msc_req_tag */
+	memset(&valid_pkt[2], 0xBB, sizeof(valid_pkt) - 2);
+
+	memcpy(ep_msc_rx_buffer, valid_pkt, sizeof(valid_pkt));
+	btable_ep[USB_EP_MSC].rx_count = sizeof(valid_pkt);
+	mock_in_isr = true;
+	usb_msc_rx();
+	mock_in_isr = false;
+	TEST_ASSERT(ep2_out_pending == 1);
+
+	bridge_arbiter_deferred();
+
+	/* Must be staged into bridge and re-armed */
+	TEST_ASSERT(ep2_out_pending == 0);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_RX_MASK) == EP_RX_VALID);
+
+	/* Popped into bridge_to_usart4 as SERVO_FRAME_MSC_DATA (0x90) */
+	TEST_ASSERT(!queue_is_empty(&bridge_to_usart4));
+	uint8_t out_frame[SERVO_MAX_FRAME_BYTES];
+	int out_len = 0;
+	while (queue_remove_unit(&bridge_to_usart4, &out_frame[out_len]))
+		out_len++;
+
+	TEST_ASSERT(out_len == (int)(4 + sizeof(valid_pkt)));
+	TEST_ASSERT(SERVO_GET_CHAN(out_frame[1]) == SERVO_CHAN_MSC &&
+		    SERVO_GET_OP(out_frame[1]) == SERVO_OP_DATA);
+	TEST_ASSERT(out_frame[2] == sizeof(valid_pkt));
+	TEST_ASSERT(out_frame[3] == SERVO_MSC_RSP_CAP);
+	TEST_ASSERT(out_frame[4] == 0x77);
+
+	/* 4. W=2 Sliding Credit Window:
+	 * With SERVO_MSC_WINDOW_CREDITS = 2, sending a second 64B chunk for
+	 * the same tag 0x77 streams immediately (ep2_out_pending -> 0 and
+	 * queued into bridge_to_usart4).
+	 */
+	memcpy(ep_msc_rx_buffer, valid_pkt, sizeof(valid_pkt));
+	btable_ep[USB_EP_MSC].rx_count = sizeof(valid_pkt);
+	mock_in_isr = true;
+	usb_msc_rx();
+	mock_in_isr = false;
+	TEST_ASSERT(ep2_out_pending == 1);
+
+	bridge_arbiter_deferred();
+	TEST_ASSERT(ep2_out_pending == 0);
+	TEST_ASSERT(!queue_is_empty(&bridge_to_usart4));
+	drain_queue(&bridge_to_usart4);
+
+	/* 5. 3rd packet is blocked when credits == 0:
+	 * Sending a 3rd 64B chunk must be held in EP2 OUT (ep2_out_pending ==
+	 * 1).
+	 */
+	memcpy(ep_msc_rx_buffer, valid_pkt, sizeof(valid_pkt));
+	btable_ep[USB_EP_MSC].rx_count = sizeof(valid_pkt);
+	mock_in_isr = true;
+	usb_msc_rx();
+	mock_in_isr = false;
+	TEST_ASSERT(ep2_out_pending == 1);
+
+	bridge_arbiter_deferred();
+	TEST_ASSERT(ep2_out_pending == 1);
+	TEST_ASSERT(queue_is_empty(&bridge_to_usart4));
+
+	/* Receiving OP_CREDIT(0) replenishes credit and pops the 3rd packet */
+	uint8_t credit_frame[SERVO_MAX_FRAME_BYTES];
+	size_t cr_len = servo_frame_encode(SERVO_MAKE_TYPE(SERVO_CHAN_MSC,
+							   SERVO_OP_CREDIT, 0),
+					   0, NULL, credit_frame);
+	queue_add_units(&usart4_to_bridge, credit_frame, cr_len);
+	bridge_arbiter_deferred();
+	TEST_ASSERT(ep2_out_pending == 0);
+	drain_queue(&bridge_to_usart4);
+
+	return EC_SUCCESS;
+}
+
+/* 13. Test Priority 3A/3B 1-for-1 Round-Robin Fairness */
+static int test_msc_and_adb_round_robin_fairness(void)
+{
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+
+	bridge.state = SERVO_STATE_ACTIVE;
+	bridge.epoch = 1;
+	bridge.active_proto = SERVO_PROTO_ADB;
+	bridge.tx_credits = 4;
+	bridge.msc_tx_credits = 4;
+	bridge.msc_awaiting_reset_ack = false;
+	bridge.pending_msc_len = 0;
+	bridge.prio3_msc_turn = true;
+
+	uint8_t adb_payload[64];
+	memset(adb_payload, 0x11, sizeof(adb_payload));
+	uint8_t msc_payload[64];
+	memset(msc_payload, 0x22, sizeof(msc_payload));
+
+	/* Stage ADB data */
+	bridge.has_tx_data = true;
+	bridge.tx_data_seq = 0;
+	bridge.tx_data_len = sizeof(adb_payload);
+	memcpy(bridge.tx_data_buf, adb_payload, sizeof(adb_payload));
+	bridge.pending_data_tx = true;
+
+	/* Stage MSC data */
+	TEST_ASSERT(servo_bridge_send_msc_data(&bridge, msc_payload,
+					       sizeof(msc_payload)));
+
+	/*
+	 * Both ready! Since bridge.prio3_msc_turn == true, Arbiter MUST
+	 * pick MSC (Priority 3B).
+	 */
+	uint8_t frame[SERVO_MAX_FRAME_BYTES];
+	uint32_t now_us = (uint32_t)get_time().val;
+	uint8_t len = servo_bridge_pop_tx_frame(&bridge, 128, frame, now_us);
+	TEST_ASSERT(len == (size_t)(4 + sizeof(msc_payload)));
+	TEST_ASSERT(SERVO_GET_CHAN(frame[1]) == SERVO_CHAN_MSC &&
+		    SERVO_GET_OP(frame[1]) == SERVO_OP_DATA);
+	TEST_ASSERT(bridge.prio3_msc_turn == false);
+
+	/* Re-stage MSC data so both are ready again */
+	bridge.msc_tx_credits = 1;
+	TEST_ASSERT(servo_bridge_send_msc_data(&bridge, msc_payload,
+					       sizeof(msc_payload)));
+
+	/*
+	 * Since bridge.prio3_msc_turn == false, Arbiter MUST pick ADB
+	 * (Priority 3A).
+	 */
+	len = servo_bridge_pop_tx_frame(&bridge, 128, frame, now_us);
+	TEST_ASSERT(len == (size_t)(4 + sizeof(adb_payload)));
+	TEST_ASSERT(SERVO_GET_CHAN(frame[1]) == SERVO_CHAN_H2H &&
+		    SERVO_GET_OP(frame[1]) == SERVO_OP_DATA);
+	TEST_ASSERT(bridge.prio3_msc_turn == true);
+
+	/* Now only MSC remains */
+	len = servo_bridge_pop_tx_frame(&bridge, 128, frame, now_us);
+	TEST_ASSERT(len == (size_t)(4 + sizeof(msc_payload)));
+	TEST_ASSERT(SERVO_GET_CHAN(frame[1]) == SERVO_CHAN_MSC &&
+		    SERVO_GET_OP(frame[1]) == SERVO_OP_DATA);
+	TEST_ASSERT(bridge.prio3_msc_turn == false);
+
+	return EC_SUCCESS;
+}
+
+/* 14. Test Servo Serial Sync on Boot Handshake */
+static int test_msc_serial_sync_on_boot_handshake(void)
+{
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+
+	mock_serial_str = "SN-SERVO-999"; /* 12 characters */
+	usb_bridge_init();
+
+	/* Initial state: pending_serial_sync is true from init */
+	TEST_ASSERT(pending_serial_sync == true);
+
+	/* Bring bridge to ACTIVE */
+	bridge.state = SERVO_STATE_ACTIVE;
+	bridge.pending_reset_req = false;
+	bridge.epoch = 1;
+	bridge.active_proto = SERVO_PROTO_ADB;
+	bridge.tx_credits = 2;
+	bridge.msc_tx_credits = 2;
+	bridge.msc_awaiting_reset_ack = false;
+	bridge.pending_msc_len = 0;
+	drain_queue(&bridge_to_usart4);
+
+	bridge_arbiter_deferred();
+
+	/* Verify serial sync queued and sent */
+	TEST_ASSERT(pending_serial_sync == false);
+	TEST_ASSERT(!queue_is_empty(&bridge_to_usart4));
+
+	uint8_t out_frame[SERVO_MAX_FRAME_BYTES];
+	int out_len = 0;
+	while (queue_remove_unit(&bridge_to_usart4, &out_frame[out_len]))
+		out_len++;
+
+	/*
+	 * Frame format: [0]=SYNC (0xA5), [1]=TYPE (0x90),
+	 * [2]=ARG_LEN (16), [3..18]=payload, [19]=crc8.
+	 */
+	TEST_ASSERT(out_len == 4 + 16);
+	TEST_ASSERT(SERVO_GET_CHAN(out_frame[1]) == SERVO_CHAN_MSC &&
+		    SERVO_GET_OP(out_frame[1]) == SERVO_OP_DATA);
+	TEST_ASSERT(out_frame[2] == 16);
+	TEST_ASSERT(out_frame[3] == SERVO_MSC_RSP_SERIAL); /* 'S' */
+	TEST_ASSERT(out_frame[4] == 0);
+	TEST_ASSERT(out_frame[5] == 12); /* slen */
+	TEST_ASSERT(out_frame[6] == 0);
+	TEST_ASSERT(memcmp(&out_frame[7], "SN-SERVO-999", 12) == 0);
+
+	/*
+	 * Verify pending_serial_sync is held while bridge is in
+	 * SERVO_STATE_RESETTING.
+	 */
+	drain_queue(&bridge_to_usart4);
+	pending_serial_sync = true;
+	bridge.state = SERVO_STATE_RESETTING;
+	bridge_arbiter_deferred();
+	TEST_ASSERT(pending_serial_sync == true);
+	TEST_ASSERT(queue_is_empty(&bridge_to_usart4));
+
+	/* When bridge becomes ACTIVE, pending serial sync is sent */
+	bridge.state = SERVO_STATE_ACTIVE;
+	bridge.msc_tx_credits = 1;
+	bridge_arbiter_deferred();
+	TEST_ASSERT(pending_serial_sync == false);
+	TEST_ASSERT(!queue_is_empty(&bridge_to_usart4));
+
+	/* Verify re-trigger on boot RESET_ACK */
+	drain_queue(&bridge_to_usart4);
+	pending_serial_sync = false;
+	bridge.state = SERVO_STATE_RESETTING;
+	bridge.booted = true;
+	bridge.msc_tx_credits = 1;
+	queue_feed_frame(&usart4_to_bridge, SERVO_FRAME_RESET_ACK | 0,
+			 SERVO_RESET_FLAG_BOOT | SERVO_PROTO_NONE, NULL);
+	bridge_arbiter_deferred();
+	/* Boot handshake completed; bridge active -> serial sync sent! */
+	TEST_ASSERT(pending_serial_sync == false);
+	TEST_ASSERT(!queue_is_empty(&bridge_to_usart4));
+	out_len = 0;
+	while (queue_remove_unit(&bridge_to_usart4, &out_frame[out_len]))
+		out_len++;
+	TEST_ASSERT(out_len == 4 + 16);
+	TEST_ASSERT(out_frame[3] == SERVO_MSC_RSP_SERIAL);
+
+	/* Verify default uninitialized serial number does not queue sync packet
+	 */
+	drain_queue(&bridge_to_usart4);
+	mock_serial_str = "Uninitialized";
+	bridge.state = SERVO_STATE_ACTIVE;
+	bridge.pending_msc_len = 0;
+	pending_serial_sync = true;
+	bridge_arbiter_deferred();
+	TEST_ASSERT(pending_serial_sync == false);
+	TEST_ASSERT(queue_is_empty(&bridge_to_usart4));
+
+	/* Verify NULL serial does not crash or queue packet */
+	mock_serial_str = NULL;
+	pending_serial_sync = true;
+	bridge_arbiter_deferred();
+	TEST_ASSERT(pending_serial_sync == false);
+	TEST_ASSERT(queue_is_empty(&bridge_to_usart4));
+
+	return EC_SUCCESS;
+}
+
 /*
  * Phase 2A: Single-Reset Discipline, Alt 0 Legacy, and High-RTT WAIT Keepalive
  */
@@ -3938,6 +4425,326 @@ static int test_phase2a_fastboot_consecutive_set_interface_no_reset(void)
 	return EC_SUCCESS;
 }
 
+static int test_msc_set_interface_alt_and_servod_teardown(void)
+{
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+	usb_bridge_init();
+
+	bridge.state = SERVO_STATE_ACTIVE;
+	bridge.epoch = 1;
+	bridge.active_proto = SERVO_PROTO_ADB;
+	bridge.tx_credits = 2;
+	bridge.msc_tx_credits = 2;
+	bridge.msc_awaiting_reset_ack = false;
+	bridge.pending_reset_req = false;
+	pending_serial_sync = false;
+	msc_host_alt_setting = 0;
+	drain_queue(&bridge_to_usart4);
+
+	/*
+	 * 0. Hardware USB reset (USB_EVENT_RESET) clears STM32_USB_EP(2) to 0.
+	 * Verify usb_msc_event(USB_EVENT_RESET) restores EA[3:0] = USB_EP_MSC.
+	 */
+	mock_usb_ep[USB_EP_MSC] = 0;
+	usb_msc_event(USB_EVENT_RESET);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & 0x0f) == USB_EP_MSC);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_RX_MASK) == EP_RX_VALID);
+
+	/*
+	 * 1. SET_INTERFACE(1, 1) [Alt 1]:
+	 * Activates MSC host session, triggers SERVO_CHAN_MSC OP_RESET_REQ
+	 * with SERVO_RESET_FLAG_HOST_ACTIVE, sets
+	 * bridge.msc_awaiting_reset_ack.
+	 */
+	usb_uint rx_buf[4] = { (USB_DIR_OUT | USB_TYPE_STANDARD |
+				USB_RECIP_INTERFACE) |
+				       (USB_REQ_SET_INTERFACE << 8),
+			       1, /* Alt 1 */
+			       USB_IFACE_MSC, 0 };
+	usb_uint tx_buf[4] = { 0 };
+	TEST_ASSERT(msc_iface_request(rx_buf, tx_buf) == 0);
+	TEST_ASSERT(msc_host_alt_setting == 1);
+	TEST_ASSERT(bridge.msc_local_host_active == true);
+	TEST_ASSERT(bridge.msc_awaiting_reset_ack == true);
+
+	/* Arbiter pops the MSC RESET_REQ */
+	bridge_arbiter_deferred();
+	TEST_ASSERT(!queue_is_empty(&bridge_to_usart4));
+	uint8_t out_frame[SERVO_MAX_FRAME_BYTES];
+	int out_len = 0;
+	while (queue_remove_unit(&bridge_to_usart4, &out_frame[out_len]))
+		out_len++;
+	TEST_ASSERT(out_len == 4);
+	TEST_ASSERT(SERVO_GET_CHAN(out_frame[1]) == SERVO_CHAN_MSC);
+	TEST_ASSERT(SERVO_GET_OP(out_frame[1]) == SERVO_OP_RESET_REQ);
+	TEST_ASSERT((out_frame[2] & SERVO_RESET_FLAG_HOST_ACTIVE) != 0);
+
+	/* While msc_awaiting_reset_ack is true, incoming MSC_REQ is dropped */
+	struct servo_msc_req req = {
+		.cmd = SERVO_MSC_CMD_CAP,
+		.req_tag = 0x55,
+		.media_gen = 1,
+		.rsvd = 0,
+		.lba_be = 0,
+	};
+	queue_feed_frame(&usart4_to_bridge, SERVO_FRAME_MSC_REQ, sizeof(req),
+			 (const uint8_t *)&req);
+	bridge_arbiter_deferred();
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+	TEST_ASSERT(btable_ep[USB_EP_MSC].tx_count == 0);
+
+	/* Peer acknowledges MSC reset */
+	uint8_t ack_frame[SERVO_MAX_FRAME_BYTES];
+	size_t ack_len = servo_frame_encode(
+		SERVO_MAKE_TYPE(SERVO_CHAN_MSC, SERVO_OP_RESET_ACK,
+				bridge.msc_epoch),
+		SERVO_RESET_FLAG_HOST_ACTIVE, NULL, ack_frame);
+	queue_add_units(&usart4_to_bridge, ack_frame, ack_len);
+	bridge_arbiter_deferred();
+	TEST_ASSERT(bridge.msc_awaiting_reset_ack == false);
+
+	/* Now MSC_REQ is accepted and arms EP2 IN */
+	queue_feed_frame(&usart4_to_bridge, SERVO_FRAME_MSC_REQ, sizeof(req),
+			 (const uint8_t *)&req);
+	bridge_arbiter_deferred();
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_VALID);
+	TEST_ASSERT(btable_ep[USB_EP_MSC].tx_count == sizeof(req));
+	TEST_ASSERT(latest_msc_req_tag == 0x55);
+
+	/*
+	 * 2. SET_INTERFACE(1, 0) [Alt 0: servod crash / disconnect]:
+	 * Immediately disarms EP2 IN, clears ep2_out_pending, emits
+	 * SERVO_CHAN_MSC OP_RESET_REQ with arg=0.
+	 */
+	rx_buf[1] = 0; /* Alt 0 */
+	ep2_out_pending = 1;
+	TEST_ASSERT(msc_iface_request(rx_buf, tx_buf) == 0);
+	TEST_ASSERT(msc_host_alt_setting == 0);
+	TEST_ASSERT(bridge.msc_local_host_active == false);
+	TEST_ASSERT(ep2_out_pending == 0);
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+	TEST_ASSERT(btable_ep[USB_EP_MSC].tx_count == 0);
+	TEST_ASSERT(latest_msc_req_tag == 0);
+
+	/* Arbiter pops the Alt 0 teardown reset */
+	drain_queue(&bridge_to_usart4);
+	bridge_arbiter_deferred();
+	out_len = 0;
+	while (queue_remove_unit(&bridge_to_usart4, &out_frame[out_len]))
+		out_len++;
+	TEST_ASSERT(out_len == 4);
+	TEST_ASSERT(SERVO_GET_CHAN(out_frame[1]) == SERVO_CHAN_MSC);
+	TEST_ASSERT(SERVO_GET_OP(out_frame[1]) == SERVO_OP_RESET_REQ);
+	TEST_ASSERT((out_frame[2] & SERVO_RESET_FLAG_HOST_ACTIVE) == 0);
+
+	/* Arriving MSC_REQ in Alt 0 is dropped without arming EP2 IN */
+	queue_feed_frame(&usart4_to_bridge, SERVO_FRAME_MSC_REQ, sizeof(req),
+			 (const uint8_t *)&req);
+	bridge_arbiter_deferred();
+	TEST_ASSERT((mock_usb_ep[USB_EP_MSC] & EP_TX_MASK) == EP_TX_NAK);
+	TEST_ASSERT(btable_ep[USB_EP_MSC].tx_count == 0);
+
+	/*
+	 * 3. Preservation of pending_serial_sync across SET_INTERFACE
+	 * transitions: If msc_tx_is_serial_sync is true when SET_INTERFACE
+	 * occurs, pending_serial_sync must be restored so the PSTATE serial
+	 * sync is never lost.
+	 */
+	pending_serial_sync = false;
+	msc_tx_is_serial_sync = true;
+	bridge.pending_msc_len = 16;
+	rx_buf[1] = 1; /* Alt 1 */
+	TEST_ASSERT(msc_iface_request(rx_buf, tx_buf) == 0);
+	TEST_ASSERT(pending_serial_sync == true);
+	TEST_ASSERT(msc_tx_is_serial_sync == false);
+
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+	return EC_SUCCESS;
+}
+
+/* 26. Test W=2 Sliding Credit Window Streaming and Cumulative Credit */
+static int test_msc_w2_streaming_and_cumulative_credit(void)
+{
+	usb_bridge_init();
+	probe_state = USB_BRIDGE_LOCKED_1M_BRIDGE;
+	bridge.state = SERVO_STATE_ACTIVE;
+	bridge.pending_reset_req = false;
+	bridge.epoch = 1;
+	bridge.active_proto = SERVO_PROTO_ADB;
+	bridge.tx_credits = 2;
+	bridge.msc_tx_credits = SERVO_MSC_WINDOW_CREDITS; /* 2 */
+	bridge.msc_unacked_seq = 0;
+	bridge.msc_tx_seq = 0;
+	pending_serial_sync = false;
+	msc_tx_is_serial_sync = false;
+	msc_host_alt_setting = 1;
+	servo_bridge_set_msc_host_active(&bridge, true, 0);
+	bridge.pending_msc_reset_req = false;
+	bridge.msc_awaiting_reset_ack = false;
+	bridge.pending_msc_len = 0;
+	latest_msc_req_tag = 0x88;
+	ep2_out_pending = 0;
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+
+	/*
+	 * 1. Streaming two back-to-back 64-byte packets into bridge_to_usart4.
+	 * Both packets stream without needing intermediate credit or UART
+	 * drain.
+	 */
+	uint8_t pkt1[64];
+	pkt1[0] = SERVO_MSC_RSP_CAP;
+	pkt1[1] = 0x88; /* tag */
+	memset(&pkt1[2], 0x11, sizeof(pkt1) - 2);
+
+	memcpy(ep_msc_rx_buffer, pkt1, sizeof(pkt1));
+	btable_ep[USB_EP_MSC].rx_count = sizeof(pkt1);
+	mock_in_isr = true;
+	usb_msc_rx();
+	mock_in_isr = false;
+	TEST_ASSERT(ep2_out_pending == 1);
+
+	/* Arbiter pops packet 1 into bridge_to_usart4 (68 bytes) */
+	bridge_arbiter_deferred();
+	TEST_ASSERT(ep2_out_pending == 0);
+	TEST_ASSERT(bridge.msc_tx_credits == 1);
+	TEST_ASSERT(bridge.msc_tx_seq == 1);
+	TEST_ASSERT(bridge.msc_unacked_seq == 0);
+	TEST_ASSERT(queue_count(&bridge_to_usart4) == 68);
+
+	/*
+	 * Packet 2 arrives while packet 1 is still transmitting in
+	 * bridge_to_usart4.
+	 */
+	uint8_t pkt2[64];
+	pkt2[0] = SERVO_MSC_RSP_CAP;
+	pkt2[1] = 0x88; /* tag */
+	memset(&pkt2[2], 0x22, sizeof(pkt2) - 2);
+
+	memcpy(ep_msc_rx_buffer, pkt2, sizeof(pkt2));
+	btable_ep[USB_EP_MSC].rx_count = sizeof(pkt2);
+	mock_in_isr = true;
+	usb_msc_rx();
+	mock_in_isr = false;
+	TEST_ASSERT(ep2_out_pending == 1);
+
+	/*
+	 * Arbiter stages packet 2 into bridge.pending_msc_buf and clears
+	 * ep2_out_pending to 0 (re-arming EP2 OUT). Since bridge_to_usart4 has
+	 * 128 - 68 = 60 free < SERVO_DATA_TX_MIN_FREE(64) = 92, packet 2 stays
+	 * staged in pending_msc_buf without overrunning the 128-byte queue.
+	 */
+	bridge_arbiter_deferred();
+	TEST_ASSERT(ep2_out_pending == 0);
+	TEST_ASSERT(bridge.pending_msc_len == 64);
+	TEST_ASSERT(bridge.msc_tx_credits == 1);
+	TEST_ASSERT(bridge.msc_tx_seq == 1);
+	TEST_ASSERT(queue_count(&bridge_to_usart4) == 68);
+
+	/*
+	 * Simulate DMA draining the first 34-byte half-frame of packet 1.
+	 * queue_space becomes 128 - 34 = 94 >= SERVO_DATA_TX_MIN_FREE(64) = 92,
+	 * so bridge_arbiter_deferred() immediately pops packet 2 into
+	 * bridge_to_usart4 (total 34 + 68 = 102 bytes queued <= 128).
+	 */
+	uint8_t dma_drain[34];
+	TEST_ASSERT(queue_remove_units(&bridge_to_usart4, dma_drain, 34) == 34);
+	usb_bridge_uart_read(NULL, 34);
+	bridge_arbiter_deferred();
+
+	TEST_ASSERT(bridge.pending_msc_len == 0);
+	TEST_ASSERT(bridge.msc_tx_credits == 0);
+	TEST_ASSERT(bridge.msc_tx_seq == 2);
+	TEST_ASSERT(bridge.msc_unacked_seq == 0);
+	TEST_ASSERT(queue_count(&bridge_to_usart4) == 102);
+
+	/*
+	 * 2. 3rd packet arrives: Credits == 0, so packet 3 is blocked in EP2
+	 * OUT.
+	 */
+	uint8_t pkt3[64];
+	pkt3[0] = SERVO_MSC_RSP_CAP;
+	pkt3[1] = 0x88;
+	memset(&pkt3[2], 0x33, sizeof(pkt3) - 2);
+
+	memcpy(ep_msc_rx_buffer, pkt3, sizeof(pkt3));
+	btable_ep[USB_EP_MSC].rx_count = sizeof(pkt3);
+	mock_in_isr = true;
+	usb_msc_rx();
+	mock_in_isr = false;
+	TEST_ASSERT(ep2_out_pending == 1);
+
+	bridge_arbiter_deferred();
+	TEST_ASSERT(ep2_out_pending == 1);
+	TEST_ASSERT(bridge.msc_tx_credits == 0);
+	TEST_ASSERT(queue_count(&bridge_to_usart4) == 102);
+
+	/*
+	 * 3. Cumulative OP_CREDIT(seq = 1):
+	 * OP_CREDIT(0) was dropped/coalesced. Receiving OP_CREDIT(1)
+	 * cumulatively acknowledges both packet 0 and packet 1! acked = ((1 -
+	 * 0) & 7) + 1 = 2 credits returned. msc_tx_credits becomes 2,
+	 * msc_unacked_seq becomes 2. Drain bridge_to_usart4 to free space, then
+	 * packet 3 will be popped.
+	 */
+	drain_queue(&bridge_to_usart4);
+
+	uint8_t credit_frame[SERVO_MAX_FRAME_BYTES];
+	size_t cr_len = servo_frame_encode(SERVO_MAKE_TYPE(SERVO_CHAN_MSC,
+							   SERVO_OP_CREDIT, 1),
+					   0, NULL, credit_frame);
+	queue_add_units(&usart4_to_bridge, credit_frame, cr_len);
+
+	bridge_arbiter_deferred();
+	/* Packet 3 popped! msc_tx_credits was 2, now 1 (packet 3 consumed 1
+	 * credit) */
+	TEST_ASSERT(ep2_out_pending == 0);
+	TEST_ASSERT(bridge.msc_unacked_seq == 2);
+	TEST_ASSERT(bridge.msc_tx_seq == 3);
+	TEST_ASSERT(bridge.msc_tx_credits == 1);
+	TEST_ASSERT(queue_count(&bridge_to_usart4) == 68);
+	drain_queue(&bridge_to_usart4);
+
+	/*
+	 * 4. Credit Timeout & Stale Credit Rejection:
+	 * Packet 3 (seq 2) was sent at last_msc_tx_us.
+	 * Advance time beyond SERVO_MSC_CREDIT_TIMEOUT_US (100 ms).
+	 */
+	uint32_t t_timeout =
+		bridge.last_msc_tx_us + SERVO_MSC_CREDIT_TIMEOUT_US + 1000;
+	force_time((timestamp_t){ .val = t_timeout });
+	bridge_arbiter_deferred();
+
+	/*
+	 * Timers restore msc_tx_credits to SERVO_MSC_WINDOW_CREDITS (2)
+	 * and align msc_unacked_seq.
+	 */
+	TEST_ASSERT(bridge.msc_tx_credits == SERVO_MSC_WINDOW_CREDITS);
+	TEST_ASSERT(bridge.msc_unacked_seq == bridge.msc_tx_seq); /* 3 */
+
+	/*
+	 * Stale credit rejection:
+	 * Late OP_CREDIT(1) from the previous window arrives.
+	 * in_flight = 2 - 2 = 0.
+	 * Must be ignored, NOT over-crediting msc_tx_credits!
+	 */
+	cr_len = servo_frame_encode(SERVO_MAKE_TYPE(SERVO_CHAN_MSC,
+						    SERVO_OP_CREDIT, 1),
+				    0, NULL, credit_frame);
+	queue_add_units(&usart4_to_bridge, credit_frame, cr_len);
+	bridge_arbiter_deferred();
+
+	TEST_ASSERT(bridge.msc_tx_credits == SERVO_MSC_WINDOW_CREDITS);
+	TEST_ASSERT(bridge.msc_unacked_seq == 3);
+
+	drain_queue(&usart4_to_bridge);
+	drain_queue(&bridge_to_usart4);
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	test_reset();
@@ -3960,6 +4767,11 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_probe_active_1m_resync_all_epochs_and_booted);
 	RUN_TEST(test_reset_held_kbd_drain_and_fallthrough_safety);
 	RUN_TEST(test_bug15_usb_reset_and_bug16_atmel_reset_proto);
+	RUN_TEST(test_msc_req_forwards_to_ep2_in_and_overwrites_unread);
+	RUN_TEST(test_msc_ep2_out_stale_tag_fast_drain);
+	RUN_TEST(test_msc_and_adb_round_robin_fairness);
+	RUN_TEST(test_msc_serial_sync_on_boot_handshake);
+	RUN_TEST(test_msc_set_interface_alt_and_servod_teardown);
 	RUN_TEST(test_s7_adb_stale_timeout_and_deferred_out_pending_race);
 	RUN_TEST(test_s8_dut_reset_kick_zlp_and_dtog_preservation);
 	RUN_TEST(test_alt0_alt1_descriptor_patching);
@@ -3968,6 +4780,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_phase2a_host_session_dirty_back_to_back_set_interface);
 	RUN_TEST(test_phase2a_peer_reset_req_none_with_kick_arms_zlp);
 	RUN_TEST(test_phase2a_fastboot_consecutive_set_interface_no_reset);
+	RUN_TEST(test_msc_w2_streaming_and_cumulative_credit);
 
 	test_print_result();
 }

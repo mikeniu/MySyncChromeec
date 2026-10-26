@@ -21,6 +21,22 @@
 #include "usb_pd.h"
 #include "util.h"
 
+#ifndef DEFAULT_SERIALNO
+#define DEFAULT_SERIALNO "Uninitialized"
+#endif
+
+static bool is_valid_serial(const char *s)
+{
+	const char *def = DEFAULT_SERIALNO;
+	if (!s || !*s)
+		return false;
+	while (*s && *def && *s == *def) {
+		s++;
+		def++;
+	}
+	return (*s != *def);
+}
+
 #ifndef STM32_USART_CR2_STOP_2B
 #define STM32_USART_CR2_STOP_2B BIT(13)
 #endif
@@ -42,7 +58,12 @@ static bool ep7_zlp_in_flight;
 static uint8_t bridge_host_alt_setting;
 static uint8_t fb_tx_64b_count;
 static uint32_t last_ep7_in_drain_us;
+static volatile uint8_t ep2_out_pending;
+static uint8_t latest_msc_req_tag;
+static bool pending_serial_sync;
 static volatile bool host_session_dirty;
+static uint8_t msc_host_alt_setting;
+static bool msc_tx_is_serial_sync;
 static uint32_t bridge_crc_errors;
 
 #define SERVO_PROBE_WAIT_BOOT_1M_US (250 * MSEC)
@@ -61,6 +82,71 @@ static uint32_t usart4_virtual_baud = 1000000U;
 
 static usb_uint ep_bridge_rx_buffer[64 / 2] __usb_ram;
 static usb_uint ep_bridge_tx_buffer[64 / 2] __usb_ram;
+static usb_uint ep_msc_rx_buffer[64 / 2] __usb_ram;
+static usb_uint ep_msc_tx_buffer[64 / 2] __usb_ram;
+
+const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_MSC) = {
+	.bLength = USB_DT_INTERFACE_SIZE,
+	.bDescriptorType = USB_DT_INTERFACE,
+	.bInterfaceNumber = USB_IFACE_MSC,
+	.bAlternateSetting = 0,
+	.bNumEndpoints = 2,
+	.bInterfaceClass = USB_CLASS_VENDOR_SPEC,
+	.bInterfaceSubClass = 0x50,
+	.bInterfaceProtocol = 0x01,
+	.iInterface = 0,
+};
+const struct usb_endpoint_descriptor USB_EP_DESC(USB_IFACE_MSC, 0) = {
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = 0x80 | USB_EP_MSC,
+	.bmAttributes = 0x02 /* Bulk IN */,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+};
+const struct usb_endpoint_descriptor USB_EP_DESC(USB_IFACE_MSC, 1) = {
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = USB_EP_MSC,
+	.bmAttributes = 0x02 /* Bulk OUT */,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+};
+
+const struct usb_interface_descriptor USB_CONF_DESC(iface1_3alt1_0iface) = {
+	.bLength = USB_DT_INTERFACE_SIZE,
+	.bDescriptorType = USB_DT_INTERFACE,
+	.bInterfaceNumber = USB_IFACE_MSC,
+	.bAlternateSetting = 1,
+	.bNumEndpoints = 2,
+	.bInterfaceClass = USB_CLASS_VENDOR_SPEC,
+	.bInterfaceSubClass = 0x50,
+	.bInterfaceProtocol = 0x01,
+	.iInterface = 0,
+};
+const struct usb_endpoint_descriptor USB_CONF_DESC(iface1_3alt1_1ep0) = {
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = 0x80 | USB_EP_MSC,
+	.bmAttributes = 0x02 /* Bulk IN */,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+};
+const struct usb_endpoint_descriptor USB_CONF_DESC(iface1_3alt1_2ep1) = {
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = USB_EP_MSC,
+	.bmAttributes = 0x02 /* Bulk OUT */,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+};
+
+static void usb_msc_tx(void);
+static void usb_msc_rx(void);
+static void usb_msc_event(enum usb_ep_event evt);
+
+USB_DECLARE_EP(USB_EP_MSC, usb_msc_tx, usb_msc_rx, usb_msc_event);
+
 const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_BRIDGE) = {
 	.bLength = USB_DT_INTERFACE_SIZE,
 	.bDescriptorType = USB_DT_INTERFACE,
@@ -154,7 +240,7 @@ static __attribute__((noinline)) void ep_toggle_safe(int ep, uint16_t mask,
 						     uint16_t val)
 {
 	interrupt_disable();
-	STM32_TOGGLE_EP(ep, mask, val, EP_CTR_BOTH);
+	STM32_TOGGLE_EP(ep, mask, val, ep | EP_CTR_BOTH);
 	interrupt_enable();
 }
 
@@ -189,6 +275,18 @@ static __attribute__((noinline)) int ep0_status_ok(uint16_t tx_count,
 	btable_ep[0].tx_count = tx_count;
 	STM32_TOGGLE_EP(0, EP_TX_RX_MASK, EP_TX_RX_VALID, flags);
 	return 0;
+}
+
+static __attribute__((noinline)) void
+usb_bridge_reset_ep(int ep, usb_uint *rx_buf, usb_uint *tx_buf)
+{
+	btable_ep[ep].tx_addr = usb_sram_addr(tx_buf);
+	btable_ep[ep].tx_count = 0;
+	btable_ep[ep].rx_addr = usb_sram_addr(rx_buf);
+	btable_ep[ep].rx_count = usb_ep_rx_size(64);
+
+	ep_toggle_safe(ep, EP_TX_RX_MASK | EP_RX_DTOG | EP_TX_DTOG,
+		       EP_TX_NAK | EP_RX_VALID);
 }
 
 static __attribute__((noinline)) int
@@ -351,6 +449,7 @@ static void bridge_dppu_reconnect_deferred(void)
 		ep7_toggle_safe(EP_TX_RX_MASK | EP_RX_DTOG | EP_TX_DTOG,
 				EP_TX_NAK | EP_RX_VALID);
 	}
+	usb_bridge_reset_ep(USB_EP_MSC, ep_msc_rx_buffer, ep_msc_tx_buffer);
 }
 
 static __attribute__((noinline)) void usart4_configure_line(int baud,
@@ -472,7 +571,12 @@ void usb_bridge_init(void)
 	host_session_dirty = false;
 	fb_tx_64b_count = 0;
 	host_usb_reset_irq = false;
+	msc_host_alt_setting = 0;
+	msc_tx_is_serial_sync = false;
 	bridge_crc_errors = 0;
+	ep2_out_pending = 0;
+	latest_msc_req_tag = 0;
+	pending_serial_sync = true;
 	atmel_reset_held = false;
 	active_usb_protocol = SERVO_PROTO_NONE;
 	effective_usb_protocol = SERVO_PROTO_NONE;
@@ -488,6 +592,30 @@ void usb_bridge_init(void)
 	usart4_configure_line(1000000, /*two_stop_bits=*/true);
 
 	hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+}
+
+static void usb_msc_tx(void)
+{
+	STM32_TOGGLE_EP(USB_EP_MSC, 0, 0, EP_CTR_RX);
+	hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+}
+
+static void usb_msc_rx(void)
+{
+	STM32_TOGGLE_EP(USB_EP_MSC, 0, 0, EP_CTR_TX);
+	ep2_out_pending = 1;
+	hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+}
+
+static void usb_msc_event(enum usb_ep_event evt)
+{
+	if (evt == USB_EVENT_RESET) {
+		msc_host_alt_setting = 0;
+		ep2_out_pending = 0;
+		latest_msc_req_tag = 0;
+		usb_bridge_reset_ep(USB_EP_MSC, ep_msc_rx_buffer,
+				    ep_msc_tx_buffer);
+	}
 }
 
 static void usb_bridge_tx(void)
@@ -568,7 +696,8 @@ static void usb_bridge_written(struct consumer const *consumer, size_t count)
 
 static void usb_bridge_uart_read(struct producer const *producer, size_t count)
 {
-	if (queue_is_empty(&bridge_to_usart4))
+	if (queue_is_empty(&bridge_to_usart4) || bridge.pending_msc_len > 0 ||
+	    bridge.pending_data_tx)
 		hook_call_deferred(&bridge_arbiter_deferred_data, 0);
 }
 
@@ -713,6 +842,32 @@ static __attribute__((noinline)) void bridge_process_uart_rx(uint32_t now_us)
 
 		if (fx.key_ack_received) {
 			queue_add_unit(&bridge_kbd_to_usb, &fx.key_ack_ch);
+		}
+
+		if (fx.msc_frame_received &&
+		    fx.msc_frame_len == sizeof(struct servo_msc_req)) {
+			latest_msc_req_tag = fx.msc_frame_payload[1];
+			if (bridge.pending_msc_len > 0 &&
+			    bridge.pending_msc_buf[0] != SERVO_MSC_RSP_SERIAL &&
+			    bridge.pending_msc_buf[1] != latest_msc_req_tag) {
+				bridge.pending_msc_len = 0;
+			}
+			if (msc_host_alt_setting == 1 &&
+			    !bridge.msc_awaiting_reset_ack) {
+				memcpy_to_usbram(
+					(void *)usb_sram_addr(ep_msc_tx_buffer),
+					fx.msc_frame_payload,
+					sizeof(struct servo_msc_req));
+				btable_ep[USB_EP_MSC].tx_count =
+					sizeof(struct servo_msc_req);
+				ep_toggle_safe(USB_EP_MSC, EP_TX_MASK,
+					       EP_TX_VALID);
+			}
+		}
+
+		if (evt == SERVO_RX_EVT_FRAME_COMPLETE &&
+		    SERVO_GET_CHAN(bridge.rx.type) == SERVO_CHAN_SYS) {
+			pending_serial_sync = true;
 		}
 	}
 }
@@ -972,7 +1127,7 @@ static void bridge_arbiter_deferred(void)
 			ep7_toggle_safe(EP_TX_MASK, EP_TX_VALID);
 		}
 
-		/* 4. Inbound Keyboard & Bulk OUT Staging */
+		/* 4. Inbound Keyboard, Bulk OUT, & MSC Staging */
 		if (probe_state == USB_BRIDGE_LOCKED_1M_BRIDGE) {
 			if (servo_bridge_can_send_key_cmd(&bridge) &&
 			    queue_count(&usb_to_bridge_kbd) > 0) {
@@ -980,6 +1135,55 @@ static void bridge_arbiter_deferred(void)
 				if (queue_remove_unit(&usb_to_bridge_kbd,
 						      &kch)) {
 					servo_bridge_send_key_cmd(&bridge, kch);
+				}
+			}
+
+			if (pending_serial_sync &&
+			    bridge.state == SERVO_STATE_ACTIVE) {
+				const char *serial = board_read_serial();
+				if (!is_valid_serial(serial)) {
+					pending_serial_sync = false;
+				} else if (servo_bridge_can_send_msc_data(
+						   &bridge)) {
+					uint8_t slen = 0;
+					while (slen < 32U &&
+					       serial[slen] != '\0')
+						slen++;
+					uint8_t spkt[36];
+					spkt[0] = SERVO_MSC_RSP_SERIAL;
+					spkt[1] = 0;
+					spkt[2] = slen;
+					spkt[3] = 0;
+					memcpy(&spkt[4], serial, slen);
+					if (servo_bridge_send_msc_data(
+						    &bridge, spkt,
+						    (uint8_t)(4U + slen))) {
+						pending_serial_sync = false;
+						msc_tx_is_serial_sync = true;
+					}
+				}
+			}
+
+			if (ep2_out_pending) {
+				uint8_t pkt[SERVO_MAX_DATA_LEN];
+				size_t rx_len = ep_read_rx_packet(
+					USB_EP_MSC, ep_msc_rx_buffer, pkt);
+				bool rearm_ep2 = false;
+				if (rx_len < 2U ||
+				    pkt[1] != latest_msc_req_tag) {
+					rearm_ep2 = true;
+				} else if (servo_bridge_can_send_msc_data(
+						   &bridge)) {
+					if (servo_bridge_send_msc_data(
+						    &bridge, pkt,
+						    (uint8_t)rx_len)) {
+						msc_tx_is_serial_sync = false;
+						rearm_ep2 = true;
+					}
+				}
+				if (rearm_ep2) {
+					ep2_out_pending = 0;
+					ep_rearm_rx(USB_EP_MSC);
 				}
 			}
 
@@ -1018,7 +1222,11 @@ static void bridge_arbiter_deferred(void)
 
 		if (queue_is_empty(&usart4_to_bridge) && !ep7_in_drained_irq &&
 		    !host_usb_reset_irq && !(rx_corrupted || rx_fe) &&
-		    !(ep7_out_pending && servo_bridge_can_send_data(&bridge)))
+		    !(ep7_out_pending && servo_bridge_can_send_data(&bridge)) &&
+		    !(ep2_out_pending &&
+		      servo_bridge_can_send_msc_data(&bridge) &&
+		      queue_space(&bridge_to_usart4) >=
+			      SERVO_DATA_TX_MIN_FREE(SERVO_MAX_DATA_LEN)))
 			break;
 
 		now_us = (uint32_t)get_time().val;
@@ -1037,10 +1245,16 @@ static void bridge_arbiter_deferred(void)
 		   bridge.rx.state != SERVO_RX_WAIT_SYNC ||
 		   bridge.tx_credits == 0 ||
 		   bridge.state == SERVO_STATE_RESETTING ||
-		   bridge.kbd_tx_credits == 0 || bridge.pending_reset_req ||
-		   bridge.pending_reset_ack || bridge.pending_credit ||
-		   bridge.pending_nak || bridge.pending_key_cmd ||
-		   bridge.pending_data_tx || ep7_out_pending ||
+		   bridge.kbd_tx_credits == 0 ||
+		   bridge.msc_tx_credits < SERVO_MSC_WINDOW_CREDITS ||
+		   bridge.msc_awaiting_reset_ack ||
+		   bridge.pending_msc_reset_req ||
+		   bridge.pending_msc_reset_ack || bridge.pending_msc_credit ||
+		   bridge.pending_reset_req || bridge.pending_reset_ack ||
+		   bridge.pending_credit || bridge.pending_nak ||
+		   bridge.pending_key_cmd || bridge.pending_data_tx ||
+		   bridge.pending_msc_len > 0 || ep2_out_pending ||
+		   pending_serial_sync || ep7_out_pending ||
 		   (bridge.active_proto == SERVO_PROTO_FASTBOOT &&
 		    (fb_tx_64b_count & 0x03) != 0 && !ep7_zlp_in_flight)) {
 		hook_call_deferred(&bridge_arbiter_deferred_data, 1 * MSEC);
@@ -1202,35 +1416,81 @@ int bridge_iface_request(usb_uint *ep0_buf_rx, usb_uint *ep0_buf_tx)
 }
 USB_DECLARE_IFACE(USB_IFACE_BRIDGE, bridge_iface_request);
 
-int usb_bridge_clear_halt(uint8_t ep_addr)
+int msc_iface_request(usb_uint *ep0_buf_rx, usb_uint *ep0_buf_tx)
 {
-	bool disconnect_pending = usb_bridge_none_disconnect_pending();
+	bool changed = false;
 
-	if ((effective_usb_protocol == SERVO_PROTO_NONE &&
-	     !disconnect_pending) ||
-	    dppu_pulse_active)
+	if (ep0_buf_rx[2] != USB_IFACE_MSC)
 		return -1;
 
-	if (ep_addr == (USB_EP_BRIDGE | 0x80)) {
-		btable_ep[USB_EP_BRIDGE].tx_count = 0;
-		ep7_zlp_in_flight = false;
-		ep7_toggle_safe(EP_TX_MASK | EP_TX_DTOG, EP_TX_NAK);
-	} else if (ep_addr == USB_EP_BRIDGE) {
-		ep7_out_pending = 0;
-		ep7_out_session_handled = false;
-		btable_ep[USB_EP_BRIDGE].rx_count = usb_ep_rx_size(64);
-		ep7_toggle_safe(EP_RX_MASK | EP_RX_DTOG,
-				(effective_usb_protocol == SERVO_PROTO_NONE) ?
-					EP_RX_NAK :
-					EP_RX_VALID);
-	} else {
+	if (usb_iface_handle_alt_req(ep0_buf_rx, ep0_buf_tx, 1,
+				     &msc_host_alt_setting, &changed) != 0)
 		return -1;
+
+	if (changed) {
+		usb_bridge_reset_ep(USB_EP_MSC, ep_msc_rx_buffer,
+				    ep_msc_tx_buffer);
+		ep2_out_pending = 0;
+		latest_msc_req_tag = 0;
+
+		if (msc_tx_is_serial_sync &&
+		    (bridge.pending_msc_len > 0 ||
+		     bridge.msc_tx_credits < SERVO_MSC_WINDOW_CREDITS)) {
+			pending_serial_sync = true;
+			msc_tx_is_serial_sync = false;
+		}
+
+		servo_bridge_set_msc_host_active(&bridge,
+						 msc_host_alt_setting == 1,
+						 (uint32_t)get_time().val);
+		hook_call_deferred(&bridge_arbiter_deferred_data, 0);
 	}
 
-	if (bridge_host_alt_setting == 0 && bridge_has_active_traffic()) {
-		host_usb_reset_irq = true;
-		host_session_dirty = false;
-		hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+	return 0;
+}
+USB_DECLARE_IFACE(USB_IFACE_MSC, msc_iface_request);
+
+int usb_bridge_clear_halt(uint8_t ep_addr)
+{
+	if (ep_addr == (USB_EP_MSC | 0x80)) {
+		btable_ep[USB_EP_MSC].tx_count = 0;
+		ep_toggle_safe(USB_EP_MSC, EP_TX_MASK | EP_TX_DTOG, EP_TX_NAK);
+	} else if (ep_addr == USB_EP_MSC) {
+		ep2_out_pending = 0;
+		btable_ep[USB_EP_MSC].rx_count = usb_ep_rx_size(64);
+		ep_toggle_safe(USB_EP_MSC, EP_RX_MASK | EP_RX_DTOG,
+			       EP_RX_VALID);
+	} else {
+		bool disconnect_pending = usb_bridge_none_disconnect_pending();
+
+		if ((effective_usb_protocol == SERVO_PROTO_NONE &&
+		     !disconnect_pending) ||
+		    dppu_pulse_active)
+			return -1;
+
+		if (ep_addr == (USB_EP_BRIDGE | 0x80)) {
+			btable_ep[USB_EP_BRIDGE].tx_count = 0;
+			ep7_zlp_in_flight = false;
+			ep7_toggle_safe(EP_TX_MASK | EP_TX_DTOG, EP_TX_NAK);
+		} else if (ep_addr == USB_EP_BRIDGE) {
+			ep7_out_pending = 0;
+			ep7_out_session_handled = false;
+			btable_ep[USB_EP_BRIDGE].rx_count = usb_ep_rx_size(64);
+			ep7_toggle_safe(EP_RX_MASK | EP_RX_DTOG,
+					(effective_usb_protocol ==
+					 SERVO_PROTO_NONE) ?
+						EP_RX_NAK :
+						EP_RX_VALID);
+		} else {
+			return -1;
+		}
+
+		if (bridge_host_alt_setting == 0 &&
+		    bridge_has_active_traffic()) {
+			host_usb_reset_irq = true;
+			host_session_dirty = false;
+			hook_call_deferred(&bridge_arbiter_deferred_data, 0);
+		}
 	}
 
 	return ep0_status_ok(0, 0);
@@ -1240,9 +1500,11 @@ int usb_bridge_clear_halt(uint8_t ep_addr)
 static int command_bridge_stats(int argc, const char **argv)
 {
 	ccprintf("state=%d proto=%d alt=%d tx_cred=%d kbd_cred=%d "
-		 "crc_err=%d ovf_h2h=0\n",
+		 "msc_cred=%d msc_alt=%d crc_err=%d ovf_h2h=0 ovf_msc=0\n",
 		 bridge.state, bridge.active_proto, bridge_host_alt_setting,
-		 bridge.tx_credits, bridge.kbd_tx_credits, bridge_crc_errors);
+		 bridge.tx_credits, bridge.kbd_tx_credits,
+		 bridge.msc_tx_credits, msc_host_alt_setting,
+		 bridge_crc_errors);
 	return EC_SUCCESS;
 }
 DECLARE_CONSOLE_COMMAND(bridge_stats, command_bridge_stats, "",

@@ -83,6 +83,66 @@ extern "C" {
 	(SERVO_RESET_FLAG_HOST_ACTIVE | SERVO_RESET_FLAG_PEER_KICK | \
 	 SERVO_RESET_PROTO_MASK)
 
+/* USB Mass Storage (MSC) BOT Protocol Constants (SERVO_CHAN_MSC) */
+#define SERVO_MSC_CMD_CAP 0x43U /* 'C': Query capacity & media_gen */
+#define SERVO_MSC_CMD_READ 0x52U /* 'R': Read 512B sector at lba_be */
+#define SERVO_MSC_RSP_CAP 0x43U /* 'C': Capacity response (8B)     */
+#define SERVO_MSC_RSP_ERR 0x45U /* 'E': Error response (8B)        */
+#define SERVO_MSC_RSP_SERIAL 0x53U /* 'S': STM32 PSTATE serial sync   */
+#define SERVO_MSC_RSP_ZERO 0x5AU /* 'Z': All-zero 512B sector response (8B) */
+
+#define SERVO_MSC_CHUNK_HDR_MASK 0xF0U
+#define SERVO_MSC_CHUNK_DATA_TAG 0x80U /* 0x80 | chunk_idx (0..7), 62B data */
+#define SERVO_MSC_CHUNK_EOF_TAG 0x90U /* 0x90 | 8 (0x98), 16B data         */
+#define SERVO_MSC_CHUNK_IDX_MASK 0x0FU
+
+#define SERVO_MSC_ERR_NO_MEDIUM 0x3AU /* ASC 0x3A: MEDIUM NOT PRESENT */
+#define SERVO_MSC_ERR_UNIT_ATTN 0x28U /* ASC 0x28: NOT READY TO READY */
+#define SERVO_MSC_ERR_LBA_RANGE 0x21U /* ASC 0x21: LBA OUT OF RANGE */
+
+struct servo_msc_req {
+	uint8_t cmd; /* 'C' (0x43) or 'R' (0x52) */
+	uint8_t req_tag; /* Monotonic 8-bit request tag */
+	uint8_t media_gen; /* ATmega's known media_gen (0 = no media) */
+	uint8_t rsvd; /* 0x00 */
+	uint32_t lba_be; /* Big-endian 32-bit LBA (0 for 'C') */
+} __attribute__((packed));
+
+struct servo_msc_rsp_hdr {
+	uint8_t rsp; /* 'C' (0x43), 'E' (0x45), or 'S' (0x53) */
+	uint8_t req_tag; /* Echoed from servo_msc_req.req_tag */
+	uint8_t media_gen; /* Current servod media_gen */
+} __attribute__((packed));
+
+struct servo_msc_cap_reply {
+	uint8_t rsp; /* 'C' (0x43) */
+	uint8_t req_tag; /* Echoed from servo_msc_req.req_tag */
+	uint8_t media_gen; /* Current servod media_gen (1..255) */
+	uint8_t flags; /* Bit 0: write_protected (1) */
+	uint32_t blocks_be; /* Big-endian total 512B blocks */
+} __attribute__((packed));
+
+struct servo_msc_err_reply {
+	uint8_t rsp; /* 'E' (0x45) */
+	uint8_t req_tag; /* Echoed from servo_msc_req.req_tag */
+	uint8_t media_gen; /* Current servod media_gen (0 or 1..255) */
+	uint8_t err_code; /* 0x3A, 0x28, or 0x21 */
+	uint32_t blocks_be; /* Big-endian current total 512B blocks */
+} __attribute__((packed));
+
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)) || \
+	(defined(__GNUC__) &&                                       \
+	 ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)))
+_Static_assert(sizeof(struct servo_msc_req) == 8,
+	       "servo_msc_req must be 8 bytes");
+_Static_assert(sizeof(struct servo_msc_rsp_hdr) == 3,
+	       "servo_msc_rsp_hdr must be 3 bytes");
+_Static_assert(sizeof(struct servo_msc_cap_reply) == 8,
+	       "servo_msc_cap_reply must be 8 bytes");
+_Static_assert(sizeof(struct servo_msc_err_reply) == 8,
+	       "servo_msc_err_reply must be 8 bytes");
+#endif
+
 /* Bridged USB Protocols (ATmega32U4 is Protocol Authority) */
 #define SERVO_PROTO_NONE 0x00U
 #define SERVO_PROTO_ADB 0x01U
@@ -113,6 +173,8 @@ extern "C" {
 #define SERVO_RX_FRAME_TIMEOUT_US \
 	10000U /* 10 ms inter-byte gap T_RX_FRAME deadline */
 #define SERVO_KBD_CREDIT_TIMEOUT_US 50000U /* 50 ms KBD credit restoration */
+#define SERVO_MSC_CREDIT_TIMEOUT_US 10000U /* 10 ms MSC credit restoration */
+#define SERVO_MSC_WINDOW_CREDITS 2U /* W=2 sliding credit window for MSC */
 #define SERVO_RESET_RETRY_US 5000U /* 5 ms reset retry timer */
 
 /* ADB A_CNXN wire constants (little-endian) */
@@ -178,7 +240,8 @@ servo_frame_encode(uint8_t type, uint8_t arg_len, const uint8_t *payload,
 	uint8_t i;
 	uint8_t ch = SERVO_GET_CHAN(type);
 	uint8_t op = SERVO_GET_OP(type);
-	bool has_data = (ch == SERVO_CHAN_H2H && op == SERVO_OP_DATA);
+	bool has_data = ((ch == SERVO_CHAN_H2H || ch == SERVO_CHAN_MSC) &&
+			 op == SERVO_OP_DATA);
 	uint8_t len = has_data ? ((arg_len <= SERVO_MAX_DATA_LEN) ?
 					  arg_len :
 					  SERVO_MAX_DATA_LEN) :
@@ -294,8 +357,8 @@ static inline bool servo_frame_is_valid_type(uint8_t type)
 	case SERVO_CHAN_KBD:
 		return (op == SERVO_OP_DATA || op == SERVO_OP_CREDIT);
 	case SERVO_CHAN_MSC:
-		/* In Commit A: MSC is inactive and rejected */
-		return false;
+		return (op == SERVO_OP_DATA || op == SERVO_OP_CREDIT ||
+			op == SERVO_OP_RESET_REQ || op == SERVO_OP_RESET_ACK);
 	default:
 		return false;
 	}
@@ -328,7 +391,18 @@ static inline bool servo_frame_is_valid_arg(uint8_t type, uint8_t arg_len)
 	case SERVO_CHAN_KBD:
 		return true;
 	case SERVO_CHAN_MSC:
-		return false;
+		switch (op) {
+		case SERVO_OP_DATA:
+			return (arg_len >= 1U && arg_len <= SERVO_MAX_DATA_LEN);
+		case SERVO_OP_CREDIT:
+			return (arg_len == 0U);
+		case SERVO_OP_RESET_REQ:
+		case SERVO_OP_RESET_ACK:
+			return ((arg_len & ~SERVO_RESET_FLAG_HOST_ACTIVE) ==
+				0U);
+		default:
+			return false;
+		}
 	default:
 		return false;
 	}
@@ -350,7 +424,8 @@ static inline uint8_t servo_frame_payload_len(uint8_t type, uint8_t arg)
 	uint8_t ch = SERVO_GET_CHAN(type);
 	uint8_t op = SERVO_GET_OP(type);
 
-	if (ch == SERVO_CHAN_H2H && op == SERVO_OP_DATA)
+	if ((ch == SERVO_CHAN_H2H || ch == SERVO_CHAN_MSC) &&
+	    op == SERVO_OP_DATA)
 		return (arg <= SERVO_MAX_DATA_LEN) ? arg : SERVO_MAX_DATA_LEN;
 
 	return 0U;
@@ -474,6 +549,13 @@ struct servo_bridge_rx_effects {
 	bool reset_occurred;
 	bool peer_kick_received;
 	bool arm_reset_zlp;
+
+	/* Added in Commit B (MSC): */
+	bool msc_frame_received;
+	uint8_t msc_frame_len;
+	const uint8_t *msc_frame_payload;
+	bool msc_host_reset;
+	bool msc_host_active;
 };
 
 struct servo_bridge_node {
@@ -482,6 +564,8 @@ struct servo_bridge_node {
 	uint32_t last_tx_us;
 	uint32_t last_reset_tx_us;
 	uint32_t last_kbd_tx_us;
+	uint32_t last_msc_tx_us;
+	uint32_t last_msc_reset_tx_us;
 
 	/* Role: true = STM32 (Epoch Leader), false = ATmega (Authority) */
 	bool is_epoch_leader;
@@ -555,6 +639,26 @@ struct servo_bridge_node {
 
 	bool pending_data_tx;
 
+	/* Priority 3B MSC state */
+	bool prio3_msc_turn;
+	uint8_t msc_tx_credits; /* 0..SERVO_MSC_WINDOW_CREDITS */
+	uint8_t msc_tx_seq;
+	uint8_t msc_unacked_seq;
+	bool pending_msc_credit;
+	uint8_t pending_msc_credit_seq;
+	uint8_t msc_epoch;
+	bool msc_local_host_active;
+	bool msc_peer_host_active;
+	bool msc_reset_synced;
+	bool msc_awaiting_reset_ack;
+	bool pending_msc_reset_req;
+	bool pending_msc_reset_ack;
+	uint8_t pending_msc_reset_ack_epoch;
+	uint8_t pending_msc_reset_ack_arg;
+	uint8_t pending_msc_len;
+	bool pending_msc_is_req;
+	uint8_t pending_msc_buf[SERVO_MAX_DATA_LEN];
+
 	/* Byte-stream RX parser */
 	struct servo_rx_parser rx;
 };
@@ -601,11 +705,16 @@ static inline void servo_bridge_init(struct servo_bridge_node *n,
 	n->last_tx_us = now_us;
 	n->last_reset_tx_us = now_us;
 	n->last_kbd_tx_us = now_us;
+	n->last_msc_tx_us = now_us;
+	n->last_msc_reset_tx_us = now_us;
 
 	n->is_epoch_leader = is_epoch_leader;
 	n->state = SERVO_STATE_RESETTING;
 	n->booted = true;
 	n->kbd_tx_credits = 1U;
+	n->msc_tx_credits = SERVO_MSC_WINDOW_CREDITS;
+	n->msc_tx_seq = 0U;
+	n->msc_unacked_seq = 0U;
 	n->pending_reset_req = true;
 }
 
@@ -974,6 +1083,39 @@ servo_bridge_clear_rx_effects(const struct servo_bridge_node *n,
 	fx->reset_occurred = false;
 	fx->peer_kick_received = false;
 	fx->arm_reset_zlp = false;
+	fx->msc_frame_received = false;
+	fx->msc_frame_len = 0U;
+	fx->msc_frame_payload = NULL;
+	fx->msc_host_reset = false;
+	fx->msc_host_active = false;
+}
+
+SERVO_HELPER void
+servo_bridge_on_sys_boot_msc(struct servo_bridge_node *n,
+			     struct servo_bridge_rx_effects *fx)
+{
+	n->pending_msc_len = 0U;
+	n->msc_tx_credits = SERVO_MSC_WINDOW_CREDITS;
+	n->msc_tx_seq = 0U;
+	n->msc_unacked_seq = 0U;
+	n->msc_reset_synced = false;
+	if (servo_is_epoch_leader(n)) {
+		if (n->msc_local_host_active) {
+			n->msc_epoch = (n->msc_epoch + 1U) & SERVO_SEQ_MASK;
+			n->msc_awaiting_reset_ack = true;
+			n->pending_msc_reset_req = true;
+			n->last_msc_reset_tx_us = n->last_tx_us;
+		} else {
+			n->msc_awaiting_reset_ack = false;
+			n->pending_msc_reset_req = false;
+		}
+	} else if (n->msc_peer_host_active) {
+		n->msc_peer_host_active = false;
+		if (fx != NULL) {
+			fx->msc_host_reset = true;
+			fx->msc_host_active = false;
+		}
+	}
 }
 
 static inline void
@@ -1048,6 +1190,8 @@ servo_bridge_on_rx_reset_ack(struct servo_bridge_node *n, bool is_sys,
 		n->state = SERVO_STATE_ACTIVE;
 		servo_bridge_apply_h2h_reset(n, seq, 1U, eff_proto, fx);
 		n->booted = false;
+		if (is_sys)
+			servo_bridge_on_sys_boot_msc(n, fx);
 		if (n->desired_proto != n->active_proto) {
 			uint8_t saved = n->pre_suspend_proto;
 			(void)servo_bridge_set_proto(n, n->desired_proto,
@@ -1063,6 +1207,8 @@ servo_bridge_on_rx_reset_ack(struct servo_bridge_node *n, bool is_sys,
 		n->desired_proto = eff_proto;
 		servo_bridge_apply_h2h_reset(n, seq, 1U, eff_proto, fx);
 		n->booted = false;
+		if (is_sys)
+			servo_bridge_on_sys_boot_msc(n, fx);
 	}
 }
 
@@ -1076,6 +1222,75 @@ static inline void servo_bridge_on_rx_frame(struct servo_bridge_node *n,
 	uint8_t seq = SERVO_GET_SEQ(type);
 
 	servo_bridge_clear_rx_effects(n, fx);
+
+	if (ch == SERVO_CHAN_MSC) {
+		switch (op) {
+		case SERVO_OP_DATA:
+			n->pending_msc_credit = true;
+			n->pending_msc_credit_seq = seq;
+			if (fx != NULL) {
+				fx->msc_frame_received = true;
+				fx->msc_frame_len = arg_len;
+				fx->msc_frame_payload = payload;
+			}
+			break;
+		case SERVO_OP_CREDIT: {
+			uint8_t in_flight = (uint8_t)(SERVO_MSC_WINDOW_CREDITS -
+						      n->msc_tx_credits);
+			uint8_t acked = (uint8_t)(((seq - n->msc_unacked_seq) &
+						   SERVO_SEQ_MASK) +
+						  1U);
+			if (in_flight > 0U && acked <= in_flight) {
+				n->msc_tx_credits =
+					(uint8_t)(n->msc_tx_credits + acked);
+				n->msc_unacked_seq =
+					(uint8_t)((seq + 1U) & SERVO_SEQ_MASK);
+			}
+			break;
+		}
+		case SERVO_OP_RESET_REQ: {
+			bool req_active =
+				(arg_len & SERVO_RESET_FLAG_HOST_ACTIVE) != 0U;
+			if (!servo_is_epoch_leader(n)) {
+				if (!n->msc_reset_synced ||
+				    seq != n->msc_epoch ||
+				    n->msc_peer_host_active != req_active) {
+					n->msc_epoch = seq;
+					n->msc_peer_host_active = req_active;
+					n->msc_reset_synced = true;
+					n->pending_msc_len = 0U;
+					n->msc_tx_credits =
+						SERVO_MSC_WINDOW_CREDITS;
+					n->msc_tx_seq = 0U;
+					n->msc_unacked_seq = 0U;
+					if (fx != NULL) {
+						fx->msc_host_reset = true;
+						fx->msc_host_active =
+							req_active;
+					}
+				}
+				n->pending_msc_reset_ack = true;
+				n->pending_msc_reset_ack_epoch = seq;
+				n->pending_msc_reset_ack_arg = arg_len;
+			}
+			break;
+		}
+		case SERVO_OP_RESET_ACK: {
+			bool ack_active =
+				(arg_len & SERVO_RESET_FLAG_HOST_ACTIVE) != 0U;
+			if (servo_is_epoch_leader(n) &&
+			    n->msc_awaiting_reset_ack && seq == n->msc_epoch &&
+			    ack_active == n->msc_local_host_active) {
+				n->msc_awaiting_reset_ack = false;
+				n->pending_msc_reset_req = false;
+			}
+			break;
+		}
+		default:
+			break;
+		}
+		return;
+	}
 
 	if (ch == SERVO_CHAN_KBD) {
 		if (op == SERVO_OP_DATA && !servo_is_epoch_leader(n)) {
@@ -1146,6 +1361,7 @@ static inline void servo_bridge_on_rx_frame(struct servo_bridge_node *n,
 			}
 
 			if (is_sys) {
+				servo_bridge_on_sys_boot_msc(n, fx);
 				if (n->booted) {
 					n->active_proto = new_proto;
 					if (!servo_is_epoch_leader(n) &&
@@ -1285,6 +1501,17 @@ static inline void servo_bridge_check_timers(struct servo_bridge_node *n,
 		n->kbd_tx_credits = 1U;
 		n->kbd_tx_seq = (n->kbd_tx_seq + 1U) & SERVO_SEQ_MASK;
 	}
+	if (n->msc_tx_credits < SERVO_MSC_WINDOW_CREDITS &&
+	    (uint32_t)(now_us - n->last_msc_tx_us) >=
+		    SERVO_MSC_CREDIT_TIMEOUT_US) {
+		n->msc_tx_credits = SERVO_MSC_WINDOW_CREDITS;
+		n->msc_unacked_seq = n->msc_tx_seq;
+	}
+	if (n->msc_awaiting_reset_ack && !n->pending_msc_reset_req &&
+	    (uint32_t)(now_us - n->last_msc_reset_tx_us) >=
+		    SERVO_RESET_RETRY_US) {
+		n->pending_msc_reset_req = true;
+	}
 }
 
 static inline size_t
@@ -1328,7 +1555,24 @@ servo_bridge_pop_tx_frame(struct servo_bridge_node *n, size_t tx_ring_free,
 		n->send_peer_kick = false;
 		n->last_tx_us = now_us;
 		n->last_reset_tx_us = now_us;
-
+	} else if (n->pending_msc_reset_ack) {
+		if (tx_ring_free < 4U)
+			return 0U;
+		type = SERVO_MAKE_TYPE(SERVO_CHAN_MSC, SERVO_OP_RESET_ACK,
+				       n->pending_msc_reset_ack_epoch);
+		arg = n->pending_msc_reset_ack_arg;
+		n->pending_msc_reset_ack = false;
+		n->last_tx_us = now_us;
+	} else if (n->pending_msc_reset_req) {
+		if (tx_ring_free < 4U)
+			return 0U;
+		type = SERVO_MAKE_TYPE(SERVO_CHAN_MSC, SERVO_OP_RESET_REQ,
+				       n->msc_epoch);
+		arg = n->msc_local_host_active ? SERVO_RESET_FLAG_HOST_ACTIVE :
+						 0x00U;
+		n->pending_msc_reset_req = false;
+		n->last_msc_reset_tx_us = now_us;
+		n->last_tx_us = now_us;
 	} else if (n->pending_credit) {
 		if (tx_ring_free < 4U)
 			return 0U;
@@ -1351,7 +1595,14 @@ servo_bridge_pop_tx_frame(struct servo_bridge_node *n, size_t tx_ring_free,
 				       n->pending_nak_seq);
 		arg = n->pending_nak_epoch & SERVO_EPOCH_MASK;
 		n->pending_nak = false;
-
+	} else if (n->pending_msc_credit) {
+		if (tx_ring_free < 4U)
+			return 0U;
+		type = SERVO_MAKE_TYPE(SERVO_CHAN_MSC, SERVO_OP_CREDIT,
+				       n->pending_msc_credit_seq);
+		arg = 0U;
+		n->pending_msc_credit = false;
+		n->last_tx_us = now_us;
 	} else if (n->pending_key_ack) {
 		if (tx_ring_free < 4U)
 			return 0U;
@@ -1373,15 +1624,42 @@ servo_bridge_pop_tx_frame(struct servo_bridge_node *n, size_t tx_ring_free,
 	}
 
 	if (!has_p1) {
-		/* Priority 3: Bulk Data */
-		if (n->state == SERVO_STATE_ACTIVE && n->pending_data_tx &&
-		    n->has_tx_data &&
-		    tx_ring_free >= SERVO_DATA_TX_MIN_FREE(n->tx_data_len)) {
+		/* Priority 3: Bulk Data Traffic (1-for-1 round-robin) */
+		bool can_h2h = (n->state == SERVO_STATE_ACTIVE &&
+				n->pending_data_tx && n->has_tx_data);
+		bool can_msc =
+			(n->pending_msc_len > 0U &&
+			 (n->pending_msc_is_req || n->msc_tx_credits > 0U) &&
+			 !n->msc_awaiting_reset_ack);
+
+		if (can_msc && (!can_h2h || n->prio3_msc_turn)) {
+			if (tx_ring_free <
+			    SERVO_DATA_TX_MIN_FREE(n->pending_msc_len))
+				return 0U;
+			arg = n->pending_msc_len;
+			type = SERVO_MAKE_TYPE(SERVO_CHAN_MSC, SERVO_OP_DATA,
+					       n->msc_tx_seq);
+			n->pending_msc_len = 0U;
+			if (!n->pending_msc_is_req) {
+				n->msc_tx_credits--;
+				n->msc_tx_seq = (n->msc_tx_seq + 1U) &
+						SERVO_SEQ_MASK;
+				n->last_msc_tx_us = now_us;
+			}
+			n->pending_msc_is_req = false;
+			n->last_tx_us = now_us;
+			n->prio3_msc_turn = false;
+			payload = n->pending_msc_buf;
+		} else if (can_h2h) {
+			if (tx_ring_free <
+			    SERVO_DATA_TX_MIN_FREE(n->tx_data_len))
+				return 0U;
 			type = SERVO_MAKE_TYPE(SERVO_CHAN_H2H, SERVO_OP_DATA,
 					       n->tx_data_seq);
 			arg = n->tx_data_len;
 			n->pending_data_tx = false;
 			n->last_tx_us = now_us;
+			n->prio3_msc_turn = true;
 			payload = n->tx_data_buf;
 		} else {
 			return 0U;
@@ -1392,6 +1670,65 @@ servo_bridge_pop_tx_frame(struct servo_bridge_node *n, size_t tx_ring_free,
 }
 
 #define servo_bridge_poll_tx servo_bridge_pop_tx_frame
+
+static inline void servo_bridge_set_msc_host_active(struct servo_bridge_node *n,
+						    bool active,
+						    uint32_t now_us)
+{
+	n->msc_epoch = (n->msc_epoch + 1U) & SERVO_SEQ_MASK;
+	n->msc_local_host_active = active;
+	n->pending_msc_len = 0U;
+	n->pending_msc_is_req = false;
+	n->msc_tx_credits = SERVO_MSC_WINDOW_CREDITS;
+	n->msc_tx_seq = 0U;
+	n->msc_unacked_seq = 0U;
+	n->msc_awaiting_reset_ack = true;
+	n->pending_msc_reset_req = true;
+	n->last_msc_reset_tx_us = now_us;
+}
+
+static inline bool
+servo_bridge_can_send_msc_data(const struct servo_bridge_node *n)
+{
+	return (n->pending_msc_len == 0U && n->msc_tx_credits > 0U &&
+		!n->msc_awaiting_reset_ack);
+}
+
+static inline bool servo_bridge_send_msc_req(struct servo_bridge_node *n,
+					     const uint8_t *payload,
+					     uint8_t len)
+{
+	uint8_t i;
+
+	if (payload == NULL || n->pending_msc_len != 0U || len != 8U ||
+	    n->msc_awaiting_reset_ack)
+		return false;
+
+	for (i = 0U; i < len; ++i)
+		n->pending_msc_buf[i] = payload[i];
+
+	n->pending_msc_len = len;
+	n->pending_msc_is_req = true;
+	return true;
+}
+
+static inline bool servo_bridge_send_msc_data(struct servo_bridge_node *n,
+					      const uint8_t *payload,
+					      uint8_t len)
+{
+	uint8_t i;
+
+	if (!servo_bridge_can_send_msc_data(n) || payload == NULL ||
+	    len == 0U || len > SERVO_MAX_DATA_LEN)
+		return false;
+
+	for (i = 0U; i < len; ++i)
+		n->pending_msc_buf[i] = payload[i];
+
+	n->pending_msc_len = len;
+	n->pending_msc_is_req = false;
+	return true;
+}
 
 #ifdef __cplusplus
 }
