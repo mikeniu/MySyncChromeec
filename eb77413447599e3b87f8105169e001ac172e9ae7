@@ -91,6 +91,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06e63874_7da4f680",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-27T19:01:02Z",
+      "side": 1,
+      "message": "Thanks for the suggestion. I will stick to stack to because it can be reused in other places.",
+      "parentUuid": "af11d71f_d394c75e",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 0
+      },
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd1a50e8_df4a3acf",
