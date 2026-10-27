@@ -297,7 +297,7 @@ static void base_detect_deferred(void)
 	if (chipset_in_state(CHIPSET_STATE_ON | CHIPSET_STATE_ANY_SUSPEND))
 		hook_call_deferred(&base_detect_deferred_data, timeout);
 };
-DECLARE_HOOK(HOOK_INIT, base_detect_deferred, HOOK_PRIO_INIT_ADC + 1);
+DECLARE_HOOK(HOOK_INIT, base_detect_deferred, HOOK_PRIO_POST_CHIPSET);
 
 static void restart_state_machine(void)
 {
