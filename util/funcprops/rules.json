@@ -1,0 +1,157 @@
+[
+  {
+    "category": "ISR Context Violation",
+    "contexts": [
+      "ISR"
+    ],
+    "description": "Acquiring or releasing a mutex (k_mutex_lock/unlock) or I2C bus lock inside an ISR callback causes thread scheduling corruption.",
+    "exemption_props": [
+      "isr_ok"
+    ],
+    "match_target": true,
+    "path_matchers": [
+      "mutex_lock",
+      "mutex_unlock",
+      "k_mutex_lock",
+      "k_mutex_unlock",
+      "i2c_lock",
+      "i2c_unlock"
+    ],
+    "prohibited_props": [],
+    "required_absent_props": [],
+    "rule_id": "MUTEX_IN_ISR"
+  },
+  {
+    "category": "ISR Context Violation",
+    "contexts": [
+      "ISR"
+    ],
+    "description": "Functions marked @sleep yield threads or block unconditionally and cannot be called inside an interrupt handler.",
+    "exemption_props": [
+      "isr_ok"
+    ],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep"
+    ],
+    "required_absent_props": [
+      "no_wait"
+    ],
+    "rule_id": "SLEEP_IN_ISR"
+  },
+  {
+    "category": "Pre-Kernel Violation",
+    "contexts": [
+      "PRE_KERNEL"
+    ],
+    "description": "Acquiring or releasing mutexes during early PRE_KERNEL_1 / PRE_KERNEL_2 boot hooks before the kernel thread scheduler is online.",
+    "exemption_props": [
+      "pre_kernel_ok",
+      "isr_ok"
+    ],
+    "match_target": true,
+    "path_matchers": [
+      "mutex_lock",
+      "mutex_unlock",
+      "k_mutex_lock",
+      "k_mutex_unlock",
+      "i2c_lock",
+      "i2c_unlock"
+    ],
+    "prohibited_props": [],
+    "required_absent_props": [],
+    "rule_id": "MUTEX_IN_PRE_KERNEL"
+  },
+  {
+    "category": "Pre-Kernel Violation",
+    "contexts": [
+      "PRE_KERNEL"
+    ],
+    "description": "Calling unconditional sleep or thread-blocking functions during early boot initialization hooks before thread scheduling is active.",
+    "exemption_props": [
+      "pre_kernel_ok",
+      "isr_ok"
+    ],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep"
+    ],
+    "required_absent_props": [
+      "no_wait"
+    ],
+    "rule_id": "SLEEP_IN_PRE_KERNEL"
+  },
+  {
+    "category": "Sysworkq Context Violation",
+    "contexts": [
+      "SYSWORKQ"
+    ],
+    "description": "Calling unconditional sleep or thread-blocking functions on k_sys_work_q causes starvation of critical system work and watchdog timeouts.",
+    "exemption_props": [],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep"
+    ],
+    "required_absent_props": [
+      "no_wait"
+    ],
+    "rule_id": "SLEEP_IN_SYSWORKQ"
+  },
+  {
+    "category": "Sysworkq Context Violation",
+    "contexts": [
+      "SYSWORKQ"
+    ],
+    "description": "Calling timeout-parameterized synchronization primitives (mutexes, semaphores, queues) on k_sys_work_q can block when contested.",
+    "exemption_props": [],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep",
+      "no_wait"
+    ],
+    "required_absent_props": [],
+    "requires_flag": "include_timeout_primitives",
+    "rule_id": "TIMEOUT_SLEEP_IN_SYSWORKQ"
+  },
+  {
+    "category": "ISR Context Violation",
+    "contexts": [
+      "ISR"
+    ],
+    "description": "Performing synchronous I2C transactions (i2c_read/write/transceive) inside an ISR stalls interrupt processing for milliseconds due to clock stretching.",
+    "exemption_props": [
+      "isr_ok"
+    ],
+    "match_target": true,
+    "path_matchers": [
+      "i2c_read",
+      "i2c_write",
+      "i2c_transceive",
+      "i2c_transfer",
+      "i2c_write_read"
+    ],
+    "prohibited_props": [],
+    "required_absent_props": [],
+    "rule_id": "I2C_IN_ISR"
+  },
+  {
+    "category": "Critical Section Violation",
+    "contexts": [
+      "ISR",
+      "PRE_KERNEL",
+      "SYSWORKQ"
+    ],
+    "description": "Calling thread yielding or sleeping functions while holding an IRQ lock, spinlock, or scheduler lock causes deadlock.",
+    "exemption_props": [],
+    "path_matchers": [
+      "irq_lock",
+      "k_spin_lock",
+      "k_sched_lock"
+    ],
+    "prohibited_props": [
+      "sleep"
+    ],
+    "required_absent_props": [],
+    "rule_id": "SLEEP_IN_CRITICAL_SECTION"
+  }
+]
