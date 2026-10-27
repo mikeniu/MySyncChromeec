@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4d54527_73c86be4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T12:45:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `set_range()` in `driver/accelgyro_lsm6dso.c` now propagates `err` from `st_write_data_with_mask()` after unlocking `s-\u003emutex` instead of unconditionally returning `EC_SUCCESS`.\n* **Architecture \u0026 Component Fit:** ✅ Error propagation and mutex handling in `set_range()` match `set_data_rate()` in the same driver and `set_range()` across sibling ST motion sensor drivers.\n* **Code Simplicity:** ✅ The 1-line fix and unit test are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Reuses existing register, range, and error constants (`LSM6DSO_ACCEL_FS_ADDR`, `LSM6DSO_ACCEL_FS_MAX_VAL`, `EC_ERROR_INVAL`, `I2C_COMMON_EMUL_NO_FAIL_REG`) with no magic numbers.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ `test_set_range_write_error` sets a baseline range (`LSM6DSO_ACCEL_FS_MAX_VAL / 2`) so `st_write_data_with_mask()` does not short-circuit on an unchanged register value, injects a write failure on `LSM6DSO_ACCEL_FS_ADDR`, asserts the exact error code (`EC_ERROR_INVAL`), verifies `acc-\u003ecurrent_range` is unchanged on failure, and restores emulator and sensor state.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+18, -1)` — Single, atomic bug fix with its unit test.\n* **Commit Message:** ✅ Concise prose explaining why the change is needed and what changed, with valid `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/81f62773-4418-4bf9-aeaa-59b9a5688a18)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b9d0714d63edc09ae8f52034f7ad51f21da09bfe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
