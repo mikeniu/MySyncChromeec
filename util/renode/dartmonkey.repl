@@ -4,9 +4,45 @@
 
 using "platforms/cpus/stm32h743.repl"
 
+cpu:
+    fpuInterruptNumber: 81
+
+lptimer1:
+    frequency: 32000
+
+timer2:
+    frequency: 64000000
+
+timer16:
+    frequency: 64000000
+
 GPIO_WP: Miscellaneous.Button @ gpioPortB 7
     invert: true
     -> gpioPortB@7
+    init:
+        ReleaseOnReset false
+
+GPIO_SLP: Miscellaneous.Button @ gpioPortD 13
+    invert: true
+    -> gpioPortD@13
+    init:
+        ReleaseOnReset false
+
+GPIO_SLP_ALT: Miscellaneous.Button @ gpioPortA 11
+    invert: true
+    -> gpioPortA@11
+    init:
+        ReleaseOnReset false
+
+GPIO_SLP_ALT_DEV: Miscellaneous.Button @ gpioPortD 14
+    invert: true
+    -> gpioPortD@14
+    init:
+        ReleaseOnReset false
+
+GPIO_TRANSPORT_SEL: Miscellaneous.Button @ gpioPortB 1
+    invert: true
+    -> gpioPortB@1
     init:
         ReleaseOnReset false
 
