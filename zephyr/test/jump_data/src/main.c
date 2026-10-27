@@ -501,4 +501,10 @@ ZTEST(jump_data, test_init_aborted_sysjump_watchdog_reset)
 	}
 }
 
+ZTEST(jump_data, test_pre_system_jump_defaults)
+{
+	chip_pre_system_jump();
+	arch_pre_system_jump();
+}
+
 ZTEST_SUITE(jump_data, NULL, NULL, jump_data_before, NULL, NULL);

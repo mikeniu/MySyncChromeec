@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "hooks.h"
 #include "system.h"
 
 #include <errno.h>
@@ -15,7 +14,7 @@
 
 LOG_MODULE_REGISTER(riscv_mpu, LOG_LEVEL_ERR);
 
-static void prepare_for_sysjump_to_ec(void)
+void arch_pre_system_jump(void)
 {
 	/*
 	 * Clear all Physical Memory Protection (PMP) entries before jumping to
@@ -26,7 +25,6 @@ static void prepare_for_sysjump_to_ec(void)
 	 */
 	z_riscv_pmp_clear_all();
 }
-DECLARE_HOOK(HOOK_SYSJUMP, prepare_for_sysjump_to_ec, HOOK_PRIO_LAST);
 
 #if defined(CONFIG_PLATFORM_EC_ROLLBACK_MPU_PROTECT)
 
