@@ -827,9 +827,17 @@ static void handle_watchdog_reset(void)
 		 */
 		else if ((reason != PANIC_SW_WATCHDOG &&
 			  reason != PANIC_SW_WATCHDOG_HARD) ||
-			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
+			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD)
 			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
-		}
+		/* Pre-2024 factory RO logs unhandled watchdog resets as
+		 * PANIC_SW_WATCHDOG with zeroed info/exception and no image
+		 * flags. Promote that to PANIC_SW_WATCHDOG_HARD in RW.
+		 */
+		else if (IS_ENABLED(CONFIG_LEGACY_RO_WATCHDOG_PANIC) &&
+			 reason == PANIC_SW_WATCHDOG && !info && !exception &&
+			 !(pdata->flags & (PANIC_DATA_FLAG_RW_IMAGE |
+					   PANIC_DATA_FLAG_RO_IMAGE)))
+			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
 	}
 }
 
