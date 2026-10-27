@@ -22,6 +22,30 @@
       },
       "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f52d8d7_f5095edb",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-27T11:46:28Z",
+      "side": 1,
+      "message": "Hey, I\u0027d debating whether we really need this in the first place after https://github.com/zephyrproject-rtos/zephyr/pull/122765, when I did my initial tests the gpio interrupt on ite was the main source of problems but on npcx I did not quite see enough traffic on the system workqueue to justify the complexity. My fear is that once we dedicate 1k of sram to this thread we\u0027ll never get rid of it even if maybe we don\u0027t really need it. Then we\u0027d inevitably end up having an endless stream of options and discussions on what to move on the main and alternate queue ec.\n\nI think it\u0027s worth reconsidering this now that the ite gpio driver has been fixed, but even then maybe it\u0027d be a better idea to try and add multiple workers support in the upstream system workqueue instead so concurrent tasks would be redistributed automatically, though then you could still have high contention if N workers are sleeping.\n\nI just don\u0027t feel like we currently have enough data to take a solid decision here.",
+      "parentUuid": "c307adb1_b51cbd4e",
+      "range": {
+        "startLine": 214,
+        "startChar": 7,
+        "endLine": 214,
+        "endChar": 34
+      },
+      "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
