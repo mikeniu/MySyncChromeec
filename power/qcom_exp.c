@@ -366,6 +366,8 @@ static void power_ac_changed(void)
 }
 DECLARE_HOOK(HOOK_AC_CHANGE, power_ac_changed, HOOK_PRIO_DEFAULT);
 
+static uint8_t boot_from_off, shutdown_from_on;
+
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_ENABLE_OFFMODE_HEARTBEAT
 
 /* 1 if the system is currently in the off-mode charging heartbeat state. */
@@ -418,7 +420,8 @@ void board_chipset_set_heartbeat_alarm_on_shutdown(void)
 		/* Move heart beat to RTC alarm based wake (45min) */
 		system_set_rtc_alarm(HEARTBEAT_WAKE_INTERVAL_SEC, 0);
 		heartbeat_mode = 0;
-	} else if (extpower_is_present()) {
+	} else if (extpower_is_present() &&
+		   shutdown_from_on == POWER_OFF_BY_POWER_GOOD_LOST) {
 		/* If chipset shutdown and external power is connected, wake
 		 * after 30 seconds to boot the AP and enable charging.
 		 * This short delay ensures the system is fully powered down
@@ -1299,8 +1302,6 @@ power_chipset_handle_host_sleep_event(enum host_sleep_event state,
  */
 test_mockable enum power_state power_handle_state(enum power_state state)
 {
-	static uint8_t boot_from_off, shutdown_from_on;
-
 	switch (state) {
 	case POWER_G3:
 		boot_from_off = check_for_power_on_event();
