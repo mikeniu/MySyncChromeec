@@ -87,6 +87,24 @@
       "parentUuid": "af1ffb97_3e3de833",
       "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e75f446_ebcf91a4",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-27T10:47:06Z",
+      "side": 1,
+      "message": "I know it can be resolved in this way but the `system_jumped_to_this_image` is specific to chromiumOS as part of the legacy when the switchcap driver could be a pure zephyr one, it also ties up the switchcap with specific expectations to the power sequencing which I would rather avoid. So I would prefer not adding it.",
+      "parentUuid": "a2a4224a_b290bc8e",
+      "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
