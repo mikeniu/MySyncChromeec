@@ -148,6 +148,12 @@
 #define CONFIG_KEYBOARD_REFRESH_ROW3
 #define CONFIG_KEYBOARD_FACTORY_TEST
 
+/* WATCHDOG_PERIOD_MS */
+#undef CONFIG_WATCHDOG_PERIOD_MS
+#define CONFIG_WATCHDOG_PERIOD_MS 2600
+
+#define CONFIG_ALLOW_UNALIGNED_ACCESS
+
 #ifndef __ASSEMBLER__
 
 #include "gpio_signal.h" /* needed by registers.h */
