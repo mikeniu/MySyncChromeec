@@ -43,9 +43,15 @@ void watchdog_trace(uint32_t excep_lr, uint32_t excep_sp)
 	 * actually occurs. If no watchdog reset occurs, this watchdog warning
 	 * panic may still be collected by the kernel and handled as a
 	 * non-fatal EC panic.
+	 *
+	 * On boards with CONFIG_LEGACY_RO_WATCHDOG_PANIC, set
+	 * PANIC_SW_WATCHDOG directly so pre-2024 factory-locked RO preserves
+	 * the faulting PC and task ID across reboot into RW.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, stack[STACK_IDX_REG_PC],
-			 task_get_current());
+	panic_set_reason(IS_ENABLED(CONFIG_LEGACY_RO_WATCHDOG_PANIC) ?
+				 PANIC_SW_WATCHDOG :
+				 PANIC_SW_WATCHDOG_WARN,
+			 stack[STACK_IDX_REG_PC], task_get_current());
 
 	panic_printf("### WATCHDOG PC=%08x / LR=%08x / pSP=%08x ",
 		     stack[STACK_IDX_REG_PC], stack[STACK_IDX_REG_LR], psp);

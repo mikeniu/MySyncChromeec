@@ -5739,6 +5739,13 @@
 #define CONFIG_AUX_TIMER_PERIOD_MS \
 	(CONFIG_WATCHDOG_PERIOD_MS - CONFIG_WATCHDOG_WARNING_LEADING_TIME_MS)
 
+/*
+ * Set PANIC_SW_WATCHDOG instead of PANIC_SW_WATCHDOG_WARN on a watchdog
+ * warning. Enable on boards with pre-2024 factory-locked RO that overwrites
+ * panic data on a watchdog reset whenever the reason is not PANIC_SW_WATCHDOG.
+ */
+#undef CONFIG_LEGACY_RO_WATCHDOG_PANIC
+
 /*****************************************************************************/
 
 /*****************************************************************************/
