@@ -169,6 +169,7 @@ struct i2c_cmd_desc_t {
  * The transfer is strictly atomic, by locking the I2C port and performing an
  * I2C_XFER_SINGLE transfer.
  *
+ * @sleep
  * @param port		Port to access
  * @param addr_flags	Peripheral device address
  * @param out		Data to send
@@ -184,6 +185,7 @@ int i2c_xfer(const int port, const uint16_t addr_flags, const uint8_t *out,
  * Same as i2c_xfer, but the bus is not implicitly locked.  It must be called
  * between i2c_lock(port, 1) and i2c_lock(port, 0).
  *
+ * @sleep
  * @param flags		Flags (see I2C_XFER_* above)
  */
 int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
@@ -192,6 +194,8 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 
 /**
  * Lock / unlock an I2C port.
+ *
+ * @sleep
  * @param port		Port to lock
  * @param lock		1 to lock, 0 to unlock
  */
