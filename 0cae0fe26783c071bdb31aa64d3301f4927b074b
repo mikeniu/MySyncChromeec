@@ -16,6 +16,24 @@
       "message": "There will be risk of ghost key triggering without proper masking in EC. Have you considered about it? Also you can just revert the original CL instead submitting this one.",
       "revId": "0cae0fe26783c071bdb31aa64d3301f4927b074b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a9c1182_c998fd14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-27T13:28:15Z",
+      "side": 1,
+      "message": "1. Lenovo confirm we should align with Mica, since mica use the same solution.\n2. We still need modify the actual-key-mask field in keyboard.dtis even though we revert the original CL. So it\u0027s better to keep this CL.",
+      "parentUuid": "1b60c914_3872dd6e",
+      "revId": "0cae0fe26783c071bdb31aa64d3301f4927b074b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
