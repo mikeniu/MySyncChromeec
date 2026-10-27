@@ -1,4 +1,4 @@
-/* Copyright 2025 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -6,7 +6,6 @@
 #include "charge_state.h"
 #include "chipset.h"
 #include "driver/charger/isl923x_public.h"
-#include "driver/retimer/anx7483_public.h"
 #include "driver/tcpm/raa489000.h"
 #include "driver/tcpm/tcpci.h"
 #include "hooks.h"
@@ -16,6 +15,25 @@
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(nissa, CONFIG_NISSA_LOG_LEVEL);
+
+#if DT_NODE_EXISTS(DT_NODELABEL(gpio_en_usb_c0_cc1_vconn))
+/* Vconn control for integrated ITE TCPC */
+void board_pd_vconn_ctrl(int port, enum usbpd_cc_pin cc_pin, int enabled)
+{
+	/* Vconn control is only for port 0 */
+	if (port)
+		return;
+
+	if (cc_pin == USBPD_CC_PIN_1)
+		gpio_pin_set_dt(
+			GPIO_DT_FROM_NODELABEL(gpio_en_usb_c0_cc1_vconn),
+			!!enabled);
+	else
+		gpio_pin_set_dt(
+			GPIO_DT_FROM_NODELABEL(gpio_en_usb_c0_cc2_vconn),
+			!!enabled);
+}
+#endif
 
 int board_is_sourcing_vbus(int port)
 {
@@ -201,6 +219,14 @@ void board_process_pd_alert(int port)
 	} else {
 		gpio = GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl);
 	}
+
+#if !defined(CONFIG_BOARD_GLASSWAY) && !defined(CONFIG_BOARD_GUREN) && \
+	!defined(CONFIG_TEST_NISSA_GLASSWAY) &&                        \
+	!defined(CONFIG_TEST_NISSA_GUREN)
+	if (!gpio_pin_get_dt(gpio)) {
+		usb_charger_task_set_event_sync(port, USB_CHG_EVENT_BC12);
+	}
+#endif
 
 	/*
 	 * Immediately schedule another TCPC interrupt if it seems we haven't
