@@ -818,16 +818,16 @@ static void handle_watchdog_reset(void)
 		 * the reason to a regular watchdog reason while preserving
 		 * the info and exception from the watchdog warning.
 		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN)
+		if (reason == PANIC_SW_WATCHDOG_WARN) {
 			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
-		/* The watchdog panic info may have already been initialized by
-		 * the watchdog handler, so only set it here if the panic reason
-		 * is not a watchdog or the panic info has already been read,
-		 * i.e. an old watchdog panic.
-		 */
-		else if ((reason != PANIC_SW_WATCHDOG &&
-			  reason != PANIC_SW_WATCHDOG_HARD) ||
-			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
+		} else if (!pdata ||
+			   (reason != PANIC_SW_WATCHDOG &&
+			    reason != PANIC_SW_WATCHDOG_HARD) ||
+			   (pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD)) {
+			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
+		} else if (IS_ENABLED(CONFIG_LEGACY_RO_WATCHDOG_PANIC) &&
+			   reason == PANIC_SW_WATCHDOG &&
+			   !(pdata->flags & PANIC_DATA_FLAG_RW_IMAGE)) {
 			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
 		}
 	}
