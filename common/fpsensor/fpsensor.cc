@@ -358,9 +358,20 @@ extern "C" void fp_task(void)
 				timeout_us = FINGER_POLLING_DELAY;
 			else
 				timeout_us = -1;
-			if (mode & FP_MODE_ANY_WAIT_IRQ) {
-				gpio_clear_pending_interrupt(GPIO_FPS_INT);
-				gpio_enable_interrupt(GPIO_FPS_INT);
+			if (mode & FP_MODE_ANY_DETECT_FINGER) {
+				/*
+				 * FP_MODE_ANY_WAIT_IRQ is a subset of
+				 * FP_MODE_ANY_DETECT_FINGER. In Zephyr FPMCU
+				 * interrupts are enabled by the sensor driver
+				 * when configuring finger detection.
+				 */
+#ifndef CONFIG_ZEPHYR
+				if (mode & FP_MODE_ANY_WAIT_IRQ) {
+					gpio_clear_pending_interrupt(
+						GPIO_FPS_INT);
+					gpio_enable_interrupt(GPIO_FPS_INT);
+				}
+#endif
 			} else if (mode & FP_MODE_RESET_SENSOR) {
 				fp_reset_and_clear_context();
 				global_context.sensor_mode &=
@@ -406,6 +417,7 @@ extern "C" void fp_task(void)
 			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
 			 * migration to Zephyr is completed.
 			 */
+#ifndef CONFIG_ZEPHYR
 			gpio_disable_interrupt(GPIO_FPS_INT);
 			if (global_context.sensor_mode &
 			    FP_MODE_ANY_DETECT_FINGER) {
@@ -445,7 +457,14 @@ extern "C" void fp_task(void)
 				fp_configure_detect();
 				gpio_clear_pending_interrupt(GPIO_FPS_INT);
 				gpio_enable_interrupt(GPIO_FPS_INT);
-			} else {
+#endif
+			} else if (!(global_context.sensor_mode &
+				     FP_MODE_FINGER_UP)) {
+				/*
+				 * In Zephyr FPMCU interrupts are managed by
+				 * the driver.
+				 */
+#ifndef CONFIG_ZEPHYR
 				if (evt & (TASK_EVENT_SENSOR_IRQ))
 					gpio_clear_pending_interrupt(
 						GPIO_FPS_INT);
