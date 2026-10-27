@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "599ecf36_a1d4e3b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-27T20:54:53Z",
+      "side": 1,
+      "message": "nit: extra word?",
+      "range": {
+        "startLine": 9,
+        "startChar": 45,
+        "endLine": 9,
+        "endChar": 49
+      },
+      "revId": "da1aca1e23170f4104684b397c0642665568e8c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a45a54ff_9478eb3e",
+        "filename": "chip/mchp/adc.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-27T20:54:53Z",
+      "side": 1,
+      "message": "why not ADC_READ_ERROR?",
+      "range": {
+        "startLine": 106,
+        "startChar": 9,
+        "endLine": 106,
+        "endChar": 25
+      },
+      "revId": "da1aca1e23170f4104684b397c0642665568e8c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
