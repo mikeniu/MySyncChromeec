@@ -57,6 +57,23 @@ ZTEST(timer, test_console_cmd_timerinfo)
 	/* Task timer information not printed here if running in a Zephyr EC */
 }
 
+ZTEST(timer, test_get_time_microsecond_resolution)
+{
+	if (!IS_ENABLED(CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER)) {
+		ztest_test_skip();
+		return;
+	}
+
+	const uint32_t wait_us = 10;
+	const uint32_t tolerance_us = 2;
+	timestamp_t start = get_time();
+
+	k_busy_wait(wait_us);
+
+	zassert_between_inclusive(time_since32(start), wait_us,
+				  wait_us + tolerance_us);
+}
+
 static void reset(void *data)
 {
 	ARG_UNUSED(data);
