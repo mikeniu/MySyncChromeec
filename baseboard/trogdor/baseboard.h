@@ -38,6 +38,7 @@
 #define CONFIG_SPI_FLASH_W25Q80 /* Internal SPI flash type. */
 
 /* EC Modules */
+#define CONFIG_LEGACY_RO_WATCHDOG_PANIC
 #define CONFIG_I2C
 #define CONFIG_I2C_CONTROLLER
 #define CONFIG_I2C_VIRTUAL_BATTERY
