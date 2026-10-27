@@ -1,4 +1,4 @@
-/* Copyright 2024 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -24,7 +24,7 @@
 
 LOG_MODULE_DECLARE(nissa, CONFIG_NISSA_LOG_LEVEL);
 
-#ifdef CONFIG_USB_PD_TCPM_ITE_ON_CHIP
+#if defined(CONFIG_BOARD_TELITH) && defined(CONFIG_USB_PD_TCPM_ITE_ON_CHIP)
 const struct cc_para_t *board_get_cc_tuning_parameter(enum usbpd_port port)
 {
 	const static struct cc_para_t
