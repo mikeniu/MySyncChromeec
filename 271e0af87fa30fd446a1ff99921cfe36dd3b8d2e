@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1745ec2d_e8cb6423",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T12:47:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality:** ✅ `set_data_rate()` in `driver/accelgyro_lsm6dso.c` now captures and returns the error code from `accelgyro_config_fifo(s)`.\n* **Architecture \u0026 Component Fit:** ✅ `emul_lsm6dso_get_i2c_common_data()` follows the established `emul_*_get_i2c_common_data()` pattern used across sibling Zephyr I2C sensor emulators.\n* **Code Simplicity:** ✅ The fix, emulator accessor, and unit test are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Uses existing register, ODR, and error constants (`LSM6DSO_FIFO_CTRL3_ADDR`, `LSM6DSO_FIFO_CTRL4_ADDR`, `LSM6DSO_ODR_MIN_VAL`, `EC_ERROR_INVAL`, `I2C_COMMON_EMUL_NO_FAIL_REG`) and `ARRAY_SIZE`.\n* **Security:** ✅ No security concerns; propagating FIFO configuration failures prevents callers from assuming FIFO reconfiguration succeeded after an I2C write error.\n* **Testing:** ✅ `test_set_data_rate_fifo_error` injects I2C write failures on both `LSM6DSO_FIFO_CTRL3_ADDR` and `LSM6DSO_FIFO_CTRL4_ADDR` and asserts that `set_data_rate()` returns `EC_ERROR_INVAL`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+41, -1)`. Focused single logical change pairing the 1-line bug fix with its emulator error-injection accessor and unit test.\n* **Commit Message:** ✅ Clear, concise problem statement and solution summary with standard `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/02c79afb-b41d-4f27-b863-fc7b3d1f0ebc)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "271e0af87fa30fd446a1ff99921cfe36dd3b8d2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
