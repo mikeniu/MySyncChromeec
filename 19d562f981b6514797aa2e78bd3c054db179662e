@@ -34,6 +34,24 @@
       "parentUuid": "06c473da_b18020f7",
       "revId": "19d562f981b6514797aa2e78bd3c054db179662e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4cd4f8a_3cd36d3c",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T12:40:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40d467b6_eb4a610b",
+      "revId": "19d562f981b6514797aa2e78bd3c054db179662e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
