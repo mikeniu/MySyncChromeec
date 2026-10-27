@@ -24,6 +24,7 @@ tests:
     extra_configs:
       - CONFIG_TEST_BOARD_GOTHRAX=y
       - CONFIG_TEST_EXTPOWER=y
+      - CONFIG_TEST_SRC="src/gothrax_charger.c"
     extra_dtc_overlay_files:
       - boards/native_sim.overlay
       - boards/charger.gothrax.overlay
@@ -32,11 +33,13 @@ tests:
     extra_configs:
       - CONFIG_TEST_BOARD_NIVVIKS=y
       - CONFIG_TEST_EXTPOWER=y
+      - CONFIG_TEST_SRC="src/charger_raa489000.c"
 
   isl923x.extpower.nissa.pirrha:
     extra_configs:
       - CONFIG_TEST_BOARD_PIRRHA=y
       - CONFIG_TEST_EXTPOWER=y
+      - CONFIG_TEST_SRC="src/charger_raa489000.c"
 
   isl923x.extpower.nissa.pujjo:
     extra_configs:
@@ -47,6 +50,7 @@ tests:
     extra_configs:
       - CONFIG_TEST_BOARD_ULDREN=y
       - CONFIG_TEST_EXTPOWER=y
+      - CONFIG_TEST_SRC="src/charger_raa489000.c"
 
   isl923x.extpower.nissa.xivu:
     extra_dtc_overlay_files:
@@ -55,6 +59,7 @@ tests:
     extra_configs:
       - CONFIG_TEST_BOARD_XIVU=y
       - CONFIG_TEST_EXTPOWER=y
+      - CONFIG_TEST_SRC="src/charger_raa489000.c"
 
   charge.manager:
     extra_dtc_overlay_files:

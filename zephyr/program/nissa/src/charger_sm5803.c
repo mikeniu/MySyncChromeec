@@ -1,9 +1,10 @@
-/* Copyright 2022 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
 
 #include "battery.h"
+#include "battery_fuel_gauge.h"
 #include "charger.h"
 #include "console.h"
 #include "driver/charger/sm5803.h"
@@ -30,7 +31,7 @@ int extpower_is_present(void)
 }
 
 /*
- * Yavilla does not have a GPIO indicating whether extpower is present,
+ * Board does not have a GPIO indicating whether extpower is present,
  * so detect using the charger(s).
  */
 __override void board_check_extpower(void)
@@ -53,3 +54,23 @@ __override void board_hibernate(void)
 	LOG_INF("Charger(s) hibernated");
 	cflush();
 }
+
+#if defined(CONFIG_BOARD_YAVIKS) || defined(CONFIG_BOARD_YAVISTA) || \
+	defined(CONFIG_TEST_NISSA_YAVIKS)
+__override int board_get_default_battery_type(void)
+{
+	int type = DEFAULT_BATTERY_TYPE;
+	int cells;
+
+	if (charger_get_battery_cells(CHARGER_PRIMARY, &cells) == EC_SUCCESS) {
+		if (cells == 3)
+			type = DEFAULT_BATTERY_TYPE_3S;
+		if (cells != 2 && cells != 3)
+			LOG_ERR("Unexpected number of cells");
+	} else {
+		LOG_ERR("Failed to get default battery type");
+	}
+
+	return type;
+}
+#endif
