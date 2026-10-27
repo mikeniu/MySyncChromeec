@@ -133,6 +133,8 @@ int uart_getc(void);
 
 /**
  * Flush the transmit FIFO.
+ *
+ * @sleep
  */
 void uart_tx_flush(void);
 
