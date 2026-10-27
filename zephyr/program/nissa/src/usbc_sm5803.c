@@ -1,4 +1,4 @@
-/* Copyright 2023 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -144,8 +144,14 @@ uint16_t tcpc_get_alert_status(void)
 	int regval;
 
 	/* Is the C1 port present and its IRQ line asserted? */
+#if defined(CONFIG_BOARD_QUANDISO) || defined(CONFIG_BOARD_QUANDISO2) || \
+	defined(CONFIG_TEST_NISSA_QUANDISO) ||                           \
+	defined(CONFIG_TEST_NISSA_QUANDISO2)
 	if (board_get_usb_pd_port_count() == 2 &&
 	    !gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl))) {
+#else
+	if (!gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl))) {
+#endif
 		/*
 		 * C1 IRQ is shared between charger and TCPC; poll TCPC to see
 		 * if it asserted the IRQ.
@@ -231,7 +237,7 @@ __override void board_set_charge_limit(int port, int supplier, int charge_ma,
 				       int max_ma, int charge_mv)
 {
 	/*
-	 * b:213937755: Quandiso C1 port is OCPC (One Charger IC Per Type-C)
+	 * b:213937755: C1 port is OCPC (One Charger IC Per Type-C)
 	 * architecture, The charging current is controlled by increasing Vsys.
 	 * However, the charger SM5803 is not limit current while Vsys
 	 * increasing, we can see the current overshoot to ~3.6A to cause

@@ -1,4 +1,4 @@
-/* Copyright 2022 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -41,8 +41,10 @@ void board_pd_vconn_ctrl(int port, enum usbpd_cc_pin cc_pin, int enabled)
 
 __override bool pd_check_vbus_level(int port, enum vbus_level level)
 {
+#if defined(CONFIG_BOARD_YAVIKS) || defined(CONFIG_TEST_NISSA_YAVIKS)
 	if (port < 0 || port >= board_get_usb_pd_port_count())
 		return false;
+#endif
 
 	return sm5803_check_vbus_level(port, level);
 }
@@ -188,7 +190,11 @@ int pd_set_power_supply_ready(int port)
 {
 	enum ec_error_list rv;
 
+#if defined(CONFIG_BOARD_YAVIKS) || defined(CONFIG_TEST_NISSA_YAVIKS)
 	if (port < 0 || port >= board_get_usb_pd_port_count()) {
+#else
+	if (port < 0 || port > board_get_usb_pd_port_count()) {
+#endif
 		LOG_WRN("Port C%d does not exist, cannot enable VBUS", port);
 		return EC_ERROR_INVAL;
 	}
@@ -225,8 +231,10 @@ __override void typec_set_source_current_limit(int port, enum tcpc_rp_value rp)
 	int rv;
 	const int current = rp == TYPEC_RP_3A0 ? 3000 : 1500;
 
+#if defined(CONFIG_BOARD_YAVIKS) || defined(CONFIG_TEST_NISSA_YAVIKS)
 	if (port < 0 || port >= board_get_usb_pd_port_count())
 		return;
+#endif
 
 	rv = charger_set_otg_current_voltage(port, current, 5000);
 	if (rv != EC_SUCCESS) {
@@ -307,6 +315,7 @@ void usb_c1_interrupt(enum gpio_signal s)
 	schedule_deferred_pd_interrupt(1);
 }
 
+#if defined(CONFIG_BOARD_YAVIKS) || defined(CONFIG_TEST_NISSA_YAVIKS)
 #define RETRY_COUNT 3
 
 static bool pi3usb9201_is_exist;
@@ -335,6 +344,7 @@ __override bool board_usb_charger_support(void)
 {
 	return pi3usb9201_is_exist;
 }
+#endif
 
 /*
  * Check state of IRQ lines at startup, ensuring an IRQ that happened before
@@ -346,7 +356,9 @@ __override bool board_usb_charger_support(void)
  */
 void board_handle_initial_typec_irq(void)
 {
+#if defined(CONFIG_BOARD_YAVIKS) || defined(CONFIG_TEST_NISSA_YAVIKS)
 	board_has_bc12_detected();
+#endif
 
 	check_c0_line();
 	/*
@@ -404,8 +416,10 @@ int pd_snk_is_vbus_provided(int port)
 {
 	int chg_det = 0;
 
+#if defined(CONFIG_BOARD_YAVIKS) || defined(CONFIG_TEST_NISSA_YAVIKS)
 	if (port < 0 || port >= board_get_usb_pd_port_count())
 		return 0;
+#endif
 
 	sm5803_get_chg_det(port, &chg_det);
 
