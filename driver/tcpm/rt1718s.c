@@ -47,9 +47,13 @@ static int rt1718s_write(int port, int reg, int val, int len)
 					  tcpc_config[port].i2c_info.addr_flags,
 					  reg, val, len);
 	} else if (len == 1) {
-		return tcpc_write(port, reg, val);
+		return i2c_write8(tcpc_config[port].i2c_info.port,
+				  tcpc_config[port].i2c_info.addr_flags, reg,
+				  val);
 	} else {
-		return tcpc_write16(port, reg, val);
+		return i2c_write16(tcpc_config[port].i2c_info.port,
+				   tcpc_config[port].i2c_info.addr_flags, reg,
+				   val);
 	}
 }
 
@@ -60,9 +64,13 @@ static int rt1718s_read(int port, int reg, int *val, int len)
 					 tcpc_config[port].i2c_info.addr_flags,
 					 reg, val, len);
 	} else if (len == 1) {
-		return tcpc_read(port, reg, val);
+		return i2c_read8(tcpc_config[port].i2c_info.port,
+				 tcpc_config[port].i2c_info.addr_flags, reg,
+				 val);
 	} else {
-		return tcpc_read16(port, reg, val);
+		return i2c_read16(tcpc_config[port].i2c_info.port,
+				  tcpc_config[port].i2c_info.addr_flags, reg,
+				  val);
 	}
 }
 

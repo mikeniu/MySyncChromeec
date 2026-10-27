@@ -9,6 +9,7 @@
 #include "test/drivers/test_state.h"
 #include "test_common.h"
 
+#include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
 
@@ -113,4 +114,44 @@ ZTEST(rt1718s_gpio, test_command_rt1718s_gpio)
 {
 	zassert_ok(shell_execute_cmd(get_ec_shell(), "rt1718s_gpio"),
 		   "Cannot execute command to get gpio on rt1718s");
+}
+
+struct gpio_sysworkq_test_data {
+	struct k_work work;
+	struct k_sem done;
+	int level;
+};
+
+static struct gpio_sysworkq_test_data test_gpio_data;
+
+static void gpio_sysworkq_test_work_handler(struct k_work *work)
+{
+	struct gpio_sysworkq_test_data *data =
+		CONTAINER_OF(work, struct gpio_sysworkq_test_data, work);
+
+	rt1718s_gpio_set_level(tcpm_rt1718s_port, RT1718S_GPIO1, 1);
+	data->level = rt1718s_gpio_get_level(tcpm_rt1718s_port, RT1718S_GPIO1);
+
+	k_sem_give(&data->done);
+}
+
+ZTEST(rt1718s_gpio, test_gpio_sysworkq)
+{
+	struct k_work_sync sync;
+
+	k_sem_init(&test_gpio_data.done, 0, 1);
+	k_work_init(&test_gpio_data.work, gpio_sysworkq_test_work_handler);
+
+	/* Set up GPIO1 as output high in emulator */
+	zassert_ok(rt1718s_emul_set_reg(rt1718s_emul,
+					RT1718S_GPIO_CTRL(RT1718S_GPIO1),
+					RT1718S_GPIO_CTRL_I));
+
+	k_work_submit(&test_gpio_data.work);
+
+	zassert_equal(k_sem_take(&test_gpio_data.done, K_MSEC(50)), 0,
+		      "GPIO operation did not complete in time on sysworkq");
+	zassert_equal(test_gpio_data.level, 1, "Expected GPIO level 1");
+
+	k_work_flush(&test_gpio_data.work, &sync);
 }
