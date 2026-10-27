@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93aa4d13_42f87d74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-27T16:28:18Z",
+      "side": 1,
+      "message": "No objection to the documentation as such. Some of the instructions seem like they might lend themselves to some kind of script.",
+      "revId": "8973df4ad7b1a08529dd879a31b03001db0a73ae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29285cbb_19bfbf1f",
+        "filename": "docker/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-27T16:28:18Z",
+      "side": 1,
+      "message": "If we start using `docker compose`, would it make sense to copy the `compose.yaml` to the satlab and use that here?",
+      "revId": "8973df4ad7b1a08529dd879a31b03001db0a73ae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c27f221_0478591b",
+        "filename": "docker/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-27T16:28:18Z",
+      "side": 1,
+      "message": "This could also be a `docker run` command or named compose service. Either of those would avoid the subtlety of, \"Run this inside the container.\"",
+      "revId": "8973df4ad7b1a08529dd879a31b03001db0a73ae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
