@@ -5,9 +5,9 @@
 
 / {
 	switchcap: switchcap {
-		compatible = "cros-ec,switchcap";
+		compatible = "cros-ec,switchcap-adc";
 		enable-gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
-		power-good-gpios = <&gpiof 0 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+		power-good-adc = <&adc_ec_vph_pwr_det>;
 	};
 
 	qcom_ap_pwrseq: qcom-ap-pwrseq {

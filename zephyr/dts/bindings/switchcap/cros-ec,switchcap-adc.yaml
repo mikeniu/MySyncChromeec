@@ -1,0 +1,33 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ChromiumOS Switchcap Driver with ADC power-good monitoring
+
+compatible: "cros-ec,switchcap-adc"
+
+properties:
+  enable-gpios:
+    type: phandle-array
+    required: true
+    description: Output GPIO used to enable the switchcap.
+
+  power-good-adc:
+    type: phandle
+    required: true
+    description: Named ADC channel node used to read switchcap voltage (mV).
+
+  power-good-threshold-mv:
+    type: int
+    default: 2000
+    description: Voltage threshold in mV above which switchcap is power-good.
+
+  power-reset-threshold-mv:
+    type: int
+    default: 10
+    description: |
+      Voltage threshold in mV at or below which switchcap is in reset state.
+
+  power-off-delay-ms:
+    type: int
+    description: Additional power-off delay in milliseconds.

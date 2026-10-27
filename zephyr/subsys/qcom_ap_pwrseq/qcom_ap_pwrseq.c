@@ -33,7 +33,9 @@ BUILD_ASSERT(
 	"Exactly one instance of cros-ec,qcom-ap-pwrseq should be defined.");
 
 BUILD_ASSERT(DT_NODE_HAS_COMPAT(DT_INST_PHANDLE(0, switchcap),
-				cros_ec_switchcap),
+				cros_ec_switchcap) ||
+		     DT_NODE_HAS_COMPAT(DT_INST_PHANDLE(0, switchcap),
+					cros_ec_switchcap_adc),
 	     "switchcap property must reference a cros-ec,switchcap device");
 
 /* Timing constants from power/qcom.c */

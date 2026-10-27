@@ -218,8 +218,3 @@ gpio_ap_plt_rst_n: &gpio_plt_rst_odl {};
 gpio_sleep_indicator: &gpio_sys_in_suspend {};
 gpio_soc_ps_hold_ls: &gpio_soc_ps_hold_ls {};
 gpio_sys_rst_odl: &gpio_sys_rst_odl {};
-
-/*
- * Aliases switchcap to common names
- */
-gpio_ec_en_vph_pwr_1a: &gpio_ec_en_vph_pwr_1a_s5_r {};

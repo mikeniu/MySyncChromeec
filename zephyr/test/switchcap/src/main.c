@@ -59,6 +59,7 @@ ZTEST(switchcap, test_is_power_good_true)
 	zassert_ok(gpio_emul_input_set(power_good_gpio.port,
 				       power_good_gpio.pin, 1));
 	zassert_true(cros_switchcap_is_power_good(switchcap_dev));
+	zassert_false(cros_switchcap_is_power_reset(switchcap_dev));
 }
 
 ZTEST(switchcap, test_is_power_good_false)
@@ -66,6 +67,7 @@ ZTEST(switchcap, test_is_power_good_false)
 	zassert_ok(gpio_emul_input_set(power_good_gpio.port,
 				       power_good_gpio.pin, 0));
 	zassert_false(cros_switchcap_is_power_good(switchcap_dev));
+	zassert_true(cros_switchcap_is_power_reset(switchcap_dev));
 }
 
 ZTEST(switchcap, test_set_power_enable)

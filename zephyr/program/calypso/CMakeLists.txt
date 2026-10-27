@@ -15,8 +15,6 @@ if(DEFINED CONFIG_BOARD_C1NV)
 endif()
 
 zephyr_library_sources("src/battery.c")
-zephyr_library_sources_ifdef(CONFIG_AP_ARM_QUALCOMM_QC_EXP
-				"src/switchcap.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
 				"src/passthru_signal.c")
 

@@ -13,4 +13,3 @@ endif()
 zephyr_library_sources("src/chipset.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_CONTROLLER
 			     "src/dp_alt_mode.c")
-zephyr_library_sources_ifdef(CONFIG_QCOM_AP_PWRSEQ_DRIVER "src/switchcap.c")

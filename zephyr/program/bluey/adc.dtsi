@@ -9,7 +9,7 @@
 	named-adc-channels {
 		compatible = "named-adc-channels";
 
-		vph_pwr {
+		adc_vph_pwr: vph_pwr {
 			enum-name = "ADC_VPH_PWR";
 			io-channels = <&adc0 11>;
 			/* Measured VPH power through 47/57 voltage divider */

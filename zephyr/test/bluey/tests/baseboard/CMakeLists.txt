@@ -9,7 +9,6 @@ target_sources(app PRIVATE
 	src/test_chipset.c
 	src/test_throttle.c
 	${PLATFORM_EC_PROGRAM_DIR}/bluey/src/battery.c
-	${PLATFORM_EC_PROGRAM_DIR}/bluey/src/switchcap.c
 	${PLATFORM_EC_PROGRAM_DIR}/bluey/src/chipset.c
 	${PLATFORM_EC_PROGRAM_DIR}/bluey/src/throttle.c
 )

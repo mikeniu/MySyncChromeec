@@ -61,6 +61,11 @@ bool cros_switchcap_is_power_good(const struct device *dev)
 	return gpio_pin_get_dt(&cfg->power_good_gpio);
 }
 
+bool cros_switchcap_is_power_reset(const struct device *dev)
+{
+	return !cros_switchcap_is_power_good(dev);
+}
+
 static int switchcap_init(const struct device *dev)
 {
 	const struct switchcap_config *cfg = dev->config;

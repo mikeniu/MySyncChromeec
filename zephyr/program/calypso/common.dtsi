@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
 /* AP interface */
 &shi0 {
 	status = "okay";
@@ -12,7 +14,13 @@
 };
 
 / {
-chosen {
+	chosen {
 		cros,rtc = &mtc;
+	};
+
+	switchcap: switchcap {
+		compatible = "cros-ec,switchcap-adc";
+		enable-gpios = <&gpioc 0 GPIO_ACTIVE_HIGH>;
+		power-good-adc = <&adc_vph_pwr>;
 	};
 };

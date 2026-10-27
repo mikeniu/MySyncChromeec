@@ -59,9 +59,15 @@
 	named-adc-channels {
 		compatible = "named-adc-channels";
 
-		vph_pwr {
+		adc_vph_pwr: vph_pwr {
 			enum-name = "ADC_VPH_PWR";
 			io-channels = <&adc0 0>;
 		};
+	};
+
+	switchcap: switchcap {
+		compatible = "cros-ec,switchcap-adc";
+		enable-gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+		power-good-adc = <&adc_vph_pwr>;
 	};
 };

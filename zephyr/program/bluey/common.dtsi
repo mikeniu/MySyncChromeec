@@ -4,6 +4,7 @@
  */
 
 #include <cros/cbi_flash.dtsi>
+#include <zephyr/dt-bindings/gpio/gpio.h>
 
 &binman {
 	wp-ro {
@@ -32,7 +33,13 @@
 };
 
 / {
-chosen {
+	chosen {
 		cros,rtc = &mtc;
+	};
+
+	switchcap: switchcap {
+		compatible = "cros-ec,switchcap-adc";
+		enable-gpios = <&gpioc 0 GPIO_ACTIVE_HIGH>;
+		power-good-adc = <&adc_vph_pwr>;
 	};
 };

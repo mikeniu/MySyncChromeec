@@ -3,8 +3,15 @@
 # found in the LICENSE file.
 
 config CROS_SWITCHCAP
-	bool "ChromiumOS Switchcap driver"
+	bool "ChromiumOS GPIO Switchcap driver"
 	default y
 	depends on DT_HAS_CROS_EC_SWITCHCAP_ENABLED
 	help
-	  Enables the switchcap driver for ChromiumOS.
+	  Enables the GPIO-based switchcap driver for ChromiumOS.
+
+config CROS_SWITCHCAP_ADC
+	bool "ChromiumOS ADC Switchcap driver"
+	default y
+	depends on DT_HAS_CROS_EC_SWITCHCAP_ADC_ENABLED
+	help
+	  Enables the ADC-based switchcap driver for ChromiumOS.

@@ -3,3 +3,4 @@
 # found in the LICENSE file.
 
 zephyr_library_sources_ifdef(CONFIG_CROS_SWITCHCAP switchcap_gpio.c)
+zephyr_library_sources_ifdef(CONFIG_CROS_SWITCHCAP_ADC switchcap_adc.c)

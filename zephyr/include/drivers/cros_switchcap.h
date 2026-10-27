@@ -50,6 +50,16 @@ bool cros_switchcap_is_enabled(const struct device *dev);
  */
 bool cros_switchcap_is_power_good(const struct device *dev);
 
+/**
+ * @brief Check if switchcap power rail is in reset state.
+ *
+ * @param dev Pointer to switchcap device structure.
+ *
+ * @retval true  Power rail is in reset state.
+ * @retval false Power rail is not in reset state.
+ */
+bool cros_switchcap_is_power_reset(const struct device *dev);
+
 #ifdef __cplusplus
 }
 #endif
