@@ -149,6 +149,7 @@ void panic_reboot(void)
 	 * Flush any remaining deferred log messages before printing the reboot
 	 * banner. LOG_PANIC() is idempotent if already called earlier.
 	 */
+	zephyr_console_panic();
 	LOG_PANIC();
 	panic_puts("\n\nRebooting...\n");
 	system_reset(0);

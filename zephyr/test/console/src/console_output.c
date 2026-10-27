@@ -446,9 +446,35 @@ ZTEST_F(console_output, test_console_panic)
 	struct shell_uart_common *sh_uart =
 		(struct shell_uart_common *)ec_sh->iface->ctx;
 
+	uart_emul_flush_tx_data(fixture->dev);
+	if (IS_ENABLED(CONFIG_SHELL_BACKEND_SERIAL_API_INTERRUPT_DRIVEN)) {
+		struct shell_uart_int_driven *sh_uart_int =
+			(struct shell_uart_int_driven *)ec_sh->iface->ctx;
+
+		ring_buf_reset(&sh_uart_int->tx_ringbuf);
+		ring_buf_put(&sh_uart_int->tx_ringbuf,
+			     (const uint8_t *)cputs_message,
+			     strlen(cputs_message));
+		zassert_false(ring_buf_is_empty(&sh_uart_int->tx_ringbuf));
+	}
+
 	zassert_false(sh_uart->blocking_tx);
 	zephyr_console_panic();
 	zassert_true(sh_uart->blocking_tx);
+
+	if (IS_ENABLED(CONFIG_SHELL_BACKEND_SERIAL_API_INTERRUPT_DRIVEN)) {
+		struct shell_uart_int_driven *sh_uart_int =
+			(struct shell_uart_int_driven *)ec_sh->iface->ctx;
+		uint8_t tx_content[SAMPLE_DATA_SIZE] = { 0 };
+		uint32_t tx_bytes;
+
+		zassert_true(ring_buf_is_empty(&sh_uart_int->tx_ringbuf));
+		tx_bytes = uart_emul_get_tx_data(fixture->dev, tx_content,
+						 sizeof(tx_content));
+		zassert_equal(tx_bytes, strlen(cputs_message));
+		zassert_mem_equal(tx_content, cputs_message,
+				  strlen(cputs_message));
+	}
 
 	(void)ec_sh->iface->api->enable(ec_sh->iface, false);
 }

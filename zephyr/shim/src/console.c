@@ -480,6 +480,33 @@ void uart_clear_input(void)
 #endif
 }
 
+static bool shell_is_active(void)
+{
+	return !shell_stopped && shell_zephyr != NULL &&
+	       shell_ready(shell_zephyr);
+}
+
+void zephyr_console_panic(void)
+{
+	/* Switch the shell to blocking mode in case it is used during panic. */
+	if (!shell_is_active()) {
+		return;
+	}
+
+	(void)shell_zephyr->iface->api->enable(shell_zephyr->iface, true);
+
+	if (IS_ENABLED(CONFIG_SHELL_BACKEND_SERIAL_API_INTERRUPT_DRIVEN)) {
+		struct shell_uart_int_driven *sh_uart =
+			(struct shell_uart_int_driven *)shell_zephyr->iface->ctx;
+		uint8_t c;
+
+		while (ring_buf_get(&sh_uart->tx_ringbuf, &c, 1) > 0) {
+			uart_poll_out(uart_shell_dev, c);
+		}
+		atomic_set(&sh_uart->tx_busy, 0);
+	}
+}
+
 #ifndef CONFIG_PIGWEED_LOG_TOKENIZED_LIB
 static void handle_sprintf_rv(int rv, size_t *len)
 {
@@ -489,12 +516,6 @@ static void handle_sprintf_rv(int rv, size_t *len)
 	} else {
 		*len += rv;
 	}
-}
-
-static bool shell_is_active(void)
-{
-	return !shell_stopped && shell_zephyr != NULL &&
-	       shell_ready(shell_zephyr);
 }
 
 /*
@@ -539,15 +560,6 @@ static void shell_write_str(const struct shell *sh, const char *buff,
 	}
 
 	z_shell_unlock(sh);
-}
-
-void zephyr_console_panic(void)
-{
-	/* Switch the shell to blocking mode in case it is used during panic. */
-	if (shell_is_active()) {
-		(void)shell_zephyr->iface->api->enable(shell_zephyr->iface,
-						       true);
-	}
 }
 
 void zephyr_print(const char *buff, size_t size)

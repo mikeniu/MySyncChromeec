@@ -5,6 +5,7 @@
 
 #include "builtin/assert.h"
 #include "common.h"
+#include "console.h"
 #include "hooks.h"
 #include "host_command.h"
 #include "panic.h"
@@ -294,6 +295,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 		panic_data_write_fatal(reason, k_current_get());
 	}
 
+	zephyr_console_panic();
 	LOG_PANIC();
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
@@ -330,6 +332,7 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	 * Switch the logger to panic mode and flush queued log messages
 	 * before printing the stack trace.
 	 */
+	zephyr_console_panic();
 	LOG_PANIC();
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
