@@ -520,6 +520,16 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 		*exception = *reason = *info = 0;
 	}
 }
+uint32_t panic_get_reason_reg(const struct panic_data *pdata)
+{
+	return pdata ? pdata->cm.regs[CORTEX_PANIC_REGISTER_R4] : 0;
+}
+
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
+{
+	if (pdata)
+		pdata->cm.regs[CORTEX_PANIC_REGISTER_R4] = reason;
+}
 
 void bus_fault_handler(void)
 {

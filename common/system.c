@@ -926,8 +926,9 @@ void system_common_pre_init(void)
 		 * the reason to a regular watchdog reason while preserving
 		 * the info and exception from the watchdog warning.
 		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN)
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+		if (pdata && reason == PANIC_SW_WATCHDOG_WARN &&
+		    !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD))
+			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG);
 		/* The watchdog panic info may have already been initialized by
 		 * the watchdog handler, so only set it here if the panic reason
 		 * is not a watchdog or the panic info has already been read,
