@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f23950dd_326264d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:27:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Commit Message \u0026 CL Scope**\n\n1. **Lead with the problem (\"why\") rather than narrating code mechanics**: The body starts by listing the modified identifiers (`Explicitly set *temp \u003d ... in cm32183_get_offset() and cm36781_get_offset(). Additionally, initialize out_temp to ... in host_cmd_motion_sense()`). Start with the high-level bug and impact—specifically that the CM32183 and CM36781 ALS drivers left the calibration temperature output parameter uninitialized in `get_offset`, causing `MOTIONSENSE_CMD_SENSOR_OFFSET` and `MOTIONSENSE_CMD_PERFORM_CALIB` to return uninitialized stack memory to the AP.\n2. **Consider splitting into two independent CLs**: As signaled by `\" and \"` in the subject line and `\"Additionally, ...\"` in the body, this CL bundles two independently revertible changes at different layers:\n   - **CL 1 (`driver/als_cm32183.c`, `driver/als_cm36781.c`)**: Fulfill the `motion_sensor_t::drv::get_offset` contract in the CM32183 and CM36781 ALS drivers by setting `*temp \u003d EC_MOTION_SENSE_INVALID_CALIB_TEMP` (matching `als_tcs3400` and `als_veml3328`).\n   - **CL 2 (`common/motion_sense.c`)**: Initialize `out_temp` in `host_cmd_motion_sense()` as defense-in-depth across `MOTIONSENSE_CMD_SENSOR_OFFSET`, `MOTIONSENSE_CMD_SENSOR_SCALE`, and `MOTIONSENSE_CMD_PERFORM_CALIB` in case any sensor driver fails to populate `*temp`.\n3. **`TEST\u003d` suite name**: `drivers.default.ec_host_cmd` links `zephyr/test/drivers/default/src/motion_sense/motion_sense.c`, which only tests `MOTIONSENSE_CMD_DUMP` and `MOTIONSENSE_CMD_READ`. The host command tests for `MOTIONSENSE_CMD_SENSOR_OFFSET`, `MOTIONSENSE_CMD_SENSOR_SCALE`, and `MOTIONSENSE_CMD_PERFORM_CALIB` are in `zephyr/test/drivers/host_cmd/src/motion_sense.c`, which runs under `drivers.host_cmd` / `drivers.host_cmd.ec_host_cmd`.\n\nSuggested commit message if kept as a single CL:\n```text\nmotion_sense: Prevent uninitialized calibration temp in host_cmd and ALS\n\nThe CM32183 and CM36781 ALS drivers did not populate the calibration\ntemperature output parameter in their get_offset implementations, and\nhost_cmd_motion_sense() declared out_temp without an initializer. When\nthe AP issued MOTIONSENSE_CMD_SENSOR_OFFSET or\nMOTIONSENSE_CMD_PERFORM_CALIB for these sensors, uninitialized EC stack\nbytes were copied into the host command response buffer.\n\nSet *temp to EC_MOTION_SENSE_INVALID_CALIB_TEMP in cm32183_get_offset()\nand cm36781_get_offset() to match other ALS drivers, and default-initialize\nout_temp in host_cmd_motion_sense() as defense-in-depth across offset,\nscale, and calibration host commands.\n\nBUG\u003db:516277361\nTEST\u003dtwister -c -T zephyr/test/drivers -s drivers.host_cmd.ec_host_cmd\n```\n\nSuggested commit messages if split into two CLs:\n- **Driver CL**:\n```text\ndriver: als: Set invalid calibration temp in cm32183 and cm36781 get_offset\n\ncm32183_get_offset() and cm36781_get_offset() wrote the sensor offset\nbut left the calibration temperature output parameter (*temp)\nuninitialized. Populate *temp with EC_MOTION_SENSE_INVALID_CALIB_TEMP to\nfulfill the motion_sense get_offset driver contract and match other ALS\ndrivers.\n\nBUG\u003db:516277361\nTEST\u003dtwister -c -T zephyr/test/drivers -s drivers.default.ec_host_cmd\n```\n- **Host command CL**:\n```text\nmotion_sense: Initialize out_temp in host_cmd_motion_sense\n\nDefault-initialize out_temp to EC_MOTION_SENSE_INVALID_CALIB_TEMP in\nhost_cmd_motion_sense() so that MOTIONSENSE_CMD_SENSOR_OFFSET,\nMOTIONSENSE_CMD_SENSOR_SCALE, and MOTIONSENSE_CMD_PERFORM_CALIB cannot\nleak uninitialized stack bytes to the AP if a sensor driver fails to\npopulate *temp.\n\nBUG\u003db:516277361\nTEST\u003dtwister -c -T zephyr/test/drivers -s drivers.host_cmd.ec_host_cmd\n```\n\n[🔗](http://go/tj/87cbd56f-5d12-4e57-ba09-223ce48a56f9)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3016458971dfbfe388192d9dec62e3564c9c0d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3baffcb7_2fb39651",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:27:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The fix for initializing the calibration temperature in `cm32183_get_offset()`, `cm36781_get_offset()`, and `host_cmd_motion_sense()` is sound and prevents leaking uninitialized stack bytes to the AP, but unit test assertions, commit message updates, and CL decomposition should be addressed before submitting.\n\n* **Functionality**: Setting `*temp \u003d EC_MOTION_SENSE_INVALID_CALIB_TEMP` in `cm32183_get_offset()` and `cm36781_get_offset()` and default-initializing `out_temp \u003d EC_MOTION_SENSE_INVALID_CALIB_TEMP` in `host_cmd_motion_sense()` accurately resolves the uninitialized calibration temperature bug across `MOTIONSENSE_CMD_SENSOR_OFFSET`, `MOTIONSENSE_CMD_SENSOR_SCALE`, and `MOTIONSENSE_CMD_PERFORM_CALIB`. (See inline note on `driver/als_cm32183.c` for a pre-existing follow-up item regarding `offset[Y]` and `offset[Z]`.)\n* **Architecture \u0026 Component Fit**: Using `EC_MOTION_SENSE_INVALID_CALIB_TEMP` (`0x8000`) matches the established `motion_sensor_t::drv::get_offset` convention across all other ALS and accelerometer/gyroscope drivers in `driver/`.\n* **Code Simplicity**: The changes are minimal and initialize `out_temp` directly at its declaration in `host_cmd_motion_sense()`.\n* **Idiomaticity \u0026 Readability**: Adheres to ChromiumOS EC C conventions and uses the named constant `EC_MOTION_SENSE_INVALID_CALIB_TEMP`.\n* **Security**: Eliminates a 2-byte stack information leak to the AP across the motion sense host command response paths (`out-\u003esensor_offset.temp`, `out-\u003esensor_scale.temp`, and `out-\u003eperform_calib.temp`).\n* **Testing**: Needs automated test assertions. In `zephyr/test/drivers/host_cmd/src/motion_sense.c`, `test_get_offset`, `test_set_get_scale`, and `test_calib` already call mocks (`mock_get_offset_custom` and `mock_get_scale`) that leave `*temp` untouched, so asserting that `response.{sensor_offset,sensor_scale,perform_calib}.temp \u003d\u003d (uint16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP` directly tests the `host_cmd_motion_sense()` fallback. Please also add unit test coverage for `cm32183_get_offset()` and `cm36781_get_offset()`.\n* **CL Size \u0026 Scope**: Although only 4 lines of diff, this CL combines two independently revertible changes at different layers: (1) fixing the `.get_offset` driver contract in `driver/als_cm32183.c` and `driver/als_cm36781.c`, and (2) adding defense-in-depth `out_temp` initialization in `common/motion_sense.c`. Consider splitting them into two focused CLs.\n* **Commit Message**: Please lead with the high-level problem (\"why\") before describing the code mechanics, and update `TEST\u003d` to reference `drivers.host_cmd.ec_host_cmd` (which builds `zephyr/test/drivers/host_cmd/src/motion_sense.c`). [[trajectory](https://goto.corp.google.com/traj/87cbd56f-5d12-4e57-ba09-223ce48a56f9)]\n\n[🔗](http://go/tj/87cbd56f-5d12-4e57-ba09-223ce48a56f9)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3016458971dfbfe388192d9dec62e3564c9c0d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d007125e_d1876f54",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1122,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:27:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Missing Unit Test Assertions for `out_temp` Fallback**\n\nInitializing `out_temp \u003d EC_MOTION_SENSE_INVALID_CALIB_TEMP` protects `MOTIONSENSE_CMD_SENSOR_OFFSET`, `MOTIONSENSE_CMD_SENSOR_SCALE`, and `MOTIONSENSE_CMD_PERFORM_CALIB` when a driver callback does not write to `*temp`, but no unit test assertions currently verify the returned `temp` field.\n\nIn `zephyr/test/drivers/host_cmd/src/motion_sense.c`, both `mock_get_offset_custom()` (line 27) and the `FAKE_VALUE_FUNC` `mock_get_scale` leave `*temp` untouched, so `test_get_offset` (line 520), `test_set_get_scale` (line 628), and `test_calib` (line 701) already execute this fallback path. Please add assertions on the response `temp` field in those tests so a regression here would fail the test suite:\n\n```c\n/* In test_get_offset (zephyr/test/drivers/host_cmd/src/motion_sense.c): */\nzassert_equal(response.sensor_offset.temp,\n\t      (uint16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP);\n\n/* In test_set_get_scale (zephyr/test/drivers/host_cmd/src/motion_sense.c): */\nzassert_equal(response.sensor_scale.temp,\n\t      (uint16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP);\n\n/* In test_calib (zephyr/test/drivers/host_cmd/src/motion_sense.c): */\nzassert_equal(response.perform_calib.temp,\n\t      (uint16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP);\n```\n\n[🔗](http://go/tj/87cbd56f-5d12-4e57-ba09-223ce48a56f9)",
+      "range": {
+        "startLine": 1122,
+        "startChar": 0,
+        "endLine": 1122,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3016458971dfbfe388192d9dec62e3564c9c0d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5739c440_eb9909ae",
+        "filename": "driver/als_cm32183.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:27:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Driver Unit Test Coverage \u0026 Pre-existing `offset[Y]` / `offset[Z]` Initialization**\n\n1. **Unit test coverage**: Neither `cm32183_get_offset` nor `cm36781_get_offset` has a unit test verifying that `drv-\u003eget_offset()` sets `*temp \u003d EC_MOTION_SENSE_INVALID_CALIB_TEMP` (compare `test_tcs_get_set_offset` in `zephyr/test/drivers/default/src/tcs3400.c`). Adding a small driver test that pre-populates `int16_t temp \u003d 0;` and asserts `zassert_equal(EC_MOTION_SENSE_INVALID_CALIB_TEMP, temp);` after calling `drv-\u003eget_offset(s, offset, \u0026temp)` will guard against regressions in both drivers.\n\n2. **Suggestion for a follow-up CL (pre-existing code)**: `host_cmd_motion_sense()` passes `int16_t offset[3]` (`out-\u003esensor_offset.offset`) to `sensor-\u003edrv-\u003eget_offset()`. Other ALS drivers (`tcs3400_get_offset` in `driver/als_tcs3400.c` and `veml3328_get_offset` in `driver/als_veml3328.c`) explicitly zero `offset[Y]` and `offset[Z]`:\n```c\noffset[X] \u003d CM32183_GET_DATA(s)-\u003eoffset;\noffset[Y] \u003d 0;\noffset[Z] \u003d 0;\n```\nHere (and in `driver/als_cm36781.c`), `*offset \u003d ...` only writes `offset[0]`, leaving `offset[1]` and `offset[2]` uninitialized if a caller does not zero the output buffer beforehand.\n\nOther locations with the same pattern:\n- `driver/als_cm36781.c` **lines 95-101** (`cm36781_get_offset`)\n\n[🔗](http://go/tj/87cbd56f-5d12-4e57-ba09-223ce48a56f9)",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3016458971dfbfe388192d9dec62e3564c9c0d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
