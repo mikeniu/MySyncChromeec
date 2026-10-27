@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "f60a0c0c31aceb1b8ec896163643fd9d65a938ce",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5202b0d0_5eb4d502",
+        "filename": "chip/stm32/host_command_common.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T16:19:33Z",
+      "side": 1,
+      "message": "Will follow up in another CL",
+      "parentUuid": "6eb400a3_9e8c032f",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "revId": "f60a0c0c31aceb1b8ec896163643fd9d65a938ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
