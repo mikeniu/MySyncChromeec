@@ -4,6 +4,7 @@
  */
 
 #include "battery.h"
+#include "charge_manager.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "gpio/gpio_int.h"
@@ -12,6 +13,9 @@
 #include "motionsense_sensors.h"
 #include "tablet_mode.h"
 #include "teliks.h"
+#include "usb_charge.h"
+#include "usb_pd.h"
+#include "usbc_ppc.h"
 
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
@@ -22,6 +26,8 @@
 
 LOG_MODULE_REGISTER(nissa, LOG_LEVEL_INF);
 
+#define HOST_EVENT_DEFER_WAIT_MS 100
+
 FAKE_VALUE_FUNC(int, cbi_get_ssfc, uint32_t *);
 FAKE_VALUE_FUNC(int, cros_cbi_get_fw_config, enum cbi_fw_config_field_id,
 		uint32_t *);
@@ -30,9 +36,22 @@ FAKE_VOID_FUNC(lsm6dsm_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(icm42607_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(bma4xx_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(lis2dw12_interrupt, enum gpio_signal);
+FAKE_VALUE_FUNC(int, ppc_is_sourcing_vbus, int);
+FAKE_VALUE_FUNC(int, ppc_vbus_source_enable, int, int);
+FAKE_VOID_FUNC(pd_set_vbus_discharge, int, int);
+FAKE_VOID_FUNC(pd_send_host_event, int);
+FAKE_VALUE_FUNC(int, ppc_vbus_sink_enable, int, int);
+FAKE_VALUE_FUNC(int, ppc_is_vbus_present, int);
+FAKE_VALUE_FUNC(int, ppc_set_vbus_source_current_limit, int,
+		enum tcpc_rp_value);
+
+unsigned int ppc_cnt = 2;
 
 static void test_before(void *fixture)
 {
+	for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
+		pd_power_supply_reset(i);
+	}
 	RESET_FAKE(cros_cbi_get_fw_config);
 	RESET_FAKE(cbi_get_ssfc);
 	RESET_FAKE(bmi3xx_interrupt);
@@ -40,6 +59,13 @@ static void test_before(void *fixture)
 	RESET_FAKE(icm42607_interrupt);
 	RESET_FAKE(bma4xx_interrupt);
 	RESET_FAKE(lis2dw12_interrupt);
+	RESET_FAKE(ppc_is_sourcing_vbus);
+	RESET_FAKE(ppc_vbus_source_enable);
+	RESET_FAKE(pd_set_vbus_discharge);
+	RESET_FAKE(pd_send_host_event);
+	RESET_FAKE(ppc_vbus_sink_enable);
+	RESET_FAKE(ppc_is_vbus_present);
+	RESET_FAKE(ppc_set_vbus_source_current_limit);
 }
 
 ZTEST_SUITE(teliks, NULL, NULL, test_before, NULL, NULL);
@@ -388,4 +414,161 @@ ZTEST(teliks, test_set_keycap_label)
 	zassert_equal(get_keycap_label(0, 14), KLLI_UNKNO);
 	set_keycap_label(0, 14, KLLI_F15);
 	zassert_equal(get_keycap_label(0, 14), KLLI_F15);
+}
+
+ZTEST(teliks, test_set_active_charge_port_none)
+{
+	/* Don't return error even disable failed */
+	ppc_vbus_sink_enable_fake.return_val = 1;
+	zassert_equal(EC_SUCCESS,
+		      board_set_active_charge_port(CHARGE_PORT_NONE));
+	zassert_equal(2, ppc_vbus_sink_enable_fake.call_count);
+	/* C0 */
+	zassert_equal(0, ppc_vbus_sink_enable_fake.arg0_history[0]);
+	zassert_equal(0, ppc_vbus_sink_enable_fake.arg1_history[0]);
+	/* C1 */
+	zassert_equal(1, ppc_vbus_sink_enable_fake.arg0_history[1]);
+	zassert_equal(0, ppc_vbus_sink_enable_fake.arg1_history[1]);
+}
+
+ZTEST(teliks, test_set_active_charge_port_invalid_port)
+{
+	zassert_equal(board_set_active_charge_port(3), EC_ERROR_INVAL,
+		      "port 3 doesn't exist, should return error");
+}
+
+ZTEST(teliks, test_set_active_charge_port_currently_sourcing)
+{
+	ppc_is_sourcing_vbus_fake.return_val = 1;
+	/* Attempting to sink on a port that's sourcing is an error */
+	zassert_equal(board_set_active_charge_port(1), EC_ERROR_INVAL);
+}
+
+ZTEST(teliks, test_set_active_charge_port)
+{
+	/* We can successfully start sinking on a port */
+	zassert_ok(board_set_active_charge_port(0));
+
+	/* Sinking on the other port was disabled */
+	zassert_equal(1, ppc_vbus_sink_enable_fake.arg0_history[0]);
+	zassert_equal(0, ppc_vbus_sink_enable_fake.arg1_history[0]);
+	/* Sinking was enabled on the new port */
+	zassert_equal(0, ppc_vbus_sink_enable_fake.arg0_history[1]);
+	zassert_equal(1, ppc_vbus_sink_enable_fake.arg1_history[1]);
+}
+
+ZTEST(teliks, test_set_active_charge_port_enable_fail)
+{
+	ppc_vbus_sink_enable_fake.return_val = 1;
+	zassert_equal(board_set_active_charge_port(0), EC_ERROR_UNKNOWN);
+}
+
+ZTEST(teliks, test_pd_power_supply_reset_not_sourcing)
+{
+	/* Initially sourcing_vbus is false, reset should be a no-op */
+	pd_power_supply_reset(0);
+
+	zassert_equal(ppc_vbus_source_enable_fake.call_count, 0);
+	zassert_equal(pd_set_vbus_discharge_fake.call_count, 0);
+
+	k_sleep(K_MSEC(HOST_EVENT_DEFER_WAIT_MS));
+	zassert_equal(pd_send_host_event_fake.call_count, 0);
+}
+
+ZTEST(teliks, test_pd_set_power_supply_ready_and_reset)
+{
+	ppc_vbus_source_enable_fake.return_val = EC_SUCCESS;
+	ppc_vbus_sink_enable_fake.return_val = EC_SUCCESS;
+
+	/* Enable VBUS sourcing */
+	zassert_ok(pd_set_power_supply_ready(0));
+
+	/* Sinking was disabled */
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 1);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg0_val, 0);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg1_val, 0);
+
+	/* Discharge was disabled */
+	if (IS_ENABLED(CONFIG_USB_PD_DISCHARGE)) {
+		zassert_equal(pd_set_vbus_discharge_fake.call_count, 1);
+		zassert_equal(pd_set_vbus_discharge_fake.arg0_val, 0);
+		zassert_equal(pd_set_vbus_discharge_fake.arg1_val, 0);
+	}
+
+	/* Sourcing was enabled */
+	zassert_equal(ppc_vbus_source_enable_fake.call_count, 1);
+	zassert_equal(ppc_vbus_source_enable_fake.arg0_val, 0);
+	zassert_equal(ppc_vbus_source_enable_fake.arg1_val, 1);
+
+	/* Allow deferred host event to run */
+	k_sleep(K_MSEC(HOST_EVENT_DEFER_WAIT_MS));
+	zassert_equal(pd_send_host_event_fake.call_count, 1);
+
+	/* Now reset power supply - should disable sourcing and enable discharge
+	 */
+	pd_power_supply_reset(0);
+
+	zassert_equal(ppc_vbus_source_enable_fake.call_count, 2);
+	zassert_equal(ppc_vbus_source_enable_fake.arg0_history[1], 0);
+	zassert_equal(ppc_vbus_source_enable_fake.arg1_history[1], 0);
+
+	if (IS_ENABLED(CONFIG_USB_PD_DISCHARGE)) {
+		zassert_equal(pd_set_vbus_discharge_fake.call_count, 2);
+		zassert_equal(pd_set_vbus_discharge_fake.arg0_history[1], 0);
+		zassert_equal(pd_set_vbus_discharge_fake.arg1_history[1], 1);
+	}
+
+	k_sleep(K_MSEC(HOST_EVENT_DEFER_WAIT_MS));
+	zassert_equal(pd_send_host_event_fake.call_count, 2);
+
+	/* Reset again - should do nothing as sourcing_vbus is now false */
+	pd_power_supply_reset(0);
+	zassert_equal(ppc_vbus_source_enable_fake.call_count, 2);
+}
+
+ZTEST(teliks, test_board_set_active_charge_port_clears_sourcing)
+{
+	ppc_vbus_source_enable_fake.return_val = EC_SUCCESS;
+	ppc_vbus_sink_enable_fake.return_val = EC_SUCCESS;
+
+	/* Enable VBUS sourcing */
+	zassert_ok(pd_set_power_supply_ready(0));
+	zassert_equal(ppc_vbus_source_enable_fake.call_count, 1);
+
+	/* Setting active charge port should clear sourcing state */
+	zassert_ok(board_set_active_charge_port(0));
+
+	/* Reset power supply should now be a no-op */
+	pd_power_supply_reset(0);
+	zassert_equal(ppc_vbus_source_enable_fake.call_count, 1);
+}
+
+ZTEST(teliks, test_pd_set_power_supply_ready_invalid_port)
+{
+	zassert_equal(pd_set_power_supply_ready(CONFIG_USB_PD_PORT_MAX_COUNT),
+		      EC_ERROR_INVAL);
+}
+
+ZTEST(teliks, test_pd_snk_is_vbus_provided)
+{
+	ppc_is_vbus_present_fake.return_val = 1;
+	zassert_equal(1, pd_snk_is_vbus_provided(0));
+
+	ppc_is_vbus_present_fake.return_val = 0;
+	zassert_equal(0, pd_snk_is_vbus_provided(0));
+}
+
+ZTEST(teliks, test_typec_set_source_current_limit)
+{
+	typec_set_source_current_limit(0, TYPEC_RP_3A0);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.call_count, 1);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.arg0_val, 0);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.arg1_val,
+		      TYPEC_RP_3A0);
+
+	typec_set_source_current_limit(0, TYPEC_RP_1A5);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.call_count, 2);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.arg0_val, 0);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.arg1_val,
+		      TYPEC_RP_1A5);
 }
