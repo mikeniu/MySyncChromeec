@@ -17,6 +17,7 @@ def check_policy(
     charge_port,
     chipset_state,
     board_led_alt_policy_label,
+    lid_state,
     batt_lvl,
     policies,
     led_id,
@@ -28,6 +29,7 @@ def check_policy(
         charge_port: charge port to be tested
         chipset_state: chipset state to be tested
         board_led_alt_policy_label: label of board led alt policy to be tested
+        lid_state: lid state to be tested
         batt_lvl: battery level to be tested
         led_id: ID of the LED to be tested
 
@@ -65,6 +67,17 @@ def check_policy(
             if not match:
                 continue
 
+        if "lid-state" in node.props:
+            match = False
+
+            for state in node.props["lid-state"].val:
+                if lid_state == state:
+                    match = True
+                    break
+
+            if not match:
+                continue
+
         if "board-led-alt-policy-label" in node.props:
             if (
                 board_led_alt_policy_label
@@ -93,6 +106,7 @@ def log_state(
     charge_port,
     chipset_state,
     board_led_alt_policy_label,
+    lid_state,
     batt_min,
     batt_range,
     led_id,
@@ -106,6 +120,7 @@ def log_state(
         charge_port: current charge port being tested
         chipset_state: current chipset state being tested
         board_led_alt_policy_label: current label of board led alt policy being tested
+        lid_state: current lid state being tested
         batt_min: lower bound of battery level range being tested
         batt_range: range of battery level that is missing coverage, 0 for state
                     is covered
@@ -120,7 +135,7 @@ def log_state(
         return False
     if batt_range == 101:
         logging.error(
-            "%s: %s LED policies found for %s%s%s%s%s",
+            "%s: %s LED policies found for %s%s%s%s%s%s",
             project_name,
             f"{coverage} overlapping" if coverage > 1 else "No",
             (charge_state + ", ") if charge_state else "",
@@ -131,11 +146,12 @@ def log_state(
                 if board_led_alt_policy_label
                 else ""
             ),
+            (lid_state + ", ") if lid_state else "",
             led_id + ", ",
         )
     else:
         logging.error(
-            "%s: %s LED policies for battery range %i%% to %i%% for %s%s%s%s%s",
+            "%s: %s LED policies for battery range %i%% to %i%% for %s%s%s%s%s%s",
             project_name,
             f"{coverage} overlapping" if coverage > 1 else "No",
             batt_min,
@@ -148,6 +164,7 @@ def log_state(
                 if board_led_alt_policy_label
                 else ""
             ),
+            (lid_state + ", ") if lid_state else "",
             led_id + ", ",
         )
     return True
@@ -170,6 +187,8 @@ def iterate_power_states(edt, project_name, policies):
 
     chipset_state_list = [None]
 
+    lid_state_list = [None]
+
     board_led_alt_policy_label_list = []
 
     board_led_alt_policy_label_sum = 1
@@ -184,6 +203,7 @@ def iterate_power_states(edt, project_name, policies):
         "charge-state": False,
         "charge-port": False,
         "chipset-state": False,
+        "lid-state": False,
         "board-led-alt-policy-label": False,
         "batt-lvl": False,
     }
@@ -194,6 +214,8 @@ def iterate_power_states(edt, project_name, policies):
                 care_about["charge-port"] = True
         if "chipset-state" in node.props:
             care_about["chipset-state"] = True
+        if "lid-state" in node.props:
+            care_about["lid-state"] = True
         if "board-led-alt-policy-label" in node.props:
             care_about["board-led-alt-policy-label"] = True
         if "batt-lvl" in node.props:
@@ -232,6 +254,9 @@ def iterate_power_states(edt, project_name, policies):
             "POWER_S5",
         ]
 
+    if care_about["lid-state"]:
+        lid_state_list = ["LED_LID_OPEN", "LED_LID_CLOSED"]
+
     if care_about["board-led-alt-policy-label"]:
         for node in policies.children.values():
             if "board-led-alt-policy-label" in node.props:
@@ -251,48 +276,52 @@ def iterate_power_states(edt, project_name, policies):
                     for board_led_alt_policy_label in range(
                         board_led_alt_policy_label_sum
                     ):
-                        policy_batt_lvl_min = 0
-                        policy_batt_range = 0
-                        prev_coverage = 1
-                        for batt_lvl in range(101):
-                            coverage = check_policy(
-                                charge_state,
-                                charge_port,
-                                chipset_state,
-                                board_led_alt_policy_label,
-                                batt_lvl,
-                                policies,
-                                led_id,
-                            )
-                            if coverage == 1:
-                                num_errors += log_state(
-                                    project_name,
+                        for lid_state in lid_state_list:
+                            policy_batt_lvl_min = 0
+                            policy_batt_range = 0
+                            prev_coverage = 1
+                            for batt_lvl in range(101):
+                                coverage = check_policy(
                                     charge_state,
                                     charge_port,
                                     chipset_state,
                                     board_led_alt_policy_label,
-                                    policy_batt_lvl_min,
-                                    policy_batt_range,
+                                    lid_state,
+                                    batt_lvl,
+                                    policies,
                                     led_id,
-                                    prev_coverage,
                                 )
-                                policy_batt_range = 0
-                                policy_batt_lvl_min = batt_lvl + 1
-                            else:
-                                policy_batt_range += 1
-                            prev_coverage = coverage
+                                if coverage == 1:
+                                    num_errors += log_state(
+                                        project_name,
+                                        charge_state,
+                                        charge_port,
+                                        chipset_state,
+                                        board_led_alt_policy_label,
+                                        lid_state,
+                                        policy_batt_lvl_min,
+                                        policy_batt_range,
+                                        led_id,
+                                        prev_coverage,
+                                    )
+                                    policy_batt_range = 0
+                                    policy_batt_lvl_min = batt_lvl + 1
+                                else:
+                                    policy_batt_range += 1
+                                prev_coverage = coverage
 
-                        num_errors += log_state(
-                            project_name,
-                            charge_state,
-                            charge_port,
-                            chipset_state,
-                            board_led_alt_policy_label,
-                            policy_batt_lvl_min,
-                            policy_batt_range,
-                            led_id,
-                            prev_coverage,
-                        )
+                            num_errors += log_state(
+                                project_name,
+                                charge_state,
+                                charge_port,
+                                chipset_state,
+                                board_led_alt_policy_label,
+                                lid_state,
+                                policy_batt_lvl_min,
+                                policy_batt_range,
+                                led_id,
+                                prev_coverage,
+                            )
     return num_errors
 
 
