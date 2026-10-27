@@ -97,7 +97,7 @@ if(DEFINED CONFIG_BOARD_YAVIKS)
 			"yaviks/src/keyboard.c"
 			"yaviks/src/board.c"
 			"yaviks/src/sub_board.c"
-			"yaviks/src/thermal.c"
+			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "yaviks/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "yaviks/src/charger.c")
@@ -109,7 +109,7 @@ if(DEFINED CONFIG_BOARD_YAVILLA)
 			"yavilla/src/led.c"
 			"yavilla/src/keyboard.c"
 			"yavilla/src/board.c"
-			"yavilla/src/thermal.c"
+			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "yavilla/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "yavilla/src/charger.c")
@@ -122,7 +122,7 @@ if(DEFINED CONFIG_BOARD_YAVISTA)
 			"yavista/src/keyboard.c"
 			"yavista/src/board.c"
 			"yavista/src/sub_board.c"
-			"yavista/src/thermal.c"
+			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "yavista/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "yavista/src/charger.c")
@@ -148,7 +148,7 @@ if(DEFINED CONFIG_BOARD_GOTHRAX)
 			"gothrax/src/usb_mux_config.c"
 			"gothrax/src/form_factor.c"
 			"gothrax/src/sub_board.c"
-			"gothrax/src/thermal.c"
+			"src/gothrax_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "gothrax/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "gothrax/src/charger.c")
@@ -177,7 +177,7 @@ if(DEFINED CONFIG_BOARD_QUANDISO)
 			"quandiso/src/sub_board.c"
 			"quandiso/src/keyboard.c"
 			"quandiso/src/led.c"
-			"quandiso/src/thermal.c"
+			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "quandiso/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/fan.c")
@@ -190,7 +190,7 @@ if(DEFINED CONFIG_BOARD_QUANDISO2)
 			"quandiso2/src/sub_board.c"
 			"quandiso2/src/keyboard.c"
 			"quandiso2/src/led.c"
-			"quandiso2/src/thermal.c"
+			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "quandiso2/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/fan.c")
@@ -288,7 +288,7 @@ if(DEFINED CONFIG_BOARD_DOMIKA)
 			"domika/src/led.c"
 			"domika/src/keyboard.c"
 			"domika/src/board.c"
-			"domika/src/thermal.c"
+			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "domika/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "domika/src/charger.c")
@@ -373,7 +373,7 @@ if(DEFINED CONFIG_BOARD_DIRKS)
 			"dirks/src/barrel_jack.c"
 			"dirks/src/led.c"
 			"src/hdmi.c"
-			"dirks/src/thermal.c"
+			"src/dirks_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "dirks/src/usbc.c")
 endif()
@@ -395,7 +395,7 @@ if(DEFINED CONFIG_BOARD_EPIC)
 			"epic/src/usb_mux_config.c"
 			"epic/src/form_factor.c"
 			"epic/src/sub_board.c"
-			"epic/src/thermal.c"
+			"src/gothrax_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "epic/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "epic/src/charger.c")
@@ -421,7 +421,7 @@ if(DEFINED CONFIG_BOARD_DIRKSON)
 			"dirkson/src/barrel_jack.c"
 			"dirkson/src/led.c"
 			"src/hdmi.c"
-			"dirkson/src/thermal.c"
+			"src/dirks_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "dirkson/src/usbc.c")
 endif()

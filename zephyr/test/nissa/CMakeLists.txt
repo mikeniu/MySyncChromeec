@@ -101,7 +101,7 @@ if(CONFIG_TEST_NISSA_GOTHRAX)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/form_factor.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_thermal.c
     )
 endif()
 
@@ -244,7 +244,7 @@ if(CONFIG_TEST_NISSA_YAVIKS)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/sub_board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/usbc.c
     )
 endif()
@@ -261,7 +261,7 @@ if(CONFIG_TEST_NISSA_QUANDISO)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/sub_board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/usbc.c
     )
 endif()
@@ -278,7 +278,7 @@ if(CONFIG_TEST_NISSA_QUANDISO2)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/sub_board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/usbc.c
     )
 endif()
@@ -293,7 +293,7 @@ if(CONFIG_TEST_NISSA_YAVILLA)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/keyboard.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yavilla/src/usbc.c
     )
 endif()
@@ -338,7 +338,7 @@ if(CONFIG_TEST_NISSA_DOMIKA)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/keyboard.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/domika/src/usbc.c
     )
 endif()
@@ -362,7 +362,7 @@ if(CONFIG_TEST_NISSA_DIRKS)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/barrel_jack.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/dirks_thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirks/src/usbc.c
     )
 endif()
@@ -393,7 +393,7 @@ if(CONFIG_TEST_NISSA_EPIC)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/form_factor.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_thermal.c
     )
 endif()
 
@@ -418,7 +418,7 @@ if(CONFIG_TEST_NISSA_DIRKSON)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/barrel_jack.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/thermal.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/dirks_thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/dirkson/src/usbc.c
     )
 endif()

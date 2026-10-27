@@ -1,16 +1,23 @@
-/* Copyright 2024 The ChromiumOS Authors
+/* Copyright 2022 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
 
 #include "chipset.h"
 #include "common.h"
+#include "cros_cbi.h"
 #include "fan.h"
 #include "temp_sensor/temp_sensor.h"
 #include "thermal.h"
 #include "util.h"
 
+#include <zephyr/logging/log.h>
+
 #include <ap_power/ap_power_interface.h>
+
+#if DT_NODE_EXISTS(DT_NODELABEL(fan_steps_1))
+LOG_MODULE_REGISTER(board_thermal, LOG_LEVEL_INF);
+#endif
 
 #define TEMP_CPU TEMP_SENSOR_ID(DT_NODELABEL(temp_cpu))
 #define TEMP_5V TEMP_SENSOR_ID(DT_NODELABEL(temp_5v_regulator))
@@ -38,8 +45,43 @@ struct fan_step {
 		.rpm = DT_PROP(nd, rpm_target), \
 	},
 
+#if DT_NODE_EXISTS(DT_NODELABEL(fan_steps_1))
+static const struct fan_step fan_table_1[] = { DT_FOREACH_CHILD(
+	DT_NODELABEL(fan_steps_1), FAN_TABLE_ENTRY) };
+
+static const struct fan_step fan_table_2[] = { DT_FOREACH_CHILD(
+	DT_NODELABEL(fan_steps_2), FAN_TABLE_ENTRY) };
+
+static const struct fan_step *fan_step_table;
+BUILD_ASSERT(ARRAY_SIZE(fan_table_1) == ARRAY_SIZE(fan_table_2),
+	     "fan tables must have the same size");
+#define NUM_FAN_LEVELS ARRAY_SIZE(fan_table_1)
+
+STATIC_IF_NOT(CONFIG_TEST)
+bool is_fan_type_2(void)
+{
+	uint32_t val;
+	int ret;
+
+	/*
+	 * Retrieve the fan type config.
+	 */
+	ret = cros_cbi_get_fw_config(FAN_TYPE, &val);
+	if (ret < 0) {
+		LOG_ERR("error retriving CBI config: %d", ret);
+		return false;
+	}
+
+	if (val == FW_FAN_TYPE_2) {
+		return true;
+	}
+	return false;
+}
+#else
 static const struct fan_step fan_step_table[] = { DT_FOREACH_CHILD(
 	DT_INST(0, cros_ec_fan_steps), FAN_TABLE_ENTRY) };
+#define NUM_FAN_LEVELS ARRAY_SIZE(fan_step_table)
+#endif
 
 int fan_table_to_rpm(int fan, int *temp)
 {
@@ -48,6 +90,14 @@ int fan_table_to_rpm(int fan, int *temp)
 	/* previous sensor temperature */
 	static int prev_tmp[TEMP_SENSOR_COUNT];
 	int i;
+
+#if DT_NODE_EXISTS(DT_NODELABEL(fan_steps_1))
+	if (is_fan_type_2()) {
+		fan_step_table = fan_table_2;
+	} else
+		fan_step_table = fan_table_1;
+#endif
+
 	/*
 	 * Compare the current and previous temperature, we have
 	 * the three paths :
@@ -55,7 +105,7 @@ int fan_table_to_rpm(int fan, int *temp)
 	 *  2. increasing path. (check the trigger point)
 	 *  3. invariant path. (return the current RPM)
 	 *
-	 * Domika thermal table V1-1
+	 * Thermal table V1-1
 	 * Increase path judgment: CPU || (5V && Charger)
 	 * Decrease path judgment: CPU && 5V && Charger
 	 */
@@ -74,7 +124,7 @@ int fan_table_to_rpm(int fan, int *temp)
 	} else if (temp[TEMP_CPU] > prev_tmp[TEMP_CPU] ||
 		   temp[TEMP_5V] > prev_tmp[TEMP_5V] ||
 		   temp[TEMP_CHARGER] > prev_tmp[TEMP_CHARGER]) {
-		for (i = current_level; i < ARRAY_SIZE(fan_step_table); i++) {
+		for (i = current_level; i < NUM_FAN_LEVELS; i++) {
 			if (temp[TEMP_CPU] > fan_step_table[i].on[TEMP_CPU] ||
 			    (temp[TEMP_5V] > fan_step_table[i].on[TEMP_5V] &&
 			     temp[TEMP_CHARGER] >
@@ -87,8 +137,8 @@ int fan_table_to_rpm(int fan, int *temp)
 	if (current_level < 0)
 		current_level = 0;
 
-	if (current_level >= ARRAY_SIZE(fan_step_table))
-		current_level = ARRAY_SIZE(fan_step_table) - 1;
+	if (current_level >= NUM_FAN_LEVELS)
+		current_level = NUM_FAN_LEVELS - 1;
 
 	for (i = 0; i < TEMP_SENSOR_COUNT; ++i)
 		prev_tmp[i] = temp[i];
@@ -102,7 +152,11 @@ void board_override_fan_control(int fan, int *temp)
 	 * In common/fan.c pwm_fan_stop() will turn off fan
 	 * when chipset suspend or shutdown.
 	 */
+#ifdef CONFIG_BOARD_YAVISTA
+	if (ap_power_in_state(AP_POWER_STATE_ON)) {
+#else
 	if (chipset_in_state(CHIPSET_STATE_ON)) {
+#endif
 		fan_set_rpm_mode(fan, 1);
 		fan_set_rpm_target(fan, fan_table_to_rpm(fan, temp));
 	}
