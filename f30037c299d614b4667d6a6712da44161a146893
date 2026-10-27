@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dacc25b5_681f6b9c",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T12:40:52Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "ccf110dd_0e6bc286",
+      "range": {
+        "startLine": 377,
+        "startChar": 1,
+        "endLine": 377,
+        "endChar": 21
+      },
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78d24cc0_50eabc3a",
@@ -58,6 +82,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f359b591_bf38a5c4",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T12:40:52Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "78d24cc0_50eabc3a",
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b71bc61_987e3bfe",
@@ -71,6 +113,24 @@
       "writtenOn": "2026-10-27T02:55:51Z",
       "side": 1,
       "message": "nit: Add braces",
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea7364c3_b5d95b8d",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T12:40:52Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "8b71bc61_987e3bfe",
       "revId": "f30037c299d614b4667d6a6712da44161a146893",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
