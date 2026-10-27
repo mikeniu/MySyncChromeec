@@ -45,6 +45,54 @@
       },
       "revId": "6069c53deacd41f78006b05107bbfc36629e62cd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dd7ddd4_05b7695c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T03:47:39Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "df6f6d5c_abde2284",
+      "range": {
+        "startLine": 11,
+        "startChar": 34,
+        "endLine": 11,
+        "endChar": 75
+      },
+      "revId": "6069c53deacd41f78006b05107bbfc36629e62cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cf5aa18_4b899c9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T03:47:39Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "75125879_b334014c",
+      "range": {
+        "startLine": 11,
+        "startChar": 25,
+        "endLine": 11,
+        "endChar": 33
+      },
+      "revId": "6069c53deacd41f78006b05107bbfc36629e62cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
