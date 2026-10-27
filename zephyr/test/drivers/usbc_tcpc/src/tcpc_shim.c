@@ -3,9 +3,17 @@
  * found in the LICENSE file.
  */
 
+#include "gpio_signal.h"
+#include "hooks.h"
+#include "test/drivers/test_state.h"
+#include "timer.h"
+#include "usb_pd.h"
 #include "usb_pd_tcpm.h"
 #include "usbc/tcpci.h"
 
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/gpio/gpio_emul.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
 
@@ -77,6 +85,152 @@ ZTEST(tcpc_shim, test_debug_accessory_cc_states)
 		cc_is_snk_dbg_acc(TYPEC_CC_VOLT_RP_DEF, TYPEC_CC_VOLT_RP_DEF));
 	zassert_false(cc_is_snk_dbg_acc(TYPEC_CC_VOLT_RD, TYPEC_CC_VOLT_RA));
 }
+
+#if defined(CONFIG_ZTEST) || defined(TEST_BUILD)
+#define ALERT_BURST_YIELD_THRESHOLD 10
+extern struct storm_tracker_t {
+	int count;
+	timestamp_t time;
+} storm_tracker[];
+void service_one_port(int port);
+
+#ifdef CONFIG_USB_PD_TCPM_TCPCI
+extern const struct deferred_data resume_pd_port_data;
+#endif
+
+static int mock_alert_count;
+static void test_mock_alert(int port)
+{
+	mock_alert_count++;
+}
+
+static const struct tcpm_drv test_mock_drv = {
+	.tcpc_alert = test_mock_alert,
+};
+
+static const struct tcpm_drv *saved_drv;
+
+static void usbc_intr_storm_before(void *data)
+{
+	saved_drv = tcpc_config[0].drv;
+	tcpc_config[0].drv = &test_mock_drv;
+	mock_alert_count = 0;
+	pd_set_suspend(0, 0);
+}
+
+static void usbc_intr_storm_after(void *data)
+{
+	get_time_mock = NULL;
+	tcpc_config[0].drv = saved_drv;
+	pd_set_suspend(0, 0);
+#ifdef CONFIG_USB_PD_TCPM_TCPCI
+	hook_call_deferred(&resume_pd_port_data, -1);
+#endif
+}
+
+ZTEST(usbc_intr_storm, test_usbc_intr_storm_decay_within_interval)
+{
+	timestamp_t mock_time;
+
+	/* Current simulated time: 10.1 seconds */
+	mock_time.val = 10 * USEC_PER_SEC + 100 * USEC_PER_MSEC;
+	get_time_mock = &mock_time;
+
+	/* Expired 100ms ago (window was 10.0s, now is 10.1s -> within 1s
+	 * interval) */
+	storm_tracker[0].count = 100;
+	storm_tracker[0].time.val = 10 * USEC_PER_SEC;
+
+	service_one_port(0);
+
+	get_time_mock = NULL;
+
+	/* Should decay to (100 / 2) + 1 = 51 */
+	zassert_equal(storm_tracker[0].count, 51, "Expected count 51, got %d",
+		      storm_tracker[0].count);
+	zassert_equal(mock_alert_count, 1, "Alert handler should be called");
+}
+
+ZTEST(usbc_intr_storm, test_usbc_intr_storm_decay_after_interval)
+{
+	timestamp_t mock_time;
+
+	/* Current simulated time: 10 seconds */
+	mock_time.val = 10 * USEC_PER_SEC;
+	get_time_mock = &mock_time;
+
+	/* Expired > 1 interval in silence (window was 5.0s, now is 10.0s -> 5s
+	 * silence) */
+	storm_tracker[0].count = 100;
+	storm_tracker[0].time.val = 5 * USEC_PER_SEC;
+
+	service_one_port(0);
+
+	get_time_mock = NULL;
+
+	/* Should reset to 1 */
+	zassert_equal(storm_tracker[0].count, 1, "Expected count 1, got %d",
+		      storm_tracker[0].count);
+	zassert_equal(mock_alert_count, 1, "Alert handler should be called");
+}
+
+ZTEST(usbc_intr_storm, test_usbc_intr_storm_triggers_suspend)
+{
+	timestamp_t mock_time;
+
+	/* Current simulated time: 10 seconds */
+	mock_time.val = 10 * USEC_PER_SEC;
+	get_time_mock = &mock_time;
+
+	/* Count at MAX, unexpired (window ends at 10.5s) */
+	storm_tracker[0].count = CONFIG_USB_PD_INT_STORM_MAX;
+	storm_tracker[0].time.val = 10 * USEC_PER_SEC + 500 * USEC_PER_MSEC;
+
+	service_one_port(0);
+
+	get_time_mock = NULL;
+
+	/* Should increment past MAX */
+	zassert_equal(storm_tracker[0].count, CONFIG_USB_PD_INT_STORM_MAX + 1,
+		      "Expected count %d, got %d",
+		      CONFIG_USB_PD_INT_STORM_MAX + 1, storm_tracker[0].count);
+	zassert_equal(mock_alert_count, 1, "Alert handler should be called");
+}
+
+ZTEST(usbc_intr_storm, test_usbc_intr_storm_burst_yield)
+{
+	timestamp_t mock_time;
+
+	/* Current simulated time: 10 seconds */
+	mock_time.val = 10 * USEC_PER_SEC;
+	get_time_mock = &mock_time;
+
+	/* Window valid until 10.5 seconds, count at 9 (one below threshold of
+	 * 10) */
+	storm_tracker[0].count = ALERT_BURST_YIELD_THRESHOLD - 1;
+	storm_tracker[0].time.val = 10 * USEC_PER_SEC + 500 * USEC_PER_MSEC;
+
+	/* Next alert increments count to 10 (multiple of
+	 * ALERT_BURST_YIELD_THRESHOLD -> yields) */
+	service_one_port(0);
+	zassert_equal(storm_tracker[0].count, ALERT_BURST_YIELD_THRESHOLD,
+		      "Expected count %d, got %d", ALERT_BURST_YIELD_THRESHOLD,
+		      storm_tracker[0].count);
+
+	/* Subsequent alert increments count to 11 (non-multiple -> no yield) */
+	service_one_port(0);
+	zassert_equal(storm_tracker[0].count, ALERT_BURST_YIELD_THRESHOLD + 1,
+		      "Expected count %d, got %d",
+		      ALERT_BURST_YIELD_THRESHOLD + 1, storm_tracker[0].count);
+
+	get_time_mock = NULL;
+	zassert_equal(mock_alert_count, 2,
+		      "Alert handler should be called twice");
+}
+
+ZTEST_SUITE(usbc_intr_storm, drivers_predicate_pre_main, NULL,
+	    usbc_intr_storm_before, usbc_intr_storm_after, NULL);
+#endif /* TEST_BUILD */
 
 void tcpc_shim_before_test(void *data)
 {
