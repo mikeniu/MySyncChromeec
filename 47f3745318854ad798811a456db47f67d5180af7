@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a7546ab_ab42c6a1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:24:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29d0593b_d3e534d8",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 0
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82fe0f00_ed06c91c",
@@ -58,6 +82,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "053ea902_9beeef8a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:24:22Z",
+      "side": 1,
+      "message": "Split bloonchipper peripheral/clock teardown into crrev.com/c/8670979 and moved crrev.com/c/8635773 (Cortex-M arch_pre_system_jump() MPU teardown) before crrev.com/c/8634174 so arm_core_mpu_disable() moves directly from HOOK_SYSJUMP to arch_pre_system_jump().",
+      "parentUuid": "4b6c2658_b1a41c39",
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c519c43d_1d363531",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:24:22Z",
+      "side": 1,
+      "message": "Split FPMCU teardown into separate CLs in the stack and moved crrev.com/c/8635773 before crrev.com/c/8634174. Kept system_fake with arch_pre_system_jump() and jump_tags tests in this CL.",
+      "parentUuid": "82fe0f00_ed06c91c",
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85f41901_b65dabf8",
@@ -71,6 +131,30 @@
       "writtenOn": "2026-10-26T18:19:40Z",
       "side": 1,
       "message": "[Gerrit AI Review] `ztest_interrupt_disable_all()` discards the lock key returned by `irq_lock()`, and `system_jump_to_booter()` passes a hardcoded `0` to `irq_unlock(0)`. To match Zephyr\u0027s `irq_lock()` / `irq_unlock(key)` contract, save the key returned by `irq_lock()` and pass it to `irq_unlock()`:\n\n```c\nstatic unsigned int irq_lock_key;\nstatic bool irq_locked;\n\nvoid ztest_interrupt_disable_all(void)\n{\n\tif (!irq_locked) {\n\t\tirq_lock_key \u003d irq_lock();\n\t\tirq_locked \u003d true;\n\t}\n}\n\nvoid system_fake_setenv(jmp_buf *env)\n{\n\tjump_env \u003d env;\n}\n\nvoid system_jump_to_booter(void)\n{\n\tif (irq_locked) {\n\t\tirq_locked \u003d false;\n\t\tirq_unlock(irq_lock_key);\n\t}\n\tif (jump_env)\n\t\tlongjmp(*jump_env, 1);\n}\n```",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 1
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95fc7c53_f6c6d9d7",
+        "filename": "zephyr/fake/system_fake.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:24:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85f41901_b65dabf8",
       "range": {
         "startLine": 18,
         "startChar": 0,
@@ -104,6 +188,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73078faf_dd0c856b",
+        "filename": "zephyr/shim/core/riscv/mpu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:24:22Z",
+      "side": 1,
+      "message": "zephyr/shim/core/riscv/mpu.c is gated on CONFIG_RISCV and is not compiled in native_sim unit tests, and arch_pre_system_jump() is a 1-line wrapper around z_riscv_pmp_clear_all().",
+      "parentUuid": "861b38d1_85403064",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 1
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82c63446_c35bd851",
@@ -127,6 +235,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b4d82d9_87d83af3",
+        "filename": "zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:24:22Z",
+      "side": 1,
+      "message": "Addressed in crrev.com/c/8670979 and crrev.com/c/8635773.",
+      "parentUuid": "82c63446_c35bd851",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 19
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb1952af_03750d38",
@@ -140,6 +272,30 @@
       "writtenOn": "2026-10-26T18:19:40Z",
       "side": 1,
       "message": "[Gerrit AI Review] Unlike `test_tim2` above (lines 49–52), `test_chip_pre_system_jump` only asserts `stm32_reset_line_toggle_fake.call_count \u003d\u003d 1` without verifying the reset controller device (`arg0_history[0]`) or reset bit (`arg1_history[0]`), and does not verify that `sys_clock_disable()` was called.\n\nPlease add `FAKE_VOID_FUNC(sys_clock_disable);` alongside the other fakes at line 20 and assert the exact reset arguments and clock disable call:\n\n```c\nZTEST(ec_quirks, test_chip_pre_system_jump)\n{\n\tRESET_FAKE(stm32_reset_line_toggle);\n\tRESET_FAKE(arm_core_mpu_disable);\n\tRESET_FAKE(sys_clock_disable);\n\n\tchip_pre_system_jump();\n\n\tzassert_equal(stm32_reset_line_toggle_fake.call_count, 1);\n\tzassert_equal(stm32_reset_line_toggle_fake.arg0_history[0],\n\t\t      DEVICE_DT_GET(DT_NODELABEL(rctl)));\n\tzassert_equal(stm32_reset_line_toggle_fake.arg1_history[0],\n\t\t      DT_RESETS_CELL(DT_NODELABEL(timers2), bits));\n\tzassert_equal(arm_core_mpu_disable_fake.call_count, 1);\n\tzassert_equal(sys_clock_disable_fake.call_count, 1);\n}\n```",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 1
+      },
+      "revId": "47f3745318854ad798811a456db47f67d5180af7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10ed0f23_841e0153",
+        "filename": "zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:24:22Z",
+      "side": 1,
+      "message": "Addressed in crrev.com/c/8670979 with assertions for stm32_reset_line_toggle_fake arguments using DT_RESET_ID. Kept native_sim\u0027s real sys_clock_disable() definition as defining FAKE_VOID_FUNC(sys_clock_disable) causes a multiple-definition linker error.",
+      "parentUuid": "fb1952af_03750d38",
       "range": {
         "startLine": 55,
         "startChar": 0,
