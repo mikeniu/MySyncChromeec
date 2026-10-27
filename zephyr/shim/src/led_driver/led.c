@@ -16,6 +16,7 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "led_common.h"
+#include "lid_switch.h"
 #include "power.h"
 #include "system.h"
 #include "util.h"
@@ -107,12 +108,19 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 
 DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_NODE_ARRAY_FOR_POLICY)
 
+/* Tokens for the lid-state property (see cros-ec,led-policy.yaml) */
+enum led_lid_state {
+	LED_LID_OPEN,
+	LED_LID_CLOSED,
+};
+
 struct node_prop_t {
 	struct led_pattern_node_t *led_patterns;
 	int batt_state_mask;
 	int batt_state;
 	uint16_t pwr_state;
 	uint16_t chipset_state;
+	uint16_t lid_state;
 	int8_t batt_lvl[2];
 	int8_t charge_port;
 	int8_t board_led_alt_policy_label;
@@ -143,6 +151,7 @@ struct node_prop_t {
 				    (DT_PROP(state_id, batt_state)), (-1)),   \
 		.pwr_state = GET_TOKEN_MASK(state_id, charge_state),          \
 		.chipset_state = GET_TOKEN_MASK(state_id, chipset_state),     \
+		.lid_state = GET_TOKEN_MASK(state_id, lid_state),             \
 		.batt_lvl = COND_CODE_1(DT_NODE_HAS_PROP(state_id, batt_lvl), \
 					(DT_PROP(state_id, batt_lvl)),        \
 					({ -1, -1 })),                        \
@@ -543,6 +552,25 @@ static int match_node(const struct policy_group *grp, int node_idx)
 			*active = false;
 			return -1;
 		}
+	}
+
+	/* Check if this node depends on lid state */
+	if (node->lid_state != 0) {
+#if IS_ENABLED(CONFIG_PLATFORM_EC_LID_SWITCH)
+		enum led_lid_state lid_state = lid_is_open() ? LED_LID_OPEN :
+							       LED_LID_CLOSED;
+
+		if (!(node->lid_state & BIT(lid_state))) {
+			*active = false;
+			return -1;
+		}
+#else
+		/* Without a lid switch, treat the lid as always open. */
+		if (!(node->lid_state & BIT(LED_LID_OPEN))) {
+			*active = false;
+			return -1;
+		}
+#endif
 	}
 
 	/* Check if this node depends on board alt policy */
