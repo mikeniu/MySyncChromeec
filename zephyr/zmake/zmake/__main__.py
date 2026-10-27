@@ -527,6 +527,11 @@ def main(argv=None):
             for d in (mod_dir.parent.parent, mod_dir.parent, mod_dir / "ec")
         )
     )
+    origin_checkout = os.environ.get("ZMAKE_ORIGIN_CHECKOUT")
+    if opts.subcommand == "compare-builds" and origin_checkout:
+        opts.checkout = pathlib.Path(origin_checkout)
+        workspace_prepared = False
+
     prep_subcommands = {"configure", "build", "compare-builds"}
     need_prep = opts.subcommand in prep_subcommands and not workspace_prepared
 

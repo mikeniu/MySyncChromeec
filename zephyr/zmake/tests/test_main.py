@@ -46,6 +46,7 @@ def fixture_mock_locate_checkout():
 def fixture_clean_env(monkeypatch):
     """Ensure ZMAKE_WORKSPACE_PREPARED and MAKEFLAGS are not set."""
     monkeypatch.delenv("ZMAKE_WORKSPACE_PREPARED", raising=False)
+    monkeypatch.delenv("ZMAKE_ORIGIN_CHECKOUT", raising=False)
     monkeypatch.delenv("MAKEFLAGS", raising=False)
     monkeypatch.setattr(main, "maybe_reexec", lambda argv: None)
     monkeypatch.setattr(main, "find_toolchains", lambda: None)
@@ -343,3 +344,51 @@ def test_main_compare_builds_no_shadow_uses_in_place_prep(
     _, cmp_kwargs = zmake_instance.compare_builds.call_args
     assert cmp_kwargs.get("worktree_patches_dirs") is None
     assert cmp_kwargs.get("worktree_src_override_dirs") is None
+
+
+@pytest.mark.usefixtures("mock_locate_checkout", "clean_env")
+@mock.patch("zmake.repository_prep._has_files", return_value=True)
+@mock.patch("zmake.repository_prep.create_shadow_checkout")
+def test_main_compare_builds_in_shadow_workspace_uses_origin_checkout(
+    mock_create, _mock_has_files, mock_preparer, mock_zmake_class, monkeypatch
+):
+    """Test compare-builds inside shadow workspace uses ZMAKE_ORIGIN_CHECKOUT."""
+    monkeypatch.setenv("ZMAKE_WORKSPACE_PREPARED", "1")
+    monkeypatch.setenv("ZMAKE_ORIGIN_CHECKOUT", "/fake/origin")
+
+    with mock.patch(
+        "zmake.repository_prep.get_default_patches_dirs",
+        return_value=[pathlib.Path("/fake/patches")],
+    ) as mock_patches, mock.patch(
+        "zmake.repository_prep.get_default_src_override_dirs",
+        return_value=[pathlib.Path("/fake/overrides")],
+    ) as mock_overrides, mock.patch(
+        "tempfile.mkdtemp", return_value="/fake/tempdir"
+    ):
+        main.main(
+            [
+                "--checkout",
+                "/fake/shadow",
+                "compare-builds",
+                "--ref1",
+                "HEAD",
+                "--ref2",
+                "HEAD",
+                "project1",
+            ]
+        )
+
+    _, zmake_kwargs = mock_zmake_class.call_args
+    assert zmake_kwargs["checkout"] == pathlib.Path("/fake/origin")
+    mock_patches.assert_called_once_with(pathlib.Path("/fake/origin"))
+    mock_overrides.assert_called_once_with(pathlib.Path("/fake/origin"))
+    mock_create.assert_not_called()
+    mock_preparer.assert_not_called()
+    zmake_instance = mock_zmake_class.return_value
+    _, cmp_kwargs = zmake_instance.compare_builds.call_args
+    assert cmp_kwargs["worktree_patches_dirs"] == [
+        pathlib.Path("/fake/patches")
+    ]
+    assert cmp_kwargs["worktree_src_override_dirs"] == [
+        pathlib.Path("/fake/overrides")
+    ]
