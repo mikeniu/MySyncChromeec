@@ -5,6 +5,12 @@
 
 #include "common.dtsi"
 
+/ {
+	zephyr,user {
+		lid-open-gpios = <&gpiob 8 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>;
+	};
+};
+
 #define ELANI80SA_COMMON_IMAGE_PROPS \
 	width = <80>; \
 	height = <80>; \
