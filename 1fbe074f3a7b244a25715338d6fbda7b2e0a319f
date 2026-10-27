@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc8be6e2_3849bbf5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1132339
+      },
+      "writtenOn": "2026-10-27T05:11:09Z",
+      "side": 1,
+      "message": "This CL is needed once [PR:122795](https://github.com/zephyrproject-rtos/zephyr/pull/122795) is cherry-picked to the Zephyr downstream repo.\nI Will update the Cq-Depend message accordingly.",
+      "revId": "1fbe074f3a7b244a25715338d6fbda7b2e0a319f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
