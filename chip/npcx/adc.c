@@ -59,6 +59,7 @@ static volatile task_id_t task_waiting;
 mutex_t adc_lock;
 
 static volatile bool adc_done;
+static bool adc_init_done;
 
 /**
  * Preset ADC operation clock.
@@ -229,6 +230,11 @@ int adc_read_channel(enum adc_channel ch)
 	const struct adc_t *adc = adc_channels + ch;
 	int value;
 	uint16_t chn_data;
+
+	if (!adc_init_done) {
+		CPRINTS("ADC read ch %d before init", ch);
+		return ADC_READ_ERROR;
+	}
 
 	mutex_lock(&adc_lock);
 
@@ -442,6 +448,8 @@ void adc_init(void)
 
 	/* Enable IRQs */
 	task_enable_irq(NPCX_IRQ_ADC);
+
+	adc_init_done = true;
 }
 #ifndef CONFIG_KEYBOARD_SCAN_ADC
 DECLARE_HOOK(HOOK_INIT, adc_init, HOOK_PRIO_INIT_ADC);
