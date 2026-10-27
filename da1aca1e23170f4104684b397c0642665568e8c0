@@ -24,6 +24,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21ddac45_18568c57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:58:18Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "599ecf36_a1d4e3b7",
+      "range": {
+        "startLine": 9,
+        "startChar": 45,
+        "endLine": 9,
+        "endChar": 49
+      },
+      "isAi": true,
+      "revId": "da1aca1e23170f4104684b397c0642665568e8c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a45a54ff_9478eb3e",
@@ -43,6 +68,31 @@
         "endLine": 106,
         "endChar": 25
       },
+      "revId": "da1aca1e23170f4104684b397c0642665568e8c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4949d6d6_4be50e92",
+        "filename": "chip/mchp/adc.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T22:58:18Z",
+      "side": 1,
+      "message": "Removed adc_read_all_channels() since it is unused dead code (removed from include/adc.h and other chip drivers in 5cc3cac589).",
+      "parentUuid": "a45a54ff_9478eb3e",
+      "range": {
+        "startLine": 106,
+        "startChar": 9,
+        "endLine": 106,
+        "endChar": 25
+      },
+      "isAi": true,
       "revId": "da1aca1e23170f4104684b397c0642665568e8c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
