@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfb2fe9d_8e864c17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T03:56:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `raa489000_enable_linear_charge()` now uses `i2c_field_update16()` to update `ISL923X_REG_CONTROL2`, preventing an I2C read failure from writing an uninitialized stack value back to the primary charger.\n* **Architecture \u0026 Component Fit:** ✅ Reuses the existing `i2c_field_update16()` helper and extends the `drivers.raa489000` devicetree/Kconfig setup cleanly to cover OCPC with a secondary charger.\n* **Code Simplicity:** ✅ Replaces the manual read-modify-write sequence and local `regval` variable with a single `i2c_field_update16()` call, and keeps `test_enable_linear_charge_read_error` minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC and Zephyr `ztest` conventions.\n* **Security:** ✅ Eliminates use of an uninitialized stack variable (`regval`) on I2C read error.\n* **Testing:** ✅ `test_enable_linear_charge_read_error` covers both the `ISL923X_REG_CONTROL2` read-error path (verifying `EC_ERROR_UNKNOWN` and that `ISL923X_REG_CONTROL2` remains `0`) and the read-success path (verifying `EC_SUCCESS` and the exact expected `GENMASK(15, 13)` register value).\n* **CL Size \u0026 Scope:** ✅ `Size: M (+44, -7)` (~6 production lines added / 7 removed, ~38 test/config lines added) — single cohesive bug fix and its unit test.\n* **Commit Message:** ✅ Clear, accurate, and concise rationale and summary with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/e2ee4f25-7c2b-4325-8aac-4a17cf6c0600)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0de0cbd00fc662bc03726b7b87837bc83c7f958c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
