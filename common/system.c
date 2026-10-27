@@ -941,6 +941,18 @@ void system_common_pre_init(void)
 	jdata = get_jump_data();
 
 	/*
+	 * If a sysjump target resets before init_jump_data() clears
+	 * jdata->magic, stale jump_data remains in RAM when RO boots.
+	 * Discard jump_data if RO booted from a reset (excluding POWER_ON
+	 * and RESET_PIN, which some chip drivers set even on a sysjump).
+	 */
+	if (IS_ENABLED(SECTION_IS_RO) &&
+	    (reset_flags & (EC_RESET_FLAG_WATCHDOG | EC_RESET_FLAG_SOFT |
+			    EC_RESET_FLAG_HARD | EC_RESET_FLAG_HIBERNATE))) {
+		goto clear_jump_data;
+	}
+
+	/*
 	 * Check jump data if this is a jump between images.
 	 */
 	if (jdata->magic == JUMP_DATA_MAGIC && jdata->version >= 1) {
@@ -1001,6 +1013,7 @@ void system_common_pre_init(void)
 		 */
 		jdata->magic = 0;
 	} else {
+clear_jump_data:
 		/* Clear the whole jump_data struct */
 		memset(jdata, 0, sizeof(struct jump_data));
 	}
