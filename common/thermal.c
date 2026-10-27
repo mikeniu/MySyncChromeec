@@ -53,7 +53,8 @@ static cond_t cond_hot[EC_TEMP_THRESH_COUNT];
 /* thermal sensor read delay */
 #if defined(CONFIG_TEMP_SENSOR_POWER) && \
 	defined(CONFIG_TEMP_SENSOR_FIRST_READ_DELAY_MS)
-static int first_read_delay = CONFIG_TEMP_SENSOR_FIRST_READ_DELAY_MS;
+test_export_static int first_read_delay =
+	CONFIG_TEMP_SENSOR_FIRST_READ_DELAY_MS;
 #endif
 
 static void thermal_control(void)
@@ -76,9 +77,12 @@ static void thermal_control(void)
 	/* add delay to ensure thermal sensor is ready when EC boot */
 #if defined(CONFIG_TEMP_SENSOR_POWER) && \
 	defined(CONFIG_TEMP_SENSOR_FIRST_READ_DELAY_MS)
-	if (first_read_delay != 0) {
-		k_msleep(first_read_delay);
-		first_read_delay = 0;
+	if (first_read_delay > 0) {
+		if (first_read_delay <= MSEC_PER_SEC)
+			first_read_delay = 0;
+		else
+			first_read_delay -= MSEC_PER_SEC;
+		return;
 	}
 #endif
 
@@ -180,7 +184,6 @@ static void thermal_control(void)
 		/* Print temperature sensor values before shutting down AP */
 		if (IS_ENABLED(CONFIG_CMD_TEMP_SENSOR)) {
 			print_temps();
-			cflush();
 		}
 
 		chipset_force_shutdown(CHIPSET_SHUTDOWN_THERMAL);

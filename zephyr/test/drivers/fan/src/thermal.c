@@ -47,6 +47,8 @@ struct thermal_fixture {
 };
 static struct thermal_fixture fixture;
 
+extern test_export_static int first_read_delay;
+
 static void seed_temp_sensors(void)
 {
 	const struct device *adc_dev = DEVICE_DT_GET(DT_NODELABEL(adc0));
@@ -379,4 +381,46 @@ ZTEST(thermal, test_hc_thermal_thresholds)
 		zassert_equal(args.response_size, sizeof(get_r));
 		zassert_mem_equal(&get_r, &set_p.cfg, sizeof(get_r));
 	}
+}
+
+ZTEST(thermal, test_thermal_control_first_read_delay)
+{
+	int t = 0;
+
+	zassert_ok(temp_sensor_read(0, &t));
+	zassert_true(t > 0);
+
+	/* Set fan off / max so normal thermal_control would set 100% fan */
+	memset(thermal_params, 0, THERMAL_PARAMS_SIZE);
+	thermal_params[0].temp_fan_off = t - 20;
+	thermal_params[0].temp_fan_max = t - 10;
+
+	/* Reset fan target to 0 */
+	fan_set_rpm_target(0, 0);
+	zassert_equal(fan_get_rpm_target(0), 0);
+
+	/* Set first_read_delay to 1500 ms (requiring 2 HOOK_SECOND ticks to
+	 * clear) */
+	first_read_delay = 1500;
+
+	/* 1st HOOK_SECOND: first_read_delay decrements from 1500 to 500, no fan
+	 * update */
+	hook_notify(HOOK_SECOND);
+	zassert_equal(first_read_delay, 500);
+	zassert_equal(fan_get_rpm_target(0), 0);
+
+	/* 2nd HOOK_SECOND: first_read_delay decrements from 500 to 0, no fan
+	 * update */
+	hook_notify(HOOK_SECOND);
+	zassert_equal(first_read_delay, 0);
+	zassert_equal(fan_get_rpm_target(0), 0);
+
+	/* 3rd HOOK_SECOND: delay is 0, normal thermal_control runs and spins up
+	 * fan */
+	hook_notify(HOOK_SECOND);
+	zassert_equal(first_read_delay, 0);
+	zassert_equal(fan_get_rpm_target(0), fans[0].rpm->rpm_max);
+
+	/* Cleanup */
+	reset_thermal_state(&fixture);
 }
