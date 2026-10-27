@@ -14,6 +14,8 @@
 #include "timer.h"
 #include "util.h"
 
+#define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
+
 /*
  * Conversion on a single channel takes less than 12 ms. Set timeout to
  * 15 ms so that we have a 3-ms margin.
@@ -21,6 +23,8 @@
 #define ADC_SINGLE_READ_TIME 15000
 
 mutex_t adc_lock;
+
+static bool adc_init_done;
 
 /*
  * Volatile should not be needed.
@@ -71,6 +75,11 @@ int adc_read_channel(enum adc_channel ch)
 	const struct adc_t *adc = adc_channels + ch;
 	int value;
 
+	if (!adc_init_done) {
+		CPRINTS("ADC read ch %d before init", ch);
+		return ADC_READ_ERROR;
+	}
+
 	mutex_lock(&adc_lock);
 
 	MCHP_ADC_SINGLE = 1 << adc->channel;
@@ -84,36 +93,6 @@ int adc_read_channel(enum adc_channel ch)
 
 	mutex_unlock(&adc_lock);
 	return value;
-}
-
-int adc_read_all_channels(int *data)
-{
-	int i;
-	int ret = EC_SUCCESS;
-	const struct adc_t *adc;
-
-	mutex_lock(&adc_lock);
-
-	MCHP_ADC_SINGLE = 0;
-	for (i = 0; i < ADC_CH_COUNT; ++i)
-		MCHP_ADC_SINGLE |= 1 << adc_channels[i].channel;
-
-	if (!start_single_and_wait(ADC_SINGLE_READ_TIME * ADC_CH_COUNT)) {
-		ret = EC_ERROR_TIMEOUT;
-		goto exit_all_channels;
-	}
-
-	for (i = 0; i < ADC_CH_COUNT; ++i) {
-		adc = adc_channels + i;
-		data[i] = (MCHP_ADC_READ(adc->channel) * adc->factor_mul) /
-				  adc->factor_div +
-			  adc->shift;
-	}
-
-exit_all_channels:
-	mutex_unlock(&adc_lock);
-
-	return ret;
 }
 
 /*
@@ -138,6 +117,8 @@ static void adc_init(void)
 	task_waiting = TASK_ID_INVALID;
 	MCHP_INT_ENABLE(MCHP_ADC_GIRQ) = MCHP_ADC_GIRQ_SINGLE_BIT;
 	task_enable_irq(MCHP_IRQ_ADC_SNGL);
+
+	adc_init_done = true;
 }
 DECLARE_HOOK(HOOK_INIT, adc_init, HOOK_PRIO_INIT_ADC);
 
