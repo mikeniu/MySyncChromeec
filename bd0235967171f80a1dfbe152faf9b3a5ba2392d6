@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95c78d91_1f14ef08",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-27T16:27:40Z",
+      "side": 1,
+      "message": "you sure you want to do this? 78% sounds fairly reasonable, at least 200+b of stack seems like a decent margin, I understand you can eat them up quickly but that\u0027s the case for all other stacks and I don\u0027t think we keep that much margin on those either\n\nmain concern is that once you allocate those 200 bytes they\u0027ll never get pulled back down if needed",
+      "revId": "bd0235967171f80a1dfbe152faf9b3a5ba2392d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
