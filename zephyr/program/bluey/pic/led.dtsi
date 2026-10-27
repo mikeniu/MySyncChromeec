@@ -57,14 +57,40 @@
 
 		/* ========== Power LED Policies ========== */
 
-		/* S0: Power on - solid white */
-		chipset-state-s0 {
+		/*
+		 * S0, lid open: Power on - solid white.
+		 *
+		 * This board's chipset stays in S0 while the lid is closed
+		 * (it never reaches S3), so the lid switch is used as the
+		 * criterion for the lid-close LED behavior instead of
+		 * POWER_S3.
+		 */
+		chipset-state-s0-lid-open {
 			chipset-state = "POWER_S0";
+			lid-state = "LED_LID_OPEN";
 
 			power-led {
 				led-id = "EC_LED_ID_POWER_LED";
 				color-0 {
 					led-color = <&power_led_white>;
+				};
+			};
+		};
+
+		/* S0, lid closed: white breathing (1s on, 3s off) */
+		chipset-state-s0-lid-closed {
+			chipset-state = "POWER_S0";
+			lid-state = "LED_LID_CLOSED";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+				color-0 {
+					led-color = <&power_led_white>;
+					period-ms = <1000>;
+				};
+				color-1 {
+					led-color = <&power_led_off>;
+					period-ms = <3000>;
 				};
 			};
 		};
