@@ -1257,6 +1257,12 @@ static int isl9241_ramp_get_current_limit(int chgnum)
 }
 #endif /* CONFIG_CHARGE_RAMP_HW */
 
+static void isl9241_disable_discharge_on_ac(void)
+{
+	charger_discharge_on_ac(0);
+}
+DECLARE_DEFERRED(isl9241_disable_discharge_on_ac);
+
 /*
  * When fully charged in a low-power state, the ISL9241 may get stuck
  * in CCM. Toggle learning mode for 50 ms to enter DCM and save power.
@@ -1271,8 +1277,8 @@ static void isl9241_restart_charge_voltage_when_full(void)
 	    led_pwr_get_state() == LED_PWRS_CHARGE_NEAR_FULL &&
 	    battery_get_disconnect_state() == BATTERY_NOT_DISCONNECTED) {
 		charger_discharge_on_ac(1);
-		k_msleep(50);
-		charger_discharge_on_ac(0);
+		hook_call_deferred(&isl9241_disable_discharge_on_ac_data,
+				   50 * MSEC);
 	}
 }
 DECLARE_HOOK(HOOK_BATTERY_SOC_CHANGE, isl9241_restart_charge_voltage_when_full,

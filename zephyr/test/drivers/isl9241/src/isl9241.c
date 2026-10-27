@@ -3,16 +3,23 @@
  * found in the LICENSE file.
  */
 
+#include "battery.h"
 #include "battery_smart.h"
+#include "charge_manager.h"
+#include "charge_state.h"
 #include "charger.h"
+#include "chipset.h"
 #include "console.h"
 #include "driver/charger/isl9241.h"
 #include "driver/charger/isl9241_public.h"
 #include "emul/emul_isl9241.h"
+#include "hooks.h"
+#include "power.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 
+#include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/shell/shell_dummy.h>
 #include <zephyr/ztest.h>
@@ -279,3 +286,98 @@ ZTEST_F(isl9241_driver, test_acokref)
 	}
 }
 #endif /* CONFIG_PLATFORM_EC_CHARGER_SET_ACOKREF */
+
+static bool mock_charge_full_active;
+
+int charge_manager_get_active_charge_port(void)
+{
+	if (mock_charge_full_active)
+		return 0;
+	return charge_manager_get_active_charge_port_no_lock();
+}
+
+const struct batt_params *charger_current_battery_params(void)
+{
+	static struct batt_params mock_batt;
+
+	if (mock_charge_full_active) {
+		mock_batt.display_charge = 1000;
+		return &mock_batt;
+	}
+	return &charge_get_status()->batt;
+}
+
+ZTEST_F(isl9241_driver, test_restart_charge_voltage_when_full)
+{
+	struct charge_state_data *curr = charge_get_status();
+	struct charge_state_data saved_charge_state = *curr;
+	enum power_state orig_power = power_get_state();
+	uint16_t reg;
+
+	/* Let any pending boot-time deferred hooks drain on k_sys_work_q */
+	k_sleep(K_SECONDS(1));
+
+	/* Ensure discharge on AC / learn mode starts cleared */
+	zassert_ok(charger_discharge_on_ac(0));
+	reg = isl9241_emul_peek(fixture->isl9241_emul, ISL9241_REG_CONTROL1);
+	zassert_false(reg & ISL9241_CONTROL1_LEARN_MODE);
+
+	/*
+	 * Negative test 1: Chipset is in S0 (CHIPSET_STATE_ON).
+	 * Even if battery is near full, hook should NOT trigger discharge on
+	 * AC.
+	 */
+	power_set_state(POWER_S0);
+	curr->state = ST_CHARGE;
+	mock_charge_full_active = true;
+
+	hook_notify(HOOK_BATTERY_SOC_CHANGE);
+	reg = isl9241_emul_peek(fixture->isl9241_emul, ISL9241_REG_CONTROL1);
+	zassert_false(reg & ISL9241_CONTROL1_LEARN_MODE);
+
+	/*
+	 * Negative test 2: Chipset is in S3 (suspended/off), but LED state
+	 * is not LED_PWRS_CHARGE_NEAR_FULL (e.g. ST_IDLE).
+	 */
+	power_set_state(POWER_S3);
+	curr->state = ST_IDLE;
+	mock_charge_full_active = false;
+
+	hook_notify(HOOK_BATTERY_SOC_CHANGE);
+	reg = isl9241_emul_peek(fixture->isl9241_emul, ISL9241_REG_CONTROL1);
+	zassert_false(reg & ISL9241_CONTROL1_LEARN_MODE);
+
+	/*
+	 * Positive test:
+	 * - Chipset is suspended/off
+	 * (!chipset_in_or_transitioning_to_state(CHIPSET_STATE_ON))
+	 * - led_pwr_get_state() == LED_PWRS_CHARGE_NEAR_FULL
+	 * - battery_get_disconnect_state() == BATTERY_NOT_DISCONNECTED
+	 */
+	power_set_state(POWER_S3);
+	curr->state = ST_CHARGE;
+	mock_charge_full_active = true;
+	zassert_equal(led_pwr_get_state(), LED_PWRS_CHARGE_NEAR_FULL);
+	zassert_equal(battery_get_disconnect_state(), BATTERY_NOT_DISCONNECTED);
+
+	hook_notify(HOOK_BATTERY_SOC_CHANGE);
+	reg = isl9241_emul_peek(fixture->isl9241_emul, ISL9241_REG_CONTROL1);
+	zassert_true(reg & ISL9241_CONTROL1_LEARN_MODE);
+
+	/* Clear mock so background tasks don't re-trigger */
+	mock_charge_full_active = false;
+
+	/* Still enabled before the 50 ms deferred timeout expires */
+	k_sleep(K_MSEC(20));
+	reg = isl9241_emul_peek(fixture->isl9241_emul, ISL9241_REG_CONTROL1);
+	zassert_true(reg & ISL9241_CONTROL1_LEARN_MODE);
+
+	/* Disabled once the 50 ms deferred callback runs */
+	k_sleep(K_MSEC(40));
+	reg = isl9241_emul_peek(fixture->isl9241_emul, ISL9241_REG_CONTROL1);
+	zassert_false(reg & ISL9241_CONTROL1_LEARN_MODE);
+
+	/* Restore modified global / mock state */
+	*curr = saved_charge_state;
+	power_set_state(orig_power);
+}
