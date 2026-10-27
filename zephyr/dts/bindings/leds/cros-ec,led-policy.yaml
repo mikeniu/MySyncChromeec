@@ -114,6 +114,17 @@ child-binding:
         - POWER_S3
         - POWER_S5
 
+    lid-state:
+      description: |
+        If the LED color depends on lid state, this property is used to
+        store a list of all lid states that use the same policy.
+        LED_LID_OPEN - The lid switch reports the lid is open.
+        LED_LID_CLOSED - The lid switch reports the lid is closed.
+      type: string-array
+      enum:
+        - LED_LID_OPEN
+        - LED_LID_CLOSED
+
     batt-state-mask:
       description: |
         If the LED color depends on battery state, this property is used
