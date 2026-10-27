@@ -105,6 +105,24 @@
       "parentUuid": "a2a4224a_b290bc8e",
       "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8a4b5ae_ddcdd38c",
+        "filename": "zephyr/drivers/switchcap/switchcap_gpio.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-27T11:19:02Z",
+      "side": 1,
+      "message": "ok thanks for clarifying, would it be worth adding a comment about it?",
+      "parentUuid": "5e75f446_ebcf91a4",
+      "revId": "11b1cc5b3a3fc3805d109783185a8297fad8f64b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
