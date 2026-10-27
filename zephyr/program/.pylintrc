@@ -6,6 +6,7 @@ additional-builtins=
     register_host_project,
     register_host_test,
     register_mchp_project,
+    register_mtkscp_project,
     register_npcx_project,
     register_raw_project,
     register_ish_project,
