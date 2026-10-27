@@ -103,6 +103,12 @@ if (DEFINED CONFIG_ARM)
 endif()
 zephyr_cc_option(-Wimplicit-fallthrough)
 zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:-Wint-conversion>)
+# TODO(b/578537764): Remove once upstream Zephyr is C23 const-correct with
+# glibc 2.43's const-preserving string macros (e.g., strchr() in getopt.c).
+zephyr_cc_option(
+  -Wno-error=discarded-qualifiers
+  -Wno-error=incompatible-pointer-types-discards-qualifiers
+)
 
 if (DEFINED CONFIG_RISCV)
   zephyr_cc_option(-fsanitize=integer-divide-by-zero)
