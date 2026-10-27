@@ -38,4 +38,17 @@ config PLATFORM_EC_WATCHDOG_HELPER
 	  Watchdog helper is used to trigger warning and gather debugging
 	  information before hardware watchdog resets the SoC.
 
+config PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO
+	bool "Enable console command for watchdog info"
+	default n
+	help
+	  Enable watchdoginfo console command. Useful for debugging watchdog
+	  issues.
+
+config PLATFORM_EC_HOSTCMD_WATCHDOG_INFO
+	bool "Enable host command for watchdog info"
+	default y
+	help
+	  Enable host command to query watchdog info.
+
 endif # WATCHDOG
