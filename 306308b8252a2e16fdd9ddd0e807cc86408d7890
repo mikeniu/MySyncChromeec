@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "488f4be9_021f302a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-27T16:12:00Z",
+      "side": 1,
+      "message": "I think this is a valid use case for `LOW_COVERAGE_REASON`, not much value in adding complexity to add the basic error paths (or even worse, as I\u0027ve sadly seen done, skip them entirely). I think that\u0027s what Keith meant with https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8616842/comments/1e01470e_041400d0",
+      "revId": "306308b8252a2e16fdd9ddd0e807cc86408d7890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
