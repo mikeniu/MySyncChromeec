@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fda65c2_65260dab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-27T11:47:41Z",
+      "side": 1,
+      "message": "This CL fixes `panic_data_dartmonkey_v2.0.2887` test, which otherwise fails on Renode while passing on hardware.",
+      "revId": "d3f246ed178dbcd69439b10fe7faf1328e8feb98",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
