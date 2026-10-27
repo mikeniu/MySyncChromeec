@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a8f0b14_b5b7a522",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T18:43:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ All occurrences of `BODY_DETECTION_ALOGIRTHM_V1` and `BODY_DETECTION_ALOGIRTHM_V2` (and their `CONFIG_` counterparts) are consistently renamed to `BODY_DETECTION_ALGORITHM_V1` and `BODY_DETECTION_ALGORITHM_V2` across `zephyr/Kconfig.body_detection`, `zephyr/CMakeLists.txt`, `common/body_detect_common.c`, `zephyr/program/trulo/uldrenite-ish/project.conf`, `zephyr/test/drivers/bmi3xx/prj.conf`, `zephyr/test/drivers/body_detection/src/body_detection.c`, and `zephyr/test/drivers/testcase.yaml`.\n* **Architecture \u0026 Component Fit:** ✅ Clean mechanical rename of the Kconfig choice symbols to match the enclosing `choice BODY_DETECTION_ALGORITHM` block in `zephyr/Kconfig.body_detection`.\n* **Code Simplicity:** ✅ Direct symbol rename and removal of the obsolete comment noting the `ALOGIRTHM` typo in `zephyr/test/drivers/body_detection/src/body_detection.c`.\n* **Idiomaticity \u0026 Readability:** ✅ Conforms to Zephyr Kconfig and ChromiumOS EC C conventions.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ All V1 and V2 preprocessor guards in `zephyr/test/drivers/body_detection/src/body_detection.c` and test suite configurations in `zephyr/test/drivers/testcase.yaml` and `zephyr/test/drivers/bmi3xx/prj.conf` are updated consistently.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+24, -25)` — Focused, atomic CL fixing a single Kconfig symbol typo across its definition and references.\n* **Commit Message:** ✅ Clear, accurate commit description with appropriate `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/5d0927fe-5392-4fe1-af76-58f21e0d27df)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e1fba6a703a781a29d42c8444c161f5ac8571267",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
