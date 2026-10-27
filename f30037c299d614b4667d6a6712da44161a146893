@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b572533_3539583e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T18:09:00Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "5d89459b_30cc078a",
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ccf110dd_0e6bc286",
         "filename": "common/host_command_task.c",
         "patchSetId": 2
@@ -172,6 +190,30 @@
       "side": 1,
       "message": "The kernel host command timeout is 200 ms on SPI (EC_MSG_DEADLINE_MS: https://chromium.googlesource.com/chromiumos/third_party/kernel/+/2285265320e762ef1f408bedc6ad23c56cc94944/drivers/platform/chrome/cros_ec_spi.c#52) and 1 s on LPC (ec_response_timed_out: https://chromium.googlesource.com/chromiumos/third_party/kernel/+/2285265320e762ef1f408bedc6ad23c56cc94944/drivers/platform/chrome/cros_ec_lpc.c#129), coreboot waits up to 30 s (https://chromium.googlesource.com/chromiumos/third_party/coreboot/+/7848938f15b07ed88394a6f2f888521810f2f529/src/ec/google/chromeec/ec_lpc.c#106), and depthcharge waits up to 1 s on SPI (ProcessTimeoutUs: https://chromium.googlesource.com/chromiumos/platform/depthcharge/+/da704d71f10a705b1b28b6e569ad3277e4352985/src/drivers/ec/cros/spi.c#38) and 100 ms / 30 s on LPC (https://chromium.googlesource.com/chromiumos/platform/depthcharge/+/da704d71f10a705b1b28b6e569ad3277e4352985/src/drivers/ec/cros/lpc.c#175).",
       "parentUuid": "9f698192_836c00a9",
+      "range": {
+        "startLine": 424,
+        "startChar": 8,
+        "endLine": 424,
+        "endChar": 9
+      },
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1b136b0_140b4a06",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T18:09:00Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "e4c56782_d74dc204",
       "range": {
         "startLine": 424,
         "startChar": 8,
