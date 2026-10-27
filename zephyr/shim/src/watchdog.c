@@ -35,7 +35,7 @@ struct watchdog_info {
 static struct k_spinlock watchdog_stats_lock;
 static int64_t watchdog_reload_period_max_ts_ms;
 static int32_t watchdog_reload_period_max_ms;
-static int64_t watchdog_reload_last_ts_ms;
+static int64_t watchdog_reload_last_ts_ms = -1;
 static uint32_t watchdog_reload_count;
 static int64_t watchdog_stats_reset_ts_ms;
 __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
@@ -169,13 +169,21 @@ void watchdog_reload(void)
 	    IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO)) {
 		K_SPINLOCK(&watchdog_stats_lock)
 		{
-			int32_t elapsed_ms = (int32_t)k_uptime_delta(
-				&watchdog_reload_last_ts_ms);
-			watchdog_reload_count++;
-			if (elapsed_ms > watchdog_reload_period_max_ms) {
-				watchdog_reload_period_max_ms = elapsed_ms;
-				watchdog_reload_period_max_ts_ms =
+			if (watchdog_reload_last_ts_ms < 0) {
+				watchdog_reload_last_ts_ms = k_uptime_get();
+				watchdog_stats_reset_ts_ms =
 					watchdog_reload_last_ts_ms;
+			} else {
+				int32_t elapsed_ms = (int32_t)k_uptime_delta(
+					&watchdog_reload_last_ts_ms);
+				watchdog_reload_count++;
+				if (elapsed_ms >
+				    watchdog_reload_period_max_ms) {
+					watchdog_reload_period_max_ms =
+						elapsed_ms;
+					watchdog_reload_period_max_ts_ms =
+						watchdog_reload_last_ts_ms;
+				}
 			}
 		}
 	}

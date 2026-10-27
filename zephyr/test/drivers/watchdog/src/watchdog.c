@@ -58,8 +58,31 @@ static void watchdog_before(void *state)
 	 * for other tests.
 	 */
 	if (!wdt_initialized) {
+		struct host_cmd_handler_args args;
+		struct ec_params_hostcmd_watchdog_info params = {
+			.reset_stats = 0,
+		};
+		struct ec_response_hostcmd_watchdog_info response;
+
 		(void)watchdog_init();
 		wdt_initialized = true;
+
+		args.command = EC_CMD_HOSTCMD_WATCHDOG_INFO;
+		args.version = 0;
+		args.params = &params;
+		args.params_size = sizeof(params);
+		args.response = &response;
+		args.response_max = sizeof(response);
+		args.response_size = 0;
+
+		/*
+		 * ec_app_main() calls watchdog_init() at boot (t = 0 ms),
+		 * which seeds watchdog_reload_last_ts_ms without incrementing
+		 * watchdog_reload_count, and one HOOK_TICK (250 ms) fires
+		 * before the test suite starts.
+		 */
+		zassert_equal(EC_RES_SUCCESS, host_command_process(&args));
+		zassert_equal(1, response.watchdog_reload_count);
 	}
 }
 
