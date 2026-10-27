@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "67030721_3c6c8101",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-27T15:26:13Z",
+      "side": 1,
+      "message": "Added lid_gpio_ready set in init_lid_gpio() and checked it in is_lid_closed()",
+      "parentUuid": "f96d6cd0_b1bf84bb",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7bf39bc9_9b8a3f1f",
         "filename": "common/fpsensor/fpsensor_led.cc",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-27T09:46:25Z",
       "side": 1,
       "message": "Maybe check state of GPIO again here? Also, have you consider any type of denounce in case of any noise on the pin?",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40e650ab_f3983e49",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-27T15:26:13Z",
+      "side": 1,
+      "message": "Actually I think that without this check there there is no need for debounce. In case of lid being opened the risk is that 10s timer would be restarted several times. In case of lid being closed it might happen that state is wrongly read as opened. Only risk is 10s of led being on.",
+      "parentUuid": "7bf39bc9_9b8a3f1f",
       "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -65,6 +101,42 @@
       "writtenOn": "2026-10-27T09:46:25Z",
       "side": 1,
       "message": "I\u0027ve also bumped into a [different method](https://docs.zephyrproject.org/latest/build/dts/zephyr-user-node.html#gpios) of defining GPIO. Can you please check if this is good for us?\n\nOtherwise, you would probably need to set as `CONFIG_INPUT_GPIO_KEYS\u003dn` as `CONFIG_LED_GPIO\u003dn`.",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5081bd1_39450f40",
+        "filename": "zephyr/program/fpmcu/em32f967/fp_led.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-27T15:26:13Z",
+      "side": 1,
+      "message": "Switched to /zephyr,user, it works, without any issues",
+      "parentUuid": "69a2d928_deec32b4",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19e40456_5c682df8",
+        "filename": "zephyr/program/fpmcu/em32f967/fp_led.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-27T15:26:13Z",
+      "side": 1,
+      "message": "Moved enabling lid-open-gpios for niedzica in niedzica.dts to a separate commit. Do we actually have LED on nysa?",
+      "parentUuid": "8a3fa709_35b63116",
       "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
