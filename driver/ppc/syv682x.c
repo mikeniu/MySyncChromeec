@@ -20,6 +20,7 @@
 #include "usbc_ppc.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
 
 #define SYV682X_FLAGS_SOURCE_ENABLED BIT(0)
@@ -105,16 +106,28 @@ static int syv682x_wait_for_ready(int port, int reg)
 	int rv;
 	timestamp_t deadline;
 
-#ifdef CONFIG_USBC_PPC_SYV682C
 	/* On SYV682C, busy bit is not applied to CONTROL_4 */
-	if (syv682x_board_is_syv682c(port) && reg == SYV682X_CONTROL_4_REG)
+	if (IS_ENABLED(CONFIG_USBC_PPC_SYV682C) &&
+	    syv682x_board_is_syv682c(port) && reg == SYV682X_CONTROL_4_REG)
 		return EC_SUCCESS;
-#endif
+
+	rv = read_reg(port, SYV682X_CONTROL_3_REG, &regval);
+	if (rv)
+		return rv;
+
+	if (!(regval & SYV682X_BUSY))
+		return EC_SUCCESS;
+
+	/* On sysworkq, do not block or busy wait for discharge */
+	if (k_current_get() == k_work_queue_thread_get(&k_sys_work_q))
+		return EC_ERROR_TIMEOUT;
 
 	deadline.val =
 		get_time().val + (SYV682X_MAX_VBUS_DISCHARGE_TIME_MS * MSEC);
 
 	do {
+		k_busy_wait(1000);
+
 		rv = read_reg(port, SYV682X_CONTROL_3_REG, &regval);
 		if (rv)
 			return rv;
@@ -126,8 +139,6 @@ static int syv682x_wait_for_ready(int port, int reg)
 			ppc_prints("busy timeout", port);
 			return EC_ERROR_TIMEOUT;
 		}
-
-		k_msleep(1);
 	} while (1);
 
 	return EC_SUCCESS;
@@ -281,17 +292,17 @@ static bool syv682x_interrupt_filter(int port, int regval, int regmask,
  */
 static int check_cc_rp_timeout(int port, int timeout)
 {
-#ifdef CONFIG_ZTEST
-	return EC_SUCCESS;
-#endif
+	timestamp_t deadline;
 	enum tcpc_cc_voltage_status cc1, cc2;
 
 	tcpm_get_cc(port, &cc1, &cc2);
+	deadline.val = get_time().val + timeout;
 
-	while (((cc_is_rp(cc1)) || (cc_is_rp(cc2))) != true) {
-		if (task_wait_event(timeout) == TASK_EVENT_TIMER) {
+	while (!cc_is_rp(cc1) && !cc_is_rp(cc2)) {
+		if (timestamp_expired(deadline, NULL))
 			return EC_ERROR_TIMEOUT;
-		}
+
+		k_busy_wait(100);
 		tcpm_get_cc(port, &cc1, &cc2);
 	}
 
@@ -639,8 +650,19 @@ static int syv682x_dump(int port)
 
 static void syv682x_handle_interrupt(int port)
 {
+	int regval;
 	int control4;
 	int status;
+
+	/*
+	 * If the chip is busy (e.g. discharging), defer interrupt handling so
+	 * we do not drop interrupt-triggered writes or block on sysworkq.
+	 */
+	if (!read_reg(port, SYV682X_CONTROL_3_REG, &regval) &&
+	    (regval & SYV682X_BUSY)) {
+		syv682x_interrupt_delayed(port, INTERRUPT_DELAY_MS);
+		return;
+	}
 
 	/* Both interrupt registers are clear on read */
 	read_reg(port, SYV682X_CONTROL_4_REG, &control4);

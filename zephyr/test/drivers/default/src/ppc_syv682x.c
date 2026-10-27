@@ -5,7 +5,9 @@
 
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_syv682x.h"
+#include "emul/tcpc/emul_tcpci.h"
 #include "syv682x.h"
+#include "tcpm/tcpci.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -37,7 +39,8 @@ struct reg_to_fail_data {
 	int reg_access_fail_countdown;
 };
 
-static const int syv682x_port = 1;
+#define SYV682X_PORT 1
+static const int syv682x_port = SYV682X_PORT;
 
 static void *syv682x_test_setup(void)
 {
@@ -73,8 +76,11 @@ static void syv682x_test_after(void *data)
 	zassert_ok(syv682x_emul_set_reg(emul, SYV682X_CONTROL_1_REG,
 					SYV682X_CONTROL_1_PWR_ENB),
 		   NULL);
+	zassert_ok(syv682x_emul_set_reg(emul, SYV682X_CONTROL_3_REG, 0), NULL);
 	syv682x_emul_set_condition(emul, SYV682X_STATUS_NONE,
 				   SYV682X_CONTROL_4_NONE);
+	syv682x_interrupt(syv682x_port);
+	ppc_vbus_sink_enable(syv682x_port, true);
 
 	/* Clear the mock read/write functions */
 	i2c_common_emul_set_read_func(common_data, NULL, NULL);
@@ -450,6 +456,23 @@ ZTEST_F(ppc_syv682x, test_syv682x_frs_disable)
 
 ZTEST_F(ppc_syv682x, test_syv682x_frs_trigger)
 {
+	const struct emul *tcpc_emul =
+		EMUL_GET_USBC_BINDING(SYV682X_PORT, tcpc);
+
+	/* Ensure PPC is sinking first */
+	zassert_ok(ppc_vbus_sink_enable(syv682x_port, true));
+	zassert_false(ppc_is_sourcing_vbus(syv682x_port), NULL);
+
+	/* Set CC to Rp so FRS check succeeds */
+	zassert_ok(tcpci_emul_set_reg(
+		tcpc_emul, TCPC_REG_ROLE_CTRL,
+		TCPC_REG_ROLE_CTRL_SET(TYPEC_NO_DRP, TYPEC_RP_USB, TYPEC_CC_RD,
+				       TYPEC_CC_RD)));
+	zassert_ok(tcpci_emul_set_reg(
+		tcpc_emul, TCPC_REG_CC_STATUS,
+		TCPC_REG_CC_STATUS_SET(0, TYPEC_CC_VOLT_RP_DEF,
+				       TYPEC_CC_VOLT_OPEN)));
+
 	/*
 	 * An FRS event when the PPC is Sink should cause the PPC to switch from
 	 * Sink to Source.
@@ -461,6 +484,102 @@ ZTEST_F(ppc_syv682x, test_syv682x_frs_trigger)
 		     "PPC is not sourcing VBUS after FRS signal handled");
 	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_NONE,
 				   SYV682X_CONTROL_4_NONE);
+	syv682x_interrupt(syv682x_port);
+	zassert_ok(ppc_vbus_sink_enable(syv682x_port, true));
+}
+
+ZTEST_F(ppc_syv682x, test_syv682x_frs_trigger_cc_timeout)
+{
+	const struct emul *tcpc_emul =
+		EMUL_GET_USBC_BINDING(SYV682X_PORT, tcpc);
+
+	/* Ensure PPC is sinking first */
+	zassert_ok(ppc_vbus_sink_enable(syv682x_port, true));
+	zassert_false(ppc_is_sourcing_vbus(syv682x_port), NULL);
+
+	/* Set CC to Open (not Rp), which should cause CC check to timeout */
+	zassert_ok(tcpci_emul_set_reg(
+		tcpc_emul, TCPC_REG_ROLE_CTRL,
+		TCPC_REG_ROLE_CTRL_SET(TYPEC_NO_DRP, TYPEC_RP_USB, TYPEC_CC_RD,
+				       TYPEC_CC_RD)));
+	zassert_ok(
+		tcpci_emul_set_reg(tcpc_emul, TCPC_REG_CC_STATUS,
+				   TCPC_REG_CC_STATUS_SET(0, TYPEC_CC_VOLT_OPEN,
+							  TYPEC_CC_VOLT_OPEN)));
+
+	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_FRS,
+				   SYV682X_CONTROL_4_NONE);
+	k_msleep(5);
+	zassert_false(ppc_is_sourcing_vbus(syv682x_port),
+		      "PPC sourced VBUS despite CC Rp timeout");
+	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_NONE,
+				   SYV682X_CONTROL_4_NONE);
+	syv682x_interrupt(syv682x_port);
+	zassert_ok(ppc_vbus_sink_enable(syv682x_port, true));
+}
+
+ZTEST_F(ppc_syv682x, test_syv682x_interrupt_busy_reschedule)
+{
+	/* Set busy bit in CONTROL_3 */
+	zassert_ok(syv682x_emul_set_reg(fixture->ppc_emul,
+					SYV682X_CONTROL_3_REG, SYV682X_BUSY));
+
+	/* Trigger an interrupt condition */
+	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_OC_5V,
+				   SYV682X_CONTROL_4_NONE);
+
+	/* Handle interrupt while busy: it should reschedule without clearing */
+	syv682x_interrupt(syv682x_port);
+	k_msleep(2);
+
+	/* Clear busy bit */
+	zassert_ok(syv682x_emul_set_reg(fixture->ppc_emul,
+					SYV682X_CONTROL_3_REG, 0));
+
+	/* Wait for the deferred reschedule (INTERRUPT_DELAY_MS = 15ms) */
+	k_msleep(25);
+
+	syv682x_emul_set_condition(fixture->ppc_emul, SYV682X_STATUS_NONE,
+				   SYV682X_CONTROL_4_NONE);
+}
+
+struct write_busy_work_data {
+	struct k_work work;
+	struct k_sem done;
+	int rv;
+};
+
+static void write_busy_work_handler(struct k_work *work)
+{
+	struct write_busy_work_data *data =
+		CONTAINER_OF(work, struct write_busy_work_data, work);
+
+	data->rv =
+		ppc_set_vbus_source_current_limit(syv682x_port, TYPEC_RP_USB);
+	k_sem_give(&data->done);
+}
+
+ZTEST_F(ppc_syv682x, test_syv682x_write_busy_sysworkq)
+{
+	struct write_busy_work_data data;
+
+	k_sem_init(&data.done, 0, 1);
+	k_work_init(&data.work, write_busy_work_handler);
+
+	/* Set busy bit in CONTROL_3 */
+	zassert_ok(syv682x_emul_set_reg(fixture->ppc_emul,
+					SYV682X_CONTROL_3_REG, SYV682X_BUSY));
+
+	k_work_submit(&data.work);
+
+	/* On sysworkq, it should fail immediately without waiting 400ms */
+	zassert_equal(k_sem_take(&data.done, K_MSEC(50)), 0,
+		      "Write busy did not return immediately on sysworkq");
+	zassert_equal(data.rv, EC_ERROR_TIMEOUT,
+		      "Expected EC_ERROR_TIMEOUT on sysworkq when busy");
+
+	zassert_ok(syv682x_emul_set_reg(fixture->ppc_emul,
+					SYV682X_CONTROL_3_REG, 0));
 }
 
 ZTEST_F(ppc_syv682x, test_syv682x_source_current_limit_usb_default)
