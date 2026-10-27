@@ -46,6 +46,30 @@
       },
       "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce8ce18c_efec8225",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-27T22:47:26Z",
+      "side": 1,
+      "message": "I\u0027m fine with the status quo here.  I think the data that could inform this would be to track the max watchdog reload period during some of the stress tests.\n\nIf the separate hook work queue lowers the max watchdog reload, then there is argument for including this.",
+      "parentUuid": "5f52d8d7_f5095edb",
+      "range": {
+        "startLine": 214,
+        "startChar": 7,
+        "endLine": 214,
+        "endChar": 34
+      },
+      "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
