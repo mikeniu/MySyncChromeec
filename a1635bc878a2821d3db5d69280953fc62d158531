@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ba008ad_8d40ac13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:28:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding redundant field initialization, designated initializers, and unit test coverage.\n\n### Review Summary\n* **Functionality:** ✅ Zero-initializing `struct ec_response_motion_sensor_data vector` in `common/motion_sense.c` and `common/motion_sense_fifo.c` prevents uninitialized stack bytes in `reserved` (for timestamp and async event entries) and `add_info` (for gesture activity entries) from being staged into the motion sense FIFO and read by the AP.\n* **Architecture \u0026 Component Fit:** ✅ Changes are properly scoped to the motion sense core (`common/motion_sense.c` and `common/motion_sense_fifo.c`).\n* **Code Simplicity:** ⚠️ In `motion_sense_push_raw_xyz()` (`common/motion_sense.c`), `vector.flags \u003d 0;` on line 715 is now redundant with zero-initialization at declaration.\n* **Idiomaticity \u0026 Readability:** ⚠️ Across `common/motion_sense.c` and `common/motion_sense_fifo.c`, prefer initializing `struct ec_response_motion_sensor_data vector` directly with C99 designated initializers (matching the `CONFIG_ORIENTATION_SENSOR` block in `check_and_queue_gestures()` and `body_detect_send_host_event()` in `common/body_detect_common.c`), which declaratively initialize the active fields in one step while automatically zero-initializing all omitted struct and union members (`reserved`, `add_info`, `flags`).\n* **Security:** ✅ Fixes a stack information leak of up to 4 bytes per FIFO entry (`reserved` / `add_info`) across the EC-to-AP host command boundary (`EC_CMD_MOTION_SENSE_CMD` / `MOTIONSENSE_CMD_FIFO_READ`).\n* **Testing:** ❌ Missing automated unit test coverage for the bug fix. Please add a unit test in `zephyr/test/drivers/default/src/motion_sense/motion_sense.c` verifying that `reserved` and unused union fields in `struct ec_response_motion_sensor_data` are zero-initialized when entries are staged into the FIFO (a ready-to-use `ZTEST_USER` snippet is provided in the inline comment on `common/motion_sense_fifo.c`).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+5, -5)` — Small, focused single logical change.\n* **Commit Message:** ✅ Clear, concise subject and body explaining the motivation and change, with valid `BUG\u003db:516317337`, `TEST\u003d`, and `Change-Id:` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/6e31d0a2-fefd-4837-9bce-75d00d5fdace)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a1635bc878a2821d3db5d69280953fc62d158531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85fa9feb_13b25f23",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:28:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Now that `vector` is zero-initialized at declaration, `vector.flags \u003d 0;` on line 715 is redundant. In addition, using a designated initializer initializes `sensor_num` and zeroes all remaining fields (including `flags` and the union payload) in a single step without separate field assignments:\n\n```c\n\t\tstruct ec_response_motion_sensor_data vector \u003d {\n\t\t\t.sensor_num \u003d s - motion_sensors,\n\t\t};\n\t\tint *v \u003d s-\u003eraw_xyz;\n```\n\n[🔗](http://go/tj/6e31d0a2-fefd-4837-9bce-75d00d5fdace)",
+      "range": {
+        "startLine": 712,
+        "startChar": 0,
+        "endLine": 716,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a1635bc878a2821d3db5d69280953fc62d158531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43893231_74192926",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:28:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Prefer initializing `vector` directly with a C99 designated initializer—matching the `CONFIG_ORIENTATION_SENSOR` block at lines 890–895 in this function and `body_detect_send_host_event()` in `common/body_detect_common.c`. A designated initializer automatically zero-initializes all omitted struct and union members (including `add_info` and `reserved`) while avoiding `{ 0 }` followed by step-by-step field mutations:\n\n```c\n\t\t\t/*\n\t\t\t * Send events to the FIFO\n\t\t\t * AP is ignoring double tap event, do no wake up and no\n\t\t\t * automatic disable.\n\t\t\t */\n\t\t\tstruct ec_response_motion_sensor_data vector \u003d {\n\t\t\t\t.flags \u003d MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO |\n\t\t\t\t\t (IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP_FOR_HOST) ?\n\t\t\t\t\t\t  MOTIONSENSE_SENSOR_FLAG_WAKEUP :\n\t\t\t\t\t\t  0),\n\t\t\t\t.sensor_num \u003d MOTION_SENSE_ACTIVITY_SENSOR_ID,\n\t\t\t\t.activity_data \u003d {\n\t\t\t\t\t.activity \u003d MOTIONSENSE_ACTIVITY_DOUBLE_TAP,\n\t\t\t\t\t.state \u003d 1, /* triggered */\n\t\t\t\t},\n\t\t\t};\n```\n\nAnd for the `MOTIONSENSE_ACTIVITY_SIG_MOTION` block:\n\n```c\n\t\t\t/* Send events to the FIFO */\n\t\t\tstruct ec_response_motion_sensor_data vector \u003d {\n\t\t\t\t.flags \u003d MOTIONSENSE_SENSOR_FLAG_WAKEUP |\n\t\t\t\t\t MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO,\n\t\t\t\t.sensor_num \u003d MOTION_SENSE_ACTIVITY_SENSOR_ID,\n\t\t\t\t.activity_data \u003d {\n\t\t\t\t\t.activity \u003d MOTIONSENSE_ACTIVITY_SIG_MOTION,\n\t\t\t\t\t.state \u003d 1, /* triggered */\n\t\t\t\t},\n\t\t\t};\n```\n\nOther locations in this file:\n* **Lines 866–874**: `vector` initialization in the `CONFIG_GESTURE_SIGMO` block of `check_and_queue_gestures()`.\n\n[🔗](http://go/tj/6e31d0a2-fefd-4837-9bce-75d00d5fdace)",
+      "range": {
+        "startLine": 839,
+        "startChar": 0,
+        "endLine": 853,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a1635bc878a2821d3db5d69280953fc62d158531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05f712f3_d7dbf0a3",
+        "filename": "common/motion_sense_fifo.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:28:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] 1. **Use designated initializers:** Prefer initializing `vector` directly with a C99 designated initializer in both `fifo_stage_timestamp()` and `motion_sense_fifo_insert_async_event()`. This initializes `flags`, `sensor_num`, and `timestamp` declaratively in one expression while automatically zero-initializing `reserved`:\n\n```c\nstatic void fifo_stage_timestamp(uint32_t timestamp, uint8_t sensor_num)\n{\n\tstruct ec_response_motion_sensor_data vector \u003d {\n\t\t.flags \u003d MOTIONSENSE_SENSOR_FLAG_TIMESTAMP,\n\t\t.sensor_num \u003d sensor_num,\n\t\t.timestamp \u003d timestamp,\n\t};\n\n\tfifo_stage_unit(\u0026vector, NULL, 0);\n}\n```\n\nAnd in `motion_sense_fifo_insert_async_event()` (lines 411–422):\n\n```c\nvoid motion_sense_fifo_insert_async_event(struct motion_sensor_t *sensor,\n\t\t\t\t\t  enum motion_sense_async_event event)\n{\n\tstruct ec_response_motion_sensor_data vector \u003d {\n\t\t.flags \u003d event,\n\t\t.sensor_num \u003d sensor - motion_sensors,\n\t\t.timestamp \u003d __hw_clock_source_read(),\n\t};\n\n\tfifo_stage_unit(\u0026vector, sensor, 0);\n\tmotion_sense_fifo_commit_data();\n}\n```\n\n2. **Add unit test coverage for zero-initialized FIFO entries:** Please add a unit test in `zephyr/test/drivers/default/src/motion_sense/motion_sense.c` verifying that `reserved` and unused fields in `struct ec_response_motion_sensor_data` are zero-initialized when entries are staged into the FIFO via `motion_sense_fifo_add_timestamp()`, `motion_sense_fifo_insert_async_event()`, and `motion_sense_push_raw_xyz()`:\n\n```c\nZTEST_USER(motion_sense, test_fifo_entries_zero_initialized)\n{\n\tconst uint32_t test_timestamp \u003d 0x12345678;\n\tconst int16_t expected_x \u003d 10;\n\tconst int16_t expected_y \u003d -20;\n\tconst int16_t expected_z \u003d 30;\n\tstruct ec_response_motion_sensor_data entries[2];\n\tuint16_t out_size \u003d 0;\n\tint count;\n\n\tmotion_sense_fifo_reset();\n\n\tmemset(\u0026entries[0], 0xff, sizeof(entries[0]));\n\tmotion_sense_fifo_add_timestamp(test_timestamp);\n\tcount \u003d motion_sense_fifo_read(sizeof(entries[0]), 1, \u0026entries[0],\n\t\t\t\t       \u0026out_size);\n\tzassert_equal(count, 1);\n\tzassert_equal(out_size, sizeof(entries[0]));\n\tzassert_equal(entries[0].sensor_num, MOTION_SENSE_INVALID_SENSOR_ID);\n\tzassert_equal(entries[0].reserved, 0);\n\tzassert_equal(entries[0].timestamp, test_timestamp);\n\n\tmemset(\u0026entries[0], 0xff, sizeof(entries[0]));\n\tmotion_sense_fifo_insert_async_event(\u0026motion_sensors[0],\n\t\t\t\t\t     ASYNC_EVENT_FLUSH);\n\tcount \u003d motion_sense_fifo_read(sizeof(entries[0]), 1, \u0026entries[0],\n\t\t\t\t       \u0026out_size);\n\tzassert_equal(count, 1);\n\tzassert_equal(out_size, sizeof(entries[0]));\n\tzassert_equal(entries[0].sensor_num, 0);\n\tzassert_equal(entries[0].reserved, 0);\n\n\tmemset(entries, 0xff, sizeof(entries));\n\tmotion_sensors[0].oversampling \u003d 0;\n\tmotion_sensors[0].oversampling_ratio \u003d 1;\n\tmotion_sensors[0].raw_xyz[X] \u003d expected_x;\n\tmotion_sensors[0].raw_xyz[Y] \u003d expected_y;\n\tmotion_sensors[0].raw_xyz[Z] \u003d expected_z;\n\tmotion_sense_push_raw_xyz(\u0026motion_sensors[0]);\n\tcount \u003d motion_sense_fifo_read(sizeof(entries), ARRAY_SIZE(entries),\n\t\t\t\t       entries, \u0026out_size);\n\tzassert_equal(count, 2);\n\tzassert_equal(entries[0].sensor_num, 0);\n\tzassert_equal(entries[0].reserved, 0);\n\tzassert_equal(entries[1].sensor_num, 0);\n\tzassert_equal(entries[1].data[X], expected_x);\n\tzassert_equal(entries[1].data[Y], expected_y);\n\tzassert_equal(entries[1].data[Z], expected_z);\n}\n```\n\nOther locations in this file:\n* **Lines 411–422**: `vector` initialization in `motion_sense_fifo_insert_async_event()`.\n\n[🔗](http://go/tj/6e31d0a2-fefd-4837-9bce-75d00d5fdace)",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 356,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a1635bc878a2821d3db5d69280953fc62d158531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
