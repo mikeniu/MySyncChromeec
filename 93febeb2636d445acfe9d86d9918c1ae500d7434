@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6be5d358_1a4774c8",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-27T15:36:02Z",
+      "side": 1,
+      "message": "Could we capture this all in a function? So the main task loop stays simple?",
+      "range": {
+        "startLine": 402,
+        "startChar": 0,
+        "endLine": 434,
+        "endChar": 4
+      },
+      "revId": "93febeb2636d445acfe9d86d9918c1ae500d7434",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
