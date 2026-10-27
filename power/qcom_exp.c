@@ -1467,18 +1467,19 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		power_off_seq(shutdown_from_on);
 		CPRINTS("power shutdown complete");
 
-		/* Call hooks after we drop power rails */
-		hook_notify(HOOK_CHIPSET_SHUTDOWN_COMPLETE);
-
-		shutdown_from_on = 0;
-
 		/*
-		 * Wait forever for the release of the power button;
-		 * otherwise, this power button press will then trigger
-		 * a power-on in G3.
+		 * Wait forever for the release of the power button before
+		 * notifying shutdown complete hooks; otherwise, a held power
+		 * button will either trigger a power-on in G3 or start the
+		 * off-mode charging RTC wake timer before entering G3.
 		 */
 		power_button_wait_for_release(-1);
 		power_button_was_pressed = 0;
+
+		/* Call hooks after we drop power rails and release button */
+		hook_notify(HOOK_CHIPSET_SHUTDOWN_COMPLETE);
+
+		shutdown_from_on = 0;
 		return POWER_G3;
 
 	default:

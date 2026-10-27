@@ -237,6 +237,14 @@ static void qcom_cleanup(void *fixture)
 	host_clear_events(EC_HOST_EVENT_MASK(EC_HOST_EVENT_HANG_DETECT) |
 			  EC_HOST_EVENT_MASK(EC_HOST_EVENT_RTC));
 	system_clear_reset_flags(0xFFFFFFFF);
+	if (extpower_is_present()) {
+		gpio_emul_input_set(gpio_dev, PIN_AC_PRESENT, 0);
+		gpio_emul_input_set(gpio_dev, PIN_POWER_GOOD, 1);
+		power_set_state(POWER_G3);
+		extpower_interrupt(GPIO_AC_PRESENT);
+		k_sleep(K_MSEC(500));
+	}
+	extpower_disable_interrupt();
 }
 
 ZTEST_SUITE(qcom_exp_power, NULL, qcom_setup, start_in_s0, qcom_cleanup, NULL);
@@ -369,11 +377,23 @@ ZTEST(qcom_exp_power, test_power_button_off)
 {
 	const struct device *gpio_dev = GPIO_DEVICE;
 
+	/* Connect AC and ensure the off-mode wake alarm is only armed after
+	 * the power button is released and the system enters G3.
+	 */
+	gpio_emul_input_set(gpio_dev, PIN_AC_PRESENT, 1);
+	extpower_interrupt(GPIO_AC_PRESENT);
+	k_sleep(K_MSEC(50));
+	mock_rtc_alarm_seconds = 0xFFFF;
+
 	gpio_emul_input_set(gpio_dev, PIN_PWR_BTN_L, 0);
-	k_sleep(K_SECONDS(9));
+	k_sleep(K_SECONDS(15));
+	zassert_equal(power_get_state(), POWER_S5G3);
+	zassert_equal(mock_rtc_alarm_seconds, 0xFFFF);
+
 	gpio_emul_input_set(gpio_dev, PIN_PWR_BTN_L, 1);
-	k_sleep(K_SECONDS(11));
+	k_sleep(K_SECONDS(1));
 	zassert_equal(power_get_state(), POWER_G3);
+	zassert_equal(mock_rtc_alarm_seconds, EXTPOWER_WAKE_INTERVAL_SEC);
 }
 
 /* Test power button short press in S0 does not power off */
@@ -398,12 +418,21 @@ ZTEST(qcom_exp_power, test_no_power_good)
 	gpio_remove_callback(gpio_dev, &gpio_callback_power);
 
 	zassert_equal(power_get_state(), POWER_S0);
+
+	/* Connect AC: OS-initiated shutdown (POWER_GOOD loss) must arm 30s wake
+	 * alarm */
+	gpio_emul_input_set(gpio_dev, PIN_AC_PRESENT, 1);
+	extpower_interrupt(GPIO_AC_PRESENT);
+	k_sleep(K_MSEC(50));
+	mock_rtc_alarm_seconds = 0xFFFF;
+
 	shell_backend_dummy_clear_output(get_ec_shell());
 	gpio_emul_input_set(gpio_dev, PIN_POWER_GOOD, 0);
 	task_wake(TASK_ID_CHIPSET);
 	k_sleep(K_SECONDS(11));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());
+	zassert_equal(mock_rtc_alarm_seconds, EXTPOWER_WAKE_INTERVAL_SEC);
 	buffer = shell_backend_dummy_get_output(get_ec_shell(), &buffer_size);
 	zassert_true(strstr(buffer, "POWER_GOOD is lost") != NULL,
 		     "Invalid console output %s", buffer);
@@ -594,6 +623,7 @@ ZTEST(qcom_exp_power, test_heartbeat_mode_and_rtc)
 	extpower_interrupt(GPIO_AC_PRESENT);
 	k_sleep(K_MSEC(50));
 	zassert_equal(extpower_is_present(), 1);
+	mock_rtc_alarm_seconds = 0xFFFF;
 	board_chipset_set_heartbeat_alarm_on_shutdown();
 	zassert_equal(mock_rtc_alarm_seconds, EXTPOWER_WAKE_INTERVAL_SEC);
 
