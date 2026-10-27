@@ -30,6 +30,10 @@ struct deferred_data {
 
 /**
  * See include/hooks.h for documentation.
+ *
+ * @isr_ok
+ * @reschedule
+ * @no_wait
  */
 int hook_call_deferred(const struct deferred_data *data, int us);
 
