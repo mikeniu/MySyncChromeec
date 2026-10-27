@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "564cdb24_2086f001",
+        "filename": "common/system.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 719,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-27T22:44:51Z",
+      "side": 1,
+      "message": "Non-blocking nit. Add {} around all branches, even single line.",
+      "range": {
+        "startLine": 719,
+        "startChar": 0,
+        "endLine": 719,
+        "endChar": 27
+      },
+      "revId": "005724cd87976748c342cac760b32ed12bc35a7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
