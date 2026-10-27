@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61e59bb0_ef8e3c45",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T03:54:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `set_range()` in `driver/accelgyro_lsm6dso.c` now propagates `err` from `st_write_data_with_mask()` after unlocking `s-\u003emutex` instead of unconditionally returning `EC_SUCCESS`.\n* **Architecture \u0026 Component Fit:** ✅ Error handling and mutex unlocking in `set_range()` match `set_data_rate()` in the same file and `set_range()` in sibling ST sensor drivers.\n* **Code Simplicity:** ✅ The fix and unit test are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Uses existing register, range, and error constants (`LSM6DSO_ACCEL_FS_ADDR`, `LSM6DSO_ACCEL_FS_MAX_VAL`, `EC_ERROR_INVAL`, `I2C_COMMON_EMUL_NO_FAIL_REG`) cleanly.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ `test_set_range_write_error` sets a known baseline range (`LSM6DSO_ACCEL_FS_MAX_VAL / 2`), injects an I2C write failure on `LSM6DSO_ACCEL_FS_ADDR`, asserts the exact expected error code (`EC_ERROR_INVAL`), verifies `acc-\u003ecurrent_range` remains unchanged on failure, and restores the emulator state and original range.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+18, -1)` — Single, atomic bug fix with its unit test.\n* **Commit Message:** ✅ Concise, accurate prose explaining the problem and fix with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/1200be98-e5cc-4fc1-92c8-990fb560f1b0)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "406a2954746f0bd8135b18ffbc464744bb5d7fe0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
