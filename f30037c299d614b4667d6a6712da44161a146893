@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d89459b_30cc078a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-27T02:55:51Z",
+      "side": 1,
+      "message": "Can we check if upstream host command handler needs similar rate limiting protection?",
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccf110dd_0e6bc286",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-27T02:55:51Z",
+      "side": 1,
+      "message": "Can we rename these to be clearer?",
+      "range": {
+        "startLine": 377,
+        "startChar": 1,
+        "endLine": 377,
+        "endChar": 21
+      },
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78d24cc0_50eabc3a",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-27T02:55:51Z",
+      "side": 1,
+      "message": "Should this be cleared after the host command is handled?",
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b71bc61_987e3bfe",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-27T02:55:51Z",
+      "side": 1,
+      "message": "nit: Add braces",
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f698192_836c00a9",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-27T02:55:51Z",
+      "side": 1,
+      "message": "Any concerns on the host timing out from sleeping before sending a response?",
+      "range": {
+        "startLine": 424,
+        "startChar": 8,
+        "endLine": 424,
+        "endChar": 9
+      },
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
