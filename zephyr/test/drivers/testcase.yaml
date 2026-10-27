@@ -1164,6 +1164,16 @@ tests:
     extra_conf_files:
     - prj.conf
     - ./lsm6dsm/prj.conf
+  drivers.lsm6dso:
+    timeout: 15
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_LSM6DSO=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./lsm6dso/sensor.dts
+    extra_conf_files:
+    - prj.conf
+    - ./lsm6dso/prj.conf
   drivers.mkbp.ec_host_cmd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_MKBP=y
