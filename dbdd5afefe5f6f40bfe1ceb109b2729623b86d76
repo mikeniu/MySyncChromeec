@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67dd4159_80c33575",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-27T03:51:09Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"srceen\" is a possible misspelling of \"screen\".\n\nTo bypass Spellchecker, add a f...\n\n\"srceen\" is a possible misspelling of \"screen\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 25
+      },
+      "revId": "dbdd5afefe5f6f40bfe1ceb109b2729623b86d76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
