@@ -50,19 +50,20 @@ void watchdog_warning_irq(void)
 	 * (during a warning) before a full watchdog bite occurs so it is
 	 * accessible after the bite.
 	 *
-	 * Why we set set PANIC_SW_WATCHDOG_WARN reason:
-	 *
-	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
-	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
-	 * actually occurs. If no watchdog reset occurs, this watchdog warning
-	 * panic may still be collected by the kernel and handled as a
-	 * non-fatal EC panic.
+	 * On boards with CONFIG_LEGACY_RO_WATCHDOG_PANIC, set
+	 * PANIC_SW_WATCHDOG directly so pre-2024 factory-locked RO preserves
+	 * the faulting PC and task ID across reboot into RW.
 	 */
 #if defined(CHIP_CORE_NDS32)
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, get_ipc(), task_get_current());
+	panic_set_reason(IS_ENABLED(CONFIG_LEGACY_RO_WATCHDOG_PANIC) ?
+				 PANIC_SW_WATCHDOG :
+				 PANIC_SW_WATCHDOG_WARN,
+			 get_ipc(), task_get_current());
 #elif defined(CHIP_CORE_RISCV)
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, get_mepc(),
-			 task_get_current());
+	panic_set_reason(IS_ENABLED(CONFIG_LEGACY_RO_WATCHDOG_PANIC) ?
+				 PANIC_SW_WATCHDOG :
+				 PANIC_SW_WATCHDOG_WARN,
+			 get_mepc(), task_get_current());
 #endif
 	/* clear interrupt status */
 	task_clear_pending_irq(et_ctrl_regs[WDT_EXT_TIMER].irq);
