@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1f3239f6_307cd3af",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T18:09:06Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "6be5d358_1a4774c8",
+      "range": {
+        "startLine": 402,
+        "startChar": 0,
+        "endLine": 434,
+        "endChar": 4
+      },
+      "revId": "93febeb2636d445acfe9d86d9918c1ae500d7434",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3bf90ec2_3222281c",
         "filename": "common/host_command_task.c",
         "patchSetId": 3
@@ -37,6 +61,24 @@
       "writtenOn": "2026-10-27T16:03:15Z",
       "side": 1,
       "message": "Setting pending_args \u003d NULL after host_send_response() races with incoming host command interrupts: once pkt0-\u003esend_response() signals the host inside host_send_response(), an ISR can immediately call host_command_received() and set pending_args \u003d args before line 437 runs, causing line 437 to clear the new pending_args and drop the command. Consider removing pending_args \u003d NULL here (or latching pending_args into a local variable and clearing it before calling host_send_response()).",
+      "revId": "93febeb2636d445acfe9d86d9918c1ae500d7434",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad5f47b2_efe042e3",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T18:09:06Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "3bf90ec2_3222281c",
       "revId": "93febeb2636d445acfe9d86d9918c1ae500d7434",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
