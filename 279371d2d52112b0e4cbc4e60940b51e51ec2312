@@ -35,6 +35,24 @@
       "message": "Rather than registering a `HOOK_SYSJUMP` handler, could we rebase this on top of crrev/c/8635773 and call `mpu_disable_fixed_regions()` from `arch_pre_system_jump()` (with `__DSB(); __ISB();`)?\n\ncrrev/c/8634173 and crrev/c/8634174 move `HOOK_SYSJUMP` back before `interrupt_disable_all()` and add `arch_pre_system_jump()` after `interrupt_disable_all()` so MPU/PMP teardown runs with interrupts disabled right before jumping.",
       "revId": "279371d2d52112b0e4cbc4e60940b51e51ec2312",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f34c917b_a0ee9e28",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-27T18:17:56Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "b9c0aefe_c1a34fd6",
+      "revId": "279371d2d52112b0e4cbc4e60940b51e51ec2312",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
