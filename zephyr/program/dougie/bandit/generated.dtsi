@@ -110,6 +110,9 @@
 		gpio_en_pp5000_hdmi_s0: en_pp5000_hdmi_s0 {
 			gpios = <&gpioj 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 		};
+		gpio_en_pp5000_usba_vbus: en_pp5000_usba_vbus {
+			gpios = <&gpiog 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
 		gpio_en_pp5000_z1: en_pp5000_z1 {
 			gpios = <&gpiog 3 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 			enum-name = "GPIO_EN_PP5000_A";
@@ -214,8 +217,6 @@
 			<&gpiog 1 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>,
 			/* NC */
 			<&gpiog 4 (GPIO_INPUT | GPIO_PULL_UP)>,
-			/* EN_PP5000_USBA_VBUS */
-			<&gpiog 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>,
 			/* EN_PP5000_FAN */
 			<&gpiog 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>,
 			/* NC */
