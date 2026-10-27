@@ -169,6 +169,9 @@ config LINK_TEST_SUITE_LIS2DH
 config LINK_TEST_SUITE_LSM6DSM
 	bool "Link tests for lsm6dsm driver"
 
+config LINK_TEST_SUITE_LSM6DSO
+	bool "Link tests for lsm6dso driver"
+
 config LINK_TEST_SUITE_LED_DRIVER_MAX695X
 	bool "Link and test the MAX695x 7-segment display driver tests"
 	help
