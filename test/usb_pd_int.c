@@ -4,6 +4,7 @@
  *
  * Test USB-PD interrupt task.
  */
+#include "hooks.h"
 #include "mock/tcpc_mock.h"
 #include "mock/timer_mock.h"
 #include "mock/usb_mux_mock.h"
@@ -95,9 +96,75 @@ test_static int test_storm_not_triggered_for_32bit_overflow(void)
 	return EC_SUCCESS;
 }
 
+test_static int test_storm_boundary_triggered(void)
+{
+	/*
+	 * Test that interrupt storms spanning across a 1-second window boundary
+	 * are detected.
+	 * Window 1: 1400 events (below CONFIG_USB_PD_INT_STORM_MAX=1800) -> no
+	 * suspend. Window 2: 1200 events starting immediately after window 1
+	 * expires. With sliding decay: (1400 / 2) + 1 + 1200 = 1901 > 1800 ->
+	 * triggers suspend. Without sliding decay: resets to 1 + 1200 = 1201 <
+	 * 1800 -> missed storm.
+	 */
+	num_events = 1401;
+	deferred_resume_called = 0;
+	schedule_deferred_pd_interrupt(PORT0);
+	task_wait_event(1100 * MSEC);
+	TEST_EQ(deferred_resume_called, 0, "%d");
+
+	num_events = 1201;
+	schedule_deferred_pd_interrupt(PORT0);
+	task_wait_event(1100 * MSEC);
+	TEST_EQ(deferred_resume_called, 1, "%d");
+
+	return EC_SUCCESS;
+}
+
+static int deferred_executed_count;
+static int events_remaining_when_deferred_ran;
+
+static void test_deferred_watchdog_fn(void)
+{
+	deferred_executed_count++;
+	events_remaining_when_deferred_ran = num_events;
+}
+DECLARE_DEFERRED(test_deferred_watchdog_fn);
+
+test_static int test_alert_burst_yields_to_hooks(void)
+{
+	/*
+	 * Verify that during an extended burst of alerts, the interrupt handler
+	 * periodically yields (via crec_usleep) to allow lower-priority tasks
+	 * (such as HOOKS task, which executes watchdog reloads and deferred
+	 * functions) to run.
+	 */
+	deferred_executed_count = 0;
+	events_remaining_when_deferred_ran = 0;
+
+	/*
+	 * 50 consecutive events: with ALERT_BURST_YIELD_THRESHOLD=10,
+	 * the task yields every 10 events (after events 10, 20, 30, 40).
+	 * Schedule deferred function to fire after 2ms (approx after 20
+	 * events).
+	 */
+	num_events = 51;
+	hook_call_deferred(&test_deferred_watchdog_fn_data, 2 * MSEC);
+
+	schedule_deferred_pd_interrupt(PORT0);
+	task_wait_event(50 * MSEC);
+
+	TEST_EQ(deferred_executed_count, 1, "%d");
+	TEST_GT(events_remaining_when_deferred_ran, 0, "%d");
+
+	return EC_SUCCESS;
+}
+
 void before_test(void)
 {
 	pd_set_suspend(PORT0, 0);
+	deferred_resume_called = 0;
+	task_wait_event(2 * SECOND);
 }
 
 void run_test(int argc, const char **argv)
@@ -108,6 +175,8 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_storm_not_triggered);
 	RUN_TEST(test_storm_triggered);
 	RUN_TEST(test_storm_not_triggered_for_32bit_overflow);
+	RUN_TEST(test_storm_boundary_triggered);
+	RUN_TEST(test_alert_burst_yields_to_hooks);
 
 	test_print_result();
 }
