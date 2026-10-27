@@ -18,6 +18,30 @@
       "isAi": true,
       "revId": "b37cb45228045f574b0cbfbb28b1deb826bd9b5f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da7c72fb_5136e536",
+        "filename": "test/timer.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T16:11:44Z",
+      "side": 1,
+      "message": "Remove before_test(). core/host/main.c already initializes the timer via timer_init() at boot, and calling __hw_clock_source_init(0) before each test rewinds the 32-bit hardware counter without resetting common/timer.c state (clksrc_high, crec_usleep()\u0027s next_print_deadline) or hooks_task / deferred call deadlines when test/timer.cc runs on-device (bloonchipper / helipilot).",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b37cb45228045f574b0cbfbb28b1deb826bd9b5f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
