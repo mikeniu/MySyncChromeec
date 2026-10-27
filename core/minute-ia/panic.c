@@ -213,3 +213,14 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 		*reason = *info = *exception = 0;
 	}
 }
+
+uint32_t panic_get_reason_reg(const struct panic_data *pdata)
+{
+	return pdata ? pdata->x86.vector : 0;
+}
+
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
+{
+	if (pdata)
+		pdata->x86.vector = reason;
+}

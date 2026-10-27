@@ -89,6 +89,16 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 		*exception = *reason = *info = 0;
 	}
 }
+uint32_t panic_get_reason_reg(const struct panic_data *pdata)
+{
+	return pdata ? pdata->riscv.regs[SOFT_PANIC_GPR_REASON] : 0;
+}
+
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
+{
+	if (pdata)
+		pdata->riscv.regs[SOFT_PANIC_GPR_REASON] = reason;
+}
 
 static void print_panic_information(uint32_t *regs, uint32_t mcause,
 				    uint32_t mepc)
