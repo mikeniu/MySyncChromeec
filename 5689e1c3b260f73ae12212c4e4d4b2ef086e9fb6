@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7459f0cc_55d336af",
+        "filename": "zephyr/program/geralt/geralt/project.conf",
+        "patchSetId": 60
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-27T21:39:19Z",
+      "side": 1,
+      "message": "Looks like a rebase conflict accidentally removed CONFIG_PLATFORM_EC_BATTERY_REPLACE_NULLS\u003dn (added in crrev.com/c/8137780).",
+      "revId": "5689e1c3b260f73ae12212c4e4d4b2ef086e9fb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
