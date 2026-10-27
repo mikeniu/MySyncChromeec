@@ -135,6 +135,17 @@ uint32_t get_panic_stack_pointer(const struct panic_data *pdata)
 	return pdata->nds_n8.regs[15];
 }
 
+uint32_t panic_get_reason_reg(const struct panic_data *pdata)
+{
+	return pdata ? pdata->nds_n8.regs[SOFT_PANIC_GPR_REASON] : 0;
+}
+
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
+{
+	if (pdata)
+		pdata->nds_n8.regs[SOFT_PANIC_GPR_REASON] = reason;
+}
+
 static void print_panic_information(uint32_t *regs, uint32_t itype,
 				    uint32_t ipc, uint32_t ipsw)
 {

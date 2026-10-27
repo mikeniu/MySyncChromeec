@@ -153,6 +153,18 @@ void ignore_bus_fault(int ignored);
 struct panic_data *panic_get_data(void);
 
 /**
+ * Get the panic reason field from a panic_data structure for the current
+ * architecture.
+ */
+uint32_t panic_get_reason_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic reason field in a panic_data structure for the current
+ * architecture.
+ */
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason);
+
+/**
  * Return a pointer to the beginning of panic data. This function can be
  * used to obtain pointer which can be used to calculate place of other
  * structures (eg. jump_data). This function should not be used to get access

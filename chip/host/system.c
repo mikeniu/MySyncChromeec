@@ -133,6 +133,47 @@ test_mockable struct panic_data *panic_get_data(void)
 				     sizeof(struct panic_data));
 }
 
+test_mockable uint32_t panic_get_reason_reg(const struct panic_data *pdata)
+{
+	if (!pdata)
+		return 0;
+	switch (pdata->arch) {
+	case PANIC_ARCH_CORTEX_M:
+		return pdata->cm.regs[3];
+	case PANIC_ARCH_NDS32_N8:
+		return pdata->nds_n8.regs[6];
+	case PANIC_ARCH_RISCV_RV32I:
+		return pdata->riscv.regs[11];
+	case PANIC_ARCH_X86:
+		return pdata->x86.vector;
+	default:
+		return 0;
+	}
+}
+
+test_mockable void panic_set_reason_reg(struct panic_data *pdata,
+					uint32_t reason)
+{
+	if (!pdata)
+		return;
+	switch (pdata->arch) {
+	case PANIC_ARCH_CORTEX_M:
+		pdata->cm.regs[3] = reason;
+		break;
+	case PANIC_ARCH_NDS32_N8:
+		pdata->nds_n8.regs[6] = reason;
+		break;
+	case PANIC_ARCH_RISCV_RV32I:
+		pdata->riscv.regs[11] = reason;
+		break;
+	case PANIC_ARCH_X86:
+		pdata->x86.vector = reason;
+		break;
+	default:
+		break;
+	}
+}
+
 test_mockable uintptr_t get_panic_data_start(void)
 {
 	return (uintptr_t)(__ram_data + RAM_DATA_SIZE -
