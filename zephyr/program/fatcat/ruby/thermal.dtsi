@@ -46,7 +46,7 @@
 			pwms = <&pwm5 5 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
 			rpm-min = <2500>;
 			rpm-start = <2500>;
-			rpm-max = <4600>;
+			rpm-max = <4300>;
 			tach = <&tach1>;
 			enable-gpio = <&gpio_en_pp5000_fan>;
 		};
