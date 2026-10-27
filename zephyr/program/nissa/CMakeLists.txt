@@ -167,7 +167,7 @@ if(DEFINED CONFIG_BOARD_CRAASKOV)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "craaskov/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
 	"craaskov/src/keyboard.c"
-	"craaskov/src/keyboard_customization.c"
+	"src/keyboard_customization.c"
 	)
 endif()
 if(DEFINED CONFIG_BOARD_QUANDISO)
@@ -218,7 +218,7 @@ if(DEFINED CONFIG_BOARD_ANRAGGAR)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "anraggar/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "anraggar/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
-			"anraggar/src/keyboard_customization.c"
+			"src/keyboard_customization.c"
 	)
 endif()
 if(DEFINED CONFIG_BOARD_GLASSWAY)
@@ -279,7 +279,7 @@ if(DEFINED CONFIG_BOARD_RIVEN)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "riven/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
 	"riven/src/keyboard.c"
-	"riven/src/keyboard_customization.c"
+	"src/keyboard_customization.c"
 	)
 endif()
 if(DEFINED CONFIG_BOARD_DOMIKA)
@@ -306,7 +306,7 @@ if(DEFINED CONFIG_BOARD_TELIKS)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "teliks/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "teliks/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
-			"teliks/src/keyboard_customization.c"
+			"src/keyboard_customization.c"
 	)
 endif()
 if(DEFINED CONFIG_BOARD_RULL)
@@ -322,6 +322,7 @@ if(DEFINED CONFIG_BOARD_RULL)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "rull/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
 			"rull/src/keyboard_customization.c"
+			"src/keyboard_customization.c"
 	)
 endif()
 if(DEFINED CONFIG_BOARD_TELITH)
@@ -336,6 +337,7 @@ if(DEFINED CONFIG_BOARD_TELITH)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "telith/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
 			"telith/src/keyboard_customization.c"
+			"src/keyboard_customization.c"
 	)
 endif()
 if(DEFINED CONFIG_BOARD_PUJJONIRU)
@@ -348,7 +350,7 @@ if(DEFINED CONFIG_BOARD_PUJJONIRU)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "pujjoniru/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "pujjoniru/src/charger.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
-			"pujjoniru/src/keyboard_customization.c"
+			"src/keyboard_customization.c"
 	)
 endif()
 if(DEFINED CONFIG_BOARD_GUREN)

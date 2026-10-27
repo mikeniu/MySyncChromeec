@@ -321,7 +321,7 @@ if(CONFIG_TEST_NISSA_RIVEN)
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/charger.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/form_factor.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/keyboard.c
-	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/keyboard_customization.c
+	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/keyboard_customization.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/touch_panel.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/usbc.c
@@ -350,7 +350,7 @@ if(CONFIG_TEST_NISSA_TELIKS)
             app PRIVATE
             src/teliks.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/teliks/src/board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/teliks/src/keyboard_customization.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/keyboard_customization.c
     )
 endif()
 
