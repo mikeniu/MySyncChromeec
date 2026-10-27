@@ -1,4 +1,4 @@
-/* Copyright 2024 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -18,7 +18,7 @@
 LOG_MODULE_DECLARE(nissa, CONFIG_NISSA_LOG_LEVEL);
 
 /*
- * Telith does not have a GPIO indicating whether extpower is present,
+ * Board does not have a GPIO indicating whether extpower is present,
  * so detect using the charger(s).
  */
 __override void board_check_extpower(void)
@@ -35,7 +35,11 @@ __override void board_check_extpower(void)
 __override void board_set_charge_limit(int port, int supplier, int charge_ma,
 				       int max_ma, int charge_mv)
 {
+#if defined(CONFIG_BOARD_PUJJONIRU) || defined(CONFIG_BOARD_RULL)
+	charge_ma = charge_ma * 98 / 100;
+#else
 	charge_ma = charge_ma * 90 / 100;
+#endif
 
 	charge_set_input_current_limit(charge_ma, charge_mv);
 	charger_set_input_current_limit(0, charge_ma);

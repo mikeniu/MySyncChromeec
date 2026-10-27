@@ -1,4 +1,4 @@
-/* Copyright 2025 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -33,7 +33,7 @@ int extpower_is_present(void)
 }
 
 /*
- * Nereid does not have a GPIO indicating whether extpower is present,
+ * Board does not have a GPIO indicating whether extpower is present,
  * so detect using the charger(s).
  */
 __override void board_check_extpower(void)
@@ -103,6 +103,8 @@ static void adapter_voltage_limit(void)
 
 DECLARE_HOOK(HOOK_INIT, adapter_voltage_limit, HOOK_PRIO_DEFAULT - 1);
 
+#if defined(CONFIG_PLATFORM_EC_BATTERY_HW_PRESENT_CUSTOM) || \
+	defined(CONFIG_TEST_NISSA_EPIC)
 enum battery_present battery_hw_present(void)
 {
 	const struct gpio_dt_spec *batt_pres;
@@ -112,3 +114,4 @@ enum battery_present battery_hw_present(void)
 	/* The GPIO is low when the battery is physically present */
 	return gpio_pin_get_dt(batt_pres) ? BP_NO : BP_YES;
 }
+#endif

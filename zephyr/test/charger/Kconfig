@@ -37,14 +37,8 @@ choice TEST_BOARD_VARIANT
 		select TEST_ISL923X
 		select TEST_CHARGER_MULTI_DEF
 
-	config TEST_BOARD_NIVVIKS
-		bool "Run nivvkis tests"
-		select TEST_PROGRAM_NISSA
-		select TEST_ISL923X
-		select TEST_CHARGER_MULTI_DEF
-
-	config TEST_BOARD_PIRRHA
-		bool "Run pirrha tests"
+	config TEST_BOARD_NISSA_RAA489000
+		bool "Run nissa RAA489000 charger tests"
 		select TEST_PROGRAM_NISSA
 		select TEST_ISL923X
 		select TEST_CHARGER_MULTI_DEF
@@ -54,18 +48,6 @@ choice TEST_BOARD_VARIANT
 		select TEST_PROGRAM_NISSA
 		select TEST_ISL923X
 		select TEST_CHARGER_SOLO_DEF
-
-	config TEST_BOARD_ULDREN
-		bool "Run uldren tests"
-		select TEST_PROGRAM_NISSA
-		select TEST_ISL923X
-		select TEST_CHARGER_MULTI_DEF
-
-	config TEST_BOARD_XIVU
-		bool "Run xivu tests"
-		select TEST_PROGRAM_NISSA
-		select TEST_ISL923X
-		select TEST_CHARGER_MULTI_DEF
 
 	config TEST_BOARD_NATIVE_SIM
 		bool "native sim test"
@@ -83,11 +65,7 @@ config TEST_BOARD_NAME
 	default "craask" if TEST_BOARD_CRAASK
 	default "craaskov" if TEST_BOARD_CRAASKOV
 	default "gothrax" if TEST_BOARD_GOTHRAX
-	default "nivviks" if TEST_BOARD_NIVVIKS
-	default "pirrha" if TEST_BOARD_PIRRHA
 	default "pujjo" if TEST_BOARD_PUJJO
-	default "uldren" if TEST_BOARD_ULDREN
-	default "xivu" if TEST_BOARD_XIVU
 
 # Charger selection
 config TEST_ISL923X
@@ -102,11 +80,6 @@ choice TEST_TARGET
 	config TEST_EXTPOWER
 		bool "Run external power tests"
 endchoice # TEST_TARGET
-
-config TEST_SRC
-	string "Override default file to test"
-	help
-	  By default zephyr/program/<program>/<variant>/charger.c is used
 
 config TEST_CHARGER_SOLO_DEF
 	bool
