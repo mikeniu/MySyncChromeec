@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9070a037_8bc2df16",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T21:01:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality**: `MOCK(HWTIMER)` (`common/mock/hwtimer_mock.c` and `include/mock/hwtimer_mock.h`) implements the `__hw_clock_*()` hooks required by `common/timer.c` using a controllable in-memory counter, `core/host/build.mk` conditionally excludes `core/host/timer.o` when `CONFIG_COMMON_TIMER` is enabled, `core/host/disabled.c` stubs `task_trigger_irq()`, and `test/timer` enables `CONFIG_COMMON_TIMER` and `MOCK(HWTIMER)` on `BOARD_HOST`.\n- **Architecture \u0026 Component Fit**: Registering `MOCK(HWTIMER)` in `common/mock/build.mk`, exposing `struct mock_ctrl_hwtimer` and `MOCK_CTRL_DEFAULT_HWTIMER` in `include/mock/hwtimer_mock.h`, enabling the mock via `test/timer.mocklist`, and guarding `core/host/timer.o` with `$(call not_cfg,$(CONFIG_COMMON_TIMER))` in `core/host/build.mk` align cleanly with ChromiumOS EC build and mock conventions.\n- **Code Simplicity**: Each hardware clock hook in `common/mock/hwtimer_mock.c` and the mock control struct in `include/mock/hwtimer_mock.h` are minimal and directly match what `common/timer.c` and `test/timer.cc` use.\n- **Idiomaticity \u0026 Readability**: C style, naming, types, header guards, `extern \"C\"` linkage, and `#if !defined(TEST_BUILD) || !defined(BOARD_HOST)` guards follow ChromiumOS EC conventions with no magic numbers or unexplained literals.\n- **Security**: No security or memory-safety concerns introduced; mock code is restricted to host test builds (`TEST_BUILD` and `BOARD_HOST`).\n- **Testing**: Enabling `CONFIG_COMMON_TIMER` and `MOCK(HWTIMER)` on `BOARD_HOST` allows `test/timer.cc` (`make run-timer`) to exercise `common/timer.c` on host, including `test_usleep_warning` and `test_get_time_overflow_irq_disabled`.\n- **CL Size \u0026 Scope**: `Size: M (+98, -1)`. The change is a single, self-contained logical change enabling `common/timer.c` in host `test/timer` builds with a mock hardware timer.\n- **Commit Message**: Clearly states the problem (*Why*) and conceptual solution (*What*) in concise prose with `BUG\u003db:213342294` and `TEST\u003d` trailers.\n\n[[trajectory](https://goto.corp.google.com/traj/fc00b7cb-1d15-4c82-8e38-32bc2e38854f)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ea7357951629cf46eeb2263a3af8ee33a6abfd4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
