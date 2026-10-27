@@ -142,6 +142,8 @@ void exception_panic(uint32_t vector, uint32_t error_code, uint32_t eip,
 	/* Initialize panic data */
 	pdata->arch = PANIC_ARCH_X86;
 	pdata->struct_version = 2;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
 	pdata->magic = PANIC_DATA_MAGIC;
 
 	/* Display the panic and reset */
@@ -193,6 +195,8 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 	pdata->magic = PANIC_DATA_MAGIC;
 	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
 	pdata->struct_version = 2;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
 	pdata->arch = PANIC_ARCH_X86;
 
 	/* Log panic cause */
