@@ -8,6 +8,7 @@
 #if defined(CONFIG_NPCX_RAM_LOCK)
 #include "ram_lock.h"
 #endif
+#include "system.h"
 
 #include <stdbool.h>
 
@@ -20,6 +21,27 @@
 #include <kernel_arch_data.h>
 
 LOG_MODULE_REGISTER(shim_mpu, LOG_LEVEL_ERR);
+
+extern void arm_core_mpu_disable(void);
+
+void arch_pre_system_jump(void)
+{
+	/*
+	 * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then
+	 * the last 64 bytes of the stack is protected to detect stack
+	 * overflows. Size of protected region must be greater than exception
+	 * frame, so CPU won't overwrite some other data when exception occurs.
+	 *
+	 * EC uses different RAM layout than Zephyr, so it's possible that after
+	 * sysjump some variables are stored in the protected region. EC also
+	 * reconfigures MPU late (Zephyr does it in reset handler).
+	 *
+	 * Disable MPU protection to avoid problems after sysjump to EC.
+	 */
+	if (IS_ENABLED(CONFIG_HW_STACK_PROTECTION)) {
+		arm_core_mpu_disable();
+	}
+}
 
 void mpu_enable(void)
 {
