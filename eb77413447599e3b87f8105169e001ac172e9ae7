@@ -45,6 +45,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0c823ae9_fe461b24",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-27T10:53:42Z",
+      "side": 1,
+      "message": "Yes, this is a known issue. The buffer size matches the one from console.c. It is not the pretties solution, but hard to find a better one here. We could just increase the buffer endlessly, which impacts stack usage. Anyway, based on my analysis, all logs fit into the SHELL_PRINTF_BUFF_SIZE size buffer.\n\nAdditionally, adding any type of synchronization mechanism on logging path is tricky, and can introduce more problems. The logging can be called from very different contexts like threads with already locked mutexes/spinlocks, ISRs, crashes etc.",
+      "parentUuid": "7e572afb_f22cec67",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 0
+      },
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bd1a50e8_df4a3acf",
         "filename": "zephyr/shim/src/log_backend_cros_ec.c",
         "patchSetId": 8
@@ -56,6 +80,24 @@
       "writtenOn": "2026-10-27T01:29:18Z",
       "side": 1,
       "message": "Any concerns on stack overflow for this large buffer?",
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c90db9f_bd347b0f",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-27T10:53:42Z",
+      "side": 1,
+      "message": "That\u0027s a good question. I\u0027ve spend a lot of time considering different approaches - stack, heap, bss etc. IMO the best approach is stack, bacause doesn\u0027t introduce additional synchronization method in critical paths like crashes. Also a separate memory part would need to be used for ISR logging and thread logging. So stack looked like the best, simplest method. \n\nThe main concern is, as you mentioned, stack overflow. I\u0027ve performed static analysis of stack usage for et171 projects and increased stacks for some threads. Even with these changes, usage of RAM is neutral, and the increased stack can be used in a different placed, which wouldn\u0027t be a case with e.g. static buffer in this file. You can see the stacks changes in CL:8607952.",
+      "parentUuid": "bd1a50e8_df4a3acf",
       "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -78,6 +120,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "785ca88c_692c277a",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-27T10:53:42Z",
+      "side": 1,
+      "message": "Makes sense, done.",
+      "parentUuid": "ff78503b_48690fbd",
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a810955_d3ac714d",
@@ -92,6 +152,24 @@
       "side": 1,
       "message": "Nit (optional): Since this backend only supports `LOG_OUTPUT_TEXT` (`.format_set \u003d NULL`) and selects `CONFIG_LOG_OUTPUT`, this can call `log_output_msg_process(\u0026log_output, \u0026msg-\u003elog, flags);` directly instead of looking it up at runtime via `log_format_func_t_get(LOG_OUTPUT_TEXT)` (similar to upstream `shell_log_backend.c`):\n```c\n\tline_ctx.len \u003d 0;\n\tlog_output_msg_process(\u0026log_output, \u0026msg-\u003elog, flags);\n\tflush_line_buf(\u0026line_ctx);\n```",
       "isAi": true,
+      "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26d25edc_5c340ab6",
+        "filename": "zephyr/shim/src/log_backend_cros_ec.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-27T10:53:42Z",
+      "side": 1,
+      "message": "Good suggestion, thanks.",
+      "parentUuid": "4a810955_d3ac714d",
       "revId": "eb77413447599e3b87f8105169e001ac172e9ae7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
