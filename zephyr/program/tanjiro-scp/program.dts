@@ -3,7 +3,14 @@
  * found in the LICENSE file.
  */
 
+#include <dt-bindings/motionsense/utils.h>
+
 / {
+	ec-console {
+		compatible = "ec-console";
+		disabled = "motionsense";
+	};
+
 	/*
 	 * common/system.c references GPIO_ENTERING_RW unconditionally. A
 	 * named-gpios child with no "gpios" property resolves it to
