@@ -47,6 +47,8 @@ extern "C" {
  *
  * Can be called both in interrupt context and task context.
  *
+ * @isr_ok
+ * @no_wait
  * @param tskid		Task to set event for
  * @param event		Event bitmap to set (TASK_EVENT_*)
  */
@@ -55,6 +57,8 @@ void task_set_event(task_id_t tskid, uint32_t event);
 /**
  * Wake a task.  This sends it the TASK_EVENT_WAKE event.
  *
+ * @isr_ok
+ * @no_wait
  * @param tskid		Task to wake
  */
 static inline void task_wake(task_id_t tskid)
@@ -75,6 +79,7 @@ task_id_t task_get_current(void);
  * order.  Automatically clears the bitmap of received events before returning
  * the events which are set.
  *
+ * @sleep
  * @param timeout_us	If > 0, sets a timer to produce the TASK_EVENT_TIMER
  *			event after the specified micro-second duration.
  *
@@ -90,6 +95,7 @@ uint32_t task_wait_event(int timeout_us);
  * order.  Automatically clears the bitmap of received events before returning
  * the events which are set.
  *
+ * @sleep
  * @param event_mask	Bitmap of task events to wait for.
  *
  * @param timeout_us	If > 0, sets a timer to produce the TASK_EVENT_TIMER
