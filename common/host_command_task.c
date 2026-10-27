@@ -416,7 +416,6 @@ static void dump_host_command_suppressed(int force)
 		hc_suppressed_cnt[i] = 0;
 	}
 	CPRINTF("]\n");
-	cflush();
 
 	/* Reset the timer */
 	suppressed_cmd_deadline.val = get_time().val + SUPPRESSED_CMD_INTERVAL;
@@ -487,7 +486,7 @@ uint16_t host_command_process(struct host_cmd_handler_args *args)
 	const struct host_command *cmd;
 	int rv;
 
-	if (hcdebug)
+	if (hcdebug && !k_is_in_isr())
 		host_command_debug_request(args);
 
 	/*
