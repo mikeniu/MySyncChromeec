@@ -4,6 +4,7 @@
  */
 
 #include "hooks.h"
+#include "system.h"
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -22,12 +23,21 @@
 
 extern void arm_core_mpu_disable(void);
 
-static void prepare_for_sysjump_to_ec(void)
+void chip_pre_system_jump(void)
 {
 	/* Reset timers and UARTs to the defaults. */
 	DT_FOREACH_STATUS_OKAY(st_stm32_timers, RESET_PERIPHERAL);
 	DT_FOREACH_STATUS_OKAY(st_stm32_uart, RESET_PERIPHERAL);
 
+	/*
+	 * Disable system clock (Cortex-M Systick it this case) because it's
+	 * unused in EC.
+	 */
+	sys_clock_disable();
+}
+
+static void prepare_for_sysjump_to_ec(void)
+{
 	/*
 	 * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then
 	 * the last 64 bytes of the stack is protected to detect stack
@@ -41,12 +51,6 @@ static void prepare_for_sysjump_to_ec(void)
 	 * Disable MPU protection to avoid problems after sysjump to EC.
 	 */
 	arm_core_mpu_disable();
-
-	/*
-	 * Disable system clock (Cortex-M Systick it this case) because it's
-	 * unused in EC.
-	 */
-	sys_clock_disable();
 }
 DECLARE_HOOK(HOOK_SYSJUMP, prepare_for_sysjump_to_ec, HOOK_PRIO_LAST);
 

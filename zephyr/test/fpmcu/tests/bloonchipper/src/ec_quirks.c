@@ -7,6 +7,7 @@
 #include "fpsensor/fpsensor_detect.h"
 #include "gpio_signal.h"
 #include "hooks.h"
+#include "system.h"
 #include "zephyr/kernel.h"
 
 #include <zephyr/drivers/clock_control/stm32_clock_control.h>
@@ -49,4 +50,17 @@ ZTEST(ec_quirks, test_tim2)
 		      (void *)DT_REG_ADDR(DT_NODELABEL(timers2)));
 	zassert_equal(stm32_clock_control_off_fake.arg0_history[0],
 		      DEVICE_DT_GET(STM32_CLOCK_CONTROL_NODE));
+}
+
+ZTEST(ec_quirks, test_chip_pre_system_jump)
+{
+	RESET_FAKE(stm32_reset_line_toggle);
+
+	chip_pre_system_jump();
+
+	zassert_equal(stm32_reset_line_toggle_fake.call_count, 1);
+	zassert_equal(stm32_reset_line_toggle_fake.arg0_history[0],
+		      DEVICE_DT_GET(DT_NODELABEL(rctl)));
+	zassert_equal(stm32_reset_line_toggle_fake.arg1_history[0],
+		      DT_RESET_ID(DT_NODELABEL(timers2)));
 }
