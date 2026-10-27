@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24818cf0_5db062d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T20:49:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality**: All prior functional issues (circular FIFO wrap-around, multi-byte FIFO read/write indexing, optional `int-gpios` initialization assertion, and active-low interrupt pin deassertion when FIFO interrupts are disabled) are resolved.\n* **Architecture \u0026 Component Fit**: Migrating `emul_lsm6dso` to `i2c_common_emul` and exposing `emul_lsm6dso_append_sample` and `emul_lsm6dso_append_raw_tag` in `zephyr/include/emul/emul_lsm6dso.h` aligns cleanly with the Zephyr I2C emulator architecture and supports both standard sample injection and raw FIFO tag testing in the stacked test CLs.\n* **Code Simplicity**: Watermark status and interrupt pin state updates are centralized in `emul_lsm6dso_set_fifo_count`, `lsm6dso_emul_set_interrupt_pin` computes the pin state without redundant branches, and `emul_lsm6dso_append_sample` selects the sensor-specific parameters in a single branch.\n* **Idiomaticity \u0026 Readability**: Named register masks, shifts, and buffer size macros (`LSM6DSO_FIFO_STS1_DIFF_MASK`, `LSM6DSO_FIFO_STS2_DIFF_MASK`, `LSM6DSO_FIFO_DIFF_MSB_SHIFT`, `LSM6DSO_FIFO_TAG_SHIFT`, `LSM6DSO_FIFO_MAX_SAMPLES`, `LSM6DSO_REG_COUNT`) are used consistently throughout.\n* **Security**: Bounds checks in `emul_lsm6dso_append_raw_tag`, `lsm6dso_emul_read_byte`, and `lsm6dso_emul_write_byte` prevent out-of-bounds buffer and register accesses.\n* **Testing**: Exercised by the companion `drivers.lsm6dso` unit test suite in the relation chain (`twister -c -s drivers.lsm6dso`).\n* **CL Size \u0026 Scope**: `Size: L (+306, -73)` (16 added header macro lines in `driver/accelgyro_lsm6dso.h` and 290 added / 73 removed test-emulator lines across `zephyr/emul/`, `zephyr/include/emul/`, and `zephyr/dts/bindings/emul/`). Splitting the `drivers.lsm6dso` test suite into a separate stacked CL keeps this change focused on a single cohesive logical change to the Zephyr emulator.\n* **Commit Message**: Clearly states both what changed and why, with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/bcdf68bc-4d60-4ad5-a3d4-58e6f1ef6fff)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0a20e2c80cb7b5d13cf916a4734fdfea8a387dad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
