@@ -73,7 +73,7 @@ if(CONFIG_TEST_NISSA_NOKRIS)
     target_sources(
             app PRIVATE
             src/nokris.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/nokris/src/charger.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/nokris_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/nokris/src/usbc.c
     )
@@ -128,7 +128,7 @@ if(CONFIG_TEST_NISSA_PUJJOGA)
             app PRIVATE
             src/pujjoga.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/charger.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/nokris_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/sub_board.c
@@ -142,7 +142,7 @@ if(CONFIG_TEST_NISSA_PUJJOGATWIN)
             app PRIVATE
             src/pujjogatwin.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/charger.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/nokris_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/led.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/sub_board.c
