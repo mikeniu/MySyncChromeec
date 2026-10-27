@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f092cbd2_bb6a65f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T20:53:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ The `drivers.lsm6dso` test suite properly verifies interrupt enable/disable gating, hardware/software FIFO flushing, and accelerometer/gyroscope sample scaling and FIFO reads against `emul_lsm6dso`.\n* **Architecture \u0026 Component Fit:** ✅ The test suite structure (`CMakeLists.txt`, `Kconfig`, `prj.conf`, `sensor.dts`, `src/main.c`, and `testcase.yaml`) aligns with existing `zephyr/test/drivers/` motion sensor test suites.\n* **Code Simplicity:** ✅ Test setup and assertions are direct and minimal without unnecessary abstractions or redundant state.\n* **Idiomaticity \u0026 Readability:** ✅ Uses named driver constants (`LSM6DSO_ODR_MIN_VAL`, `LSM6DSO_DISCARD_SAMPLES`, `CONFIG_ACCEL_LSM6DSO_INT_EVENT`), standard Zephyr devicetree/GPIO macros, and `ARRAY_SIZE`/`sizeof` rather than magic numbers.\n* **Security:** ✅ No security concerns in this unit test addition.\n* **Testing:** ✅ Exercises both disabled-interrupt gating and enabled-interrupt FIFO reads for accelerometer and gyroscope samples using distinct per-axis values (`X`, `Y`, `Z`) to prevent axis-swap masking.\n* **CL Size \u0026 Scope:** ✅ `Size: L (+294, -0)` (0 production lines, +294 test and test-configuration lines). Represents a single, self-contained logical change adding the `drivers.lsm6dso` unit test suite.\n* **Commit Message:** ✅ Clear imperative subject line, concise prose summary explaining what the test suite verifies, and properly formatted `BUG\u003d`, `TEST\u003d`, and `Change-Id:` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/336fe377-a27b-4172-8f02-48e549351c39)] [🔗](http://go/tj/336fe377-a27b-4172-8f02-48e549351c39)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "db92cbdc1930886f8336e49c6711fcb9c60881a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
