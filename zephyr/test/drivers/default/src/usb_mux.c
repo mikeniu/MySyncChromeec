@@ -40,6 +40,8 @@ static struct usb_mux *usbc1_virtual_usb_mux;
 /** Number of usb mux proxies in chain that CAN_IDLE */
 #define NUM_OF_PROXY_CAN_IDLE 1
 
+static bool proxy_set_require_ack;
+
 /** Pointers to original usb muxes chain of port c1 */
 const struct usb_mux *org_mux[NUM_OF_PROXY];
 
@@ -94,8 +96,8 @@ static int proxy_set_custom(const struct usb_mux *me, mux_state_t mux_state,
 	if (org_mux[i] != NULL && org_mux[i]->driver->set != NULL) {
 		ec = org_mux[i]->driver->set(org_mux[i], mux_state,
 					     ack_required);
-		/* Disable waiting for ACK in tests */
-		*ack_required = false;
+		/* Disable waiting for ACK in tests unless requested */
+		*ack_required = proxy_set_require_ack;
 	}
 
 	if (task_is_host_command()) {
@@ -231,8 +233,8 @@ static void proxy_hpd_update_custom(const struct usb_mux *me,
 
 	if (org_mux[i] != NULL && org_mux[i]->hpd_update != NULL) {
 		org_mux[i]->hpd_update(org_mux[i], mux_state, ack_required);
-		/* Disable waiting for ACK in tests */
-		*ack_required = false;
+		/* Disable waiting for ACK in tests unless requested */
+		*ack_required = proxy_set_require_ack;
 	}
 
 	if (!task_is_host_command()) {
@@ -1035,6 +1037,54 @@ ZTEST(usb_init_mux, test_usb_mux_typec_command)
 	zassert_equal(EC_SUCCESS,
 		      shell_execute_cmd(get_ec_shell(), "typec 1 dock"), NULL);
 	CHECK_PROXY_FAKE_CALL_CNT_MUX_STATE(proxy_set, NUM_OF_PROXY, exp_mode);
+}
+
+struct sysworkq_test_data {
+	struct k_work work;
+	struct k_sem done;
+	bool thread_is_sysworkq;
+};
+
+static void sysworkq_test_work_handler(struct k_work *work)
+{
+	struct sysworkq_test_data *data =
+		CONTAINER_OF(work, struct sysworkq_test_data, work);
+
+	data->thread_is_sysworkq =
+		(k_current_get() == k_work_queue_thread_get(&k_sys_work_q));
+
+	/* Trigger chipset reset and resume */
+	hook_notify(HOOK_CHIPSET_RESET);
+	hook_notify(HOOK_CHIPSET_RESUME);
+
+	/* Trigger usb_mux_set with ack_required forced to true */
+	usb_mux_set(USBC_PORT_C1, USB_PD_MUX_USB_ENABLED, USB_SWITCH_CONNECT,
+		    0 /* polarity */);
+
+	/* Trigger usb_mux_hpd_update */
+	usb_mux_hpd_update(USBC_PORT_C1, USB_PD_MUX_HPD_LVL);
+
+	k_sem_give(&data->done);
+}
+
+ZTEST(usb_init_mux, test_sysworkq_mux_operations_non_blocking)
+{
+	struct sysworkq_test_data data;
+
+	k_sem_init(&data.done, 0, 1);
+	k_work_init(&data.work, sysworkq_test_work_handler);
+
+	reset_proxy_fakes();
+	proxy_set_require_ack = true;
+
+	k_work_submit(&data.work);
+
+	zassert_equal(k_sem_take(&data.done, K_MSEC(500)), 0,
+		      "sysworkq mux operations did not complete in time");
+	zassert_true(data.thread_is_sysworkq,
+		     "Work did not execute on k_sys_work_q");
+
+	proxy_set_require_ack = false;
 }
 
 /** Setup proxy chain and uninit usb muxes */

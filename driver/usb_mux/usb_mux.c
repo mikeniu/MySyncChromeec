@@ -19,6 +19,7 @@
 #include "usbc_ppc.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
 
 #ifdef CONFIG_COMMON_RUNTIME
@@ -273,7 +274,123 @@ __maybe_unused void usb_mux_task(void *u)
 	}
 }
 
-/* Configure the MUX */
+/* Configure a single MUX in the chain */
+static int configure_mux_chip(int port, int chip, const struct usb_mux *mux_ptr,
+			      enum mux_config_type config,
+			      mux_state_t *mux_state, bool *ack_required)
+{
+	int rv = EC_SUCCESS;
+	mux_state_t lcl_state;
+	const struct usb_mux_driver *drv = mux_ptr->driver;
+	bool unused_ack = false;
+	bool *ack_ptr = ack_required ? ack_required : &unused_ack;
+
+	if (ack_required)
+		*ack_required = false;
+
+	/* Action time!  Lock this mux */
+	k_mutex_lock(&mux_lock[port], K_FOREVER);
+
+	switch (config) {
+	case USB_MUX_INIT:
+		if (drv && drv->init) {
+			rv = drv->init(mux_ptr);
+			if (rv)
+				break;
+		}
+
+		/* Apply board specific initialization */
+		if (mux_ptr->board_init)
+			rv = mux_ptr->board_init(mux_ptr);
+
+		break;
+
+	case USB_MUX_LOW_POWER:
+		if (drv && drv->enter_low_power_mode)
+			rv = drv->enter_low_power_mode(mux_ptr);
+
+		break;
+
+	case USB_MUX_CHIPSET_IDLE:
+		if ((mux_ptr->flags & USB_MUX_FLAG_CAN_IDLE) && drv &&
+		    drv->set_idle_mode)
+			rv = drv->set_idle_mode(mux_ptr, true);
+
+		break;
+
+	case USB_MUX_CHIPSET_ACTIVE:
+		if ((mux_ptr->flags & USB_MUX_FLAG_CAN_IDLE) && drv &&
+		    drv->set_idle_mode)
+			rv = drv->set_idle_mode(mux_ptr, false);
+
+		break;
+
+	case USB_MUX_CHIPSET_RESET:
+		if (drv && drv->chipset_reset)
+			rv = drv->chipset_reset(mux_ptr);
+
+		break;
+
+	case USB_MUX_SET_MODE:
+		lcl_state = *mux_state;
+
+		if (mux_ptr->flags & USB_MUX_FLAG_SET_WITHOUT_FLIP)
+			lcl_state &= ~USB_PD_MUX_POLARITY_INVERTED;
+
+		if ((lcl_state != USB_PD_MUX_NONE) &&
+		    (mux_ptr->flags & USB_MUX_FLAG_POLARITY_INVERTED))
+			lcl_state ^= USB_PD_MUX_POLARITY_INVERTED;
+
+		if (drv && drv->set) {
+			rv = drv->set(mux_ptr, lcl_state, ack_ptr);
+			if (rv)
+				break;
+		}
+
+		/* Apply board specific setting */
+		if (mux_ptr->board_set)
+			rv = mux_ptr->board_set(mux_ptr, lcl_state);
+
+		/* Inform the AP its selected mux is set */
+		if (IS_ENABLED(CONFIG_USB_MUX_AP_CONTROL)) {
+			if (chip == 0)
+				pd_notify_event(port,
+						PD_STATUS_EVENT_MUX_0_SET_DONE);
+			else if (chip == 1)
+				pd_notify_event(port,
+						PD_STATUS_EVENT_MUX_1_SET_DONE);
+		}
+
+		break;
+
+	case USB_MUX_GET_MODE:
+		/*
+		 * This is doing a GET_CC on all of the MUXes in the
+		 * chain and ORing them together. This will make sure
+		 * if one of the MUX values has FLIP turned off that
+		 * we will end up with the correct value in the end.
+		 */
+		if (drv && drv->get) {
+			rv = drv->get(mux_ptr, &lcl_state);
+			if (rv)
+				break;
+			*mux_state |= lcl_state;
+		}
+		break;
+
+	case USB_MUX_HPD_UPDATE:
+		if (mux_ptr->hpd_update)
+			mux_ptr->hpd_update(mux_ptr, *mux_state, ack_ptr);
+		break;
+	}
+
+	/* Unlock before returning */
+	k_mutex_unlock(&mux_lock[port]);
+
+	return rv;
+}
+
+/* Configure the MUX for operations that do not require an AP ACK */
 static int configure_mux(int port, int index, enum mux_config_type config,
 			 mux_state_t *mux_state)
 {
@@ -297,117 +414,50 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 	for (mux_chain = &usb_muxes[port];
 	     rv == EC_SUCCESS && mux_chain != NULL && mux_chain->mux != NULL;
 	     mux_chain = mux_chain->next, chip++) {
-		mux_state_t lcl_state;
-		const struct usb_mux *mux_ptr = mux_chain->mux;
-		const struct usb_mux_driver *drv = mux_ptr->driver;
+		if (index != TYPEC_USB_MUX_SET_ALL_CHIPS && index != chip)
+			continue;
+
+		rv = configure_mux_chip(port, chip, mux_chain->mux, config,
+					mux_state, NULL);
+	}
+
+	if (rv)
+		CPRINTS("mux config:%d, port:%d, rv:%d", config, port, rv);
+
+	return rv;
+}
+
+/* Configure the MUX for operations that can request an AP ACK */
+static int configure_mux_ack(int port, int index, enum mux_config_type config,
+			     mux_state_t *mux_state)
+{
+	int rv = EC_SUCCESS;
+	const struct usb_mux_chain *mux_chain;
+	int chip = 0;
+
+	if (config == USB_MUX_SET_MODE || config == USB_MUX_GET_MODE) {
+		if (mux_state == NULL)
+			return EC_ERROR_INVAL;
+
+		if (config == USB_MUX_GET_MODE)
+			*mux_state = USB_PD_MUX_NONE;
+	}
+
+	for (mux_chain = &usb_muxes[port];
+	     rv == EC_SUCCESS && mux_chain != NULL && mux_chain->mux != NULL;
+	     mux_chain = mux_chain->next, chip++) {
 		bool ack_required = false;
 
 		if (index != TYPEC_USB_MUX_SET_ALL_CHIPS && index != chip)
 			continue;
 
-		/* Action time!  Lock this mux */
-		k_mutex_lock(&mux_lock[port], K_FOREVER);
-
-		switch (config) {
-		case USB_MUX_INIT:
-			if (drv && drv->init) {
-				rv = drv->init(mux_ptr);
-				if (rv)
-					break;
-			}
-
-			/* Apply board specific initialization */
-			if (mux_ptr->board_init)
-				rv = mux_ptr->board_init(mux_ptr);
-
+		rv = configure_mux_chip(port, chip, mux_chain->mux, config,
+					mux_state, &ack_required);
+		if (rv)
 			break;
 
-		case USB_MUX_LOW_POWER:
-			if (drv && drv->enter_low_power_mode)
-				rv = drv->enter_low_power_mode(mux_ptr);
-
-			break;
-
-		case USB_MUX_CHIPSET_IDLE:
-			if ((mux_ptr->flags & USB_MUX_FLAG_CAN_IDLE) && drv &&
-			    drv->set_idle_mode)
-				rv = drv->set_idle_mode(mux_ptr, true);
-
-			break;
-
-		case USB_MUX_CHIPSET_ACTIVE:
-			if ((mux_ptr->flags & USB_MUX_FLAG_CAN_IDLE) && drv &&
-			    drv->set_idle_mode)
-				rv = drv->set_idle_mode(mux_ptr, false);
-
-			break;
-
-		case USB_MUX_CHIPSET_RESET:
-			if (drv && drv->chipset_reset)
-				rv = drv->chipset_reset(mux_ptr);
-
-			break;
-
-		case USB_MUX_SET_MODE:
-			lcl_state = *mux_state;
-
-			if (mux_ptr->flags & USB_MUX_FLAG_SET_WITHOUT_FLIP)
-				lcl_state &= ~USB_PD_MUX_POLARITY_INVERTED;
-
-			if ((lcl_state != USB_PD_MUX_NONE) &&
-			    (mux_ptr->flags & USB_MUX_FLAG_POLARITY_INVERTED))
-				lcl_state ^= USB_PD_MUX_POLARITY_INVERTED;
-
-			if (drv && drv->set) {
-				rv = drv->set(mux_ptr, lcl_state,
-					      &ack_required);
-				if (rv)
-					break;
-			}
-
-			/* Apply board specific setting */
-			if (mux_ptr->board_set)
-				rv = mux_ptr->board_set(mux_ptr, lcl_state);
-
-			/* Inform the AP its selected mux is set */
-			if (IS_ENABLED(CONFIG_USB_MUX_AP_CONTROL)) {
-				if (chip == 0)
-					pd_notify_event(
-						port,
-						PD_STATUS_EVENT_MUX_0_SET_DONE);
-				else if (chip == 1)
-					pd_notify_event(
-						port,
-						PD_STATUS_EVENT_MUX_1_SET_DONE);
-			}
-
-			break;
-
-		case USB_MUX_GET_MODE:
-			/*
-			 * This is doing a GET_CC on all of the MUXes in the
-			 * chain and ORing them together. This will make sure
-			 * if one of the MUX values has FLIP turned off that
-			 * we will end up with the correct value in the end.
-			 */
-			if (drv && drv->get) {
-				rv = drv->get(mux_ptr, &lcl_state);
-				if (rv)
-					break;
-				*mux_state |= lcl_state;
-			}
-			break;
-
-		case USB_MUX_HPD_UPDATE:
-			if (mux_ptr->hpd_update)
-				mux_ptr->hpd_update(mux_ptr, *mux_state,
-						    &ack_required);
-		}
-
-		/* Unlock before any host command waits */
-		k_mutex_unlock(&mux_lock[port]);
-
-		if (ack_required) {
+		if (IS_ENABLED(CONFIG_USB_MUX_AP_ACK_REQUEST) && ack_required &&
+		    k_current_get() != k_work_queue_thread_get(&k_sys_work_q)) {
 			ack_task[port] = task_get_current();
 
 			/*
@@ -565,7 +615,7 @@ static void perform_mux_set(int port, int index, mux_state_t mux_mode,
 			    mux_mode | USB_PD_MUX_POLARITY_INVERTED :
 			    mux_mode;
 
-	if (configure_mux(port, index, USB_MUX_SET_MODE, &mux_state))
+	if (configure_mux_ack(port, index, USB_MUX_SET_MODE, &mux_state))
 		return;
 
 	if (enable_debug_prints)
@@ -690,8 +740,8 @@ void usb_mux_flip(int port)
 	else
 		mux_state |= USB_PD_MUX_POLARITY_INVERTED;
 
-	configure_mux(port, TYPEC_USB_MUX_SET_ALL_CHIPS, USB_MUX_SET_MODE,
-		      &mux_state);
+	configure_mux_ack(port, TYPEC_USB_MUX_SET_ALL_CHIPS, USB_MUX_SET_MODE,
+			  &mux_state);
 }
 
 static void perform_mux_hpd_update(int port, int index, mux_state_t hpd_state)
@@ -703,7 +753,7 @@ static void perform_mux_hpd_update(int port, int index, mux_state_t hpd_state)
 	if (exit_low_power_mode(port) != EC_SUCCESS)
 		return;
 
-	configure_mux(port, index, USB_MUX_HPD_UPDATE, &hpd_state);
+	configure_mux_ack(port, index, USB_MUX_HPD_UPDATE, &hpd_state);
 }
 
 test_mockable void usb_mux_hpd_update(int port, mux_state_t hpd_state)
