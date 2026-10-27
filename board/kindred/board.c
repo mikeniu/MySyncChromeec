@@ -595,7 +595,7 @@ static void determine_accel_devices(void)
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, determine_accel_devices, HOOK_PRIO_DEFAULT);
-DECLARE_HOOK(HOOK_INIT, determine_accel_devices, HOOK_PRIO_INIT_ADC + 2);
+DECLARE_HOOK(HOOK_INIT, determine_accel_devices, HOOK_PRIO_POST_DEFAULT);
 
 void motion_interrupt(enum gpio_signal signal)
 {

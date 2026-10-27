@@ -99,7 +99,7 @@ DECLARE_DEFERRED(update_5v_usage);
 /*
  * Start power monitoring after ADCs have been initialised.
  */
-DECLARE_HOOK(HOOK_INIT, update_5v_usage, HOOK_PRIO_INIT_ADC + 1);
+DECLARE_HOOK(HOOK_INIT, update_5v_usage, HOOK_PRIO_POST_CHARGE_MANAGER);
 
 static void port_ocp_interrupt(enum gpio_signal signal)
 {

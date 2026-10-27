@@ -28,44 +28,46 @@ enum hook_priority {
 	HOOK_PRIO_INIT_DMA = HOOK_PRIO_FIRST + 1,
 	/* LPC inits before modules which need memory-mapped I/O */
 	HOOK_PRIO_INIT_LPC = HOOK_PRIO_FIRST + 1,
+	/* ADC inits before modules which read board/SKU straps (I2C, battery)
+	 */
+	HOOK_PRIO_INIT_ADC = HOOK_PRIO_FIRST + 2,
 	/*
 	 * I2C dependents (battery, sensors, etc), everything but the
 	 * controllers. I2C controller is now initialized in main.c
 	 * TODO(b/138384267): Split this hook up and name the resulting
 	 * ones more semantically.
 	 */
-	HOOK_PRIO_INIT_I2C = HOOK_PRIO_FIRST + 2,
+	HOOK_PRIO_INIT_I2C = HOOK_PRIO_FIRST + 4,
 	HOOK_PRIO_PRE_I2C = HOOK_PRIO_INIT_I2C - 1,
 	HOOK_PRIO_POST_I2C = HOOK_PRIO_INIT_I2C + 1,
 	HOOK_PRIO_BATTERY_INIT = HOOK_PRIO_POST_I2C,
 	HOOK_PRIO_POST_BATTERY_INIT = HOOK_PRIO_BATTERY_INIT + 1,
 	/* Chipset inits before modules which need to know its initial state. */
-	HOOK_PRIO_INIT_CHIPSET = HOOK_PRIO_FIRST + 3,
+	HOOK_PRIO_INIT_CHIPSET = HOOK_PRIO_FIRST + 5,
 	HOOK_PRIO_POST_CHIPSET = HOOK_PRIO_INIT_CHIPSET + 1,
 	/* Lid switch inits before power button */
-	HOOK_PRIO_INIT_LID = HOOK_PRIO_FIRST + 4,
+	HOOK_PRIO_INIT_LID = HOOK_PRIO_FIRST + 6,
 	HOOK_PRIO_POST_LID = HOOK_PRIO_INIT_LID + 1,
 	/* Power button inits before chipset and switch */
-	HOOK_PRIO_INIT_POWER_BUTTON = HOOK_PRIO_FIRST + 5,
+	HOOK_PRIO_INIT_POWER_BUTTON = HOOK_PRIO_FIRST + 7,
 	HOOK_PRIO_POST_POWER_BUTTON = HOOK_PRIO_INIT_POWER_BUTTON + 1,
 	/* Init switch states after power button / lid */
-	HOOK_PRIO_INIT_SWITCH = HOOK_PRIO_FIRST + 6,
+	HOOK_PRIO_INIT_SWITCH = HOOK_PRIO_FIRST + 8,
 	/* Init fan before PWM */
-	HOOK_PRIO_INIT_FAN = HOOK_PRIO_FIRST + 7,
+	HOOK_PRIO_INIT_FAN = HOOK_PRIO_FIRST + 9,
 	/* PWM inits before modules which might use it (LEDs) */
-	HOOK_PRIO_INIT_PWM = HOOK_PRIO_FIRST + 8,
+	HOOK_PRIO_INIT_PWM = HOOK_PRIO_FIRST + 10,
 	HOOK_PRIO_POST_PWM = HOOK_PRIO_INIT_PWM + 1,
 	/* SPI inits before modules which might use it (sensors) */
-	HOOK_PRIO_INIT_SPI = HOOK_PRIO_FIRST + 9,
+	HOOK_PRIO_INIT_SPI = HOOK_PRIO_FIRST + 11,
 	/* Extpower inits before modules which might use it (battery, LEDs) */
-	HOOK_PRIO_INIT_EXTPOWER = HOOK_PRIO_FIRST + 10,
+	HOOK_PRIO_INIT_EXTPOWER = HOOK_PRIO_FIRST + 12,
 	/* Init VBOOT hash later, since it depends on deferred functions */
-	HOOK_PRIO_INIT_VBOOT_HASH = HOOK_PRIO_FIRST + 11,
+	HOOK_PRIO_INIT_VBOOT_HASH = HOOK_PRIO_FIRST + 13,
 	/* Init charge manager before usage in board init */
-	HOOK_PRIO_INIT_CHARGE_MANAGER = HOOK_PRIO_FIRST + 12,
+	HOOK_PRIO_INIT_CHARGE_MANAGER = HOOK_PRIO_FIRST + 14,
 	HOOK_PRIO_POST_CHARGE_MANAGER = HOOK_PRIO_INIT_CHARGE_MANAGER + 1,
 
-	HOOK_PRIO_INIT_ADC = HOOK_PRIO_DEFAULT,
 	HOOK_PRIO_INIT_DAC = HOOK_PRIO_DEFAULT,
 
 	/* Specific values to lump temperature-related hooks together */

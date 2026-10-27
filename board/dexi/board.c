@@ -520,4 +520,4 @@ static void power_monitor(void)
 }
 
 /* Start power monitoring after ADCs have been initialised. */
-DECLARE_HOOK(HOOK_INIT, power_monitor, HOOK_PRIO_INIT_ADC + 1);
+DECLARE_HOOK(HOOK_INIT, power_monitor, HOOK_PRIO_POST_CHARGE_MANAGER);
