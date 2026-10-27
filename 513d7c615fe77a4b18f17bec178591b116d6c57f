@@ -22,6 +22,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "542100c4_54d2419d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-27T20:41:32Z",
+      "side": 1,
+      "message": "CL Size \u0026 Scope: --\u003e I split this CL as suggested.",
+      "parentUuid": "3511b528_db1d9acb",
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30e67279_10f2a3bf",
         "filename": "zephyr/emul/emul_lsm6dso.c",
         "patchSetId": 2
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad994ba1_223609bf",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-27T20:41:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30e67279_10f2a3bf",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 9999
+      },
       "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -72,6 +114,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d0c9c483_78314f14",
+        "filename": "zephyr/emul/emul_lsm6dso.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-27T20:41:32Z",
+      "side": 1,
+      "message": "emul_lsm6dso_append_raw_tag is needed for one of the tests in a CL in this relation chain. So I did not mark this as static. #2 of the comment is addressed",
+      "parentUuid": "59737c29_5a6a4cef",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 9999
+      },
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2eaad6f1_38a7c528",
         "filename": "zephyr/include/emul/emul_lsm6dso.h",
         "patchSetId": 2
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d57c774_b878a66e",
+        "filename": "zephyr/include/emul/emul_lsm6dso.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-27T20:41:32Z",
+      "side": 1,
+      "message": "Used in follow-up CL:8392099 (test_invalid_fifo_tag) in this stack",
+      "parentUuid": "2eaad6f1_38a7c528",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 9999
+      },
       "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c73acc2_c443b6a2",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-27T20:41:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b42e11d2_2da937d7",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 9999
+      },
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ec69318_8fafec2a",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ea1b8ab_c3699732",
+        "filename": "zephyr/test/drivers/lsm6dso/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-27T20:41:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ec69318_8fafec2a",
+      "range": {
+        "startLine": 98,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 9999
+      },
       "revId": "513d7c615fe77a4b18f17bec178591b116d6c57f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
