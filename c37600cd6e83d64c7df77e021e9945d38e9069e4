@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a6575d2_040b9876",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-27T22:29:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Correctly validates that `data-\u003epending_response_length` does not exceed `sizeof(data-\u003eresponse_buffer)` before reading the response over I2C, unlocking `data-\u003emutex` and returning `-EMSGSIZE` on overflow.\n* **Architecture \u0026 Component Fit:** ✅ Places the bounds check directly in `dsp_client_get_cbi_flags` alongside the existing `PENDING_RESPONSE_LENGTH_ERROR` guard and follows the driver\u0027s established mutex cleanup and error propagation conventions.\n* **Code Simplicity:** ✅ Minimal guard clause in `dsp_client_get_cbi_flags` and a focused unit test in `test_comms.cc` with no unnecessary state or control flow.\n* **Idiomaticity \u0026 Readability:** ✅ Uses `sizeof(data-\u003eresponse_buffer)` directly, appropriate format specifiers (`%u` and `%zu`), and derives the boundary test input from `sizeof(data-\u003eresponse_buffer) + 1` without magic numbers.\n* **Security:** ✅ Prevents out-of-bounds I2C writes into adjacent `.bss` memory when `pending_response_length` exceeds the capacity of `data-\u003eresponse_buffer`.\n* **Testing:** ✅ Adds `DspComms.ResponseLengthExceedsBufferSize` verifying that `dsp_client_get_cbi_flags` returns `-EMSGSIZE` when `pending_response_length` is `sizeof(data-\u003eresponse_buffer) + 1`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+30, -0)` — Small, self-contained single logical change pairing the bounds check with its unit test.\n* **Commit Message:** ✅ Concise subject line and prose body clearly explaining what changed and why, with standard `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/0f7fee32-5c39-4489-876e-62aefd8e2465)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c37600cd6e83d64c7df77e021e9945d38e9069e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
