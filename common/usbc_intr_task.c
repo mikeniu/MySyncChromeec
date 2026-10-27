@@ -18,6 +18,8 @@
 
 #include <stdint.h>
 
+#include <zephyr/kernel.h>
+
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
@@ -25,6 +27,7 @@
 #define PD_PROCESS_INTERRUPT BIT(0)
 
 #define ALERT_STORM_INTERVAL SECOND
+#define ALERT_BURST_YIELD_THRESHOLD 10
 
 static uint8_t pd_int_task_id[CONFIG_USB_PD_PORT_MAX_COUNT];
 
@@ -39,12 +42,17 @@ test_mockable void schedule_deferred_pd_interrupt(const int port)
 		task_set_event(pd_int_task_id[port], PD_PROCESS_INTERRUPT);
 }
 
-static struct {
+#if defined(CONFIG_ZTEST) || defined(TEST_BUILD)
+#undef test_export_static
+#define test_export_static
+#endif
+
+test_export_static struct storm_tracker_t {
 	int count;
 	timestamp_t time;
 } storm_tracker[CONFIG_USB_PD_PORT_MAX_COUNT];
 
-static void service_one_port(int port)
+test_export_static void service_one_port(int port)
 {
 	timestamp_t now;
 
@@ -52,14 +60,20 @@ static void service_one_port(int port)
 
 	now = get_time();
 	if (timestamp_expired(storm_tracker[port].time, &now)) {
-		/* Reset timer into future */
-		storm_tracker[port].time.val = now.val + ALERT_STORM_INTERVAL;
-
 		/*
-		 * Start at 1 since we are processing an interrupt right
-		 * now
+		 * If we expired within one interval, keep half of the previous
+		 * count to avoid boundary reset blind spots during active
+		 * storms. If more than an interval has passed in silence, reset
+		 * to 1.
 		 */
-		storm_tracker[port].count = 1;
+		if (now.val <
+		    storm_tracker[port].time.val + ALERT_STORM_INTERVAL) {
+			storm_tracker[port].count =
+				(storm_tracker[port].count / 2) + 1;
+		} else {
+			storm_tracker[port].count = 1;
+		}
+		storm_tracker[port].time.val = now.val + ALERT_STORM_INTERVAL;
 	} else if (++storm_tracker[port].count > CONFIG_USB_PD_INT_STORM_MAX) {
 		CPRINTS("C%d: Interrupt storm detected."
 			" Disabling port temporarily",
@@ -100,6 +114,7 @@ void pd_interrupt_handler_task(void *p)
 	while (1) {
 		bool have_alerts;
 		const int evt = task_wait_event(-1);
+		int consecutive_alerts = 0;
 
 		if ((evt & PD_PROCESS_INTERRUPT) == 0)
 			continue;
@@ -117,8 +132,14 @@ void pd_interrupt_handler_task(void *p)
 		do {
 			have_alerts = (tcpc_get_alert_status() & port_mask) &&
 				      pd_is_port_enabled(port);
-			if (have_alerts)
+			if (have_alerts) {
 				service_one_port(port);
+				if (++consecutive_alerts >=
+				    ALERT_BURST_YIELD_THRESHOLD) {
+					consecutive_alerts = 0;
+					k_usleep(MSEC);
+				}
+			}
 			board_process_pd_alert(port);
 		} while (have_alerts);
 	}
@@ -170,6 +191,7 @@ void pd_shared_alert_task(void *p)
 	while (1) {
 		const int evt = task_wait_event(-1);
 		int have_alerts;
+		int consecutive_alerts = 0;
 
 		if ((evt & PD_PROCESS_INTERRUPT) == 0)
 			continue;
@@ -206,6 +228,12 @@ void pd_shared_alert_task(void *p)
 			for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT;
 			     ++port) {
 				board_process_pd_alert(port);
+			}
+
+			if (++consecutive_alerts >=
+			    ALERT_BURST_YIELD_THRESHOLD) {
+				consecutive_alerts = 0;
+				k_usleep(MSEC);
 			}
 		} while (have_alerts != 0);
 	}
