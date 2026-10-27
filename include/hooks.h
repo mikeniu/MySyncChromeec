@@ -310,6 +310,7 @@ enum hook_type {
  * operations that are not valid in interrupt context.  Instead of calling a
  * hook from interrupt context, use a deferred function.
  *
+ * @reschedule
  * @param type		Type of hook routines to call.
  */
 void hook_notify(enum hook_type type);
