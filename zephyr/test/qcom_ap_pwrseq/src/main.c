@@ -28,7 +28,7 @@ static const struct gpio_dt_spec power_good_gpio =
 static const struct gpio_dt_spec ap_rst_gpio =
 	GPIO_DT_SPEC_GET(AP_PWRSEQ_NODE, ap_rst_gpios);
 static const struct gpio_dt_spec pmic_kpd_pwr_gpio =
-	GPIO_DT_SPEC_GET(AP_PWRSEQ_NODE, pmic_kpd_pwr_odl_gpios);
+	GPIO_DT_SPEC_GET(AP_PWRSEQ_NODE, pmic_kpd_pwr_gpios);
 static const struct gpio_dt_spec pmic_resin_gpio =
 	GPIO_DT_SPEC_GET(AP_PWRSEQ_NODE, pmic_resin_gpios);
 
@@ -65,7 +65,8 @@ static void test_before(void *f)
 	}
 
 	/* Restore default GPIO configurations and emulated input levels. */
-	zassert_ok(gpio_pin_configure_dt(&pmic_resin_gpio, GPIO_OUTPUT_HIGH));
+	zassert_ok(
+		gpio_pin_configure_dt(&pmic_resin_gpio, GPIO_OUTPUT_INACTIVE));
 	zassert_ok(gpio_emul_input_set(ap_rst_gpio.port, ap_rst_gpio.pin, 1));
 	zassert_ok(gpio_emul_input_set(power_good_gpio.port,
 				       power_good_gpio.pin, 1));
@@ -184,7 +185,7 @@ ZTEST(qcom_ap_pwrseq, test_explicit_power_on)
 	zassert_ok(gpio_emul_input_set(power_good_gpio.port,
 				       power_good_gpio.pin, 0));
 	zassert_ok(gpio_pin_configure_dt(&pmic_resin_gpio,
-					 GPIO_OUTPUT_HIGH | GPIO_INPUT));
+					 GPIO_OUTPUT_INACTIVE | GPIO_INPUT));
 	zassert_ok(gpio_emul_input_set(pmic_resin_gpio.port,
 				       pmic_resin_gpio.pin, 1));
 
@@ -354,7 +355,7 @@ ZTEST(qcom_ap_pwrseq, test_startup_fail_pmic_timeout)
 	zassert_ok(gpio_emul_input_set(power_good_gpio.port,
 				       power_good_gpio.pin, 0));
 	zassert_ok(gpio_pin_configure_dt(&pmic_resin_gpio,
-					 GPIO_OUTPUT_HIGH | GPIO_INPUT));
+					 GPIO_OUTPUT_INACTIVE | GPIO_INPUT));
 	zassert_ok(gpio_emul_input_set(pmic_resin_gpio.port,
 				       pmic_resin_gpio.pin, 1));
 
@@ -492,7 +493,7 @@ ZTEST(qcom_ap_pwrseq, test_force_shutdown_from_s0)
 	/* Enter S0 with pmic_resin readable high for set_pmic_pwron(false) */
 	power_on_to_s0();
 	zassert_ok(gpio_pin_configure_dt(&pmic_resin_gpio,
-					 GPIO_OUTPUT_HIGH | GPIO_INPUT));
+					 GPIO_OUTPUT_INACTIVE | GPIO_INPUT));
 	zassert_ok(gpio_emul_input_set(pmic_resin_gpio.port,
 				       pmic_resin_gpio.pin, 1));
 
