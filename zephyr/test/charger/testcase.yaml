@@ -24,7 +24,7 @@ tests:
     extra_configs:
       - CONFIG_TEST_BOARD_GOTHRAX=y
       - CONFIG_TEST_EXTPOWER=y
-      - CONFIG_TEST_SRC="src/gothrax_charger.c"
+      - CONFIG_TEST_SRC="src/charger_raa489000.c"
     extra_dtc_overlay_files:
       - boards/native_sim.overlay
       - boards/charger.gothrax.overlay
