@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "190899e6_34ee9858",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T08:25:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** `rts5817maa_init`, `rts5817maa_deinit`, `rts5817maa_config`, `rts5817maa_get_info`, and `rts5817maa_init_driver` properly handle sensor initialization, error bitmask reporting, interrupt disabling, devicetree configuration extraction, and hardware ID queries.\n*   **Architecture \u0026 Component Fit:** The driver base cleanly implements the `cros_fingerprint` driver API and aligns with the structure of sibling fingerprint sensor drivers in `zephyr/drivers/fingerprint/`. Removing the temporary `DEVICE_DT_DEFINE` stub from `rts5817maa_pal.c` properly switches the PAL test suite to use the driver\u0027s devicetree device instantiation.\n*   **Code Simplicity:** Functions are concise and linear, using early-return guard clauses without unnecessary state or control-flow complexity.\n*   **Idiomaticity \u0026 Readability:** Clean use of `static` linkage, Zephyr devicetree/GPIO/SPI macros (`SPI_DT_SPEC_INST_GET`, `GPIO_DT_SPEC_INST_GET`, `LISTIFY`, `BUILD_ASSERT`, `IS_ENABLED`), designated initializers, native struct assignment, and descriptive constants.\n*   **Security:** Null pointer arguments and caller buffer capacities are validated in `rts5817maa_get_info`, and compile-time `BUILD_ASSERT` checks guard frame buffer sizes and configuration counts.\n*   **Testing:** Comprehensive `ztest` unit tests with FFF mocks verify successful initialization, all mapped and unmapped `rts5817maa_sensor_init` error paths, deinitialization, and `get_info` nominal, isolated null-argument, boundary capacity (`NUM_IMAGE_CAPTURE_TYPES - 1`, `NUM_IMAGE_CAPTURE_TYPES`, `NUM_IMAGE_CAPTURE_TYPES + 1`), and HWID failure cases.\n*   **CL Size \u0026 Scope:** `Size: L (+600, -11)`. The production diff is 244 lines (`fingerprint_rts5817maa.c` and `CMakeLists.txt`), under the 250-line production threshold, while the remaining +356/-11 lines consist of the `ztest` unit test suite and removal of the temporary device stub in `rts5817maa_pal.c` for this single logical change.\n*   **Commit Message:** Concise prose paragraphs accurately describing the scope of the driver base and unit tests, with properly formatted `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/87bdc126-a54f-4f11-a5e6-027a3587a64d)] [🔗](http://go/tj/87bdc126-a54f-4f11-a5e6-027a3587a64d)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7d2e570eecc63135daa36ead013bab563ca52800",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
