@@ -54,7 +54,7 @@ int board_set_active_charge_port(int port)
 
 	if (port == CHARGE_PORT_NONE) {
 		/* Disable all ports. */
-		for (i = 0; i < ppc_cnt; i++) {
+		for (i = 0; i < board_get_usb_pd_port_count(); i++) {
 			/*
 			 * Do not return early if one fails otherwise we can
 			 * get into a boot loop assertion failure.
@@ -80,7 +80,7 @@ int board_set_active_charge_port(int port)
 	 * Turn off the other ports' sink path FETs, before enabling the
 	 * requested charge port.
 	 */
-	for (i = 0; i < ppc_cnt; i++) {
+	for (i = 0; i < board_get_usb_pd_port_count(); i++) {
 		if (i == port)
 			continue;
 
@@ -121,7 +121,7 @@ int pd_set_power_supply_ready(int port)
 {
 	int rv;
 
-	if (port >= CONFIG_USB_PD_PORT_MAX_COUNT) {
+	if (port >= board_get_usb_pd_port_count()) {
 		return EC_ERROR_INVAL;
 	}
 
@@ -156,6 +156,9 @@ __override void typec_set_source_current_limit(int port, enum tcpc_rp_value rp)
 {
 	int rv;
 	const int current = rp == TYPEC_RP_3A0 ? 3000 : 1500;
+
+	if (port < 0 || port >= board_get_usb_pd_port_count())
+		return;
 
 	rv = ppc_set_vbus_source_current_limit(port, rp);
 	if (rv != EC_SUCCESS) {

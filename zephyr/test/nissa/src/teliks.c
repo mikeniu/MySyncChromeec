@@ -4,6 +4,7 @@
  */
 
 #include "battery.h"
+#include "charge_manager.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "gpio/gpio_int.h"
@@ -12,6 +13,11 @@
 #include "motionsense_sensors.h"
 #include "tablet_mode.h"
 #include "teliks.h"
+#include "teliks_sub_board.h"
+#include "typec_control.h"
+#include "usb_charge.h"
+#include "usb_pd.h"
+#include "usbc_ppc.h"
 
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
@@ -22,6 +28,9 @@
 
 LOG_MODULE_REGISTER(nissa, LOG_LEVEL_INF);
 
+extern enum teliks_sub_board_type teliks_cached_sub_board;
+void board_usb_pd_count_init(void);
+
 FAKE_VALUE_FUNC(int, cbi_get_ssfc, uint32_t *);
 FAKE_VALUE_FUNC(int, cros_cbi_get_fw_config, enum cbi_fw_config_field_id,
 		uint32_t *);
@@ -30,6 +39,13 @@ FAKE_VOID_FUNC(lsm6dsm_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(icm42607_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(bma4xx_interrupt, enum gpio_signal);
 FAKE_VOID_FUNC(lis2dw12_interrupt, enum gpio_signal);
+FAKE_VALUE_FUNC(int, ppc_is_sourcing_vbus, int);
+FAKE_VALUE_FUNC(int, ppc_vbus_source_enable, int, int);
+FAKE_VALUE_FUNC(int, ppc_vbus_sink_enable, int, int);
+FAKE_VALUE_FUNC(int, ppc_is_vbus_present, int);
+FAKE_VALUE_FUNC(int, ppc_set_vbus_source_current_limit, int,
+		enum tcpc_rp_value);
+FAKE_VOID_FUNC(pd_set_vbus_discharge, int, int);
 
 static void test_before(void *fixture)
 {
@@ -40,6 +56,12 @@ static void test_before(void *fixture)
 	RESET_FAKE(icm42607_interrupt);
 	RESET_FAKE(bma4xx_interrupt);
 	RESET_FAKE(lis2dw12_interrupt);
+	RESET_FAKE(ppc_is_sourcing_vbus);
+	RESET_FAKE(ppc_vbus_source_enable);
+	RESET_FAKE(ppc_vbus_sink_enable);
+	RESET_FAKE(ppc_is_vbus_present);
+	RESET_FAKE(ppc_set_vbus_source_current_limit);
+	RESET_FAKE(pd_set_vbus_discharge);
 }
 
 ZTEST_SUITE(teliks, NULL, NULL, test_before, NULL, NULL);
@@ -388,4 +410,161 @@ ZTEST(teliks, test_set_keycap_label)
 	zassert_equal(get_keycap_label(0, 14), KLLI_UNKNO);
 	set_keycap_label(0, 14, KLLI_F15);
 	zassert_equal(get_keycap_label(0, 14), KLLI_F15);
+}
+
+static uint32_t sb_fw_config_value;
+
+static int get_fake_sb_fw_config(enum cbi_fw_config_field_id field_id,
+				 uint32_t *value)
+{
+	if (field_id == FW_SUB_BOARD)
+		*value = sb_fw_config_value;
+	return 0;
+}
+
+ZTEST(teliks, test_sub_board)
+{
+	const struct gpio_dt_spec *s5_gpio =
+		GPIO_DT_FROM_NODELABEL(gpio_en_pp5000_s5);
+
+	/* CBI read error falls back to TELIKS_SB_NONE (1 port) */
+	teliks_cached_sub_board = TELIKS_SB_UNKNOWN;
+	cros_cbi_get_fw_config_fake.return_val = EC_ERROR_UNKNOWN;
+	zassert_equal(teliks_get_sb_type(), TELIKS_SB_NONE);
+	/* Cached value returned on subsequent call */
+	zassert_equal(teliks_get_sb_type(), TELIKS_SB_NONE);
+
+	/* FW_SUB_BOARD_1 -> TELIKS_SB_C (2 ports) */
+	teliks_cached_sub_board = TELIKS_SB_UNKNOWN;
+	RESET_FAKE(cros_cbi_get_fw_config);
+	cros_cbi_get_fw_config_fake.custom_fake = get_fake_sb_fw_config;
+	sb_fw_config_value = FW_SUB_BOARD_1;
+	gpio_pin_set_dt(s5_gpio, 0);
+	hook_notify(HOOK_INIT);
+	zassert_equal(teliks_get_sb_type(), TELIKS_SB_C);
+	zassert_equal(board_get_usb_pd_port_count(), 2);
+	zassert_equal(gpio_emul_output_get(s5_gpio->port, s5_gpio->pin), 1);
+
+	/* Unset / default sub-board -> TELIKS_SB_NONE (1 port) */
+	teliks_cached_sub_board = TELIKS_SB_UNKNOWN;
+	sb_fw_config_value = 0;
+	hook_notify(HOOK_INIT);
+	zassert_equal(teliks_get_sb_type(), TELIKS_SB_NONE);
+	zassert_equal(board_get_usb_pd_port_count(), 1);
+}
+
+ZTEST(teliks, test_usbc_1_port_sku)
+{
+	teliks_cached_sub_board = TELIKS_SB_NONE;
+	board_usb_pd_count_init();
+	zassert_equal(board_get_usb_pd_port_count(), 1);
+
+	/* CHARGE_PORT_NONE must only disable port 0, never unpopulated port 1
+	 */
+	zassert_ok(board_set_active_charge_port(CHARGE_PORT_NONE));
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 1);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg0_history[0], 0);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg1_history[0], 0);
+
+	/* Selecting port 0 must not attempt to disable unpopulated port 1 */
+	RESET_FAKE(ppc_vbus_sink_enable);
+	zassert_ok(board_set_active_charge_port(0));
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 1);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg0_history[0], 0);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg1_history[0], 1);
+
+	/* Port 1 is invalid on 1-port SKU */
+	RESET_FAKE(ppc_vbus_sink_enable);
+	zassert_equal(board_set_active_charge_port(1), EC_ERROR_INVAL);
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 0);
+
+	zassert_equal(pd_set_power_supply_ready(1), EC_ERROR_INVAL);
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 0);
+
+	typec_set_source_current_limit(1, TYPEC_RP_3A0);
+	typec_set_source_current_limit(-1, TYPEC_RP_3A0);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.call_count, 0);
+}
+
+ZTEST(teliks, test_usbc_2_port_sku)
+{
+	teliks_cached_sub_board = TELIKS_SB_C;
+	board_usb_pd_count_init();
+	zassert_equal(board_get_usb_pd_port_count(), 2);
+
+	board_pd_vconn_ctrl(0, USBPD_CC_PIN_1, 1);
+	board_reset_pd_mcu();
+
+	ppc_is_sourcing_vbus_fake.return_val = 1;
+	zassert_equal(board_is_sourcing_vbus(0), 1);
+	zassert_equal(board_vbus_source_enabled(0), 1);
+	zassert_equal(board_set_active_charge_port(0), EC_ERROR_INVAL);
+	ppc_is_sourcing_vbus_fake.return_val = 0;
+
+	ppc_is_vbus_present_fake.return_val = 1;
+	zassert_equal(pd_snk_is_vbus_provided(0), 1);
+
+	/* CHARGE_PORT_NONE disables both ports even if ppc_vbus_sink_enable
+	 * fails */
+	ppc_vbus_sink_enable_fake.return_val = EC_ERROR_UNKNOWN;
+	zassert_ok(board_set_active_charge_port(CHARGE_PORT_NONE));
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 2);
+
+	/* Invalid port */
+	zassert_equal(board_set_active_charge_port(2), EC_ERROR_INVAL);
+
+	/* Enable port 0 when disabling port 1 fails, and enabling port 0 fails
+	 */
+	RESET_FAKE(ppc_vbus_sink_enable);
+	ppc_vbus_sink_enable_fake.return_val = EC_ERROR_UNKNOWN;
+	zassert_equal(board_set_active_charge_port(0), EC_ERROR_UNKNOWN);
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 2);
+
+	/* Enable port 0 succeeds */
+	RESET_FAKE(ppc_vbus_sink_enable);
+	ppc_vbus_sink_enable_fake.return_val = EC_SUCCESS;
+	zassert_ok(board_set_active_charge_port(0));
+	zassert_equal(ppc_vbus_sink_enable_fake.call_count, 2);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg0_history[0], 1);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg1_history[0], 0);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg0_history[1], 0);
+	zassert_equal(ppc_vbus_sink_enable_fake.arg1_history[1], 1);
+
+	/* pd_power_supply_reset */
+	pd_power_supply_reset(0);
+	zassert_equal(ppc_vbus_source_enable_fake.call_count, 1);
+	zassert_equal(ppc_vbus_source_enable_fake.arg0_val, 0);
+	zassert_equal(ppc_vbus_source_enable_fake.arg1_val, 0);
+	if (IS_ENABLED(CONFIG_USB_PD_DISCHARGE)) {
+		zassert_equal(pd_set_vbus_discharge_fake.call_count, 1);
+		zassert_equal(pd_set_vbus_discharge_fake.arg0_val, 0);
+		zassert_equal(pd_set_vbus_discharge_fake.arg1_val, 1);
+	}
+	k_sleep(K_MSEC(10));
+
+	/* pd_set_power_supply_ready */
+	zassert_equal(pd_set_power_supply_ready(2), EC_ERROR_INVAL);
+
+	RESET_FAKE(ppc_vbus_sink_enable);
+	ppc_vbus_sink_enable_fake.return_val = EC_ERROR_UNKNOWN;
+	zassert_equal(pd_set_power_supply_ready(0), EC_ERROR_UNKNOWN);
+
+	ppc_vbus_sink_enable_fake.return_val = EC_SUCCESS;
+	ppc_vbus_source_enable_fake.return_val = EC_ERROR_UNKNOWN;
+	zassert_equal(pd_set_power_supply_ready(0), EC_ERROR_UNKNOWN);
+
+	ppc_vbus_source_enable_fake.return_val = EC_SUCCESS;
+	zassert_ok(pd_set_power_supply_ready(0));
+	k_sleep(K_MSEC(10));
+
+	/* typec_set_source_current_limit */
+	typec_set_source_current_limit(0, TYPEC_RP_3A0);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.call_count, 1);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.arg0_val, 0);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.arg1_val,
+		      TYPEC_RP_3A0);
+
+	ppc_set_vbus_source_current_limit_fake.return_val = EC_ERROR_UNKNOWN;
+	typec_set_source_current_limit(1, TYPEC_RP_1A5);
+	zassert_equal(ppc_set_vbus_source_current_limit_fake.call_count, 2);
 }
