@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebe6f5df_67c5f417",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T08:28:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** ✅ Configures the `RTS5817MAA` fingerprint sensor node in `realtekfp.dts`, enables the fingerprint subsystem Kconfig options for `BOARD_REALTEKFP`, and maps `realtek_rts5817maa` to `FP_SENSOR_TYPE_REALTEK` in `fpsensor_detect_get_type()`.\n*   **Architecture \u0026 Component Fit:** ✅ Follows the established Zephyr FPMCU board configuration and `fpsensor` shim patterns used by sibling boards.\n*   **Code Simplicity:** ✅ Uses `RTS5817MAA_DEFAULT_IMAGE_PROPS` in `realtekfp.dts` to avoid duplicating frame parameters across the 8 capture configurations.\n*   **Idiomaticity \u0026 Readability:** ✅ Clean, idiomatic Kconfig, Devicetree, and C preprocessor usage.\n*   **Security:** ✅ Enforces 3072-bit RSA key size and exponent 3 in `Kconfig`; no security concerns.\n*   **Testing:** ✅ Consists of declarative board hardware configuration (`.dts`, `Kconfig`) and compile-time Devicetree compatibility selection in `fpsensor.c` verified by the board build (`zmake build realtekfp`).\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+76, -0)`. Single, cohesive logical change integrating the `RTS5817MAA` sensor on the `realtekfp` board.\n*   **Commit Message:** ✅ Clear, concise, and properly formatted with `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/335a154f-ae68-4830-b98b-5d3f9962e1b6)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "69932cda5d5500da7e6d1c3ba000eed249c14fab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
