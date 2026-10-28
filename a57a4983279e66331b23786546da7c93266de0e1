@@ -46,6 +46,30 @@
       },
       "revId": "a57a4983279e66331b23786546da7c93266de0e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3131f69_24000b99",
+        "filename": "zephyr/drivers/cros_system/cros_system_npcx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1132339
+      },
+      "writtenOn": "2026-10-28T06:06:24Z",
+      "side": 1,
+      "message": "I understand the background behind why these CL chains were introduced.\n\nSetting `PRIMASK` at the beginning of this flow ultimately guarantees that no ISR can interrupt it. This flow has only register accesses and not call kernel functions (no call to `arch_cpu_irqs_are_enabled`, unless `board_hibernate_late` touch it.)\n\nUsing `irq_lock()` should have the same effect, unless some private code sets an IRQ\u0027s priority to `0` without using the Zephyr API (e.g., by calling `NVIC_SetPriority()` directly). So it is not masked by `irq_lock`. \nI assume there are no such cases in the Chromium EC codebase.",
+      "parentUuid": "04e8beee_c530eb26",
+      "range": {
+        "startLine": 253,
+        "startChar": 1,
+        "endLine": 261,
+        "endChar": 0
+      },
+      "revId": "a57a4983279e66331b23786546da7c93266de0e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
