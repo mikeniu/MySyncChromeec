@@ -16,6 +16,41 @@
       "message": "First of all, the commit message is incomplete.\n\nSecondly, if we adapt the approach I suggested in the previous CL in the chain and check whether `project.signer` is an iterable:\n```py\nsigners \u003d (\n    project.signer\n    if isinstance(project.signer, Iterable)\n    else [project.signer]\n)\n```\n\nthen this change should not not be needed at all. Is that correct or am I missing something?",
       "revId": "abe2d98be7213e5bb44cd74a7c3081298788ff1f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0b7dd89_cd713bc6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:11:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80be9591_7f33d642",
+      "revId": "abe2d98be7213e5bb44cd74a7c3081298788ff1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff73b5c7_08aa4819",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:11:40Z",
+      "side": 1,
+      "message": "Unsure how/why the commitmsg is incomplete but abandoning CL based on recent changes and input",
+      "revId": "abe2d98be7213e5bb44cd74a7c3081298788ff1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
