@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f117b617_e2a2f2f0",
+        "filename": "common/panic_log.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-28T18:53:09Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Optimization: Consider checking `if (panic_log_frozen) return;` before calling `irq_lock()`. This avoids the overhead of disabling interrupts in the common case where the log is frozen. You should still keep the check inside the lock to handle the race condition.",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 0
+      },
+      "revId": "0218eecd12102525ab56c40c674fb464b7d951b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
