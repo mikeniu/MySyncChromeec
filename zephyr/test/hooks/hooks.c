@@ -8,6 +8,7 @@
 
 #include <stdbool.h>
 
+#include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
 
 static bool h1_called;
@@ -222,6 +223,32 @@ ZTEST(hooks_tests, test_hook_ap_power_events)
 
 	hook_notify(HOOK_CHIPSET_STARTUP);
 	zassert_equal(3, ev_count, "Startup callback not called");
+}
+
+/*
+ * State for HOOK_SECOND initial delay verification.
+ */
+static int64_t first_hook_second_uptime_ms = -1;
+static int hook_second_count;
+
+static void hook_second_handler(void)
+{
+	if (first_hook_second_uptime_ms < 0) {
+		first_hook_second_uptime_ms = k_uptime_get();
+	}
+	hook_second_count++;
+}
+DECLARE_HOOK(HOOK_SECOND, hook_second_handler, HOOK_PRIO_DEFAULT);
+
+ZTEST(hooks_tests, test_hook_second_initial_delay)
+{
+	k_sleep(K_MSEC(1100));
+
+	zassert_true(hook_second_count >= 1,
+		     "HOOK_SECOND did not fire after 1100ms");
+	zassert_true(first_hook_second_uptime_ms >= MSEC_PER_SEC,
+		     "HOOK_SECOND fired too early: %lld ms < %d ms",
+		     first_hook_second_uptime_ms, MSEC_PER_SEC);
 }
 
 ZTEST_SUITE(hooks_tests, NULL, NULL, NULL, NULL, NULL);
