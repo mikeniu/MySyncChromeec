@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c49fa5de_40abde9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T08:29:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **CL Size \u0026 Scope:** `Size: S (+30, -0)`. This CL is a single, self-contained logical change introducing the shared driver configuration and runtime data header (`zephyr/drivers/fingerprint/fingerprint_rts5817maa.h`) for the RTS5817MAA fingerprint sensor.\n* **Functionality:** Looks good. `struct rts5817maa_data` and `struct rts5817maa_cfg` properly declare the device pointer, callback state, GPIO interrupt callback, error bitmask, SPI/GPIO devicetree specs, static sensor info, and flexible array member for image frame configurations.\n* **Architecture \u0026 Component Fit:** Placing the shared configuration and runtime data structures in `zephyr/drivers/fingerprint/fingerprint_rts5817maa.h` cleanly decouples the Zephyr driver and the platform abstraction layer (PAL), matching the architecture of sibling fingerprint drivers in `zephyr/drivers/fingerprint/`.\n* **Code Simplicity:** Minimal, declarative struct definitions with only the required header includes (`\u003czephyr/drivers/gpio.h\u003e`, `\u003czephyr/drivers/spi.h\u003e`, and `\u003cdrivers/fingerprint.h\u003e`).\n* **Idiomaticity \u0026 Readability:** Follows Zephyr and ChromiumOS EC C conventions with standard include guards, devicetree spec types (`spi_dt_spec`, `gpio_dt_spec`), and a C99 flexible array member (`sensor_image_configs[]`).\n* **Security:** N/A. Header-only data structure declarations with no executable logic.\n* **Testing:** N/A. This CL only introduces declarative struct definitions without executable logic.\n* **Commit Message:** Concise and accurate, clearly stating the purpose of the shared header with valid `BUG\u003d` and `TEST\u003d` footers.\n\n[[trajectory](https://goto.corp.google.com/traj/39161049-591b-4460-b0d3-92913c8b6353)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e8a420756b103b3522745c341d6205fc84f73bcc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
