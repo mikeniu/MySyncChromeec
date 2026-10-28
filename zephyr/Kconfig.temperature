@@ -92,24 +92,6 @@ config PLATFORM_EC_TEMP_SENSOR_APL6012
 endif # PLATFORM_EC_TEMP_SENSOR
 
 
-config PLATFORM_EC_TEMP_SENSOR_FIRST_READ_DELAY
-	bool "Enable a delay before reading temperature seensors"
-	help
-	  Enables a delay on the first read of temperature sensors after
-	  the EC powers on. This allows for setting of any power rails that
-	  control the temperature sensors on the platform.
-
-if PLATFORM_EC_TEMP_SENSOR_FIRST_READ_DELAY
-
-config PLATFORM_EC_TEMP_SENSOR_FIRST_READ_DELAY_MS
-	int "Temperature sensor read delay time"
-	default 500
-	help
-	  Sets the delay time, in milliseconds, before the first the EC will
-	  read any temperature sensors and perform any thermal management.
-
-endif # PLATFORM_EC_TEMP_SENSOR_FIRST_READ_DELAY
-
 config PLATFORM_EC_FAN
 	bool "Fan support"
 	default y
