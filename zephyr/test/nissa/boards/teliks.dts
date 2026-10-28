@@ -40,6 +40,9 @@
 			gpios = <&gpiol 5 GPIO_INPUT>;
 			enum-name = "GPIO_BATT_PRES_ODL";
 		};
+		gpio_en_pp5000_s5: en_pp5000_s5 {
+			gpios = <&gpiok 5 GPIO_OUTPUT>;
+		};
 	};
 
 	gpio-interrupts {
@@ -93,6 +96,11 @@
 			tcpc = <&tcpci_emul_1>;
 			usb-mux-chain-1 {
 				compatible = "cros-ec,usb-mux-chain";
+				usb-muxes = <&virtual_mux_1>;
+			};
+			usb_mux_chain_1_no_mux: usb-mux-chain-1-no-mux {
+				compatible = "cros-ec,usb-mux-chain";
+				alternative-chain;
 				usb-muxes = <&virtual_mux_1>;
 			};
 		};
