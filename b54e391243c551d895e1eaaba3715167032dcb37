@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed05c39c_9f1abdca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T21:01:00Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "12014df2_576ce06e",
+      "revId": "b54e391243c551d895e1eaaba3715167032dcb37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c8b2d66_51f00076",
@@ -45,6 +63,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc27062b_2299fe9d",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T21:01:00Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "4c8b2d66_51f00076",
+      "range": {
+        "startLine": 967,
+        "startChar": 0,
+        "endLine": 1031,
+        "endChar": 9999
+      },
+      "revId": "b54e391243c551d895e1eaaba3715167032dcb37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3b95a4c_fb699d09",
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "b54e391243c551d895e1eaaba3715167032dcb37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afd7ce1f_1920ee2c",
+        "filename": "zephyr/test/pdc/src/rts54xx/rts54xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T21:01:00Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "c3b95a4c_fb699d09",
+      "range": {
+        "startLine": 260,
+        "startChar": 0,
+        "endLine": 306,
+        "endChar": 9999
+      },
       "revId": "b54e391243c551d895e1eaaba3715167032dcb37",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
