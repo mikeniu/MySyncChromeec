@@ -43,6 +43,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba204885_45873b07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1158719
+      },
+      "writtenOn": "2026-10-28T22:54:11Z",
+      "side": 1,
+      "message": "lgtm % tom\u0027s comment if bssl takes a while.\n\nis there a specific builder or suite of builders this broke? wondering if it\u0027d be easy to add to our presubmit testing for glibc rolls.",
+      "revId": "62fcb7e9c265c64e0250385b7855514b96f8148b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85c4e770_e3590e21",
