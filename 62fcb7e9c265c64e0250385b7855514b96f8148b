@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c57173dc_c328dd16",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T22:51:39Z",
+      "side": 1,
+      "message": "Looks like this is not really a cherry-pick of that. To make it easier to verify, please make sure that the mentioned commit hashes are long enough for gerrit to linkify them (or use the URL: https://crrev.com/c/8667423)",
+      "range": {
+        "startLine": 16,
+        "startChar": 42,
+        "endLine": 17,
+        "endChar": 54
+      },
+      "revId": "62fcb7e9c265c64e0250385b7855514b96f8148b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "85c4e770_e3590e21",
         "filename": "third_party/boringssl/boringssl-toolchain.cmake",
         "patchSetId": 1
