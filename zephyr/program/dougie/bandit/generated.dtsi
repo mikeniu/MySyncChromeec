@@ -40,7 +40,7 @@
 		compatible = "named-gpios";
 
 		gpio_ap_ec_sysrst_l: ap_ec_sysrst_l {
-			gpios = <&gpioh 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpioh 3 (GPIO_INPUT | GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
 			enum-name = "GPIO_AP_RST_L";
 		};
 		gpio_ccd_mode_l: ccd_mode_l {
@@ -93,11 +93,11 @@
 			gpios = <&gpioj 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
 		gpio_ec_pmic_kpd_pwr: ec_pmic_kpd_pwr {
-			gpios = <&gpioj 0 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <&gpioj 0 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 			enum-name = "GPIO_PMIC_KPD_PWR";
 		};
 		gpio_ec_pmic_resin: ec_pmic_resin {
-			gpios = <&gpioj 1 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <&gpioj 1 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 			enum-name = "GPIO_PMIC_RESIN";
 		};
 		gpio_ec_s1b_pwr_detect: ec_s1b_pwr_detect {
@@ -159,7 +159,7 @@
 			gpios = <&gpiom 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
 		gpio_sys_in_suspend_l: sys_in_suspend_l {
-			gpios = <&gpiof 1 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			gpios = <&gpiof 1 (GPIO_INPUT | GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
 			enum-name = "GPIO_AP_SUSPEND";
 		};
 		gpio_sys_rst_odl: sys_rst_odl {

@@ -13,6 +13,7 @@
 #include "../usbc.dtsi"
 #include "../interrupts.dtsi"
 #include "../i2c.dtsi"
+#include "../power_signals.dtsi"
 
 /* Bandit project DTS includes*/
 

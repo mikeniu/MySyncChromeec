@@ -1,0 +1,22 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	switchcap: switchcap {
+		compatible = "cros-ec,switchcap";
+		enable-gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
+		power-good-gpios = <&gpiof 0 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+	};
+
+	qcom_ap_pwrseq: qcom-ap-pwrseq {
+		compatible = "cros-ec,qcom-ap-pwrseq";
+		switchcap = <&switchcap>;
+		ap-rst-gpios = <&gpioh 3 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+		ap-suspend-gpios = <&gpiof 1 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+		power-good-gpios = <&gpiof 2 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+		pmic-kpd-pwr-gpios = <&gpioj 0 GPIO_ACTIVE_HIGH>;
+		pmic-resin-gpios = <&gpioj 1 GPIO_ACTIVE_HIGH>;
+	};
+};
