@@ -4,6 +4,7 @@
  */
 
 #include "ap_power/ap_pwrseq_sm.h"
+#include "ap_pwrseq_drv_sm.h"
 
 #include <zephyr/logging/log.h>
 
@@ -156,6 +157,11 @@ int ap_pwrseq_sm_init(void *const data, k_tid_t tid,
 	return 0;
 }
 
+__weak bool ap_pwrseq_check_g3_startup_ok(void)
+{
+	return true;
+}
+
 int ap_pwrseq_sm_run_state(void *const data, uint32_t events)
 {
 	struct ap_pwrseq_sm_data *sm_data = data;
@@ -169,6 +175,12 @@ int ap_pwrseq_sm_run_state(void *const data, uint32_t events)
 
 	if (sm_data->smf.current == NULL) {
 		return -EINVAL;
+	}
+
+	if (ap_pwrseq_sm_get_cur_state(data) == AP_POWER_STATE_G3 &&
+	    (events & BIT(AP_PWRSEQ_EVENT_POWER_STARTUP)) &&
+	    !ap_pwrseq_check_g3_startup_ok()) {
+		events &= ~BIT(AP_PWRSEQ_EVENT_POWER_STARTUP);
 	}
 
 	sm_data->in_transition = false;

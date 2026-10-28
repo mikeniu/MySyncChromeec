@@ -18,6 +18,8 @@
 #include "ap_power/ap_pwrseq_sm.h"
 #include "x86_non_dsx_common_pwrseq_sm_handler.h"
 #include "zephyr_console_shim.h"
+
+#include <ap_power_override_functions.h>
 #endif
 
 /* Delay in ms when starting from G3 */
@@ -212,12 +214,6 @@ void request_start_from_g3(void)
 	const struct device *dev = ap_pwrseq_get_instance();
 
 	LOG_INF("Request start from G3");
-
-	if (!board_ap_power_is_startup_ok()) {
-		LOG_INF("Start from G3 inhibited"
-			" by !is_startup_ok");
-		return;
-	}
 
 	/*
 	 * If in S5, restart the timer to give the CPU more time
@@ -864,6 +860,20 @@ static int x86_non_dsx_g3_entry(void *data)
 	return 0;
 }
 
+bool ap_pwrseq_check_g3_startup_ok(void)
+{
+	if (!atomic_test_bit(flags, START_FROM_G3)) {
+		return true;
+	}
+
+	if (!board_ap_power_is_startup_ok()) {
+		LOG_INF("Start from G3 inhibited by !is_startup_ok");
+		atomic_clear_bit(flags, START_FROM_G3);
+		return false;
+	}
+	return true;
+}
+
 static int x86_non_dsx_g3_run(void *data)
 {
 	/*
@@ -878,6 +888,7 @@ static int x86_non_dsx_g3_run(void *data)
 	if (k_timer_remaining_get(&x86_non_dsx_timer)) {
 		return 0;
 	}
+
 	/*
 	 * At this point all power rails and power signals are already checked
 	 * by application and chipset state action handlers, it is safe to move

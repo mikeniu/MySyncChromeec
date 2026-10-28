@@ -602,6 +602,9 @@ ZTEST(ap_pwrseq, test_insufficient_power_blocks_s5)
 	zassert_equal(40, system_can_boot_ap_fake.call_count);
 	zassert_true(
 		chipset_in_or_transitioning_to_state(CHIPSET_STATE_HARD_OFF));
+	if (IS_ENABLED(CONFIG_AP_PWRSEQ_DRIVER)) {
+		verify_ap_inputs(false);
+	}
 }
 
 /* Utilities for finding a Zephyr thread by name */
