@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ea49d82_336b28aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-10-28T10:20:21Z",
+      "side": 1,
+      "message": "Hi Al,\n\nI\u0027ll use this chipset state implementation for SCP [CL8559698](https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8559698/7/zephyr/Kconfig.ap_power) so I move it to the common code and add a flag.",
+      "revId": "d65e9f541f2b420a7c13f4eb6917b65943246264",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
