@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fb1395e_181486c6",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:37:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c6cfbe8_c7c32854",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7eb5751f_e82d11da",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-20T10:14:07Z",
       "side": 1,
       "message": "Please clean up the whitespace changes throughout the documentation",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "554a9384_fb7ce152",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:37:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7eb5751f_e82d11da",
       "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -69,6 +105,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d4607a2_29b2b278",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:37:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e48b9e84_410b6401",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f618b43b_e4ee0890",
@@ -86,6 +140,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "079b4172_b9b2ff5c",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:37:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f618b43b_e4ee0890",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20c6aa9f_adc04e13",
@@ -99,6 +171,24 @@
       "writtenOn": "2026-10-20T10:14:07Z",
       "side": 1,
       "message": "(This is an AI finding so please double-check)\n\nIf the generators are chained as suggested in the first CL in the chain and they use the same `signed_bin` path, the input and output file for this futility call are identical, which apparently triggers some processing edge case in futility logic. Please change `signed_bin` path to a unique string, e.g. `ec-rochksum.bin` or similar.",
+      "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ba424d0_95f5aa77",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:37:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20c6aa9f_adc04e13",
       "revId": "bdebb4bdb171530b21091b47125fbd4cf8d6b02a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
