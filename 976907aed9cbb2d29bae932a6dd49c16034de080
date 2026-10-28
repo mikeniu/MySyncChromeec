@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ef1636d_7db43ffa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T22:13:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality:** ✅ Moving `interrupt_disable_all()` after `hook_notify(HOOK_SYSJUMP)` in `jump_to_image()` restores normal thread/scheduler context for `HOOK_SYSJUMP` handlers while keeping interrupts disabled prior to `watchdog_reload()`, `chip_pre_system_jump()`, and `arch_pre_system_jump()`.\n- **Architecture \u0026 Component Fit:** ✅ Cleanly separates module state preservation (`HOOK_SYSJUMP` with interrupts enabled) from low-level SoC and CPU teardown (`chip_pre_system_jump()` and `arch_pre_system_jump()` with interrupts disabled).\n- **Code Simplicity:** ✅ Minimal, direct partial revert of `35f59cca062b`.\n- **Idiomaticity \u0026 Readability:** ✅ Restores symmetric `k_mutex_lock()`/`k_mutex_unlock()` usage in `preserve_enable_5v_state()` and `k_msleep()` in `flash_shared_enable_ec_access()`, and updates the `HOOK_SYSJUMP` documentation in `include/hooks.h`.\n- **Security:** ✅ Re-enables `pwr_5v_ctl_mtx` locking around `pwr_5v_en_req` now that `HOOK_SYSJUMP` runs with interrupts enabled, and preserves atomic execution for `chip_pre_system_jump()` and `arch_pre_system_jump()`.\n- **Testing:** ✅ `zephyr/test/jump_tags/src/jump_tags.c` verifies that interrupts remain enabled during `HOOK_SYSJUMP` before `chip_pre_system_jump()` and `arch_pre_system_jump()` execute with interrupts disabled.\n- **CL Size \u0026 Scope:** ✅ `Size: S (+14, -33)` — single, atomic logical change.\n- **Commit Message:** ✅ Clear, concise prose explaining the rationale and scope with valid `BUG\u003d` and `TEST\u003d` footers. [[trajectory](https://goto.corp.google.com/traj/c682d006-a9b3-4f68-8217-02a252dc3ef8)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "976907aed9cbb2d29bae932a6dd49c16034de080",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
