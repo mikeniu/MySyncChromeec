@@ -155,7 +155,7 @@ Watchdog resets require special coordination between the watchdog timer, the pan
 There are three distinct software panic reasons associated with watchdogs:
 
 1.  **`PANIC_SW_WATCHDOG_WARN`** (`0xDEAD6668`, introduced in commit [a58ecc0d44](https://chromium.googlesource.com/chromiumos/platform/ec/+/a58ecc0d441eeb5613af383e8de757f5d79879b2) (introduced warning)):
-    Set when the software watchdog warning timer fires. It captures the active thread context (the truncated thread ID in `exception`) and the Program Counter (PC) where execution was interrupted.
+    Set when the software watchdog warning timer fires. It captures the active thread context (the truncated thread ID in `exception`) and the Program Counter (PC) where execution was interrupted. If the watchdog is subsequently fed via `watchdog_reload()` or if a non-watchdog reset occurs, the stale warning panic data is cleared.
 2.  **`PANIC_SW_WATCHDOG`** (`0xDEAD6664`):
     The "promoted" watchdog reason. During boot, if the reset flags indicate a watchdog reset and the existing panic reason in RAM is `PANIC_SW_WATCHDOG_WARN`, the reason is promoted to `PANIC_SW_WATCHDOG`. This preserves the captured PC (info) and thread ID (exception) from the warning.
 3.  **`PANIC_SW_WATCHDOG_HARD`** (`0xDEAD666A`, introduced in commit [60c5c62f4c](https://chromium.googlesource.com/chromiumos/platform/ec/+/60c5c62f4c193b25cc3fc9f43adce9b3e1d1b6e9) (introduced hard watchdog)):

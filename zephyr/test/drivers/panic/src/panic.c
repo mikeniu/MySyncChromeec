@@ -173,6 +173,45 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 	}
 }
 
+ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_no_watchdog_reset)
+{
+	panic_data_write_sw(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
+
+	/* Set RO flag explicitly to test preservation in RO */
+	struct panic_data *pdata = get_panic_data_write();
+	pdata->flags &= ~PANIC_DATA_FLAG_RW_IMAGE;
+	pdata->flags |= PANIC_DATA_FLAG_RO_IMAGE;
+	const struct panic_data original_pdata = *pdata;
+
+	/* Simulate a power-on reset cause */
+	system_set_reset_flags(EC_RESET_FLAG_POWER_ON);
+	panic_data_init();
+
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		zassert_is_null(
+			panic_get_data(),
+			"Stale watchdog warning should be cleared in RW");
+	} else {
+		/* In RO, existing panic data should remain untouched */
+		zassert_mem_equal(panic_get_data(), &original_pdata,
+				  sizeof(original_pdata), NULL);
+	}
+
+	/* Verify that when PANIC_DATA_FLAG_OLD_HOSTCMD is set (!is_panic_new),
+	 * panic_data_init leaves pdata intact on a non-watchdog reset.
+	 */
+	panic_data_write_sw(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
+	pdata = get_panic_data_write();
+	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
+	const struct panic_data old_pdata = *pdata;
+
+	system_set_reset_flags(EC_RESET_FLAG_POWER_ON);
+	panic_data_init();
+
+	zassert_mem_equal(panic_get_data(), &old_pdata, sizeof(old_pdata),
+			  "Already-read panic data should be preserved");
+}
+
 ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_already_read)
 {
 	panic_data_write_sw(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
@@ -500,6 +539,26 @@ ZTEST(panic, test_panic_data_write_watchdog_warning)
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get(),
 		      "Exception register must store thread ID");
+}
+
+ZTEST(panic, test_panic_data_invalidate)
+{
+	struct panic_data *pdata;
+
+	/* Invalidate by passing pointer */
+	panic_data_write_sw(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	pdata = panic_get_data();
+	zassert_not_null(pdata, "Panic data must exist after write");
+	panic_data_invalidate(pdata);
+	zassert_is_null(panic_get_data(),
+			"Panic data must be NULL after invalidate(pdata)");
+
+	/* Invalidate by passing NULL (system panic data) */
+	panic_data_write_sw(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	zassert_not_null(panic_get_data(), "Panic data must exist after write");
+	panic_data_invalidate(NULL);
+	zassert_is_null(panic_get_data(),
+			"Panic data must be NULL after invalidate(NULL)");
 }
 
 ZTEST(panic, test_panic_data_write_fatal)
