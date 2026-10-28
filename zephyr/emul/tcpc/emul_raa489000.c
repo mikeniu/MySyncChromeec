@@ -29,9 +29,33 @@ static int raa489000_emul_write_byte(const struct emul *emul, int reg,
 	return tcpci_emul_write_byte(emul, reg, val, bytes);
 }
 
+static bool is_raa489000_vendor_reg(int reg)
+{
+	switch (reg) {
+	case RAA489000_TCPC_SETTING1:
+	case RAA489000_VBUS_VOLTAGE_TARGET:
+	case RAA489000_VBUS_CURRENT_TARGET:
+	case RAA489000_VBUS_OCP_UV_THRESHOLD:
+	case RAA489000_TYPEC_SETTING1:
+	case RAA489000_PD_PHYSICAL_SETTING1:
+	case RAA489000_PD_PHYSICAL_PARAMETER1:
+	case 0xAA: /* RAA489000 unlock register */
+		return true;
+	default:
+		return false;
+	}
+}
+
 static int raa489000_emul_handle_write(const struct emul *emul, int reg,
 				       int msg_len)
 {
+	if (is_raa489000_vendor_reg(reg)) {
+		struct tcpc_emul_data *tcpc_data = emul->data;
+		struct tcpci_ctx *ctx = tcpc_data->tcpci_ctx;
+
+		return tcpci_emul_set_reg(emul, reg, ctx->write_data);
+	}
+
 	return tcpci_emul_handle_write(emul, reg, msg_len);
 }
 
