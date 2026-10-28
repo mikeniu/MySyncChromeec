@@ -18,6 +18,24 @@
       "isAi": true,
       "revId": "d188c5cb260450675937c9382ce003598249b8c5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "887edd6d_9b4ca0e9",
+        "filename": "core/host/build.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T20:18:45Z",
+      "side": 1,
+      "message": "Nit: Since `BOARD\u003dhost` never splits `CONFIG_COMMON_TIMER` across `ro`/`rw` (it\u0027s a simple boolean: `y` or empty), using `ifeq` is easier to read at a glance than `not_cfg`:\n\n```makefile\nifeq ($(CONFIG_COMMON_TIMER),)\ncore-y+\u003dtimer.o\nendif\n```",
+      "isAi": true,
+      "revId": "d188c5cb260450675937c9382ce003598249b8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
