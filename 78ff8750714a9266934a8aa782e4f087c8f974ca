@@ -46,6 +46,29 @@
       },
       "revId": "78ff8750714a9266934a8aa782e4f087c8f974ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74665ccf_ed32f5ff",
+        "filename": "zephyr/test/fpmcu/tests/bloonchipper/include/cmsis_core.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-28T21:54:50Z",
+      "side": 1,
+      "message": "`zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c` currently only has `ZTEST(ec_quirks, test_tim2)` and never invokes `hook_notify(HOOK_SYSJUMP)` (even though it defines `arm_core_mpu_disable` and `stm32_reset_line_toggle` fakes for `prepare_for_sysjump_to_ec()`). As a result, `prepare_for_sysjump_to_ec()` and these new stubs have 0% coverage in `fpmcu.bloonchipper.ec_quirks`.\n\nCan we add a `ZTEST(ec_quirks, test_prepare_for_sysjump_to_ec)` in `zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c` that calls `hook_notify(HOOK_SYSJUMP)` (and optionally use FFF `DECLARE_FAKE_VOID_FUNC` / `FAKE_VOID_FUNC` here so the test can assert `__disable_irq`, `__set_BASEPRI(0)`, `__DSB`, and `__ISB` are called)?",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 1
+      },
+      "revId": "78ff8750714a9266934a8aa782e4f087c8f974ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
