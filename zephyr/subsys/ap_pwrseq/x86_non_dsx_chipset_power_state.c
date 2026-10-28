@@ -33,7 +33,7 @@ enum power_states_ndsx chipset_pwr_seq_get_state(void)
 	if (!chipset_is_vw_power_good()) {
 		LOG_ERR("Not enough power signals on (%#x), forcing shutdown",
 			(unsigned int)power_get_signals());
-		ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+		ap_power_force_shutdown_now(AP_POWER_SHUTDOWN_G3);
 		return SYS_POWER_STATE_G3;
 	}
 
@@ -88,7 +88,7 @@ enum power_states_ndsx chipset_pwr_seq_get_state(void)
 	 */
 	LOG_INF("Unable to determine CPU state (%#x), forcing shutdown",
 		(unsigned int)power_get_signals());
-	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	ap_power_force_shutdown_now(AP_POWER_SHUTDOWN_G3);
 	return SYS_POWER_STATE_G3;
 }
 #else
