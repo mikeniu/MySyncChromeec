@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66b373d3_3fef7118",
+        "filename": "zephyr/program/ocelot/blanc/src/board_power.c",
+        "patchSetId": 53
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-28T11:21:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "822e15d0_cf092300",
+      "revId": "7718d354a6b8522862b5d1f2e6b690d81ed5854e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf9afe57_bfa8ae71",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57b2616b_dec38e1a",
+        "filename": "zephyr/program/ocelot/blanc/src/board_power.c",
+        "patchSetId": 53
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-28T11:21:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf9afe57_bfa8ae71",
+      "revId": "7718d354a6b8522862b5d1f2e6b690d81ed5854e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4191e8a4_edb6d551",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-28T09:45:30Z",
       "side": 1,
       "message": "The released high value should not be equal to the high value.",
+      "revId": "7718d354a6b8522862b5d1f2e6b690d81ed5854e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be69ede6_37f5ca59",
+        "filename": "zephyr/program/ocelot/blanc/temp_sensors.dtsi",
+        "patchSetId": 53
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-28T11:21:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4191e8a4_edb6d551",
       "revId": "7718d354a6b8522862b5d1f2e6b690d81ed5854e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
