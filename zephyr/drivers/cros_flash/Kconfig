@@ -132,7 +132,7 @@ config CROS_FLASH_CUSTOM_JUMP_STRUCTURE
 
 config CROS_FLASH_STM32_EC_JUMP_STRUCTURE
 	bool "Enable backward compatibility with EC flash jump structure"
-	depends on CROS_FLASH_BACKEND_STM32 && SOC_SERIES_STM32F4X
+	depends on CROS_FLASH_BACKEND_STM32 && (SOC_SERIES_STM32F4X || SOC_SERIES_STM32H7X)
 	default n
 	select CROS_FLASH_CUSTOM_JUMP_STRUCTURE
 	help

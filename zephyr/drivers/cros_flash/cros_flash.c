@@ -424,13 +424,14 @@ static int cros_flash_restore_state(const struct device *dev,
 	const void *prev;
 
 	prev = system_get_jump_tag(FLASH_SYSJUMP_TAG, &version, &size);
-	if (!prev)
-		return -ENODATA;
 
 #ifdef CONFIG_CROS_FLASH_CUSTOM_JUMP_STRUCTURE
 	return decode_wp_from_sysjump(&data->protection, prot_flags, prev, size,
 				      version);
 #else
+	if (!prev)
+		return -ENODATA;
+
 	if (version != CROS_FLASH_PROT_VERSION ||
 	    size != sizeof(struct cros_flash_protection)) {
 		return -ENOENT;

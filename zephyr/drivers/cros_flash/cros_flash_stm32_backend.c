@@ -96,7 +96,10 @@ int decode_wp_from_sysjump(struct cros_flash_protection *protection,
 	const struct jump_wp_state *wp =
 		(const struct jump_wp_state *)jump_data;
 
-	if (!protection || !wp || size != sizeof(*wp) ||
+	if (!wp)
+		return -ENODATA;
+
+	if (!protection || size != sizeof(*wp) ||
 	    version != CROS_FLASH_STM32_PROT_VERSION)
 		return -EINVAL;
 
@@ -129,5 +132,61 @@ void prepare_wp_jump(struct cros_flash_protection *protection)
 	system_add_jump_tag(FLASH_SYSJUMP_TAG, CROS_FLASH_STM32_PROT_VERSION,
 			    sizeof(wp_state), &wp_state);
 }
-#endif /* CONFIG_SOC_SERIES_STM32F4X */
+#elif defined(CONFIG_SOC_SERIES_STM32H7X)
+struct jump_wp_state {
+	int access_disabled;
+	int option_disabled;
+	int stuck_locked;
+};
+
+int decode_wp_from_sysjump(struct cros_flash_protection *protection,
+			   uint32_t prot_flags, const void *jump_data,
+			   size_t size, int version)
+{
+	const struct jump_wp_state *wp =
+		(const struct jump_wp_state *)jump_data;
+
+	if (!protection)
+		return -EINVAL;
+
+	if (!wp) {
+		/*
+		 * Production dartmonkey RO (v2.0.2887-311310808) predates
+		 * FLASH_SYSJUMP_TAG support on STM32H7 (added in 58bd6e336112).
+		 * However, rwsig_jump_now() in RO locks the entire flash in
+		 * hardware before jumping to RW whenever WP is enabled.
+		 */
+		if ((prot_flags & EC_FLASH_PROTECT_GPIO_ASSERTED) &&
+		    (prot_flags & EC_FLASH_PROTECT_RO_NOW)) {
+			protection->control_access_blocked = true;
+			protection->protection_changes_blocked = true;
+		}
+		return EC_SUCCESS;
+	}
+
+	if (size != sizeof(*wp) || version != CROS_FLASH_STM32_PROT_VERSION)
+		return -EINVAL;
+
+	protection->control_access_blocked = (wp->access_disabled != 0);
+	protection->protection_changes_blocked = (wp->option_disabled != 0);
+
+	return EC_SUCCESS;
+}
+
+void prepare_wp_jump(struct cros_flash_protection *protection)
+{
+	struct jump_wp_state wp_state;
+
+	if (!protection)
+		return;
+
+	wp_state.access_disabled = protection->control_access_blocked ? 1 : 0;
+	wp_state.option_disabled =
+		protection->protection_changes_blocked ? 1 : 0;
+	wp_state.stuck_locked = 0;
+
+	system_add_jump_tag(FLASH_SYSJUMP_TAG, CROS_FLASH_STM32_PROT_VERSION,
+			    sizeof(wp_state), &wp_state);
+}
+#endif
 #endif /* CONFIG_CROS_FLASH_STM32_EC_JUMP_STRUCTURE */
