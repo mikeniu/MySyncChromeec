@@ -33,6 +33,7 @@ static bool in_debug_mode;
 enum {
 	S5_INACTIVE_TIMER_RUNNING,
 	START_FROM_G3,
+	FORCE_SHUTDOWN,
 	FLAGS_MAX,
 };
 static ATOMIC_DEFINE(flags, FLAGS_MAX);
@@ -44,8 +45,10 @@ static struct pwrseq_context pwrseq_ctx = {
 	.power_state = SYS_POWER_STATE_UNINIT,
 };
 static struct k_sem pwrseq_sem;
+static atomic_t force_shutdown_reason;
 
 static void s5_inactive_timer_handler(struct k_timer *timer);
+static void ap_power_force_shutdown_now(enum ap_power_shutdown_reason reason);
 /* S5 inactive timer*/
 K_TIMER_DEFINE(s5_inactive_timer, s5_inactive_timer_handler, NULL);
 
@@ -177,7 +180,7 @@ static void s5_inactive_timer_handler(struct k_timer *timer)
 static void shutdown_and_notify(enum ap_power_shutdown_reason reason)
 {
 	ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN);
-	ap_power_force_shutdown(reason);
+	ap_power_force_shutdown_now(reason);
 	ap_power_ev_send_callbacks(AP_POWER_SHUTDOWN_COMPLETE);
 }
 
@@ -261,7 +264,8 @@ void apshutdown(void)
 }
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
-void ap_power_force_shutdown(enum ap_power_shutdown_reason reason)
+#ifndef CONFIG_AP_PWRSEQ_DRIVER
+static void ap_power_force_shutdown_now(enum ap_power_shutdown_reason reason)
 {
 #ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
 	/* This prevents force shutdown if debug mode is enabled */
@@ -272,11 +276,30 @@ void ap_power_force_shutdown(enum ap_power_shutdown_reason reason)
 #endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */
 
 	report_ap_reset((enum chipset_shutdown_reason)reason);
+	k_timer_stop(&s5_inactive_timer);
+	atomic_clear_bit(flags, S5_INACTIVE_TIMER_RUNNING);
+	board_ap_power_force_shutdown();
+}
+#endif /* !CONFIG_AP_PWRSEQ_DRIVER */
+
+void ap_power_force_shutdown(enum ap_power_shutdown_reason reason)
+{
+#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
+	/* This prevents force shutdown if debug mode is enabled */
+	if (in_debug_mode) {
+		LOG_WRN("debug_mode is enabled, preventing force shutdown");
+		return;
+	}
+#endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */
+
 #ifdef CONFIG_AP_PWRSEQ_DRIVER
+	report_ap_reset((enum chipset_shutdown_reason)reason);
 	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
 			     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
 #else
-	board_ap_power_force_shutdown();
+	atomic_set(&force_shutdown_reason, reason);
+	atomic_set_bit(flags, FORCE_SHUTDOWN);
+	ap_pwrseq_wake();
 #endif
 }
 
@@ -451,7 +474,7 @@ static int common_pwr_sm_run(int state)
 
 	case SYS_POWER_STATE_S5G3:
 		/* Nofity power event after we remove power rails */
-		ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+		ap_power_force_shutdown_now(AP_POWER_SHUTDOWN_G3);
 		return SYS_POWER_STATE_G3;
 
 	case SYS_POWER_STATE_S5S4:
@@ -679,7 +702,7 @@ test_export_static void pwr_seq_set_initial_state(void)
 	 */
 	if (((reset_flags & EC_RESET_FLAG_SYSJUMP) == 0) &&
 	    (state != SYS_POWER_STATE_G3)) {
-		ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+		ap_power_force_shutdown_now(AP_POWER_SHUTDOWN_G3);
 		state = SYS_POWER_STATE_G3;
 	}
 	if (state == SYS_POWER_STATE_S0) {
@@ -701,6 +724,26 @@ static void pwrseq_loop_thread(void *p1, void *p2, void *p3)
 	 */
 	ap_power_ev_send_callbacks(AP_POWER_INITIALIZED);
 	while (1) {
+		if (atomic_test_and_clear_bit(flags, FORCE_SHUTDOWN)) {
+			enum ap_power_shutdown_reason reason =
+				(enum ap_power_shutdown_reason)atomic_get(
+					&force_shutdown_reason);
+
+			curr_state = pwr_sm_get_state();
+			enable_sleep(SLEEP_MASK_AP_RUN);
+			if (curr_state != SYS_POWER_STATE_G3 &&
+			    curr_state != SYS_POWER_STATE_G3S5 &&
+			    curr_state != SYS_POWER_STATE_S5 &&
+			    curr_state != SYS_POWER_STATE_S5S4 &&
+			    curr_state != SYS_POWER_STATE_S5G3 &&
+			    curr_state != SYS_POWER_STATE_S4S5) {
+				shutdown_and_notify(reason);
+			} else {
+				ap_power_force_shutdown_now(reason);
+			}
+			pwr_sm_set_state(SYS_POWER_STATE_G3);
+		}
+
 		curr_state = pwr_sm_get_state();
 
 		/*

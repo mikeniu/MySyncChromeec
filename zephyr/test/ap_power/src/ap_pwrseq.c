@@ -28,6 +28,9 @@
 #include <ap_power_override_functions.h>
 
 void pwr_seq_set_initial_state(void);
+#ifndef CONFIG_AP_PWRSEQ_DRIVER
+void pwr_sm_set_state(enum power_states_ndsx new_state);
+#endif
 
 LOG_MODULE_REGISTER(test_ap_pwrseq);
 
@@ -636,11 +639,7 @@ ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
 
 ZTEST(ap_pwrseq, test_pwr_seq_initial_state)
 {
-	if (IS_ENABLED(CONFIG_AP_PWRSEQ_DRIVER)) {
-		ztest_test_skip();
-		return;
-	}
-
+#ifndef CONFIG_AP_PWRSEQ_DRIVER
 	power_signal_set(PWR_EC_PCH_SYS_PWROK, 0);
 
 	/* Bring system up to S0 */
@@ -673,6 +672,27 @@ ZTEST(ap_pwrseq, test_pwr_seq_initial_state)
 
 	zassert_true(ap_power_in_state(AP_POWER_STATE_HARD_OFF));
 	zassert_equal(atomic_get(&sleep_mask) & SLEEP_MASK_AP_RUN, 0);
+
+	/*
+	 * Test 3: Asynchronous ap_power_force_shutdown() in S0.
+	 */
+	pwr_sm_set_state(SYS_POWER_STATE_S0);
+	zassert_true(ap_power_in_state(AP_POWER_STATE_ON));
+	ap_pwrseq_reset_ev_counters();
+
+	disable_sleep(SLEEP_MASK_AP_RUN);
+	zassert_not_equal(atomic_get(&sleep_mask) & SLEEP_MASK_AP_RUN, 0);
+
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(100);
+
+	zassert_true(ap_power_in_state(AP_POWER_STATE_HARD_OFF));
+	zassert_equal(atomic_get(&sleep_mask) & SLEEP_MASK_AP_RUN, 0);
+	zassert_equal(1, power_shutdown_count);
+	zassert_equal(1, power_shutdown_complete_count);
+#else
+	ztest_test_skip();
+#endif
 }
 
 void ap_pwrseq_after_test(void *data)

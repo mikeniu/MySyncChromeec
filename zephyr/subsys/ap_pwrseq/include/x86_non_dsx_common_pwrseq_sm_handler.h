@@ -26,6 +26,7 @@
 enum power_states_ndsx chipset_pwr_sm_run(enum power_states_ndsx curr_state);
 enum power_states_ndsx chipset_pwr_seq_get_state(void);
 enum power_states_ndsx pwr_sm_get_state(void);
+void pwr_sm_set_state(enum power_states_ndsx new_state);
 const char *const pwr_sm_get_state_name(enum power_states_ndsx state);
 #else
 enum ap_pwrseq_state chipset_pwr_seq_get_state(void);
