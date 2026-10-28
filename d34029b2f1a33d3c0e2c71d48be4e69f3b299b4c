@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cead816_58632354",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T22:57:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The early-return refactoring in `host_command_protocol_info()` is clean and behavior-preserving, but please add unit test coverage in `test/fp_transport.c` for the `curr_transport_type !\u003d FP_TRANSPORT_TYPE_SPI` (`EC_RES_INVALID_COMMAND`) guard branch.\n\n### Review Summary\n* **Functionality:** ✅ Preserves exact behavior across FPMCU and non-FPMCU configurations (`CONFIG_FINGERPRINT_MCU`, `CONFIG_USART_HOST_COMMAND`, and `CONFIG_SPI`).\n* **Architecture \u0026 Component Fit:** ✅ Fits the STM32 host command handler structure cleanly.\n* **Code Simplicity:** ✅ Eliminates the mutable `ret_status` variable and deduplicates the `IS_ENABLED(CONFIG_SPI)` branch via early returns.\n* **Idiomaticity \u0026 Readability:** ✅ Uses idiomatic guard clauses, `IS_ENABLED()` checks, and existing enum constants.\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ `test/fp_transport.c` only exercises the `EC_RES_SUCCESS` paths for `FP_TRANSPORT_TYPE_UART` (on `bloonchipper`) and `FP_TRANSPORT_TYPE_SPI`; it does not cover the new `if (curr_transport_type !\u003d FP_TRANSPORT_TYPE_SPI) return EC_RES_INVALID_COMMAND;` guard branch (see inline comment).\n* **CL Size \u0026 Scope:** ✅ `Size: S (+8, -9)`. Focused, single-purpose refactoring.\n* **Commit Message:** ✅ Clear, concise, and accurately describes the what and why of the change.\n\n[🔗](http://go/tj/76f50ae5-6aa1-4148-bf95-e2f34c8ef0bd)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d34029b2f1a33d3c0e2c71d48be4e69f3b299b4c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49f5b3f6_a1e99f7b",
+        "filename": "chip/stm32/host_command_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T22:57:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Because FPMCU and non-FPMCU paths now share the `if (IS_ENABLED(CONFIG_SPI))` check on line 39, this early return is the sole guard preventing non-SPI FPMCU transports from falling through into `spi_get_protocol_info(args)` when `CONFIG_SPI` is enabled.\n\nHowever, `test/fp_transport.c` currently only tests the happy paths (`FP_TRANSPORT_TYPE_UART` on `bloonchipper` and `FP_TRANSPORT_TYPE_SPI`), both of which expect `EC_RES_SUCCESS`. If this `if (curr_transport_type !\u003d FP_TRANSPORT_TYPE_SPI)` guard were removed, all existing tests in `test/fp_transport.c` would still pass. (Also note that `make run-fp_transport` runs on the host emulator where `EMU_BUILD` exits `run_test()` immediately without compiling `chip/stm32/host_command_common.c`.)\n\nPlease add unit test coverage in `test/fp_transport.c` for this `EC_RES_INVALID_COMMAND` early-return branch:\n1. Because `curr_transport_type` is only cached once it transitions away from `FP_TRANSPORT_TYPE_UNKNOWN`, testing `FP_TRANSPORT_TYPE_UNKNOWN` first in `run_test()` exercises this guard without preventing the subsequent `UART` or `SPI` test from caching its transport type.\n2. On boards where `!IS_ENABLED(CONFIG_USART_HOST_COMMAND)` (such as `dartmonkey`), running the `\"uart\"` test case can also verify that `FP_TRANSPORT_TYPE_UART` falls through line 31 and is rejected by this guard with `EC_RES_INVALID_COMMAND`.\n\n```c\ntest_static int test_host_command_protocol_info_invalid(\n\tenum fp_transport_type transport_type)\n{\n\tstruct ec_response_get_protocol_info info;\n\n\tmock_ctrl_fpsensor_detect.fpsensor_detect_get_type_return \u003d\n\t\tFP_SENSOR_TYPE_FPC;\n\tmock_ctrl_fpsensor_detect.get_fp_transport_type_return \u003d transport_type;\n\n\tTEST_EQ(test_send_host_command(EC_CMD_GET_PROTOCOL_INFO, 0, NULL, 0,\n\t\t\t\t       \u0026info, sizeof(info)),\n\t\tEC_RES_INVALID_COMMAND, \"%d\");\n\n\treturn EC_SUCCESS;\n}\n\ntest_static int test_host_command_protocol_info_unknown(void)\n{\n\treturn test_host_command_protocol_info_invalid(\n\t\tFP_TRANSPORT_TYPE_UNKNOWN);\n}\n\ntest_static int test_host_command_protocol_info_uart_disabled(void)\n{\n\treturn test_host_command_protocol_info_invalid(FP_TRANSPORT_TYPE_UART);\n}\n```\n\nAnd in `run_test()` in `test/fp_transport.c`:\n\n```c\n\t/*\n\t * Verify that an unknown transport type is rejected before a valid\n\t * transport type is cached in curr_transport_type.\n\t */\n\tRUN_TEST(test_host_command_protocol_info_unknown);\n\n\t/* The transport type is cached in a static variable, so the tests\n\t * cannot be run back to back (without reboot).\n\t */\n\tif (strncmp(argv[1], \"uart\", 4) \u003d\u003d 0) {\n\t\tif (IS_ENABLED(BOARD_BLOONCHIPPER))\n\t\t\tRUN_TEST(test_host_command_protocol_info_uart);\n\t\telse if (!IS_ENABLED(CONFIG_USART_HOST_COMMAND))\n\t\t\tRUN_TEST(test_host_command_protocol_info_uart_disabled);\n\t} else if (strncmp(argv[1], \"spi\", 3) \u003d\u003d 0) {\n\t\tRUN_TEST(test_host_command_protocol_info_spi);\n\t}\n```\n\n[🔗](http://go/tj/76f50ae5-6aa1-4148-bf95-e2f34c8ef0bd)",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d34029b2f1a33d3c0e2c71d48be4e69f3b299b4c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
