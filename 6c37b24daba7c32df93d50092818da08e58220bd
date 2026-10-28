@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "662e8772_a1f25539",
+        "filename": "zephyr/shim/chip/npcx/system_external_storage.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-28T21:54:53Z",
+      "side": 1,
+      "message": "Nit: Can we add a short inline comment above this sequence (similar to `bloonchipper/src/ec_quirks.c` and `cros_system_npcx.c`) explaining why `PRIMASK` is masked and `BASEPRI` is cleared before the Boot ROM / GDMA flash copy and target image entry (e.g., preventing priority-0 interrupts while overwriting code RAM and restoring hardware reset interrupt mask state for Legacy EC on `helipilot`)?",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 9
+      },
+      "revId": "6c37b24daba7c32df93d50092818da08e58220bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "342bf38f_5d26d320",
         "filename": "zephyr/shim/chip/npcx/system_external_storage.c",
         "patchSetId": 2
