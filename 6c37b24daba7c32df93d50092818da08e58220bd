@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "342bf38f_5d26d320",
+        "filename": "zephyr/shim/chip/npcx/system_external_storage.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T19:36:58Z",
+      "side": 1,
+      "message": "You also added this code to cros_system_npcx.c.  How about creating a macro for both uses?",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 0
+      },
+      "revId": "6c37b24daba7c32df93d50092818da08e58220bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
