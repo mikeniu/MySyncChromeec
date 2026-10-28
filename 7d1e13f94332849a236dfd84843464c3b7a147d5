@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7ee49f2_db54c46e",
+        "filename": "zephyr/program/dougie/bandit/generated.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T17:53:55Z",
+      "side": 1,
+      "message": "Note - we are trying to depecrate the `named-gpios` node.  This doesn\u0027t match the Zephyr driver model which expects the individual driver to own the GPIOs it needs.  In this case, the PDC driver owns this GPIO so it should be deleted from here.\n\n`named-gpios` is used to shim Zephyr GPIOs into the legacy EC drivers.  The PDC drivers are fully Zephyrized so they don\u0027t need the shim.\n\nIn a rare cases, you can leave the GPIOs in `named-gpios` and also owned by a driver, but you should add the `no-auto-init` property.",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 53
+      },
+      "revId": "7d1e13f94332849a236dfd84843464c3b7a147d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
