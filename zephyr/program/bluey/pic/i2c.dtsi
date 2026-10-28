@@ -11,7 +11,20 @@
 			i2c-port = <&i2c5_0>;
 			enum-names = "I2C_PORT_ADSP", "I2C_PORT_BATTERY";
 		};
+		i2c_ec_i2c_dbg: ec_i2c_dbg {
+			i2c-port = <&i2c2_0>;
+			enum-names = "I2C_PORT_PAC";
+		};
 	};
+};
+
+&i2c2_0 {
+	status = "okay";
+	pinctrl-0 = <&i2c2_0_sda_scl_gp91_92>;
+	pinctrl-names = "default";
+
+	label = "I2C_PORT_PAC";
+	clock-frequency = <I2C_BITRATE_FAST>;
 };
 
 &i2c5_0 {
@@ -21,6 +34,10 @@
 
 	label = "I2C_PORT_ADSP";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
+};
+
+&i2c_ctrl2 {
+	status = "okay";
 };
 
 &i2c_ctrl5 {

@@ -6074,6 +6074,141 @@ int cmd_next_event(int argc, char *argv[])
 	return 0;
 }
 
+static int pwrmon_read_events(void)
+{
+	struct ec_response_get_next_event_v3 *ev =
+		(struct ec_response_get_next_event_v3 *)ec_inbuf;
+	int rv;
+	int count = 0;
+
+	while ((rv = ec_command(EC_CMD_GET_NEXT_EVENT, 3, NULL, 0, ec_inbuf,
+				ec_max_insize)) > 0) {
+		if (ev->event_type != EC_MKBP_EVENT_PWRMON)
+			continue;
+		printf("ch %2u  %12" PRId64 " uW  %10u samples\n",
+		       ev->data.pwrmon_data.channel_id,
+		       ev->data.pwrmon_data.value,
+		       ev->data.pwrmon_data.samples);
+		count++;
+	}
+
+	return count;
+}
+
+static int cmd_pwrmon(int argc, char *argv[])
+{
+	struct ec_params_pwrmon p;
+	struct ec_response_pwrmon r;
+	const char *cmd;
+	char *end;
+	int rv;
+	int i;
+
+	memset(&p, 0, sizeof(p));
+	memset(&r, 0, sizeof(r));
+	cmd = argc > 1 ? argv[1] : "info";
+
+	if (!strcasecmp(cmd, "info")) {
+		p.cmd = EC_PWRMON_GET_CHANNEL_COUNT;
+		rv = ec_command(EC_CMD_PWRMON, 0, &p, sizeof(p), &r,
+				sizeof(r));
+		if (rv < 0)
+			return rv;
+		printf("Channel count: %u\n", r.channel_count);
+		for (i = 0; i < r.channel_count; ++i) {
+			memset(&p, 0, sizeof(p));
+			p.cmd = EC_PWRMON_DUMP_INFO;
+			p.channel_id = i;
+			rv = ec_command(EC_CMD_PWRMON, 0, &p, sizeof(p), &r,
+					sizeof(r));
+			if (rv < 0)
+				return rv;
+			printf("  %2u: %s\n", r.dump_info.channel_id,
+			       r.dump_info.channel_name);
+		}
+		return 0;
+	}
+
+	if (!strcasecmp(cmd, "rate")) {
+		if (argc > 2) {
+			if (strcasecmp(argv[2], "set")) {
+				fprintf(stderr,
+					"Usage: %s rate [set <rate>]\n",
+					argv[0]);
+				return -1;
+			}
+			if (argc < 4) {
+				fprintf(stderr,
+					"Usage: %s rate set <rate>\n",
+					argv[0]);
+				return -1;
+			}
+			p.cmd = EC_PWRMON_SET_RATE;
+			p.set_rate = strtol(argv[3], &end, 0);
+			if (*end) {
+				fprintf(stderr, "Invalid rate: %s\n", argv[3]);
+				return -1;
+			}
+			rv = ec_command(EC_CMD_PWRMON, 0, &p, sizeof(p), &r,
+					sizeof(r));
+			if (rv < 0)
+				return rv;
+		}
+		memset(&p, 0, sizeof(p));
+		p.cmd = EC_PWRMON_GET_RATE;
+		rv = ec_command(EC_CMD_PWRMON, 0, &p, sizeof(p), &r,
+				sizeof(r));
+		if (rv < 0)
+			return rv;
+		printf("Sample rate: %u\n", r.sample_rate);
+		return 0;
+	}
+
+	if (!strcasecmp(cmd, "start")) {
+		p.cmd = EC_PWRMON_START;
+	} else if (!strcasecmp(cmd, "stop")) {
+		p.cmd = EC_PWRMON_STOP;
+	} else if (!strcasecmp(cmd, "latch")) {
+		p.cmd = EC_PWRMON_LATCH;
+	} else {
+		fprintf(stderr,
+			"Usage: %s "
+			"[info|rate [set <rate>]|start|stop|latch]\n",
+			argv[0]);
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_PWRMON, 0, &p, sizeof(p), &r, sizeof(r));
+	if (rv < 0)
+		return rv;
+
+	if (p.cmd == EC_PWRMON_LATCH) {
+		struct ec_params_pwrmon pcount;
+		struct ec_response_pwrmon rcount;
+		int remaining;
+
+		memset(&pcount, 0, sizeof(pcount));
+		pcount.cmd = EC_PWRMON_GET_CHANNEL_COUNT;
+		rv = ec_command(EC_CMD_PWRMON, 0, &pcount, sizeof(pcount),
+				&rcount, sizeof(rcount));
+		if (rv < 0)
+			return rv;
+		remaining = rcount.channel_count;
+
+		for (i = 0; i < 20 && remaining > 0; ++i) {
+			int n = pwrmon_read_events();
+
+			if (n == 0) {
+				usleep(50 * 1000);
+				continue;
+			}
+			remaining -= n;
+		}
+	}
+
+	return 0;
+}
+
 static int find_led_color_by_name(const char *color)
 {
 	int i;
@@ -7854,6 +7989,38 @@ int cmd_poe(int argc, char *argv[])
 	}
 
 	rv = ec_command(EC_CMD_SWITCH_ENABLE_POE, 0, &p, sizeof(p), NULL, 0);
+	if (rv < 0)
+		return rv;
+
+	printf("Success.\n");
+	return 0;
+}
+
+/* Bluey private host command; keep in sync with battery_soc_sync.c. */
+#define EC_CMD_BLUEY_SET_BATTERY_SOC EC_PRIVATE_HOST_COMMAND_VALUE(0x0001)
+
+int cmd_set_batt_soc(int argc, char *argv[])
+{
+	struct {
+		uint8_t soc;
+	} __ec_align1 p;
+	char *e;
+	long soc;
+	int rv;
+
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <0-100>\n", argv[0]);
+		return -1;
+	}
+	soc = strtol(argv[1], &e, 0);
+	if ((e && *e) || soc < 0 || soc > 100) {
+		fprintf(stderr, "Bad value.\n");
+		return -1;
+	}
+	p.soc = soc;
+
+	rv = ec_command(EC_CMD_BLUEY_SET_BATTERY_SOC, 0, &p, sizeof(p), NULL,
+			0);
 	if (rv < 0)
 		return rv;
 
@@ -13135,6 +13302,9 @@ const struct command commands[] = {
 	{ "pwmsetkblight", cmd_pwm_set_keyboard_backlight,
 	  "<percent>\n"
 	  "\tSet keyboard backlight in percent." },
+	{ "pwrmon", cmd_pwrmon,
+	  "[info|rate [set <rate>]|start|stop|latch]\n"
+	  "\tRead power rails via the EC power monitor." },
 	{ "rand", cmd_rand,
 	  "<num_bytes>\n"
 	  "\tgenerate <num_bytes> of random numbers." },
@@ -13180,6 +13350,8 @@ const struct command commands[] = {
 	  "get|set\n"
 	  "\tGet or reset s0ix counter." },
 	{ "sertest", cmd_serial_test, "\n\tSerial output test for COM2." },
+	{ "setbattsoc", cmd_set_batt_soc,
+	  "<0-100>\n\tTell the EC the battery level (bluey)." },
 	{ "smartdischarge", cmd_smart_discharge,
 	  "\n\tSet/Get smart discharge parameters." },
 	{ "stress", cmd_stress_test,
