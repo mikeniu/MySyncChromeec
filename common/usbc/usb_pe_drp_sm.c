@@ -1810,6 +1810,11 @@ static bool common_src_snk_dpm_requests(int port)
 		pe_set_dpm_curr_request(port, DPM_REQUEST_SEND_ALERT);
 		set_state_pe(port, PE_SEND_ALERT);
 		return true;
+	} else {
+		const uint32_t dpm_request = pe[port].dpm_request;
+
+		CPRINTF("Unhandled DPM Request %x received\n", dpm_request);
+		PE_CLR_DPM_REQUEST(port, dpm_request);
 	}
 
 	return false;
@@ -1863,10 +1868,6 @@ static bool source_dpm_requests(int port)
 		return true;
 	}
 
-	const uint32_t dpm_request = pe[port].dpm_request;
-
-	CPRINTF("Unhandled DPM Request %x received\n", dpm_request);
-	PE_CLR_DPM_REQUEST(port, dpm_request);
 	PE_CLR_FLAG(port, PE_FLAGS_LOCALLY_INITIATED_AMS);
 
 	return false;
@@ -1918,8 +1919,6 @@ static bool sink_dpm_requests(int port)
 
 		/* Requires no state change, fall through to false */
 		PE_CLR_DPM_REQUEST(port, DPM_REQUEST_FRS_DET_DISABLE);
-	} else if (common_src_snk_dpm_requests(port)) {
-		return true;
 #ifdef CONFIG_USB_PD_EPR
 	} else if (PE_CHK_DPM_REQUEST(port, DPM_REQUEST_EPR_MODE_ENTRY)) {
 		if (pe_snk_in_epr_mode(port)) {
@@ -1967,11 +1966,8 @@ static bool sink_dpm_requests(int port)
 		set_state_pe(port, PE_SNK_SELECT_CAPABILITY);
 		return true;
 #endif /* CONFIG_USB_PD_EPR */
-	} else {
-		const uint32_t dpm_request = pe[port].dpm_request;
-
-		CPRINTF("Unhandled DPM Request %x received\n", dpm_request);
-		PE_CLR_DPM_REQUEST(port, dpm_request);
+	} else if (common_src_snk_dpm_requests(port)) {
+		return true;
 	}
 
 	PE_CLR_FLAG(port, PE_FLAGS_LOCALLY_INITIATED_AMS);

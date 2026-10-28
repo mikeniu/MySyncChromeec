@@ -293,6 +293,40 @@ ZTEST_F(usb_pe_test_sink, test_dpm_request_enter_mode)
 	dp_init(port);
 }
 
+/**
+ * @brief Test that a no-op common DPM request in PE_SNK_Ready does not clear
+ * other pending DPM requests, and that unhandled DPM request bits are cleared.
+ */
+ZTEST_F(usb_pe_test_sink, test_sink_dpm_noop_preserves_pending_requests)
+{
+	int port = TEST_USB_PORT;
+
+	zassert_true(pd_get_vconn_state(port));
+	zassert_equal(PD_ROLE_DFP, pd_get_data_role(port));
+
+	/*
+	 * Request the current VCONN role (a no-op in
+	 * common_src_snk_dpm_requests) alongside a valid DR_SWAP request.
+	 * Clearing the no-op VCONN_SWAP must not wipe out the pending DR_SWAP
+	 * bit.
+	 */
+	pe_set_requested_vconn_role(port, PD_ROLE_VCONN_SRC);
+	pd_dpm_request(port, DPM_REQUEST_VCONN_SWAP);
+	pd_dpm_request(port, DPM_REQUEST_DR_SWAP);
+	k_sleep(K_MSEC(500));
+
+	zassert_equal(PD_ROLE_UFP, pd_get_data_role(port),
+		      "Pending DR_SWAP was lost after no-op VCONN_SWAP");
+
+	/*
+	 * Exercise unhandled DPM request fallback in
+	 * common_src_snk_dpm_requests (GET_SRC_CAPS is unhandled in Sink mode).
+	 */
+	pd_dpm_request(port, DPM_REQUEST_GET_SRC_CAPS);
+	k_sleep(K_MSEC(50));
+	zassert_equal(PE_SNK_READY, get_state_pe(port));
+}
+
 /* =========================================================================
  * Source Tests
  * ========================================================================= */
@@ -492,4 +526,31 @@ ZTEST_F(usb_pe_test_source, test_dpm_notify_attention)
 	/* Reset DP state */
 	dp_init(port);
 	zassert_true(pe_is_running(port), "PE should remain running");
+}
+
+/**
+ * @brief Test that a no-op common DPM request in PE_SRC_Ready does not clear
+ * other pending DPM requests.
+ */
+ZTEST_F(usb_pe_test_source, test_source_dpm_noop_preserves_pending_requests)
+{
+	int port = TEST_USB_PORT;
+
+	zassert_true(pd_get_vconn_state(port));
+	pe_set_snk_caps(port, 0, NULL);
+	zassert_equal(0, pd_get_snk_cap_cnt(port));
+
+	/*
+	 * Request the current VCONN role (a no-op in
+	 * common_src_snk_dpm_requests) alongside GET_SNK_CAPS. Clearing the
+	 * no-op VCONN_SWAP must not wipe out the pending GET_SNK_CAPS bit.
+	 */
+	pe_set_requested_vconn_role(port, PD_ROLE_VCONN_SRC);
+	pd_dpm_request(port, DPM_REQUEST_VCONN_SWAP);
+	pd_dpm_request(port, DPM_REQUEST_GET_SNK_CAPS);
+	k_sleep(K_MSEC(500));
+
+	zassert_equal(2, pd_get_snk_cap_cnt(port),
+		      "Pending GET_SNK_CAPS was lost after no-op VCONN_SWAP");
+	zassert_equal(PE_SRC_READY, get_state_pe(port));
 }
