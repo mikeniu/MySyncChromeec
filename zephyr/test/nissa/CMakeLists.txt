@@ -95,6 +95,7 @@ if(CONFIG_TEST_NISSA_GOTHRAX)
     target_sources(
             app PRIVATE
             src/gothrax.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
@@ -306,6 +307,7 @@ if(CONFIG_TEST_NISSA_GLASSWAY)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/usb_mux_config.c
@@ -375,6 +377,7 @@ if(CONFIG_TEST_NISSA_GUREN)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/usb_mux_config.c
@@ -387,6 +390,7 @@ if(CONFIG_TEST_NISSA_EPIC)
     target_sources(
             app PRIVATE
             src/epic.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
