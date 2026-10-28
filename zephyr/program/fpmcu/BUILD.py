@@ -225,9 +225,11 @@ dartmonkey = register_fpmcu_variant(
     variant_optional_modules=["fpc"],
     variant_dts_overlays=[
         here / "dartmonkey" / "dartmonkey.dts",
+        here / "dartmonkey" / "ec_quirks.dts",
     ],
     variant_kconfig_files=[
         here / "dartmonkey" / "prj.conf",
+        here / "dartmonkey" / "ec_quirks.conf",
     ],
     signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
         here / "dartmonkey" / "dev_key.pem",
