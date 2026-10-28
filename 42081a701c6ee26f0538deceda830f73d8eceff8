@@ -34,6 +34,24 @@
       ],
       "revId": "42081a701c6ee26f0538deceda830f73d8eceff8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f88349c8_ac1d82d1",
+        "filename": "chip/stm32/usart_rx_dma.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1270601
+      },
+      "writtenOn": "2026-10-28T19:12:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99b2b34b_df7add90",
+      "revId": "42081a701c6ee26f0538deceda830f73d8eceff8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
