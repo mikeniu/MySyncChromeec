@@ -70,6 +70,31 @@
       },
       "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef0c8b5a_baca9d8e",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-28T15:35:36Z",
+      "side": 1,
+      "message": "Agree, adding another work queue does not fix the underlying problems. Cleaning up the blocking calls in the sys_work_q would resolve most sysworkq performance issues. \n\nWe also have an open discussion on lowering its priority below `sysworkq` (crrev.com/c/8523323) so console activity doesn\u0027t starve `sysworkq`.",
+      "parentUuid": "ce8ce18c_efec8225",
+      "range": {
+        "startLine": 214,
+        "startChar": 7,
+        "endLine": 214,
+        "endChar": 34
+      },
+      "isAi": true,
+      "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
