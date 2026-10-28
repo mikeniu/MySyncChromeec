@@ -1,0 +1,28 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f5e7e2a_6686873d",
+        "filename": "test/interrupt.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-10-28T08:54:52Z",
+      "side": 1,
+      "message": "Consider using distinct bitflags in `has_error` (e.g. `has_error |\u003d BIT(...)` for each failure condition across `my_isr()`, `critical_section_isr()`, and `test_init()`) and asserting with `TEST_EQ(has_error, 0, \"0x%x\")` instead of `TEST_ASSERT(!has_error)`. That way, if the test fails, the printed `EVAL` value immediately identifies which check failed.",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "11b31c0c81c5288e7acdb19c1bd83b7147d7f8e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
