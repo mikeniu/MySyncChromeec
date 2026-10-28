@@ -255,7 +255,11 @@ void panic_data_write_watchdog_warning(uintptr_t pc,
 {
 	struct panic_data *const pdata = panic_data_reset(NULL);
 
-	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+	panic_set_reason_reg(
+		pdata,
+		IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT) ?
+			PANIC_SW_WATCHDOG :
+			PANIC_SW_WATCHDOG_WARN);
 	panic_set_info_reg(pdata, (uint32_t)pc);
 	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
 

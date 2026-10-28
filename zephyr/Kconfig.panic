@@ -85,4 +85,17 @@ config PLATFORM_EC_PANIC_HOST_EVENT
 	  panic has occurred. This alerts the AP that a panic occurred on the
 	  previous boot.
 
+config PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT
+	bool "Legacy RO watchdog panic compatibility"
+	default n
+	help
+	  Enable compatibility with legacy factory-locked RO firmware (prior to
+	  commit 682f4c61f1) that runs watchdog reset promotion in RO.
+
+	  Legacy RO expects PANIC_SW_WATCHDOG rather than PANIC_SW_WATCHDOG_WARN
+	  on watchdog resets; any other reason causes legacy RO to overwrite the
+	  panic data and zero out faulting registers. When enabled, watchdog
+	  warnings write PANIC_SW_WATCHDOG directly so legacy RO preserves the
+	  captured faulting PC and thread ID.
+
 endif # PLATFORM_EC_PANIC

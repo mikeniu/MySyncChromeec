@@ -1288,6 +1288,12 @@ tests:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_PANIC=y
     - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
+  drivers.panic.legacy_ro_compat:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
+    - CONFIG_LINK_TEST_SUITE_PANIC=y
+    - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
+    - CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT=y
   drivers.panic_output.ro:
     tags:
     - host_cmd

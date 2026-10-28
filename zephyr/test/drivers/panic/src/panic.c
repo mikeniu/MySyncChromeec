@@ -527,13 +527,31 @@ ZTEST(panic, test_panic_data_write_watchdog_warning)
 
 	zassert_not_null(pdata, "Panic data must not be NULL after write");
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC, "Magic must be valid");
-	zassert_equal(panic_get_reason_reg(pdata), PANIC_SW_WATCHDOG_WARN,
-		      "Reason must be PANIC_SW_WATCHDOG_WARN");
+	uint32_t expected_reason =
+		IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT) ?
+			PANIC_SW_WATCHDOG :
+			PANIC_SW_WATCHDOG_WARN;
+	zassert_equal(panic_get_reason_reg(pdata), expected_reason,
+		      "Reason must match watchdog warning configuration");
 	zassert_equal(panic_get_info_reg(pdata), 0x10080000,
 		      "Info register must match PC");
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get(),
 		      "Exception register must store thread ID");
+
+	/* In RW, a subsequent watchdog reset preserves the warning PC
+	 * and results in PANIC_SW_WATCHDOG (either promoted from WARN
+	 * when compat=n, or preserved directly when compat=y).
+	 */
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+		panic_data_init();
+		zassert_equal(panic_get_reason_reg(panic_get_data()),
+			      PANIC_SW_WATCHDOG,
+			      "Reason must be PANIC_SW_WATCHDOG after reset");
+		zassert_equal(panic_get_info_reg(panic_get_data()), 0x10080000,
+			      "PC must be preserved");
+	}
 }
 
 ZTEST(panic, test_panic_data_invalidate)

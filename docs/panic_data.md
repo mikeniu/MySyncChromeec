@@ -183,6 +183,11 @@ If the RO image was unable to interpret the RW panic data (e.g., because the RO 
 
 To resolve this, commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2) restricted the watchdog promotion logic to run **only in the RW image**. The RO image preserves the reset flags and does not modify the panic data, allowing the RW image to safely perform the promotion after sysjump. *Note*: With this change, the watchdog warning reason (`PANIC_SW_WATCHDOG_WARN`) will not be promoted while executing the RO image, even if a watchdog reset occurred. This is typically not noticed since the EC immediately jumps to RW unless EC software sync is disabled for development.
 
+#### Legacy RO Watchdog Compatibility (`CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT`)
+For boards with factory-locked RO built prior to commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2), the RO image performs watchdog reset promotion on every watchdog reset. If the existing panic reason is anything other than `PANIC_SW_WATCHDOG` (such as `PANIC_SW_WATCHDOG_WARN`), legacy RO overwrites the panic data and zeroes out faulting registers.
+
+Enabling `CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT` causes the watchdog warning handler to write `PANIC_SW_WATCHDOG` instead of `PANIC_SW_WATCHDOG_WARN`, ensuring legacy RO preserves the captured faulting PC and thread ID.
+
 ## Zephyr Integration
 
 Zephyr's `k_sys_fatal_error_handler` is overridden by the EC (see [zephyr/shim/src/panic.c](../zephyr/shim/src/panic.c#167)). When a fatal error occurs:
