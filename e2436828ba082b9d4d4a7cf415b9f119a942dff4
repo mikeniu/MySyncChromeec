@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7461669_cd16d7d8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T17:47:55Z",
+      "side": 1,
+      "message": "I haven\u0027t done a detail review of all the specific GPIOs, but the general structure looks good to me.",
+      "revId": "e2436828ba082b9d4d4a7cf415b9f119a942dff4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
