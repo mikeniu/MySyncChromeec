@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "common.h"
 #include "config.h"
 #include "ec_tasks.h"
 #include "hooks.h"
@@ -82,9 +83,7 @@ const struct watchdog_info wdt_info[] = {
 int wdt_chan[ARRAY_SIZE(wdt_info)];
 bool watchdog_initialized;
 
-#ifdef TEST_BUILD
-bool wdt_warning_triggered;
-#endif /* TEST_BUILD */
+test_export_static bool wdt_warning_triggered;
 
 static int watchdog_config(const struct watchdog_info *info)
 {
@@ -186,6 +185,14 @@ void watchdog_reload(void)
 
 		wdt_feed(wdt_info[i].wdt_dev, wdt_chan[i]);
 	}
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC) && wdt_warning_triggered) {
+		unsigned int key = irq_lock();
+
+		wdt_warning_triggered = false;
+		panic_data_invalidate(NULL);
+		irq_unlock(key);
+	}
 }
 DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_LAST);
 
@@ -253,6 +260,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * PANIC_SW_WATCHDOG in panic_data_init if a watchdog reset occurs.
 	 */
 	panic_data_write_watchdog_warning(exception_address, thread);
+	wdt_warning_triggered = true;
 
 	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
 		thread_name = k_thread_name_get(thread);
@@ -271,9 +279,6 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	/* TODO(b/176523207): watchdog warning message */
 	printk("Watchdog deadline is close! THREAD:%p THREAD_NAME:%s\n",
 	       (void *)thread, thread_name);
-#endif
-#ifdef TEST_BUILD
-	wdt_warning_triggered = true;
 #endif
 #ifdef CONFIG_SOC_SERIES_MEC172X
 	extern void cros_chip_wdt_handler(const struct device *wdt_dev,

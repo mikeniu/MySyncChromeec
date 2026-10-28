@@ -145,6 +145,14 @@ struct panic_data *panic_data_reset(struct panic_data *pdata);
 void panic_data_finalize(struct panic_data *pdata);
 
 /**
+ * Invalidate panic data by clearing its magic number and flushing to RAM.
+ *
+ * @param pdata Pointer to panic_data to invalidate, or NULL to invalidate
+ *              the system panic data buffer from panic_get_data().
+ */
+void panic_data_invalidate(struct panic_data *pdata);
+
+/**
  * Get the panic reason field from a panic_data structure for the current
  * architecture.
  */

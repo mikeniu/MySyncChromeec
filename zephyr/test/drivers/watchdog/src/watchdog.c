@@ -142,6 +142,13 @@ ZTEST(watchdog, test_wdt_warning_handler)
 		      "Panic exception should match current thread id");
 	zassert_equal(0, panic_get_info_reg(pdata),
 		      "Panic info should match exception address (0 on posix)");
+
+	watchdog_reload();
+	zassert_is_null(
+		panic_get_data(),
+		"Watchdog warning panic data should be cleared on reload");
+	zassert_false(wdt_warning_triggered,
+		      "Watchdog warning triggered should be cleared on reload");
 }
 
 /**

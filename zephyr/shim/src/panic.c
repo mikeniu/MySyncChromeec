@@ -195,6 +195,19 @@ void panic_data_finalize(struct panic_data *pdata)
 	}
 }
 
+void panic_data_invalidate(struct panic_data *pdata)
+{
+	if (!pdata) {
+		pdata = panic_get_data();
+	}
+
+	if (pdata) {
+		pdata->magic = 0;
+		sys_cache_data_flush_range((void *)&pdata->magic,
+					   sizeof(pdata->magic));
+	}
+}
+
 void panic_data_write_esf(const struct arch_esf *esf)
 {
 	struct panic_data *pdata = panic_data_reset(NULL);
@@ -451,6 +464,9 @@ test_export_static int panic_data_init(void)
 			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_HARD);
 			panic_data_finalize(pdata);
 		}
+	} else if (is_panic_new && reason == PANIC_SW_WATCHDOG_WARN) {
+		LOG_INF("Clearing stale watchdog warning panic");
+		panic_data_invalidate(pdata);
 	}
 
 	return 0;
