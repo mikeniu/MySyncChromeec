@@ -1,0 +1,34 @@
+[
+  {
+    "category": "ISR Context Violation",
+    "contexts": [
+      "ISR"
+    ],
+    "description": "Functions marked @sleep yield threads or block and cannot be called inside an interrupt handler unless wrapped by an @isr_ok function.",
+    "exemption_props": [
+      "isr_ok"
+    ],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep"
+    ],
+    "required_absent_props": [],
+    "rule_id": "SLEEP_IN_ISR"
+  },
+  {
+    "category": "Pre-Kernel Violation",
+    "contexts": [
+      "PRE_KERNEL"
+    ],
+    "description": "Functions marked @sleep cannot be called during early PRE_KERNEL_1 / PRE_KERNEL_2 boot initialization hooks before thread scheduling is active unless marked @pre_kernel_ok.",
+    "exemption_props": [
+      "pre_kernel_ok"
+    ],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep"
+    ],
+    "required_absent_props": [],
+    "rule_id": "SLEEP_IN_PRE_KERNEL"
+  }
+]
