@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b99aef17_9ad6d484",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T22:07:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Moving `st_stm32_timers`, `st_stm32_uart`, and `sys_clock_disable()` teardown from `HOOK_SYSJUMP` into `chip_pre_system_jump()` ensures peripheral and system clock teardown executes after interrupts are disabled and after `watchdog_reload()` in `jump_to_image()`.\n* **Architecture \u0026 Component Fit:** ✅ Overrides `chip_pre_system_jump()` declared in `include/system.h`, matching the system jump teardown lifecycle for chip peripherals and clocks while CPU memory protection remains active.\n* **Code Simplicity:** ✅ The split between `chip_pre_system_jump()` and `prepare_for_sysjump_to_ec()` and the added unit test are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC and Zephyr C conventions with no magic values or incidental modifications.\n* **Security:** ✅ No security issues introduced; peripheral and clock teardown runs with interrupts disabled before jumping to the target image.\n* **Testing:** ✅ `test_chip_pre_system_jump` in `zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c` verifies peripheral reset line toggling via `chip_pre_system_jump()`.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+25, -7)` — Focused, single logical change (+12, -7 production lines; +13, -0 test lines).\n* **Commit Message:** ✅ Clear, concise summary and rationale with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/b27f1bff-3e86-4a48-816c-c41aaabce04b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2e2809c94e1494763c995b1f7774d1cd05ee7483",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
