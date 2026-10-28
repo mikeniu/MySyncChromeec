@@ -714,11 +714,11 @@ static inline void increment_sensor_collection(struct motion_sensor_t *sensor,
 void motion_sense_push_raw_xyz(struct motion_sensor_t *s)
 {
 	if (IS_ENABLED(CONFIG_ACCEL_FIFO)) {
-		struct ec_response_motion_sensor_data vector;
+		struct ec_response_motion_sensor_data vector = {
+			.sensor_num = s - motion_sensors,
+		};
 		int *v = s->raw_xyz;
 
-		vector.flags = 0;
-		vector.sensor_num = s - motion_sensors;
 		if (IS_ENABLED(CONFIG_ACCEL_SPOOF_MODE) &&
 		    s->flags & MOTIONSENSE_FLAG_IN_SPOOF_MODE)
 			v = s->spoof_xyz;
@@ -841,21 +841,25 @@ static void check_and_queue_gestures(uint32_t *event)
 	    (*event & TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(
 			      MOTIONSENSE_ACTIVITY_DOUBLE_TAP))) {
 		if (IS_ENABLED(CONFIG_GESTURE_HOST_DETECTION)) {
-			struct ec_response_motion_sensor_data vector;
-
-			vector.flags = MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO;
 			/*
 			 * Send events to the FIFO
 			 * AP is ignoring double tap event, do no wake up and no
 			 * automatic disable.
 			 */
-			if (IS_ENABLED(
-				    CONFIG_GESTURE_SENSOR_DOUBLE_TAP_FOR_HOST))
-				vector.flags |= MOTIONSENSE_SENSOR_FLAG_WAKEUP;
-			vector.activity_data.activity =
-				MOTIONSENSE_ACTIVITY_DOUBLE_TAP;
-			vector.activity_data.state = 1 /* triggered */;
-			vector.sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID;
+			struct ec_response_motion_sensor_data vector = {
+				.flags =
+					MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO |
+					(IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP_FOR_HOST) ?
+						 MOTIONSENSE_SENSOR_FLAG_WAKEUP :
+						 0),
+				.sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID,
+				.activity_data = {
+					.activity =
+						MOTIONSENSE_ACTIVITY_DOUBLE_TAP,
+					.state = 1, /* triggered */
+				},
+			};
+
 			motion_sense_fifo_stage_data(&vector, NULL, 0,
 						     __hw_clock_source_read());
 			motion_sense_fifo_commit_data();
@@ -868,15 +872,18 @@ static void check_and_queue_gestures(uint32_t *event)
 			      MOTIONSENSE_ACTIVITY_SIG_MOTION))) {
 		struct motion_sensor_t *activity_sensor;
 		if (IS_ENABLED(CONFIG_GESTURE_HOST_DETECTION)) {
-			struct ec_response_motion_sensor_data vector;
-
 			/* Send events to the FIFO */
-			vector.flags = MOTIONSENSE_SENSOR_FLAG_WAKEUP |
-				       MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO;
-			vector.activity_data.activity =
-				MOTIONSENSE_ACTIVITY_SIG_MOTION;
-			vector.activity_data.state = 1 /* triggered */;
-			vector.sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID;
+			struct ec_response_motion_sensor_data vector = {
+				.flags = MOTIONSENSE_SENSOR_FLAG_WAKEUP |
+					 MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO,
+				.sensor_num = MOTION_SENSE_ACTIVITY_SENSOR_ID,
+				.activity_data = {
+					.activity =
+						MOTIONSENSE_ACTIVITY_SIG_MOTION,
+					.state = 1, /* triggered */
+				},
+			};
+
 			motion_sense_fifo_stage_data(&vector, NULL, 0,
 						     __hw_clock_source_read());
 			motion_sense_fifo_commit_data();
