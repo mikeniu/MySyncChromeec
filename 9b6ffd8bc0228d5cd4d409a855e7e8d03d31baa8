@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81205f7a_14879476",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1160139
+      },
+      "writtenOn": "2026-10-28T15:00:32Z",
+      "side": 1,
+      "message": "This CL needs to be cherry-picked to R157 as well. Thanks!",
+      "revId": "9b6ffd8bc0228d5cd4d409a855e7e8d03d31baa8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
