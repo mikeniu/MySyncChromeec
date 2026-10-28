@@ -16,6 +16,24 @@
       "message": "Just else { lid_gpio_ready \u003d true;}?",
       "revId": "b1e237a112a157498715f907531265348eeaf1df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a242ad05_5a24b150",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-28T13:49:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "faabcf8e_6826ea6c",
+      "revId": "b1e237a112a157498715f907531265348eeaf1df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

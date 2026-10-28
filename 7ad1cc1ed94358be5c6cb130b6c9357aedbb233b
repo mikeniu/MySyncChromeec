@@ -109,6 +109,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2f2c6099_f05d52bb",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-28T13:49:39Z",
+      "side": 1,
+      "message": "While the LED is on the FPMCU cannot sleep. It takes pm_lock until the LED gets turned off. I think that we would also need to take pm_lock for the delayed work if used for debouncing. It adds complexity. On the other hand consequence of the false edge is FPMCU staying awake for 10s with the LED on and the lid halfway open or closed.",
+      "parentUuid": "398f10b0_aa0a4258",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a3fa709_35b63116",
         "filename": "zephyr/program/fpmcu/em32f967/fp_led.dtsi",
         "patchSetId": 4
@@ -209,6 +227,24 @@
       "side": 1,
       "message": "Oh, nice! Do you think it\u0027s better this way? It\u0027s not a subject of this CL, but does it make sense to also use it for PB_ignore and led?",
       "parentUuid": "b5081bd1_39450f40",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e2c69c9_01c71576",
+        "filename": "zephyr/program/fpmcu/em32f967/fp_led.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4405694
+      },
+      "writtenOn": "2026-10-28T13:49:39Z",
+      "side": 1,
+      "message": "I think it is better when the code is not using actual driver. It would be also the case for the button ignore. For the LED we sue led-pwm driver which makes it something different.",
+      "parentUuid": "25ea9ec5_847a94ee",
       "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
