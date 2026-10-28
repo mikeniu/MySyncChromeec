@@ -411,4 +411,11 @@ enum ap_pwrseq_state ap_pwrseq_sm_get_entry_state(void *const data);
  * @retval AP_POWER_STATE_UNDEF If state machine is not doing state transition.
  **/
 enum ap_pwrseq_state ap_pwrseq_sm_get_exit_state(void *const data);
+
+/**
+ * @brief Check if starting from G3 is ok before processing STARTUP event.
+ *
+ * @retval True If startup is allowed, False otherwise.
+ **/
+bool ap_pwrseq_check_g3_startup_ok(void);
 #endif /* PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_H_ */
