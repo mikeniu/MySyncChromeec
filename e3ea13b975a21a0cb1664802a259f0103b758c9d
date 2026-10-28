@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68c4bcb4_7bcfe235",
+        "filename": "zephyr/program/nissa/teliks/src/usbc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-10-28T22:31:16Z",
+      "side": 1,
+      "message": "can we use `board_is_usb_pd_port_present()` here?",
+      "range": {
+        "startLine": 124,
+        "startChar": 4,
+        "endLine": 124,
+        "endChar": 43
+      },
+      "revId": "e3ea13b975a21a0cb1664802a259f0103b758c9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61f853b4_c859a427",
+        "filename": "zephyr/program/nissa/teliks/src/usbc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-10-28T22:31:16Z",
+      "side": 1,
+      "message": "can we use `board_is_usb_pd_port_present()` here?",
+      "range": {
+        "startLine": 160,
+        "startChar": 4,
+        "endLine": 160,
+        "endChar": 54
+      },
+      "revId": "e3ea13b975a21a0cb1664802a259f0103b758c9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
