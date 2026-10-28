@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e86a1831_73770286",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T08:37:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `rts5817maa_acquire_image` validates the output buffer and capture type, invokes `rts5817maa_sensor_acquire_image`, logs raw failure status codes, and maps sensor return values to `enum fingerprint_sensor_scan` or `-EIO`.\n* **Architecture \u0026 Component Fit:** ✅ Implements `.acquire_image` on `cros_fp_rts5817maa_driver_api` consistently with the Zephyr `cros_fingerprint` driver interface and existing `rts5817maa` operations.\n* **Code Simplicity:** ✅ Helper switches (`convert_fp_capture_type_to_rts_capture_type` and `convert_rts_get_image_error_code`) and linear early-return guard clauses in `rts5817maa_acquire_image` are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Uses named `enum fingerprint_sensor_scan` and `rts_fp_return_t` constants, `IF_DISABLED`/`IS_ENABLED`, and standard Zephyr error codes (`-EINVAL`, `-ENOTSUP`, `-EIO`).\n* **Security:** ✅ Validates `image \u003d\u003d NULL` and `size \u003c CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE` before passing the buffer pointer to the sensor library.\n* **Testing:** ✅ Unit tests cover valid capture types, scan status mappings (`TOO_FAST`, `LOW_SENSOR_COVERAGE`), unmapped sensor errors (`-EIO`), unsupported capture types (`-EINVAL`), `NULL` buffer, buffer size boundaries (`size - 1`, `size`, `size + 1`), and all `enum fingerprint_capture_type` enumerators.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+209, -0)` (58 production lines and 151 unit test lines). Single cohesive logical change implementing `.acquire_image` for `rts5817maa` with unit tests.\n* **Commit Message:** ✅ Concise imperative subject line, clear prose summary of what and why, and standard `BUG\u003d`, `TEST\u003d`, and `Change-Id:` trailers.\n\n[🔗](http://go/tj/3f466fcb-b36e-4f51-8451-5f51b14eceb8)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8a009c2b019bb45af2470fadf382a98eb165a607",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
