@@ -16,6 +16,24 @@
       "message": "I find all the type casting from generators to lists and the other way round confusing. I think the code could be simplified a lot if instead we take advantage of the fact that both `pack_firmware` and `sign` yield, so we can chain the generators first and consume them once afterwards, in the `shutil.copy2` loop. This way, we also get rid of the filtering step, which is already done by `RwsigSigner.sign` (`signers.py : 117`).\n\nWith this approach, the change would boil down to:\n```py\nfiles \u003d project.packer.pack_firmware( # no longer \"unsigned\" if processed by multiple signers \n    packer_work_dir,\n    self.jobserver,\n    dirs,\n    version_string\u003dversion_string,\n)\n\nsigners \u003d (\n    project.signer\n    if isinstance(project.signer, Iterable)\n    else [project.signer]\n)\n\nfor signer in signers:\n    self.logger.debug(\n        \"Running signer %s.\", signer.__class__.__name__\n    )\n    files \u003d signer.sign(files, packer_work_dir, self.jobserver)\n\nfor output_file, output_name in files:\n    shutil.copy2(output_file, output_dir / output_name)\n    self.logger.debug(\n        \"Output file \u0027%s\u0027 created.\", output_dir / output_name\n    )\n```\n\nI haven\u0027t tested it but it seems cleaner.",
       "revId": "fd24a2d6d3605b1e437847e5580ca82e155b4da4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b927744_d7b68eb7",
+        "filename": "zephyr/zmake/zmake/zmake.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 904,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-28T00:12:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "051ea872_a7462716",
+      "revId": "fd24a2d6d3605b1e437847e5580ca82e155b4da4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
