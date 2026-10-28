@@ -21,6 +21,7 @@
 #include <zephyr/fff.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/ztest.h>
 
 #define wdt_helper DEVICE_DT_GET(DT_CHOSEN(cros_ec_watchdog_helper))
@@ -32,9 +33,9 @@
 	(CONFIG_AUX_TIMER_PERIOD_MS + (CONFIG_AUX_TIMER_PERIOD_MS / 2))
 
 /**
- * @brief Boolean to indicate watchdog alert triggered
+ * @brief Flag to indicate watchdog alert triggered
  */
-extern bool wdt_warning_triggered;
+extern atomic_t wdt_warning_active;
 bool wdt_initialized;
 
 /**
@@ -49,7 +50,7 @@ static void watchdog_before(void *state)
 {
 	ARG_UNUSED(state);
 	set_test_runner_tid();
-	wdt_warning_triggered = false;
+	atomic_clear(&wdt_warning_active);
 
 	/* When shuffling need watchdog initialized and running
 	 * for other tests.
@@ -93,14 +94,15 @@ ZTEST(watchdog_helper, test_watchdog_reload)
 	int i;
 	int safe_wait_ms = DEFAULT_WDT_EXPIRY_MS / 2;
 
-	zassert_false(wdt_warning_triggered, "Watchdog timer expired early.");
+	zassert_false(atomic_get(&wdt_warning_active),
+		      "Watchdog timer expired early.");
 	watchdog_reload();
 	for (i = 0; i < 10; i++) {
 		k_timer_start(&ktimer, K_MSEC(safe_wait_ms), K_NO_WAIT);
 		k_busy_wait(safe_wait_ms * 1000);
 		k_timer_stop(&ktimer);
 		watchdog_reload();
-		zassert_false(wdt_warning_triggered,
+		zassert_false(atomic_get(&wdt_warning_active),
 			      "Watchdog timer expired unexpectedly on loop=%d",
 			      i);
 	}
@@ -120,13 +122,15 @@ ZTEST(watchdog_helper, test_wdt_warning_handler)
 	/* Feed the dog so timer is reset */
 	watchdog_reload();
 
-	zassert_false(wdt_warning_triggered, "Watchdog timer expired early.");
+	zassert_false(atomic_get(&wdt_warning_active),
+		      "Watchdog timer expired early.");
 
 	k_timer_start(&ktimer, K_MSEC(DEFAULT_WDT_EXPIRY_MS), K_NO_WAIT);
 	k_busy_wait(DEFAULT_WDT_EXPIRY_MS * 1000);
 	k_timer_stop(&ktimer);
 
-	zassert_true(wdt_warning_triggered, "Watchdog timer did not expire.");
+	zassert_true(atomic_get(&wdt_warning_active),
+		     "Watchdog timer did not expire.");
 }
 
 /**

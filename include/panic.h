@@ -145,6 +145,16 @@ struct panic_data *panic_data_reset(struct panic_data *pdata);
 void panic_data_finalize(struct panic_data *pdata);
 
 /**
+ * Mark finalized panic data as invalid so it is ignored on subsequent reads
+ * or reboots, without zeroing or re-initializing the buffer like
+ * panic_data_reset().
+ *
+ * @param pdata Pointer to panic_data to invalidate, or NULL to invalidate
+ *              the system panic data buffer.
+ */
+void panic_data_invalidate(struct panic_data *pdata);
+
+/**
  * Get the panic reason field from a panic_data structure for the current
  * architecture.
  */
