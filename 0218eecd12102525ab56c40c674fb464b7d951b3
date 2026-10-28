@@ -22,6 +22,30 @@
       },
       "revId": "0218eecd12102525ab56c40c674fb464b7d951b3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "811cde68_aae834b9",
+        "filename": "common/panic_log.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-28T19:59:12Z",
+      "side": 1,
+      "message": "The panic log will be unfrozen in the vast majority of cases, so keeping the check inside the lock is optimal.",
+      "parentUuid": "f117b617_e2a2f2f0",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 0
+      },
+      "revId": "0218eecd12102525ab56c40c674fb464b7d951b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
