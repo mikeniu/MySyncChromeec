@@ -98,6 +98,15 @@
 #define CM32183_REG_TRIGGER_LOW_THRESHOLD BIT(15)
 #define CM32183_REG_TRIGGER_HIGH_THRESHOLD BIT(14)
 
+struct cm32183_drv_data {
+	int rate;
+	int last_value;
+	/* the coefficient is scale.uscale */
+	int16_t scale;
+	uint16_t uscale;
+	int16_t offset;
+};
+
 extern const struct accelgyro_drv cm32183_drv;
 
 #endif /* __CROS_EC_ALS_CM32183_H */

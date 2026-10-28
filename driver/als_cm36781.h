@@ -41,6 +41,15 @@
 #define CM36781_MAX_FREQ (10 * 1000)
 #define CM36781_MIN_FREQ (1 * 1000)
 
+struct cm36781_drv_data {
+	int rate;
+	int last_value;
+	/* the coefficient is scale.uscale */
+	int16_t scale;
+	uint16_t uscale;
+	int16_t offset;
+};
+
 extern const struct accelgyro_drv cm36781_drv;
 
 #endif /* __CROS_EC_ALS_CM36781_H */
