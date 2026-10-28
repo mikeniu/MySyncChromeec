@@ -62,6 +62,8 @@ int timestamp_expired(timestamp_t deadline, const timestamp_t *now);
  *
  * This may only be called from a task function, with interrupts enabled.
  *
+ * @sleep
+ *
  * @param us		Number of microseconds to sleep.
  * @return 0 on success, negative on error
  */
@@ -71,6 +73,8 @@ int crec_usleep(unsigned int us);
  * Sleep for milliseconds.
  *
  * Otherwise the same as crec_usleep().
+ *
+ * @sleep
  *
  * @param ms		Number of milliseconds to sleep.
  */
@@ -82,6 +86,8 @@ static inline void crec_msleep(unsigned int ms)
 
 /**
  * Get the current timestamp from the system timer.
+ *
+ * @isr_ok
  */
 timestamp_t get_time(void);
 
@@ -89,6 +95,9 @@ timestamp_t get_time(void);
  * Print the current timer information using the command output channel.
  *
  * This may be called from interrupt level.
+ *
+ * @sleep
+ * @isr_ok
  */
 void timer_print_info(void);
 
