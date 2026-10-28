@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "759124c7_4879d28b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T21:08:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Bounding the `do-while` loop in `handle_irqs()` to `RTS54XX_MAX_IRQ_LOOP_COUNT` iterations prevents the high-priority RTS54xx driver thread from spinning indefinitely and starving lower-priority threads when an IRQ line remains asserted while ARA continues responding, and logs a warning only when the IRQ remains asserted after reaching the limit.\n* **Architecture \u0026 Component Fit:** ✅ Defining `RTS54XX_MAX_IRQ_LOOP_COUNT` in `zephyr/drivers/usbc/pdc_rts54xx.h` and bounding the loop in `handle_irqs()` in `zephyr/drivers/usbc/pdc_rts54xx.c` fits cleanly within the driver state machine and shared internal header.\n* **Code Simplicity:** ✅ Both the driver loop bound and `test_handle_irqs_limit` in `zephyr/test/pdc/src/rts54xx/rts54xx.c` are minimal, direct, and free of redundant state or dead branches.\n* **Idiomaticity \u0026 Readability:** ✅ Uses the shared `RTS54XX_MAX_IRQ_LOOP_COUNT` constant across driver and test code and follows Zephyr and ChromiumOS EC C conventions.\n* **Security:** ✅ Prevents unbounded thread starvation and watchdog resets from stuck SMBus ARA/IRQ states; no security issues introduced.\n* **Testing:** ✅ `test_handle_irqs_limit` covers both reaching the `RTS54XX_MAX_IRQ_LOOP_COUNT` upper bound when the IRQ line stays asserted (`RTS54XX_MAX_IRQ_LOOP_COUNT + 1`) and early loop termination as soon as the IRQ GPIO deasserts before the limit (`RTS54XX_MAX_IRQ_LOOP_COUNT - 1`).\n* **CL Size \u0026 Scope:** ✅ `Size: M (+74, -1)` (8 production lines, 66 test lines). Single, tightly focused logical change.\n* **Commit Message:** ✅ Clear, concise prose explaining both the starvation root cause and the fix, with valid `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/04153e92-fd96-4ea1-8a5b-77a0f75becce)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b24b8cd439dc12b5f41e087f73d7a1ba85ba2a13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
