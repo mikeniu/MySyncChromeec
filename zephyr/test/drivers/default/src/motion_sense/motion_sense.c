@@ -5,6 +5,8 @@
 
 #include "accelgyro.h"
 #include "chipset.h"
+#include "driver/als_cm32183.h"
+#include "driver/als_cm36781.h"
 #include "ec_commands.h"
 #include "hooks.h"
 #include "host_command.h"
@@ -785,4 +787,36 @@ ZTEST(motion_sense, test_motion_sense_host_commands_extended)
 	memset(&params, 0, sizeof(params));
 	params.cmd = MOTIONSENSE_CMD_ONLINE_CALIB_READ;
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+}
+
+ZTEST_USER(motion_sense, test_als_cm32183_cm36781_get_offset)
+{
+	struct cm32183_drv_data cm32183_data = {
+		.offset = 42,
+	};
+	struct motion_sensor_t cm32183_sensor = {
+		.drv = &cm32183_drv,
+		.drv_data = &cm32183_data,
+	};
+	struct cm36781_drv_data cm36781_data = {
+		.offset = -17,
+	};
+	struct motion_sensor_t cm36781_sensor = {
+		.drv = &cm36781_drv,
+		.drv_data = &cm36781_data,
+	};
+	int16_t offset[3] = { 0 };
+	int16_t temp = 0;
+
+	zassert_equal(EC_SUCCESS, cm32183_sensor.drv->get_offset(
+					  &cm32183_sensor, offset, &temp));
+	zassert_equal(42, offset[0]);
+	zassert_equal((int16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP, temp);
+
+	offset[0] = 0;
+	temp = 0;
+	zassert_equal(EC_SUCCESS, cm36781_sensor.drv->get_offset(
+					  &cm36781_sensor, offset, &temp));
+	zassert_equal(-17, offset[0]);
+	zassert_equal((int16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP, temp);
 }

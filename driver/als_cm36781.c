@@ -12,15 +12,6 @@
 #include "i2c.h"
 #include "math_util.h"
 
-struct cm36781_drv_data {
-	int rate;
-	int last_value;
-	/* the coefficient is scale.uscale */
-	int16_t scale;
-	uint16_t uscale;
-	int16_t offset;
-};
-
 #define CPRINTF(format, args...) cprintf(CC_ACCEL, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_ACCEL, format, ##args)
 #define CM36781_GET_DATA(_s) ((struct cm36781_drv_data *)(_s)->drv_data)
@@ -96,6 +87,7 @@ static int cm36781_get_offset(const struct motion_sensor_t *s, int16_t *offset,
 			      int16_t *temp)
 {
 	*offset = CM36781_GET_DATA(s)->offset;
+	*temp = EC_MOTION_SENSE_INVALID_CALIB_TEMP;
 	return EC_SUCCESS;
 }
 

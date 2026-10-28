@@ -541,6 +541,8 @@ ZTEST_USER_F(host_cmd_motion_sense, test_get_offset)
 		zassert_equal(response.sensor_offset.offset[i], mock_offset[i],
 			      NULL);
 	}
+	zassert_equal(response.sensor_offset.temp,
+		      (uint16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP);
 	zassert_equal(1, mock_set_offset_fake.arg2_history[0]);
 }
 
@@ -641,6 +643,8 @@ ZTEST_USER_F(host_cmd_motion_sense, test_set_get_scale)
 		   NULL);
 	zassert_equal(1, mock_set_scale_fake.call_count);
 	zassert_equal(1, mock_get_scale_fake.call_count);
+	zassert_equal(response.sensor_scale.temp,
+		      (uint16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP);
 	zassert_equal(1, mock_set_scale_fake.arg2_history[0]);
 }
 
@@ -712,6 +716,8 @@ ZTEST_USER_F(host_cmd_motion_sense, test_calib)
 		   NULL);
 	zassert_equal(1, mock_perform_calib_fake.call_count);
 	zassert_equal(1, mock_get_offset_fake.call_count);
+	zassert_equal(response.perform_calib.temp,
+		      (uint16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP);
 	zassert_true(mock_perform_calib_fake.arg1_history[0]);
 }
 
