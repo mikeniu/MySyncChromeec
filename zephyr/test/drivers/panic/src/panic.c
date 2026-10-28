@@ -293,6 +293,45 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
 	}
 }
 
+ZTEST(panic, test_panic_data_init__legacy_ro_watchdog_compat)
+{
+	/* Simulate an unhandled hard watchdog reset from legacy RO:
+	 * PANIC_SW_WATCHDOG with info = 0, exception = 0, and no image flags.
+	 */
+	panic_data_write_sw(PANIC_SW_WATCHDOG, 0, 0);
+	struct panic_data *pdata = get_panic_data_write();
+	pdata->flags &= ~(PANIC_DATA_FLAG_RW_IMAGE | PANIC_DATA_FLAG_RO_IMAGE);
+	const struct panic_data original_pdata = *pdata;
+
+	/* Simulate a watchdog reset cause */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		if (IS_ENABLED(
+			    CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT)) {
+			/* When compat is enabled, unflagged zeroed
+			 * PANIC_SW_WATCHDOG is converted to
+			 * PANIC_SW_WATCHDOG_HARD.
+			 */
+			zassert_equal(
+				panic_get_reason_reg(panic_get_data()),
+				PANIC_SW_WATCHDOG_HARD,
+				"Should be rewritten to PANIC_SW_WATCHDOG_HARD");
+		} else {
+			/* When compat is disabled, PANIC_SW_WATCHDOG is
+			 * preserved */
+			zassert_equal(panic_get_reason_reg(panic_get_data()),
+				      PANIC_SW_WATCHDOG,
+				      "PANIC_SW_WATCHDOG should be preserved");
+		}
+	} else {
+		/* In RO, existing panic data should remain untouched */
+		zassert_mem_equal(panic_get_data(), &original_pdata,
+				  sizeof(original_pdata), NULL);
+	}
+}
+
 ZTEST(panic, test_panic_data_init__no_watchdog_reset_flag)
 {
 	panic_data_write_sw(PANIC_SW_DIV_ZERO, 0x12, 0x34);
@@ -532,13 +571,31 @@ ZTEST(panic, test_panic_data_write_watchdog_warning)
 
 	zassert_not_null(pdata, "Panic data must not be NULL after write");
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC, "Magic must be valid");
-	zassert_equal(panic_get_reason_reg(pdata), PANIC_SW_WATCHDOG_WARN,
-		      "Reason must be PANIC_SW_WATCHDOG_WARN");
+	uint32_t expected_reason =
+		IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT) ?
+			PANIC_SW_WATCHDOG :
+			PANIC_SW_WATCHDOG_WARN;
+	zassert_equal(panic_get_reason_reg(pdata), expected_reason,
+		      "Reason must match watchdog warning configuration");
 	zassert_equal(panic_get_info_reg(pdata), 0x10080000,
 		      "Info register must match PC");
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get(),
 		      "Exception register must store thread ID");
+
+	/* In RW, a subsequent watchdog reset preserves the warning PC
+	 * and results in PANIC_SW_WATCHDOG (either promoted from WARN
+	 * when compat=n, or preserved directly when compat=y).
+	 */
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+		panic_data_init();
+		zassert_equal(panic_get_reason_reg(panic_get_data()),
+			      PANIC_SW_WATCHDOG,
+			      "Reason must be PANIC_SW_WATCHDOG after reset");
+		zassert_equal(panic_get_info_reg(panic_get_data()), 0x10080000,
+			      "PC must be preserved");
+	}
 }
 
 ZTEST(panic, test_panic_data_invalidate)
