@@ -11,6 +11,16 @@ config AP_POWER_CONTROL
       This is automatically enabled if an implementation of AP power
       sequencing is enabled.
 
+config PLATFORM_EC_CHIPSET_STATE_ALWAYS_ON
+	bool "Assume AP chipset is always in S0 (CHIPSET_STATE_ON)"
+	depends on !AP_POWER_CONTROL
+	default y if SOC_FAMILY_INTEL_ISH
+	help
+	  For companion processors (such as Intel ISH or MediaTek SCP) that do
+	  not control AP power rails (AP_POWER_CONTROL=n) and only execute when
+	  the host AP is powered on, report CHIPSET_STATE_ON from
+	  chipset_in_state() instead of CHIPSET_STATE_ANY_OFF.
+
 menuconfig PLATFORM_EC_BOOT_AP_POWER_REQUIREMENTS
 	bool "Power requirements to boot AP"
 	default y

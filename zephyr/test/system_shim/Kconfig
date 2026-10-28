@@ -24,7 +24,7 @@ config SYSTEM_SHIM_TEST_DEFAULT
 
 config SYSTEM_SHIM_TEST_ISH
 	bool "Use the ISH shim"
-	select TEST_DISABLE_INLINE_CHIPSET_IN_STATE
+	select PLATFORM_EC_CHIPSET_STATE_ALWAYS_ON
 	help
 	  Build and run the shim/src/ish_system.c tests.
 

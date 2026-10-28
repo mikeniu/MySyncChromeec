@@ -3,13 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "power.h"
 #include "system.h"
-
-int chipset_in_state(int state_mask)
-{
-	return state_mask & CHIPSET_STATE_ON;
-}
 
 test_mockable const char *system_get_chip_vendor(void)
 {
