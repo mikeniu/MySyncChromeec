@@ -143,6 +143,9 @@ const char *get_timestamp_now(void);
 /**
  * Put a string to the console channel.
  *
+ * @isr_ok
+ * @pre_kernel_ok
+ *
  * @param channel	Output channel
  * @param outstr	String to write
  *
@@ -153,7 +156,10 @@ int cputs(enum console_channel channel, const char *outstr);
 /**
  * Print formatted output to the console channel.
  *
- * @param channel	Output chanel
+ * @isr_ok
+ * @pre_kernel_ok
+ *
+ * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes
  *
  * @return non-zero if output was truncated.
@@ -165,6 +171,9 @@ cprintf(enum console_channel channel, const char *format, ...);
  * Print formatted output with timestamp. This is like:
  *   cprintf(channel, "[<TIMESTAMP> " + format + "]\n", ...)
  *
+ * @isr_ok
+ * @pre_kernel_ok
+ *
  * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes
  *
@@ -175,6 +184,9 @@ cprints(enum console_channel channel, const char *format, ...);
 
 /**
  * Print formatted output to the console channel.
+ *
+ * @isr_ok
+ * @pre_kernel_ok
  *
  * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes
@@ -189,6 +201,9 @@ cvprintf(enum console_channel channel, const char *format, va_list args);
  * Print formatted output with timestamp. This is like:
  *   cprintf(channel, "[<TIMESTAMP> " + format + "]\n", ...)
  *
+ * @isr_ok
+ * @pre_kernel_ok
+ *
  * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes
  * @param args          Variadic arguments referenced in the format string.
@@ -201,6 +216,8 @@ cvprints(enum console_channel channel, const char *format, va_list args);
 
 /**
  * Flush the console output for all channels.
+ *
+ * @sleep
  */
 void cflush(void);
 
