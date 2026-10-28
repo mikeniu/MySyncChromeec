@@ -7,6 +7,15 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES CROS_EC_REPO CROSS_COMPILE CC_NAME CXX_NAME)
 include("${CROS_EC_REPO}/cmake/toolchain-common.cmake")
 
+# TODO(b/491765858): Remove once ChromeOS third_party/boringssl is uprevved to
+# include upstream BoringSSL's C23 const-correct OPENSSL_memchr() for glibc
+# 2.43's const-preserving string macros.
+if ("${CC_NAME}" STREQUAL gcc)
+add_compile_options(-Wno-error=discarded-qualifiers)
+else()
+add_compile_options(-Wno-error=incompatible-pointer-types-discards-qualifiers)
+endif()
+
 # Specify our platform, which disables filesystem, threads, etc.
 add_definitions(-DCROS_EC)
 
