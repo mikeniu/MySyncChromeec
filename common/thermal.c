@@ -50,12 +50,6 @@ BUILD_ASSERT(EC_TEMP_THRESH_COUNT == 3);
 /* Keep track of which thresholds have triggered */
 static cond_t cond_hot[EC_TEMP_THRESH_COUNT];
 
-/* thermal sensor read delay */
-#if defined(CONFIG_TEMP_SENSOR_POWER) && \
-	defined(CONFIG_TEMP_SENSOR_FIRST_READ_DELAY_MS)
-static int first_read_delay = CONFIG_TEMP_SENSOR_FIRST_READ_DELAY_MS;
-#endif
-
 static void thermal_control(void)
 {
 	int i, j, t, rv;
@@ -71,15 +65,6 @@ static void thermal_control(void)
 #else
 	int temp[TEMP_SENSOR_COUNT];
 #endif
-#endif
-
-	/* add delay to ensure thermal sensor is ready when EC boot */
-#if defined(CONFIG_TEMP_SENSOR_POWER) && \
-	defined(CONFIG_TEMP_SENSOR_FIRST_READ_DELAY_MS)
-	if (first_read_delay != 0) {
-		k_msleep(first_read_delay);
-		first_read_delay = 0;
-	}
 #endif
 
 	/* Get ready to count things */
