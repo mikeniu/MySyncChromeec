@@ -22,6 +22,30 @@
       },
       "revId": "78ff8750714a9266934a8aa782e4f087c8f974ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad82d636_1fd03f16",
+        "filename": "zephyr/program/fpmcu/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-28T21:30:13Z",
+      "side": 1,
+      "message": "Done in https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8674077.",
+      "parentUuid": "e1004ac4_5e4af530",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 17
+      },
+      "revId": "78ff8750714a9266934a8aa782e4f087c8f974ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
