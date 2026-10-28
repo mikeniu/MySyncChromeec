@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81cd5901_7b4e0047",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T10:53:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67030721_3c6c8101",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7bf39bc9_9b8a3f1f",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Actually I think that without this check there there is no need for debounce. In case of lid being opened the risk is that 10s timer would be restarted several times. In case of lid being closed it might happen that state is wrongly read as opened. Only risk is 10s of led being on.",
       "parentUuid": "7bf39bc9_9b8a3f1f",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "398f10b0_aa0a4258",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T10:53:39Z",
+      "side": 1,
+      "message": "\u003e  In case of lid being closed it might happen that state is wrongly read as opened. Only risk is 10s of led being on.\n\nI wouldn\u0027t call in negligible risk 😄 EC core code uses a LID_DEBOUNCE_US config. The simplest solution would be to use delayed work + checking state of GPIO, but not sure if I\u0027m missing something or not. What do you think? FPMCU should go sleep while LED is on, right?",
+      "parentUuid": "40e650ab_f3983e49",
       "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -137,6 +173,42 @@
       "side": 1,
       "message": "Moved enabling lid-open-gpios for niedzica in niedzica.dts to a separate commit. Do we actually have LED on nysa?",
       "parentUuid": "8a3fa709_35b63116",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbd32996_ec432f23",
+        "filename": "zephyr/program/fpmcu/em32f967/fp_led.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T10:53:39Z",
+      "side": 1,
+      "message": "I don\u0027t know, not even mentioning the lid open pin.",
+      "parentUuid": "19e40456_5c682df8",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25ea9ec5_847a94ee",
+        "filename": "zephyr/program/fpmcu/em32f967/fp_led.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T10:53:39Z",
+      "side": 1,
+      "message": "Oh, nice! Do you think it\u0027s better this way? It\u0027s not a subject of this CL, but does it make sense to also use it for PB_ignore and led?",
+      "parentUuid": "b5081bd1_39450f40",
       "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
