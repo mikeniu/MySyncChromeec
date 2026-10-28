@@ -16,6 +16,25 @@
       "message": "This change seems simple enough, but the underlying behavior is weird. It doesn\u0027t look like you fundamentally changed it, and I\u0027m taking at face value that it was correct before. Am I right in thinking that the test would pass at ToT, and the implementation change is a no-op in terms of behavior?",
       "revId": "b4bed34d28ae32ea71c6390687425f3cfc93fc8d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50839987_af5a4a3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-28T19:09:27Z",
+      "side": 1,
+      "message": "The hardware behavior is the same (pulsing learn mode for 50 ms to exit CCM), except it no longer blocks k_sys_work_q during those 50 ms. Because of that, the test actually fails at ToT: at ToT, hook_notify() sleeps for the full 50 ms and clears ISL9241_CONTROL1_LEARN_MODE before returning, whereas with the deferred callback learn mode is still set when hook_notify() returns and clears after 50 ms. Simplified the test to make this clearer.",
+      "parentUuid": "56a87777_5bb956ed",
+      "isAi": true,
+      "revId": "b4bed34d28ae32ea71c6390687425f3cfc93fc8d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
