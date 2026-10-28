@@ -30,3 +30,4 @@ pytest check_zephyr_project_config_unittest.py
 ./kconfig_check_unittest.py
 ./check_funcprops_unittest.py
 ./funcprops/funcprops_test.py
+./funcprops/sysworkq_test.py

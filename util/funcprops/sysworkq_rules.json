@@ -1,0 +1,67 @@
+[
+  {
+    "category": "Sysworkq Context Violation",
+    "contexts": [
+      "SYSWORKQ"
+    ],
+    "description": "Performing synchronous bus or flash I/O (I2C, SPI, flash write/erase) on k_sys_work_q stalls the system workqueue for milliseconds.",
+    "exemption_props": [
+      "isr_ok"
+    ],
+    "match_target": true,
+    "path_matchers": [
+      "i2c_read",
+      "i2c_write",
+      "i2c_update",
+      "i2c_field_update",
+      "i2c_transfer",
+      "i2c_transceive",
+      "i2c_lock",
+      "spi_transaction",
+      "spi_transceive",
+      "spi_read",
+      "spi_write",
+      "crec_flash_physical_write",
+      "crec_flash_physical_erase"
+    ],
+    "prohibited_props": [],
+    "required_absent_props": [],
+    "rule_id": "IO_IN_SYSWORKQ"
+  },
+  {
+    "category": "Sysworkq Context Violation",
+    "contexts": [
+      "SYSWORKQ"
+    ],
+    "description": "Calling unconditional @sleep functions (delays, work flushes, thread joins, or blocking waits without a @no_wait path) on k_sys_work_q stalls critical system work.",
+    "exemption_props": [
+      "isr_ok"
+    ],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep"
+    ],
+    "required_absent_props": [
+      "no_wait"
+    ],
+    "rule_id": "SLEEP_IN_SYSWORKQ"
+  },
+  {
+    "category": "Sysworkq Context Violation",
+    "contexts": [
+      "SYSWORKQ"
+    ],
+    "description": "Calling @sleep functions with a @no_wait path (k_mutex_lock, k_sem_take, k_event_wait, k_msgq_*, k_queue_get) on k_sys_work_q can block when contested unless invoked with K_NO_WAIT.",
+    "exemption_props": [
+      "isr_ok"
+    ],
+    "path_matchers": [],
+    "prohibited_props": [
+      "sleep",
+      "no_wait"
+    ],
+    "required_absent_props": [],
+    "requires_flag": "include_no_wait",
+    "rule_id": "NO_WAIT_IN_SYSWORKQ"
+  }
+]

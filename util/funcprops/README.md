@@ -105,8 +105,27 @@ python3 analyze_funcprops.py \
 
 ---
 
-## 4. Unit Tests
+## 4. System Workqueue Static Analyzer (`analyze_sysworkq.py` & `sysworkq_rules.json`)
+
+[`analyze_sysworkq.py`](analyze_sysworkq.py) audits handlers that execute on Zephyr's system workqueue (`k_sys_work_q`), including `DECLARE_HOOK` routines (for hook types dispatched on `k_sys_work_q`), `DECLARE_DEFERRED` routines (`*_work_data`), and statically initialized `struct k_work` / `struct k_work_delayable` objects (`K_WORK_DEFINE` / `K_WORK_DELAYABLE_DEFINE`).
+
+Violations are classified using [`sysworkq_rules.json`](sysworkq_rules.json):
+* **`IO_IN_SYSWORKQ`**: Synchronous bus or flash I/O (`i2c_*`, `spi_*`, `crec_flash_physical_*`).
+* **`SLEEP_IN_SYSWORKQ`**: Unconditional `@sleep` calls without a `@no_wait` path (`crec_usleep`, `k_sleep_ticks`, `task_wait_event*`, `k_work_flush*`, `k_work_cancel*_sync`, `k_thread_join`, `k_yield`, `k_condvar_wait`).
+* **`NO_WAIT_IN_SYSWORKQ`**: `@sleep` + `@no_wait` synchronization primitives (`k_mutex_lock`, `k_sem_take`, `k_event_wait*`, `k_msgq_*`, `k_queue_get`, `k_poll`). Can be suppressed with `--exclude-no-wait`.
+
+```bash
+python3 analyze_sysworkq.py \
+  --exclude-no-wait \
+  --warn-only \
+  ../../build/zephyr/lapis/build-ro/zephyr/zephyr.elf
+```
+
+---
+
+## 5. Unit Tests
 
 ```bash
 python3 funcprops_test.py
+python3 sysworkq_test.py
 ```
