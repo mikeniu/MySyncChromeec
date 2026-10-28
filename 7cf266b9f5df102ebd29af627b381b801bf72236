@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0fdc997_5cc0f846",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-28T19:01:24Z",
+      "side": 1,
+      "message": "See inline reply.",
+      "parentUuid": "cd8e5083_06260d8b",
+      "revId": "7cf266b9f5df102ebd29af627b381b801bf72236",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9a310a8_b54382e6",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "7cf266b9f5df102ebd29af627b381b801bf72236",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48264225_c463ef5d",
+        "filename": "zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-28T19:01:24Z",
+      "side": 1,
+      "message": "1. `sys_clock_disable()` is a strong symbol in `drivers/timer/native_sim_timer.c`, so `FAKE_VOID_FUNC(sys_clock_disable)` fails to link with a multiple definition error on `native_sim`.\n2. `prepare_for_sysjump_to_ec()` and `arm_core_mpu_disable()` are removed from `ec_quirks.c` in the next CL in the stack (https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8635773), where MPU teardown moves to `arch_pre_system_jump()`.",
+      "parentUuid": "a9a310a8_b54382e6",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 9999
+      },
       "revId": "7cf266b9f5df102ebd29af627b381b801bf72236",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
