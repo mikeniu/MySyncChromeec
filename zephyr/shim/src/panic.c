@@ -247,7 +247,11 @@ void panic_data_write_watchdog_warning(uintptr_t pc,
 {
 	struct panic_data *const pdata = panic_data_reset(NULL);
 
-	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+	panic_set_reason_reg(
+		pdata,
+		IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT) ?
+			PANIC_SW_WATCHDOG :
+			PANIC_SW_WATCHDOG_WARN);
 	panic_set_info_reg(pdata, (uint32_t)pc);
 	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
 
@@ -461,7 +465,14 @@ test_export_static int panic_data_init(void)
 			panic_data_finalize(pdata);
 		} else if ((reason != PANIC_SW_WATCHDOG &&
 			    reason != PANIC_SW_WATCHDOG_HARD) ||
-			   !is_panic_new) {
+			   !is_panic_new ||
+			   (IS_ENABLED(
+				    CONFIG_PLATFORM_EC_PANIC_LEGACY_RO_WATCHDOG_COMPAT) &&
+			    reason == PANIC_SW_WATCHDOG &&
+			    !panic_get_info_reg(pdata) &&
+			    !panic_get_exception_reg(pdata) &&
+			    !(pdata->flags & (PANIC_DATA_FLAG_RW_IMAGE |
+					      PANIC_DATA_FLAG_RO_IMAGE)))) {
 			/* The watchdog panic info may have already been
 			 * initialized by the watchdog handler, so only set it
 			 * here if the panic reason is not a watchdog or the
@@ -477,6 +488,14 @@ test_export_static int panic_data_init(void)
 			panic_data_finalize(pdata);
 		}
 	} else if (reason == PANIC_SW_WATCHDOG_WARN) {
+		/*
+		 * ponytail: ~500 ms pin-reset window under
+		 * LEGACY_RO_WATCHDOG_COMPAT writes PANIC_SW_WATCHDOG and will
+		 * report as a crash; clearing PANIC_SW_WATCHDOG on
+		 * !is_watchdog_reset would drop real unread crashes across
+		 * pin/hibernate resets, and fixing the window requires burning
+		 * the last free bit in panic_data.flags.
+		 */
 		LOG_INF("Clearing stale watchdog warning panic");
 		pdata->magic = 0;
 		sys_cache_data_flush_range((void *)&pdata->magic,
