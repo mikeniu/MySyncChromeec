@@ -670,6 +670,9 @@ static void tc_detached(int port)
 	if (IS_ENABLED(CONFIG_USBC_SS_MUX))
 		usb_mux_set(port, USB_PD_MUX_NONE, USB_SWITCH_DISCONNECT,
 			    tc[port].polarity);
+
+	if (IS_ENABLED(CONFIG_CHARGE_MANAGER))
+		charge_manager_update_dualrole(port, CAP_UNKNOWN);
 }
 
 static inline void pd_set_dual_role_and_event(int port,
@@ -2205,7 +2208,9 @@ static void tc_unattached_snk_entry(const int port)
 	 * require we set CC Open before changing power roles with a debug
 	 * accessory.
 	 */
-	tcpm_debug_detach(port);
+	if (get_last_state_tc(port) != TC_LOW_POWER_MODE &&
+	    get_last_state_tc(port) != TC_ATTACH_WAIT_SNK)
+		tcpm_debug_detach(port);
 	typec_select_pull(port, TYPEC_CC_RD);
 	typec_select_src_current_limit_rp(
 		port, typec_get_default_current_limit_rp(port));
@@ -2219,9 +2224,6 @@ static void tc_unattached_snk_entry(const int port)
 	 * down.
 	 */
 	bc12_role_change_handler(port, prev_data_role, tc[port].data_role);
-
-	if (IS_ENABLED(CONFIG_CHARGE_MANAGER))
-		charge_manager_update_dualrole(port, CAP_UNKNOWN);
 
 	tc_set_partner_role(port, PPC_DEV_DISCONNECTED, OCP_CLEAR);
 
@@ -2807,7 +2809,9 @@ static void tc_unattached_src_entry(const int port)
 	 * require we set CC Open before changing power roles with a debug
 	 * accessory.
 	 */
-	tcpm_debug_detach(port);
+	if (get_last_state_tc(port) != TC_LOW_POWER_MODE &&
+	    get_last_state_tc(port) != TC_ATTACH_WAIT_SRC)
+		tcpm_debug_detach(port);
 	typec_select_pull(port, TYPEC_CC_RP);
 	typec_select_src_current_limit_rp(
 		port, typec_get_default_current_limit_rp(port));
@@ -2824,9 +2828,6 @@ static void tc_unattached_src_entry(const int port)
 	bc12_role_change_handler(port, prev_data_role, tc[port].data_role);
 
 	tc_set_partner_role(port, PPC_DEV_DISCONNECTED, OCP_CLEAR);
-
-	if (IS_ENABLED(CONFIG_CHARGE_MANAGER))
-		charge_manager_update_dualrole(port, CAP_UNKNOWN);
 
 	CLR_FLAGS_ON_DISCONNECT(port);
 	tc[port].ps_reset_state = PS_STATE0;
