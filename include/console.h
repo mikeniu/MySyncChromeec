@@ -20,12 +20,21 @@
 extern "C" {
 #endif
 
-/*
- * Functions to start/stop/bypass the running Zephyr shell. These functions
- * will stop/start the shell from processing and should be used for briefly
- * taking control of the UART.
+/**
+ * Stop the running Zephyr shell from processing so the caller can briefly
+ * take control of the UART.
+ *
+ * @sleep
+ *
+ * @return 0 on success, negative error code on failure.
  */
 int uart_shell_stop(void);
+
+/**
+ * Restart the Zephyr shell after uart_shell_stop().
+ *
+ * @sleep
+ */
 void uart_shell_start(void);
 void uart_shell_rx_bypass(bool enable);
 
@@ -143,6 +152,10 @@ const char *get_timestamp_now(void);
 /**
  * Put a string to the console channel.
  *
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
+ *
  * @param channel	Output channel
  * @param outstr	String to write
  *
@@ -153,7 +166,11 @@ int cputs(enum console_channel channel, const char *outstr);
 /**
  * Print formatted output to the console channel.
  *
- * @param channel	Output chanel
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
+ *
+ * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes
  *
  * @return non-zero if output was truncated.
@@ -165,6 +182,10 @@ cprintf(enum console_channel channel, const char *format, ...);
  * Print formatted output with timestamp. This is like:
  *   cprintf(channel, "[<TIMESTAMP> " + format + "]\n", ...)
  *
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
+ *
  * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes
  *
@@ -175,6 +196,10 @@ cprints(enum console_channel channel, const char *format, ...);
 
 /**
  * Print formatted output to the console channel.
+ *
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
  *
  * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes
@@ -188,6 +213,10 @@ cvprintf(enum console_channel channel, const char *format, va_list args);
 /**
  * Print formatted output with timestamp. This is like:
  *   cprintf(channel, "[<TIMESTAMP> " + format + "]\n", ...)
+ *
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
  *
  * @param channel	Output channel
  * @param format	Format string; see printf.h for valid formatting codes

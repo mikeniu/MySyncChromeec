@@ -33,6 +33,8 @@ struct zephyr_console_command {
  * zshim_run_ec_console_command() - Dispatch a CrOS EC console command
  * using Zephyr's shell
  *
+ * @sleep
+ *
  * @command:		Pointer to a struct zephyr_console_command
  * @argc:		The number of command line arguments.
  * @argv:		The NULL-terminated list of arguments.
@@ -79,6 +81,10 @@ int zshim_run_ec_console_command(const struct zephyr_console_command *command,
  * console_buf_notify_chars() - Notify the console host command buffer
  * of bytes on the console.
  *
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
+ *
  * @s:			The pointer to the string.
  * @len:		The size of the string.
  *
@@ -96,6 +102,10 @@ k_tid_t get_shell_thread(void);
 /**
  * zephyr_print() - Write a pre-formatted string to the console outputs
  * (panic log, Zephyr shell TX stream, and AP console buffer).
+ *
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
  *
  * @buff:		Pointer to the string buffer (must be NUL-terminated).
  * @size:		Length of the string in bytes (excluding NUL).
