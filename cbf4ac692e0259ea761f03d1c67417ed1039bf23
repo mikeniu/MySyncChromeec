@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61568e99_cad491e8",
+        "filename": "zephyr/program/dougie/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T18:05:05Z",
+      "side": 1,
+      "message": "Should these signals be part of the QCOM power sequence driver?\n\nAs a general rule, try to avoid creating board specific C files. ODMs copy/paste these files and we end up with messes like b/578128557.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 66
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4ee45b2_8af84aa3",
+        "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T18:05:05Z",
+      "side": 1,
+      "message": "I recommend converting this entire file to a proper Zephyr driver, along with unit tests.\n\nSee my previous comment regarding board C code.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 48
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fc6b3e7_f6a6c320",
+        "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T18:05:05Z",
+      "side": 1,
+      "message": "Direct lookup of nodelabels are hard for developers to discover.  Converting this to a proper Zephyr driver helps gather all the settings in one place.",
+      "range": {
+        "startLine": 30,
+        "startChar": 47,
+        "endLine": 30,
+        "endChar": 64
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
