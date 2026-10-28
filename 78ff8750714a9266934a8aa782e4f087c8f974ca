@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1004ac4_5e4af530",
+        "filename": "zephyr/program/fpmcu/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T19:37:38Z",
+      "side": 1,
+      "message": "Make this a macro.",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 17
+      },
+      "revId": "78ff8750714a9266934a8aa782e4f087c8f974ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
