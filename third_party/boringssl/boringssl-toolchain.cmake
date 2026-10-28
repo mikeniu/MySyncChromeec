@@ -7,6 +7,14 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES CROS_EC_REPO CROSS_COMPILE CC_NAME CXX_NAME)
 include("${CROS_EC_REPO}/cmake/toolchain-common.cmake")
 
+# TODO(b/578537764): Remove once BoringSSL is C23 const-correct with glibc
+# 2.43's const-preserving string macros (e.g., memchr() in OPENSSL_memchr).
+if ("${CC_NAME}" STREQUAL gcc)
+add_compile_options(-Wno-error=discarded-qualifiers)
+else()
+add_compile_options(-Wno-error=incompatible-pointer-types-discards-qualifiers)
+endif()
+
 # Specify our platform, which disables filesystem, threads, etc.
 add_definitions(-DCROS_EC)
 
