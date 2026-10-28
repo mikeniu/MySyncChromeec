@@ -64,9 +64,6 @@
 /* Timeout for PMIC resetting AP after hard off. */
 #define PMIC_AP_RESET_TIMEOUT (1 * SECOND)
 
-/* 30 ms for hard reset, we hold it longer to prevent TPM false alarm. */
-#define SYS_RST_PULSE_LENGTH (50 * MSEC)
-
 /*
  * A delay for distinguish a WDT reset or a normal shutdown. It usually takes
  * 90ms to pull AP_IN_SLEEP_L low in a normal shutdown.
@@ -268,7 +265,6 @@ void chipset_reset(enum chipset_shutdown_reason reason)
 	hook_call_deferred(&reset_flag_deferred_data, RESET_FLAG_TIMEOUT);
 	/* Hold GPIO_SYS_RST_ODL to S5 and it will be released during S5->S3. */
 	GPIO_SET_LEVEL(GPIO_SYS_RST_ODL, 0);
-	k_usleep(SYS_RST_PULSE_LENGTH);
 }
 
 #ifdef CONFIG_POWER_TRACK_HOST_SLEEP_STATE
