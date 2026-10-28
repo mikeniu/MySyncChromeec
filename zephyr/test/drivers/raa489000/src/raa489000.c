@@ -134,5 +134,43 @@ ZTEST(tcpc_raa489000, test_init_error)
 					  I2C_COMMON_EMUL_NO_FAIL_REG);
 }
 
+ZTEST(tcpc_raa489000, test_enter_low_power_mode)
+{
+	const struct emul *raa489000_emul = EMUL_DT_GET(RAA489000_EMUL_NODE);
+	const struct tcpm_drv *drv = tcpc_config[RAA489000_PORT].drv;
+	uint16_t reg_val;
+
+	/* Initialize registers to known non-zero values */
+	zassert_ok(tcpci_emul_set_reg(raa489000_emul,
+				      RAA489000_PD_PHYSICAL_SETTING1, 0x6c0c));
+	zassert_ok(tcpci_emul_set_reg(raa489000_emul, RAA489000_TCPC_SETTING1,
+				      RAA489000_TCPCV1_0_EN |
+					      RAA489000_TCPC_PWR_CNTRL));
+	zassert_ok(tcpci_emul_set_reg(raa489000_emul, TCPC_REG_COMMAND, 0));
+
+	/* Enter low power mode */
+	zassert_not_null(drv->enter_low_power_mode);
+	zassert_ok(drv->enter_low_power_mode(RAA489000_PORT));
+
+	/* Verify PD PHY setting1 was cleared */
+	zassert_ok(tcpci_emul_get_reg(
+		raa489000_emul, RAA489000_PD_PHYSICAL_SETTING1, &reg_val));
+	zassert_equal(reg_val, 0, "PD PHY setting1 should be 0, got 0x%04x",
+		      reg_val);
+
+	/* Verify TCPC setting1 was preserved */
+	zassert_ok(tcpci_emul_get_reg(raa489000_emul, RAA489000_TCPC_SETTING1,
+				      &reg_val));
+	zassert_equal(reg_val, RAA489000_TCPCV1_0_EN | RAA489000_TCPC_PWR_CNTRL,
+		      "TCPC setting1 should be preserved, got 0x%04x", reg_val);
+
+	/* Verify TCPC_REG_COMMAND received I2CIDLE command */
+	zassert_ok(
+		tcpci_emul_get_reg(raa489000_emul, TCPC_REG_COMMAND, &reg_val));
+	zassert_equal(reg_val, TCPC_REG_COMMAND_I2CIDLE,
+		      "Command should be I2CIDLE (0x%02x), got 0x%02x",
+		      TCPC_REG_COMMAND_I2CIDLE, reg_val);
+}
+
 ZTEST_SUITE(tcpc_raa489000, drivers_predicate_post_main, NULL, NULL, NULL,
 	    NULL);

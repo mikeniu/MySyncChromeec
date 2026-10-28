@@ -34,10 +34,6 @@ static int raa489000_enter_low_power_mode(int port)
 	if (rv)
 		CPRINTS("RAA489000(%d): Failed to set PD PHY setting1!", port);
 
-	rv = tcpc_write16(port, RAA489000_TCPC_SETTING1, 0);
-	if (rv)
-		CPRINTS("RAA489000(%d): Failed to set TCPC setting1!", port);
-
 	return tcpci_enter_low_power_mode(port);
 }
 #endif /* CONFIG_USB_PD_TCPC_LOW_POWER */
