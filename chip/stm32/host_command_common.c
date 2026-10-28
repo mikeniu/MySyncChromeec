@@ -20,8 +20,6 @@ static enum fp_transport_type curr_transport_type = FP_TRANSPORT_TYPE_UNKNOWN;
 static enum ec_status
 host_command_protocol_info(struct host_cmd_handler_args *args)
 {
-	enum ec_status ret_status = EC_RES_INVALID_COMMAND;
-
 	if (IS_ENABLED(CONFIG_FINGERPRINT_MCU)) {
 		/*
 		 * Read transport type from TRANSPORT_SEL bootstrap pin the
@@ -32,15 +30,16 @@ host_command_protocol_info(struct host_cmd_handler_args *args)
 
 		if (IS_ENABLED(CONFIG_USART_HOST_COMMAND) &&
 		    curr_transport_type == FP_TRANSPORT_TYPE_UART)
-			ret_status = usart_get_protocol_info(args);
-		else if (IS_ENABLED(CONFIG_SPI) &&
-			 curr_transport_type == FP_TRANSPORT_TYPE_SPI)
-			ret_status = spi_get_protocol_info(args);
-	} else if (IS_ENABLED(CONFIG_SPI)) {
-		ret_status = spi_get_protocol_info(args);
+			return usart_get_protocol_info(args);
+
+		if (curr_transport_type != FP_TRANSPORT_TYPE_SPI)
+			return EC_RES_INVALID_COMMAND;
 	}
 
-	return ret_status;
+	if (IS_ENABLED(CONFIG_SPI))
+		return spi_get_protocol_info(args);
+
+	return EC_RES_INVALID_COMMAND;
 }
 DECLARE_HOST_COMMAND(EC_CMD_GET_PROTOCOL_INFO, host_command_protocol_info,
 		     EC_VER_MASK(0));

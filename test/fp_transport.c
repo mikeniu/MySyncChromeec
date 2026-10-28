@@ -64,6 +64,33 @@ test_static int test_host_command_protocol_info_spi(void)
 		FP_TRANSPORT_TYPE_SPI, &expected_info[FP_TRANSPORT_TYPE_SPI]);
 }
 
+test_static int
+test_host_command_protocol_info_invalid(enum fp_transport_type transport_type)
+{
+	struct ec_response_get_protocol_info info;
+
+	mock_ctrl_fpsensor_detect.fpsensor_detect_get_type_return =
+		FP_SENSOR_TYPE_FPC;
+	mock_ctrl_fpsensor_detect.get_fp_transport_type_return = transport_type;
+
+	TEST_EQ(test_send_host_command(EC_CMD_GET_PROTOCOL_INFO, 0, NULL, 0,
+				       &info, sizeof(info)),
+		EC_RES_INVALID_COMMAND, "%d");
+
+	return EC_SUCCESS;
+}
+
+test_static int test_host_command_protocol_info_unknown(void)
+{
+	return test_host_command_protocol_info_invalid(
+		FP_TRANSPORT_TYPE_UNKNOWN);
+}
+
+test_static int test_host_command_protocol_info_uart_disabled(void)
+{
+	return test_host_command_protocol_info_invalid(FP_TRANSPORT_TYPE_UART);
+}
+
 void run_test(int argc, const char **argv)
 {
 	/* The tests after this only work on device right now. */
@@ -78,13 +105,23 @@ void run_test(int argc, const char **argv)
 		return;
 	}
 
+	/*
+	 * Verify that an unknown transport type is rejected before a valid
+	 * transport type is cached in curr_transport_type.
+	 */
+	RUN_TEST(test_host_command_protocol_info_unknown);
+
 	/* The transport type is cached in a static variable, so the tests
 	 * cannot be run back to back (without reboot).
 	 */
-	if (strncmp(argv[1], "uart", 4) == 0 && IS_ENABLED(BOARD_BLOONCHIPPER))
-		RUN_TEST(test_host_command_protocol_info_uart);
-	else if (strncmp(argv[1], "spi", 3) == 0)
+	if (strncmp(argv[1], "uart", 4) == 0) {
+		if (IS_ENABLED(BOARD_BLOONCHIPPER))
+			RUN_TEST(test_host_command_protocol_info_uart);
+		else if (!IS_ENABLED(CONFIG_USART_HOST_COMMAND))
+			RUN_TEST(test_host_command_protocol_info_uart_disabled);
+	} else if (strncmp(argv[1], "spi", 3) == 0) {
 		RUN_TEST(test_host_command_protocol_info_spi);
+	}
 
 	test_print_result();
 }
