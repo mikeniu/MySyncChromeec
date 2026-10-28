@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bc3884b_d1b9e159",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T19:25:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f3239f6_307cd3af",
+      "range": {
+        "startLine": 402,
+        "startChar": 0,
+        "endLine": 434,
+        "endChar": 4
+      },
+      "revId": "93febeb2636d445acfe9d86d9918c1ae500d7434",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bf90ec2_3222281c",
@@ -79,6 +103,24 @@
       "side": 1,
       "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
       "parentUuid": "3bf90ec2_3222281c",
+      "revId": "93febeb2636d445acfe9d86d9918c1ae500d7434",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27320525_8c6d832f",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T19:25:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad5f47b2_efe042e3",
       "revId": "93febeb2636d445acfe9d86d9918c1ae500d7434",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

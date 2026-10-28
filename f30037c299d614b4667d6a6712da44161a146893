@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4622e487_3fc2d2c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T19:25:26Z",
+      "side": 1,
+      "message": "Yes, upstream Zephyr EC (main) shares the same common/host_command_task.c (linked via zephyr/CMakeLists.txt), still samples t0 \u003d get_time() inside the loop, and uses k_usleep(CONFIG_HOSTCMD_RATE_LIMITING_RECESS). It has the identical preemption vulnerability and will need the same fix backported once verified on legacy.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "5d89459b_30cc078a",
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ccf110dd_0e6bc286",
@@ -214,6 +232,30 @@
       "side": 1,
       "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
       "parentUuid": "e4c56782_d74dc204",
+      "range": {
+        "startLine": 424,
+        "startChar": 8,
+        "endLine": 424,
+        "endChar": 9
+      },
+      "revId": "f30037c299d614b4667d6a6712da44161a146893",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1038774b_bd45088f",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T19:25:26Z",
+      "side": 1,
+      "message": "No concern with host timeouts. CONFIG_HOSTCMD_RATE_LIMITING_RECESS is 20 ms (include/config.h). The Linux kernel ChromeOS EC driver (drivers/platform/chrome/cros_ec_proto.c) timeout is 1000 ms (1 second). Holding off host_send_response() by 20 ms cleanly forces the host LPC/eSPI driver to wait within its timeout window, allowing lower-priority EC tasks (HOOK_TICK at 10 ms, watchdog reload) to execute.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "9f698192_836c00a9",
       "range": {
         "startLine": 424,
         "startChar": 8,
