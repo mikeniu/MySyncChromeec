@@ -16,6 +16,24 @@
       "message": "Please update this cherry-pick to match PS6 of https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8654735.",
       "revId": "8b872baf2ff69c2b8331309e5c085dd469efa95b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "775b357e_49aa401d",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-28T19:21:54Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "8a4703dc_9e3a84fe",
+      "revId": "8b872baf2ff69c2b8331309e5c085dd469efa95b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
