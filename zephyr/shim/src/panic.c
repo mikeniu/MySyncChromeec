@@ -22,6 +22,8 @@
 
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
+static bool watchdog_warning_active;
+
 /*
  * Arch-specific configuration
  *
@@ -168,6 +170,9 @@ void panic_data_print(const struct panic_data *pdata)
  */
 struct panic_data *panic_data_reset(struct panic_data *pdata)
 {
+	if (!pdata || pdata == panic_get_data()) {
+		watchdog_warning_active = false;
+	}
 	if (!pdata) {
 		pdata = get_panic_data_write();
 	}
@@ -247,6 +252,25 @@ void panic_data_write_watchdog_warning(uintptr_t pc,
 	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
 
 	panic_data_finalize(pdata);
+	watchdog_warning_active = true;
+}
+
+void panic_data_clear_watchdog_warning(void)
+{
+	unsigned int key = irq_lock();
+
+	if (watchdog_warning_active) {
+		struct panic_data *const pdata = panic_get_data();
+
+		watchdog_warning_active = false;
+		if (pdata) {
+			pdata->magic = 0;
+			sys_cache_data_flush_range((void *)&pdata->magic,
+						   sizeof(pdata->magic));
+		}
+	}
+
+	irq_unlock(key);
 }
 
 void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread)
@@ -403,7 +427,8 @@ test_export_static int panic_data_init(void)
 
 	is_panic_new = panic_data_is_new();
 
-	if (is_panic_new) {
+	if (is_panic_new &&
+	    (is_watchdog_reset || reason != PANIC_SW_WATCHDOG_WARN)) {
 		LOG_WRN("New Panic Detected: %s",
 			panic_sw_reason_is_valid(reason) ?
 				panic_sw_reasons[reason - PANIC_SW_BASE] :
@@ -451,6 +476,11 @@ test_export_static int panic_data_init(void)
 			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_HARD);
 			panic_data_finalize(pdata);
 		}
+	} else if (reason == PANIC_SW_WATCHDOG_WARN) {
+		LOG_INF("Clearing stale watchdog warning panic");
+		pdata->magic = 0;
+		sys_cache_data_flush_range((void *)&pdata->magic,
+					   sizeof(pdata->magic));
 	}
 
 	return 0;

@@ -173,6 +173,31 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 	}
 }
 
+ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_no_watchdog_reset)
+{
+	panic_data_write_sw(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
+
+	/* Set RO flag explicitly to test preservation in RO */
+	struct panic_data *pdata = get_panic_data_write();
+	pdata->flags &= ~PANIC_DATA_FLAG_RW_IMAGE;
+	pdata->flags |= PANIC_DATA_FLAG_RO_IMAGE;
+	const struct panic_data original_pdata = *pdata;
+
+	/* Simulate a power-on reset cause */
+	system_set_reset_flags(EC_RESET_FLAG_POWER_ON);
+	panic_data_init();
+
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		zassert_is_null(
+			panic_get_data(),
+			"Stale watchdog warning should be cleared in RW");
+	} else {
+		/* In RO, existing panic data should remain untouched */
+		zassert_mem_equal(panic_get_data(), &original_pdata,
+				  sizeof(original_pdata), NULL);
+	}
+}
+
 ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_already_read)
 {
 	panic_data_write_sw(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
@@ -500,6 +525,40 @@ ZTEST(panic, test_panic_data_write_watchdog_warning)
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get(),
 		      "Exception register must store thread ID");
+}
+
+ZTEST(panic, test_panic_data_clear_watchdog_warning)
+{
+	panic_data_write_watchdog_warning(0x10080000, k_current_get());
+	zassert_not_null(panic_get_data(), "Panic data must exist after write");
+
+	panic_data_clear_watchdog_warning();
+	zassert_is_null(panic_get_data(),
+			"Panic data must be NULL after clear_watchdog_warning");
+
+	/* A non-watchdog-warning panic should not be cleared */
+	panic_data_write_sw(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	panic_data_clear_watchdog_warning();
+	zassert_not_null(panic_get_data(),
+			 "Non-watchdog-warning panic should not be cleared");
+
+	/* A warning overwritten by a non-warning panic should not be cleared */
+	panic_data_write_watchdog_warning(0x10080000, k_current_get());
+	panic_data_write_sw(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	panic_data_clear_watchdog_warning();
+	zassert_not_null(
+		panic_get_data(),
+		"Panic overwritten by non-warning should not be cleared");
+
+	/* Resetting a local scratch buffer must not clear
+	 * watchdog_warning_active */
+	struct panic_data scratch;
+
+	panic_data_write_watchdog_warning(0x10080000, k_current_get());
+	panic_data_reset(&scratch);
+	panic_data_clear_watchdog_warning();
+	zassert_is_null(panic_get_data(),
+			"Scratch reset must not preserve warning");
 }
 
 ZTEST(panic, test_panic_data_write_fatal)

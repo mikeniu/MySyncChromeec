@@ -186,6 +186,10 @@ void watchdog_reload(void)
 
 		wdt_feed(wdt_info[i].wdt_dev, wdt_chan[i]);
 	}
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC)) {
+		panic_data_clear_watchdog_warning();
+	}
 }
 DECLARE_HOOK(HOOK_TICK, watchdog_reload, HOOK_PRIO_LAST);
 

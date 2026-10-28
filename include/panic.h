@@ -109,6 +109,12 @@ void panic_data_write_watchdog_warning(uintptr_t pc,
 				       const struct k_thread *thread);
 
 /**
+ * Clear uncommitted watchdog warning panic data if the watchdog recovers
+ * before resetting.
+ */
+void panic_data_clear_watchdog_warning(void);
+
+/**
  * Write panic data for a Zephyr fatal error without an ESF.
  *
  * @param reason Zephyr fatal error reason code (e.g. K_ERR_KERNEL_PANIC).
