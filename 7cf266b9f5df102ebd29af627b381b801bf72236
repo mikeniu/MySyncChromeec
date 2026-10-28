@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd8e5083_06260d8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T15:54:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please expand the unit test in `zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c` to cover `sys_clock_disable()` and the updated `HOOK_SYSJUMP` behavior.\n\n### Review Summary\n* **Functionality:** ✅ Moving `st_stm32_timers`, `st_stm32_uart`, and `sys_clock_disable()` teardown from `HOOK_SYSJUMP` into `chip_pre_system_jump()` ensures peripheral and system clock teardown occurs after `watchdog_reload()` in `jump_to_image()`.\n* **Architecture \u0026 Component Fit:** ✅ Overrides `chip_pre_system_jump()` declared in `include/system.h`, matching the system jump teardown lifecycle.\n* **Code Simplicity:** ✅ The split between `chip_pre_system_jump()` and `prepare_for_sysjump_to_ec()` is minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC / Zephyr conventions with no magic values.\n* **Security:** ✅ No security issues introduced; MPU teardown remains in place prior to jumping to the target image.\n* **Testing:** ❌ `test_chip_pre_system_jump` only checks `stm32_reset_line_toggle` and does not verify that `chip_pre_system_jump()` calls `sys_clock_disable()` or that `HOOK_SYSJUMP` (`prepare_for_sysjump_to_ec()`) calls `arm_core_mpu_disable()` without tearing down peripherals/clocks early. See inline comment.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+25, -7)` — Focused, single logical change (+12, -7 production lines; +13, -0 test lines).\n* **Commit Message:** ✅ Clear, accurate summary and rationale with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[🔗](http://go/tj/5c3a5228-9188-49db-bb42-c732d99b76b9)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7cf266b9f5df102ebd29af627b381b801bf72236",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9a310a8_b54382e6",
+        "filename": "zephyr/test/fpmcu/tests/bloonchipper/src/ec_quirks.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T15:54:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `test_chip_pre_system_jump` only verifies that `timers2` is reset, leaving two parts of this change untested:\n\n1. `chip_pre_system_jump()` also calls `sys_clock_disable()`, which is not faked or asserted here (if `sys_clock_disable()` were removed, the test would still pass). Since `sys_clock_disable()` has a weak default implementation on `native_sim`, it can be faked with `FAKE_VOID_FUNC(sys_clock_disable)`.\n2. `prepare_for_sysjump_to_ec()` (`HOOK_SYSJUMP`) was modified in this CL to only call `arm_core_mpu_disable()` and no longer reset peripherals or disable the system clock. `FAKE_VOID_FUNC(arm_core_mpu_disable)` and `hooks.h` are already present in this file, so we can directly test `hook_notify(HOOK_SYSJUMP)` as well.\n\nPlease add a fake for `sys_clock_disable` (with `#include \u003czephyr/drivers/timer/system_timer.h\u003e`) and verify both `chip_pre_system_jump()` and `HOOK_SYSJUMP`:\n\n```c\nZTEST(ec_quirks, test_chip_pre_system_jump)\n{\n\tRESET_FAKE(arm_core_mpu_disable);\n\tRESET_FAKE(stm32_reset_line_toggle);\n\tRESET_FAKE(sys_clock_disable);\n\n\tchip_pre_system_jump();\n\n\tzassert_equal(stm32_reset_line_toggle_fake.call_count, 1);\n\tzassert_equal(stm32_reset_line_toggle_fake.arg0_history[0],\n\t\t      DEVICE_DT_GET(DT_NODELABEL(rctl)));\n\tzassert_equal(stm32_reset_line_toggle_fake.arg1_history[0],\n\t\t      DT_RESET_ID(DT_NODELABEL(timers2)));\n\tzassert_equal(sys_clock_disable_fake.call_count, 1);\n\tzassert_equal(arm_core_mpu_disable_fake.call_count, 0);\n}\n\nZTEST(ec_quirks, test_prepare_for_sysjump_to_ec)\n{\n\tRESET_FAKE(arm_core_mpu_disable);\n\tRESET_FAKE(stm32_reset_line_toggle);\n\tRESET_FAKE(sys_clock_disable);\n\n\thook_notify(HOOK_SYSJUMP);\n\n\tzassert_equal(arm_core_mpu_disable_fake.call_count, 1);\n\tzassert_equal(stm32_reset_line_toggle_fake.call_count, 0);\n\tzassert_equal(sys_clock_disable_fake.call_count, 0);\n}\n```\n\n[🔗](http://go/tj/5c3a5228-9188-49db-bb42-c732d99b76b9)",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7cf266b9f5df102ebd29af627b381b801bf72236",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
