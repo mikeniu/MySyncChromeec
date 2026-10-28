@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aadaf27_8581c61a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-28T15:23:40Z",
+      "side": 1,
+      "message": "This branch was created before the CBI support was added.  There is no need to backport any CBI fixes to this branch.",
+      "revId": "f544b31b88fa9fca808cb3bd93fe8796e335a8a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
