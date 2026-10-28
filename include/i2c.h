@@ -169,6 +169,8 @@ struct i2c_cmd_desc_t {
  * The transfer is strictly atomic, by locking the I2C port and performing an
  * I2C_XFER_SINGLE transfer.
  *
+ * @sleep
+ *
  * @param port		Port to access
  * @param addr_flags	Peripheral device address
  * @param out		Data to send
@@ -184,6 +186,8 @@ int i2c_xfer(const int port, const uint16_t addr_flags, const uint8_t *out,
  * Same as i2c_xfer, but the bus is not implicitly locked.  It must be called
  * between i2c_lock(port, 1) and i2c_lock(port, 0).
  *
+ * @sleep
+ *
  * @param flags		Flags (see I2C_XFER_* above)
  */
 int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
@@ -192,6 +196,12 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 
 /**
  * Lock / unlock an I2C port.
+ *
+ * Must only be called from thread context (acquires or releases a recursive
+ * kernel mutex).
+ *
+ * @sleep
+ *
  * @param port		Port to lock
  * @param lock		1 to lock, 0 to unlock
  */
@@ -202,6 +212,8 @@ void i2c_lock(int port, int lock);
 
 /**
  * Prepare I2C module for sysjump.
+ *
+ * @sleep
  */
 void i2c_prepare_sysjump(void);
 
@@ -217,6 +229,8 @@ void i2c_set_timeout(int port, uint32_t timeout);
  * Read a 32-bit register from the peripheral at 7-bit peripheral address
  * <addr_flags>, at the specified 8-bit <offset> in the peripheral's address
  * space.
+ *
+ * @sleep
  */
 int i2c_read32(const int port, const uint16_t addr_flags, int offset,
 	       int *data);
@@ -225,6 +239,8 @@ int i2c_read32(const int port, const uint16_t addr_flags, int offset,
  * Write a 32-bit register to the peripheral at 7-bit peripheral address
  * <addr_flags>, at the specified 8-bit <offset> in the peripheral's address
  * space.
+ *
+ * @sleep
  */
 int i2c_write32(const int port, const uint16_t addr_flags, int offset,
 		int data);
@@ -233,6 +249,8 @@ int i2c_write32(const int port, const uint16_t addr_flags, int offset,
  * Read a 16-bit register from the peripheral at 7-bit peripheral address
  * <addr_flags>, at the specified 8-bit <offset> in the peripheral's address
  * space.
+ *
+ * @sleep
  */
 int i2c_read16(const int port, const uint16_t addr_flags, int offset,
 	       int *data);
@@ -241,6 +259,8 @@ int i2c_read16(const int port, const uint16_t addr_flags, int offset,
  * Write a 16-bit register to the peripheral at 7-bit peripheral address
  * <addr_flags>, at the specified 8-bit <offset> in the peripheral's address
  * space.
+ *
+ * @sleep
  */
 int i2c_write16(const int port, const uint16_t addr_flags, int offset,
 		int data);
@@ -249,6 +269,8 @@ int i2c_write16(const int port, const uint16_t addr_flags, int offset,
  * Read an 8-bit register from the peripheral at 7-bit peripheral address
  * <addr_flags>, at the specified 8-bit <offset> in the peripheral's address
  * space.
+ *
+ * @sleep
  */
 int i2c_read8(const int port, const uint16_t addr_flags, int offset, int *data);
 
@@ -256,6 +278,8 @@ int i2c_read8(const int port, const uint16_t addr_flags, int offset, int *data);
  * Write an 8-bit register to the peripheral at 7-bit peripheral address
  * <addr_flags>, at the specified 8-bit <offset> in the peripheral's address
  * space.
+ *
+ * @sleep
  */
 int i2c_write8(const int port, const uint16_t addr_flags, int offset, int data);
 
@@ -266,10 +290,19 @@ int i2c_write8(const int port, const uint16_t addr_flags, int offset, int data);
  * setting the <mask> bit value(s) or clearing them. If the value to be written
  * is the same as the original value of the register, the write will not be
  * performed.
+ *
+ * @sleep
  */
 int i2c_update8(const int port, const uint16_t addr_flags, const int offset,
 		const uint8_t mask, const enum mask_update_action action);
 
+/**
+ * Read, modify, write a 16-bit i2c register to the peripheral at 7-bit
+ * peripheral address <addr_flags> at the specified 8-bit <offset> in the
+ * peripheral's address space.
+ *
+ * @sleep
+ */
 int i2c_update16(const int port, const uint16_t addr_flags, const int offset,
 		 const uint16_t mask, const enum mask_update_action action);
 
@@ -281,11 +314,20 @@ int i2c_update16(const int port, const uint16_t addr_flags, const int offset,
  * and the set value do not have to be in the same bit locations.  If the
  * new value is not the same as the original value, the new value will be
  * written back out to the device, otherwise no write will be performed.
+ *
+ * @sleep
  */
 int i2c_field_update8(const int port, const uint16_t addr_flags,
 		      const int offset, const uint8_t field_mask,
 		      const uint8_t set_value);
 
+/**
+ * Read, modify, write field of a 16-bit i2c register to the peripheral at
+ * 7-bit peripheral address <addr_flags>, at the specified 8-bit <offset> in
+ * the peripheral's address space.
+ *
+ * @sleep
+ */
 int i2c_field_update16(const int port, const uint16_t addr_flags,
 		       const int offset, const uint16_t field_mask,
 		       const uint16_t set_value);
@@ -293,6 +335,8 @@ int i2c_field_update16(const int port, const uint16_t addr_flags,
 /**
  * Read one or two bytes data from the peripheral at 7-bit peripheral address
  * <addr_flags>, at 16-bit <offset> in the peripheral's address space.
+ *
+ * @sleep
  */
 int i2c_read_offset16(const int port, const uint16_t addr_flags,
 		      uint16_t offset, int *data, int len);
@@ -300,6 +344,8 @@ int i2c_read_offset16(const int port, const uint16_t addr_flags,
 /**
  * Write one or two bytes data to the peripheral at 7-bit peripheral address
  * <addr_flags>, at 16-bit <offset> in the peripheral's address space.
+ *
+ * @sleep
  */
 int i2c_write_offset16(const int port, const uint16_t addr_flags,
 		       uint16_t offset, int data, int len);
@@ -307,6 +353,8 @@ int i2c_write_offset16(const int port, const uint16_t addr_flags,
 /**
  * Read <len> bytes block data from the peripheral at 7-bit peripheral address
  * * <addr_flags>, at 16-bit <offset> in the peripheral's address space.
+ *
+ * @sleep
  */
 int i2c_read_offset16_block(const int port, const uint16_t addr_flags,
 			    uint16_t offset, uint8_t *data, int len);
@@ -314,6 +362,8 @@ int i2c_read_offset16_block(const int port, const uint16_t addr_flags,
 /**
  * Write <len> bytes block data to the peripheral at 7-bit peripheral address
  * <addr_flags>, at 16-bit <offset> in the peripheral's address space.
+ *
+ * @sleep
  */
 int i2c_write_offset16_block(const int port, const uint16_t addr_flags,
 			     uint16_t offset, const uint8_t *data, int len);
@@ -338,6 +388,8 @@ int i2c_unwedge(int port);
  *     [length_N] [byte_0] [byte_1] ... [byte_N]
  *
  * <len>      : the max length of receiving buffer
+ *
+ * @sleep
  */
 int i2c_read_sized_block(const int port, const uint16_t addr_flags, int offset,
 			 uint8_t *data, int max_len, int *read_len);
@@ -351,6 +403,8 @@ int i2c_read_sized_block(const int port, const uint16_t addr_flags, int offset,
  *              ascii, len should be at least N+1 to include the
  *              terminating 0.  Similar to strlcpy, the terminating null is
  *              always written into the output buffer.
+ *
+ * @sleep
  */
 int i2c_read_string(const int port, const uint16_t addr_flags, int offset,
 		    uint8_t *data, int len);
@@ -359,6 +413,8 @@ int i2c_read_string(const int port, const uint16_t addr_flags, int offset,
  * Read a data block of <len> 8-bit transfers from the peripheral at 7-bit
  * peripheral address <addr_flags>, at the specified 8-bit <offset> in the
  * peripheral's address space.
+ *
+ * @sleep
  */
 int i2c_read_block(const int port, const uint16_t addr_flags, int offset,
 		   uint8_t *data, int len);
@@ -367,6 +423,8 @@ int i2c_read_block(const int port, const uint16_t addr_flags, int offset,
  * Write a data block of <len> 8-bit transfers to the peripheral at 7-bit
  * peripheral address <addr_flags>, at the specified 8-bit <offset> in the
  * peripheral's address space.
+ *
+ * @sleep
  */
 int i2c_write_block(const int port, const uint16_t addr_flags, int offset,
 		    const uint8_t *data, int len);
@@ -420,6 +478,10 @@ int board_is_i2c_port_powered(int port);
  * Defined in common/i2c_trace.c, used by i2c controller to notify tracing
  * functionality of transactions.
  *
+ * @sleep
+ * @isr_ok
+ * @pre_kernel_ok
+ *
  * @param port: I2C port number
  * @param addr_flags: peripheral device address
  * @param out_data: pointer to data written
@@ -455,6 +517,8 @@ enum i2c_freq i2c_khz_to_freq(int speed_khz);
 /**
  * Set bus speed. Only support for ports with I2C_PORT_FLAG_DYNAMIC_SPEED
  * flag.
+ *
+ * @sleep
  *
  * @param port:		Port to access
  * @param freq:		Bus speed.
