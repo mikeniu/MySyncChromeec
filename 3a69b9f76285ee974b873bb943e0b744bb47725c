@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b551646b_e71eb0bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-28T08:34:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/efdc9723-7a97-4ce5-ada4-3ef17c004bdb)]\n\n### Review Summary\n*   **Functionality:** ARMv8-M (PMSAv8) MPU support for Cortex-M33 (`realtekfp` / RTS5817) is implemented properly. `mpu_add_static_rollback_regions()` queries the enabled static rollback region index via `arm_cmse_mpu_region_get()` during `PRE_KERNEL_1` initialization and immediately locks it via `mpu_lock_rollback(true)`, with `DSB` and `ISB` barriers ensuring MPU register updates take effect before subsequent memory accesses.\n*   **Architecture \u0026 Component Fit:** Splitting the Cortex-M MPU shim into `mpu_v7m.c` (verbatim move of `mpu.c`) and `mpu_v8m.c` selected in `zephyr/shim/core/cortex-m/CMakeLists.txt` cleanly separates the PMSAv7 and PMSAv8 implementations without preprocessor clutter, and `zephyr/shim/chip/rtkfp/mpu_regions.c` integrates cleanly with Zephyr\u0027s `CONFIG_CPU_HAS_CUSTOM_FIXED_SOC_MPU_REGIONS` mechanism.\n*   **Code Simplicity:** Functions in `mpu_v8m.c` are concise, linear, and reuse `mpu_lock_rollback(true)` for initial lock setup.\n*   **Idiomaticity \u0026 Readability:** Uses standard Zephyr devicetree macros, barrier intrinsics (`barrier_dsync_fence_full()`, `barrier_isync_fence_full()`), CMSIS bitmasks, and descriptive region constants, with clear comments explaining the ARMv8-M hardware constraints (`MPU_RBAR.AP`, `PRIVDEFENA`, and `TT` region lookup).\n*   **Security:** Properly protects the rollback flash region by disabling the MPU entry while `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` (`PRIVDEFENA \u003d\u003d 0`) is enforced, causing any unauthorized access to fault.\n*   **Testing:** This change configures hardware-specific ARMv8-M MPU registers (`MPU-\u003eRNR`, `MPU-\u003eRLAR`), CMSE `TT` lookups, and SoC memory map regions that require physical Cortex-M33 hardware to exercise.\n*   **CL Size \u0026 Scope:** Size: M (+171, -1). The CL is a single, cohesive logical change adding Cortex-M33 MPU support.\n*   **Commit Message:** Concisely explains the rationale and conceptual changes in two short prose paragraphs with the required `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3a69b9f76285ee974b873bb943e0b744bb47725c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
