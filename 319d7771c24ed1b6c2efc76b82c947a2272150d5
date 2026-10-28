@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0a7a89d_79834d32",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T10:29:28Z",
+      "side": 1,
+      "message": "This part is incorrect. Hash should be calculated over entire WP region. Only over EC_RO without the checksum section at the end. The WP_RO region itself may contain that are not a part of RO FW itself, e.g. flash header.",
+      "revId": "319d7771c24ed1b6c2efc76b82c947a2272150d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f27027f_442353dd",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T10:29:28Z",
+      "side": 1,
+      "message": "Looks like all futility does is justcalculatong SHA256 over a provided file and write a result to a file. Does it even make sense to use it if you have to extract proper sections, provide size, etc anyway?",
+      "revId": "319d7771c24ed1b6c2efc76b82c947a2272150d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
