@@ -28,14 +28,14 @@ properties:
     description: |
       Input GPIO indicating motherboard power good state.
 
-  pmic-kpd-pwr-odl-gpios:
+  pmic-kpd-pwr-gpios:
     type: phandle-array
     required: true
     description: |
-      Output open-drain GPIO to PMIC power key signal.
+      Output GPIO to PMIC power key signal.
 
   pmic-resin-gpios:
     type: phandle-array
     required: true
     description: |
-      Output open-drain GPIO to PMIC reset signal.
+      Output GPIO to PMIC reset signal.

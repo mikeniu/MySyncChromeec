@@ -16,10 +16,10 @@
 	qcom_ap_pwrseq: qcom-ap-pwrseq {
 		compatible = "cros-ec,qcom-ap-pwrseq";
 		switchcap = <&switchcap>;
-		ap-rst-gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+		ap-rst-gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
 		ap-suspend-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
 		power-good-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
-		pmic-kpd-pwr-odl-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
-		pmic-resin-gpios = <&gpio0 4 GPIO_ACTIVE_HIGH>;
+		pmic-kpd-pwr-gpios = <&gpio0 3 GPIO_ACTIVE_LOW>;
+		pmic-resin-gpios = <&gpio0 4 GPIO_ACTIVE_LOW>;
 	};
 };

@@ -110,7 +110,7 @@ static const struct qcom_ap_pwrseq_config qcom_cfg = {
 	.ap_suspend_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), ap_suspend_gpios),
 	.power_good_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), power_good_gpios),
 	.pmic_kpd_pwr_gpio =
-		GPIO_DT_SPEC_GET(DT_DRV_INST(0), pmic_kpd_pwr_odl_gpios),
+		GPIO_DT_SPEC_GET(DT_DRV_INST(0), pmic_kpd_pwr_gpios),
 	.pmic_resin_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), pmic_resin_gpios),
 	.switchcap_dev = DEVICE_DT_GET(DT_INST_PHANDLE(0, switchcap)),
 };
@@ -191,24 +191,24 @@ static int set_pmic_pwron(bool enable)
 	if (enable == is_pmic_pwron())
 		return EC_SUCCESS;
 
-	if (gpio_pin_get_dt(&qcom_cfg.pmic_resin_gpio) == 0) {
+	if (gpio_pin_get_dt(&qcom_cfg.pmic_resin_gpio) == 1) {
 		LOG_ERR("PMIC_RESIN_L not pulled up by PMIC; cancel pwron");
 		return EC_ERROR_UNKNOWN;
 	}
 
-	/* Power-on: assert PMIC_KPD_PWR_ODL (drive low)
-	 * Power-off: assert both PMIC_KPD_PWR_ODL and PMIC_RESIN_L (drive low)
+	/* Power-on: assert PMIC_KPD_PWR
+	 * Power-off: assert both PMIC_KPD_PWR and PMIC_RESIN
 	 */
-	gpio_pin_set_dt(&qcom_cfg.pmic_kpd_pwr_gpio, 0);
-	if (!enable)
-		gpio_pin_set_dt(&qcom_cfg.pmic_resin_gpio, 0);
-
-	ret = wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT_US);
-
-	/* Release open-drain lines back to high-Z */
 	gpio_pin_set_dt(&qcom_cfg.pmic_kpd_pwr_gpio, 1);
 	if (!enable)
 		gpio_pin_set_dt(&qcom_cfg.pmic_resin_gpio, 1);
+
+	ret = wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT_US);
+
+	/* Release lines back to inactive state */
+	gpio_pin_set_dt(&qcom_cfg.pmic_kpd_pwr_gpio, 0);
+	if (!enable)
+		gpio_pin_set_dt(&qcom_cfg.pmic_resin_gpio, 0);
 
 	return ret;
 }
@@ -220,13 +220,13 @@ static int warm_reset_seq(void)
 {
 	LOG_INF("Initiating warm reset");
 
-	/* Pulse PMIC_RESIN_L low for 20ms */
-	gpio_pin_set_dt(&qcom_cfg.pmic_resin_gpio, 0);
-	k_usleep(PMIC_RESIN_PULSE_LENGTH_US);
+	/* Pulse PMIC_RESIN_L active for 20ms */
 	gpio_pin_set_dt(&qcom_cfg.pmic_resin_gpio, 1);
+	k_usleep(PMIC_RESIN_PULSE_LENGTH_US);
+	gpio_pin_set_dt(&qcom_cfg.pmic_resin_gpio, 0);
 
-	/* Wait for AP_RST_L to be asserted (line pulled low) */
-	if (!WAIT_FOR(gpio_pin_get_dt(&qcom_cfg.ap_rst_gpio) == 0,
+	/* Wait for AP_RST_L to be asserted */
+	if (!WAIT_FOR(gpio_pin_get_dt(&qcom_cfg.ap_rst_gpio) == 1,
 		      WARM_RESET_CHECK_TIMEOUT_US,
 		      k_usleep(WARM_RESET_CHECK_WAIT_US))) {
 		LOG_ERR("AP warm reset pulse not detected on AP_RST_L");
@@ -758,10 +758,9 @@ static void ap_rst_interrupt(const struct device *port,
 	ARG_UNUSED(pins);
 
 	/*
-	 * Track falling edges (active-low reset assertion) when AP is in S0 or
-	 * S3.
+	 * Track reset assertion edges when AP is in S0 or S3.
 	 */
-	if (gpio_pin_get_dt(&qcom_cfg.ap_rst_gpio) == 0 &&
+	if (gpio_pin_get_dt(&qcom_cfg.ap_rst_gpio) == 1 &&
 	    chipset_in_state(CHIPSET_STATE_ON | CHIPSET_STATE_SUSPEND)) {
 		int count = atomic_inc(&qcom_data.ap_rst_transitions) + 1;
 		int delay_ms;
@@ -848,16 +847,16 @@ static int qcom_ap_pwrseq_init(const struct device *dev)
 		return ret;
 	}
 
-	/* Configure open-drain outputs to initial released (high-Z) state */
+	/* Configure PMIC outputs to initial inactive (released) state */
 	ret = gpio_pin_configure_dt(&qcom_cfg.pmic_kpd_pwr_gpio,
-				    GPIO_OUTPUT_HIGH);
+				    GPIO_OUTPUT_INACTIVE);
 	if (ret < 0) {
 		LOG_ERR_GPIO_CFG("PMIC_KPD_PWR", ret);
 		return ret;
 	}
 
 	ret = gpio_pin_configure_dt(&qcom_cfg.pmic_resin_gpio,
-				    GPIO_OUTPUT_HIGH);
+				    GPIO_OUTPUT_INACTIVE);
 	if (ret < 0) {
 		LOG_ERR_GPIO_CFG("PMIC_RESIN", ret);
 		return ret;
@@ -895,7 +894,7 @@ static int qcom_ap_pwrseq_init(const struct device *dev)
 		return ret;
 	}
 
-	/* Configure interrupt on AP_RST falling edge (reset asserted) */
+	/* Configure interrupt on AP_RST active edge (reset asserted) */
 	gpio_init_callback(&qcom_data.ap_rst_cb, ap_rst_interrupt,
 			   BIT(qcom_cfg.ap_rst_gpio.pin));
 	ret = gpio_add_callback(qcom_cfg.ap_rst_gpio.port,
@@ -905,7 +904,7 @@ static int qcom_ap_pwrseq_init(const struct device *dev)
 		return ret;
 	}
 	ret = gpio_pin_interrupt_configure_dt(&qcom_cfg.ap_rst_gpio,
-					      GPIO_INT_EDGE_FALLING);
+					      GPIO_INT_EDGE_TO_ACTIVE);
 	if (ret < 0) {
 		LOG_ERR_GPIO_INT("AP_RST", ret);
 		return ret;
