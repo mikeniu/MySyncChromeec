@@ -109,3 +109,53 @@ ZTEST_USER(motion_sense, test_als_cm32183_cm36781_get_offset)
 	zassert_equal(-17, offset[0]);
 	zassert_equal((int16_t)EC_MOTION_SENSE_INVALID_CALIB_TEMP, temp);
 }
+
+ZTEST_USER(motion_sense, test_fifo_entries_zero_initialized)
+{
+	const uint32_t test_timestamp = 0x12345678;
+	const int16_t expected_x = 10;
+	const int16_t expected_y = -20;
+	const int16_t expected_z = 30;
+	struct ec_response_motion_sensor_data entries[2];
+	uint16_t out_size = 0;
+	int count;
+
+	motion_sense_fifo_reset();
+
+	memset(&entries[0], 0xff, sizeof(entries[0]));
+	motion_sense_fifo_add_timestamp(test_timestamp);
+	count = motion_sense_fifo_read(sizeof(entries[0]), 1, &entries[0],
+				       &out_size);
+	zassert_equal(count, 1);
+	zassert_equal(out_size, sizeof(entries[0]));
+	zassert_equal(entries[0].sensor_num, MOTION_SENSE_INVALID_SENSOR_ID);
+	zassert_equal(entries[0].reserved, 0);
+	zassert_equal(entries[0].timestamp, test_timestamp);
+
+	memset(&entries[0], 0xff, sizeof(entries[0]));
+	motion_sense_fifo_insert_async_event(&motion_sensors[0],
+					     ASYNC_EVENT_FLUSH);
+	count = motion_sense_fifo_read(sizeof(entries[0]), 1, &entries[0],
+				       &out_size);
+	zassert_equal(count, 1);
+	zassert_equal(out_size, sizeof(entries[0]));
+	zassert_equal(entries[0].sensor_num, 0);
+	zassert_equal(entries[0].reserved, 0);
+
+	memset(entries, 0xff, sizeof(entries));
+	motion_sensors[0].oversampling = 0;
+	motion_sensors[0].oversampling_ratio = 1;
+	motion_sensors[0].raw_xyz[X] = expected_x;
+	motion_sensors[0].raw_xyz[Y] = expected_y;
+	motion_sensors[0].raw_xyz[Z] = expected_z;
+	motion_sense_push_raw_xyz(&motion_sensors[0]);
+	count = motion_sense_fifo_read(sizeof(entries), ARRAY_SIZE(entries),
+				       entries, &out_size);
+	zassert_equal(count, 2);
+	zassert_equal(entries[0].sensor_num, 0);
+	zassert_equal(entries[0].reserved, 0);
+	zassert_equal(entries[1].sensor_num, 0);
+	zassert_equal(entries[1].data[X], expected_x);
+	zassert_equal(entries[1].data[Y], expected_y);
+	zassert_equal(entries[1].data[Z], expected_z);
+}
