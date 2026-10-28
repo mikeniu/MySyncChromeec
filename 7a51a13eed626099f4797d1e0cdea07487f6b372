@@ -1,0 +1,237 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4685595_955bd2c7",
+        "filename": "zephyr/program/fpmcu/dartmonkey/CMakeLists.txt",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "2026",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6914b931_8e30032b",
+        "filename": "zephyr/program/fpmcu/dartmonkey/dartmonkey.dts",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "2026",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7190c2eb_3591dfb6",
+        "filename": "zephyr/program/fpmcu/dartmonkey/gpio.dtsi",
+        "patchSetId": 22
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "Are all these GPIOs used?",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4c47a17_aab67458",
+        "filename": "zephyr/program/fpmcu/dartmonkey/soc.dtsi",
+        "patchSetId": 22
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "Have you check if that\u0027s possible?",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6a3ccc4_1c3b0a67",
+        "filename": "zephyr/program/fpmcu/dartmonkey/soc.dtsi",
+        "patchSetId": 22
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "How about removing entire mac node?",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c5ba262_85c93246",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/init.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "2026",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e135a25_f78e62b7",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/init.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "This can be added in dts.",
+      "range": {
+        "startLine": 52,
+        "startChar": 51,
+        "endLine": 52,
+        "endChar": 63
+      },
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bbefc39_c820dd69",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/init.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "This can return negative values on error.",
+      "range": {
+        "startLine": 60,
+        "startChar": 12,
+        "endLine": 60,
+        "endChar": 27
+      },
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e2bc6b7_a66ef3f4",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/init.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "Is it the most power-saving mode of GPIO? Maybe analog input?",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aab698f1_6f5d0d70",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/init.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "Is this pin used later on in the code?",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c432962c_42dd2e0d",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/init.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "I think potential fallback should be to say board is hw prod.",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e40bb3d1_16e95451",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/power.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "2026",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1698378f_4b12481e",
+        "filename": "zephyr/program/fpmcu/dartmonkey/src/power.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-28T12:36:43Z",
+      "side": 1,
+      "message": "Again, I think a potential fallback should be to board is hw prod",
+      "revId": "7a51a13eed626099f4797d1e0cdea07487f6b372",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
