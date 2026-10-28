@@ -70,6 +70,31 @@
       },
       "revId": "a57a4983279e66331b23786546da7c93266de0e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85269e49_ce4542a3",
+        "filename": "zephyr/drivers/cros_system/cros_system_npcx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-28T16:10:53Z",
+      "side": 1,
+      "message": "Confirmed, neither direct `NVIC_SetPriority()` calls nor `CONFIG_ZERO_LATENCY_IRQS` are used in `platform/ec` or the NPCX SoC/drivers.",
+      "parentUuid": "e3131f69_24000b99",
+      "range": {
+        "startLine": 253,
+        "startChar": 1,
+        "endLine": 261,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "a57a4983279e66331b23786546da7c93266de0e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
