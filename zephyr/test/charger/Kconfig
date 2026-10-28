@@ -31,12 +31,6 @@ choice TEST_BOARD_VARIANT
 		select TEST_ISL923X
 		select TEST_CHARGER_MULTI_DEF
 
-	config TEST_BOARD_GOTHRAX
-		bool "Run gothrax tests"
-		select TEST_PROGRAM_NISSA
-		select TEST_ISL923X
-		select TEST_CHARGER_MULTI_DEF
-
 	config TEST_BOARD_NISSA_RAA489000
 		bool "Run nissa RAA489000 charger tests"
 		select TEST_PROGRAM_NISSA
@@ -64,7 +58,6 @@ config TEST_BOARD_NAME
 	default "brox" if TEST_BOARD_BROX
 	default "craask" if TEST_BOARD_CRAASK
 	default "craaskov" if TEST_BOARD_CRAASKOV
-	default "gothrax" if TEST_BOARD_GOTHRAX
 	default "pujjo" if TEST_BOARD_PUJJO
 
 # Charger selection

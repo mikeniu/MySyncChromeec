@@ -151,7 +151,10 @@ if(DEFINED CONFIG_BOARD_GOTHRAX)
 			"src/gothrax_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/usbc_raa489000.c")
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/gothrax_charger.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER
+			"src/charger_raa489000.c"
+			"src/gothrax_charger.c"
+	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/fan.c")
 endif()
 if(DEFINED CONFIG_BOARD_CRAASKOV)
@@ -232,7 +235,10 @@ if(DEFINED CONFIG_BOARD_GLASSWAY)
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/glassway_fan.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/usbc_raa489000.c")
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/glassway_charger.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER
+			"src/charger_raa489000.c"
+			"src/glassway_charger.c"
+	)
 endif()
 if(DEFINED CONFIG_BOARD_SUNDANCE)
 	project(sundance)
@@ -364,7 +370,10 @@ if(DEFINED CONFIG_BOARD_GUREN)
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/glassway_fan.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/usbc_raa489000.c")
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/glassway_charger.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER
+			"src/charger_raa489000.c"
+			"src/glassway_charger.c"
+	)
 endif()
 if(DEFINED CONFIG_BOARD_DIRKS)
 	project(dirks)
@@ -398,7 +407,10 @@ if(DEFINED CONFIG_BOARD_EPIC)
 			"src/gothrax_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/usbc_raa489000.c")
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/gothrax_charger.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER
+			"src/charger_raa489000.c"
+			"src/gothrax_charger.c"
+	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/fan.c")
 endif()
 
