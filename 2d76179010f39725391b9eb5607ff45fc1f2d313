@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8d0caba_c6030bb7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T20:38:18Z",
+      "side": 1,
+      "message": "Only moving files around.  There is no change in the net code coverage.",
+      "revId": "2d76179010f39725391b9eb5607ff45fc1f2d313",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
