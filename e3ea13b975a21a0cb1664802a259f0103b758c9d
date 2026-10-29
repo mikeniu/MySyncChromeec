@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b97121c8_b7ae39e9",
+        "filename": "zephyr/program/nissa/teliks/src/usbc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T01:05:38Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "68c4bcb4_7bcfe235",
+      "range": {
+        "startLine": 124,
+        "startChar": 4,
+        "endLine": 124,
+        "endChar": 43
+      },
+      "revId": "e3ea13b975a21a0cb1664802a259f0103b758c9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "61f853b4_c859a427",
         "filename": "zephyr/program/nissa/teliks/src/usbc.c",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-28T22:31:16Z",
       "side": 1,
       "message": "can we use `board_is_usb_pd_port_present()` here?",
+      "range": {
+        "startLine": 160,
+        "startChar": 4,
+        "endLine": 160,
+        "endChar": 54
+      },
+      "revId": "e3ea13b975a21a0cb1664802a259f0103b758c9d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f841c00_6fb04696",
+        "filename": "zephyr/program/nissa/teliks/src/usbc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T01:05:38Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "61f853b4_c859a427",
       "range": {
         "startLine": 160,
         "startChar": 4,
