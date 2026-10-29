@@ -1209,13 +1209,13 @@ static void charge_manager_refresh(void)
 	if (is_pd_port(updated_old_port))
 		pd_set_new_power_request(updated_old_port);
 
+	CM_MUTEX_UNLOCK(&cm_refresh);
+
 	if (power_changed) {
 		hook_notify(HOOK_POWER_SUPPLY_CHANGE);
 		/* notify host of power info change */
 		pd_send_host_event(PD_EVENT_POWER_CHANGE);
 	}
-
-	CM_MUTEX_UNLOCK(&cm_refresh);
 }
 
 /**
