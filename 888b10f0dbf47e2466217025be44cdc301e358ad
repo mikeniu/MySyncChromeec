@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bfb3643_3da7915a",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:12:59Z",
+      "side": 1,
+      "message": "`ap_power_interface.c` is built for all `CONFIG_AP_PWRSEQ` targets (`zephyr/subsys/ap_pwrseq/CMakeLists.txt`), not just `CONFIG_X86_NON_DSX_PWRSEQ`. Including `\u003cx86_non_dsx_common_pwrseq_sm_handler.h\u003e` and moving `ap_power_force_shutdown()`, `ap_power_reset()`, and `debug_mode` (lines 192-274) here couples generic `ap_pwrseq` code to `x86_non_dsx` internals (`PWR_SYS_RST`, `sys_reset_delay`).\n\nRecommended fix: Keep these functions in a shared file under `zephyr/subsys/ap_pwrseq/x86_non_dsx/` (and also remove the dangling `void ap_power_init_reset_log(void);` prototype in `zephyr/include/ap_power/ap_power_interface.h:221`).",
+      "revId": "888b10f0dbf47e2466217025be44cdc301e358ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8a1e37a_c15222bb",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:12:59Z",
+      "side": 1,
+      "message": "This now uses the Zephyr shell API.\n```suggestion\n\t\t\treturn EINVAL;\n```",
+      "revId": "888b10f0dbf47e2466217025be44cdc301e358ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72727e9d_ca204294",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_common_pwrseq.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:12:59Z",
+      "side": 1,
+      "message": "`LOG_DBG(\"Deasserting PWR_EC_PCH_RSMRST\");` (which preceded `power_signal_set(PWR_EC_PCH_RSMRST, 0);` prior to this CL) was dropped when moving `rsmrst_pass_thru_handler()` to this header.",
+      "revId": "888b10f0dbf47e2466217025be44cdc301e358ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15c315d2_c09ce2b9",
+        "filename": "zephyr/subsys/ap_pwrseq/include/x86_non_dsx_common_pwrseq_sm_handler.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:12:59Z",
+      "side": 1,
+      "message": "```suggestion\n#ifdef CONFIG_AP_PWRSEQ_DRIVER\n```",
+      "revId": "888b10f0dbf47e2466217025be44cdc301e358ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
