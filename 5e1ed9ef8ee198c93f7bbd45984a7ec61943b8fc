@@ -95,6 +95,30 @@
       "isAi": true,
       "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9661e6d_6e940294",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-29T11:14:44Z",
+      "side": 1,
+      "message": "sounds good let\u0027s push this aside for now, easy enough to come back to it if we decide that we want it in the future but I feel like we can come up with something better anyway",
+      "parentUuid": "ef0c8b5a_baca9d8e",
+      "range": {
+        "startLine": 214,
+        "startChar": 7,
+        "endLine": 214,
+        "endChar": 34
+      },
+      "revId": "5e1ed9ef8ee198c93f7bbd45984a7ec61943b8fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
