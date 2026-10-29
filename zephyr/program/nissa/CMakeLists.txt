@@ -17,7 +17,7 @@ if(DEFINED CONFIG_BOARD_NIVVIKS)
 	project(nivviks)
 	zephyr_library_sources(
 			"src/nivviks_led.c"
-			"nivviks/src/form_factor.c"
+			"src/form_factor.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/fan.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/usbc_raa489000.c")
@@ -36,7 +36,7 @@ if(DEFINED CONFIG_BOARD_NOKRIS)
 	project(nokris)
 	zephyr_library_sources(
 			"src/nivviks_led.c"
-			"nokris/src/form_factor.c"
+			"src/form_factor.c"
 			"src/hdmi.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/fan.c")
@@ -82,7 +82,7 @@ if(DEFINED CONFIG_BOARD_JOXER)
 			"joxer/src/board.c"
 			"joxer/src/led.c"
 			"joxer/src/keyboard.c"
-			"joxer/src/form_factor.c"
+			"src/form_factor.c"
 			"joxer/src/sub_board.c"
 			"joxer/src/thermal.c"
 	)
@@ -146,7 +146,7 @@ if(DEFINED CONFIG_BOARD_GOTHRAX)
 	zephyr_library_sources(
 			"src/hdmi.c"
 			"gothrax/src/usb_mux_config.c"
-			"gothrax/src/form_factor.c"
+			"src/form_factor.c"
 			"src/gothrax_sub_board.c"
 			"src/gothrax_thermal.c"
 	)
@@ -244,7 +244,7 @@ if(DEFINED CONFIG_BOARD_SUNDANCE)
 	project(sundance)
 	zephyr_library_sources(
 			"sundance/src/led.c"
-			"sundance/src/form_factor.c"
+			"src/form_factor.c"
 			"sundance/src/board.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "sundance/src/usbc.c")
@@ -400,7 +400,7 @@ if(DEFINED CONFIG_BOARD_EPIC)
 	zephyr_library_sources(
 			"src/hdmi.c"
 			"epic/src/usb_mux_config.c"
-			"epic/src/form_factor.c"
+			"src/form_factor.c"
 			"src/gothrax_sub_board.c"
 			"src/gothrax_thermal.c"
 	)
