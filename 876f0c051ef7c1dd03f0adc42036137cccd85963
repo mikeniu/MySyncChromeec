@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6dd7f04_2dbc6f43",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-29T08:43:37Z",
+      "side": 1,
+      "message": "Running `./twister -s bluey.pic` with this CL results in following error:\n```\nERROR   - native_sim/native         bluey.pic                                          FAILED: rc\u003d1\nERROR   - see: /mnt/host/source/src/platform/ec/twister-out/native_sim_native/host_llvm/platform/ec/zephyr/test/bluey/bluey.pic/handler.log\n```\n\nPlease run the same command at your end and fix the error.",
+      "revId": "876f0c051ef7c1dd03f0adc42036137cccd85963",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
