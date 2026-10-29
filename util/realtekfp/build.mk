@@ -4,16 +4,34 @@
 
 _cur_dir := $(notdir $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
 
+host-util-bin-cxx-y += rts5817_flash
+rts5817_flash-objs := $(addprefix $(_cur_dir)/, \
+	rts5817_flash.o \
+	rts5817_flash_cli.o \
+	rts5817_flasher.o \
+	rts5817_usb_device.o \
+	rts5817_libusb_backend.o \
+)
+
+_rts5817_flash_bin := $(out)/util/rts5817_flash
+$(_rts5817_flash_bin): HOST_CXXFLAGS+=-fvisibility=hidden -Iutil/realtekfp
+$(_rts5817_flash_bin): HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) \
+	--cflags libusb-1.0)
+$(_rts5817_flash_bin): HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) \
+	--libs libusb-1.0)
+
 host-util-bin-cxx-y += rts5817_flash_test
 rts5817_flash_test-objs := $(addprefix $(_cur_dir)/, \
 	rts5817_usb_device.o \
 	rts5817_usb_device_test.o \
 	rts5817_flash_cli.o \
 	rts5817_flash_cli_test.o \
+	rts5817_flasher.o \
+	rts5817_flasher_test.o \
 )
 
 _rts5817_test_bin := $(out)/util/rts5817_flash_test
-$(_rts5817_test_bin): HOST_CXXFLAGS+=-Iutil/realtekfp
+$(_rts5817_test_bin): HOST_CXXFLAGS+=-fvisibility=hidden -Iutil/realtekfp
 $(_rts5817_test_bin): HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) \
 	--cflags gtest gmock)
 $(_rts5817_test_bin): HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) \
