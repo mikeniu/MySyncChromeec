@@ -89,6 +89,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "240b292a_1f1766d1",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:52:03Z",
+      "side": 1,
+      "message": "The empty firmware, zero transfer size and claim-failure cases were done in ps3. Not done: switching dfu_download() to std::span, because it changes the signature used by the CLI and its tests. I would rather do it as a separate follow-up, so I am leaving this thread open.",
+      "parentUuid": "8d1c47b3_ceb5c162",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 503,
+        "endChar": 9999
+      },
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4629de58_600cf201",
         "filename": "util/rts5817_flash.cc",
         "patchSetId": 2

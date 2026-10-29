@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b85495d_ba21a629",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:52:03Z",
+      "side": 1,
+      "message": "Done in ps4: the message now says the download runs over RtsUsbBackend, including the claim/release and kernel-driver hooks added here. The interface methods stay in this change since they are used only by dfu_download().",
+      "parentUuid": "ed3b306e_61348bf3",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdfa31e3_06431ed4",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Thank you for adding the `RtsUsbBackend` test suite and addressing the edge cases from the previous patchset. Please split the `RtsUsbBackend` interface additions into the prerequisite backend CL and address the remaining test/precondition simplifications noted inline.\n\n### Review Summary\n**Functionality:** ✅ `RtsUsbDevice::dfu_download` properly handles empty payloads, kernel driver detachment, interface claiming/releasing on all error and completion paths, short writes, block status polling, and the trailing zero-length packet.\n**Architecture \u0026 Component Fit:** ✅ Routing USB operations through `RtsUsbBackend` cleanly decouples the DFU state machine from `libusb` and integrates with `utils-test`.\n**Code Simplicity:** ❌ A few simplifications are needed (see inline comments):\n- In `RtsUsbDevice::dfu_download` (`util/rts5817_usb_device.cc`), `find_dfu_interface()` already checks `backend_-\u003eis_open()` at entry and `parse_dfu_transfer_size()` already substitutes `kDfuDefaultTransferSize` when `wTransferSize \u003d\u003d 0`, so the entry checks can be simplified to `if (firmware.empty() || !find_dfu_interface()) return false;`.\n- In `RtsUsbDeviceDownloadTest` (`util/rts5817_usb_device_test.cc`), inherit from `RtsUsbDeviceDfuTest` to reuse `dfu_interface()`, and drop `::testing::Mock::VerifyAndClearExpectations(backend_)` and the repeated mock setup boilerplate in `FailsWithoutOpenDevice`, `FailsWhenNoDfuInterface`, `ContinuesWhenKernelDriverDetachFails`, and `ClaimFailureLeavesNothingToRelease`.\n**Idiomaticity \u0026 Readability:** ✅ Naming, constants (`kDfuDownload`, `kDfuProgressStepPct`), and C++ types follow codebase conventions.\n**Security:** ✅ No security vulnerabilities identified.\n**Testing:** ❌ Comprehensive boundary and failure scenarios are covered, with a couple of assertion/matcher refinements needed in `util/rts5817_usb_device_test.cc`:\n- Assert the exact block payload bytes in `ImageExactlyOneBlock` (`rec_.blocks[0].data`) and `ImageOfExactMultipleOfBlockSize` (`rec_.blocks[0].data` and `rec_.blocks[2].data.empty()`).\n- Replace wildcard `_` matchers with the exact contract arguments (`kDfuGetStatusResponseLen`, `kUsbDfuTimeoutMs`, and `kUsbCtrlTimeoutMs`) in the `kDfuGetStatus` and `kDfuClrStatus` expectations.\n**CL Size \u0026 Scope:** ❌ `Size: L (+453, -0)` (162 production lines across `rts5817_usb_backend.h`, `rts5817_libusb_backend.{h,cc}`, and `rts5817_usb_device.{h,cc}`, plus 291 test/mock lines in `rts5817_mock_usb_backend.h` and `rts5817_usb_device_test.cc`). While the production line count is under 250 lines, this CL bundles adding new interface methods (`detach_kernel_driver` and `claim_interface`) across `RtsUsbBackend`, `RtsLibusbBackend`, and `MockRtsUsbBackend` with implementing `RtsUsbDevice::dfu_download`. Adding new interface methods along with their concrete and mock implementations should live in a prerequisite CL (or be folded into the parent `RtsUsbBackend` CL in the stack) separate from the caller that consumes them:\n1. **CL 1 (Prerequisite / fold into parent `RtsUsbBackend` CL):** Add `detach_kernel_driver` and `claim_interface` to `RtsUsbBackend` (`util/rts5817_usb_backend.h`), `RtsLibusbBackend` (`util/rts5817_libusb_backend.h`, `util/rts5817_libusb_backend.cc`), and `MockRtsUsbBackend` (`util/rts5817_mock_usb_backend.h`).\n2. **CL 2 (This CL):** Add `kDfuDownload`, `kDfuProgressStepPct`, and `RtsUsbDevice::dfu_download` (`util/rts5817_usb_device.h`, `util/rts5817_usb_device.cc`) along with its `RtsUsbDeviceDownloadTest` unit tests (`util/rts5817_usb_device_test.cc`).\n**Commit Message:** ❌ Please update the commit message so it reflects that `RtsUsbDevice::dfu_download` operates over `RtsUsbBackend` rather than calling `libusb` directly (see inline comment on `/COMMIT_MSG` for copy-pasteable options).\n\n[🔗](http://go/tj/c4d18987-0543-4539-89be-1c0e912698a4)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "014f6ec7_f07ee482",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:52:03Z",
+      "side": 1,
+      "message": "Done in ps4: the entry checks are merged into firmware.empty() || !find_dfu_interface(), the download test fixture inherits RtsUsbDeviceDfuTest without VerifyAndClearExpectations, ImageExactlyOneBlock and ImageOfExactMultipleOfBlockSize assert the block payloads, and the DFU_GETSTATUS/DFU_CLRSTATUS expectations use exact arguments.\n\nNot done: moving detach_kernel_driver()/claim_interface() into a separate prerequisite CL, since dfu_download() is their only user.",
+      "parentUuid": "cdfa31e3_06431ed4",
       "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4d7e614_9d6918ea",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:52:03Z",
+      "side": 1,
+      "message": "Done in ps4: merged into if (firmware.empty() || !find_dfu_interface()) return false;.",
+      "parentUuid": "cbe73269_7347509b",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 355,
+        "endChar": 9999
+      },
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa8582ad_eb26231f",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a4b978a_97360a7b",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:52:03Z",
+      "side": 1,
+      "message": "Done in ps4: RtsUsbDeviceDownloadTest inherits RtsUsbDeviceDfuTest and reuses dfu_interface(), and the four setup-override tests no longer call VerifyAndClearExpectations or repeat the mock setup.",
+      "parentUuid": "fa8582ad_eb26231f",
+      "range": {
+        "startLine": 614,
+        "startChar": 0,
+        "endLine": 635,
+        "endChar": 9999
+      },
       "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd098586_6292741d",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:52:03Z",
+      "side": 1,
+      "message": "Done in ps4: added a shared fill_idle_status helper used by status_always_idle() and ManifestNotIdleStillSucceeds, and the DFU_GETSTATUS expectations use kDfuGetStatusResponseLen and kUsbDfuTimeoutMs.",
+      "parentUuid": "0afb2149_1fac14a9",
+      "range": {
+        "startLine": 658,
+        "startChar": 0,
+        "endLine": 671,
+        "endChar": 9999
+      },
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c1bf756_62b5abd9",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b186cb58_88adbc5c",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:52:03Z",
+      "side": 1,
+      "message": "Done in ps4: ImageExactlyOneBlock and ImageOfExactMultipleOfBlockSize assert the block payloads and the trailing empty block, and the DFU_CLRSTATUS expectations use wValue 0 and kUsbCtrlTimeoutMs.",
+      "parentUuid": "1c1bf756_62b5abd9",
+      "range": {
+        "startLine": 708,
+        "startChar": 0,
+        "endLine": 730,
+        "endChar": 9999
+      },
       "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
