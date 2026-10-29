@@ -18,6 +18,7 @@
 #include <span>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include "rts5817_usb_backend.h"
 
@@ -32,6 +33,7 @@ enum class RtsError {
   kStall,
   kProtocolError,
   kNoDfuInterface,
+  kDeviceRejected,
 };
 
 inline std::string_view ToString(RtsError error) {
@@ -52,6 +54,8 @@ inline std::string_view ToString(RtsError error) {
       return "Unexpected response from the device";
     case RtsError::kNoDfuInterface:
       return "No DFU interface found on the device";
+    case RtsError::kDeviceRejected:
+      return "The device reported a DFU error";
   }
   return "Unknown error";
 }
@@ -81,7 +85,56 @@ inline constexpr uint8_t kBmReqH2dStdDev = 0x00;
 inline constexpr uint8_t kBmReqD2hVendorDev = 0xC0;
 
 // DFU class-specific requests (bmRequestType = 0x21 or 0xA1).
-inline constexpr uint8_t kDfuDetach = 0x00;
+enum class DfuRequest : uint8_t {
+  kDetach = 0x00,
+  kDownload = 0x01,
+  kGetStatus = 0x03,
+  kClrStatus = 0x04,
+  kAbort = 0x06,
+};
+
+// DFU_GETSTATUS response: bStatus, bwPollTimeout[3], bState, iString.
+inline constexpr size_t kDfuGetStatusResponseLen = 6;
+inline constexpr size_t kDfuStatusOff = 0;
+inline constexpr size_t kDfuPollTimeoutOff = 1;
+inline constexpr size_t kDfuStateOff = 4;
+
+// DFU status codes (from USB DFU spec).
+enum class DfuStatus : uint8_t {
+  kOk = 0x00,
+  // The device could not finish the last request (RTS5817: image rejected).
+  kNotDone = 0x09,
+};
+
+// DFU states (from USB DFU spec).
+enum class DfuState : uint8_t {
+  kDfuIdle = 2,
+  kDfuDnloadSync = 3,
+  kDfuDnloadBusy = 4,
+  kDfuDnloadIdle = 5,
+  kDfuManifestSync = 6,
+  kDfuManifest = 7,
+  kDfuManifestWaitReset = 8,
+  kDfuUploadIdle = 9,
+  kDfuError = 10,
+};
+
+// The six-byte DFU_GETSTATUS response.
+struct DfuStatusResponse {
+  uint8_t status = 0;
+  std::chrono::milliseconds poll_timeout{0};
+  uint8_t state = 0;
+
+  // Decodes the response; bwPollTimeout is a 24-bit little-endian value.
+  static DfuStatusResponse FromBytes(
+      std::span<const uint8_t, kDfuGetStatusResponseLen> raw);
+};
+
+// Print download progress every this many percent.
+inline constexpr size_t kDfuProgressStepPct = 10;
+
+// Poll delay used when the device reports bwPollTimeout == 0.
+inline constexpr std::chrono::milliseconds kDfuMinPollDelay{1};
 
 // DFU descriptor type.
 inline constexpr uint8_t kDfuDescriptorType = 0x21;
@@ -98,9 +151,13 @@ inline constexpr uint8_t kDfuSubclass = 0x01;
 
 // bmRequestType: 0x21 = Host-to-device, Class, Interface.
 inline constexpr uint8_t kBmReqH2dClsIf = 0x21;
+// bmRequestType: 0xA1 = Device-to-host, Class, Interface.
+inline constexpr uint8_t kBmReqD2hClsIf = 0xA1;
 
 // USB I/O timeouts.
 inline constexpr std::chrono::milliseconds kUsbCtrlTimeout{1000};
+// Covers the manifest phase, where the device programs and verifies flash.
+inline constexpr std::chrono::seconds kUsbDfuTimeout{60};
 
 // Default transfer size if we cannot parse the DFU functional descriptor. This
 // is the RTS5817 SPI flash sector size.
@@ -159,8 +216,19 @@ class RtsUsbDevice {
   std::expected<void, RtsError> DfuDetach(
       std::chrono::milliseconds detach_timeout);
 
-  // wTransferSize of the DFU interface found by the last lookup.
-  uint16_t transfer_size() const { return transfer_size_; }
+  // Performs the full DFU firmware download and then detaches so the device
+  // boots the new image.
+  //
+  // Must be called on the device in DFU mode (0BDA:5800), i.e. after
+  // DfuDetach() made it re-enumerate and WaitForDevice() reopened it.
+  // `firmware` must already have any trailing DFU suffix stripped: the
+  // RTS5817 rejects it as payload because the downloaded length no longer
+  // matches the image header.
+  //
+  // Fails if the device rejects the image, which it reports by stalling the
+  // final zero-length DFU_DNLOAD (RTS5817 validates the length and a SHA-256
+  // of the whole image there).
+  std::expected<void, RtsError> DfuDownload(std::span<const uint8_t> firmware);
 
  private:
   // Claims an interface for the lifetime of the object, so every return path
@@ -194,10 +262,37 @@ class RtsUsbDevice {
   // Finds the DFU interface and parses the DFU functional descriptor.
   std::expected<DfuInterfaceInfo, RtsError> FindDfuInterface();
 
+  // Reads DFU_GETSTATUS.
+  std::expected<DfuStatusResponse, RtsError> DfuGetStatus(int interface);
+
+  // Polls DFU_GETSTATUS until the device is no longer busy and returns the
+  // state it settled in: dfuIDLE or dfuDNLOAD-IDLE.
+  std::expected<DfuState, RtsError> DfuPollIdle(int interface);
+
+  // Sends DFU_CLRSTATUS. Only valid in dfuERROR; the RTS5817 stalls it, and
+  // enters dfuERROR, in any other state.
+  std::expected<void, RtsError> DfuClearStatus(int interface);
+
+  // Sends DFU_ABORT, which returns dfuDNLOAD-IDLE / dfuUPLOAD-IDLE to dfuIDLE.
+  std::expected<void, RtsError> DfuAbort(int interface);
+
+  // Brings a device left in a non-idle state by an earlier, interrupted
+  // transfer back to dfuIDLE.
+  std::expected<void, RtsError> DfuRecoverToIdle(int interface);
+
+  // Clears the error state after a failed transfer, but only if the device is
+  // in dfuERROR: CLRSTATUS anywhere else makes the RTS5817 stall and enter it.
+  void DfuClearIfInError(int interface);
+
+  // Prints the device's bStatus/bState, to explain a rejected transfer.
+  void DfuReportStatus(int interface);
+
+  // Sends a zero-length class request to `interface`.
+  std::expected<void, RtsError> DfuSendRequest(DfuRequest request,
+                                               uint16_t value, int interface);
+
   std::unique_ptr<RtsUsbBackend> backend_;
   SleepFn sleep_;
-  int dfu_interface_ = -1;
-  uint16_t transfer_size_ = kDfuDefaultTransferSize;
 };
 
 }  // namespace realtekfp

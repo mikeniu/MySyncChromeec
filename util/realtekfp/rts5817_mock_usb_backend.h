@@ -40,6 +40,7 @@ class MockRtsUsbBackend : public RtsUsbBackend {
   MOCK_METHOD((std::expected<void, int>), ClaimInterface,
               (int interface_number), (override));
   MOCK_METHOD(void, ReleaseInterface, (int interface_number), (override));
+  MOCK_METHOD(int, ResetDevice, (), (override));
   MOCK_METHOD(std::string_view, ErrorName, (int error), (const, override));
 };
 

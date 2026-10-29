@@ -82,6 +82,9 @@ class RtsUsbBackend {
   // Releases a claimed interface.
   virtual void ReleaseInterface(int interface_number) = 0;
 
+  // Resets the device; the handle may become invalid afterwards.
+  virtual int ResetDevice() = 0;
+
   // Name of a negative libusb error code, for diagnostics.
   virtual std::string_view ErrorName(int error) const = 0;
 };
