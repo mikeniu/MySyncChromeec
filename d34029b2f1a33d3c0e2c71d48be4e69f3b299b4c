@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "d34029b2f1a33d3c0e2c71d48be4e69f3b299b4c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb0e5386_6dcc5be8",
+        "filename": "chip/stm32/host_command_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T00:00:58Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "49f5b3f6_a1e99f7b",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
+      "revId": "d34029b2f1a33d3c0e2c71d48be4e69f3b299b4c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
