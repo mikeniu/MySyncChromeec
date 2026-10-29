@@ -6,15 +6,23 @@
 #ifndef __UTIL_MISC_UTIL_H
 #define __UTIL_MISC_UTIL_H
 
-/* Don't use a macro where an inline will do... */
-static inline int MIN(int a, int b)
-{
-	return a < b ? a : b;
-}
-static inline int MAX(int a, int b)
-{
-	return a > b ? a : b;
-}
+/*
+ * Type generic MIN()/MAX(). Plain 'int' parameters used to silently truncate
+ * size_t and uint32_t arguments and reinterpret them as negative values, which
+ * turned clamping of an unsigned length into a huge length (b/518787535).
+ */
+#define MIN(a, b)                                  \
+	({                                         \
+		__typeof__(a) _min_a = (a);        \
+		__typeof__(b) _min_b = (b);        \
+		_min_a < _min_b ? _min_a : _min_b; \
+	})
+#define MAX(a, b)                                  \
+	({                                         \
+		__typeof__(a) _max_a = (a);        \
+		__typeof__(b) _max_b = (b);        \
+		_max_a > _max_b ? _max_a : _max_b; \
+	})
 
 /**
  * Write a buffer to the file.
