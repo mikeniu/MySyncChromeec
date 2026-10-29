@@ -22,6 +22,30 @@
       },
       "revId": "7d1e13f94332849a236dfd84843464c3b7a147d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1ad31ae_f0731eee",
+        "filename": "zephyr/program/dougie/bandit/generated.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-10-29T19:00:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7ee49f2_db54c46e",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 53
+      },
+      "revId": "7d1e13f94332849a236dfd84843464c3b7a147d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
