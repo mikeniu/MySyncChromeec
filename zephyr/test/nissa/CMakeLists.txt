@@ -99,7 +99,7 @@ if(CONFIG_TEST_NISSA_GOTHRAX)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/usb_mux_config.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/form_factor.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_thermal.c
@@ -308,7 +308,7 @@ if(CONFIG_TEST_NISSA_GLASSWAY)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/usb_mux_config.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/keyboard.c
     )
 endif()
@@ -378,7 +378,7 @@ if(CONFIG_TEST_NISSA_GUREN)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/board.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/usb_mux_config.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/keyboard.c
     )
 endif()
@@ -392,7 +392,7 @@ if(CONFIG_TEST_NISSA_EPIC)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/usb_mux_config.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_usb_mux_config.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/form_factor.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_thermal.c

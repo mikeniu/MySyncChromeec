@@ -145,7 +145,7 @@ if(DEFINED CONFIG_BOARD_GOTHRAX)
 	project(gothrax)
 	zephyr_library_sources(
 			"src/hdmi.c"
-			"gothrax/src/usb_mux_config.c"
+			"src/gothrax_usb_mux_config.c"
 			"src/form_factor.c"
 			"src/gothrax_sub_board.c"
 			"src/gothrax_thermal.c"
@@ -230,7 +230,7 @@ if(DEFINED CONFIG_BOARD_GLASSWAY)
 			"src/glassway_sub_board.c"
 			"src/glassway_kb_backlight.c"
 			"glassway/src/board.c"
-			"glassway/src/usb_mux_config.c"
+			"src/glassway_usb_mux_config.c"
 			"glassway/src/keyboard.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/glassway_fan.c")
@@ -363,7 +363,7 @@ if(DEFINED CONFIG_BOARD_GUREN)
 			"src/glassway_sub_board.c"
 			"src/glassway_kb_backlight.c"
 			"guren/src/board.c"
-			"guren/src/usb_mux_config.c"
+			"src/glassway_usb_mux_config.c"
 			"guren/src/keyboard.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FAN "src/glassway_fan.c")
@@ -399,7 +399,7 @@ if(DEFINED CONFIG_BOARD_EPIC)
 	project(epic)
 	zephyr_library_sources(
 			"src/hdmi.c"
-			"epic/src/usb_mux_config.c"
+			"src/gothrax_usb_mux_config.c"
 			"src/form_factor.c"
 			"src/gothrax_sub_board.c"
 			"src/gothrax_thermal.c"
