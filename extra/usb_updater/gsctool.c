@@ -748,6 +748,11 @@ static int ts_read(void *buf, size_t max_rx_size)
 	rv = fread(response, 1, sizeof(response), tpm_output);
 	if (rv > 0)
 		rv -= 1; /* Discard the \n character added by trunks_send. */
+	/*
+	 * The read can fill the entire buffer, terminate it before it is
+	 * printed below, the trailing newline is not needed either.
+	 */
+	response[rv > 0 ? rv : 0] = '\0';
 
 	debug("response of size %d, max rx size %zd: %s\n", rv, max_rx_size,
 	      response);
@@ -928,9 +933,10 @@ static int tpm_send_pkt(struct transfer_descriptor *td, unsigned int digest,
 	}
 
 	if (response && response_size) {
-		len = MIN(len, *response_size);
-		memcpy(response, raw_response + response_offset, len);
-		*response_size = len;
+		size_t copy_size = MIN((size_t)len, *response_size);
+
+		memcpy(response, raw_response + response_offset, copy_size);
+		*response_size = copy_size;
 	}
 
 	/* Return the actual return code from the TPM response header. */
@@ -1143,9 +1149,10 @@ static int transfer_block(struct usb_endpoint *uep, struct update_pdu *updu,
 
 	/* Now send the block, chunk by chunk. */
 	for (transfer_size = 0; transfer_size < payload_size;) {
-		int chunk_size;
+		size_t chunk_size;
 
-		chunk_size = MIN(uep->chunk_len, payload_size - transfer_size);
+		chunk_size = MIN((size_t)uep->chunk_len,
+				 payload_size - transfer_size);
 		do_xfer(uep, transfer_data_ptr, chunk_size, NULL, 0, 0, NULL);
 		transfer_data_ptr += chunk_size;
 		transfer_size += chunk_size;
@@ -1204,7 +1211,7 @@ static void transfer_section(struct transfer_descriptor *td, uint8_t *data_ptr,
 		struct update_pdu updu;
 
 		/* prepare the header to prepend to the block. */
-		payload_size = MIN(data_len, SIGNED_TRANSFER_SIZE);
+		payload_size = MIN(data_len, (size_t)SIGNED_TRANSFER_SIZE);
 		updu.block_size =
 			htobe32(payload_size + sizeof(struct update_pdu));
 
@@ -3202,7 +3209,8 @@ static void print_ccd_info(void *response, size_t response_size,
 	}
 
 	/* Now report CCD state on the console. */
-	const char *const state = ccd_info.ccd_state > ARRAY_SIZE(state_names) ?
+	const char *const state = ccd_info.ccd_state >=
+						  ARRAY_SIZE(state_names) ?
 					  "Error" :
 					  state_names[ccd_info.ccd_state];
 	const char *const password = (ccd_info.ccd_indicator_bitmap &
@@ -4101,8 +4109,8 @@ static bool get_bid(struct transfer_descriptor *td, struct board_id *bid)
 	int rv;
 	size_t response_size = sizeof(*bid);
 
-	rv = send_vendor_command(td, VENDOR_CC_GET_BOARD_ID, bid, response_size,
-				 bid, &response_size);
+	rv = send_vendor_command(td, VENDOR_CC_GET_BOARD_ID, NULL, 0, bid,
+				 &response_size);
 	if (rv) {
 		/* b/424475170 H1 will return NO_SUCH_COMMAND if there's */
 		/* currently a BID mismatch. */
@@ -4122,7 +4130,7 @@ static bool get_bid(struct transfer_descriptor *td, struct board_id *bid)
 		fprintf(stderr,
 			"Error reading board ID: response size %zd, "
 			"first byte %#02x\n",
-			response_size, response_size ? *(uint8_t *)&bid : -1);
+			response_size, response_size ? *(uint8_t *)bid : -1);
 		exit(update_error);
 	}
 
@@ -4621,6 +4629,7 @@ static int pop_flog_dt(struct transfer_descriptor *td,
 		       struct parsed_flog_entry *parsed_entry)
 {
 	union dt_entry_u entry;
+	size_t payload_size;
 	size_t resp_size = sizeof(entry);
 	int rv = send_vendor_command(td, VENDOR_CC_POP_LOG_ENTRY_MS,
 				     &parsed_entry->raw_timestamp,
@@ -4632,12 +4641,29 @@ static int pop_flog_dt(struct transfer_descriptor *td,
 		parsed_entry->end_of_list = true;
 		return 0;
 	}
+	/*
+	 * The GSC is not trusted to report a consistent entry, the payload
+	 * size has to be derived from the number of bytes actually received,
+	 * and then verified against the size reported in the entry header.
+	 * Note that 'entry.evt.size' covers both the event type and the
+	 * payload, subtracting from it would underflow if it is not checked
+	 * first.
+	 */
+	if (resp_size < offsetof(dt_event_t, payload)) {
+		fprintf(stderr, "%s: truncated log entry, %zd bytes\n",
+			__func__, resp_size);
+		return -1;
+	}
+	payload_size = resp_size - offsetof(dt_event_t, payload);
+	if (entry.evt.size < sizeof(entry.evt.event_type)) {
+		payload_size = 0;
+	} else if ((entry.evt.size - sizeof(entry.evt.event_type)) <
+		   payload_size) {
+		payload_size = entry.evt.size - sizeof(entry.evt.event_type);
+	}
 	parsed_entry->event_type = entry.evt.event_type;
-	parsed_entry->payload_size =
-		MIN(entry.evt.size - sizeof(entry.evt.event_type),
-		    MAX_PAYLOAD_SIZE);
-	memcpy(parsed_entry->payload, entry.evt.payload,
-	       parsed_entry->payload_size);
+	parsed_entry->payload_size = payload_size;
+	memcpy(parsed_entry->payload, entry.evt.payload, payload_size);
 	parsed_entry->raw_timestamp = entry.evt.time;
 	parsed_entry->timestamp =
 		(parsed_entry->raw_timestamp & ~(1ULL << 63)) / 1000;
@@ -4650,6 +4676,7 @@ static int pop_flog(struct transfer_descriptor *td,
 		    struct parsed_flog_entry *parsed_entry)
 {
 	union entry_u entry;
+	size_t payload_size;
 	size_t resp_size = sizeof(entry);
 	uint32_t ts = (uint32_t)parsed_entry->raw_timestamp;
 	int rv = send_vendor_command(td, VENDOR_CC_POP_LOG_ENTRY, &ts,
@@ -4660,11 +4687,21 @@ static int pop_flog(struct transfer_descriptor *td,
 		parsed_entry->end_of_list = true;
 		return 0;
 	}
+	/*
+	 * Do not parse the header unless it was received in full, and do not
+	 * copy more payload bytes than the GSC actually sent.
+	 */
+	if (resp_size < offsetof(struct flash_log_entry, payload)) {
+		fprintf(stderr, "%s: truncated log entry, %zd bytes\n",
+			__func__, resp_size);
+		return -1;
+	}
+	payload_size = resp_size - offsetof(struct flash_log_entry, payload);
+	if (FLASH_LOG_PAYLOAD_SIZE(entry.r.size) < payload_size)
+		payload_size = FLASH_LOG_PAYLOAD_SIZE(entry.r.size);
 	parsed_entry->event_type = entry.r.type;
-	parsed_entry->payload_size =
-		MIN(FLASH_LOG_PAYLOAD_SIZE(entry.r.size), MAX_PAYLOAD_SIZE);
-	memcpy(parsed_entry->payload, entry.r.payload,
-	       parsed_entry->payload_size);
+	parsed_entry->payload_size = payload_size;
+	memcpy(parsed_entry->payload, entry.r.payload, payload_size);
 	parsed_entry->raw_timestamp = entry.r.timestamp;
 	parsed_entry->timestamp = entry.r.timestamp;
 	parsed_entry->timestamp_reliable = true;
@@ -4988,7 +5025,11 @@ static int get_console_logs(struct transfer_descriptor *td, bool *empty)
 	if (empty)
 		*empty = response_size == 0;
 
-	printf("%s", response);
+	/*
+	 * The GSC can fill the entire buffer, which would leave no room for a
+	 * terminating zero, print no more than what was received.
+	 */
+	printf("%.*s", (int)response_size, response);
 	if (empty && *empty)
 		printf("\n");
 	return 0;
@@ -5682,7 +5723,7 @@ int main(int argc, char *argv[])
 	int get_endorsement_seed = 0;
 	const char *endorsement_seed_str = "";
 	int corrupt_inactive_rw = 0;
-	struct board_id bid;
+	struct board_id bid = { 0 };
 	enum board_id_action bid_action;
 	int password = 0;
 	int ccd_open = 0;
@@ -6139,11 +6180,12 @@ int main(int argc, char *argv[])
 	    !get_flog && !get_endorsement_seed && !get_metrics && !get_time &&
 	    !factory_config && !factory_mode && !erase_ap_ro_hash &&
 	    !password && !reboot_gsc && !rma && !set_capability &&
-	    !show_fw_ver && !sn_bits && !sn_inc_rma && !start_apro_verify &&
-	    !openbox_desc_file && !tstamp && !tpm_mode && (wp == WP_NONE) &&
-	    !get_chassis_open && !get_dev_ids && !get_aprov_reset_counts &&
-	    !upload_owner_config && !parse_device_ids && !set_strongbox &&
-	    !download_owner_config && !upload_boot_svc_msg) {
+	    !show_fw_ver && !sn_bits && !sn_inc_rma && !spi_drive &&
+	    !start_apro_verify && !openbox_desc_file && !tstamp && !tpm_mode &&
+	    (wp == WP_NONE) && !get_chassis_open && !get_dev_ids &&
+	    !get_aprov_reset_counts && !upload_owner_config &&
+	    !parse_device_ids && !set_strongbox && !download_owner_config &&
+	    !upload_boot_svc_msg) {
 		num_images = argc - optind;
 		if (num_images <= 0) {
 			fprintf(stderr,
