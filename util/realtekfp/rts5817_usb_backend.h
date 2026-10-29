@@ -53,6 +53,15 @@ class RtsUsbBackend {
 	 */
 	virtual int get_interfaces(std::vector<RtsUsbInterface> *interfaces) = 0;
 
+	/** Detach the kernel driver of an interface, if one is attached. */
+	virtual int detach_kernel_driver(int interface_number) = 0;
+
+	/** Claim an interface. Returns 0 or a negative libusb error. */
+	virtual int claim_interface(int interface_number) = 0;
+
+	/** Release a claimed interface. */
+	virtual void release_interface(int interface_number) = 0;
+
 	/** Reset the device; the handle may become invalid afterwards. */
 	virtual int reset_device() = 0;
 
