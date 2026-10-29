@@ -247,24 +247,6 @@ ZTEST(yavilla, test_set_active_charge_port)
 	zassert_equal(board_set_active_charge_port(0), EC_ERROR_UNKNOWN);
 }
 
-ZTEST(yavilla, test_tcpc_get_alert_status)
-{
-	const struct gpio_dt_spec *c1_int =
-		GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl);
-	/* GPIO is normally configured by code not tested in this case */
-	zassert_ok(gpio_pin_configure_dt(c1_int, GPIO_INPUT));
-
-	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT, TCPC_REG_ALERT_CC_STATUS);
-
-	/* Nothing if the IRQ line isn't asserted */
-	zassert_ok(gpio_emul_input_set(c1_int->port, c1_int->pin, 1));
-	zassert_equal(tcpc_get_alert_status(), 0);
-
-	/* Alert active if it is and the alert register has bits set */
-	zassert_ok(gpio_emul_input_set(c1_int->port, c1_int->pin, 0));
-	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_1);
-}
-
 ZTEST(yavilla, test_pd_power_supply_reset)
 {
 	charger_is_sourcing_otg_power_fake.return_val = 1;

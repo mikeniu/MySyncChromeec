@@ -209,32 +209,6 @@ ZTEST(pirrha, test_set_active_charge_port_disable_fail)
 	zassert_ok(board_set_active_charge_port(0));
 }
 
-ZTEST(pirrha, test_tcpc_get_alert_status)
-{
-	const struct gpio_dt_spec *c0_int =
-		GPIO_DT_FROM_NODELABEL(gpio_usb_c0_int_odl);
-	const struct gpio_dt_spec *c1_int =
-		GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl);
-
-	/* Sub-board IO configuration is handled by other inits */
-	gpio_pin_configure_dt(c1_int, GPIO_INPUT_PULL_UP);
-
-	/* Both IRQs are asserted */
-	gpio_emul_input_set(c0_int->port, c0_int->pin, 0);
-	gpio_emul_input_set(c1_int->port, c1_int->pin, 0);
-
-	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 1);
-	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_0);
-
-	/* Bit 14 is ignored */
-	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 0x4000);
-	zassert_equal(tcpc_get_alert_status(), 0);
-
-	/* Port 1 works too */
-	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT, 0x8000);
-	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_1);
-}
-
 ZTEST(pirrha, test_pd_power_supply_reset)
 {
 	uint16_t reg;

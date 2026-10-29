@@ -7,12 +7,16 @@
 #include "charge_state.h"
 #include "charger.h"
 #include "chipset.h"
+#include "driver/tcpm/tcpci.h"
 #include "hooks.h"
 #include "nissa_common.h"
 #include "system.h"
 #include "usb_mux.h"
+#include "usb_pd.h"
+#include "usb_pd_tcpm.h"
 
 #include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/logging/log.h>
 
 #include <ap_power/ap_power.h>
@@ -177,3 +181,57 @@ board_allow_i2c_passthru(const struct i2c_cmd_desc_t *cmd_desc)
 #endif
 		;
 }
+
+#if DT_NODE_EXISTS(DT_ALIAS(gpio_usb_c1_int_odl))
+#define GPIO_USB_C1_INT_ODL GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl)
+#elif DT_NODE_EXISTS(DT_NODELABEL(gpio_usb_c1_int_odl))
+#define GPIO_USB_C1_INT_ODL GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl)
+#endif
+
+#if !defined(CONFIG_PLATFORM_EC_TCPC_INTERRUPT)
+uint16_t tcpc_get_alert_status(void)
+{
+	uint16_t status = 0;
+
+#if DT_NODE_EXISTS(DT_NODELABEL(gpio_usb_c0_int_odl)) && \
+	DT_NODE_EXISTS(DT_NODELABEL(tcpc_port0))
+	/*
+	 * The interrupt line is shared between the TCPC and BC1.2 detector IC.
+	 * Therefore, go out and actually read the alert registers to report the
+	 * alert status.
+	 */
+	if (!gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_usb_c0_int_odl))) {
+		int regval, alert_mask;
+
+		if (!tcpc_read16(0, TCPC_REG_ALERT, &regval) &&
+		    !tcpc_read16(0, TCPC_REG_ALERT_MASK, &alert_mask)) {
+			/* The TCPCI Rev 1.0 spec says to ignore bits 14:12. */
+			if (!(tcpc_config[0].flags & TCPC_FLAGS_TCPCI_REV2_0))
+				regval &= ~((1 << 14) | (1 << 13) | (1 << 12));
+			/* Ignore alerts that are not in the alert mask */
+			if (regval & alert_mask)
+				status |= PD_STATUS_TCPC_ALERT_0;
+		}
+	}
+#endif
+
+#ifdef GPIO_USB_C1_INT_ODL
+	if (board_get_usb_pd_port_count() == 2 &&
+	    !gpio_pin_get_dt(GPIO_USB_C1_INT_ODL)) {
+		int regval, alert_mask;
+
+		if (!tcpc_read16(1, TCPC_REG_ALERT, &regval) &&
+		    !tcpc_read16(1, TCPC_REG_ALERT_MASK, &alert_mask)) {
+			/* TCPCI spec Rev 1.0 says to ignore bits 14:12. */
+			if (!(tcpc_config[1].flags & TCPC_FLAGS_TCPCI_REV2_0))
+				regval &= ~((1 << 14) | (1 << 13) | (1 << 12));
+			/* Ignore alerts that are not in the alert mask */
+			if (regval & alert_mask)
+				status |= PD_STATUS_TCPC_ALERT_1;
+		}
+	}
+#endif
+
+	return status;
+}
+#endif

@@ -6,19 +6,28 @@
 #include "ap_power/ap_power_events.h"
 #include "battery.h"
 #include "charger.h"
+#include "driver/tcpm/tcpci.h"
 #include "emul/emul_sm5803.h"
+#include "emul/tcpc/emul_tcpci.h"
 #include "hooks.h"
 #include "ocpc.h"
 #include "usb_pd.h"
+#include "usb_pd_tcpm.h"
 
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
+
+#include <dt-bindings/gpio_defines.h>
 
 FAKE_VALUE_FUNC(enum battery_present, battery_is_present);
 FAKE_VALUE_FUNC(int, board_set_active_charge_port, int);
 FAKE_VALUE_FUNC(uint8_t, board_get_usb_pd_port_count);
 FAKE_VALUE_FUNC(int, power_button_is_pressed);
+
+#define TCPC0 EMUL_DT_GET(DT_NODELABEL(tcpc_port0))
+#define TCPC1 EMUL_DT_GET(DT_NODELABEL(tcpc_port1))
 
 static void suite_before(void *fixture)
 {
@@ -141,4 +150,50 @@ ZTEST(nissa_common, test_i2c_passthru_policy)
 	zassert_false(board_allow_i2c_passthru(&(struct i2c_cmd_desc_t){
 		.port = I2C_PORT_BATTERY,
 	}));
+}
+
+ZTEST(nissa_common, test_tcpc_get_alert_status)
+{
+	const struct gpio_dt_spec *c0_int =
+		GPIO_DT_FROM_NODELABEL(gpio_usb_c0_int_odl);
+	const struct gpio_dt_spec *c1_int =
+		GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl);
+
+	/* Sub-board IO configuration is handled by other inits */
+	gpio_pin_configure_dt(c1_int, GPIO_INPUT_PULL_UP);
+
+	/* Both IRQs are asserted */
+	gpio_emul_input_set(c0_int->port, c0_int->pin, 0);
+	gpio_emul_input_set(c1_int->port, c1_int->pin, 0);
+
+	/* Enable all TCPC Alerts */
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT_MASK, TCPC_REG_ALERT_MASK_ALL);
+	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT_MASK, TCPC_REG_ALERT_MASK_ALL);
+
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 1);
+	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_0);
+
+	/* Bit 14 is ignored */
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 0x4000);
+	zassert_equal(tcpc_get_alert_status(), 0);
+
+	/* Port 1 works too */
+	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT, 0x8000);
+	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_1);
+
+	/* Port 1 ignored when port count is 1 */
+	board_get_usb_pd_port_count_fake.return_val = 1;
+	zassert_equal(tcpc_get_alert_status(), 0);
+	board_get_usb_pd_port_count_fake.return_val = 2;
+
+	/* Disable all TCPC Alerts */
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT_MASK, 0);
+	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT_MASK, 0);
+
+	/* Expect no alert status when alert mask is 0 */
+	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 1);
+	zassert_equal(tcpc_get_alert_status(), 0);
+
+	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT, 0x8000);
+	zassert_equal(tcpc_get_alert_status(), 0);
 }
