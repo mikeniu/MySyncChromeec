@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <expected>
 #include <print>
+#include <span>
 #include <utility>
 
 namespace realtekfp {
@@ -167,6 +168,43 @@ std::expected<void, RtsError> RtsUsbDevice::EnableDownload() {
   }
   std::println("Download mode enabled on device.");
   return {};
+}
+
+uint16_t ParseDfuTransferSize(std::span<const uint8_t> extra) {
+  // Walk the descriptor stream. The DFU functional descriptor has type 0x21
+  // and contains wTransferSize at byte offset 5-6.
+  while (extra.size() > kDfuDescTypeOff) {
+    uint8_t desc_len = extra[0];
+
+    if (desc_len == 0 || desc_len > extra.size()) {
+      break;
+    }
+
+    if (extra[kDfuDescTypeOff] == kDfuDescriptorType &&
+        desc_len >= kDfuDescMinLen) {
+      uint16_t size =
+          extra[kDfuDescXferSizeOff] | (extra[kDfuDescXferSizeOff + 1] << 8);
+
+      return size != 0 ? size : kDfuDefaultTransferSize;
+    }
+    extra = extra.subspan(desc_len);
+  }
+
+  return kDfuDefaultTransferSize;
+}
+
+DfuStatusResponse DfuStatusResponse::FromBytes(
+    std::span<const uint8_t, kDfuGetStatusResponseLen> raw) {
+  const uint32_t poll_timeout_ms =
+      raw[kDfuPollTimeoutOff] |
+      (static_cast<uint32_t>(raw[kDfuPollTimeoutOff + 1]) << 8) |
+      (static_cast<uint32_t>(raw[kDfuPollTimeoutOff + 2]) << 16);
+
+  return {
+      .status = static_cast<DfuStatus>(raw[kDfuStatusOff]),
+      .poll_timeout = std::chrono::milliseconds(poll_timeout_ms),
+      .state = static_cast<DfuState>(raw[kDfuStateOff]),
+  };
 }
 
 }  // namespace realtekfp

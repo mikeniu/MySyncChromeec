@@ -389,5 +389,150 @@ TEST(RtsErrorTest, ToStringCoversAllValues) {
   }
 }
 
+// bitCanDnload | bitManifestationTolerant | bitWillDetach
+constexpr uint8_t kDfuAttributes = 0x0B;
+constexpr uint8_t kDfuDetachTimeoutLo = 0xFF;
+constexpr uint8_t kDfuDetachTimeoutHi = 0x00;
+constexpr uint8_t kDfuVersionLo = 0x10;  // bcdDFUVersion 1.10
+constexpr uint8_t kDfuVersionHi = 0x01;
+// Length of the DFU 1.1 functional descriptor, which adds bcdDFUVersion.
+constexpr uint8_t kDfu11DescLen = 9;
+
+// A DFU 1.1 functional descriptor advertising the given wTransferSize.
+std::vector<uint8_t> DfuFuncDesc(uint16_t transfer_size) {
+  return {kDfu11DescLen,
+          kDfuDescriptorType,
+          kDfuAttributes,
+          kDfuDetachTimeoutLo,
+          kDfuDetachTimeoutHi,
+          static_cast<uint8_t>(transfer_size & 0xFF),
+          static_cast<uint8_t>(transfer_size >> 8),
+          kDfuVersionLo,
+          kDfuVersionHi};
+}
+
+TEST(ParseDfuTransferSizeTest, ValidDfu11Descriptor) {
+  std::vector<uint8_t> extra = DfuFuncDesc(2048);
+
+  ASSERT_EQ(extra.size(), kDfu11DescLen);
+  EXPECT_EQ(ParseDfuTransferSize(extra), 2048);
+}
+
+TEST(ParseDfuTransferSizeTest, ParsesRts5817SevenByteDescriptor) {
+  // What the RTS5817 reports in both Runtime and DFU mode: bLength 7 (no
+  // bcdDFUVersion), bmAttributes 0x0F, wDetachTimeOut 2000, wTransferSize 4096.
+  // A second descriptor advertising a different size follows, so skipping or
+  // rejecting the 7-byte one cannot pass via the 4096-byte default.
+  std::vector<uint8_t> extra = {0x07, 0x21, 0x0F, 0xD0, 0x07, 0x00, 0x10};
+  const std::vector<uint8_t> second = DfuFuncDesc(2048);
+
+  ASSERT_EQ(extra.size(), kDfuDescMinLen);
+  extra.insert(extra.end(), second.begin(), second.end());
+  EXPECT_EQ(ParseDfuTransferSize(extra), 4096);
+}
+
+TEST(ParseDfuTransferSizeTest, ValidExactMinLengthDescriptor) {
+  std::vector<uint8_t> extra = DfuFuncDesc(2048);
+
+  extra[0] = kDfuDescMinLen;
+  extra.resize(kDfuDescMinLen);
+  EXPECT_EQ(ParseDfuTransferSize(extra), 2048);
+}
+
+TEST(ParseDfuTransferSizeTest, EmptyUsesDefault) {
+  EXPECT_EQ(ParseDfuTransferSize({}), kDfuDefaultTransferSize);
+}
+
+TEST(ParseDfuTransferSizeTest, SingleByteBufferUsesDefault) {
+  const std::vector<uint8_t> extra = {0x01};
+
+  EXPECT_EQ(ParseDfuTransferSize(extra), kDfuDefaultTransferSize);
+}
+
+TEST(ParseDfuTransferSizeTest, ValidDescriptorLongerThanMinLength) {
+  std::vector<uint8_t> extra = DfuFuncDesc(2048);
+
+  extra[0] = kDfu11DescLen + 1;
+  extra.push_back(0x00);
+  EXPECT_EQ(ParseDfuTransferSize(extra), 2048);
+}
+
+TEST(ParseDfuTransferSizeTest, DescriptorShorterThanMinLengthUsesDefault) {
+  std::vector<uint8_t> extra = DfuFuncDesc(2048);
+
+  // Declares one byte less than needed to hold wTransferSize.
+  extra[0] = kDfuDescMinLen - 1;
+  extra.resize(kDfuDescMinLen - 1);
+  EXPECT_EQ(ParseDfuTransferSize(extra), kDfuDefaultTransferSize);
+}
+
+TEST(ParseDfuTransferSizeTest, TruncatedDescriptorUsesDefault) {
+  std::vector<uint8_t> extra = DfuFuncDesc(2048);
+
+  // Declares kDfu11DescLen bytes but one byte is missing.
+  extra.pop_back();
+  EXPECT_EQ(ParseDfuTransferSize(extra), kDfuDefaultTransferSize);
+}
+
+TEST(ParseDfuTransferSizeTest, ZeroLengthDescriptorStopsParsing) {
+  std::vector<uint8_t> extra = {0x00, kDfuDescriptorType, 0x00};
+  std::vector<uint8_t> func = DfuFuncDesc(2048);
+
+  extra.insert(extra.end(), func.begin(), func.end());
+  EXPECT_EQ(ParseDfuTransferSize(extra), kDfuDefaultTransferSize);
+}
+
+TEST(ParseDfuTransferSizeTest, SkipsNonDfuDescriptor) {
+  // Same length as a DFU descriptor, so only the type check rejects it.
+  std::vector<uint8_t> extra = DfuFuncDesc(2048);
+  std::vector<uint8_t> func = DfuFuncDesc(512);
+
+  extra[kDfuDescTypeOff] = 0x99;
+  extra.insert(extra.end(), func.begin(), func.end());
+  EXPECT_EQ(ParseDfuTransferSize(extra), 512);
+}
+
+TEST(ParseDfuTransferSizeTest, SkipsShortNonDfuDescriptor) {
+  std::vector<uint8_t> extra = {0x04, 0x99, 0xAA, 0xBB};
+  std::vector<uint8_t> func = DfuFuncDesc(512);
+
+  extra.insert(extra.end(), func.begin(), func.end());
+  EXPECT_EQ(ParseDfuTransferSize(extra), 512);
+}
+
+TEST(ParseDfuTransferSizeTest, UsesFirstDfuDescriptor) {
+  std::vector<uint8_t> extra = DfuFuncDesc(256);
+  std::vector<uint8_t> second = DfuFuncDesc(4096);
+
+  extra.insert(extra.end(), second.begin(), second.end());
+  EXPECT_EQ(ParseDfuTransferSize(extra), 256);
+}
+
+TEST(ParseDfuTransferSizeTest, ZeroTransferSizeUsesDefault) {
+  EXPECT_EQ(ParseDfuTransferSize(DfuFuncDesc(0)), kDfuDefaultTransferSize);
+}
+
+TEST(ParseDfuTransferSizeTest, DecodesLittleEndianTransferSize) {
+  EXPECT_EQ(ParseDfuTransferSize(DfuFuncDesc(0x1234)), 0x1234);
+}
+
+TEST(DfuStatusResponseTest, Decodes24BitLittleEndianPollTimeout) {
+  const std::array<uint8_t, kDfuGetStatusResponseLen> raw = {0x09, 0x03, 0x02,
+                                                             0x01, 0x04, 0x00};
+
+  const DfuStatusResponse response = DfuStatusResponse::FromBytes(raw);
+
+  EXPECT_EQ(response.status, DfuStatus::kNotDone);
+  // Needs all three bytes: 0x010203 ms.
+  EXPECT_EQ(response.poll_timeout, milliseconds(0x010203));
+  EXPECT_EQ(response.state, DfuState::kDfuDnloadBusy);
+}
+
+TEST(DfuStatusResponseTest, ZeroPollTimeout) {
+  const std::array<uint8_t, kDfuGetStatusResponseLen> raw = {};
+
+  EXPECT_EQ(DfuStatusResponse::FromBytes(raw).poll_timeout, milliseconds(0));
+}
+
 }  // namespace
 }  // namespace realtekfp
