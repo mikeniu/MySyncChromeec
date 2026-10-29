@@ -22,6 +22,7 @@
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/uart.h>
+#include <zephyr/irq.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_output_custom.h>
@@ -429,6 +430,14 @@ void uart_tx_flush(void)
 #if defined(CONFIG_UART_INTERRUPT_DRIVEN)
 	while (!uart_irq_tx_complete(uart_shell_dev)) {
 		if (k_can_yield()) {
+			unsigned int key = irq_lock();
+			bool can_yield = arch_irq_unlocked(key);
+			irq_unlock(key);
+
+			if (!can_yield) {
+				return;
+			}
+
 			k_msleep(1);
 		}
 	}
