@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42eb73d5_1a1dc0dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T09:02:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n* **Functionality:** All functional issues from patchset 1 are resolved. `RtsUsbDevice::release()` unconditionally resets `dfu_interface_` and `transfer_size_` and no longer attempts to release an unclaimed interface, and `dfu_detach()` properly discovers the DFU interface and sends the `DFU_DETACH` control transfer.\n* **Architecture \u0026 Component Fit:** `RtsUsbDevice::transfer_size()` is now exposed as a `const` accessor so callers and tests can inspect the parsed `wTransferSize`, and `release_interface()` is cleanly deferred to the CL that introduces `claim_interface()`.\n* **Code Simplicity:** `parse_dfu_transfer_size()` concisely traverses the descriptor stream using `std::span\u003cconst uint8_t\u003e` and `extra.subspan(desc_len)`, and `RtsLibusbBackend::get_interfaces()` constructs `RtsUsbInterface` elements in place via `interfaces-\u003eemplace_back(...)` with designated initializers.\n* **Idiomaticity \u0026 Readability:** Clean use of C++20/C++23 `std::span\u003cconst uint8_t\u003e`, `inline constexpr` header constants with `size_t` offsets/lengths, named descriptor constants in unit tests, and designated initializers.\n* **Security:** Bounds checks in `parse_dfu_transfer_size()` properly guard against empty, single-byte, zero-length, and truncated descriptors.\n* **Testing:** Thorough unit test coverage in `ParseDfuTransferSizeTest` (including exact minimum length, 1-byte buffer, `kDfuDescMinLen - 1`, `kDfuDescMinLen + 1`, truncated, zero-length, non-DFU, multiple DFU, zero transfer size, and little-endian decoding) and `RtsUsbDeviceDfuTest` (covering all branches of `find_dfu_interface()`, `dfu_detach()`, `transfer_size()`, and `release()`).\n* **CL Size \u0026 Scope:** `Size: L (+410, -0)` (+195 production lines across 5 files, +2 mock lines in `rts5817_mock_usb_backend.h`, and +213 unit test lines in `rts5817_usb_device_test.cc`). Even though each piece is small, this CL still bundles a new backend interface method (`RtsUsbBackend::get_interfaces()`), a standalone exported descriptor parser (`parse_dfu_transfer_size()`), and higher-level `RtsUsbDevice::dfu_detach()` integration into a single change. Please split this into 3 stacked CLs:\n  1. **CL 1:** Add the standalone `parse_dfu_transfer_size()` descriptor parser and DFU descriptor constants (`util/realtekfp/rts5817_usb_device.h`, `util/realtekfp/rts5817_usb_device.cc`) with its `ParseDfuTransferSizeTest` unit tests (`util/realtekfp/rts5817_usb_device_test.cc`).\n  2. **CL 2:** Add `RtsUsbInterface` and `get_interfaces()` to `RtsUsbBackend`, `RtsLibusbBackend`, and `MockRtsUsbBackend` (`util/realtekfp/rts5817_usb_backend.h`, `util/realtekfp/rts5817_libusb_backend.h`, `util/realtekfp/rts5817_libusb_backend.cc`, `util/realtekfp/rts5817_mock_usb_backend.h`).\n  3. **CL 3:** Add DFU interface discovery, `transfer_size()`, and `RtsUsbDevice::dfu_detach()` (`util/realtekfp/rts5817_usb_device.h`, `util/realtekfp/rts5817_usb_device.cc`) with `RtsUsbDeviceDfuTest` (`util/realtekfp/rts5817_usb_device_test.cc`).\n* **Commit Message:** The updated commit message in patchset 2 is clear, leads with the rationale, and omits test-suite narration; when splitting the CL, please use the per-CL commit messages suggested in the existing `/COMMIT_MSG` thread.\n\n[🔗](http://go/tj/5c541f85-e5d3-43aa-aeff-90ae25292bea)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b0ac9ba6ec26ee8a5af24f824acf3f6a846fecc7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
