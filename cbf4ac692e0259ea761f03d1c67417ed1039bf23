@@ -98,6 +98,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ff254ff5_77d0ffde",
+        "filename": "zephyr/program/dougie/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T18:59:53Z",
+      "side": 1,
+      "message": "If these signals `gpio_en_pp5000_z1` and `gpio_ec_en_pp3300_s3` are are not connected to the AP, then I fully agree that these should be managed separately from the QCOM power sequence driver.\n\n`ap_power_events` is a great match for this.  This requires that the QCOM power sequence driver is updated to support the AP_POWER_EVENT_CALLBACK_DEFINE.  See b/527824236#comment15 and b/527824236#comment16 for details.",
+      "parentUuid": "8f3a8226_968125f4",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 66
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4ee45b2_8af84aa3",
         "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
         "patchSetId": 1
