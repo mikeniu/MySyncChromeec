@@ -5,6 +5,7 @@
 
 #include "battery.h"
 #include "battery_smart.h"
+#include "charge_state.h"
 #include "drivers/pdc.h"
 #include "emul/emul_pdc.h"
 #include "fakes.h"
@@ -21,6 +22,40 @@
 static const struct emul *emul = EMUL_DT_GET(PDC_NODE_PORT0);
 
 FAKE_VALUE_FUNC(int, chipset_in_state, int);
+
+const struct batt_params *charger_current_battery_params(void)
+{
+	static struct batt_params test_batt;
+	int val = 0;
+
+	battery_static[BATT_IDX_MAIN].design_voltage =
+		(battery_design_voltage(&val) == 0 && val > 0) ? val : 0;
+	battery_static[BATT_IDX_MAIN].design_capacity =
+		(battery_design_capacity(&val) == 0 && val > 0) ? val : 0;
+
+	test_batt.is_present = battery_is_present();
+	test_batt.flags = 0;
+
+	if (battery_remaining_capacity(&val) == 0) {
+		test_batt.remaining_capacity = val;
+	} else {
+		test_batt.flags |= BATT_FLAG_BAD_REMAINING_CAPACITY;
+	}
+
+	if (battery_status(&val) == 0) {
+		test_batt.status = val;
+	} else {
+		test_batt.flags |= BATT_FLAG_BAD_STATUS;
+	}
+
+	if (battery_full_charge_capacity(&val) == 0) {
+		test_batt.full_capacity = val;
+	} else {
+		test_batt.flags |= BATT_FLAG_BAD_FULL_CAPACITY;
+	}
+
+	return &test_batt;
+}
 
 static void *pdc_battery_status_setup(void)
 {
@@ -154,4 +189,87 @@ ZTEST_USER(pdc_battery_status, test_battery_status_src_connection)
 	zassert_ok(emul_pdc_get_battery_status(emul, &bstat));
 	/* 1100mAh * 7.7V = 8470mWh = 8.47Wh. In 0.1Wh units, this is 85. */
 	zassert_equal(bstat.present_capacity, 85);
+}
+
+ZTEST_USER(pdc_battery_status, test_battery_status_edge_cases)
+{
+	union connector_status_t connector_status = {};
+	union battery_status_t bstat;
+	union battery_capability_t bcap;
+
+	/* 1. Battery not present (BP_NO) */
+	set_battery_present(BP_NO);
+	emul_pdc_configure_snk(emul, &connector_status);
+	emul_pdc_connect_partner(emul, &connector_status);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	zassert_ok(emul_pdc_get_battery_status(emul, &bstat));
+	zassert_equal(bstat.battery_present, 0);
+	zassert_equal(bstat.present_capacity, BSDO_CAP_UNKNOWN);
+
+	zassert_ok(emul_pdc_get_battery_capability(emul, &bcap));
+	zassert_equal(bcap.design_capacity, 0);
+	zassert_equal(bcap.last_full_charge_capacity, 0);
+
+	/* 2. Battery present, zero design voltage (v == 0) */
+	set_battery_present(BP_YES);
+	set_battery_design_voltage(0);
+	emul_pdc_disconnect(emul);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	emul_pdc_connect_partner(emul, &connector_status);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	zassert_ok(emul_pdc_get_battery_status(emul, &bstat));
+	zassert_equal(bstat.present_capacity, BSDO_CAP_UNKNOWN);
+
+	zassert_ok(emul_pdc_get_battery_capability(emul, &bcap));
+	zassert_equal(bcap.design_capacity, 0xffff);
+	zassert_equal(bcap.last_full_charge_capacity, 0xffff);
+
+	/* 3. Zero design capacity (c == 0) and bad full capacity flag */
+	set_battery_design_voltage(7700);
+	set_battery_design_capacity(0);
+	battery_full_charge_capacity_fake.return_val = -1;
+	emul_pdc_disconnect(emul);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	emul_pdc_connect_partner(emul, &connector_status);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	zassert_ok(emul_pdc_get_battery_capability(emul, &bcap));
+	zassert_equal(bcap.design_capacity, 0xffff);
+	zassert_equal(bcap.last_full_charge_capacity, 0xffff);
+
+	/* 4. Bad remaining capacity flag */
+	battery_remaining_capacity_fake.return_val = -1;
+	hook_notify(HOOK_BATTERY_SOC_CHANGE);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	zassert_ok(emul_pdc_get_battery_status(emul, &bstat));
+	zassert_equal(bstat.present_capacity, BSDO_CAP_UNKNOWN);
+
+	/* 5. Bad status flag -> IDLE */
+	battery_remaining_capacity_fake.return_val = 0;
+	battery_status_fake.return_val = -1;
+	hook_notify(HOOK_BATTERY_SOC_CHANGE);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	zassert_ok(emul_pdc_get_battery_status(emul, &bstat));
+	zassert_equal(bstat.battery_state, BSDO_BATTERY_STATE_IDLE);
+
+	/* 6. STATUS_FULLY_CHARGED -> IDLE */
+	battery_status_fake.return_val = 0;
+	set_battery_status(STATUS_FULLY_CHARGED);
+	hook_notify(HOOK_BATTERY_SOC_CHANGE);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	zassert_ok(emul_pdc_get_battery_status(emul, &bstat));
+	zassert_equal(bstat.battery_state, BSDO_BATTERY_STATE_IDLE);
+
+	/* 7. Charging (neither fully charged nor discharging) -> CHARGING */
+	set_battery_status(0);
+	hook_notify(HOOK_BATTERY_SOC_CHANGE);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	zassert_ok(emul_pdc_get_battery_status(emul, &bstat));
+	zassert_equal(bstat.battery_state, BSDO_BATTERY_STATE_CHARGING);
 }
