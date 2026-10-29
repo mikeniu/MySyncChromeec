@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "259bd6b1_7dd98aa5",
+        "filename": "zephyr/program/bluey/pic/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3436255
+      },
+      "writtenOn": "2026-10-29T04:54:17Z",
+      "side": 1,
+      "message": "Do we plan to always keep this disabled? Can you please add a TODO if we are ever to evaluate this again?",
+      "revId": "5cd490129fb9979267c2d5dc340c11a038a1d0b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
