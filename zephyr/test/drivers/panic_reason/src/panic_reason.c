@@ -39,6 +39,24 @@ ZTEST(panic_reason, test_panic_reason_zephyr_with_esf)
 	zassert_not_null(pdata, NULL);
 	zassert_equal(PANIC_ARCH_POSIX, pdata->arch);
 	zassert_equal(0x12345678, pdata->posix.esf_placeholder);
+	zassert_equal(PANIC_ZEPHYR_FATAL_ERROR, pdata->posix.reason);
+	zassert_equal(K_ERR_KERNEL_PANIC, pdata->posix.info);
+	zassert_equal(PANIC_DATA_MAGIC, pdata->magic);
+
+	k_sys_fatal_error_handler(K_ERR_STACK_CHK_FAIL, &esf);
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(0x12345678, pdata->posix.esf_placeholder);
+	zassert_equal(PANIC_SW_STACK_OVERFLOW, pdata->posix.reason);
+	zassert_equal(PANIC_DATA_MAGIC, pdata->magic);
+
+	k_sys_fatal_error_handler(K_ERR_CPU_EXCEPTION, &esf);
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(0x12345678, pdata->posix.esf_placeholder);
+	zassert_equal(0, pdata->posix.reason);
 	zassert_equal(PANIC_DATA_MAGIC, pdata->magic);
 }
 

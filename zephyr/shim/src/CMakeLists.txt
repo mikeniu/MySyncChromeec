@@ -84,6 +84,10 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MKBP_EVENT  mkbp_event.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MOTIONSENSE
                                                             motionsense_sensors.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC       panic.c)
+if (DEFINED CONFIG_X86 AND DEFINED CONFIG_PLATFORM_EC_PANIC)
+  zephyr_ld_options(-Wl,--wrap=z_x86_unhandled_cpu_exception)
+  zephyr_ld_options(-Wl,--wrap=z_x86_page_fault_handler)
+endif()
 zephyr_library_sources_ifdef(CONFIG_CROS_EC_POWER_SIGNAL_LIST
 							    power.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PWM_HC      pwm_hc.c)
