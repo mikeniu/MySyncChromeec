@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4021cd36_2d6f1726",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T04:15:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality:** ✅ `set_interrupt_enabled()` acquires `interrupt_lock` when `in_task_context()` is true (`!in_interrupt \u0026\u0026 my_task_id !\u003d TASK_ID_INVALID`) and updates `interrupt_disabled` directly when in an ISR or on the main/scheduler thread (`my_task_id \u003d\u003d TASK_ID_INVALID`), preventing deadlocks while preserving synchronization from running tasks.\n* **Architecture \u0026 Component Fit:** ✅ Extracting `in_task_context()` and `set_interrupt_enabled(bool enabled)` as file-scoped helpers in `core/host/task.c` cleanly centralizes the host emulator interrupt lock guard for `interrupt_disable()` and `interrupt_enable()`.\n* **Code Simplicity:** ✅ Control flow in `in_task_context()`, `set_interrupt_enabled()`, and `test/interrupt.c` is minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions, `bool` parameter/return naming (`set_interrupt_enabled` / `is_interrupt_enabled`), and `BIT()` / `TEST_EQ()` macro idioms.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ✅ `test/interrupt.c` isolates and exercises all clauses of `in_task_context()` (`in_interrupt` in `critical_section_isr()`, `my_task_id \u003d\u003d TASK_ID_INVALID` in `test_init()`, and task context in `interrupt_disable_test()`), verifying each state transition with distinct `has_error` bitflags, and `test/build.mk` re-enables the `interrupt` host test.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+62, -11)` (28 lines in `core/host/task.c`, 41 lines in `test/interrupt.c`, 4 lines in `test/build.mk`). Single cohesive bug fix paired with its unit test.\n* **Commit Message:** ✅ Clear problem statement, rationale, and footer tags (`BUG\u003d`, `TEST\u003d`, `Change-Id:`) matching the diff.\n\n[🔗](http://go/tj/a00d9125-f506-4abd-8d16-81b26cd56290)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "66b9152ac1aa63bb4cc0dcc592b71c68f55683c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
