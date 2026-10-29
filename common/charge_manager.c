@@ -790,7 +790,7 @@ static bool is_battery_disconnected(void)
 	if (!IS_ENABLED(CONFIG_BATTERY)) {
 		return false;
 	}
-	enum battery_present bp = battery_is_present();
+	enum battery_present bp = charger_current_battery_params()->is_present;
 	return (bp == BP_NO || bp == BP_NOT_SURE ||
 		(bp == BP_YES &&
 		 battery_is_cut_off() != BATTERY_CUTOFF_STATE_NORMAL));
