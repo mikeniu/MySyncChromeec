@@ -137,33 +137,6 @@ int board_set_active_charge_port(int port)
 
 	return rv;
 }
-
-uint16_t tcpc_get_alert_status(void)
-{
-	/*
-	 * TCPC 0 is embedded in the EC and processes interrupts in the chip
-	 * code (it83xx/intc.c). This function only needs to poll port C1 if
-	 * present.
-	 */
-	uint16_t status = 0;
-	int regval;
-
-	/* Is the C1 port present and its IRQ line asserted? */
-	if (board_get_usb_pd_port_count() == 2 &&
-	    !gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl))) {
-		/*
-		 * C1 IRQ is shared between BC1.2 and TCPC; poll TCPC to see if
-		 * it asserted the IRQ.
-		 */
-		if (!tcpc_read16(1, TCPC_REG_ALERT, &regval)) {
-			if (regval)
-				status = PD_STATUS_TCPC_ALERT_1;
-		}
-	}
-
-	return status;
-}
-
 void pd_power_supply_reset(int port)
 {
 	int prev_en;

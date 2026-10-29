@@ -50,6 +50,7 @@ tests:
     extra_configs:
       - CONFIG_TEST_NISSA_COMMON=y
       - CONFIG_STUB_EXTPOWER_IS_PRESENT=y
+      - CONFIG_PLATFORM_EC_TCPC_INTERRUPT=n
   nissa.nivviks:
     extra_dtc_overlay_files:
       - "boards/generic_npcx.dts"

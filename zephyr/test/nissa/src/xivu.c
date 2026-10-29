@@ -168,27 +168,10 @@ static int chipset_in_state_break_tcpc_command(int state_mask)
 	return 0;
 }
 
-ZTEST(xivu, test_pd_power_supply_and_alerts)
+ZTEST(xivu, test_pd_power_supply)
 {
-	const struct gpio_dt_spec *c0_int =
-		GPIO_DT_FROM_NODELABEL(gpio_usb_c0_int_odl);
-	const struct gpio_dt_spec *c1_int =
-		GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl);
 	uint16_t reg;
 	uint32_t val;
-
-	gpio_pin_configure_dt(c1_int, GPIO_INPUT_PULL_UP);
-	gpio_emul_input_set(c0_int->port, c0_int->pin, 0);
-	gpio_emul_input_set(c1_int->port, c1_int->pin, 0);
-	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 1);
-	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_0);
-	tcpci_emul_set_reg(TCPC0, TCPC_REG_ALERT, 0x4000);
-	zassert_equal(tcpc_get_alert_status(), 0);
-	tcpci_emul_set_reg(TCPC1, TCPC_REG_ALERT, 0x8000);
-	zassert_equal(tcpc_get_alert_status(), PD_STATUS_TCPC_ALERT_1);
-	board_get_usb_pd_port_count_fake.return_val = 1;
-	zassert_equal(tcpc_get_alert_status(), 0);
-	board_get_usb_pd_port_count_fake.return_val = 2;
 
 	pd_power_supply_reset(0);
 	tcpci_emul_get_reg(TCPC0, TCPC_REG_COMMAND, &reg);
@@ -222,6 +205,15 @@ ZTEST(xivu, test_pd_power_supply_and_alerts)
 
 	chipset_in_state_fake.return_val = 1;
 	zassert_equal(pd_set_power_supply_ready(0), EC_ERROR_NOT_POWERED);
+
+	const struct gpio_dt_spec *c0_int =
+		GPIO_DT_FROM_NODELABEL(gpio_usb_c0_int_odl);
+	const struct gpio_dt_spec *c1_int =
+		GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl);
+
+	gpio_pin_configure_dt(c1_int, GPIO_INPUT_PULL_UP);
+	gpio_emul_input_set(c0_int->port, c0_int->pin, 0);
+	gpio_emul_input_set(c1_int->port, c1_int->pin, 0);
 
 	board_reset_pd_mcu();
 	board_process_pd_alert(0);
