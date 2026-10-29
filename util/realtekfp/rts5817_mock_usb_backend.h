@@ -21,6 +21,8 @@ class MockRtsUsbBackend : public RtsUsbBackend {
 		     uint16_t index, uint8_t *data, uint16_t length,
 		     unsigned int timeout_ms),
 		    (override));
+	MOCK_METHOD(int, get_interfaces, (std::vector<RtsUsbInterface> *),
+		    (override));
 	MOCK_METHOD(const char *, error_name, (int error), (const, override));
 };
 
