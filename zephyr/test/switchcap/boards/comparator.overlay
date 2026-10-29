@@ -1,0 +1,20 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	fake_comp: fake-comp {
+		compatible = "zephyr,fake-comp";
+	};
+
+	switchcap: switchcap {
+		compatible = "cros-ec,switchcap";
+		enable-gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+		power-good-comp = <&fake_comp>;
+		power-off-delay-ms = <10>;
+	};
+};

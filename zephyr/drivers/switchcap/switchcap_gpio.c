@@ -7,6 +7,9 @@
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
+#if defined(CONFIG_CROS_SWITCHCAP_PG_COMPARATOR)
+#include <zephyr/drivers/comparator.h>
+#endif
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -18,15 +21,37 @@ LOG_MODULE_REGISTER(switchcap, LOG_LEVEL_INF);
 BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 	     "Exactly one instance of cros-ec,switchcap should be defined.");
 
+#if defined(CONFIG_CROS_SWITCHCAP_PG_GPIO)
+BUILD_ASSERT(DT_INST_NODE_HAS_PROP(0, power_good_gpios),
+	     "power-good-gpios property is required for GPIO power-good.");
+BUILD_ASSERT(
+	!DT_INST_NODE_HAS_PROP(0, power_good_comp),
+	"power-good-comp property must not be defined for GPIO power-good.");
+#elif defined(CONFIG_CROS_SWITCHCAP_PG_COMPARATOR)
+BUILD_ASSERT(DT_INST_NODE_HAS_PROP(0, power_good_comp),
+	     "power-good-comp property is required for comparator power-good.");
+BUILD_ASSERT(!DT_INST_NODE_HAS_PROP(0, power_good_gpios),
+	     "power-good-gpios property must not be defined for comparator "
+	     "power-good.");
+#endif
+
 struct switchcap_config {
 	struct gpio_dt_spec enable_gpio;
+#if defined(CONFIG_CROS_SWITCHCAP_PG_GPIO)
 	struct gpio_dt_spec power_good_gpio;
+#elif defined(CONFIG_CROS_SWITCHCAP_PG_COMPARATOR)
+	const struct device *power_good_comp;
+#endif
 	uint16_t power_off_delay_ms;
 };
 
 static const struct switchcap_config switchcap_cfg = {
 	.enable_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), enable_gpios),
+#if defined(CONFIG_CROS_SWITCHCAP_PG_GPIO)
 	.power_good_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), power_good_gpios),
+#elif defined(CONFIG_CROS_SWITCHCAP_PG_COMPARATOR)
+	.power_good_comp = DEVICE_DT_GET(DT_INST_PHANDLE(0, power_good_comp)),
+#endif
 	.power_off_delay_ms = DT_INST_PROP_OR(0, power_off_delay_ms, 0),
 };
 
@@ -58,7 +83,18 @@ bool cros_switchcap_is_power_good(const struct device *dev)
 {
 	const struct switchcap_config *cfg = dev->config;
 
+#if defined(CONFIG_CROS_SWITCHCAP_PG_GPIO)
 	return gpio_pin_get_dt(&cfg->power_good_gpio);
+#elif defined(CONFIG_CROS_SWITCHCAP_PG_COMPARATOR)
+	int ret = comparator_get_output(cfg->power_good_comp);
+
+	if (ret < 0) {
+		LOG_ERR("Failed to read power-good comparator: %d", ret);
+		return false;
+	}
+
+	return ret == 1;
+#endif
 }
 
 static int switchcap_init(const struct device *dev)
@@ -71,10 +107,17 @@ static int switchcap_init(const struct device *dev)
 		return -ENODEV;
 	}
 
+#if defined(CONFIG_CROS_SWITCHCAP_PG_GPIO)
 	if (!gpio_is_ready_dt(&cfg->power_good_gpio)) {
 		LOG_ERR_DEVICE_NOT_READY(cfg->power_good_gpio.port);
 		return -ENODEV;
 	}
+#elif defined(CONFIG_CROS_SWITCHCAP_PG_COMPARATOR)
+	if (!device_is_ready(cfg->power_good_comp)) {
+		LOG_ERR_DEVICE_NOT_READY(cfg->power_good_comp);
+		return -ENODEV;
+	}
+#endif
 
 	/*
 	 * Configure as output without forcing an initial level so the existing
@@ -87,11 +130,13 @@ static int switchcap_init(const struct device *dev)
 		return ret;
 	}
 
+#if defined(CONFIG_CROS_SWITCHCAP_PG_GPIO)
 	ret = gpio_pin_configure_dt(&cfg->power_good_gpio, GPIO_INPUT);
 	if (ret < 0) {
 		LOG_ERR("Failed to configure power-good GPIO: %d", ret);
 		return ret;
 	}
+#endif
 
 	return 0;
 }

@@ -6,4 +6,12 @@ common:
   platform_allow:
     - native_sim
 tests:
-  switchcap.default: {}
+  switchcap.default:
+    extra_configs:
+      - CONFIG_CROS_SWITCHCAP_PG_GPIO=y
+  switchcap.comparator:
+    extra_dtc_overlay_files:
+      - boards/comparator.overlay
+    extra_configs:
+      - CONFIG_COMPARATOR=y
+      - CONFIG_CROS_SWITCHCAP_PG_COMPARATOR=y

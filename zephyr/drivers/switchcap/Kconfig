@@ -8,3 +8,25 @@ config CROS_SWITCHCAP
 	depends on DT_HAS_CROS_EC_SWITCHCAP_ENABLED
 	help
 	  Enables the switchcap driver for ChromiumOS.
+
+if CROS_SWITCHCAP
+
+choice CROS_SWITCHCAP_PG_TYPE
+	prompt "Switchcap power-good signal type"
+
+config CROS_SWITCHCAP_PG_GPIO
+	bool "GPIO power-good signal"
+	help
+	  Monitor switchcap power-good status using a digital input GPIO
+	  specified by power-good-gpios in devicetree.
+
+config CROS_SWITCHCAP_PG_COMPARATOR
+	bool "Comparator power-good signal"
+	depends on COMPARATOR
+	help
+	  Monitor switchcap power-good status using a Zephyr comparator
+	  device specified by power-good-comp in devicetree.
+
+endchoice
+
+endif # CROS_SWITCHCAP

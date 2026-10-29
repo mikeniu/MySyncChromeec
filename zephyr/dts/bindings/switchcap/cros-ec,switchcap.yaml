@@ -2,21 +2,29 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-description: ChromiumOS Switchcap Driver controlled by GPIOs
+description: ChromiumOS Switchcap driver
 
 compatible: "cros-ec,switchcap"
+
+include: base.yaml
 
 properties:
   enable-gpios:
     type: phandle-array
     required: true
-    description: Output GPIO used to enable the switchcap.
+    description: GPIO used to enable the switchcap converter.
 
   power-good-gpios:
     type: phandle-array
-    required: true
-    description: Input GPIO used to read switchcap power-good status.
+    description: GPIO used to monitor the power-good status of the switchcap.
+
+  power-good-comp:
+    type: phandle
+    description:
+      Comparator device used to monitor the power-good status of the switchcap.
 
   power-off-delay-ms:
     type: int
-    description: Additional power-off delay in milliseconds.
+    description:
+      Optional delay in milliseconds to wait after disabling the switchcap
+      before returning.
