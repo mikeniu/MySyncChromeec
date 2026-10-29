@@ -46,6 +46,30 @@
       },
       "revId": "42d5b6a9805ee9e6259b7e65da497e83419c0ac8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3c61e7f_0a7b37c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T17:06:06Z",
+      "side": 1,
+      "message": "A new bug is preferred.",
+      "parentUuid": "2afafa59_242e66e0",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 15
+      },
+      "revId": "42d5b6a9805ee9e6259b7e65da497e83419c0ac8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
