@@ -36,6 +36,25 @@
       "isAi": true,
       "revId": "d188c5cb260450675937c9382ce003598249b8c5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4658dafc_d38ed274",
+        "filename": "core/host/build.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T03:28:36Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "887edd6d_9b4ca0e9",
+      "isAi": true,
+      "revId": "d188c5cb260450675937c9382ce003598249b8c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
