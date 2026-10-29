@@ -75,6 +75,13 @@ class RtsUsbBackend {
   // Lists the interfaces of the active configuration.
   virtual std::expected<std::vector<RtsUsbInterface>, int> GetInterfaces() = 0;
 
+  // Claims an interface, detaching any kernel driver bound to it. Open() makes
+  // the backend re-attach that driver when the interface is released.
+  virtual std::expected<void, int> ClaimInterface(int interface_number) = 0;
+
+  // Releases a claimed interface.
+  virtual void ReleaseInterface(int interface_number) = 0;
+
   // Name of a negative libusb error code, for diagnostics.
   virtual std::string_view ErrorName(int error) const = 0;
 };
