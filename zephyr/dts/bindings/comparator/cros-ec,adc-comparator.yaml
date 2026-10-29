@@ -1,0 +1,19 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ChromiumOS ADC-backed voltage comparator
+
+compatible: "cros-ec,adc-comparator"
+
+include: voltage-divider-common.yaml
+
+properties:
+  output-ohms:
+    default: 1
+
+  threshold-mv:
+    type: int
+    required: true
+    description:
+      Voltage threshold in millivolts above which the comparator output is high.

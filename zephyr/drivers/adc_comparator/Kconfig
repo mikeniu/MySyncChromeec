@@ -1,0 +1,12 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config CROS_ADC_COMPARATOR
+	bool "ChromiumOS ADC voltage comparator driver"
+	default y
+	depends on DT_HAS_CROS_EC_ADC_COMPARATOR_ENABLED
+	depends on ADC
+	depends on COMPARATOR
+	help
+	  Enables the ADC-backed voltage comparator driver for ChromiumOS.
