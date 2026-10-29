@@ -162,6 +162,30 @@
       "isAi": true,
       "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb270558_4661036b",
+        "filename": "test/test_config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T02:34:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5a9eed77_898dd4f9",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 9999
+      },
+      "revId": "efad242402f74e1aa3f218ee7970250f735fa70c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
