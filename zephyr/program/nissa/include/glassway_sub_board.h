@@ -16,6 +16,9 @@ enum glassway_sub_board_type {
 	GLASSWAY_SB_1C_1A = 3, /* USB type C, USB type A */
 	GLASSWAY_SB_1C_LTE = 4, /* USB type C, LTE */
 	GLASSWAY_SB_HDMI_LTE = 5, /* HDMI, LTE */
+	GLASSWAY_SB_HDMI = 6, /* HDMI */
+	GLASSWAY_SB_HDMI_1A = 7, /* HDMI, USB type A */
+	GLASSWAY_SB_1C_5G = 8, /* USB type C, LTE-5G */
 };
 
 enum glassway_sub_board_type glassway_get_sb_type(void);

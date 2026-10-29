@@ -10,6 +10,6 @@
 
 extern const struct ec_response_keybd_config pujjogatwin_kb;
 
-extern enum pujjogatwin_sub_board_type pujjogatwin_cached_sb;
+extern enum pujjoga_sub_board_type pujjoga_cached_sub_board;
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_PUJJOGATWIN_H_ */

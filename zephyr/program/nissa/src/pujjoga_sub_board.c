@@ -10,6 +10,7 @@
 #include "driver/tcpm/tcpci.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
+#include "nissa_hdmi.h"
 #include "pujjoga_sub_board.h"
 #include "task.h"
 #include "usb_charge.h"
@@ -95,6 +96,11 @@ void pujjoga_configure_hdmi_vcc(void)
 	gpio_pin_configure_dt(GPIO_DT_FROM_ALIAS(gpio_hdmi_en_odl),
 			      GPIO_OUTPUT_INACTIVE | GPIO_OPEN_DRAIN |
 				      GPIO_ACTIVE_LOW);
+}
+
+__override void nissa_configure_hdmi_power_gpios(void)
+{
+	pujjoga_configure_hdmi_vcc();
 }
 #endif
 

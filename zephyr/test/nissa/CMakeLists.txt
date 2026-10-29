@@ -111,7 +111,7 @@ target_sources_ifdef(
         app PRIVATE
         src/gothrax_sub_board.c
         src/log_module.c
-        ${PLATFORM_EC_PROGRAM_DIR}/nissa/gothrax/src/sub_board.c)
+        ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_sub_board.c)
 
 if(CONFIG_TEST_NISSA_PUJJO)
     target_sources(
@@ -130,9 +130,8 @@ if(CONFIG_TEST_NISSA_PUJJOGA)
             src/pujjoga.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/nokris_charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/sub_board.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/pujjoga_sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjoga/src/usbc.c
     )
 endif()
@@ -144,9 +143,8 @@ if(CONFIG_TEST_NISSA_PUJJOGATWIN)
             src/pujjogatwin.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/nokris_charger.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/hdmi.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/sub_board.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/pujjoga_sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/pujjogatwin/src/usbc.c
     )
 endif()
@@ -244,7 +242,7 @@ if(CONFIG_TEST_NISSA_YAVIKS)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/yaviks/src/sub_board.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/yaviks_sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/yaviks_usbc.c
     )
@@ -261,7 +259,7 @@ if(CONFIG_TEST_NISSA_QUANDISO)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso/src/sub_board.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/quandiso_sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_sm5803.c
     )
@@ -278,7 +276,7 @@ if(CONFIG_TEST_NISSA_QUANDISO2)
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/fan.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/keyboard.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/quandiso2/src/sub_board.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/quandiso_sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/thermal.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_sm5803.c
     )
@@ -305,7 +303,7 @@ if(CONFIG_TEST_NISSA_GLASSWAY)
             app PRIVATE
             src/glassway.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_fan.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/glassway/src/sub_board.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_charger.c
@@ -375,7 +373,7 @@ if(CONFIG_TEST_NISSA_GUREN)
             app PRIVATE
             src/guren.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_fan.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/guren/src/sub_board.c
+            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_sub_board.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/usbc_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/charger_raa489000.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/glassway_charger.c
@@ -432,7 +430,7 @@ target_sources_ifdef(
         app PRIVATE
         src/epic_sub_board.c
         src/log_module.c
-        ${PLATFORM_EC_PROGRAM_DIR}/nissa/epic/src/sub_board.c)
+        ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/gothrax_sub_board.c)
 
 target_sources_ifdef(
         CONFIG_TEST_NISSA_XIVU

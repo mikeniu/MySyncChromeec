@@ -96,7 +96,7 @@ if(DEFINED CONFIG_BOARD_YAVIKS)
 			"yaviks/src/led.c"
 			"yaviks/src/keyboard.c"
 			"yaviks/src/board.c"
-			"yaviks/src/sub_board.c"
+			"src/yaviks_sub_board.c"
 			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/yaviks_usbc.c")
@@ -121,7 +121,7 @@ if(DEFINED CONFIG_BOARD_YAVISTA)
 			"yavista/src/led.c"
 			"yavista/src/keyboard.c"
 			"yavista/src/board.c"
-			"yavista/src/sub_board.c"
+			"src/yaviks_sub_board.c"
 			"src/thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/yaviks_usbc.c")
@@ -147,7 +147,7 @@ if(DEFINED CONFIG_BOARD_GOTHRAX)
 			"src/hdmi.c"
 			"gothrax/src/usb_mux_config.c"
 			"gothrax/src/form_factor.c"
-			"gothrax/src/sub_board.c"
+			"src/gothrax_sub_board.c"
 			"src/gothrax_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/usbc_raa489000.c")
@@ -177,7 +177,7 @@ if(DEFINED CONFIG_BOARD_QUANDISO)
 	project(quandiso)
 	zephyr_library_sources(
 			"quandiso/src/board.c"
-			"quandiso/src/sub_board.c"
+			"src/quandiso_sub_board.c"
 			"quandiso/src/keyboard.c"
 			"quandiso/src/led.c"
 			"src/thermal.c"
@@ -190,7 +190,7 @@ if(DEFINED CONFIG_BOARD_QUANDISO2)
 	project(quandiso2)
 	zephyr_library_sources(
 			"quandiso2/src/board.c"
-			"quandiso2/src/sub_board.c"
+			"src/quandiso_sub_board.c"
 			"quandiso2/src/keyboard.c"
 			"quandiso2/src/led.c"
 			"src/thermal.c"
@@ -215,7 +215,7 @@ if(DEFINED CONFIG_BOARD_ANRAGGAR)
 	zephyr_include_directories("anraggar/include")
 	zephyr_library_sources(
 			"anraggar/src/board.c"
-			"anraggar/src/sub_board.c"
+			"src/anraggar_sub_board.c"
 			"src/prochot.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "anraggar/src/usbc.c")
@@ -227,7 +227,7 @@ endif()
 if(DEFINED CONFIG_BOARD_GLASSWAY)
 	project(glassway)
 	zephyr_library_sources(
-			"glassway/src/sub_board.c"
+			"src/glassway_sub_board.c"
 			"src/glassway_kb_backlight.c"
 			"glassway/src/board.c"
 			"glassway/src/usb_mux_config.c"
@@ -255,8 +255,7 @@ if(DEFINED CONFIG_BOARD_PUJJOGA)
 	zephyr_library_sources(
 			"pujjoga/src/board.c"
 			"pujjoga/src/led.c"
-			"pujjoga/src/hdmi.c"
-			"pujjoga/src/sub_board.c"
+			"src/pujjoga_sub_board.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "pujjoga/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/nokris_charger.c")
@@ -266,8 +265,7 @@ if(DEFINED CONFIG_BOARD_PUJJOGATWIN)
 	zephyr_library_sources(
 			"pujjogatwin/src/board.c"
 			"pujjogatwin/src/led.c"
-			"pujjogatwin/src/hdmi.c"
-			"pujjogatwin/src/sub_board.c"
+			"src/pujjoga_sub_board.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "pujjogatwin/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/nokris_charger.c")
@@ -306,7 +304,7 @@ if(DEFINED CONFIG_BOARD_TELIKS)
 	zephyr_include_directories("teliks/include")
 	zephyr_library_sources(
 			"teliks/src/board.c"
-			"teliks/src/sub_board.c"
+			"src/anraggar_sub_board.c"
 			"src/prochot.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/teliks_usbc.c")
@@ -320,7 +318,7 @@ if(DEFINED CONFIG_BOARD_RULL)
 	zephyr_include_directories("rull/include")
 	zephyr_library_sources(
 			"rull/src/board.c"
-			"rull/src/sub_board.c"
+			"src/anraggar_sub_board.c"
 			"rull/src/usb_mux_config.c"
 			"rull/src/board_touchpanal.c"
 	)
@@ -362,7 +360,7 @@ endif()
 if(DEFINED CONFIG_BOARD_GUREN)
 	project(guren)
 	zephyr_library_sources(
-			"guren/src/sub_board.c"
+			"src/glassway_sub_board.c"
 			"src/glassway_kb_backlight.c"
 			"guren/src/board.c"
 			"guren/src/usb_mux_config.c"
@@ -403,7 +401,7 @@ if(DEFINED CONFIG_BOARD_EPIC)
 			"src/hdmi.c"
 			"epic/src/usb_mux_config.c"
 			"epic/src/form_factor.c"
-			"epic/src/sub_board.c"
+			"src/gothrax_sub_board.c"
 			"src/gothrax_thermal.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "src/usbc_raa489000.c")

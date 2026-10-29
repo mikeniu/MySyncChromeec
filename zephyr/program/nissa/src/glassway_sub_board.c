@@ -5,6 +5,8 @@
 
 /* Glassway sub-board hardware configuration */
 
+#include "charge_state.h"
+#include "chipset.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "driver/tcpm/tcpci.h"
@@ -87,6 +89,23 @@ enum glassway_sub_board_type glassway_get_sb_type(void)
 		glassway_cached_sub_board = GLASSWAY_SB_HDMI_LTE;
 		LOG_INF("SB: HDMI, LTE");
 		break;
+
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	case FW_SUB_BOARD_6:
+		glassway_cached_sub_board = GLASSWAY_SB_HDMI;
+		LOG_INF("SB: HDMI");
+		break;
+
+	case FW_SUB_BOARD_7:
+		glassway_cached_sub_board = GLASSWAY_SB_HDMI_1A;
+		LOG_INF("SB: HDMI, USB type A");
+		break;
+
+	case FW_SUB_BOARD_8:
+		glassway_cached_sub_board = GLASSWAY_SB_1C_5G;
+		LOG_INF("SB: USB type A, 5G");
+		break;
+#endif
 	}
 	return glassway_cached_sub_board;
 }
@@ -105,6 +124,9 @@ test_export_static void board_usb_pd_count_init(void)
 	case GLASSWAY_SB_1C_1A:
 	case GLASSWAY_SB_1C:
 	case GLASSWAY_SB_1C_LTE:
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	case GLASSWAY_SB_1C_5G:
+#endif
 		cached_usb_pd_port_count = 2;
 		break;
 	}
@@ -120,8 +142,16 @@ static void hdmi_hpd_interrupt(const struct device *device,
 {
 	int state = gpio_pin_get_dt(GPIO_DT_FROM_ALIAS(gpio_hpd_odl));
 
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	if (chipset_in_state(CHIPSET_STATE_ON)) {
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_soc_hdmi_hpd),
+				state);
+		LOG_INF("HDMI HPD changed state to %d", state);
+	}
+#else
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_soc_hdmi_hpd), state);
 	LOG_DBG("HDMI HPD changed state to %d", state);
+#endif
 }
 
 #if CONFIG_NISSA_BOARD_HAS_HDMI_SUPPORT
@@ -154,7 +184,11 @@ static void lte_power_handler(struct ap_power_ev_callback *cb,
 {
 	enum glassway_sub_board_type sb = glassway_get_sb_type();
 
-	if (sb != GLASSWAY_SB_1C_LTE && sb != GLASSWAY_SB_HDMI_LTE)
+	if (sb != GLASSWAY_SB_1C_LTE && sb != GLASSWAY_SB_HDMI_LTE
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	    && sb != GLASSWAY_SB_1C_5G
+#endif
+	)
 		return;
 
 	/* Enable rails for S5 */
@@ -197,7 +231,11 @@ static void glassway_subboard_config(void)
 	 * if this port is not present. VBUS enable must be configured if
 	 * needed and is controlled by the usba-port-enable-pins driver.
 	 */
-	if (sb == GLASSWAY_SB_1C_1A || sb == GLASSWAY_SB_1A) {
+	if (sb == GLASSWAY_SB_1C_1A || sb == GLASSWAY_SB_1A
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	    || sb == GLASSWAY_SB_HDMI_1A
+#endif
+	) {
 		/*
 		 * Configure VBUS enable, retaining current value.
 		 * SB_NONE indicates missing fw_config; it's safe to enable VBUS
@@ -221,7 +259,11 @@ static void glassway_subboard_config(void)
 	 */
 #if CONFIG_USB_PD_PORT_MAX_COUNT > 1
 	if (sb == GLASSWAY_SB_1C_1A || sb == GLASSWAY_SB_1C ||
-	    sb == GLASSWAY_SB_1C_LTE) {
+	    sb == GLASSWAY_SB_1C_LTE
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	    || sb == GLASSWAY_SB_1C_5G
+#endif
+	) {
 		/* Configure interrupt input */
 		gpio_pin_configure_dt(GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl),
 				      GPIO_INPUT | GPIO_PULL_UP);
@@ -231,7 +273,11 @@ static void glassway_subboard_config(void)
 	}
 #endif
 
-	if (sb == GLASSWAY_SB_HDMI_LTE) {
+	if (sb == GLASSWAY_SB_HDMI_LTE
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	    || sb == GLASSWAY_SB_HDMI || sb == GLASSWAY_SB_HDMI_1A
+#endif
+	) {
 		/*
 		 * HDMI: two outputs control power which must be configured to
 		 * non-default settings, and HPD must be forwarded to the AP
@@ -270,7 +316,11 @@ static void glassway_subboard_config(void)
 		irq_unlock(irq_key);
 	}
 
-	if ((sb == GLASSWAY_SB_1C_LTE) || (sb == GLASSWAY_SB_HDMI_LTE)) {
+	if (sb == GLASSWAY_SB_1C_LTE || sb == GLASSWAY_SB_HDMI_LTE
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	    || sb == GLASSWAY_SB_1C_5G
+#endif
+	) {
 		/*
 		 * LTE: Set up callbacks for enabling/disabling
 		 * sub-board power on S5 state.
