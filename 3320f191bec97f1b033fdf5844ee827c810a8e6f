@@ -16,6 +16,24 @@
       "message": "Why did you have to remove the `#ifndef CONFIG_ZEPHYR`? If this doesn\u0027t work for some reason then we should fix `main` since we need to keep this code in sync.",
       "revId": "3320f191bec97f1b033fdf5844ee827c810a8e6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "906be0a0_d153f114",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-29T21:28:15Z",
+      "side": 1,
+      "message": "### `firmware-ec-legacy-public-cq` Failure on Patch Set 1\n\nIn the Patch Set 1 run of `chromeos/all-partners/firmware-ec-legacy-public-cq` ([build 8666773940167119137](https://cr-buildbucket.appspot.com/build/8666773940167119137)), the `build firmware | call build API script` step failed compiling `buccaneer` and `nocturne_fp` with:\n\n```text\ncommon/fpsensor/fpsensor.cc:288:2: error: unterminated conditional directive\n  288 | #ifdef HAVE_FP_PRIVATE_DRIVER\n      |  ^\ncommon/fpsensor/fpsensor.cc:1120:24: error: expected \u0027}\u0027\n 1120 |                      EC_VER_MASK(0));\n      |                                      ^\ncommon/fpsensor/fpsensor.cc:279:1: note: to match this \u0027{\u0027\n  279 | {\n      | ^\n2 errors generated.\nmake[2]: *** [Makefile.rules:568: build/nocturne_fp/RW/common/fpsensor/fpsensor.o] Error 1\n...\nmake: *** [Makefile.rules:212: build_boards] Error 2\nFailed boards/tests:\n\tbuccaneer\n\tnocturne_fp\n```\n\n### Root Cause\n\n1. On `ec-legacy`, commit [`16594aa552`](https://chromium.googlesource.com/chromiumos/platform/ec/+/16594aa55209023b929f72863248d462cfb7f251) ([CL:7114214](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7114214), *\"ec-legacy: Drop zephyr specific code\"* by `jpmurphy@google.com`) removed `#ifdef CONFIG_ZEPHYR` / `#ifndef CONFIG_ZEPHYR` blocks from `common/fpsensor/fpsensor.cc`, whereas `main` still has them (restored in [CL:8526413](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8526413), whose copybot CL to `ec-legacy`, [CL:8518894](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8518894), was abandoned).\n2. Because `ec-legacy` did not have the surrounding `#ifndef CONFIG_ZEPHYR` / `#endif` context lines that `main` had, Copybot\u0027s 3-way merge of [CL:8559077](https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8559077) into Patch Set 1 dropped two `#endif` lines and left an **unclosed `#ifndef CONFIG_ZEPHYR`** at line 467:\n   - Line 420 opened `#ifndef CONFIG_ZEPHYR` without its matching `#endif` after `gpio_disable_interrupt(GPIO_FPS_INT);`.\n   - Line 460 closed `#endif` inside `if (global_context.sensor_mode \u0026 FP_MODE_ANY_WAIT_IRQ) { ... }`.\n   - Line 467 opened `#ifndef CONFIG_ZEPHYR` inside `else if (!(global_context.sensor_mode \u0026 FP_MODE_FINGER_UP))` without any matching `#endif`.\n3. That unclosed `#ifndef CONFIG_ZEPHYR` swallowed `#else /* !HAVE_FP_PRIVATE_DRIVER */` and `#endif /* !HAVE_FP_PRIVATE_DRIVER */` (lines 477–483), causing `#ifdef HAVE_FP_PRIVATE_DRIVER` (at line 288) to remain unterminated until EOF (line 1120) and causing `cros format` to fail.",
+      "parentUuid": "fea8e496_bd0ea010",
+      "revId": "3320f191bec97f1b033fdf5844ee827c810a8e6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
