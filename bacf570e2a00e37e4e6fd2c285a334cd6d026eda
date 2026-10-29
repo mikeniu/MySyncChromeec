@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48937191_dc446ed5",
+        "filename": "zephyr/subsys/bt_passthru/zephyr_bt_sender.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-29T02:54:59Z",
+      "side": 1,
+      "message": "Done. Used offsetof() to avoid the struct cast.",
+      "parentUuid": "fd4cb7f0_1f01fc61",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 0
+      },
+      "revId": "bacf570e2a00e37e4e6fd2c285a334cd6d026eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18d38d2d_bb5a8b73",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dd46f41_30cfc167",
+        "filename": "zephyr/test/bt_passthru/src/mock_hci_driver.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-29T02:54:59Z",
+      "side": 1,
+      "message": "net_buf_put() and net_buf_get() were deprecated and removed in Zephyr 4.2. k_fifo_put() / k_fifo_get() is the current API.",
+      "parentUuid": "18d38d2d_bb5a8b73",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 0
+      },
+      "revId": "bacf570e2a00e37e4e6fd2c285a334cd6d026eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4304ddd3_2945fa7a",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-20T16:39:11Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: Prefer using `net_buf_get(\u0026g_held_tx_bufs, K_NO_WAIT)` instead of `k_fifo_get`.",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 0
+      },
+      "revId": "bacf570e2a00e37e4e6fd2c285a334cd6d026eda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c139d012_02f93a92",
+        "filename": "zephyr/test/bt_passthru/src/mock_hci_driver.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-29T02:54:59Z",
+      "side": 1,
+      "message": "Same as above, net_buf_get() was removed.",
+      "parentUuid": "4304ddd3_2945fa7a",
       "range": {
         "startLine": 94,
         "startChar": 0,
