@@ -13,6 +13,6 @@ void board_setup_init(void);
 void alt_sensor_init(void);
 void kb_init(void);
 
-extern enum guren_sub_board_type guren_cached_sub_board;
+extern enum glassway_sub_board_type glassway_cached_sub_board;
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_GUREN_H_ */

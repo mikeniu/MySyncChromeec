@@ -5,7 +5,7 @@
  * Unit tests for program/nissa/src/sub_board.c.
  */
 #include "cros_cbi.h"
-#include "epic_sub_board.h"
+#include "gothrax_sub_board.h"
 #include "hooks.h"
 #include "nissa_hdmi.h"
 #include "usb_pd.h"
@@ -29,7 +29,7 @@ FAKE_VOID_FUNC(usb_interrupt_c1, enum gpio_signal);
  * tests per process, and usb_pd_count_init() needs to run following each update
  * of reported sub-board.
  */
-extern enum epic_sub_board_type cached_sub_board;
+extern enum gothrax_sub_board_type cached_sub_board;
 void board_usb_pd_count_init(void);
 
 /* Shim GPIO initialization from devicetree. */
@@ -89,7 +89,7 @@ static void test_before_fn(void *fixture_)
 	struct epic_sub_board_fixture *fixture = fixture_;
 
 	/* Reset cached global state. */
-	cached_sub_board = EPIC_SB_UNKNOWN;
+	cached_sub_board = GOTHRAX_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* Return the fake fw_config value. */
@@ -113,7 +113,7 @@ ZTEST_F(epic_sub_board, test_usb_c_a)
 {
 	/* Set the sub-board, reported configuration is correct. */
 	set_fw_config_value(FW_SUB_BOARD_1);
-	zassert_equal(epic_get_sb_type(), EPIC_SB_C_A);
+	zassert_equal(gothrax_get_sb_type(), GOTHRAX_SB_C_A);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	/* Should have fetched CBI exactly once, asking for the sub-board. */
@@ -141,7 +141,7 @@ ZTEST_F(epic_sub_board, test_usb_c_a)
 ZTEST_F(epic_sub_board, test_usb_c_lte)
 {
 	set_fw_config_value(FW_SUB_BOARD_2);
-	zassert_equal(epic_get_sb_type(), EPIC_SB_C_A_LTE);
+	zassert_equal(gothrax_get_sb_type(), GOTHRAX_SB_C_A_LTE);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	init_gpios(NULL);
@@ -174,7 +174,7 @@ ZTEST_F(epic_sub_board, test_usb_c_lte)
 ZTEST_F(epic_sub_board, test_usb_a)
 {
 	set_fw_config_value(FW_SUB_BOARD_3);
-	zassert_equal(epic_get_sb_type(), EPIC_SB_A);
+	zassert_equal(gothrax_get_sb_type(), GOTHRAX_SB_A);
 	zassert_equal(board_get_usb_pd_port_count(), 1);
 
 	init_gpios(NULL);
@@ -187,7 +187,7 @@ ZTEST_F(epic_sub_board, test_usb_a)
 ZTEST_F(epic_sub_board, test_usb_a_hdmi)
 {
 	set_fw_config_value(FW_SUB_BOARD_6);
-	zassert_equal(epic_get_sb_type(), EPIC_SB_A_HDMI_LTE);
+	zassert_equal(gothrax_get_sb_type(), GOTHRAX_SB_HDMI_A_LTE);
 	zassert_equal(board_get_usb_pd_port_count(), 1);
 
 	init_gpios(NULL);
@@ -229,7 +229,7 @@ ZTEST(epic_sub_board, test_unset_board)
 {
 	/* fw_config with an unset sub-board means none is present. */
 	set_fw_config_value(0);
-	zassert_equal(epic_get_sb_type(), EPIC_SB_NONE);
+	zassert_equal(gothrax_get_sb_type(), GOTHRAX_SB_NONE);
 	zassert_equal(board_get_usb_pd_port_count(), 1);
 }
 
@@ -246,7 +246,7 @@ ZTEST(epic_sub_board, test_cbi_error)
 	 * as absent.
 	 */
 	cros_cbi_get_fw_config_fake.custom_fake = get_fw_config_error;
-	zassert_equal(epic_get_sb_type(), EPIC_SB_NONE);
+	zassert_equal(gothrax_get_sb_type(), GOTHRAX_SB_NONE);
 }
 
 /** Override default HDMI configuration to exercise the power enable as well. */

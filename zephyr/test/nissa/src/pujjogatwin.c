@@ -11,8 +11,8 @@
 #include "led_common.h"
 #include "led_onoff_states.h"
 #include "nissa_hdmi.h"
+#include "pujjoga_sub_board.h"
 #include "pujjogatwin.h"
-#include "pujjogatwin_sub_board.h"
 #include "system.h"
 #include "typec_control.h"
 #include "usb_charge.h"
@@ -46,7 +46,7 @@ LOG_MODULE_REGISTER(nissa, LOG_LEVEL_INF);
 
 void hdmi_power_handler(struct ap_power_ev_callback *cb,
 			struct ap_power_ev_data data);
-void pujjogatwin_configure_hdmi_vcc(void);
+void pujjoga_configure_hdmi_vcc(void);
 
 int init_gpios(const struct device *unused);
 
@@ -89,7 +89,7 @@ ZTEST(pujjogatwin, test_hdmi_power)
 	struct ap_power_ev_data data;
 
 	nissa_configure_hdmi_power_gpios();
-	pujjogatwin_configure_hdmi_vcc();
+	pujjoga_configure_hdmi_vcc();
 	zassert_equal(gpio_emul_output_get_dt(hdmi_vcc), 0);
 
 	init_gpios(NULL);
@@ -242,7 +242,7 @@ ZTEST(pujjogatwin, test_reset_pd_mcu)
 	zassert_equal(nct38xx_reset_notify_fake.arg0_val, 0);
 }
 
-enum pujjogatwin_sub_board_type pujjogatwin_get_sb_type(void);
+enum pujjoga_sub_board_type pujjoga_get_sb_type(void);
 
 static uint32_t fw_config_value;
 
@@ -266,12 +266,12 @@ ZTEST(pujjogatwin, test_db_with_a_and_hdmi)
 		get_fake_sub_board_fw_config_field;
 
 	/* Reset cached global state. */
-	pujjogatwin_cached_sb = PUJJOGATWIN_SB_UNKNOWN;
+	pujjoga_cached_sub_board = PUJJOGA_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_fw_config_value(FW_SUB_BOARD_3);
-	zassert_equal(pujjogatwin_get_sb_type(), PUJJOGATWIN_SB_HDMI_A,
+	zassert_equal(pujjoga_get_sb_type(), PUJJOGA_SB_HDMI_A,
 		      "SB: HDMI, USB type A");
 
 	init_gpios(NULL);
@@ -288,13 +288,12 @@ ZTEST(pujjogatwin, test_unset_board)
 		get_fake_sub_board_fw_config_field;
 
 	/* Reset cached global state. */
-	pujjogatwin_cached_sb = PUJJOGATWIN_SB_UNKNOWN;
+	pujjoga_cached_sub_board = PUJJOGA_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* fw_config with an unset sub-board means none is present. */
 	set_fw_config_value(0);
-	zassert_equal(pujjogatwin_get_sb_type(), PUJJOGATWIN_SB_NONE,
-		      "SB: None");
+	zassert_equal(pujjoga_get_sb_type(), PUJJOGA_SB_NONE, "SB: None");
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -317,8 +316,7 @@ ZTEST(pujjogatwin, test_cbi_error)
 	 * as absent.
 	 */
 	cros_cbi_get_fw_config_fake.custom_fake = get_fw_config_error;
-	zassert_equal(pujjogatwin_get_sb_type(), PUJJOGATWIN_SB_NONE,
-		      "SB: None");
+	zassert_equal(pujjoga_get_sb_type(), PUJJOGA_SB_NONE, "SB: None");
 }
 
 ZTEST(pujjogatwin, test_pen_detect_interrupt)

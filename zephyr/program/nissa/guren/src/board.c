@@ -16,8 +16,8 @@
 #include "driver/accel_bma4xx.h"
 #include "driver/accelgyro_bmi323.h"
 #include "driver/accelgyro_icm42607.h"
+#include "glassway_sub_board.h"
 #include "gpio/gpio_int.h"
-#include "guren_sub_board.h"
 #include "hooks.h"
 #include "motion_sense.h"
 #include "motionsense_sensors.h"
@@ -108,8 +108,8 @@ __override void board_power_change(struct ap_power_ev_callback *cb,
 		if (!gpio_pin_get_dt(pen_detect_gpio))
 			gpio_pin_set_dt(pen_power_gpio, 1);
 
-		if ((val == GUREN_SB_HDMI_LTE) || (val == GUREN_SB_HDMI) ||
-		    (val == GUREN_SB_HDMI_1A)) {
+		if ((val == GLASSWAY_SB_HDMI_LTE) ||
+		    (val == GLASSWAY_SB_HDMI) || (val == GLASSWAY_SB_HDMI_1A)) {
 			state = gpio_pin_get_dt(
 				GPIO_DT_FROM_ALIAS(gpio_hpd_odl));
 			gpio_pin_set_dt(hdmi_hpd_gpio, state);
@@ -123,8 +123,8 @@ __override void board_power_change(struct ap_power_ev_callback *cb,
 		gpio_disable_dt_interrupt(pen_detect_int);
 		gpio_pin_set_dt(pen_power_gpio, 0);
 
-		if ((val == GUREN_SB_HDMI_LTE) || (val == GUREN_SB_HDMI) ||
-		    (val == GUREN_SB_HDMI_1A)) {
+		if ((val == GLASSWAY_SB_HDMI_LTE) ||
+		    (val == GLASSWAY_SB_HDMI) || (val == GLASSWAY_SB_HDMI_1A)) {
 			gpio_pin_set_dt(hdmi_hpd_gpio, 0);
 		}
 		break;

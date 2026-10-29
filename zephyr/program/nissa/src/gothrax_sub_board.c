@@ -1,14 +1,14 @@
-/* Copyright 2025 The ChromiumOS Authors
+/* Copyright 2023 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
 
-/* Epic sub-board hardware configuration */
+/* Gothrax sub-board hardware configuration */
 
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "driver/tcpm/tcpci.h"
-#include "epic_sub_board.h"
+#include "gothrax_sub_board.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 #include "nissa_hdmi.h"
@@ -37,11 +37,12 @@ __override uint8_t board_get_usb_pd_port_count(void)
 	return cached_usb_pd_port_count;
 }
 
-test_export_static enum epic_sub_board_type cached_sub_board = EPIC_SB_UNKNOWN;
+test_export_static enum gothrax_sub_board_type cached_sub_board =
+	GOTHRAX_SB_UNKNOWN;
 /*
  * Retrieve sub-board type from FW_CONFIG.
  */
-enum epic_sub_board_type epic_get_sb_type(void)
+enum gothrax_sub_board_type gothrax_get_sb_type(void)
 {
 	int ret;
 	uint32_t val;
@@ -49,10 +50,10 @@ enum epic_sub_board_type epic_get_sb_type(void)
 	/*
 	 * Return cached value.
 	 */
-	if (cached_sub_board != EPIC_SB_UNKNOWN)
+	if (cached_sub_board != GOTHRAX_SB_UNKNOWN)
 		return cached_sub_board;
 
-	cached_sub_board = EPIC_SB_NONE; /* Defaults to none */
+	cached_sub_board = GOTHRAX_SB_NONE; /* Defaults to none */
 	ret = cros_cbi_get_fw_config(FW_SUB_BOARD, &val);
 	if (ret != 0) {
 		LOG_WRN("Error retrieving CBI FW_CONFIG field %d",
@@ -64,24 +65,31 @@ enum epic_sub_board_type epic_get_sb_type(void)
 		LOG_WRN("No sub-board defined");
 		break;
 	case FW_SUB_BOARD_1:
-		cached_sub_board = EPIC_SB_C_A;
+		cached_sub_board = GOTHRAX_SB_C_A;
 		LOG_INF("SB: USB type C, USB type A");
 		break;
 
 	case FW_SUB_BOARD_2:
-		cached_sub_board = EPIC_SB_C_A_LTE;
+		cached_sub_board = GOTHRAX_SB_C_A_LTE;
 		LOG_INF("SB: USB type C,USB type A, WWAN LTE");
 		break;
 
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
 	case FW_SUB_BOARD_3:
-		cached_sub_board = EPIC_SB_A;
+		cached_sub_board = GOTHRAX_SB_A;
 		LOG_INF("SB: USB type A");
 		break;
 
 	case FW_SUB_BOARD_6:
-		cached_sub_board = EPIC_SB_A_HDMI_LTE;
+		cached_sub_board = GOTHRAX_SB_HDMI_A_LTE;
 		LOG_INF("SB: HDMI, USB type A, WWAN LTE");
 		break;
+#else
+	case FW_SUB_BOARD_3:
+		cached_sub_board = GOTHRAX_SB_HDMI_A_LTE;
+		LOG_INF("SB: HDMI, USB type A, WWAN LTE");
+		break;
+#endif
 	}
 	return cached_sub_board;
 }
@@ -92,13 +100,13 @@ enum epic_sub_board_type epic_get_sb_type(void)
  */
 test_export_static void board_usb_pd_count_init(void)
 {
-	switch (epic_get_sb_type()) {
+	switch (gothrax_get_sb_type()) {
 	default:
 		cached_usb_pd_port_count = 1;
 		break;
 
-	case EPIC_SB_C_A:
-	case EPIC_SB_C_A_LTE:
+	case GOTHRAX_SB_C_A:
+	case GOTHRAX_SB_C_A_LTE:
 		cached_usb_pd_port_count = 2;
 		break;
 	}
@@ -121,7 +129,7 @@ static void hdmi_power_handler(struct ap_power_ev_callback *cb,
 		GPIO_DT_FROM_NODELABEL(gpio_hdmi_sel);
 #endif
 
-	if (epic_get_sb_type() != EPIC_SB_A_HDMI_LTE)
+	if (gothrax_get_sb_type() != GOTHRAX_SB_HDMI_A_LTE)
 		return;
 
 	switch (data.event) {
@@ -212,9 +220,9 @@ static void soc_it8xxx2_disable_i2c4_alt(void)
 static void lte_power_handler(struct ap_power_ev_callback *cb,
 			      struct ap_power_ev_data data)
 {
-	enum epic_sub_board_type sb = epic_get_sb_type();
+	enum gothrax_sub_board_type sb = gothrax_get_sb_type();
 
-	if (sb != EPIC_SB_A_HDMI_LTE && sb != EPIC_SB_C_A_LTE)
+	if (sb != GOTHRAX_SB_HDMI_A_LTE && sb != GOTHRAX_SB_C_A_LTE)
 		return;
 
 	/* Enable rails for S5 */
@@ -245,9 +253,9 @@ AP_POWER_EVENT_CALLBACK_DEFINE(lte_power_handler, AP_POWER_HARD_OFF,
  * (indicated by CBI fw_config); this function configures them according to the
  * needs of the present sub-board.
  */
-static void epic_subboard_config(void)
+static void gothrax_subboard_config(void)
 {
-	enum epic_sub_board_type sb = epic_get_sb_type();
+	enum gothrax_sub_board_type sb = gothrax_get_sb_type();
 
 #if USB_PORT_ENABLE_COUNT > 1
 	BUILD_ASSERT(USB_PORT_ENABLE_COUNT == 2,
@@ -257,8 +265,11 @@ static void epic_subboard_config(void)
 	 * if this port is not present. VBUS enable must be configured if
 	 * needed and is controlled by the usba-port-enable-pins driver.
 	 */
-	if (sb == EPIC_SB_C_A || sb == EPIC_SB_C_A_LTE || sb == EPIC_SB_A ||
-	    sb == EPIC_SB_A_HDMI_LTE) {
+	if (sb == GOTHRAX_SB_C_A || sb == GOTHRAX_SB_C_A_LTE ||
+#if DT_NODE_EXISTS(DT_PATH(nissa_fw_config, sub_board, sub_board_6))
+	    sb == GOTHRAX_SB_A ||
+#endif
+	    sb == GOTHRAX_SB_HDMI_A_LTE) {
 		/*
 		 * Configure VBUS enable, retaining current value.
 		 * SB_NONE indicates missing fw_config; it's safe to enable VBUS
@@ -287,7 +298,7 @@ static void epic_subboard_config(void)
 	 * but the interrupt line needs to be configured.
 	 */
 #if CONFIG_USB_PD_PORT_MAX_COUNT > 1
-	if (sb == EPIC_SB_C_A || sb == EPIC_SB_C_A_LTE) {
+	if (sb == GOTHRAX_SB_C_A || sb == GOTHRAX_SB_C_A_LTE) {
 		/* Configure interrupt input */
 		gpio_pin_configure_dt(GPIO_DT_FROM_ALIAS(gpio_usb_c1_int_odl),
 				      GPIO_INPUT | GPIO_PULL_UP);
@@ -298,7 +309,7 @@ static void epic_subboard_config(void)
 #endif
 
 	switch (sb) {
-	case EPIC_SB_A_HDMI_LTE:
+	case GOTHRAX_SB_HDMI_A_LTE:
 #if CONFIG_NISSA_BOARD_HAS_HDMI_SUPPORT
 	{
 		/*
@@ -360,7 +371,7 @@ static void epic_subboard_config(void)
 		 */
 #endif
 		break;
-	case EPIC_SB_C_A_LTE:
+	case GOTHRAX_SB_C_A_LTE:
 		/*
 		 * LTE: Set up callbacks for enabling/disabling
 		 * sub-board power on S5 state.
@@ -378,7 +389,7 @@ static void epic_subboard_config(void)
 		break;
 	}
 }
-DECLARE_HOOK(HOOK_INIT, epic_subboard_config, HOOK_PRIO_POST_FIRST);
+DECLARE_HOOK(HOOK_INIT, gothrax_subboard_config, HOOK_PRIO_POST_FIRST);
 
 /*
  * Enable interrupts

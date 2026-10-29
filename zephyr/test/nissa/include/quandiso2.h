@@ -10,6 +10,6 @@ void kb_layout_init(void);
 void fan_init(void);
 void board_init(void);
 
-extern enum quandiso2_sub_board_type quandiso2_cached_sub_board;
+extern enum quandiso_sub_board_type quandiso_cached_sub_board;
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_QUANDISO2_H_ */

@@ -16,7 +16,7 @@
 #include "hooks.h"
 #include "keyboard_protocol.h"
 #include "quandiso2.h"
-#include "quandiso2_sub_board.h"
+#include "quandiso_sub_board.h"
 #include "system.h"
 #include "tablet_mode.h"
 #include "tcpm/tcpci.h"
@@ -127,7 +127,7 @@ static void test_before(void *fixture)
 	kb_layout = 0;
 
 	/* Make the DB is 1C1A as initial */
-	quandiso2_cached_sub_board = QUANDISO2_SB_C_A;
+	quandiso_cached_sub_board = QUANDISO_SB_C_A;
 	set_fw_config_value(FW_SUB_BOARD_2);
 }
 ZTEST_SUITE(quandiso2, NULL, NULL, test_before, NULL, NULL);
@@ -590,7 +590,7 @@ ZTEST(quandiso2, test_fan_cbi_error)
 	zassert_equal(flags, 0, "actual GPIO flags were %#x", flags);
 }
 
-enum quandiso2_sub_board_type quandiso2_get_sb_type(void);
+enum quandiso_sub_board_type quandiso_get_sb_type(void);
 
 static int
 get_fake_sub_board_fw_config_field(enum cbi_fw_config_field_id field_id,
@@ -608,12 +608,12 @@ ZTEST(quandiso2, test_db_absent)
 		get_fake_sub_board_fw_config_field;
 
 	/* Reset cached global state. */
-	quandiso2_cached_sub_board = QUANDISO2_SB_UNKNOWN;
+	quandiso_cached_sub_board = QUANDISO_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_fw_config_value(FW_SUB_BOARD_1);
-	zassert_equal(quandiso2_get_sb_type(), QUANDISO2_SB_ABSENT);
+	zassert_equal(quandiso_get_sb_type(), QUANDISO_SB_ABSENT);
 	zassert_equal(board_get_usb_pd_port_count(), 1);
 
 	init_gpios(NULL);
@@ -622,7 +622,7 @@ ZTEST(quandiso2, test_db_absent)
 	ASSERT_GPIO_FLAGS(GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl),
 			  GPIO_PULL_UP | GPIO_INPUT);
 
-	quandiso2_cached_sub_board = QUANDISO2_SB_C_A;
+	quandiso_cached_sub_board = QUANDISO_SB_C_A;
 	fw_config_value = -1;
 }
 
@@ -631,12 +631,12 @@ ZTEST(quandiso2, test_db_with_c)
 	cros_cbi_get_fw_config_fake.custom_fake =
 		get_fake_sub_board_fw_config_field;
 	/* Reset cached global state. */
-	quandiso2_cached_sub_board = QUANDISO2_SB_UNKNOWN;
+	quandiso_cached_sub_board = QUANDISO_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_fw_config_value(FW_SUB_BOARD_2);
-	zassert_equal(quandiso2_get_sb_type(), QUANDISO2_SB_C_A);
+	zassert_equal(quandiso_get_sb_type(), QUANDISO_SB_C_A);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	init_gpios(NULL);
@@ -645,7 +645,7 @@ ZTEST(quandiso2, test_db_with_c)
 	ASSERT_GPIO_FLAGS(GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl),
 			  GPIO_PULL_UP | GPIO_INPUT | GPIO_INT_EDGE_FALLING);
 
-	quandiso2_cached_sub_board = QUANDISO2_SB_C_A;
+	quandiso_cached_sub_board = QUANDISO_SB_C_A;
 	fw_config_value = -1;
 }
 
@@ -654,12 +654,12 @@ ZTEST(quandiso2, test_db_with_lte_only)
 	cros_cbi_get_fw_config_fake.custom_fake =
 		get_fake_sub_board_fw_config_field;
 	/* Reset cached global state. */
-	quandiso2_cached_sub_board = QUANDISO2_SB_UNKNOWN;
+	quandiso_cached_sub_board = QUANDISO_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_fw_config_value(FW_SUB_BOARD_3);
-	zassert_equal(quandiso2_get_sb_type(), QUANDISO2_SB_LTE);
+	zassert_equal(quandiso_get_sb_type(), QUANDISO_SB_LTE);
 	zassert_equal(board_get_usb_pd_port_count(), 1);
 
 	init_gpios(NULL);
@@ -668,7 +668,7 @@ ZTEST(quandiso2, test_db_with_lte_only)
 	ASSERT_GPIO_FLAGS(GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl),
 			  GPIO_PULL_UP | GPIO_INPUT);
 
-	quandiso2_cached_sub_board = QUANDISO2_SB_C_A;
+	quandiso_cached_sub_board = QUANDISO_SB_C_A;
 	fw_config_value = -1;
 }
 
@@ -677,12 +677,12 @@ ZTEST(quandiso2, test_db_with_c_lte)
 	cros_cbi_get_fw_config_fake.custom_fake =
 		get_fake_sub_board_fw_config_field;
 	/* Reset cached global state. */
-	quandiso2_cached_sub_board = QUANDISO2_SB_UNKNOWN;
+	quandiso_cached_sub_board = QUANDISO_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_fw_config_value(FW_SUB_BOARD_4);
-	zassert_equal(quandiso2_get_sb_type(), QUANDISO2_SB_C_LTE);
+	zassert_equal(quandiso_get_sb_type(), QUANDISO_SB_C_LTE);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	init_gpios(NULL);
@@ -691,7 +691,7 @@ ZTEST(quandiso2, test_db_with_c_lte)
 	ASSERT_GPIO_FLAGS(GPIO_DT_FROM_NODELABEL(gpio_usb_c1_int_odl),
 			  GPIO_PULL_UP | GPIO_INPUT | GPIO_INT_EDGE_FALLING);
 
-	quandiso2_cached_sub_board = QUANDISO2_SB_C_A;
+	quandiso_cached_sub_board = QUANDISO_SB_C_A;
 	fw_config_value = -1;
 }
 
@@ -707,11 +707,11 @@ ZTEST(quandiso2, test_cbi_error)
 	 * Reading fw_config from CBI returns an error, so sub-board is treated
 	 * as default.
 	 */
-	quandiso2_cached_sub_board = QUANDISO2_SB_C_A;
+	quandiso_cached_sub_board = QUANDISO_SB_C_A;
 	fw_config_value = -1;
 
 	cros_cbi_get_fw_config_fake.custom_fake = get_fw_config_error;
-	zassert_equal(quandiso2_get_sb_type(), QUANDISO2_SB_C_A);
+	zassert_equal(quandiso_get_sb_type(), QUANDISO_SB_C_A);
 }
 
 static int chipset_state;

@@ -12,9 +12,9 @@
 #include "emul/tcpc/emul_tcpci.h"
 #include "extpower.h"
 #include "fan.h"
+#include "glassway_sub_board.h"
 #include "gpio/gpio_int.h"
 #include "guren.h"
-#include "guren_sub_board.h"
 #include "hooks.h"
 #include "keyboard_8042_sharedlib.h"
 #include "keyboard_raw.h"
@@ -87,7 +87,7 @@ FAKE_VOID_FUNC(lpc_keyboard_resume_irq);
 void board_usb_pd_count_init(void);
 static uint32_t fw_config_value;
 
-enum guren_sub_board_type guren_get_sb_type(void);
+enum glassway_sub_board_type glassway_get_sb_type(void);
 
 static int
 get_fake_sub_board_fw_config_field(enum cbi_fw_config_field_id field_id,
@@ -128,7 +128,7 @@ static void test_before_fn(void *fixture_)
 	struct guren_sub_board_fixture *fixture = fixture_;
 
 	/* Reset cached global state. */
-	guren_cached_sub_board = GUREN_SB_UNKNOWN;
+	glassway_cached_sub_board = GLASSWAY_SB_UNKNOWN;
 	fw_config_value = -1;
 
 	/* Return the fake fw_config value. */
@@ -150,7 +150,7 @@ ZTEST_SUITE(guren_sub_board, NULL, suite_setup_fn, test_before_fn, NULL, NULL);
 
 static void set_sb_config(uint32_t value)
 {
-	guren_cached_sub_board = GUREN_SB_UNKNOWN;
+	glassway_cached_sub_board = GLASSWAY_SB_UNKNOWN;
 	cros_cbi_get_fw_config_fake.custom_fake =
 		get_fake_sub_board_fw_config_field;
 	fw_config_value = value;
@@ -188,7 +188,7 @@ static void test_before(void *fixture)
 	 * Clear cached sub-board ID from CBI and reset to the default
 	 * sub-board (side effect: cros_cbi_get_fw_config_fake is configured).
 	 */
-	set_sb_config(GUREN_SB_1C_1A);
+	set_sb_config(GLASSWAY_SB_1C_1A);
 }
 
 ZTEST_SUITE(guren, NULL, NULL, test_before, NULL, NULL);
@@ -514,7 +514,7 @@ ZTEST(guren, test_db_without_c)
 {
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_2);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1A);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1A);
 	zassert_equal(board_get_usb_pd_port_count(), 1);
 
 	init_gpios(NULL);
@@ -525,7 +525,7 @@ ZTEST(guren, test_db_without_c)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_5);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_HDMI_LTE);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_HDMI_LTE);
 	zassert_equal(board_get_usb_pd_port_count(), 1);
 
 	init_gpios(NULL);
@@ -539,7 +539,7 @@ ZTEST(guren, test_db_with_c)
 {
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_1);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	init_gpios(NULL);
@@ -550,7 +550,7 @@ ZTEST(guren, test_db_with_c)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_3);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_1A);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_1A);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	init_gpios(NULL);
@@ -558,7 +558,7 @@ ZTEST(guren, test_db_with_c)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_4);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_LTE);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_LTE);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	init_gpios(NULL);
@@ -568,7 +568,7 @@ ZTEST(guren, test_db_with_c)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_8);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_5G);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_5G);
 	zassert_equal(board_get_usb_pd_port_count(), 2);
 
 	init_gpios(NULL);
@@ -586,7 +586,7 @@ ZTEST(guren, test_db_with_hdmi)
 	nissa_configure_hdmi_rails_fake.call_count = 0;
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_1);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -595,7 +595,7 @@ ZTEST(guren, test_db_with_hdmi)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_2);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1A);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1A);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -604,7 +604,7 @@ ZTEST(guren, test_db_with_hdmi)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_3);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_1A);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_1A);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -613,7 +613,7 @@ ZTEST(guren, test_db_with_hdmi)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_4);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_LTE);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_LTE);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -622,7 +622,7 @@ ZTEST(guren, test_db_with_hdmi)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_8);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_5G);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_5G);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -631,7 +631,7 @@ ZTEST(guren, test_db_with_hdmi)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_5);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_HDMI_LTE);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_HDMI_LTE);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -644,7 +644,7 @@ ZTEST(guren, test_db_with_hdmi)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_6);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_HDMI);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_HDMI);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -657,7 +657,7 @@ ZTEST(guren, test_db_with_hdmi)
 
 	/* Set the sub-board, reported configuration is correct. */
 	set_sb_config(FW_SUB_BOARD_7);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_HDMI_1A);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_HDMI_1A);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -672,7 +672,7 @@ ZTEST(guren, test_db_with_hdmi)
 ZTEST_F(guren_sub_board, test_db_with_lte)
 {
 	set_sb_config(FW_SUB_BOARD_4);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_LTE);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_LTE);
 
 	init_gpios(NULL);
 	hook_notify(HOOK_INIT);
@@ -692,7 +692,7 @@ ZTEST_F(guren_sub_board, test_db_with_lte)
 	hook_notify(HOOK_INIT);
 
 	set_sb_config(FW_SUB_BOARD_5);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_HDMI_LTE);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_HDMI_LTE);
 
 	/* GPIOs are configured as expected. */
 	ASSERT_GPIO_FLAGS(fixture->sb_2 /* Standby power enable */,
@@ -707,7 +707,7 @@ ZTEST_F(guren_sub_board, test_db_with_lte)
 	hook_notify(HOOK_INIT);
 
 	set_sb_config(FW_SUB_BOARD_8);
-	zassert_equal(guren_get_sb_type(), GUREN_SB_1C_5G);
+	zassert_equal(glassway_get_sb_type(), GLASSWAY_SB_1C_5G);
 
 	/* GPIOs are configured as expected. */
 	ASSERT_GPIO_FLAGS(fixture->sb_2 /* Standby power enable */,
