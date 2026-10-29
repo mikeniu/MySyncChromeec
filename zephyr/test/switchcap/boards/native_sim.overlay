@@ -7,10 +7,21 @@
 #include <zephyr/dt-bindings/gpio/gpio.h>
 
 / {
+	fake_comp: fake-comp {
+		compatible = "zephyr,fake-comp";
+	};
+
 	switchcap: switchcap {
 		compatible = "cros-ec,switchcap";
 		enable-gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
 		power-good-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+		power-off-delay-ms = <10>;
+	};
+
+	switchcap_comp: switchcap-comp {
+		compatible = "cros-ec,switchcap-comparator";
+		enable-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+		power-good-comp = <&fake_comp>;
 		power-off-delay-ms = <10>;
 	};
 };

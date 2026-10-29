@@ -14,10 +14,26 @@
 #include <stdbool.h>
 
 #include <zephyr/device.h>
+#include <zephyr/sys/__assert.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** @cond INTERNAL_HIDDEN */
+
+typedef int (*cros_switchcap_set_power_t)(const struct device *dev,
+					  bool enable);
+typedef bool (*cros_switchcap_is_enabled_t)(const struct device *dev);
+typedef bool (*cros_switchcap_is_power_good_t)(const struct device *dev);
+
+__subsystem struct cros_switchcap_driver_api {
+	cros_switchcap_set_power_t set_power;
+	cros_switchcap_is_enabled_t is_enabled;
+	cros_switchcap_is_power_good_t is_power_good;
+};
+
+/** @endcond */
 
 /**
  * @brief Enable or disable switchcap power rail.
@@ -28,7 +44,14 @@ extern "C" {
  * @retval 0 On success.
  * @return Negative errno code on failure.
  */
-int cros_switchcap_set_power(const struct device *dev, bool enable);
+static inline int cros_switchcap_set_power(const struct device *dev,
+					   bool enable)
+{
+	__ASSERT(DEVICE_API_GET(cros_switchcap, dev)->set_power != NULL,
+		 "set_power is not optional");
+
+	return DEVICE_API_GET(cros_switchcap, dev)->set_power(dev, enable);
+}
 
 /**
  * @brief Check if switchcap power rail is currently enabled.
@@ -38,7 +61,13 @@ int cros_switchcap_set_power(const struct device *dev, bool enable);
  * @retval true  Switchcap rail is enabled.
  * @retval false Switchcap rail is disabled.
  */
-bool cros_switchcap_is_enabled(const struct device *dev);
+static inline bool cros_switchcap_is_enabled(const struct device *dev)
+{
+	__ASSERT(DEVICE_API_GET(cros_switchcap, dev)->is_enabled != NULL,
+		 "is_enabled is not optional");
+
+	return DEVICE_API_GET(cros_switchcap, dev)->is_enabled(dev);
+}
 
 /**
  * @brief Check if switchcap power rail is in good state.
@@ -48,7 +77,13 @@ bool cros_switchcap_is_enabled(const struct device *dev);
  * @retval true  Power rail is good.
  * @retval false Power rail is not good.
  */
-bool cros_switchcap_is_power_good(const struct device *dev);
+static inline bool cros_switchcap_is_power_good(const struct device *dev)
+{
+	__ASSERT(DEVICE_API_GET(cros_switchcap, dev)->is_power_good != NULL,
+		 "is_power_good is not optional");
+
+	return DEVICE_API_GET(cros_switchcap, dev)->is_power_good(dev);
+}
 
 #ifdef __cplusplus
 }

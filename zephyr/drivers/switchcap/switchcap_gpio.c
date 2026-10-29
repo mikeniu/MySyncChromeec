@@ -13,26 +13,17 @@
 
 #include <drivers/cros_switchcap.h>
 
-LOG_MODULE_REGISTER(switchcap, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(switchcap_gpio, LOG_LEVEL_INF);
 
-BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
-	     "Exactly one instance of cros-ec,switchcap should be defined.");
-
-struct switchcap_config {
+struct switchcap_gpio_config {
 	struct gpio_dt_spec enable_gpio;
 	struct gpio_dt_spec power_good_gpio;
 	uint16_t power_off_delay_ms;
 };
 
-static const struct switchcap_config switchcap_cfg = {
-	.enable_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), enable_gpios),
-	.power_good_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), power_good_gpios),
-	.power_off_delay_ms = DT_INST_PROP_OR(0, power_off_delay_ms, 0),
-};
-
-int cros_switchcap_set_power(const struct device *dev, bool enable)
+static int switchcap_gpio_set_power(const struct device *dev, bool enable)
 {
-	const struct switchcap_config *cfg = dev->config;
+	const struct switchcap_gpio_config *cfg = dev->config;
 	int ret;
 
 	ret = gpio_pin_set_dt(&cfg->enable_gpio, enable);
@@ -47,23 +38,29 @@ int cros_switchcap_set_power(const struct device *dev, bool enable)
 	return 0;
 }
 
-bool cros_switchcap_is_enabled(const struct device *dev)
+static bool switchcap_gpio_is_enabled(const struct device *dev)
 {
-	const struct switchcap_config *cfg = dev->config;
+	const struct switchcap_gpio_config *cfg = dev->config;
 
 	return gpio_pin_get_dt(&cfg->enable_gpio);
 }
 
-bool cros_switchcap_is_power_good(const struct device *dev)
+static bool switchcap_gpio_is_power_good(const struct device *dev)
 {
-	const struct switchcap_config *cfg = dev->config;
+	const struct switchcap_gpio_config *cfg = dev->config;
 
 	return gpio_pin_get_dt(&cfg->power_good_gpio);
 }
 
-static int switchcap_init(const struct device *dev)
+static DEVICE_API(cros_switchcap, switchcap_gpio_api) = {
+	.set_power = switchcap_gpio_set_power,
+	.is_enabled = switchcap_gpio_is_enabled,
+	.is_power_good = switchcap_gpio_is_power_good,
+};
+
+static int switchcap_gpio_init(const struct device *dev)
 {
-	const struct switchcap_config *cfg = dev->config;
+	const struct switchcap_gpio_config *cfg = dev->config;
 	int ret;
 
 	if (!gpio_is_ready_dt(&cfg->enable_gpio)) {
@@ -96,5 +93,17 @@ static int switchcap_init(const struct device *dev)
 	return 0;
 }
 
-DEVICE_DT_INST_DEFINE(0, switchcap_init, NULL, NULL, &switchcap_cfg,
-		      POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, NULL);
+#define SWITCHCAP_GPIO_INIT(inst)                                               \
+	static const struct switchcap_gpio_config switchcap_gpio_cfg_##inst = { \
+		.enable_gpio = GPIO_DT_SPEC_INST_GET(inst, enable_gpios),       \
+		.power_good_gpio =                                              \
+			GPIO_DT_SPEC_INST_GET(inst, power_good_gpios),          \
+		.power_off_delay_ms =                                           \
+			DT_INST_PROP_OR(inst, power_off_delay_ms, 0),           \
+	};                                                                      \
+	DEVICE_DT_INST_DEFINE(inst, switchcap_gpio_init, NULL, NULL,            \
+			      &switchcap_gpio_cfg_##inst, POST_KERNEL,          \
+			      CONFIG_KERNEL_INIT_PRIORITY_DEVICE,               \
+			      &switchcap_gpio_api);
+
+DT_INST_FOREACH_STATUS_OKAY(SWITCHCAP_GPIO_INIT)
