@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "659d47fb_9cd67a02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1508185
+      },
+      "writtenOn": "2026-10-29T22:14:34Z",
+      "side": 1,
+      "message": "Verified on hardware (`nissa/uldren`, `satlab-0wgatfqi2208800f-utc274-nissa-krk-1` connected to Unigraf UTC-274 tester):\n\n- **EC Firmware**: `uldren-15217.1385.0` (from CQ build https://ci.chromium.org/ui/b/8666599812945315521)\n- **Test**: `atest DesktopUsbTypecDataSwapHostTestCases:DataSwapTest` (unmodified upstream test verifying both DUT `port_info.data_role` and tester `self.utc.data_role`)\n- **Results**: **2/2 PASSED** (`0 Failed`)\n  - `DataSwapTest.test_data_role_swap_dut_port0_flipped`: **PASSED** (30.15s)\n  - `DataSwapTest.test_data_role_swap_dut_port0_normal`: **PASSED** (23.75s)\n\nLog excerpt:\n```\n[Iteration 1/2]: Setting DUT port 1 data role to DutDataRole.UFP.\n[Iteration 1/2]: Verified data roles on DUT port 1: DUT\u003dDutDataRole.UFP, UTC\u003dDataRole.DFP.\n[Iteration 1/2]: Setting DUT port 1 data role to DutDataRole.DFP.\n[Iteration 1/2]: Verified data roles on DUT port 1: DUT\u003dDutDataRole.DFP, UTC\u003dDataRole.UFP.\n[Iteration 2/2]: Setting DUT port 1 data role to DutDataRole.UFP.\n[Iteration 2/2]: Verified data roles on DUT port 1: DUT\u003dDutDataRole.UFP, UTC\u003dDataRole.DFP.\n[Iteration 2/2]: Setting DUT port 1 data role to DutDataRole.DFP.\n[Iteration 2/2]: Verified data roles on DUT port 1: DUT\u003dDutDataRole.DFP, UTC\u003dDataRole.UFP.\n```",
+      "isAi": true,
+      "revId": "96a5a129ca91483e1538498b2d2a7ba7978ee614",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
