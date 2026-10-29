@@ -143,6 +143,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a912202f_3311cdaa",
+        "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-10-29T19:04:18Z",
+      "side": 1,
+      "message": "Implemented this as a driver in http://crrev.com/c/8683127",
+      "parentUuid": "f4ee45b2_8af84aa3",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 48
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7fc6b3e7_f6a6c320",
@@ -156,6 +180,30 @@
       "writtenOn": "2026-10-28T18:05:05Z",
       "side": 1,
       "message": "Direct lookup of nodelabels are hard for developers to discover.  Converting this to a proper Zephyr driver helps gather all the settings in one place.",
+      "range": {
+        "startLine": 30,
+        "startChar": 47,
+        "endLine": 30,
+        "endChar": 64
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c1fd3d6_abe17c57",
+        "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-10-29T19:04:18Z",
+      "side": 1,
+      "message": "As above, implemented this as a driver in http://crrev.com/c/8683127",
+      "parentUuid": "7fc6b3e7_f6a6c320",
       "range": {
         "startLine": 30,
         "startChar": 47,
