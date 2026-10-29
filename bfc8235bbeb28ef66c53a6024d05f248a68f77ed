@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0dadeb3_9711584b",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 4012,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T23:50:08Z",
+      "side": 1,
+      "message": "Combine this change into the parent commit.",
+      "range": {
+        "startLine": 4012,
+        "startChar": 0,
+        "endLine": 4012,
+        "endChar": 43
+      },
+      "revId": "bfc8235bbeb28ef66c53a6024d05f248a68f77ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
