@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d66a0fe5_1147b5ce",
+        "filename": "zephyr/drivers/adc_comparator/adc_comparator.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T17:27:32Z",
+      "side": 1,
+      "message": "This driver should be submitted upstream.",
+      "range": {
+        "startLine": 6,
+        "startChar": 22,
+        "endLine": 6,
+        "endChar": 44
+      },
+      "revId": "dca2d3a2bf782d7ef9482de1449937bd26ce54c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
