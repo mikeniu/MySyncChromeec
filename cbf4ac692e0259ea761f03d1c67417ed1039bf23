@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8f3a8226_968125f4",
+        "filename": "zephyr/program/dougie/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-29T18:07:00Z",
+      "side": 1,
+      "message": "It will not be a good idea to mix AP power sequencing and other various signals. The required signals may vary and the the specific stage at which it may need to be enabled/disabled may vary too, creating a lot of model specific variation in the AP SEQ driver.\n\nIf one want a clean approach it would be better to make a dedicated DT drivers or use existing one:\n - gpio_en_pp5000_usba_vbus: could use the src/platform/ec/common/usb_port_power_dumb.c like src/platform/ec/zephyr/program/rauru/usba.dtsi\n - cros-ec,ap-power-events (zephyr/drivers/ap_power_events/ap_power_events.c) can be used for the rest, maybe with some adjustments.",
+      "parentUuid": "b9364760_af0d9884",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 66
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4ee45b2_8af84aa3",
         "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
         "patchSetId": 1
