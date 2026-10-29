@@ -225,9 +225,14 @@ int battery_get_mode(int *mode)
 
 #if !defined(CONFIG_BATTERY_PRESENT_GPIO) && \
 	!defined(CONFIG_BATTERY_PRESENT_CUSTOM)
+test_export_static enum battery_present cached_present = BP_NOT_INIT;
+
 __overridable enum battery_present battery_is_present(void)
 {
 	int manufacture_date;
+
+	if (cached_present != BP_NOT_INIT)
+		return cached_present;
 
 	if (sb_read(SB_MANUFACTURE_DATE, &manufacture_date)) {
 		/* Require 2 consecutive failures before declaring the
@@ -557,6 +562,8 @@ void battery_get_params(struct batt_params *batt)
 		batt_new.is_present = BP_YES;
 	else
 		batt_new.is_present = BP_NOT_SURE;
+
+	cached_present = batt_new.is_present;
 #endif
 
 	if (battery_want_charge(&batt_new))

@@ -12,6 +12,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
 
+extern enum battery_present cached_present;
+
 #define BATTERY_NODE DT_NODELABEL(battery)
 
 struct battery_present_fixture {
@@ -33,6 +35,8 @@ static void *battery_present_setup(void)
 static void battery_present_before_and_teardown(void *fixture)
 {
 	struct battery_present_fixture *f = fixture;
+
+	cached_present = BP_NOT_INIT;
 
 	i2c_common_emul_set_fail_auto_clear(f->common_data, false);
 	i2c_common_emul_set_read_fail_reg(f->common_data,
@@ -63,6 +67,36 @@ ZTEST_USER_F(battery_present, test_i2c_access_fails)
 	i2c_common_emul_set_write_fail_reg(fixture->common_data,
 					   I2C_COMMON_EMUL_FAIL_ALL_REG);
 
+	zassert_equal(battery_is_present(), BP_NOT_SURE);
+}
+
+ZTEST_F(battery_present, test_cached_presence)
+{
+	struct batt_params params = { 0 };
+
+	/*
+	 * Responsive battery updates cached_present to BP_YES; subsequent
+	 * battery_is_present() calls return BP_YES without I2C reads.
+	 */
+	battery_get_params(&params);
+	zassert_equal(params.is_present, BP_YES);
+	zassert_equal(cached_present, BP_YES);
+
+	i2c_common_emul_set_read_fail_reg(fixture->common_data,
+					  I2C_COMMON_EMUL_FAIL_ALL_REG);
+	zassert_equal(battery_is_present(), BP_YES);
+
+	/*
+	 * Unresponsive battery updates cached_present to BP_NOT_SURE;
+	 * subsequent battery_is_present() calls return BP_NOT_SURE without
+	 * I2C reads even when I2C is restored.
+	 */
+	battery_get_params(&params);
+	zassert_equal(params.is_present, BP_NOT_SURE);
+	zassert_equal(cached_present, BP_NOT_SURE);
+
+	i2c_common_emul_set_read_fail_reg(fixture->common_data,
+					  I2C_COMMON_EMUL_NO_FAIL_REG);
 	zassert_equal(battery_is_present(), BP_NOT_SURE);
 }
 
