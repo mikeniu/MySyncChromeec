@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac34e35b_8c1ebdb0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T00:00:48Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "c57173dc_c328dd16",
+      "range": {
+        "startLine": 16,
+        "startChar": 42,
+        "endLine": 17,
+        "endChar": 54
+      },
+      "revId": "62fcb7e9c265c64e0250385b7855514b96f8148b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "47b664aa_21e6e76e",
@@ -73,6 +97,30 @@
       "writtenOn": "2026-10-28T22:50:00Z",
       "side": 1,
       "message": "Wrong bug? Looks like it\u0027s for Zephyr. I would suggest submitting a PR to boringssl. They\u0027ve accepted my build fix patches like this very quickly (same day).",
+      "range": {
+        "startLine": 10,
+        "startChar": 2,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "62fcb7e9c265c64e0250385b7855514b96f8148b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2127bf8_a1c3a15e",
+        "filename": "third_party/boringssl/boringssl-toolchain.cmake",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T00:00:48Z",
+      "side": 1,
+      "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "85c4e770_e3590e21",
       "range": {
         "startLine": 10,
         "startChar": 2,
