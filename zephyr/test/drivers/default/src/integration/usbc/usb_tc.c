@@ -61,9 +61,25 @@ static void usb_tc_before(void *fixture_data)
 	k_sleep(K_MSEC(100));
 }
 
+static const struct tcpm_drv *saved_tcpm_drv;
+static struct tcpm_drv mock_tcpm_drv;
+static int tc_debug_detach_count;
+
+static int mock_debug_detach(int port)
+{
+	if (port == TEST_PORT)
+		tc_debug_detach_count++;
+	return 0;
+}
+
 static void usb_tc_after(void *fixture_data)
 {
 	struct usb_tc_fixture *fixture = (struct usb_tc_fixture *)fixture_data;
+
+	if (saved_tcpm_drv != NULL) {
+		tcpc_config[TEST_PORT].drv = saved_tcpm_drv;
+		saved_tcpm_drv = NULL;
+	}
 
 	tcpci_emul_disconnect_partner(fixture->tcpci_emul);
 	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
@@ -302,6 +318,54 @@ ZTEST_F(usb_tc, test_tc_attach_wait_bounce_no_disconnect_hook)
 	k_sleep(K_SECONDS(1));
 	zassert_false(tc_is_attached_snk(TEST_PORT));
 	zassert_equal(1, tc_disconnect_hook_count);
+}
+
+ZTEST_F(usb_tc, test_tc_attach_wait_bounce_no_debug_detach)
+{
+	/*
+	 * Hook debug_detach in the TCPM driver to count invocations.
+	 */
+	saved_tcpm_drv = tcpc_config[TEST_PORT].drv;
+	mock_tcpm_drv = *saved_tcpm_drv;
+	mock_tcpm_drv.debug_detach = mock_debug_detach;
+	tcpc_config[TEST_PORT].drv = &mock_tcpm_drv;
+
+	tcpci_partner_init(&fixture->partner_emul, PD_REV20);
+	fixture->partner_emul.extensions = tcpci_src_emul_init(
+		&fixture->src_ext, &fixture->partner_emul, NULL);
+
+	/*
+	 * Freeze in sink mode so unattached disconnect returns to
+	 * Unattached.SNK without entering LowPowerMode or toggling to
+	 * Unattached.SRC.
+	 */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FREEZE);
+	k_sleep(K_MSEC(100));
+	tc_debug_detach_count = 0;
+
+	/*
+	 * Connect partner to enter AttachWait.SNK, then disconnect before
+	 * debounce expires and an attach occurs. Transition back to
+	 * Unattached.SNK should NOT call debug_detach because no role
+	 * change or attach occurred.
+	 */
+	zassert_ok(tcpci_partner_connect_to_tcpci(&fixture->partner_emul,
+						  fixture->tcpci_emul));
+	k_sleep(K_MSEC(50));
+	zassert_equal(0, strcmp(tc_get_current_state(TEST_PORT),
+				"AttachWait.SNK"));
+
+	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
+	k_sleep(K_MSEC(50));
+	zassert_false(tc_is_attached_snk(TEST_PORT));
+	zassert_equal(0, tc_debug_detach_count);
+
+	/*
+	 * Switching power role to Unattached.SRC SHOULD call debug_detach.
+	 */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SOURCE);
+	k_sleep(K_MSEC(100));
+	zassert_equal(1, tc_debug_detach_count);
 }
 
 ZTEST_F(usb_tc, test_tc_dts_debug_accessory_cc1)
