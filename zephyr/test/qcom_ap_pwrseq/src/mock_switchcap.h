@@ -11,11 +11,15 @@
 #include <zephyr/device.h>
 #include <zephyr/fff.h>
 
-DECLARE_FAKE_VALUE_FUNC(int, cros_switchcap_set_power, const struct device *,
+DECLARE_FAKE_VALUE_FUNC(int, mock_switchcap_set_power, const struct device *,
 			bool);
-DECLARE_FAKE_VALUE_FUNC(bool, cros_switchcap_is_enabled, const struct device *);
-DECLARE_FAKE_VALUE_FUNC(bool, cros_switchcap_is_power_good,
+DECLARE_FAKE_VALUE_FUNC(bool, mock_switchcap_is_enabled, const struct device *);
+DECLARE_FAKE_VALUE_FUNC(bool, mock_switchcap_is_power_good,
 			const struct device *);
+
+#define cros_switchcap_set_power_fake mock_switchcap_set_power_fake
+#define cros_switchcap_is_enabled_fake mock_switchcap_is_enabled_fake
+#define cros_switchcap_is_power_good_fake mock_switchcap_is_power_good_fake
 
 void mock_switchcap_reset_state(void);
 
