@@ -10,6 +10,7 @@
 #define PLATFORM_EC_UTIL_REALTEKFP_RTS5817_USB_DEVICE_H_
 
 #include <chrono>
+#include <cstdint>
 #include <expected>
 #include <functional>
 #include <memory>
@@ -26,6 +27,8 @@ enum class RtsError {
   kUsbError,
   kInvalidParameter,
   kTimeout,
+  kStall,
+  kProtocolError,
 };
 
 inline std::string_view ToString(RtsError error) {
@@ -40,9 +43,40 @@ inline std::string_view ToString(RtsError error) {
       return "Invalid parameter";
     case RtsError::kTimeout:
       return "Timed out waiting for the device to re-enumerate";
+    case RtsError::kStall:
+      return "The device stalled the request";
+    case RtsError::kProtocolError:
+      return "Unexpected response from the device";
   }
   return "Unknown error";
 }
+
+// RTS5817 vendor-specific USB control requests (same as rtsflash.py).
+//
+// XMEM_READ reads 4 bytes (little endian) of device memory; the address is
+// split into wValue (low 16 bits) and wIndex (high 16 bits).
+inline constexpr uint8_t kRtsVreqXmemRead = 0x41;
+// The initial vector table address tells which image is running.
+inline constexpr uint32_t kRtsInitVtorAddr = 0x401E2090;
+inline constexpr uint32_t kRtsInitVtorBootRom = 0x00000000;
+inline constexpr uint32_t kRtsInitVtorFlashImage = 0x01800000;
+// GET_STATUS / SET_STATUS only exist in the Boot ROM.
+inline constexpr uint8_t kRtsStdGetStatus = 0x1A;
+inline constexpr uint8_t kRtsStdSetStatus = 0x1B;
+// wValue for kRtsStdSetStatus: enable download mode.
+inline constexpr uint16_t kRtsEnableDownloadMode = 1;
+
+// Pre-computed bmRequestType values (raw uint8_t values per USB spec). Avoids
+// -Wdeprecated-enum-enum-conversion when OR'ing different libusb enum types.
+//   0x80 = Device-to-host, Standard, Device
+//   0x00 = Host-to-device, Standard, Device
+//   0xC0 = Device-to-host, Vendor, Device
+inline constexpr uint8_t kBmReqD2hStdDev = 0x80;
+inline constexpr uint8_t kBmReqH2dStdDev = 0x00;
+inline constexpr uint8_t kBmReqD2hVendorDev = 0xC0;
+
+// USB I/O timeouts.
+inline constexpr std::chrono::milliseconds kUsbCtrlTimeout{1000};
 
 class RtsUsbDevice {
  public:
@@ -71,6 +105,12 @@ class RtsUsbDevice {
 
   // Releases USB resources.
   void Release();
+
+  // Enables DFU download mode via vendor control request. Only the Boot ROM
+  // implements the request; a running Flash Image (or a device that stalls the
+  // mode query) is left untouched so the caller can go straight to
+  // DFU_DETACH.
+  std::expected<void, RtsError> EnableDownload();
 
  private:
   std::unique_ptr<RtsUsbBackend> backend_;

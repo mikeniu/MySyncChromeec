@@ -8,8 +8,15 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <algorithm>
+#include <array>
+#include <bit>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <expected>
 #include <memory>
+#include <span>
 #include <utility>
 #include <vector>
 
@@ -21,7 +28,9 @@ namespace {
 using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::InSequence;
+using ::testing::IsEmpty;
 using ::testing::Return;
+using ::testing::SizeIs;
 using ::testing::StrictMock;
 using ::testing::Test;
 
@@ -200,6 +209,171 @@ TEST_F(RtsUsbDeviceTest, WaitForDeviceFailsWhenLibusbInitFails) {
   EXPECT_EQ(res.error(), RtsError::kUsbError);
 }
 
+// Replies to the R_INITVTOR query with `value` (little endian).
+auto InitVtorIs(uint32_t value) {
+  return [value](uint8_t, uint8_t, uint16_t, uint16_t, std::span<uint8_t> data,
+                 milliseconds) {
+    std::ranges::copy(std::bit_cast<std::array<uint8_t, sizeof(value)>>(value),
+                      data.begin());
+    return std::expected<size_t, int>(data.size());
+  };
+}
+
+// Replies to GET_STATUS with the given one-byte status.
+auto StatusIs(uint8_t status) {
+  return [status](uint8_t, uint8_t, uint16_t, uint16_t, std::span<uint8_t> data,
+                  milliseconds) {
+    data[0] = status;
+    return std::expected<size_t, int>(1);
+  };
+}
+
+class RtsUsbDeviceEnableDownloadTest : public RtsUsbDeviceTest {
+ protected:
+  void SetUp() override {
+    RtsUsbDeviceTest::SetUp();
+    EXPECT_CALL(*backend_, IsOpen()).WillRepeatedly(Return(true));
+  }
+
+  void ExpectInitVtorQuery(testing::Action<std::expected<size_t, int>(
+                               uint8_t, uint8_t, uint16_t, uint16_t,
+                               std::span<uint8_t>, milliseconds)>
+                               reply) {
+    EXPECT_CALL(
+        *backend_,
+        ControlTransferIn(kBmReqD2hVendorDev, kRtsVreqXmemRead,
+                          kRtsInitVtorAddr & 0xFFFF, kRtsInitVtorAddr >> 16,
+                          SizeIs(sizeof(uint32_t)), kUsbCtrlTimeout))
+        .WillOnce(reply);
+  }
+
+  void ExpectGetStatus(testing::Action<std::expected<size_t, int>(
+                           uint8_t, uint8_t, uint16_t, uint16_t,
+                           std::span<uint8_t>, milliseconds)>
+                           reply) {
+    EXPECT_CALL(*backend_, ControlTransferIn(kBmReqD2hStdDev, kRtsStdGetStatus,
+                                             0, 0, SizeIs(1), kUsbCtrlTimeout))
+        .WillOnce(reply);
+  }
+};
+
+TEST_F(RtsUsbDeviceTest, EnableDownloadRequiresOpenDevice) {
+  EXPECT_CALL(*backend_, IsOpen()).WillOnce(Return(false));
+  EXPECT_CALL(*backend_, ControlTransferIn(_, _, _, _, _, _)).Times(0);
+
+  auto res = device_->EnableDownload();
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, SendsSetStatusWhenInactive) {
+  InSequence seq;
+
+  ExpectInitVtorQuery(InitVtorIs(kRtsInitVtorBootRom));
+  ExpectGetStatus(StatusIs(0));
+  EXPECT_CALL(*backend_, ControlTransferOut(kBmReqH2dStdDev, kRtsStdSetStatus,
+                                            kRtsEnableDownloadMode, 0,
+                                            IsEmpty(), kUsbCtrlTimeout))
+      .WillOnce(Return(std::expected<size_t, int>(0)));
+
+  EXPECT_TRUE(device_->EnableDownload());
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, SkipsSetStatusWhenAlreadyActive) {
+  InSequence seq;
+
+  ExpectInitVtorQuery(InitVtorIs(kRtsInitVtorBootRom));
+  ExpectGetStatus(StatusIs(1));
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _)).Times(0);
+
+  EXPECT_TRUE(device_->EnableDownload());
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, SkipsGetStatusInFlashImage) {
+  ExpectInitVtorQuery(InitVtorIs(kRtsInitVtorFlashImage));
+  EXPECT_CALL(*backend_, ControlTransferIn(kBmReqD2hStdDev, _, _, _, _, _))
+      .Times(0);
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _)).Times(0);
+
+  EXPECT_TRUE(device_->EnableDownload());
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, SkipsGetStatusForUnknownImage) {
+  ExpectInitVtorQuery(InitVtorIs(0x12345678));
+  EXPECT_CALL(*backend_, ControlTransferIn(kBmReqD2hStdDev, _, _, _, _, _))
+      .Times(0);
+
+  EXPECT_TRUE(device_->EnableDownload());
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, ProceedsWhenModeQueryStalls) {
+  ExpectInitVtorQuery(Return(std::unexpected(kUsbErrorPipe)));
+  EXPECT_CALL(*backend_, ControlTransferIn(kBmReqD2hStdDev, _, _, _, _, _))
+      .Times(0);
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _)).Times(0);
+
+  EXPECT_TRUE(device_->EnableDownload());
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, FailsOnModeQueryTransportError) {
+  ExpectInitVtorQuery(Return(std::unexpected(kUsbErrorNoDevice)));
+
+  auto res = device_->EnableDownload();
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, FailsOnModeQueryShortRead) {
+  ExpectInitVtorQuery(Return(std::expected<size_t, int>(sizeof(uint32_t) - 1)));
+
+  auto res = device_->EnableDownload();
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kProtocolError);
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, FailsOnGetStatusError) {
+  InSequence seq;
+
+  ExpectInitVtorQuery(InitVtorIs(kRtsInitVtorBootRom));
+  ExpectGetStatus(Return(std::unexpected(kUsbErrorPipe)));
+
+  auto res = device_->EnableDownload();
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kStall);
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, FailsOnGetStatusShortRead) {
+  InSequence seq;
+
+  ExpectInitVtorQuery(InitVtorIs(kRtsInitVtorBootRom));
+  ExpectGetStatus(Return(std::expected<size_t, int>(0)));
+
+  auto res = device_->EnableDownload();
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kProtocolError);
+}
+
+TEST_F(RtsUsbDeviceEnableDownloadTest, FailsOnSetStatusError) {
+  InSequence seq;
+
+  ExpectInitVtorQuery(InitVtorIs(kRtsInitVtorBootRom));
+  ExpectGetStatus(StatusIs(0));
+  EXPECT_CALL(*backend_, ControlTransferOut(kBmReqH2dStdDev, kRtsStdSetStatus,
+                                            kRtsEnableDownloadMode, 0,
+                                            IsEmpty(), kUsbCtrlTimeout))
+      .WillOnce(Return(std::unexpected(kUsbErrorAccess)));
+
+  auto res = device_->EnableDownload();
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kAccessDenied);
+}
+
 TEST_F(RtsUsbDeviceTest, ReleaseClosesBackend) {
   EXPECT_CALL(*backend_, Close()).Times(2);
 
@@ -209,7 +383,8 @@ TEST_F(RtsUsbDeviceTest, ReleaseClosesBackend) {
 TEST(RtsErrorTest, ToStringCoversAllValues) {
   for (RtsError error :
        {RtsError::kDeviceNotFound, RtsError::kAccessDenied, RtsError::kUsbError,
-        RtsError::kInvalidParameter, RtsError::kTimeout}) {
+        RtsError::kInvalidParameter, RtsError::kTimeout, RtsError::kStall,
+        RtsError::kProtocolError}) {
     EXPECT_NE(ToString(error), "Unknown error");
   }
 }
