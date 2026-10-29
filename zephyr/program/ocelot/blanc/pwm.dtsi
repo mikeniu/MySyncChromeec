@@ -10,3 +10,10 @@
 	pinctrl-names = "default";
 };
 
+/* FAN_PWM */
+&pwm5 {
+	status = "okay";
+	pinctrl-0 = <&pwm5_gpb7>;
+	pinctrl-names = "default";
+};
+
