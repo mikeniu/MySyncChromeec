@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ef9e497_b39dbb39",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/drv_handlers/chipset_power_state.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:18:01Z",
+      "side": 1,
+      "message": "Build is broken for boards that don\u0027t enable S0ix.  Move the comma.\n\n```suggestion\nAP_PWRSEQ_STATE_ENTRY_CALLBACK_DEFINE(x86_non_dsx_chipset_state_entry_cb,\n\t\t\t\t      AP_POWER_STATE_G3, AP_POWER_STATE_S3,\n\t\t\t\t      AP_POWER_STATE_S0, AP_POWER_STATE_S5\n#if CONFIG_AP_PWRSEQ_S0IX\n\t\t\t\t      ,\n\t\t\t\t      AP_POWER_STATE_S0ix\n#endif\n```",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 6
+      },
+      "revId": "95346a5291fe08c5e1c548f9476e1f4987267f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4f3c2f8_2d1e30db",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/drv_handlers/chipset_power_state.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:18:01Z",
+      "side": 1,
+      "message": "Build failure when `CONFIG_AP_PWRSEQ_S0IX\u003dn` (accidental revert of commit `17cca4d488`). Same issue as line 85 — move the comma after `AP_POWER_STATE_S0` inside `#if CONFIG_AP_PWRSEQ_S0IX`:",
+      "revId": "95346a5291fe08c5e1c548f9476e1f4987267f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d4055b3_64ef4a39",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/drv_handlers/common_pwrseq_sm_handler.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:18:01Z",
+      "side": 1,
+      "message": "Accidental revert of commit `16c3bc4098`: replace deprecated `#include \u003catomic.h\u003e` with `#include \u003czephyr/sys/atomic.h\u003e`.",
+      "revId": "95346a5291fe08c5e1c548f9476e1f4987267f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46081d7c_b05a85e9",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/drv_handlers/common_pwrseq_sm_handler.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:18:01Z",
+      "side": 1,
+      "message": "Issue 1 of b/541328749 still affects driver mode when already in G3:\nIn `zephyr/subsys/ap_pwrseq/x86_non_dsx/common_pwrseq_host_command.c`, `host_command_reboot_ap_on_g3()` calls `request_start_from_g3()` (line 15) *before* `set_start_from_g3_delay_seconds(cmd-\u003ereboot_ap_at_g3_delay)` (line 22). If the AP is already in `AP_POWER_STATE_G3` when the host command runs, line 77 (`if (start_from_g3_delay_ms)`) sees `0`, immediately posts `AP_PWRSEQ_EVENT_POWER_STARTUP`, and leaves `start_from_g3_delay_ms` stale for the *next* G3 entry.\n\nRecommended fix in `zephyr/subsys/ap_pwrseq/x86_non_dsx/common_pwrseq_host_command.c`:\n```c\nstatic enum ec_host_cmd_status\nhost_command_reboot_ap_on_g3(struct ec_host_cmd_handler_args *args)\n{\n\tconst struct ec_params_reboot_ap_on_g3_v1 *cmd \u003d args-\u003einput_buf;\n\n\tswitch (args-\u003eversion) {\n\tcase 0:\n\t\tbreak;\n\tcase 1:\n\t\t/* Store user specified delay to wait in G3 state */\n\t\tset_start_from_g3_delay_seconds(cmd-\u003ereboot_ap_at_g3_delay);\n\t\tbreak;\n\tdefault:\n\t\treturn EC_HOST_CMD_INVALID_VERSION;\n\t}\n\n\t/* Store request for processing at g3 */\n\trequest_start_from_g3();\n\n\treturn EC_HOST_CMD_SUCCESS;\n}\n```",
+      "revId": "95346a5291fe08c5e1c548f9476e1f4987267f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de880ab7_aa78d0dd",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/handlers/common_pwrseq_sm_handler.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:18:01Z",
+      "side": 1,
+      "message": "Accidental revert of commit `16c3bc4098`: replace deprecated `#include \u003catomic.h\u003e` with `#include \u003czephyr/sys/atomic.h\u003e`.",
+      "revId": "95346a5291fe08c5e1c548f9476e1f4987267f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "643599db_6684ad57",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/handlers/common_pwrseq_sm_handler.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:18:01Z",
+      "side": 1,
+      "message": "Unintended functional change in non-driver S5 (Issue 5 of b/541328749):\nPrior to this refactoring stack, `ap_power_in_debug_mode()` was only checked in S5 when `CONFIG_AP_PWRSEQ_DRIVER` was enabled. Keeping this check in `handlers/common_pwrseq_sm_handler.c` alters non-driver S5 behavior by preventing the S5 inactivity timer from starting when `debug_mode` is enabled.\n\nRecommended fix: Remove lines 199-202 here.",
+      "revId": "95346a5291fe08c5e1c548f9476e1f4987267f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "626f424d_453a5ef6",
+        "filename": "zephyr/test/ap_power/src/ap_pwrseq.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T22:18:01Z",
+      "side": 1,
+      "message": "`test_ap_pwrseq_8_reboot_ap_on_g3_delay` only sends `EC_CMD_REBOOT_AP_ON_G3` while in `S0` (before `ap_power_force_shutdown()`). Please also add a test case (or step) that sends `EC_CMD_REBOOT_AP_ON_G3` with `reboot_ap_at_g3_delay \u003d 1` while the AP is *already* in `G3`, which exercises the `ap_pwrseq_get_current_state(dev) \u003d\u003d AP_POWER_STATE_G3` branch in `drv_handlers/common_pwrseq_sm_handler.c:76`.",
+      "revId": "95346a5291fe08c5e1c548f9476e1f4987267f7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
