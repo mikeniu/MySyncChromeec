@@ -71,6 +71,15 @@ MEMORY
 	FLASH_HDR (rx) : ORIGIN = FW_OFF(RO_HDR), LENGTH = FW_SIZE(RO_HDR)
 	FLASH (rx) : ORIGIN = FW_OFF(SECTION) + FW_SIZE(RO_HDR), \
 		     LENGTH = FW_SIZE(SECTION) - FW_SIZE(RO_HDR)
+#elif defined(SECTION_IS_RW) && defined(CONFIG_NPCX7M6FC_RO_COMPAT)
+#define NPCX7M6FC_RO_COMPAT_OFFSET 0x20000
+#define NPCX7M6FC_RO_ENTRY_OFF 0x198
+#define NPCX7M6FC_RO_LOW_SIZE \
+	(NPCX7M6FC_RO_COMPAT_OFFSET + NPCX7M6FC_RO_ENTRY_OFF)
+	FLASH_LOW (rx) : ORIGIN = FW_OFF(SECTION), \
+			 LENGTH = NPCX7M6FC_RO_LOW_SIZE
+	FLASH (rx) : ORIGIN = FW_OFF(SECTION) + NPCX7M6FC_RO_LOW_SIZE, \
+		     LENGTH = FW_SIZE(SECTION) - NPCX7M6FC_RO_LOW_SIZE
 #else
 	FLASH (rx) : ORIGIN = FW_OFF(SECTION), LENGTH = FW_SIZE(SECTION)
 #endif
@@ -91,9 +100,19 @@ MEMORY
 	IRAM (rw) : ORIGIN = CONFIG_RAM_BASE, LENGTH = CONFIG_RAM_SIZE
 
 #ifdef CONFIG_EXTERNAL_STORAGE
+#if defined(SECTION_IS_RW) && defined(CONFIG_NPCX7M6FC_RO_COMPAT)
+	CDRAM_LOW (rx) : \
+		ORIGIN = CONFIG_PROGRAM_MEMORY_BASE + FW_MEM_OFF(SECTION), \
+		LENGTH = NPCX7M6FC_RO_LOW_SIZE
+	CDRAM (rx) : \
+		ORIGIN = CONFIG_PROGRAM_MEMORY_BASE + FW_MEM_OFF(SECTION) + \
+			 NPCX7M6FC_RO_LOW_SIZE, \
+		LENGTH = FW_SIZE(SECTION) - NPCX7M6FC_RO_LOW_SIZE
+#else
 	CDRAM (rx) : \
 		ORIGIN = CONFIG_PROGRAM_MEMORY_BASE + FW_MEM_OFF(SECTION), \
 		LENGTH = FW_SIZE(SECTION)
+#endif
 #endif /* CONFIG_EXTERNAL_STORAGE */
 
 #ifdef CONFIG_CHIP_MEMORY_REGIONS
@@ -144,6 +163,49 @@ SECTIONS
 		KEEP(*(.roshared*))
 	} > SHARED_LIB
 #endif
+#if defined(SECTION_IS_RW) && defined(CONFIG_NPCX7M6FC_RO_COMPAT)
+	.text.low : {
+		*(.text.vecttable)
+		. = ALIGN(4);
+		__image_data_offset = .;
+		KEEP(*(.rodata.ver))
+
+		. = ALIGN(4);
+		KEEP(*(.rodata.pstate))
+
+		. = ALIGN(8);
+		STRINGIFY(OUTDIR/core/CORE/init.o) (.text)
+#if NPCX_FAMILY_VERSION >= NPCX_FAMILY_NPCX7 && !defined(CONFIG_HIBERNATE_PSL)
+		/* Keep hibernate utility in last code ram block */
+		. = ALIGN(4);
+		KEEP(*(.after_init))
+		__after_init_end = .;
+#endif
+		*(.text*)
+	} > CDRAM_LOW AT > FLASH_LOW
+
+	.text : {
+		KEEP(*(.ro_m7_entry))
+		*(.text*)
+#ifdef CONFIG_EXTERNAL_STORAGE
+		. = ALIGN(4);
+		__flash_lpfw_start = .;
+		/* Entering deep idle FW for better power consumption */
+		KEEP(*(.lowpower_ram))
+		. = ALIGN(4);
+		__flash_lpfw_end = .;
+		__flash_lplfw_start = .;
+		/* GDMA utilities for better FW download speed */
+		KEEP(*(.lowpower_ram2))
+		. = ALIGN(4);
+		__flash_lplfw_end = .;
+#endif /* CONFIG_EXTERNAL_STORAGE */
+	} > EC_IMAGE_VMA_MEM_REGION AT > EC_IMAGE_LMA_MEM_REGION
+
+	ASSERT((reset_from_ro_m6 + NPCX7M6FC_RO_COMPAT_OFFSET) ==
+	       reset_from_ro_m7,
+	       "reset_from_ro_m7 must be at reset_from_ro_m6 + 0x20000")
+#else
 	.text : {
 		*(.text.vecttable)
 		. = ALIGN(4);
@@ -176,6 +238,7 @@ SECTIONS
 		__flash_lplfw_end = .;
 #endif /* CONFIG_EXTERNAL_STORAGE */
 	} > EC_IMAGE_VMA_MEM_REGION AT > EC_IMAGE_LMA_MEM_REGION
+#endif
 
 	. = ALIGN(4);
 	.rodata : {
@@ -532,8 +595,13 @@ SECTIONS
 	 * __image_size is stored in the struct image_data header and used
 	 * in hash calculations.
 	 */
+#if defined(SECTION_IS_RW) && defined(CONFIG_NPCX7M6FC_RO_COMPAT)
+	__flash_used = FLASH_USED_END - ORIGIN(FLASH_LOW);
+	__flash_size = LENGTH(FLASH_LOW) + LENGTH(EC_IMAGE_LMA_MEM_REGION);
+#else
 	__flash_used = FLASH_USED_END - ORIGIN(EC_IMAGE_LMA_MEM_REGION);
 	__flash_size = LENGTH(EC_IMAGE_LMA_MEM_REGION);
+#endif
 #ifndef CONFIG_CHIP_INIT_ROM_REGION
 #if defined(SECTION_IS_RW) && (CONFIG_FLASH_WRITE_SIZE > 4)
 	.rw_image_size_alignment FLASH_USED_END : AT(FLASH_USED_END)
@@ -568,7 +636,7 @@ SECTIONS
 	 * apparently because we're sending it into IRAM, not FLASH.
 	 * Verify that all sections linked into the FLASH region will fit.
 	 */
-	ASSERT((LENGTH(EC_IMAGE_LMA_MEM_REGION)
+	ASSERT((__flash_size
 #if defined(CONFIG_RWSIG) && defined(SECTION_IS_RO)
 	       - CONFIG_RO_PUBKEY_SIZE
 #endif
@@ -656,9 +724,9 @@ SECTIONS
 	 * FLASH region and the bytes used in the .init_rom section.
 	 */
 #ifdef CONFIG_CHIP_DATA_IN_INIT_ROM
-	__image_size = LENGTH(FLASH) + SIZEOF(.init_rom) + SIZEOF(.data);
+	__image_size = __flash_size + SIZEOF(.init_rom) + SIZEOF(.data);
 #else
-	__image_size = LENGTH(FLASH) + SIZEOF(.init_rom);
+	__image_size = __flash_size + SIZEOF(.init_rom);
 #endif /* CONFIG_CHIP_DATA_IN_INIT_ROM */
 #endif /* CONFIG_CHIP_INIT_ROM_REGION */
 

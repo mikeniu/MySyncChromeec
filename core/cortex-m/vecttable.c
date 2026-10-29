@@ -39,6 +39,9 @@ void default_handler(void)
 #define null
 
 extern void stack_end(void); /* not technically correct, it's just a pointer */
+#if defined(SECTION_IS_RW) && defined(CONFIG_NPCX7M6FC_RO_COMPAT)
+#define reset reset_from_ro_m7
+#endif
 extern void reset(void);
 
 DISABLE_GCC_WARNING("-Wattribute-alias")

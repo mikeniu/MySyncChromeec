@@ -47,6 +47,11 @@ CFLAGS_CPU+=-flto
 LDFLAGS_EXTRA+=-flto
 endif
 
+ifneq ($(CONFIG_NPCX7M6FC_RO_COMPAT),)
+CFLAGS_CPU+=-ffunction-sections
+LDFLAGS_EXTRA+=-Wl,--enable-non-contiguous-regions
+endif
+
 core-y=cpu.o debug.o init.o vecttable.o
 # When using clang, we get these as builtins from compiler-rt.
 ifneq ($(CROSS_COMPILE_CC_NAME),clang)

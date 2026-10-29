@@ -1322,6 +1322,7 @@ void system_jump_to_booter(void)
 	static uint32_t flash_offset;
 	static uint32_t flash_used;
 	static uint32_t addr_entry;
+	uint32_t dest_addr = CONFIG_PROGRAM_MEMORY_BASE;
 
 	/*
 	 * Get memory offset and size for RO/RW regions.
@@ -1352,6 +1353,19 @@ void system_jump_to_booter(void)
 	addr_entry =
 		*(uintptr_t *)(flash_offset + CONFIG_MAPPED_STORAGE_BASE + 4);
 
+#ifdef CONFIG_NPCX7M6FC_RO_COMPAT
+	/*
+	 * Shipped npcx7m6fc RO images are linked at 0x10090000 with a 192 KB
+	 * (0x30000) code RAM region. If jumping to an npcx7m6fc RO image, load
+	 * it at its linked base address and size.
+	 */
+	if (system_get_shrspi_image_copy() == EC_IMAGE_RO &&
+	    (addr_entry & 0xffff0000) == 0x10090000) {
+		dest_addr = 0x10090000;
+		flash_used = 0x30000;
+	}
+#endif
+
 	/*
 	 * Speed up FW download time by increasing clock freq of EC. It will
 	 * restore to default in clock_init() later.
@@ -1362,9 +1376,9 @@ void system_jump_to_booter(void)
 #if defined(CHIP_FAMILY_NPCX5)
 	system_download_from_flash(flash_offset, /* The offset of the data in
 						    spi flash */
-				   CONFIG_PROGRAM_MEMORY_BASE, /* RAM Addr of
-								  downloaded
-								  data */
+				   dest_addr, /* RAM Addr of
+						 downloaded
+						 data */
 				   flash_used, /* Number of bytes to download */
 				   addr_entry /* jump to this address after
 						 download */
@@ -1372,8 +1386,8 @@ void system_jump_to_booter(void)
 #else
 	download_from_flash(flash_offset, /* The offset of the data in spi flash
 					   */
-			    CONFIG_PROGRAM_MEMORY_BASE, /* RAM Addr of
-							   downloaded data */
+			    dest_addr, /* RAM Addr of
+					  downloaded data */
 			    flash_used, /* Number of bytes to download      */
 			    SIGN_NO_CHECK, /* Need CRC check or not */
 			    addr_entry, /* jump to this address after download

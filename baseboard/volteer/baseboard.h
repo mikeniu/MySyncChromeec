@@ -22,6 +22,9 @@
 #define CONFIG_FLASH_SIZE_BYTES (512 * 1024)
 #define CONFIG_SPI_FLASH_REGS
 #define CONFIG_SPI_FLASH_W25Q80 /* Internal SPI flash type. */
+#ifdef CHIP_VARIANT_NPCX7M7FC
+#define CONFIG_NPCX7M6FC_RO_COMPAT
+#endif
 
 /* Allow objects to be linked into a flash resident section */
 #define CONFIG_CHIP_INIT_ROM_REGION

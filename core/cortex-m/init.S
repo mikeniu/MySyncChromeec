@@ -11,6 +11,58 @@
 .syntax unified
 .code 16
 
+#if defined(SECTION_IS_RW) && defined(CONFIG_NPCX7M6FC_RO_COMPAT)
+/*
+ * Entry point when a shipped npcx7m6fc RO image (which links and loads EC
+ * images at 0x10090000 with size 0x30000) jumps to an npcx7m7fc RW image
+ * (linked at 0x10070000 with size 0x3f000).
+ *
+ * The RW vector table's reset entry (vectors[1]) points to reset_from_ro_m7
+ * at VMA 0x10090198 (offset 0x20198 in the RW binary).
+ * - When npcx7m7fc RO loads RW at 0x10070000 and jumps to 0x10090199, RAM
+ *   0x10090198 contains reset_from_ro_m7, which branches to reset.
+ * - When npcx7m6fc RO loads RW at 0x10090000 and jumps to 0x10090199, RAM
+ *   0x10090198 contains offset 0x198 of the RW binary (this function, linked
+ *   at VMA 0x10070198), which calls the Nuvoton boot ROM download_from_flash
+ *   API to reload the full RW image at 0x10070000 and jump to reset.
+ */
+.global reset_from_ro_m6
+.thumb_func
+reset_from_ro_m6:
+	cpsid i
+	mov r0, #0
+	msr control, r0
+	isb
+
+	/* Disable MPU before reloading RW into 0x10070000 */
+	ldr r1, =0xE000ED94  /* MPU_CTRL */
+	str r0, [r1]
+	dsb
+	isb
+
+	/* Set stack pointer and allocate 16 bytes for ROM call args/status */
+	ldr r0, =stack_end
+	sub r0, r0, #16
+	mov sp, r0
+
+	/*
+	 * Call Nuvoton boot ROM:
+	 * download_from_flash(src_offset, dest_addr, size,
+	 *                     SIGN_NO_CHECK, exe_addr, &status)
+	 */
+	ldr r0, =reset
+	str r0, [sp, #0]     /* arg5: exe_addr (Thumb bit set by linker) */
+	add r0, sp, #8
+	str r0, [sp, #4]     /* arg6: &status */
+	ldr r0, =(CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_STORAGE_OFF)
+	ldr r1, =CONFIG_PROGRAM_MEMORY_BASE
+	ldr r2, =CONFIG_RW_SIZE
+	mov r3, #0           /* arg4: SIGN_NO_CHECK */
+	mov r4, #0x40        /* API_DOWNLOAD_FROM_FLASH_PTR */
+	ldr r4, [r4]
+	blx r4
+#endif
+
 .global reset
 .thumb_func
 reset:
@@ -124,6 +176,14 @@ _data_end:
 .long __data_end
 _data_lma_start:
 .long __data_lma_start
+
+#if defined(SECTION_IS_RW) && defined(CONFIG_NPCX7M6FC_RO_COMPAT)
+.section .ro_m7_entry, "ax"
+.global reset_from_ro_m7
+.thumb_func
+reset_from_ro_m7:
+	b.w reset
+#endif
 
 /* Reserve space for system stack */
 .section .bss.system_stack

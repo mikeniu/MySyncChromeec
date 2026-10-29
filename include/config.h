@@ -3657,6 +3657,12 @@
 /* Do not try hold I/O pins at frozen level during deep sleep */
 #undef CONFIG_NO_PINHOLD
 
+/*
+ * Support booting an npcx7m7fc RW image (linked at 0x10070000) when loaded by
+ * a shipped npcx7m6fc RO image (which copies RW to 0x10090000).
+ */
+#undef CONFIG_NPCX7M6FC_RO_COMPAT
+
 /* Use OTP as a source of key material. */
 #undef CONFIG_OTP_KEY
 
