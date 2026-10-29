@@ -51,7 +51,7 @@ if(DEFINED CONFIG_BOARD_CRAASK)
 			"src/kb_backlight.c"
 			"craask/src/led.c"
 			"craask/src/thermal.c"
-			"craask/src/touch_panel.c"
+			"src/touch_panel.c"
 	)
 	project(craask)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "craask/src/usbc.c")
@@ -164,7 +164,7 @@ if(DEFINED CONFIG_BOARD_CRAASKOV)
 			"craaskov/src/board.c"
 			"craaskov/src/keyboard.c"
 			"craaskov/src/hdmi.c"
-			"craaskov/src/touch_panel.c"
+			"src/touch_panel.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "craaskov/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "craaskov/src/charger.c")
@@ -275,7 +275,7 @@ if(DEFINED CONFIG_BOARD_RIVEN)
 	zephyr_library_sources(
 			"riven/src/form_factor.c"
 			"riven/src/led.c"
-			"riven/src/touch_panel.c"
+			"src/touch_panel.c"
 			"riven/src/usb_mux_config.c"
 	)
 	project(riven)
@@ -320,7 +320,7 @@ if(DEFINED CONFIG_BOARD_RULL)
 			"rull/src/board.c"
 			"src/anraggar_sub_board.c"
 			"rull/src/usb_mux_config.c"
-			"rull/src/board_touchpanal.c"
+			"src/touch_panel.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "rull/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/charger_bq25710.c")
@@ -349,7 +349,7 @@ if(DEFINED CONFIG_BOARD_PUJJONIRU)
 	zephyr_include_directories("pujjoniru/include")
 	zephyr_library_sources(
 			"pujjoniru/src/board.c"
-			"pujjoniru/src/board_touchpanel.c"
+			"src/touch_panel.c"
 	)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC "pujjoniru/src/usbc.c")
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER "src/charger_bq25710.c")
