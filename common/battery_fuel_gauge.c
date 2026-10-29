@@ -194,89 +194,61 @@ void init_battery_type(void)
 {
 	int type;
 	int dflt = board_get_default_battery_type();
+	int max_retries = MAX(CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT,
+			      CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT);
+	int retry_delay = CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT ?
+				  BATTERY_INIT_TYPE_DEFERRED_RETRY_DELAY :
+				  (100 * MSEC);
 	int ret;
 
 	ret = battery_manufacturer_name(batt_manuf_name,
 					sizeof(batt_manuf_name));
-
-	for (int i = 0; i < CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT; i++) {
-		if (ret == EC_SUCCESS) {
-			break;
-		}
-		CPRINTS("Manuf name not found, wait 100ms then retry (attempt %d)",
-			i);
-		k_msleep(100);
-		ret = battery_manufacturer_name(batt_manuf_name,
-						sizeof(batt_manuf_name));
-	}
-
 	if (ret) {
 		BCFGPRT("Manuf name not found");
-		battery_conf = &board_battery_info[dflt];
-
-		if (battery_init_retry_count <
-		    CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT) {
-			battery_init_retry_count++;
-			BCFGPRT("Retry battery init (%d/%d)",
-				battery_init_retry_count,
-				CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT);
-			hook_call_deferred(
-				&init_battery_type_data,
-				BATTERY_INIT_TYPE_DEFERRED_RETRY_DELAY);
-		} else {
-			battery_init_retry_count = 0;
+	} else {
+		/* Don't carry over any previous name (in case i2c fail). */
+		memset(batt_device_name, 0, sizeof(batt_device_name));
+		if (battery_device_name(batt_device_name,
+					sizeof(batt_device_name))) {
+			BCFGPRT("Device name not found");
+			memset(batt_device_name, 0, sizeof(batt_device_name));
+			/* Battery name is optional after retries. */
+			if (battery_init_retry_count < max_retries)
+				ret = EC_ERROR_UNKNOWN;
 		}
-		return;
-	}
-
-	/* Don't carry over any previous name (in case i2c fail). */
-	memset(batt_device_name, 0, sizeof(batt_device_name));
-	ret = battery_device_name(batt_device_name, sizeof(batt_device_name));
-
-	for (int i = 0; i < CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT; i++) {
-		if (ret == EC_SUCCESS) {
-			break;
-		}
-		CPRINTS("Device name not found, wait 100ms then retry (attempt %d)",
-			i);
-		k_msleep(100);
-		ret = battery_device_name(batt_device_name,
-					  sizeof(batt_device_name));
 	}
 
 	if (ret) {
-		BCFGPRT("Device name not found");
-		memset(batt_device_name, 0, sizeof(batt_device_name));
-		/* Battery name is optional. Proceed. */
-	}
-
-	BCFGPRT("Battery says %s,%s", batt_manuf_name, batt_device_name);
-
-	type = get_battery_type();
-	if (type != BATTERY_TYPE_COUNT) {
-		BCFGPRT("Found config_fw[%d]", type);
-		battery_conf = &board_battery_info[type];
-		battery_init_retry_count = 0;
-		hook_call_deferred(&init_battery_type_data, -1);
-		return;
-	}
-
-	BCFGPRT("Config not found in FW");
-
-	if (IS_ENABLED(CONFIG_BATTERY_CONFIG_IN_CBI)) {
-		if (bcfg_search_in_cbi(&battery_conf_cache) == EC_SUCCESS) {
-			BCFGPRT("Found config in CBI");
-			battery_conf = &battery_conf_cache;
-			battery_init_retry_count = 0;
-			hook_call_deferred(&init_battery_type_data, -1);
+		battery_conf = &board_battery_info[dflt];
+		if (battery_init_retry_count < max_retries) {
+			battery_init_retry_count++;
+			BCFGPRT("Retry battery init (%d/%d)",
+				battery_init_retry_count, max_retries);
+			hook_call_deferred(&init_battery_type_data,
+					   retry_delay);
 			return;
 		}
-		BCFGPRT("Config not found in CBI");
+	} else {
+		BCFGPRT("Battery says %s,%s", batt_manuf_name,
+			batt_device_name);
+
+		type = get_battery_type();
+		if (type != BATTERY_TYPE_COUNT) {
+			BCFGPRT("Found config_fw[%d]", type);
+			battery_conf = &board_battery_info[type];
+		} else if (IS_ENABLED(CONFIG_BATTERY_CONFIG_IN_CBI) &&
+			   bcfg_search_in_cbi(&battery_conf_cache) ==
+				   EC_SUCCESS) {
+			BCFGPRT("Found config in CBI");
+			battery_conf = &battery_conf_cache;
+		} else {
+			BCFGPRT("Fall back to config_fw[%d]", dflt);
+			battery_conf = &board_battery_info[dflt];
+		}
 	}
 
-	/* Battery config isn't in CBI. */
-	BCFGPRT("Fall back to config_fw[%d]", dflt);
-	battery_conf = &board_battery_info[dflt];
+	battery_init_retry_count = 0;
+	hook_call_deferred(&init_battery_type_data, -1);
 }
 DECLARE_HOOK(HOOK_INIT, init_battery_type, HOOK_PRIO_BATTERY_INIT);
 
