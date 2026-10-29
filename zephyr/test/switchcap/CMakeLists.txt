@@ -6,4 +6,5 @@ cmake_minimum_required(VERSION 3.13.1)
 find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 project(switchcap)
 
-target_sources(app PRIVATE src/main.c)
+target_sources_ifdef(CONFIG_CROS_SWITCHCAP_PG_GPIO app PRIVATE src/main.c)
+target_sources_ifdef(CONFIG_CROS_SWITCHCAP_PG_ADC app PRIVATE src/test_adc.c)

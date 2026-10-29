@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-description: ChromiumOS Switchcap Driver controlled by GPIOs
+description: ChromiumOS Switchcap Driver
 
 compatible: "cros-ec,switchcap"
 
@@ -14,8 +14,16 @@ properties:
 
   power-good-gpios:
     type: phandle-array
-    required: true
     description: Input GPIO used to read switchcap power-good status.
+
+  io-channels:
+    type: phandle-array
+    description: ADC channel used to read switchcap power-good voltage.
+
+  power-good-threshold-mv:
+    type: int
+    default: 2000
+    description: Voltage threshold in mV above which switchcap is power-good.
 
   power-off-delay-ms:
     type: int
