@@ -1,0 +1,33 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+	};
+
+	usbc {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port0@0 {
+			compatible = "named-usbc-port";
+			reg = <0>;
+		};
+		port1@1 {
+			compatible = "named-usbc-port";
+			reg = <1>;
+		};
+
+		dp_alt_mode: dp-alt-mode {
+			compatible = "cros-ec,pdc-dp-alt-mode";
+			hpd-gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+			aux-path-sel-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+		};
+	};
+};

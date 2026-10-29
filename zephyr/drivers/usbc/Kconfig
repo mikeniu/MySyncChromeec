@@ -16,6 +16,16 @@ config USBC_INTEL_ALTMODE
 	  chip and EC for configuring the USB-C alternate mode muxes inside
 	  Intel AP.
 
+config USBC_PDC_DP_ALT_MODE
+	bool "USB-C PDC DisplayPort Alt-Mode HPD and AUX mux driver"
+	default y if DT_HAS_CROS_EC_PDC_DP_ALT_MODE_ENABLED
+	depends on DT_HAS_CROS_EC_PDC_DP_ALT_MODE_ENABLED
+	depends on USB_PDC_POWER_MGMT || ZTEST
+	help
+	  Enable the devicetree-driven DisplayPort Alt-Mode driver that
+	  handles PDC DP_ATTENTION and UNATTACH callbacks to drive the AP
+	  DisplayPort HPD and optional AUX path select GPIOs.
+
 config USBC_PDC_IT52XX
 	bool "ITE IT52XX Power Delivery Controller driver"
 	default y if DT_HAS_ITE_IT52XX_PDC_ENABLED

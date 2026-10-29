@@ -1,0 +1,10 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "native_sim.overlay"
+
+&dp_alt_mode {
+	/delete-property/ aux-path-sel-gpios;
+};

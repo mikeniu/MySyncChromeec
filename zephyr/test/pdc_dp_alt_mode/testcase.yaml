@@ -1,0 +1,12 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+common:
+  platform_allow:
+    - native_sim
+tests:
+  pdc_dp_alt_mode.default: {}
+  pdc_dp_alt_mode.no_aux_mux:
+    extra_dtc_overlay_files:
+      - boards/no_aux_mux.overlay

@@ -1,0 +1,21 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: ChromiumOS PDC DisplayPort Alt-Mode HPD and AUX mux driver
+
+compatible: "cros-ec,pdc-dp-alt-mode"
+
+include: base.yaml
+
+properties:
+  hpd-gpios:
+    type: phandle-array
+    required: true
+    description: Output GPIO driving DisplayPort HPD to the AP.
+
+  aux-path-sel-gpios:
+    type: phandle-array
+    description:
+      Optional output GPIO selecting the DisplayPort AUX path between USB-C
+      ports (0 for port 0, 1 for port 1).

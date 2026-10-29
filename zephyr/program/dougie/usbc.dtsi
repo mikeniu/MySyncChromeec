@@ -25,6 +25,12 @@
 			policy = <&cros_policy>;
 		};
 
+		dp_alt_mode: dp-alt-mode {
+			compatible = "cros-ec,pdc-dp-alt-mode";
+			hpd-gpios = <&gpiof 3 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+			aux-path-sel-gpios = <&gpioj 7 GPIO_ACTIVE_HIGH>;
+		};
+
 		ppm-driver {
 			compatible = "ucsi-ppm";
 		};
