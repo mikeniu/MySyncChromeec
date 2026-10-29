@@ -28,6 +28,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "696a6e9f_b8092bd9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:39Z",
+      "side": 1,
+      "message": "Partly done in ps2: the subject no longer joins two items with \"and\", the message now leads with the reason, and the test-coverage sentence is gone.\n\nNot done: splitting into three CLs. The parser, get_interfaces() and dfu_detach() are small and only make sense together, so I kept them in one change. Leaving this open for you to decide.",
+      "parentUuid": "3bead568_eed340b0",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4c1ee81_aeb5fc3d",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n* **Functionality:** `RtsUsbDevice::release()` calls `backend_-\u003erelease_interface(dfu_interface_)` even though `find_dfu_interface()` only reads the active configuration descriptor and never claims the interface via `libusb_claim_interface()`, which causes `libusb_release_interface()` to fail with `LIBUSB_ERROR_NOT_FOUND`. In addition, `dfu_interface_` is not reset to `-1` if `release()` is called when `backend_-\u003eis_open()` is `false`.\n* **Architecture \u0026 Component Fit:** `RtsUsbDevice` stores `transfer_size_` as a private member that is never read outside `printf`, making `find_dfu_transfer_size()`\u0027s integration in `find_dfu_interface()` dead state in this CL and untestable via `RtsUsbDeviceDfuTest`. Either expose an accessor (`uint16_t transfer_size() const`) or defer `transfer_size_` to the CL that uses it.\n* **Code Simplicity:** `parse_dfu_transfer_size()` can be simplified by accepting `std::span\u003cconst uint8_t\u003e` and advancing via `extra \u003d extra.subspan(desc_len)` instead of tracking manual `off`, `desc`, and `sz` pointers. In `RtsLibusbBackend::get_interfaces()`, constructing `RtsUsbInterface` in place via `interfaces-\u003eemplace_back(...)` with designated initializers avoids the temporary variable, `std::move`, and `#include \u003cutility\u003e`.\n* **Idiomaticity \u0026 Readability:** Prefer C++20/C++23 `std::span\u003cconst uint8_t\u003e` over raw `(const uint8_t *, int)` pointer/length pairs, and replace magic literals and multi-line field-by-field struct initialization in the unit tests with named constants and designated initializers.\n* **Security:** Bounds checks in `parse_dfu_transfer_size()` properly guard against zero-length and truncated descriptors.\n* **Testing:** Good unit test structure, but `ParseDfuTransferSizeTest` is missing boundary tests for a 1-byte buffer (`extra.size() \u003d\u003d kDfuDescTypeOff`) and for a descriptor longer than the minimum length (`desc_len \u003d\u003d kDfuDescMinLen + 1`), and `RtsUsbDeviceDfuTest` does not assert on the parsed transfer size.\n* **CL Size \u0026 Scope:** `Size: L (+406, -0)` (+211 production/mock lines across 6 files, +195 test lines). This CL bundles three independently reviewable logical changes that should be split into smaller stacked CLs:\n  1. **CL 1:** Add the standalone `parse_dfu_transfer_size()` descriptor parser and DFU descriptor constants (`util/rts5817_usb_device.h`, `util/rts5817_usb_device.cc`) with its `ParseDfuTransferSizeTest` unit tests (`util/rts5817_usb_device_test.cc`).\n  2. **CL 2:** Add `RtsUsbInterface` and `get_interfaces()` to `RtsUsbBackend`, `RtsLibusbBackend`, and `MockRtsUsbBackend` (`util/rts5817_usb_backend.h`, `util/rts5817_libusb_backend.h`, `util/rts5817_libusb_backend.cc`, `util/rts5817_mock_usb_backend.h`), deferring `release_interface()` to the CL that adds `claim_interface()`.\n  3. **CL 3:** Add DFU interface discovery and `RtsUsbDevice::dfu_detach()` (`util/rts5817_usb_device.h`, `util/rts5817_usb_device.cc`) with `RtsUsbDeviceDfuTest` (`util/rts5817_usb_device_test.cc`).\n* **Commit Message:** Please update the commit message for each split CL to avoid joining distinct change categories with `\" and \"` in the subject line, lead with the *Why* rationale, and omit test-suite narration.\n\n[🔗](http://go/tj/133da944-0407-4c57-82eb-1e99128ae54b)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df0082c4_38de1582",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:39Z",
+      "side": 1,
+      "message": "Done in ps2: release_interface() is deferred to the change that adds claim_interface(), release() always resets dfu_interface_ and transfer_size_, transfer_size() is exposed and asserted in the tests, parse_dfu_transfer_size() takes a std::span, get_interfaces() uses emplace_back with designated initializers, and the 1-byte and desc_len \u003d\u003d kDfuDescMinLen + 1 cases are added.\n\nNot done: splitting into three CLs, see the COMMIT_MSG thread.",
+      "parentUuid": "f4c1ee81_aeb5fc3d",
       "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b69473ef_c2e9d290",
+        "filename": "util/rts5817_libusb_backend.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:39Z",
+      "side": 1,
+      "message": "Done in ps2: get_interfaces() constructs the element in place with emplace_back and designated initializers, and the \u003cutility\u003e include is removed.",
+      "parentUuid": "d2f25c46_f8fbf246",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 9999
+      },
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec5328fb_95f4abb1",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2607838d_47470332",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:39Z",
+      "side": 1,
+      "message": "Done in ps2: release_interface() is no longer part of this change, and release() now resets dfu_interface_ and transfer_size_ unconditionally before closing the backend.",
+      "parentUuid": "ec5328fb_95f4abb1",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 91,
+        "endChar": 9999
+      },
       "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c477608d_86bdd06d",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:39Z",
+      "side": 1,
+      "message": "Done in ps2: parse_dfu_transfer_size() walks the descriptors with std::span::subspan(), and transfer_size() is exposed and asserted in RtsUsbDeviceDfuTest.",
+      "parentUuid": "caf8f693_3dd61e44",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 233,
+        "endChar": 9999
+      },
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2faedcc_6ebb234e",
@@ -145,6 +259,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df262b0_dd44729a",
+        "filename": "util/rts5817_usb_device.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:39Z",
+      "side": 1,
+      "message": "Done in ps2: parse_dfu_transfer_size() takes std::span\u003cconst uint8_t\u003e, and the descriptor offsets are size_t constants.",
+      "parentUuid": "a2faedcc_6ebb234e",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 9999
+      },
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7c90541_69924da8",
@@ -166,6 +304,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fa8aefd_e4e5d2e6",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:39Z",
+      "side": 1,
+      "message": "Done in ps2: added the single-byte and longer-than-minimum descriptor tests, DetachSendsRequestToDfuInterface uses a 2048 transfer size and asserts transfer_size(), the magic numbers are named constants, and RtsUsbInterface is built with designated initializers.",
+      "parentUuid": "f7c90541_69924da8",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 378,
+        "endChar": 9999
+      },
       "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
