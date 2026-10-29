@@ -10,10 +10,12 @@
 #define PLATFORM_EC_UTIL_REALTEKFP_RTS5817_USB_DEVICE_H_
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <expected>
 #include <functional>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <thread>
 
@@ -75,8 +77,26 @@ inline constexpr uint8_t kBmReqD2hStdDev = 0x80;
 inline constexpr uint8_t kBmReqH2dStdDev = 0x00;
 inline constexpr uint8_t kBmReqD2hVendorDev = 0xC0;
 
+// DFU descriptor type.
+inline constexpr uint8_t kDfuDescriptorType = 0x21;
+// DFU functional descriptor layout (byte offsets and minimum length). The
+// RTS5817 reports the 7-byte DFU 1.0 layout (no bcdDFUVersion); wTransferSize
+// is the last field read.
+inline constexpr size_t kDfuDescTypeOff = 1;
+inline constexpr size_t kDfuDescXferSizeOff = 5;
+inline constexpr size_t kDfuDescMinLen = kDfuDescXferSizeOff + sizeof(uint16_t);
+
 // USB I/O timeouts.
 inline constexpr std::chrono::milliseconds kUsbCtrlTimeout{1000};
+
+// Default transfer size if we cannot parse the DFU functional descriptor. This
+// is the RTS5817 SPI flash sector size.
+inline constexpr uint16_t kDfuDefaultTransferSize = 4096;
+
+// Extracts wTransferSize from the class-specific descriptors that follow a
+// DFU interface descriptor. Returns kDfuDefaultTransferSize if there is no
+// valid DFU functional descriptor or if it reports a zero transfer size.
+uint16_t ParseDfuTransferSize(std::span<const uint8_t> extra);
 
 class RtsUsbDevice {
  public:
