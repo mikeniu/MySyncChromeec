@@ -1,0 +1,49 @@
+From 31c62530a1f6f191c9a686d06dac228a6289e754 Mon Sep 17 00:00:00 2001
+From: Rob Barnes <robbarnes@google.com>
+Date: Thu, 22 Oct 2026 09:13:08 -0600
+Subject: [PATCH] FROMPULL: arch: arm: cortex_m: report PRIMASK in
+ arch_cpu_irqs_are_enabled()
+
+On ARMv7-M and ARMv8-M Mainline, arch_cpu_irqs_are_enabled() only checks
+BASEPRI. When PRIMASK is set (e.g. with a raw "cpsid i" or
+arch_zli_lock()), regular interrupts and PendSV are masked, but the
+function still reports interrupts as enabled.
+
+As a result k_can_yield() returns true, and code that sleeps when it can
+yield and busy-waits otherwise takes the sleep path, which cannot
+context switch with PendSV masked.
+
+Also require PRIMASK to be clear, matching ARMv6-M and ARMv8-M Baseline
+where PRIMASK is the IRQ lock. This only changes the result when PRIMASK
+is set, in which case interrupts are in fact disabled.
+
+Signed-off-by: Rob Barnes <robbarnes@google.com>
+(cherry picked from commit https://github.com/zephyrproject-rtos/zephyr/pull/123232)
+
+BUG=b:575868788
+TEST=zmake build ovis craask karis lapis
+TEST=sysjump RO/RW and tast firmware.EcStress.all on craask and karis
+TEST=sysjump RO/RW on lapis
+
+Change-Id: I34a4907afc0d26daa46a8987cdb03bb1e63441c1
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/zephyrproject/+/8633434
+---
+ zephyr/include/zephyr/arch/arm/asm_inline_gcc.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/zephyr/include/zephyr/arch/arm/asm_inline_gcc.h b/zephyr/include/zephyr/arch/arm/asm_inline_gcc.h
+index b415a3a72eb..be235e01a5f 100644
+--- a/zephyr/include/zephyr/arch/arm/asm_inline_gcc.h
++++ b/zephyr/include/zephyr/arch/arm/asm_inline_gcc.h
+@@ -126,7 +126,8 @@ static ALWAYS_INLINE bool arch_cpu_irqs_are_enabled(void)
+ #if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE)
+ 	return __get_PRIMASK() == 0U;
+ #elif defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
+-	return __get_BASEPRI() == 0U;
++	/* irq_lock() uses BASEPRI, but PRIMASK also masks interrupts. */
++	return (__get_BASEPRI() == 0U) && (__get_PRIMASK() == 0U);
+ #elif defined(CONFIG_ARMV7_R) || defined(CONFIG_AARCH32_ARMV8_R) ||                                \
+ 	defined(CONFIG_ARM_A_PROFILE_AARCH32)
+ 	unsigned int cpsr;
+-- 
+2.56.0.317.g454f8302e1-goog
