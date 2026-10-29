@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "13b2d7e7_4150882e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-29T11:17:43Z",
+      "side": 1,
+      "message": "https://github.com/zephyrproject-rtos/zephyr/pull/122795",
+      "revId": "1fbe074f3a7b244a25715338d6fbda7b2e0a319f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fc8be6e2_3849bbf5",
