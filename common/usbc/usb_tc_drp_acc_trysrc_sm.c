@@ -2205,7 +2205,9 @@ static void tc_unattached_snk_entry(const int port)
 	 * require we set CC Open before changing power roles with a debug
 	 * accessory.
 	 */
-	tcpm_debug_detach(port);
+	if (get_last_state_tc(port) != TC_LOW_POWER_MODE &&
+	    get_last_state_tc(port) != TC_ATTACH_WAIT_SNK)
+		tcpm_debug_detach(port);
 	typec_select_pull(port, TYPEC_CC_RD);
 	typec_select_src_current_limit_rp(
 		port, typec_get_default_current_limit_rp(port));
@@ -2807,7 +2809,9 @@ static void tc_unattached_src_entry(const int port)
 	 * require we set CC Open before changing power roles with a debug
 	 * accessory.
 	 */
-	tcpm_debug_detach(port);
+	if (get_last_state_tc(port) != TC_LOW_POWER_MODE &&
+	    get_last_state_tc(port) != TC_ATTACH_WAIT_SRC)
+		tcpm_debug_detach(port);
 	typec_select_pull(port, TYPEC_CC_RP);
 	typec_select_src_current_limit_rp(
 		port, typec_get_default_current_limit_rp(port));
