@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf71612c_be0a0f7b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-29T21:10:56Z",
+      "side": 1,
+      "message": "This change effectively stops reporting of any WD warnings. Let\u0027s discuss it a bit before we proceed.",
+      "revId": "98abbd8321ea4fb81d1a54a89030aceb2d0cb6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
