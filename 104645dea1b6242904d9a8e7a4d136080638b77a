@@ -109,6 +109,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "647a2237_2dc5b99d",
+        "filename": "core/host/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T04:07:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "933d61de_d1b3c851",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 9999
+      },
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82030e21_f8e11d19",
@@ -155,6 +179,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00832483_a71546f3",
+        "filename": "test/interrupt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T04:07:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8fbffc6_0a13549d",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 9999
+      },
       "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
