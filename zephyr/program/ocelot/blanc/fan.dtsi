@@ -1,0 +1,30 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+#include <cros/thermistor/thermistor.dtsi>
+
+/ {
+	fans {
+		compatible = "cros-ec,fans";
+		fan_0 {
+			pwms = <&pwm5 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <960>;
+			rpm-start = <1200>;
+			rpm-max = <4800>;
+			tach = <&tach1>;
+			rpm-deviation = <1>;
+			pgood-gpio = <&gpio_all_sys_pwrgd>;
+			enable-gpio = <&gpio_en_pp5000_fan>;
+		};
+	};
+};
+
+&tach1 {
+	status = "okay";
+	pinctrl-0 = <&ta1_1_in_gp40>;
+	pinctrl-names = "default";
+	sample-clk = <NPCX_TACH_FREQ_LFCLK>;
+	port = <NPCX_TACH_PORT_A>;
+	pulses-per-round = <2>;
+};
