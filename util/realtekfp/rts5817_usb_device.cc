@@ -5,6 +5,8 @@
 
 #include "rts5817_usb_device.h"
 
+#include <array>
+#include <bit>
 #include <chrono>
 #include <cstdio>
 #include <expected>
@@ -22,6 +24,8 @@ RtsError ToRtsError(int usb_error) {
       return RtsError::kDeviceNotFound;
     case kUsbErrorAccess:
       return RtsError::kAccessDenied;
+    case kUsbErrorPipe:
+      return RtsError::kStall;
     default:
       return RtsError::kUsbError;
   }
@@ -98,5 +102,71 @@ std::expected<void, RtsError> RtsUsbDevice::WaitForDevice(
 }
 
 void RtsUsbDevice::Release() { backend_->Close(); }
+
+std::expected<void, RtsError> RtsUsbDevice::EnableDownload() {
+  if (!backend_->IsOpen()) {
+    return std::unexpected(RtsError::kDeviceNotFound);
+  }
+
+  // Only the Boot ROM implements GET_STATUS / SET_STATUS. A Flash Image
+  // stalls them, so check which image is running first.
+  // bmRequestType = 0xC0: Device-to-host, Vendor, Device
+  std::array<uint8_t, sizeof(uint32_t)> init_vector{};
+  auto mode = backend_->ControlTransferIn(
+      kBmReqD2hVendorDev, kRtsVreqXmemRead,
+      static_cast<uint16_t>(kRtsInitVtorAddr & 0xFFFF),
+      static_cast<uint16_t>(kRtsInitVtorAddr >> 16), init_vector,
+      kUsbCtrlTimeout);
+
+  if (!mode) {
+    if (mode.error() == kUsbErrorPipe) {
+      std::println("Mode query stalled; leaving download mode untouched.");
+      return {};
+    }
+    return Fail(*backend_, "Reading R_INITVTOR", mode.error());
+  }
+  if (*mode < init_vector.size()) {
+    std::println(stderr, "Error: Reading R_INITVTOR failed: short read");
+    return std::unexpected(RtsError::kProtocolError);
+  }
+
+  const uint32_t vector = std::bit_cast<uint32_t>(init_vector);
+  if (vector != kRtsInitVtorBootRom) {
+    std::println("Not running from Boot ROM (R_INITVTOR = {:#010x}).", vector);
+    return {};
+  }
+
+  // bmRequestType = 0x80: Device-to-host, Standard, Device
+  // bRequest = kRtsStdGetStatus (0x1A), wValue = 0, wIndex = 0
+  std::array<uint8_t, 1> status{};
+  auto got = backend_->ControlTransferIn(kBmReqD2hStdDev, kRtsStdGetStatus, 0,
+                                         0, status, kUsbCtrlTimeout);
+
+  if (!got) {
+    return Fail(*backend_, "GET_STATUS", got.error());
+  }
+  if (*got < status.size()) {
+    std::println(stderr, "Error: GET_STATUS failed: short read");
+    return std::unexpected(RtsError::kProtocolError);
+  }
+
+  if (status[0] != 0) {
+    std::println("Download mode already active (status = {}).", status[0]);
+    return {};
+  }
+
+  // bmRequestType = 0x00: Host-to-device, Standard, Device
+  // bRequest = kRtsStdSetStatus (0x1B), wValue = kRtsEnableDownloadMode,
+  // wIndex = 0
+  auto set = backend_->ControlTransferOut(kBmReqH2dStdDev, kRtsStdSetStatus,
+                                          kRtsEnableDownloadMode, 0, {},
+                                          kUsbCtrlTimeout);
+
+  if (!set) {
+    return Fail(*backend_, "SET_STATUS", set.error());
+  }
+  std::println("Download mode enabled on device.");
+  return {};
+}
 
 }  // namespace realtekfp
