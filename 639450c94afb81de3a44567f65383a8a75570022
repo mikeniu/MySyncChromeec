@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3946e76c_847dbb75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T03:34:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality:** ✅ `set_interrupt_disabled()` acquires `interrupt_lock` when `in_task_context()` is true (`!in_interrupt \u0026\u0026 my_task_id !\u003d TASK_ID_INVALID`) and updates `interrupt_disabled` directly when in an ISR or on the main/scheduler thread (`my_task_id \u003d\u003d TASK_ID_INVALID`), preventing deadlocks without skipping the lock during `TASK_ID_HOOKS` initialization.\n* **Architecture \u0026 Component Fit:** ✅ Extracting `in_task_context()` and `set_interrupt_disabled()` as file-scoped helpers in `core/host/task.c` cleanly centralizes the host emulator interrupt lock guard for `interrupt_disable()` and `interrupt_enable()`.\n* **Code Simplicity:** ✅ Control flow in `in_task_context()`, `set_interrupt_disabled()`, and `test/interrupt.c` is minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions, naming, and `BIT()` / `TEST_EQ()` macro idioms.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ✅ `test/interrupt.c` exercises both non-locking paths (`in_interrupt` in `critical_section_isr()` and `my_task_id \u003d\u003d TASK_ID_INVALID` in `test_init()`) alongside the task-context locking path in `interrupt_disable_test()`, verifying each state transition with distinct `has_error` bitflags, and `test/build.mk` re-enables the `interrupt` host test.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+62, -11)` (31 lines in `core/host/task.c`, 38 lines in `test/interrupt.c`, 4 lines in `test/build.mk`). Single cohesive bug fix paired with its unit test.\n* **Commit Message:** ✅ Clear problem statement, rationale, and footer tags (`BUG\u003d`, `TEST\u003d`, `Change-Id:`) matching the patchset 4 changes.\n\n[🔗](http://go/tj/5a7ff970-65c6-47a9-aa1f-c3455ad62b96)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "639450c94afb81de3a44567f65383a8a75570022",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
