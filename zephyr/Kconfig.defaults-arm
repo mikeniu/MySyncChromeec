@@ -23,3 +23,8 @@ configdefault ARCH_HAS_STACKWALK
 # Reset core registers, MPU, and NVIC state on entry for RO <-> RW sysjumps.
 configdefault INIT_ARCH_HW_AT_BOOT
 	default y
+
+# Required for NPCX SHI host command driver to transition from suspended
+# state to active state via pm_device_runtime_get() on AP startup.
+configdefault PM_DEVICE_RUNTIME
+	default y if EC_HOST_CMD_BACKEND_SHI_NPCX
