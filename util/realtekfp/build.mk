@@ -8,6 +8,8 @@ host-util-bin-cxx-y += rts5817_flash_test
 rts5817_flash_test-objs := $(addprefix $(_cur_dir)/, \
 	rts5817_usb_device.o \
 	rts5817_usb_device_test.o \
+	rts5817_flash_cli.o \
+	rts5817_flash_cli_test.o \
 )
 
 _rts5817_test_bin := $(out)/util/rts5817_flash_test
