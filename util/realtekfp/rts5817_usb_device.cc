@@ -128,3 +128,28 @@ bool RtsUsbDevice::enable_download()
 
 	return true;
 }
+
+uint16_t parse_dfu_transfer_size(std::span<const uint8_t> extra)
+{
+	/*
+	 * Walk the descriptor stream.  The DFU functional descriptor has type
+	 * 0x21 and contains wTransferSize at byte offset 5-6.
+	 */
+	while (extra.size() > kDfuDescTypeOff) {
+		uint8_t desc_len = extra[0];
+
+		if (desc_len == 0 || desc_len > extra.size())
+			break;
+
+		if (extra[kDfuDescTypeOff] == kDfuDescriptorType &&
+		    desc_len >= kDfuDescMinLen) {
+			uint16_t size = extra[kDfuDescXferSizeOff] |
+					(extra[kDfuDescXferSizeOff + 1] << 8);
+
+			return size != 0 ? size : kDfuDefaultTransferSize;
+		}
+		extra = extra.subspan(desc_len);
+	}
+
+	return kDfuDefaultTransferSize;
+}
