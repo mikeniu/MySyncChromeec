@@ -26,12 +26,22 @@ static k_tid_t fake_main_tid;
 
 /* 0 - did not run, 1 - true, -1 - false */
 static int last_check_main_thread_result;
+static int cmd_exec_delay_ms;
+static K_SEM_DEFINE(cmd_done_sem, 0, 1);
+
+static void test_send_response(struct host_cmd_handler_args *args)
+{
+	ARG_UNUSED(args);
+	k_sem_give(&cmd_done_sem);
+}
 
 static enum ec_host_cmd_status
 check_main_thread(struct ec_host_cmd_handler_args *args)
 {
 	last_check_main_thread_result =
 		(k_current_get() == get_main_thread() ? 1 : -1);
+	if (cmd_exec_delay_ms > 0)
+		k_msleep(cmd_exec_delay_ms);
 	return EC_HOST_CMD_SUCCESS;
 }
 
@@ -90,6 +100,31 @@ ZTEST(host_cmd_thread, test_takeover)
 	 * it's not the original main thread.
 	 */
 	zassert_equal(-1, last_check_main_thread_result);
+
+	/*
+	 * Verify that back-to-back commands whose execution/preemption time
+	 * exceeds CONFIG_HOSTCMD_RATE_LIMITING_MIN_REST (3ms) do not reset
+	 * last_recess_time and trigger the 20ms rate-limiting recess once
+	 * cumulative active time exceeds CONFIG_HOSTCMD_RATE_LIMITING_PERIOD
+	 * (500ms).
+	 */
+	args.send_response = test_send_response;
+	cmd_exec_delay_ms = 200;
+	for (int i = 0; i < 3; i++) {
+		int64_t t_start = k_uptime_get();
+		int64_t elapsed;
+
+		k_sem_reset(&cmd_done_sem);
+		host_command_received(&args);
+		zassert_ok(k_sem_take(&cmd_done_sem, K_MSEC(1000)));
+		elapsed = k_uptime_get() - t_start;
+		if (i == 2) {
+			zassert_true(elapsed >= 220,
+				     "Expected recess delay >= 220ms, got %lld",
+				     elapsed);
+		}
+	}
+	cmd_exec_delay_ms = 0;
 
 	/* Kill the extra thread */
 	k_thread_abort(fake_main_tid);
