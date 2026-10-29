@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24e79f68_453def41",
+        "filename": "zephyr/snippets/pw-tokenize/pw-tokenize.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, removed the stray config option.",
+      "parentUuid": "6b8dbba6_e0832b92",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 41
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e77e527_1013b80f",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-29T03:55:41Z",
       "side": 1,
       "message": "Please move DECLARE_EVENT_SOURCE(EC_MKBP_EVENT_CHRE, ...) from CL:8615305 into this CL. Without it, mkbp_get_next_event() returns EC_HOST_CMD_ERROR when this event fires.",
+      "range": {
+        "startLine": 121,
+        "startChar": 1,
+        "endLine": 121,
+        "endChar": 37
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef5cfea1_92507ce8",
+        "filename": "zephyr/subsys/chre/chre_host_tunnel.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, moved `DECLARE_EVENT_SOURCE(EC_MKBP_EVENT_CHRE, ...)` into this CL.",
+      "parentUuid": "0e77e527_1013b80f",
       "range": {
         "startLine": 121,
         "startChar": 1,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf5660ad_5d0c437b",
+        "filename": "zephyr/subsys/chre/chre_host_tunnel.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, switched to `chreGetMessageToHostMaxSize()`.",
+      "parentUuid": "33aac29e_573f6ca7",
+      "range": {
+        "startLine": 146,
+        "startChar": 1,
+        "endLine": 146,
+        "endChar": 36
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f549ed32_8a12f6f2",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-10-29T03:55:41Z",
       "side": 1,
       "message": "Nit: `PRId64` to be consistent with `PRIx64` below.\n\nAlso, should we call `chre::SystemTime::setEstimatedHostTimeOffset(req-\u003eoffset())` here like slpi/exynos `host_link.cc`? Otherwise `chreGetEstimatedHostTimeOffset()` always returns 0.",
+      "range": {
+        "startLine": 259,
+        "startChar": 40,
+        "endLine": 259,
+        "endChar": 44
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68c9ea61_19fb6897",
+        "filename": "zephyr/subsys/chre/chre_host_tunnel.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, changed format specifier to `PRId64` and wired up `chre::SystemTime::setEstimatedHostTimeOffset(req-\u003eoffset())`.",
+      "parentUuid": "f549ed32_8a12f6f2",
       "range": {
         "startLine": 259,
         "startChar": 40,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc7921fd_ba7e8f65",
+        "filename": "zephyr/subsys/chre/chre_host_tunnel.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, added checks rejecting `total_size \u003d\u003d 0` and capping at `CONFIG_CHRE_DYNAMIC_MEMORY_SIZE`.",
+      "parentUuid": "c339642a_8e32f028",
+      "range": {
+        "startLine": 364,
+        "startChar": 3,
+        "endLine": 364,
+        "endChar": 42
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8faf89df_fa9c49b7",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-10-29T03:55:41Z",
       "side": 1,
       "message": "Use `args-\u003eoutput_buf_size` instead of `args-\u003eresponse_size` (same for lines 414, 437, 473)?",
+      "range": {
+        "startLine": 369,
+        "startChar": 9,
+        "endLine": 369,
+        "endChar": 22
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d474f8d7_fd3dbdd0",
+        "filename": "zephyr/subsys/chre/chre_host_tunnel.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, updated all host command handlers to use `args-\u003eoutput_buf_size`.",
+      "parentUuid": "8faf89df_fa9c49b7",
       "range": {
         "startLine": 369,
         "startChar": 9,
@@ -162,6 +306,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90980633_1d1a5340",
+        "filename": "zephyr/subsys/chre/chre_host_tunnel.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, added check comparing `params-\u003efragment_id` against `s_rx_state.next_fragment_id`, and safely freeing the buffer and resetting `in_progress` on mismatch.",
+      "parentUuid": "17664cf9_75d24f3e",
+      "range": {
+        "startLine": 383,
+        "startChar": 5,
+        "endLine": 385,
+        "endChar": 27
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd0c28cf_c7aaf3e9",
@@ -175,6 +343,30 @@
       "writtenOn": "2026-10-29T03:55:41Z",
       "side": 1,
       "message": "`sizeof(*resp) + kMaxChunkPayloadSize` \u003d 12 + 240 \u003d 252 bytes, but HECI only gives the handler 248 bytes on ToT (`HECI_CROS_EC_RESPONSE_MAX` 256 - 8 bytes of `ec_host_response`). When `max_size` is 0 or \u003e\u003d 237, the `memcpy` writes 4 bytes past `response_buffer`, and then `host_packet_respond()` fails with `EC_RES_RESPONSE_TOO_BIG`.\n\nMy CL:8612752 grows the HECI buffers to 280 (268 bytes for the handler), so it fits after that lands.\n\nEither way, 240 is a magic number that happens to fit. The legacy shim doesn\u0027t check the min request/response sizes, so check `args-\u003einput_buf_size \u003c sizeof(*params)` and `args-\u003eoutput_buf_max \u003c sizeof(*resp)`, and clamp `max_payload` to `args-\u003eoutput_buf_max - sizeof(*resp)`?",
+      "range": {
+        "startLine": 442,
+        "startChar": 1,
+        "endLine": 442,
+        "endChar": 43
+      },
+      "revId": "08cc310e11e30b17747bd8326a652472271eaea7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ed09918_b99fb65e",
+        "filename": "zephyr/subsys/chre/chre_host_tunnel.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T17:18:39Z",
+      "side": 1,
+      "message": "Done, added checks for `args-\u003einput_buf_size \u003c sizeof(*params)` and `args-\u003eoutput_buf_max \u003c sizeof(*resp)`, and dynamically clamped `max_payload \u003d args-\u003eoutput_buf_max - sizeof(*resp)`.",
+      "parentUuid": "dd0c28cf_c7aaf3e9",
       "range": {
         "startLine": 442,
         "startChar": 1,
