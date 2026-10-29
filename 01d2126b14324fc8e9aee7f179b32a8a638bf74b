@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "878989d3_a237abcc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T09:00:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Commit Message — Single Logical Change \u0026 Subject Line Scope:**\n\nThe subject line (`rts5817: Add RtsUsbDevice lifecycle and download mode`) still joins two distinct responsibilities (`RtsUsbDevice lifecycle` and `download mode`) with `\" and \"`, and this CL also bundles `RtsLibusbBackend` (`util/realtekfp/rts5817_libusb_backend.{h,cc}`, 99 lines), pushing the non-test production diff to 348 lines (374 non-test lines including `build.mk`). Please split this CL into smaller, focused commits (see the `/PATCHSET_LEVEL` summary and `util/realtekfp/build.mk` comment).\n\n### Copy-Pasteable Commit Messages (Recommended Split)\n\n**CL 1 (`RtsUsbDevice` lifecycle management):**\n```text\nrts5817: Add RtsUsbDevice lifecycle management\n\nSelf-contained RTS5817 firmware updates need USB device handling that\ndoes not rely on an external dfu-util.\n\nIntroduce RtsUsbDevice and the RtsUsbBackend transport interface to\nopen devices by VID:PID, poll for re-enumeration, and release USB\nresources. Provide a gmock backend with unit tests wired into\nutils-test.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n**CL 2 (RTS5817 vendor download-mode control):**\n```text\nrts5817: Support enabling download mode on RtsUsbDevice\n\nExtend RtsUsbDevice and RtsUsbBackend with control transfer support to\nquery the RTS5817 runtime status and enable download mode through\nvendor control requests when inactive. Add unit tests covering active,\ninactive, short-read, and error paths.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n**CL 3 (`RtsLibusbBackend` implementation, or fold into the CLI binary CL):**\n```text\nrts5817: Add libusb backend for RtsUsbDevice\n\nImplement RtsLibusbBackend using libusb-1.0 to provide hardware USB\ncontext management, device opening by VID:PID, and control transfers for\nRtsUsbDevice.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n### Copy-Pasteable Commit Message (Single-CL Alternative)\n```text\nrts5817: Add RtsUsbDevice wrapper for RTS5817 flashing utility\n\nSelf-contained RTS5817 firmware updates need USB device handling that\ndoes not rely on an external dfu-util.\n\nIntroduce RtsUsbDevice and the RtsUsbBackend transport interface to\nopen devices by VID:PID, poll for re-enumeration, release USB resources,\nand enable download mode through RTS5817 vendor control requests, with\ngmock unit tests wired into utils-test.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n[🔗](http://go/tj/07013c35-06fc-4bc0-beed-33379a66d8b2)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c7a0eb0_e430fed1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T09:00:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:**\n  * All previously identified functional defects have been resolved: `wait_for_device()` rejects `timeout_ms \u003c\u003d 0` and `poll_interval_ms \u003c\u003d 0` before touching the backend, `RtsLibusbBackend::open()` closes any existing device handle before opening a new one, `init()` and `wait_for_device()` release prior resources before re-initializing and on failure paths, and `enable_download()` guards against short reads on `GET_STATUS`.\n* **Architecture \u0026 Component Fit:**\n  * Placing the Realtek fingerprint utility sources under `util/realtekfp/` with its own `util/realtekfp/build.mk` cleanly matches sibling host utilities (`util/elan/`, `util/egis/`, `util/focaltech/`). However, `rts5817_flash_test` only exercises `RtsUsbDevice` via `MockRtsUsbBackend` and does not use `RtsLibusbBackend`; decoupling `RtsLibusbBackend` from this CL avoids linking `libusb-1.0` into the unit test runner (matching `util/elan/build.mk`).\n* **Code Simplicity:**\n  * The implementations of `RtsUsbDevice::init()`, `wait_for_device()`, `release()`, and `enable_download()` are concise, linear, and easy to follow.\n* **Idiomaticity \u0026 Readability:**\n  * Header-scope constants in `util/realtekfp/rts5817_usb_device.h` now use `inline constexpr`, class declarations follow standard C++ member ordering with in-class initializers and deleted copy operations, and test files use clean namespace-scope `using` declarations and named constants (`kTimeoutMs`, `kPollIntervalMs`).\n* **Security:**\n  * `enable_download()` verifies `ret \u003c static_cast\u003cint\u003e(sizeof(status))` before inspecting `status`, preventing uninitialized or stale buffer reads on 0-byte transfers.\n* **Testing:**\n  * `util/realtekfp/rts5817_usb_device_test.cc` thoroughly covers success, error, short-read, timeout (`3 * kPollIntervalMs`), and invalid-interval (`0` and `-1` for both `timeout_ms` and `poll_interval_ms`) boundaries using `StrictMock\u003cMockRtsUsbBackend\u003e`, `InSequence` with exact `close()` call counts, and exact control-transfer argument matchers.\n* **CL Size \u0026 Scope:**\n  * This CL is `Size: L (+638, -1)`, comprising **348 lines of production code** (`rts5817_usb_backend.h`: 44, `rts5817_libusb_backend.h`: 34, `rts5817_libusb_backend.cc`: 65, `rts5817_usb_device.h`: 75, `rts5817_usb_device.cc`: 130), **26 lines of build configuration** (`util/build.mk`: 1, `util/realtekfp/build.mk`: 25), and **264 lines of test/mock code** (`rts5817_mock_usb_backend.h`: 27, `rts5817_usb_device_test.cc`: 237). Because the non-test production diff exceeds the 250-line limit (`348 \u003e\u003d 250`) and bundles multiple independently reviewable components (`RtsUsbDevice` lifecycle management, RTS5817 vendor download-mode control, and `RtsLibusbBackend`), please split this CL into smaller commits:\n    1. **CL 1:** Add `RtsUsbBackend` (`init`, `open`, `close`, `error_name`), `MockRtsUsbBackend`, `RtsUsbDevice` lifecycle management (`init`, `wait_for_device`, `release`), lifecycle unit tests in `util/realtekfp/rts5817_usb_device_test.cc`, and `util/realtekfp/build.mk` (~185 non-test production lines).\n    2. **CL 2:** Extend `RtsUsbBackend`, `MockRtsUsbBackend`, and `RtsUsbDevice` with `is_open()`, `control_transfer()`, and `enable_download()` (along with vendor control request constants and the `EnableDownload*` unit tests, ~75 non-test production lines).\n    3. **CL 3:** Add `RtsLibusbBackend` (`util/realtekfp/rts5817_libusb_backend.h` and `util/realtekfp/rts5817_libusb_backend.cc`, 99 lines) in its own CL or in the `rts5817_flash` CLI binary CL where `RtsLibusbBackend` is instantiated.\n* **Commit Message:**\n  * The subject line (`rts5817: Add RtsUsbDevice lifecycle and download mode`) still joins two distinct responsibilities with `\" and \"`. See the inline comment on `/COMMIT_MSG` for copy-pasteable commit messages.\n\n[🔗](http://go/tj/07013c35-06fc-4bc0-beed-33379a66d8b2)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d891360_c5b31688",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T09:00:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Decouple `RtsLibusbBackend` and `libusb-1.0` from the Mock-Based Unit Test Target:**\n\n`rts5817_usb_device_test.cc` exercises `RtsUsbDevice` exclusively through `MockRtsUsbBackend` and has no dependency on `RtsLibusbBackend` or `libusb-1.0`. Linking `rts5817_libusb_backend.o` and `libusb-1.0` into `rts5817_flash_test` is only needed here because `util/realtekfp/rts5817_libusb_backend.{h,cc}` (99 lines) is bundled into this CL ahead of the `rts5817_flash` CLI target that instantiates it (compare `util/elan/build.mk`, where `libusb_backend.o` and `libusb-1.0` are linked only into `elaniap_tool` and omitted from `elaniap_test_runner`).\n\nMoving `util/realtekfp/rts5817_libusb_backend.{h,cc}` to a separate CL (or into the CLI binary CL where `RtsLibusbBackend` is instantiated) keeps `rts5817_flash_test` free of unnecessary `libusb-1.0` flags and reduces the production diff of this CL below the 250-line threshold:\n\n```makefile\nhost-util-bin-cxx-y +\u003d rts5817_flash_test\nrts5817_flash_test-objs :\u003d $(addprefix $(_cur_dir)/, \\\n\trts5817_usb_device.o \\\n\trts5817_usb_device_test.o \\\n)\n\n_rts5817_test_bin :\u003d $(out)/util/rts5817_flash_test\n$(_rts5817_test_bin): HOST_CXXFLAGS+\u003d-Iutil/realtekfp\n$(_rts5817_test_bin): HOST_CXXFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) \\\n\t--cflags gtest gmock)\n$(_rts5817_test_bin): HOST_LDFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) \\\n\t--libs gtest gtest_main gmock)\n```\n\n[🔗](http://go/tj/07013c35-06fc-4bc0-beed-33379a66d8b2)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
