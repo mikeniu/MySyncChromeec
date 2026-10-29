@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e3a3c37_5aa531dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T01:15:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5f06c97a-b6e5-4512-a053-d97e0423b13f)]\n\n### Review Summary\n- **Functionality**: `system_disable_jump()` now unconditionally calls `mpu_enable()` when `CONFIG_MPU` is enabled so fixed Cortex-M MPU regions protect code and data RAM even when write-protect is unlocked, while `mpu_enable()` gates sticky NPCX RAM lock configuration on `system_is_locked()` and `arch_pre_system_jump()` disables fixed MPU regions (followed by `__DSB()` and `__ISB()` barriers) before jumping to a target image or RAM loader.\n- **Architecture \u0026 Component Fit**: Moving the NPCX RAM lock check and log message into `mpu_enable()` under `CONFIG_NPCX_RAM_LOCK` keeps `common/system.c` target-agnostic, and disabling fixed MPU regions inside `arch_pre_system_jump()` ensures MPU teardown runs with interrupts disabled after `chip_pre_system_jump()` right before jumping to the target image, matching the `arch_pre_system_jump()` contract in `include/system.h`.\n- **Code Simplicity**: The changes are minimal and direct, reusing `mpu_disable_fixed_regions()` cleanly in `arch_pre_system_jump()` and evaluating `system_is_locked()` once before the region loop in `mpu_enable()`.\n- **Idiomaticity \u0026 Readability**: Adheres to ChromiumOS EC and Zephyr C conventions (`LOG_INF`, CMSIS barrier intrinsics, Kconfig, and FFF fakes), and `zephyr/shim/include/mpu.h` includes `\u003cstdint.h\u003e` directly for `uint32_t`.\n- **Security**: Strengthens defense-in-depth on unlocked Cortex-M targets by ensuring fixed MPU write and execute-never protections are enabled when jumps are disabled.\n- **Testing**: `zephyr/test/system_common` enables `CONFIG_MPU` via `TEST_SYSTEM_MPU` and verifies in `test_syslock_console_cmd` that `system_disable_jump()` invokes `mpu_enable()` both when `system_is_locked()` is false and after locking via `syslock`.\n- **CL Size \u0026 Scope**: `Size: M (+62, -19)`. Focused, single logical change (~35 production lines and ~27 test lines) combining `system_disable_jump()` MPU enablement with the required NPCX RAM lock guard, `arch_pre_system_jump()` region teardown, self-contained header include, and unit test.\n- **Commit Message**: Concisely explains the motivation and conceptual solution in two short prose paragraphs with valid `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "17826ee9e9393ae1f8b6120f0fb0c4eb11bf64b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
