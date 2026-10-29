@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3fa7ffcb_47cc6c70",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3245,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T23:49:14Z",
+      "side": 1,
+      "message": "Please add a unit test for forcing the driver to enter the disable state.  Same thing for the Realtek driver.",
+      "range": {
+        "startLine": 3245,
+        "startChar": 0,
+        "endLine": 3245,
+        "endChar": 38
+      },
+      "revId": "d55a6e331a1ba33c4b052d2863aa310a141a3b50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b8331535_94a00cd1",
         "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
         "patchSetId": 1
@@ -31,6 +54,24 @@
       "writtenOn": "2026-10-29T03:28:56Z",
       "side": 1,
       "message": "Any issue if we don\u0027t support the reset when port in in PDC_DISABLE state ?",
+      "revId": "d55a6e331a1ba33c4b052d2863aa310a141a3b50",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f94be6f9_dc518d33",
+        "filename": "zephyr/subsys/pd_controller/pdc_power_mgmt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 4867,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T23:49:14Z",
+      "side": 1,
+      "message": "This appears to be only connected to the shell command.  I think we want to allow a user to try and reset a disabled port.",
+      "parentUuid": "420fe834_d3729c9b",
       "revId": "d55a6e331a1ba33c4b052d2863aa310a141a3b50",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
