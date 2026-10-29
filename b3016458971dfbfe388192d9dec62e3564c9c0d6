@@ -93,6 +93,30 @@
       "isAi": true,
       "revId": "b3016458971dfbfe388192d9dec62e3564c9c0d6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50ee4945_a9b9b5da",
+        "filename": "driver/als_cm32183.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T19:29:59Z",
+      "side": 1,
+      "message": "I agree with zeroing the `offset[Y]` and `offset[Z]` fields as well",
+      "parentUuid": "5739c440_eb9909ae",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 9999
+      },
+      "revId": "b3016458971dfbfe388192d9dec62e3564c9c0d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
