@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fea8e496_bd0ea010",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T21:16:48Z",
+      "side": 1,
+      "message": "Why did you have to remove the `#ifndef CONFIG_ZEPHYR`? If this doesn\u0027t work for some reason then we should fix `main` since we need to keep this code in sync.",
+      "revId": "3320f191bec97f1b033fdf5844ee827c810a8e6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
