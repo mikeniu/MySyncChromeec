@@ -22,6 +22,30 @@
       },
       "revId": "07e76be15fc65f6cdf41f0746aa174c4f94410ec",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ac5c1ee_f668dcb5",
+        "filename": "zephyr/Kconfig.defaults-arm",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-29T19:24:46Z",
+      "side": 1,
+      "message": "The ITE SHI driver does not actually require `CONFIG_PM_DEVICE_RUNTIME`. The assertion in `ec_host_cmd_backend_shi_ite.c`:\n\n```c\nBUILD_ASSERT(!IS_ENABLED(CONFIG_PM_DEVICE_RUNTIME) || IS_ENABLED(CONFIG_PM_DEVICE_SYSTEM_MANAGED),\n             \"CONFIG_PM_DEVICE_SYSTEM_MANAGED must be enabled when using CONFIG_PM_DEVICE_RUNTIME\");\n```\n\nonly enforces that *if* runtime PM is enabled, system-managed PM must be as well. In fact, enabling `CONFIG_PM_DEVICE_RUNTIME\u003dy` causes Zephyr\u0027s Kconfig to default `CONFIG_PM_DEVICE_SYSTEM_MANAGED` to `n`, which actually trips this `BUILD_ASSERT` and breaks compilation on ITE boards (e.g. `rauru`).\n\nFurthermore:\n1. Unlike NPCX (which initializes the hardware in a disabled/suspended state and relies on `PM_DEVICE_ACTION_RESUME` to configure registers and unmask IRQs), the ITE driver fully initializes and unmasks the controller during boot and uses `shi_ite_pm_policy_state_lock_get/put()` directly on CS edges to manage sleep state locks. None of the existing ITE boards enable runtime PM (and `skywalker` explicitly sets `CONFIG_PM_DEVICE_RUNTIME\u003dn` in `ite_program.conf`).\n2. IT8xxx2 is a RISC-V chip (`ARCH\u003driscv`), so `zephyr/Kconfig.defaults-arm` is not evaluated for ITE boards anyway.\n\nIf we do want to enable runtime PM for ITE SHI, that should be done in a separate CL alongside `CONFIG_PM_DEVICE_SYSTEM_MANAGED\u003dy` with dedicated testing on ITE hardware.",
+      "parentUuid": "68cb0a5b_3e724074",
+      "range": {
+        "startLine": 30,
+        "startChar": 14,
+        "endLine": 30,
+        "endChar": 42
+      },
+      "revId": "07e76be15fc65f6cdf41f0746aa174c4f94410ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
