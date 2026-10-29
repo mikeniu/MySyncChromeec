@@ -17,3 +17,23 @@
 	pinctrl-names = "default";
 };
 
+/* EC_LED1_ODL */
+&pwm0 {
+	status = "okay";
+	pinctrl-0 = <&pwm0_gpc3>;
+	pinctrl-names = "default";
+};
+
+/* EC_LED2_ODL */
+&pwm1 {
+	status = "okay";
+	pinctrl-0 = <&pwm1_gpc2>;
+	pinctrl-names = "default";
+};
+
+/* EC_PWRBTN_LED_CTRL */
+&pwm2 {
+	status = "okay";
+	pinctrl-0 = <&pwm2_gpc4>;
+	pinctrl-names = "default";
+};
