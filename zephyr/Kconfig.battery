@@ -254,30 +254,28 @@ config PLATFORM_EC_BATTERY_INIT_TYPE_RETRY_COUNT
 	default 0
 	help
 	  Number of times to retry reading battery manufacturer or name during
-	  initialization.
+	  initialization using a deferred retry mechanism on the system
+	  workqueue.
 
 	  Some battery controller chips (such as BQ40Z555) will
 	  NACK I2C transactions while they perform internal housekeeping, and
 	  do not update the SBS BatteryStatus either; the EC will treat failures
 	  in these cases as evidence that the battery is disconnected, and
 	  failures of this type during battery initialization will leave the
-	  battery permanently ignored even if present. If a battery is known
-	  to exhibit this behavior, setting this option to a nonzero value will
-	  retry reading each of those fields from the battery
-	  (up to a total of COUNT + 1 attempts) after a short delay, allowing
-	  the battery time to complete its housekeeping.
+	  battery permanently ignored even if present. Similarly, some
+	  batteries require time to wake up after exiting shutdown mode.
+	  If a battery is known to exhibit this behavior, setting this option to
+	  a nonzero value will retry reading from the battery via deferred
+	  calls (up to COUNT retries) after a configurable delay, allowing
+	  the battery time to wake up and complete housekeeping without blocking
+	  the system workqueue.
 
-config PLATFORM_EC_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT
-	int "Battery init type deferred retry count"
-	default 0
+config PLATFORM_EC_BATTERY_INIT_TYPE_RETRY_DELAY_MS
+	int "Battery init type retry delay in ms"
+	default 100
 	help
-	  Number of retries when initializing the battery type using a
-	  deferred retry mechanism.
-
-	  Some batteries may not respond immediately after exiting
-	  shutdown mode because the fuel gauge requires time to wake up.
-	  The EC will retry the initialization multiple times before
-	  failing back to the default battery configuration.
+	  Delay in milliseconds between deferred retry attempts when
+	  initializing the battery type in init_battery_type().
 
 config PLATFORM_EC_BATTERY_HW_PRESENT_CUSTOM
 	bool "Hardware check of battery presence"
