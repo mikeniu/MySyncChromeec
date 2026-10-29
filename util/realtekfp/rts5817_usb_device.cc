@@ -5,6 +5,7 @@
 
 #include "rts5817_usb_device.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <thread>
@@ -221,4 +222,114 @@ bool RtsUsbDevice::find_dfu_interface()
 
 	fprintf(stderr, "Error: no DFU interface found on device.\n");
 	return false;
+}
+
+bool RtsUsbDevice::dfu_poll_idle()
+{
+	/*
+	 * Use a generous timeout (60 s) for the overall polling, since the
+	 * manifest phase (flash programming) can take tens of seconds.
+	 */
+	int timeout = kUsbDfuTimeoutMs;
+	int slept = 0;
+
+	while (slept < timeout) {
+		/*
+		 * bmRequestType = 0xA1: Device-to-Host, Class, Interface
+		 * bRequest = kDfuGetStatus (0x03)
+		 * Data (6 bytes): bStatus, bwPollTimeout[3], bState, iString
+		 */
+		uint8_t response[kDfuGetStatusResponseLen];
+		int ret = backend_->control_transfer(
+			kBmReqD2hClsIf, kDfuGetStatus, 0,
+			static_cast<uint16_t>(dfu_interface_), response,
+			sizeof(response), kUsbDfuTimeoutMs);
+
+		if (ret < static_cast<int>(kDfuGetStatusResponseLen)) {
+			fprintf(stderr, "DFU_GETSTATUS failed: %s\n",
+				ret < 0 ? backend_->error_name(ret) :
+					  "short read");
+			return false;
+		}
+
+		uint8_t bStatus = response[kDfuStatusOff];
+		uint32_t poll_timeout =
+			response[kDfuPollTimeoutOff] |
+			(static_cast<uint32_t>(response[kDfuPollTimeoutOff + 1])
+			 << 8) |
+			(static_cast<uint32_t>(response[kDfuPollTimeoutOff + 2])
+			 << 16);
+		uint8_t bState = response[kDfuStateOff];
+
+		if (bStatus != kDfuStatusOk || bState == kDfuStateDfuError) {
+			fprintf(stderr, "DFU error: bStatus=%d, bState=%d\n",
+				bStatus, bState);
+			return false;
+		}
+
+		switch (bState) {
+		case kDfuStateDfuIdle:
+		case kDfuStateDfuDnloadIdle:
+			/* Terminal success states. */
+			return true;
+
+		case kDfuStateDfuManifestWaitReset:
+			/*
+			 * Device completed manifest and requests a USB reset.
+			 * Try issuing one; this may invalidate the device
+			 * handle (if the device re-enumerates), which is OK.
+			 */
+			printf("Device requests USB reset after manifest.\n");
+			backend_->reset_device();
+			return true;
+
+		case kDfuStateDfuDnloadSync:
+		case kDfuStateDfuDnloadBusy:
+		case kDfuStateDfuManifestSync:
+		case kDfuStateDfuManifest:
+			/*
+			 * Transient / busy states: sleep for the suggested
+			 * poll interval and retry.
+			 */
+			break;
+
+		default:
+			fprintf(stderr, "Unexpected DFU state: bState=%d\n",
+				bState);
+			return false;
+		}
+
+		/* Never sleep past the overall timeout. */
+		int remaining_ms = timeout - slept;
+		int delay_ms = (poll_timeout > 0) ?
+				       static_cast<int>(std::min<uint32_t>(
+					       poll_timeout, remaining_ms)) :
+				       std::min(kDfuMinPollDelayMs,
+						remaining_ms);
+
+		sleep_ms_(delay_ms);
+		slept += delay_ms;
+	}
+
+	fprintf(stderr, "Timed out waiting for DFU idle state.\n");
+	return false;
+}
+
+bool RtsUsbDevice::dfu_clear_status()
+{
+	/*
+	 * bmRequestType = 0x21: Host-to-Device, Class, Interface
+	 * bRequest = kDfuClrStatus (0x04)
+	 */
+	int ret = backend_->control_transfer(
+		kBmReqH2dClsIf, kDfuClrStatus, 0,
+		static_cast<uint16_t>(dfu_interface_), nullptr, 0,
+		kUsbCtrlTimeoutMs);
+
+	if (ret < 0) {
+		fprintf(stderr, "DFU_CLRSTATUS failed: %s\n",
+			backend_->error_name(ret));
+		return false;
+	}
+	return true;
 }

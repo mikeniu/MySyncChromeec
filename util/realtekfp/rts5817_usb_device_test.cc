@@ -447,4 +447,202 @@ TEST_F(RtsUsbDeviceDfuTest, ReleaseForgetsFoundInterface)
 	EXPECT_EQ(device_->transfer_size(), kDfuDefaultTransferSize);
 }
 
+/* Exposes the protected DFU helpers and lets tests set the DFU interface. */
+class TestableRtsUsbDevice : public RtsUsbDevice {
+    public:
+	using RtsUsbDevice::dfu_clear_status;
+	using RtsUsbDevice::dfu_poll_idle;
+	using RtsUsbDevice::RtsUsbDevice;
+};
+
+class RtsUsbDeviceStatusTest : public Test {
+    protected:
+	void SetUp() override
+	{
+		auto backend = std::make_unique<StrictMock<MockRtsUsbBackend>>();
+
+		backend_ = backend.get();
+		EXPECT_CALL(*backend_, error_name(_))
+			.WillRepeatedly(Return("error"));
+		EXPECT_CALL(*backend_, close()).Times(AnyNumber());
+		EXPECT_CALL(*backend_, is_open())
+			.WillRepeatedly(Return(false));
+		device_ = std::make_unique<TestableRtsUsbDevice>(
+			std::move(backend),
+			[this](int ms) { slept_.push_back(ms); });
+	}
+
+	/* Reply to the next DFU_GETSTATUS with the given status fields. */
+	void expect_status(uint8_t status, uint32_t poll_timeout_ms,
+			   uint8_t state, int ret = kDfuGetStatusResponseLen)
+	{
+		EXPECT_CALL(*backend_,
+			    control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0,
+					    _, _, kDfuGetStatusResponseLen,
+					    kUsbDfuTimeoutMs))
+			.WillOnce([=](uint8_t, uint8_t, uint16_t, uint16_t,
+				      uint8_t *data, uint16_t, unsigned int) {
+				data[kDfuStatusOff] = status;
+				data[kDfuPollTimeoutOff] = poll_timeout_ms & 0xFF;
+				data[kDfuPollTimeoutOff + 1] =
+					(poll_timeout_ms >> 8) & 0xFF;
+				data[kDfuPollTimeoutOff + 2] =
+					(poll_timeout_ms >> 16) & 0xFF;
+				data[kDfuStateOff] = state;
+				data[kDfuStateOff + 1] = 0;
+				return ret;
+			});
+	}
+
+	StrictMock<MockRtsUsbBackend> *backend_ = nullptr;
+	std::unique_ptr<TestableRtsUsbDevice> device_;
+	std::vector<int> slept_;
+};
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleSucceedsOnIdleStatesWithoutSleeping)
+{
+	for (uint8_t state : { kDfuStateDfuIdle, kDfuStateDfuDnloadIdle }) {
+		expect_status(kDfuStatusOk, 0, state);
+		EXPECT_TRUE(device_->dfu_poll_idle());
+	}
+	EXPECT_TRUE(slept_.empty());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleResetsDeviceOnManifestWaitReset)
+{
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuManifestWaitReset);
+	EXPECT_CALL(*backend_, reset_device()).WillOnce(Return(0));
+
+	EXPECT_TRUE(device_->dfu_poll_idle());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleWaitsThroughBusyStates)
+{
+	InSequence seq;
+
+	expect_status(kDfuStatusOk, 5, kDfuStateDfuDnloadSync);
+	expect_status(kDfuStatusOk, 7, kDfuStateDfuDnloadBusy);
+	expect_status(kDfuStatusOk, 9, kDfuStateDfuManifestSync);
+	expect_status(kDfuStatusOk, 11, kDfuStateDfuManifest);
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuIdle);
+
+	EXPECT_TRUE(device_->dfu_poll_idle());
+	EXPECT_EQ(slept_, (std::vector<int>{ 5, 7, 9, 11 }));
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleDecodes24BitLittleEndianPollTimeout)
+{
+	InSequence seq;
+
+	/* Needs all three bytes: 0x010203 ms = 66051 ms, clamped below. */
+	expect_status(kDfuStatusOk, 0x000203, kDfuStateDfuDnloadBusy);
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuIdle);
+
+	EXPECT_TRUE(device_->dfu_poll_idle());
+	EXPECT_EQ(slept_, (std::vector<int>{ 0x203 }));
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleUsesMinimumDelayForZeroPollTimeout)
+{
+	InSequence seq;
+
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuDnloadBusy);
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuIdle);
+
+	EXPECT_TRUE(device_->dfu_poll_idle());
+	EXPECT_EQ(slept_, (std::vector<int>{ kDfuMinPollDelayMs }));
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleClampsDelayToRemainingTimeout)
+{
+	/*
+	 * A huge 24-bit poll timeout must neither overflow nor sleep past the
+	 * overall timeout; the single sleep uses up the remaining budget.
+	 */
+	expect_status(kDfuStatusOk, 0xFFFFFF, kDfuStateDfuManifest);
+
+	EXPECT_FALSE(device_->dfu_poll_idle());
+	EXPECT_EQ(slept_, (std::vector<int>{ kUsbDfuTimeoutMs }));
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleTimesOutAtExactBoundary)
+{
+	InSequence seq;
+
+	expect_status(kDfuStatusOk, kUsbDfuTimeoutMs - 1, kDfuStateDfuManifest);
+	expect_status(kDfuStatusOk, 1, kDfuStateDfuManifest);
+
+	EXPECT_FALSE(device_->dfu_poll_idle());
+	EXPECT_EQ(slept_, (std::vector<int>{ kUsbDfuTimeoutMs - 1, 1 }));
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleSucceedsOnLastPollBeforeTimeout)
+{
+	InSequence seq;
+
+	expect_status(kDfuStatusOk, kUsbDfuTimeoutMs - 1, kDfuStateDfuManifest);
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuIdle);
+
+	EXPECT_TRUE(device_->dfu_poll_idle());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleFailsOnTransferError)
+{
+	expect_status(0, 0, 0, -1);
+
+	EXPECT_FALSE(device_->dfu_poll_idle());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleFailsOnShortRead)
+{
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuIdle,
+		      kDfuGetStatusResponseLen - 1);
+
+	EXPECT_FALSE(device_->dfu_poll_idle());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleFailsOnDfuErrorState)
+{
+	expect_status(kDfuStatusOk, 0, kDfuStateDfuError);
+
+	EXPECT_FALSE(device_->dfu_poll_idle());
+	EXPECT_TRUE(slept_.empty());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleFailsOnNonZeroStatus)
+{
+	expect_status(0x0E, 0, kDfuStateDfuDnloadBusy);
+
+	EXPECT_FALSE(device_->dfu_poll_idle());
+	EXPECT_TRUE(slept_.empty());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, PollIdleFailsImmediatelyOnUnexpectedState)
+{
+	/* appIDLE (0), appDETACH (1), dfuUPLOAD-IDLE (9) and invalid (11). */
+	for (uint8_t state : { 0, 1, 9, 11 }) {
+		expect_status(kDfuStatusOk, 100, state);
+		EXPECT_FALSE(device_->dfu_poll_idle());
+	}
+	EXPECT_TRUE(slept_.empty());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, ClearStatusSendsRequest)
+{
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dClsIf, kDfuClrStatus, 0, _,
+				    nullptr, 0, kUsbCtrlTimeoutMs))
+		.WillOnce(Return(0));
+
+	EXPECT_TRUE(device_->dfu_clear_status());
+}
+
+TEST_F(RtsUsbDeviceStatusTest, ClearStatusFailsOnTransferError)
+{
+	EXPECT_CALL(*backend_, control_transfer(_, _, _, _, _, _, _))
+		.WillOnce(Return(-1));
+
+	EXPECT_FALSE(device_->dfu_clear_status());
+}
+
 } /* namespace */
