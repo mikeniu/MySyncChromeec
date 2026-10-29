@@ -5,6 +5,7 @@
 
 #include "rts5817_usb_device.h"
 
+#include <algorithm>
 #include <memory>
 #include <span>
 #include <vector>
@@ -643,6 +644,247 @@ TEST_F(RtsUsbDeviceStatusTest, ClearStatusFailsOnTransferError)
 		.WillOnce(Return(-1));
 
 	EXPECT_FALSE(device_->dfu_clear_status());
+}
+
+constexpr uint16_t kTransferSize = 4;
+constexpr int kDfuIf = 1;
+
+/* Opened device with a DFU interface advertising kTransferSize. */
+class RtsUsbDeviceDownloadTest : public RtsUsbDeviceDfuTest {
+    protected:
+	struct Block {
+		uint16_t number;
+		std::vector<uint8_t> data;
+	};
+
+	void SetUp() override
+	{
+		RtsUsbDeviceDfuTest::SetUp();
+		EXPECT_CALL(*backend_, is_open()).WillRepeatedly(Return(true));
+		EXPECT_CALL(*backend_, get_interfaces(_))
+			.WillRepeatedly(DoAll(
+				SetArgPointee<0>(std::vector<RtsUsbInterface>{
+					dfu_interface(kDfuIf, kTransferSize) }),
+				Return(0)));
+		EXPECT_CALL(*backend_, detach_kernel_driver(kDfuIf))
+			.WillRepeatedly(Return(0));
+		EXPECT_CALL(*backend_, claim_interface(kDfuIf))
+			.WillRepeatedly(Return(0));
+	}
+
+	/* Accept every DFU_DOWNLOAD and record it. */
+	void record_downloads(int fail_at_block = -1)
+	{
+		EXPECT_CALL(*backend_,
+			    control_transfer(kBmReqH2dClsIf, kDfuDownload, _,
+					    kDfuIf, _, _, kUsbDfuTimeoutMs))
+			.WillRepeatedly([this, fail_at_block](
+						uint8_t, uint8_t, uint16_t value,
+						uint16_t, uint8_t *data,
+						uint16_t length, unsigned int) {
+				if (static_cast<int>(value) == fail_at_block)
+					return -1;
+				blocks_.push_back(
+					{ value,
+					  std::vector<uint8_t>(data,
+							       data + length) });
+				return static_cast<int>(length);
+			});
+	}
+
+	static int fill_idle_status(uint8_t, uint8_t, uint16_t, uint16_t,
+				    uint8_t *data, uint16_t, unsigned int)
+	{
+		std::fill_n(data, kDfuGetStatusResponseLen, 0);
+		data[kDfuStateOff] = kDfuStateDfuDnloadIdle;
+		return static_cast<int>(kDfuGetStatusResponseLen);
+	}
+
+	/* Every DFU_GETSTATUS reports dfuDNLOAD-IDLE. */
+	void status_always_idle()
+	{
+		EXPECT_CALL(*backend_,
+			    control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0,
+					    kDfuIf, _, kDfuGetStatusResponseLen,
+					    kUsbDfuTimeoutMs))
+			.WillRepeatedly(fill_idle_status);
+	}
+
+	std::vector<Block> blocks_;
+};
+
+TEST_F(RtsUsbDeviceDownloadTest, ChunksAcrossTransferSizeBoundaries)
+{
+	record_downloads();
+	status_always_idle();
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	/* kTransferSize + 1 bytes: one full block, a 1-byte tail, and a ZLP. */
+	const std::vector<uint8_t> fw = { 0x10, 0x20, 0x30, 0x40, 0x50 };
+
+	ASSERT_TRUE(device_->dfu_download(fw));
+	ASSERT_EQ(blocks_.size(), 3u);
+	EXPECT_EQ(blocks_[0].number, 0);
+	EXPECT_EQ(blocks_[0].data,
+		  (std::vector<uint8_t>{ 0x10, 0x20, 0x30, 0x40 }));
+	EXPECT_EQ(blocks_[1].number, 1);
+	EXPECT_EQ(blocks_[1].data, (std::vector<uint8_t>{ 0x50 }));
+	EXPECT_EQ(blocks_[2].number, 2);
+	EXPECT_TRUE(blocks_[2].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ImageSmallerThanOneBlock)
+{
+	record_downloads();
+	status_always_idle();
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	ASSERT_TRUE(device_->dfu_download({ 0x01, 0x02 }));
+	ASSERT_EQ(blocks_.size(), 2u);
+	EXPECT_EQ(blocks_[0].data, (std::vector<uint8_t>{ 0x01, 0x02 }));
+	EXPECT_TRUE(blocks_[1].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ImageExactlyOneBlock)
+{
+	record_downloads();
+	status_always_idle();
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	ASSERT_TRUE(device_->dfu_download({ 1, 2, 3, 4 }));
+	ASSERT_EQ(blocks_.size(), 2u);
+	EXPECT_EQ(blocks_[0].data, (std::vector<uint8_t>{ 1, 2, 3, 4 }));
+	EXPECT_TRUE(blocks_[1].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ImageOfExactMultipleOfBlockSize)
+{
+	record_downloads();
+	status_always_idle();
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	ASSERT_TRUE(device_->dfu_download({ 1, 2, 3, 4, 5, 6, 7, 8 }));
+	ASSERT_EQ(blocks_.size(), 3u);
+	EXPECT_EQ(blocks_[0].data, (std::vector<uint8_t>{ 1, 2, 3, 4 }));
+	EXPECT_EQ(blocks_[1].data, (std::vector<uint8_t>{ 5, 6, 7, 8 }));
+	EXPECT_EQ(blocks_[2].number, 2);
+	EXPECT_TRUE(blocks_[2].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, RejectsEmptyFirmware)
+{
+	EXPECT_CALL(*backend_, claim_interface(_)).Times(0);
+
+	EXPECT_FALSE(device_->dfu_download({}));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWithoutOpenDevice)
+{
+	EXPECT_CALL(*backend_, is_open()).WillOnce(Return(false));
+
+	EXPECT_FALSE(device_->dfu_download({ 1 }));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWhenNoDfuInterface)
+{
+	EXPECT_CALL(*backend_, get_interfaces(_)).WillOnce(Return(0));
+	EXPECT_CALL(*backend_, claim_interface(_)).Times(0);
+
+	EXPECT_FALSE(device_->dfu_download({ 1 }));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ContinuesWhenKernelDriverDetachFails)
+{
+	EXPECT_CALL(*backend_, detach_kernel_driver(kDfuIf))
+		.WillOnce(Return(-1));
+	record_downloads();
+	status_always_idle();
+	EXPECT_CALL(*backend_, release_interface(kDfuIf));
+
+	EXPECT_TRUE(device_->dfu_download({ 1, 2 }));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ClaimFailureLeavesNothingToRelease)
+{
+	EXPECT_CALL(*backend_, claim_interface(kDfuIf)).WillOnce(Return(-1));
+	EXPECT_CALL(*backend_, release_interface(_)).Times(0);
+
+	/* The destructor must not release an interface that was never claimed. */
+	EXPECT_FALSE(device_->dfu_download({ 1, 2 }));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, TransferFailureClearsStatusAndReleases)
+{
+	record_downloads(/*fail_at_block=*/1);
+	status_always_idle();
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dClsIf, kDfuClrStatus, 0, kDfuIf,
+				    nullptr, 0, kUsbCtrlTimeoutMs))
+		.WillOnce(Return(0));
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	EXPECT_FALSE(device_->dfu_download({ 1, 2, 3, 4, 5, 6 }));
+	ASSERT_EQ(blocks_.size(), 1u);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ShortWriteIsAnError)
+{
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dClsIf, kDfuDownload, 0, kDfuIf, _,
+				    kTransferSize, kUsbDfuTimeoutMs))
+		.WillOnce(Return(kTransferSize - 1));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dClsIf, kDfuClrStatus, 0, kDfuIf,
+				    nullptr, 0, kUsbCtrlTimeoutMs))
+		.WillOnce(Return(0));
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	EXPECT_FALSE(device_->dfu_download({ 1, 2, 3, 4, 5, 6 }));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, PollFailureReleasesInterface)
+{
+	record_downloads();
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, kDfuIf,
+				    _, kDfuGetStatusResponseLen,
+				    kUsbDfuTimeoutMs))
+		.WillOnce(Return(-1));
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	EXPECT_FALSE(device_->dfu_download({ 1, 2, 3, 4, 5, 6 }));
+	ASSERT_EQ(blocks_.size(), 1u);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FinalZlpFailureIsOnlyAWarning)
+{
+	/* Blocks are accepted, the trailing zero-length packet is rejected. */
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dClsIf, kDfuDownload, 0, kDfuIf, _,
+				    2, kUsbDfuTimeoutMs))
+		.WillOnce(Return(2));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dClsIf, kDfuDownload, 1, kDfuIf,
+				    nullptr, 0, kUsbDfuTimeoutMs))
+		.WillOnce(Return(-1));
+	status_always_idle();
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	EXPECT_TRUE(device_->dfu_download({ 1, 2 }));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ManifestNotIdleStillSucceeds)
+{
+	record_downloads();
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqD2hClsIf, kDfuGetStatus, 0, kDfuIf,
+				    _, kDfuGetStatusResponseLen,
+				    kUsbDfuTimeoutMs))
+		.WillOnce(fill_idle_status)
+		.WillOnce(Return(-1));
+	EXPECT_CALL(*backend_, release_interface(kDfuIf)).Times(1);
+
+	EXPECT_TRUE(device_->dfu_download({ 1, 2 }));
 }
 
 } /* namespace */
