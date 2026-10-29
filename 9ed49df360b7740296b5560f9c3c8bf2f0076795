@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca9c4159_42db533b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-29T22:38:55Z",
+      "side": 1,
+      "message": "Are each of these project functions copy-pasted? Could they each have one program-level copy?",
+      "revId": "9ed49df360b7740296b5560f9c3c8bf2f0076795",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
