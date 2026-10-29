@@ -951,6 +951,9 @@ static void charge_manager_get_best_port(int *new_port, int *new_supplier)
 	*new_supplier = best_supplier;
 }
 
+static void charge_manager_refresh(void);
+DECLARE_DEFERRED(charge_manager_refresh);
+
 /**
  * Charge manager refresh -- responsible for selecting the active charge port
  * and charge power. Called as a deferred task.
@@ -967,7 +970,11 @@ static void charge_manager_refresh(void)
 	int ceil;
 	int power_changed = 0;
 
-	CM_MUTEX_LOCK(&cm_refresh);
+	/* Do not block k_sys_work_q if cm_refresh is held; retry shortly. */
+	if (k_mutex_lock(&cm_refresh, K_NO_WAIT) != 0) {
+		hook_call_deferred(&charge_manager_refresh_data, 1 * MSEC);
+		return;
+	}
 
 	/* Hunt for an acceptable charge port */
 	while (1) {
@@ -1210,7 +1217,6 @@ static void charge_manager_refresh(void)
 
 	CM_MUTEX_UNLOCK(&cm_refresh);
 }
-DECLARE_DEFERRED(charge_manager_refresh);
 
 /**
  * Called when charge override times out waiting for power swap.
