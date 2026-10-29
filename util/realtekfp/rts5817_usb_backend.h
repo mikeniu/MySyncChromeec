@@ -16,6 +16,7 @@
 #include <expected>
 #include <span>
 #include <string_view>
+#include <vector>
 
 namespace realtekfp {
 
@@ -24,6 +25,15 @@ inline constexpr int kUsbErrorAccess = -3;
 inline constexpr int kUsbErrorNoDevice = -4;
 inline constexpr int kUsbErrorNotFound = -5;
 inline constexpr int kUsbErrorPipe = -9;
+
+// One alternate setting of a USB interface of the active configuration.
+struct RtsUsbInterface {
+  int number = 0;
+  uint8_t usb_class = 0;
+  uint8_t usb_subclass = 0;
+  // Class-specific descriptors that follow the interface descriptor.
+  std::vector<uint8_t> extra;
+};
 
 struct UsbDeviceId {
   uint16_t vid = 0;
@@ -61,6 +71,9 @@ class RtsUsbBackend {
   virtual std::expected<size_t, int> ControlTransferOut(
       uint8_t request_type, uint8_t request, uint16_t value, uint16_t index,
       std::span<const uint8_t> data, std::chrono::milliseconds timeout) = 0;
+
+  // Lists the interfaces of the active configuration.
+  virtual std::expected<std::vector<RtsUsbInterface>, int> GetInterfaces() = 0;
 
   // Name of a negative libusb error code, for diagnostics.
   virtual std::string_view ErrorName(int error) const = 0;

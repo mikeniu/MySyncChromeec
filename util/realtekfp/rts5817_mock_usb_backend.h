@@ -13,6 +13,7 @@
 #include <expected>
 #include <span>
 #include <string_view>
+#include <vector>
 
 #include "rts5817_usb_backend.h"
 
@@ -34,6 +35,8 @@ class MockRtsUsbBackend : public RtsUsbBackend {
                uint16_t index, std::span<const uint8_t> data,
                std::chrono::milliseconds timeout),
               (override));
+  MOCK_METHOD((std::expected<std::vector<RtsUsbInterface>, int>), GetInterfaces,
+              (), (override));
   MOCK_METHOD(std::string_view, ErrorName, (int error), (const, override));
 };
 
