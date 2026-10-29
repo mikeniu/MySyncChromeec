@@ -21,6 +21,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "9ac2e6d3_d4ce495a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-29T20:05:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "386fbb5b_ee5cb95a",
+      "revId": "c5f3f12067d91f96b3b5373199de7f77e8c2e744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e63adf36_74871c17",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -59,6 +77,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f345e5f9_1d126d40",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-29T20:05:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8dbcc43b_a1d2b8b9",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 0
+      },
+      "revId": "c5f3f12067d91f96b3b5373199de7f77e8c2e744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2943b00e_bdc88598",
@@ -72,6 +114,30 @@
       "writtenOn": "2026-09-03T21:46:47Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: By removing the `for` loop here, `battery_device_name` no longer has any retry logic. If the first read fails, the code immediately gives up on getting the device name, whereas previously it was retried `CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT` times. \n\nIf this is intentional, it\u0027s worth updating the commit message to reflect this behavior change. If it\u0027s a mistake, you might need to either add a deferred retry for the device name as well (which might mean re-running the whole function or using a state machine) or keep the synchronous retries here (if a short block is acceptable here, though that defeats the goal of the patch).",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 0
+      },
+      "revId": "c5f3f12067d91f96b3b5373199de7f77e8c2e744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24ef5831_17799335",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-29T20:05:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2943b00e_bdc88598",
       "range": {
         "startLine": 224,
         "startChar": 0,
