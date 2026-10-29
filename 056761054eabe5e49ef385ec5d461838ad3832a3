@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85b9bb21_8b72a360",
+        "filename": "third_party/boringssl/boringssl-toolchain.cmake",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1001604
+      },
+      "writtenOn": "2026-10-29T19:05:55Z",
+      "side": 1,
+      "message": "Upstream BoringSSL doesn\u0027t build its internals as C anymore at all, and hasn\u0027t for some time now. It sounds like you all are running a very old, unsupported BoringSSL.",
+      "revId": "056761054eabe5e49ef385ec5d461838ad3832a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
