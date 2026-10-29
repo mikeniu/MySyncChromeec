@@ -117,6 +117,26 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_INFO(pdata) ((pdata)->riscv.regs[10])
 #define PANIC_ARCH_POST_COPY(pdata)
 #elif defined(CONFIG_X86)
+static uint32_t x86_exception_vector = X86_VEC_DOUBLE_FAULT;
+
+FUNC_NORETURN void
+__real_z_x86_unhandled_cpu_exception(uintptr_t vector,
+				     const struct arch_esf *esf);
+FUNC_NORETURN void
+__wrap_z_x86_unhandled_cpu_exception(uintptr_t vector,
+				     const struct arch_esf *esf)
+{
+	x86_exception_vector = vector;
+	__real_z_x86_unhandled_cpu_exception(vector, esf);
+}
+
+void __real_z_x86_page_fault_handler(struct arch_esf *esf);
+void __wrap_z_x86_page_fault_handler(struct arch_esf *esf)
+{
+	x86_exception_vector = X86_VEC_PAGE_FAULT;
+	__real_z_x86_page_fault_handler(esf);
+}
+
 #define PANIC_ARCH PANIC_ARCH_X86
 #define PANIC_REG_LIST(M, M_GPR)      \
 	M_GPR(eax, x86.eax, eax)      \
@@ -132,8 +152,11 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
 #define PANIC_REG_REASON(pdata) (pdata->x86.vector)
 #define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
-#define PANIC_ARCH_POST_COPY(pdata) \
-	((pdata)->x86.task_id = (uint8_t)(uintptr_t)k_current_get())
+#define PANIC_ARCH_POST_COPY(pdata)                                         \
+	do {                                                                \
+		(pdata)->x86.vector = x86_exception_vector;                 \
+		(pdata)->x86.task_id = (uint8_t)(uintptr_t)k_current_get(); \
+	} while (0)
 #elif defined(CONFIG_ARCH_POSIX)
 #define PANIC_ARCH PANIC_ARCH_POSIX
 #define PANIC_REG_LIST(M, M_GPR) \
@@ -290,6 +313,20 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 
 	if ((PANIC_ARCH != PANIC_ARCH_UNSUPPORTED) && esf) {
 		panic_data_write_esf(esf);
+		if (IS_ENABLED(CONFIG_X86) || IS_ENABLED(CONFIG_ARCH_POSIX)) {
+			struct panic_data *pdata = panic_get_data();
+
+			if (reason == K_ERR_STACK_CHK_FAIL) {
+				panic_set_reason_reg(pdata,
+						     PANIC_SW_STACK_OVERFLOW);
+				panic_data_finalize(pdata);
+			} else if (reason != K_ERR_CPU_EXCEPTION) {
+				panic_set_reason_reg(pdata,
+						     PANIC_ZEPHYR_FATAL_ERROR);
+				panic_set_info_reg(pdata, reason);
+				panic_data_finalize(pdata);
+			}
+		}
 		if (!IS_ENABLED(CONFIG_LOG)) {
 			panic_data_print(panic_get_data());
 		}
@@ -410,10 +447,23 @@ test_export_static int panic_data_init(void)
 	is_panic_new = panic_data_is_new();
 
 	if (is_panic_new) {
-		LOG_WRN("New Panic Detected: %s",
-			panic_sw_reason_is_valid(reason) ?
-				panic_sw_reasons[reason - PANIC_SW_BASE] :
-				"");
+		uint32_t info = panic_get_info_reg(pdata);
+		uint8_t exception = panic_get_exception_reg(pdata);
+
+		if (panic_sw_reason_is_valid(reason)) {
+			LOG_WRN("New Panic Detected: %s (info=0x%08x, exc=0x%02x)",
+				panic_sw_reasons[reason - PANIC_SW_BASE], info,
+				exception);
+		} else {
+			LOG_WRN("New Panic Detected: reason=0x%08x (info=0x%08x, exc=0x%02x)",
+				reason, info, exception);
+		}
+#if defined(CONFIG_X86)
+		LOG_WRN("x86 panic: vec=0x%08x err=0x%08x eip=0x%08x cs=0x%04x eflags=0x%08x task=%u",
+			pdata->x86.vector, pdata->x86.error_code,
+			pdata->x86.eip, pdata->x86.cs, pdata->x86.eflags,
+			pdata->x86.task_id);
+#endif
 	}
 
 	/*
