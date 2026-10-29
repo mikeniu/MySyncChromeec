@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5eb8e7d_87607c3f",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T23:47:41Z",
+      "side": 1,
+      "message": "__attribute__((constructor)) functions are not executed in Chrome EC bare-metal firmware (ec-legacy). In core/cortex_m/init.S, application_start zeroes .bss, copies .data, calls system_chip_init, and jumps directly to main(). It does not invoke __libc_init_array or run constructors in .init_array. Consequently, check_canary_before_pre_init() is never called, canary_found_before_pre_init stays false (zeroed in .bss), and TEST_ASSERT(!canary_found_before_pre_init) always passes unconditionally even if system_reset() failed to clear fp_buffer before resetting into RO.",
+      "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
