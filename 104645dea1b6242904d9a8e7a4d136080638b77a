@@ -22,6 +22,25 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f126e298_f475a73d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T03:28:32Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "54c93113_9102aa6f",
+      "isAi": true,
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "902c1cd2_c6947b4b",
         "filename": "core/host/task.c",
         "patchSetId": 1
@@ -47,6 +66,31 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "933d61de_d1b3c851",
+        "filename": "core/host/task.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T03:28:32Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "902c1cd2_c6947b4b",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "82030e21_f8e11d19",
         "filename": "test/interrupt.c",
         "patchSetId": 1
@@ -65,6 +109,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8fbffc6_0a13549d",
+        "filename": "test/interrupt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T03:28:32Z",
+      "side": 1,
+      "message": "Code updated in PS4; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "82030e21_f8e11d19",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "104645dea1b6242904d9a8e7a4d136080638b77a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
