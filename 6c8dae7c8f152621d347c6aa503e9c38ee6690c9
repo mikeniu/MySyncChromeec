@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc956e4e_63141f39",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T03:57:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Preserves exact behavior across FPMCU and non-FPMCU configurations (`CONFIG_FINGERPRINT_MCU`, `CONFIG_USART_HOST_COMMAND`, and `CONFIG_SPI`).\n* **Architecture \u0026 Component Fit:** ✅ Fits the STM32 host command handler and unit test structure cleanly.\n* **Code Simplicity:** ✅ Eliminates the mutable `ret_status` local variable and deduplicates the `IS_ENABLED(CONFIG_SPI)` branch via early returns.\n* **Idiomaticity \u0026 Readability:** ✅ Uses idiomatic guard clauses, `IS_ENABLED()` checks, and existing status/transport enum constants.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ `test/fp_transport.c` covers both valid transport paths (`FP_TRANSPORT_TYPE_UART` and `FP_TRANSPORT_TYPE_SPI`) and the `EC_RES_INVALID_COMMAND` guard branch (`FP_TRANSPORT_TYPE_UNKNOWN` and `FP_TRANSPORT_TYPE_UART` when `CONFIG_USART_HOST_COMMAND` is disabled).\n* **CL Size \u0026 Scope:** ✅ `Size: M (+48, -12)` (15 production diff lines in `chip/stm32/host_command_common.c` and 45 test diff lines in `test/fp_transport.c`). Focused, single-purpose refactoring with corresponding unit tests.\n* **Commit Message:** ✅ Clear, concise, and accurately describes the what and why of the change.\n\n[[trajectory](https://goto.corp.google.com/traj/c0f23c75-62ca-48cf-b628-15ff9740cc7e)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6c8dae7c8f152621d347c6aa503e9c38ee6690c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
