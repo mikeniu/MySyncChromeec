@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c867428_f96ef6de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-29T02:09:19Z",
+      "side": 1,
+      "message": "Please separate common code changes from project specific code changes and submit the relation chain.",
+      "revId": "7c093f0ee8d5fd0f571d6c7e6cb7c78e0a80d165",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
