@@ -16,6 +16,24 @@
       "message": "Will this CL be cherry-picked to firmware release branch (e.g. R156)?",
       "revId": "a92852443ae05b743525db19f3ce3d21f7853486",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4586bfa9_ffc38255",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-10-29T01:23:14Z",
+      "side": 1,
+      "message": "ya, might as well pick this up.",
+      "parentUuid": "bb344d6a_b052a7a1",
+      "revId": "a92852443ae05b743525db19f3ce3d21f7853486",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
