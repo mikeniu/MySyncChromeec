@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff2a43ff_7fdc707d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1182824
+      },
+      "writtenOn": "2026-10-29T01:59:43Z",
+      "side": 1,
+      "message": "LGTM! Thanks for catching and cleaning this up.\n\nI double-checked the history and hardware timing: `SYS_RST_PULSE_LENGTH` (50 ms) originally came from the pre-`344cd23cdb54` flow where `chipset_reset()` did an in-place `S0 -\u003e S0` pulse (`GPIO_SYS_RST_ODL \u003d 0` -\u003e `usleep(50 ms)` -\u003e `GPIO_SYS_RST_ODL \u003d 1`) and needed at least 50 ms to avoid triggering a GSC/TPM false alarm.\n\nSince commit `344cd23cdb54` (\"mt818x: chipset_reset do full S0-\u003eS5-\u003eS0\"), `GPIO_SYS_RST_ODL` stays asserted low across `S0 -\u003e S3 -\u003e S5 -\u003e S5S3` and is only deasserted on `TASK_ID_CHIPSET` in `POWER_S5S3` after `set_pmic_pwron()` (which already sleeps `2 * PMIC_EN_PULSE_MS \u003d 100 ms`). So the reset pulse width is still guaranteed to be \u003e100 ms on `TASK_ID_CHIPSET`, and removing the leftover `k_usleep()` from `chipset_reset()` cleanly avoids blocking `k_sys_work_q`.",
+      "revId": "902724c7389d39bb34202dc468c1a9730e0c8f2b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
