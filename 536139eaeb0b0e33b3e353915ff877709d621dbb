@@ -3,6 +3,42 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "89f33903_94f195e7",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T23:48:16Z",
+      "side": 1,
+      "message": "Throughout chip/stm32/system.c, chip family and variant checks consistently use preprocessor directives (#if defined(CHIP_FAMILY_STM32H7), #ifdef CHIP_VARIANT_STM32L476, etc.), never IS_ENABLED(). IS_ENABLED() is intended for CONFIG_* macros. Using #if defined(CHIP_VARIANT_STM32H7X3) here and in system_reset() is idiomatic for Chrome EC and prevents compiling clear_ahb4() and referencing weak symbols on non-H7 chips.",
+      "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd97907f_81721e17",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T23:48:16Z",
+      "side": 1,
+      "message": "Please use #if defined(CHIP_VARIANT_STM32H7X3) instead of if (IS_ENABLED(CHIP_VARIANT_STM32H7X3)) here as well for consistency.",
+      "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a5eb8e7d_87607c3f",
         "filename": "test/fp_buffer_clear.cc",
         "patchSetId": 24
@@ -14,6 +50,60 @@
       "writtenOn": "2026-10-29T23:47:41Z",
       "side": 1,
       "message": "__attribute__((constructor)) functions are not executed in Chrome EC bare-metal firmware (ec-legacy). In core/cortex_m/init.S, application_start zeroes .bss, copies .data, calls system_chip_init, and jumps directly to main(). It does not invoke __libc_init_array or run constructors in .init_array. Consequently, check_canary_before_pre_init() is never called, canary_found_before_pre_init stays false (zeroed in .bss), and TEST_ASSERT(!canary_found_before_pre_init) always passes unconditionally even if system_reset() failed to clear fp_buffer before resetting into RO.",
+      "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4261ead_47484dd8",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T23:48:16Z",
+      "side": 1,
+      "message": "__attribute__((constructor)) functions are not executed in Chrome EC bare-metal firmware (ec-legacy). In core/cortex_m/init.S, application_start zeroes .bss, copies .data, calls system_chip_init, and jumps directly to main(). It does not invoke __libc_init_array or execute functions in .init_array. Consequently, check_canary_before_pre_init() never runs, canary_found_before_pre_init remains false (zeroed in .bss), and TEST_ASSERT(!canary_found_before_pre_init) always passes unconditionally. Furthermore, system_pre_init() clears .ahb4 on boot before tests run, so the subsequent TEST_ASSERT_MEMSET(fp_buffer, 0, ...) also passes. As written, this test cannot verify that system_reset() cleared fp_buffer before resetting.",
+      "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a337c6c_0124dd40",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T23:48:16Z",
+      "side": 1,
+      "message": "IS_ENABLED() is intended for boolean CONFIG_* build options. SECTION_IS_RW is a section selector defined by Makefile.rules via -DSECTION_IS_RW\u003d. Throughout the codebase and earlier in this file (lines 16, 106), #ifdef SECTION_IS_RW is used. Please use #ifdef SECTION_IS_RW or system_is_in_rw() for consistency.",
+      "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acf316b8_160589a9",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 590,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T23:48:16Z",
+      "side": 1,
+      "message": "fp_buffer_clear was added to _skip_test_chudow and _skip_test_helipilot (for Zephyr), but _skip_test_sanok was not updated. Consider adding fp_buffer_clear to _skip_test_sanok if sanok does not support this test.",
       "isAi": true,
       "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
