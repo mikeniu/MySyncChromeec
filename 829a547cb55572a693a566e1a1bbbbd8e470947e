@@ -50,6 +50,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fe17bf7_d7c25042",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T04:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d228237f_7925debf",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4cff0138_279d3e04",
@@ -146,6 +170,30 @@
       "side": 1,
       "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
       "parentUuid": "82ae4434_c772f566",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "revId": "829a547cb55572a693a566e1a1bbbbd8e470947e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bffa748_9c1ccb55",
+        "filename": "common/mock/hwtimer_mock.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T04:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b26ab09_3797d222",
       "range": {
         "startLine": 13,
         "startChar": 0,
