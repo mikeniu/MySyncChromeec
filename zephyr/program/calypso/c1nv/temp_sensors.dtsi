@@ -8,58 +8,74 @@
 / {
 	named-adc-channels {
 
-		adc_temp_backcov: backcov {
+		adc_temp_soc: adc-temp-soc {
 			enum-name = "ADC_TEMP_SENSOR_1";
 			io-channels = <&adc0 0>;
 		};
-		adc_temp_keyboard: keyboard {
+		adc_temp_charger1: adc-temp-charger1 {
 			enum-name = "ADC_TEMP_SENSOR_2";
 			io-channels = <&adc0 1>;
 		};
-		adc_temp_cpu: cpu {
+		adc_temp_prebuck: adc-temp-prebuck {
 			enum-name = "ADC_TEMP_SENSOR_3";
 			io-channels = <&adc0 2>;
 		};
-		adc_temp_wlan: wlan {
+		adc_temp_charger2: adc-temp-charger2 {
 			enum-name = "ADC_TEMP_SENSOR_4";
 			io-channels = <&adc0 3>;
 		};
 	};
 
-	temp_sensor_backcov: backcov {
+	temp_soc: temp-soc {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
-		adc = <&adc_temp_backcov>;
+		adc = <&adc_temp_soc>;
 	};
-	temp_sensor_keyboard: keyboard {
+	temp_charger1: temp-charger1 {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
-		adc = <&adc_temp_keyboard>;
+		adc = <&adc_temp_charger1>;
 	};
-	temp_sensor_cpu: cpu {
+	temp_prebuck: temp-prebuck {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
-		adc = <&adc_temp_cpu>;
+		adc = <&adc_temp_prebuck>;
 	};
-	temp_sensor_wlan: wlan {
+	temp_charger2: temp-charger2 {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
-		adc = <&adc_temp_wlan>;
+		adc = <&adc_temp_charger2>;
 	};
 
 	named-temp-sensors {
 		compatible = "cros-ec,temp-sensors";
-		temp_backcov: backcov {
-			sensor = <&temp_sensor_backcov>;
+		temp_sensor_soc: soc {
+			temp-host-high = <70>;
+			temp-host-halt = <110>;
+			temp-host-release-high = <60>;
+			temp-host-release-halt = <100>;
+			sensor = <&temp_soc>;
 		};
-		temp_keyboard: keyboard {
-			sensor = <&temp_sensor_keyboard>;
+		temp_sensor_charger1: charger1 {
+			temp-host-high = <110>;
+			temp-host-halt = <150>;
+			temp-host-release-high = <100>;
+			temp-host-release-halt = <140>;
+			sensor = <&temp_charger1>;
 		};
-		temp_cpu: cpu {
-			sensor = <&temp_sensor_cpu>;
+		temp_sensor_prebuck: prebuck {
+			temp-host-high = <80>;
+			temp-host-halt = <90>;
+			temp-host-release-high = <70>;
+			temp-host-release-halt = <80>;
+			sensor = <&temp_prebuck>;
 		};
-		temp_wlan: wlan {
-			sensor = <&temp_sensor_wlan>;
+		temp_sensor_charger2: charger2 {
+			temp-host-high = <110>;
+			temp-host-halt = <150>;
+			temp-host-release-high = <100>;
+			temp-host-release-halt = <140>;
+			sensor = <&temp_charger2>;
 		};
 	};
 };
