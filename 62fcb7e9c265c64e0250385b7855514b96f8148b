@@ -50,6 +50,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4fa4c4c7_f1159614",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T03:17:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac34e35b_8c1ebdb0",
+      "range": {
+        "startLine": 16,
+        "startChar": 42,
+        "endLine": 17,
+        "endChar": 54
+      },
+      "revId": "62fcb7e9c265c64e0250385b7855514b96f8148b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "47b664aa_21e6e76e",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -121,6 +145,30 @@
       "side": 1,
       "message": "Code updated in PS2; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
       "parentUuid": "85c4e770_e3590e21",
+      "range": {
+        "startLine": 10,
+        "startChar": 2,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "62fcb7e9c265c64e0250385b7855514b96f8148b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55f942ec_8207c41d",
+        "filename": "third_party/boringssl/boringssl-toolchain.cmake",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-29T03:17:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2127bf8_a1c3a15e",
       "range": {
         "startLine": 10,
         "startChar": 2,
