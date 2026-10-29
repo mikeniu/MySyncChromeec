@@ -84,6 +84,30 @@
       "isAi": true,
       "revId": "11b31c0c81c5288e7acdb19c1bd83b7147d7f8e2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d785713_d32baca8",
+        "filename": "test/interrupt.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-10-29T03:29:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c0e85e8_1276a485",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "revId": "11b31c0c81c5288e7acdb19c1bd83b7147d7f8e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
