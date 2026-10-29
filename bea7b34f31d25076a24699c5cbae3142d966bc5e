@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4363528_bb149700",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T09:04:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Commit Message Accuracy:** It looks like the commit message update mentioned in your reply was not included in the Patchset 4 upload—`/COMMIT_MSG` still states that `RtsUsbDevice` downloads firmware *\"directly via libusb control transfers\"* rather than through `RtsUsbBackend`.\n\nBelow are copy-pasteable commit messages for both the split-CL approach and the single-CL option (also removing the trailing period from the subject line and using imperative mood `Add`):\n\n**Option A — If `RtsUsbBackend` interface methods are moved to a prerequisite CL (or folded into the parent `RtsUsbBackend` CL):**\n\n*CL 1 (Backend interface \u0026 implementations):*\n```text\nrts5817: Add interface claim and kernel driver hooks to RtsUsbBackend\n\nExtend RtsUsbBackend, RtsLibusbBackend, and MockRtsUsbBackend with\ndetach_kernel_driver(), claim_interface(), and release_interface() so\nRtsUsbDevice can acquire and release the USB DFU interface during\nfirmware transfers.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n*CL 2 (This CL — `RtsUsbDevice::dfu_download`):*\n```text\nrts5817: Implement DFU download in RtsUsbDevice\n\nAdd firmware flashing support to RtsUsbDevice by implementing the USB\nDFU Specification (Interface Class 0xFE) download sequence over\nRtsUsbBackend control transfers, handling interface claiming, block\nchunking, status polling, and manifest completion without external\ntools like dfu-util.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n**Option B — Single-CL description (if kept together):**\n```text\nrts5817: Implement DFU download in RtsUsbDevice\n\nAdd firmware flashing support to RtsUsbDevice by implementing the USB\nDFU Specification (Interface Class 0xFE) download sequence over\nRtsUsbBackend, including backend hooks to detach the kernel driver and\nclaim/release the DFU interface, block chunking, status polling, and\nmanifest completion without external tools like dfu-util.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n[🔗](http://go/tj/229ca942-b01d-4680-85b2-9a3f6134aa4b)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce4794ee_dcd45aa2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T09:04:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n**Functionality:** ✅ `RtsUsbDevice::dfu_download` properly validates non-empty firmware and DFU interface presence, detaches any active kernel driver, claims and releases the interface across all completion and error paths, checks for short control transfers, polls block status, and sends the trailing zero-length packet.\n**Architecture \u0026 Component Fit:** ✅ Routing DFU download operations through `RtsUsbBackend` cleanly decouples the protocol state machine from `libusb` and integrates with `utils-test`.\n**Code Simplicity:** ❌ In `util/realtekfp/rts5817_usb_device_test.cc`, `kTransferSize`, `kDfuIf`, and `DownloadRecorder` are defined above `RtsUsbDeviceStatusTest` rather than next to `RtsUsbDeviceDownloadTest`, and `DownloadRecorder` wraps a single `std::vector\u003cBlock\u003e blocks` field that can be a direct member of `RtsUsbDeviceDownloadTest` (see inline comment).\n**Idiomaticity \u0026 Readability:** ❌ `util/realtekfp/rts5817_usb_device_test.cc` includes 7 unrelated `::testing::` qualification cleanups inside `RtsUsbDeviceStatusTest` (lines 471, 480, 534, 548, 560, 583, 594) that belong in the parent CL where `RtsUsbDeviceStatusTest` is introduced.\n**Security:** ✅ No security vulnerabilities identified.\n**Testing:** ✅ Thorough unit test coverage in `RtsUsbDeviceDownloadTest` exercising chunking boundaries (`\u003c kTransferSize`, `\u003d\u003d kTransferSize`, `kTransferSize + 1`, and exact multiples), trailing ZLP, empty firmware, closed device, missing DFU interface, kernel driver detach failure, claim failure, transfer error and short write recovery (`DFU_CLRSTATUS` + release), poll failure, and manifest non-idle handling.\n**CL Size \u0026 Scope:** ❌ `Size: L (+425, -7)` (167 production lines across `rts5817_usb_backend.h`, `rts5817_libusb_backend.{h,cc}`, and `rts5817_usb_device.{h,cc}`, plus 258 added and 7 modified test/mock lines in `rts5817_mock_usb_backend.h` and `rts5817_usb_device_test.cc`). While the production delta is under 250 lines, this CL bundles three separable changes that should be split:\n1. **CL 1 (Fold into parent `RtsUsbBackend` CL or separate prerequisite CL):** Add `detach_kernel_driver`, `claim_interface`, and `release_interface` to `RtsUsbBackend` (`util/realtekfp/rts5817_usb_backend.h`), `RtsLibusbBackend` (`util/realtekfp/rts5817_libusb_backend.h`, `util/realtekfp/rts5817_libusb_backend.cc`), and `MockRtsUsbBackend` (`util/realtekfp/rts5817_mock_usb_backend.h`).\n2. **CL 2 (Fold into parent `RtsUsbDeviceStatusTest` CL):** Keep the `::testing::` namespace qualification cleanups in `RtsUsbDeviceStatusTest` (`util/realtekfp/rts5817_usb_device_test.cc` lines 471, 480, 534, 548, 560, 583, 594) in the parent CL that introduces `RtsUsbDeviceStatusTest`.\n3. **CL 3 (This CL):** Add `kDfuDownload`, `kDfuProgressStepPct`, and `RtsUsbDevice::dfu_download` (`util/realtekfp/rts5817_usb_device.h`, `util/realtekfp/rts5817_usb_device.cc`) along with `RtsUsbDeviceDownloadTest` (`util/realtekfp/rts5817_usb_device_test.cc`).\n**Commit Message:** ❌ The commit message in Patchset 4 was not updated and still states that `RtsUsbDevice` downloads firmware *\"directly via libusb control transfers\"* rather than over `RtsUsbBackend` (see inline comment on `/COMMIT_MSG` for copy-pasteable replacements). [🔗](http://go/tj/229ca942-b01d-4680-85b2-9a3f6134aa4b)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9283dd5b_b9d59c17",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T09:04:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **CL Scope \u0026 Code Simplicity (`RtsUsbDeviceStatusTest` Cleanup \u0026 Download Test Scoping):**\n\n1. **Unrelated `::testing::` cleanup in `RtsUsbDeviceStatusTest`:** Lines 471, 480, 534, 548, 560, 583, and 594 modify `RtsUsbDeviceStatusTest` (introduced in the parent CL) to drop `::testing::` prefixes. Please revert these unrelated edits in this CL (or fold them into the parent CL that introduces `RtsUsbDeviceStatusTest`) so this diff only touches code related to `dfu_download`.\n2. **Scope `kTransferSize`, `kDfuIf`, and `Block` to `RtsUsbDeviceDownloadTest`:** `kTransferSize`, `kDfuIf`, and `DownloadRecorder` are placed above `RtsUsbDeviceStatusTest` even though they are only used by `RtsUsbDeviceDownloadTest` (at line 662). Moving `kTransferSize` and `kDfuIf` directly above `RtsUsbDeviceDownloadTest` and storing `std::vector\u003cBlock\u003e blocks_;` directly on `RtsUsbDeviceDownloadTest` eliminates the extra `DownloadRecorder` wrapper struct (`rec_.blocks` -\u003e `blocks_`):\n\n```cpp\nclass RtsUsbDeviceStatusTest : public ::testing::Test {\n```\n\nAnd at line 661:\n\n```cpp\nconstexpr uint16_t kTransferSize \u003d 4;\nconstexpr int kDfuIf \u003d 1;\n\n/* Opened device with a DFU interface advertising kTransferSize. */\nclass RtsUsbDeviceDownloadTest : public RtsUsbDeviceDfuTest {\n    protected:\n\tstruct Block {\n\t\tuint16_t number;\n\t\tstd::vector\u003cuint8_t\u003e data;\n\t};\n...\n\tstd::vector\u003cBlock\u003e blocks_;\n};\n```\n\nOther locations in this file:\n- **Line 480** (`RtsUsbDeviceStatusTest::SetUp`)\n- **Line 534** (`PollIdleWaitsThroughBusyStates`)\n- **Line 548** (`PollIdleDecodes24BitLittleEndianPollTimeout`)\n- **Line 560** (`PollIdleUsesMinimumDelayForZeroPollTimeout`)\n- **Line 583** (`PollIdleTimesOutAtExactBoundary`)\n- **Line 594** (`PollIdleSucceedsOnLastPollBeforeTimeout`)\n- **Lines 662–718** (`RtsUsbDeviceDownloadTest`)\n\n[🔗](http://go/tj/229ca942-b01d-4680-85b2-9a3f6134aa4b)",
+      "range": {
+        "startLine": 459,
+        "startChar": 0,
+        "endLine": 471,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
