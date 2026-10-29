@@ -29,6 +29,10 @@ The [project configuration](project_config.md) documentation details the steps
 required to create a new Chromebook program (reference board) and for creating a
 new project variant.
 
+The [Zephyr Project Best Practices](zephyr_project_best_practices.md) guide
+outlines architectural best practices, GPIO ownership principles, and common
+pitfalls when bringing up or extending Zephyr EC programs.
+
 The [Zephyr New Board Checklist](zephyr_new_board_checklist.md) links to the
 documentation needed to configure individual EC features.
 

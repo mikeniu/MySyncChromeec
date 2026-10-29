@@ -15,6 +15,11 @@ projects and for modifying/maintaining existing Zephyr EC projects.
 
 ## How to use this document
 
+Before configuring individual features, review the [Zephyr Project Best
+Practices](zephyr_project_best_practices.md) for architectural guidelines on
+avoiding board-specific C code, managing GPIO driver ownership, and structuring
+devicetrees.
+
 The following sections detail a single feature set that needs modification for
 your board design. Each feature set can be implemented with a reasonably sized
 change list, and can be worked on independently.

@@ -67,6 +67,7 @@
 
 ## Zephyr
 
+*   [Zephyr Project Best Practices](./zephyr/zephyr_project_best_practices.md)
 *   [Zephyr New Board Checklist](./zephyr/zephyr_new_board_checklist.md)
 *   [Building Zephyr OS](./zephyr/zephyr_build.md)
 *   [Initialization Order](./zephyr/zephyr_init.md)

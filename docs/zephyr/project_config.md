@@ -15,6 +15,10 @@ The goals of the project organization include:
 * Define the set of files required by each project.
 * Define the best practices for devicetrees.
 
+See also the [Zephyr Project Best Practices](zephyr_project_best_practices.md)
+guide for detailed architectural patterns and review guidelines for programs
+and variants.
+
 
 ### Glossary
 
