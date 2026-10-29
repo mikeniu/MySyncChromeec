@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "55552edc0debe8005f8bfbf0a5029a1d02abfa2b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ee3c2cb_f9924c49",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-29T09:01:07Z",
+      "side": 1,
+      "message": "Won\u0027t this be a problem while cherry-picking to ec-legacy?",
+      "revId": "55552edc0debe8005f8bfbf0a5029a1d02abfa2b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
