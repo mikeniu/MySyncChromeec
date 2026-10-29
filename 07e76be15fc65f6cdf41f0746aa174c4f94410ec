@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68cb0a5b_3e724074",
+        "filename": "zephyr/Kconfig.defaults-arm",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-29T17:34:05Z",
+      "side": 1,
+      "message": "The [ITE SHI backend](https://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/third_party/zephyrproject/zephyr/subsys/mgmt/ec_host_cmd/backends/ec_host_cmd_backend_shi_ite.c;l\u003d566;drc\u003d4e219fc5b089300a44495c3e604fb8a4fe5ab09a) requires CONFIG_PM_DEVICE_RUNTIME.\n\nShould this also have `default y if EC_HOST_CMD_BACKEND_SHI_ITE`?",
+      "range": {
+        "startLine": 30,
+        "startChar": 14,
+        "endLine": 30,
+        "endChar": 42
+      },
+      "revId": "07e76be15fc65f6cdf41f0746aa174c4f94410ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
