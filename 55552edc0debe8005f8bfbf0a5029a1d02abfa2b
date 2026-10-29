@@ -33,6 +33,24 @@
       "message": "Won\u0027t this be a problem while cherry-picking to ec-legacy?",
       "revId": "55552edc0debe8005f8bfbf0a5029a1d02abfa2b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41c68683_6ba3d47d",
+        "filename": "common/host_command_task.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-29T16:46:26Z",
+      "side": 1,
+      "message": "`main` and `ec-legacy` have forked and are no longer enforcing shared code, except where required by fingerprint copybot (`host_command_task.c` is not included). If backported, `k_is_in_isr` would be replaced with `in_interrupt_context`.",
+      "parentUuid": "4ee3c2cb_f9924c49",
+      "revId": "55552edc0debe8005f8bfbf0a5029a1d02abfa2b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
