@@ -34,6 +34,24 @@
       "parentUuid": "fea8e496_bd0ea010",
       "revId": "3320f191bec97f1b033fdf5844ee827c810a8e6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac81a1ba_fbb2be14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-29T21:29:40Z",
+      "side": 1,
+      "message": "Ugh... Can you file a bug about this? We\u0027re going to end up causing bugs if these two drift out of sync.",
+      "parentUuid": "906be0a0_d153f114",
+      "revId": "3320f191bec97f1b033fdf5844ee827c810a8e6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
