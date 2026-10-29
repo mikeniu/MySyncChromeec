@@ -25,6 +25,18 @@ class RtsUsbBackend {
 	/** Close the device and destroy the context. Safe to call twice. */
 	virtual void close() = 0;
 
+	/** True while a device is open. */
+	virtual bool is_open() const = 0;
+
+	/**
+	 * Issue a control transfer.
+	 * Returns the number of bytes transferred or a negative libusb error.
+	 */
+	virtual int control_transfer(uint8_t request_type, uint8_t request,
+				     uint16_t value, uint16_t index,
+				     uint8_t *data, uint16_t length,
+				     unsigned int timeout_ms) = 0;
+
 	/** Name of a negative libusb error code, for diagnostics. */
 	virtual const char *error_name(int error) const = 0;
 };

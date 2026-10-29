@@ -84,3 +84,47 @@ void RtsUsbDevice::release()
 {
 	backend_->close();
 }
+
+bool RtsUsbDevice::enable_download()
+{
+	if (!backend_->is_open())
+		return false;
+
+	/*
+	 * bmRequestType = 0x80: Device-to-host, Standard, Device
+	 * bRequest = kRtsStdGetStatus (0x1A)
+	 * wValue = 0, wIndex = 0
+	 */
+	uint8_t status = 0;
+	int ret = backend_->control_transfer(
+		kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, &status, sizeof(status),
+		kUsbCtrlTimeoutMs);
+
+	if (ret < static_cast<int>(sizeof(status))) {
+		fprintf(stderr, "Error: GET_STATUS failed: %s\n",
+			ret < 0 ? backend_->error_name(ret) : "short read");
+		return false;
+	}
+
+	if (status == 0) {
+		/*
+		 * bmRequestType = 0x00: Host-to-device, Standard, Device
+		 * bRequest = kRtsStdSetStatus (0x1B)
+		 * wValue = kRtsEnableDownloadMode, wIndex = 0
+		 */
+		ret = backend_->control_transfer(
+			kBmReqH2dStdDev, kRtsStdSetStatus, kRtsEnableDownloadMode, 0,
+			nullptr, 0, kUsbCtrlTimeoutMs);
+
+		if (ret < 0) {
+			fprintf(stderr, "Error: SET_STATUS failed: %s\n",
+				backend_->error_name(ret));
+			return false;
+		}
+		printf("Download mode enabled on device.\n");
+	} else {
+		printf("Download mode already active (status = %d).\n", status);
+	}
+
+	return true;
+}

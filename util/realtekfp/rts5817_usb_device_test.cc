@@ -18,8 +18,10 @@ namespace
 
 using ::testing::_;
 using ::testing::AnyNumber;
+using ::testing::DoAll;
 using ::testing::InSequence;
 using ::testing::Return;
+using ::testing::SetArgPointee;
 using ::testing::StrictMock;
 using ::testing::Test;
 
@@ -146,6 +148,83 @@ TEST_F(RtsUsbDeviceTest, WaitForDeviceFailsWhenLibusbInitFails)
 	EXPECT_CALL(*backend_, init()).WillOnce(Return(-1));
 
 	EXPECT_FALSE(device_->wait_for_device(kVid, kPid, kTimeoutMs, kPollIntervalMs));
+}
+
+TEST_F(RtsUsbDeviceTest, EnableDownloadRequiresOpenDevice)
+{
+	EXPECT_CALL(*backend_, is_open()).WillOnce(Return(false));
+	EXPECT_CALL(*backend_, control_transfer(_, _, _, _, _, _, _)).Times(0);
+
+	EXPECT_FALSE(device_->enable_download());
+}
+
+TEST_F(RtsUsbDeviceTest, EnableDownloadSendsSetStatusWhenInactive)
+{
+	InSequence seq;
+
+	EXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,
+				    sizeof(uint8_t), kUsbCtrlTimeoutMs))
+		.WillOnce(DoAll(SetArgPointee<4>(0), Return(1)));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dStdDev, kRtsStdSetStatus,
+				    kRtsEnableDownloadMode, 0, nullptr, 0,
+				    kUsbCtrlTimeoutMs))
+		.WillOnce(Return(0));
+
+	EXPECT_TRUE(device_->enable_download());
+}
+
+TEST_F(RtsUsbDeviceTest, EnableDownloadSkipsSetStatusWhenAlreadyActive)
+{
+	EXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,
+				    sizeof(uint8_t), kUsbCtrlTimeoutMs))
+		.WillOnce(DoAll(SetArgPointee<4>(1), Return(1)));
+
+	EXPECT_TRUE(device_->enable_download());
+}
+
+TEST_F(RtsUsbDeviceTest, EnableDownloadFailsOnGetStatusError)
+{
+	EXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,
+				    sizeof(uint8_t), kUsbCtrlTimeoutMs))
+		.WillOnce(Return(-1));
+
+	EXPECT_FALSE(device_->enable_download());
+}
+
+TEST_F(RtsUsbDeviceTest, EnableDownloadFailsOnGetStatusShortRead)
+{
+	EXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,
+				    sizeof(uint8_t), kUsbCtrlTimeoutMs))
+		.WillOnce(Return(0));
+
+	EXPECT_FALSE(device_->enable_download());
+}
+
+TEST_F(RtsUsbDeviceTest, EnableDownloadFailsOnSetStatusError)
+{
+	InSequence seq;
+
+	EXPECT_CALL(*backend_, is_open()).WillOnce(Return(true));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqD2hStdDev, kRtsStdGetStatus, 0, 0, _,
+				    sizeof(uint8_t), kUsbCtrlTimeoutMs))
+		.WillOnce(DoAll(SetArgPointee<4>(0), Return(1)));
+	EXPECT_CALL(*backend_,
+		    control_transfer(kBmReqH2dStdDev, kRtsStdSetStatus,
+				    kRtsEnableDownloadMode, 0, nullptr, 0,
+				    kUsbCtrlTimeoutMs))
+		.WillOnce(Return(-1));
+
+	EXPECT_FALSE(device_->enable_download());
 }
 
 TEST_F(RtsUsbDeviceTest, ReleaseClosesBackend)

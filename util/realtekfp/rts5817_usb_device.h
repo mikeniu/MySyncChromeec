@@ -15,6 +15,25 @@
 
 #include "rts5817_usb_backend.h"
 
+/* RTS5817 vendor-specific USB control requests (same as rtsflash.py) */
+inline constexpr uint8_t kRtsStdGetStatus = 0x1A;
+inline constexpr uint8_t kRtsStdSetStatus = 0x1B;
+/* wValue for kRtsStdSetStatus: enable download mode */
+inline constexpr uint16_t kRtsEnableDownloadMode = 1;
+
+/*
+ * Pre-computed bmRequestType values (raw uint8_t values per USB spec).
+ * Avoids -Wdeprecated-enum-enum-conversion when OR'ing different libusb
+ * enum types.
+ *   0x80 = Device-to-host, Standard, Device
+ *   0x00 = Host-to-device, Standard, Device
+ */
+inline constexpr uint8_t kBmReqD2hStdDev = 0x80;
+inline constexpr uint8_t kBmReqH2dStdDev = 0x00;
+
+/* USB I/O timeouts */
+inline constexpr unsigned int kUsbCtrlTimeoutMs = 1000;
+
 class RtsUsbDevice {
     public:
 	using SleepFn = std::function<void(int)>;
@@ -42,6 +61,9 @@ class RtsUsbDevice {
 
 	/** Release USB resources. */
 	void release();
+
+	/** Enable DFU download mode via vendor control request. */
+	bool enable_download();
 
     private:
 	static void default_sleep_ms(int ms);
