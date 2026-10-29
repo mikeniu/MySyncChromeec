@@ -383,7 +383,7 @@ TEST(RtsErrorTest, ToStringCoversAllValues) {
   for (RtsError error :
        {RtsError::kDeviceNotFound, RtsError::kAccessDenied, RtsError::kUsbError,
         RtsError::kInvalidParameter, RtsError::kTimeout, RtsError::kStall,
-        RtsError::kProtocolError}) {
+        RtsError::kProtocolError, RtsError::kNoDfuInterface}) {
     EXPECT_NE(ToString(error), "Unknown error");
   }
 }
@@ -396,6 +396,7 @@ constexpr uint8_t kDfuVersionLo = 0x10;  // bcdDFUVersion 1.10
 constexpr uint8_t kDfuVersionHi = 0x01;
 // Length of the DFU 1.1 functional descriptor, which adds bcdDFUVersion.
 constexpr uint8_t kDfu11DescLen = 9;
+constexpr uint8_t kHidClass = 0x03;
 
 // A DFU 1.1 functional descriptor advertising the given wTransferSize.
 std::vector<uint8_t> DfuFuncDesc(uint16_t transfer_size) {
@@ -501,6 +502,158 @@ TEST(ParseDfuTransferSizeTest, ZeroTransferSizeUsesDefault) {
 
 TEST(ParseDfuTransferSizeTest, DecodesLittleEndianTransferSize) {
   EXPECT_EQ(ParseDfuTransferSize(DfuFuncDesc(0x1234)), 0x1234);
+}
+
+// Fixture with an opened device, for the DFU interface tests.
+class RtsUsbDeviceDfuTest : public RtsUsbDeviceTest {
+ protected:
+  RtsUsbInterface DfuInterface(int number, uint16_t transfer_size) {
+    return {
+        .number = number,
+        .usb_class = kDfuClass,
+        .usb_subclass = kDfuSubclass,
+        .extra = DfuFuncDesc(transfer_size),
+    };
+  }
+
+  void ExpectInterfaces(std::vector<RtsUsbInterface> interfaces) {
+    EXPECT_CALL(*backend_, IsOpen()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*backend_, GetInterfaces()).WillOnce(Return(interfaces));
+  }
+};
+
+TEST_F(RtsUsbDeviceDfuTest, DetachRejectsTimeoutThatDoesNotFitInWValue) {
+  EXPECT_CALL(*backend_, GetInterfaces()).Times(0);
+  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);
+
+  for (milliseconds timeout : {milliseconds(-1), milliseconds(65536)}) {
+    auto res = device_->DfuDetach(timeout);
+
+    ASSERT_FALSE(res);
+    EXPECT_EQ(res.error(), RtsError::kInvalidParameter);
+  }
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachAcceptsTheLargestTimeout) {
+  ExpectInterfaces({DfuInterface(2, 2048)});
+  EXPECT_CALL(*backend_, ClaimInterface(2))
+      .WillOnce(Return(std::expected<void, int>{}));
+  EXPECT_CALL(*backend_, ControlTransferOut(kBmReqH2dClsIf, kDfuDetach, 65535,
+                                            2, IsEmpty(), kUsbCtrlTimeout))
+      .WillOnce(Return(std::expected<size_t, int>(0)));
+  EXPECT_CALL(*backend_, ReleaseInterface(2));
+
+  EXPECT_TRUE(device_->DfuDetach(milliseconds(65535)));
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachRequiresOpenDevice) {
+  EXPECT_CALL(*backend_, IsOpen()).WillRepeatedly(Return(false));
+  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _)).Times(0);
+
+  auto res = device_->DfuDetach(milliseconds(1000));
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachFailsWhenConfigDescriptorUnavailable) {
+  EXPECT_CALL(*backend_, IsOpen()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*backend_, GetInterfaces()).WillOnce(Return(std::unexpected(-1)));
+  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _)).Times(0);
+
+  auto res = device_->DfuDetach(milliseconds(1000));
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kUsbError);
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachFailsWithoutDfuInterface) {
+  ExpectInterfaces({
+      RtsUsbInterface{
+          .number = 0,
+          .usb_class = kHidClass,
+          .usb_subclass = kDfuSubclass,
+      },
+  });
+  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _)).Times(0);
+
+  auto res = device_->DfuDetach(milliseconds(1000));
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kNoDfuInterface);
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachRequiresMatchingClassAndSubclass) {
+  RtsUsbInterface wrong_subclass = DfuInterface(1, 1024);
+
+  wrong_subclass.usb_subclass = kDfuSubclass + 1;
+  ExpectInterfaces({wrong_subclass});
+
+  auto res = device_->DfuDetach(milliseconds(1000));
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kNoDfuInterface);
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachClaimsInterfaceAroundRequest) {
+  InSequence seq;
+
+  ExpectInterfaces({RtsUsbInterface{.number = 0}, DfuInterface(2, 2048)});
+  EXPECT_CALL(*backend_, ClaimInterface(2))
+      .WillOnce(Return(std::expected<void, int>{}));
+  EXPECT_CALL(*backend_, ControlTransferOut(kBmReqH2dClsIf, kDfuDetach, 1234, 2,
+                                            IsEmpty(), kUsbCtrlTimeout))
+      .WillOnce(Return(std::expected<size_t, int>(0)));
+  EXPECT_CALL(*backend_, ReleaseInterface(2));
+
+  EXPECT_TRUE(device_->DfuDetach(milliseconds(1234)));
+  EXPECT_EQ(device_->transfer_size(), 2048);
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachFailsWhenClaimFails) {
+  ExpectInterfaces({DfuInterface(2, 2048)});
+  EXPECT_CALL(*backend_, ClaimInterface(2))
+      .WillOnce(Return(std::unexpected(kUsbErrorAccess)));
+  EXPECT_CALL(*backend_, ReleaseInterface(_)).Times(0);
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _)).Times(0);
+
+  auto res = device_->DfuDetach(milliseconds(1000));
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kAccessDenied);
+}
+
+TEST_F(RtsUsbDeviceDfuTest, DetachReleasesInterfaceOnTransferError) {
+  InSequence seq;
+
+  ExpectInterfaces({DfuInterface(0, 1024)});
+  EXPECT_CALL(*backend_, ClaimInterface(0))
+      .WillOnce(Return(std::expected<void, int>{}));
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _))
+      .WillOnce(Return(std::unexpected(kUsbErrorPipe)));
+  EXPECT_CALL(*backend_, ReleaseInterface(0));
+
+  auto res = device_->DfuDetach(milliseconds(1000));
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kStall);
+}
+
+TEST_F(RtsUsbDeviceDfuTest, ReleaseForgetsFoundInterface) {
+  ExpectInterfaces({DfuInterface(3, 2048)});
+  EXPECT_CALL(*backend_, ClaimInterface(3))
+      .WillOnce(Return(std::expected<void, int>{}));
+  EXPECT_CALL(*backend_, ControlTransferOut(_, _, _, _, _, _))
+      .WillOnce(Return(std::expected<size_t, int>(0)));
+  EXPECT_CALL(*backend_, ReleaseInterface(3));
+  ASSERT_TRUE(device_->DfuDetach(milliseconds(1000)));
+  ASSERT_EQ(device_->transfer_size(), 2048);
+
+  device_->Release();
+  EXPECT_EQ(device_->transfer_size(), kDfuDefaultTransferSize);
 }
 
 }  // namespace
