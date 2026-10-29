@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78b54232_8fd71dd1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: dropped the \"and\" from the subject and removed the series-narration paragraph. The libusb backend is now compiled by the test binary in this change. Not split into separate CLs, see the patchset-level thread.",
+      "parentUuid": "df1b5d1b_3cdfeb3c",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 9999
+      },
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "625d1c3c_ff3bb35a",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:**\n  * **`timeout_ms \u003d\u003d 0` Boundary Bug (`util/rts5817_usb_device.cc`, line 56):** `wait_for_device()` checks `if (timeout_ms \u003c 0 || poll_interval_ms \u003c\u003d 0)`, which allows `timeout_ms \u003d\u003d 0` through. Because the polling loop condition is `for (int waited \u003d 0; waited \u003c timeout_ms; ...)`, passing `timeout_ms \u003d\u003d 0` still releases existing resources and calls `backend_-\u003einit()`, executes zero `open()` attempts, and immediately fails. Check `timeout_ms \u003c\u003d 0` up front.\n  * **Device Handle Leak on Repeated `open()` (`util/rts5817_libusb_backend.cc`, lines 19–26):** Unlike `RtsLibusbBackend::init()`, `RtsLibusbBackend::open()` overwrites `dev_handle_` without closing an already-open handle if called again before `close()`.\n  * **Uncompiled Source Files (`util/build.mk`, lines 50–61):** `util/rts5817_libusb_backend.h` and `util/rts5817_libusb_backend.cc` are added in this CL, but `util/build.mk` only compiles `rts5817_usb_device.o` and `rts5817_usb_device_test.o`, leaving `rts5817_libusb_backend.{h,cc}` uncompiled by `make BOARD\u003dhost utils-test` and `make BOARD\u003dhost utils-host`.\n* **Architecture \u0026 Component Fit:**\n  * Introducing `RtsUsbBackend` and `MockRtsUsbBackend` cleanly decouples `RtsUsbDevice` from physical `libusb` hardware and aligns well with sibling host utilities in `util/` (such as `util/elan`). However, `RtsLibusbBackend` should be introduced in the CL that wires `rts5817_libusb_backend.o` into `util/build.mk` so it is compiled in the commit that adds it.\n* **Code Simplicity:**\n  * The control flow in `RtsUsbDevice::init()`, `wait_for_device()`, `release()`, and `enable_download()` is concise and direct, with injectable `SleepFn` avoiding real-time sleeps in unit tests.\n* **Idiomaticity \u0026 Readability:**\n  * **Header Constants (`util/rts5817_usb_device.h`, lines 19–35):** Use `inline constexpr` for namespace-scope constants defined in headers so they share a single definition across translation units.\n  * **Namespace Qualifications \u0026 Named Test Constants (`util/rts5817_usb_device_test.cc`):** Keep leading `::` on `using` declarations at namespace scope and drop redundant `::testing::` prefixes inside class and test bodies; extract the repeated `1000` and `100` polling intervals into named constants (`kTimeoutMs`, `kPollIntervalMs`).\n* **Security:**\n  * `enable_download()` properly checks `ret \u003c static_cast\u003cint\u003e(sizeof(status))` on `GET_STATUS` before reading `status`.\n* **Testing:**\n  * **Error-Path `close()` Verification Masked by Destructor (`util/rts5817_usb_device_test.cc`, lines 65–73, 107–116, 200–205):** Because `~RtsUsbDevice()` calls `release()` -\u003e `backend_-\u003eclose()` at teardown, `Times(AtLeast(2))` in `InitReleasesWhenDeviceNotFound` and `Times(AtLeast(1))` in `ReleaseClosesBackend` would still pass even if the failure-path `release()` in `init()` or `device_-\u003erelease()` in the test body were deleted, and `WaitForDeviceTimesOut` does not verify `close()` on timeout. Use `InSequence` with exact `close()` counts.\n  * **Missing `timeout_ms \u003d\u003d 0` Boundary Case (`util/rts5817_usb_device_test.cc`, lines 118–123):** Add `timeout_ms \u003d\u003d 0` to `WaitForDeviceRejectsInvalidIntervals` and assert `EXPECT_CALL(*backend_, init()).Times(0)`.\n  * **Wildcard Matchers on Deterministic Control Transfer Arguments (`util/rts5817_usb_device_test.cc`, lines 158–198):** Specify the exact expected control-transfer parameters in the remaining `EnableDownload*` tests rather than wildcard `_` matchers.\n* **CL Size \u0026 Scope:**\n  * This CL has `Size: L (+590, -0)`, consisting of **343 lines of production code** (`rts5817_usb_backend.h`: 44, `rts5817_libusb_backend.h`: 34, `rts5817_libusb_backend.cc`: 60, `rts5817_usb_device.h`: 75, `rts5817_usb_device.cc`: 130), **13 lines of build rules** (`util/build.mk`), and **234 lines of test/mock code** (`rts5817_mock_usb_backend.h`: 27, `rts5817_usb_device_test.cc`: 207). Because the non-test production diff exceeds the 250-line limit (`343 \u003e\u003d 250`) and bundles three distinct logical components (`RtsUsbDevice` lifecycle, RTS5817 vendor download-mode control, and an uncompiled `RtsLibusbBackend`), please split this CL:\n    1. **CL 1:** Add `RtsUsbBackend` (`init`, `open`, `close`, `error_name`), `MockRtsUsbBackend`, `RtsUsbDevice` lifecycle management (`init`, `wait_for_device`, `release`), lifecycle unit tests in `util/rts5817_usb_device_test.cc`, and `util/build.mk` (~185 non-test lines).\n    2. **CL 2:** Add `is_open()` and `control_transfer()` to `RtsUsbBackend`/`MockRtsUsbBackend`, RTS5817 vendor download-mode control (`enable_download()` and request constants), and the `EnableDownload*` unit tests (~75 non-test lines).\n    3. **CL 3:** Add `RtsLibusbBackend` (`util/rts5817_libusb_backend.h` and `util/rts5817_libusb_backend.cc`, ~94 lines) and wire `rts5817_libusb_backend.o` into `util/build.mk` (or fold it into the `rts5817_flash` CLI CL where `rts5817_libusb_backend.o` is linked).\n* **Commit Message:**\n  * Avoid joining multiple responsibilities with `\" and \"` in the subject line and remove the patch-series staging narration in the third paragraph. See the inline comment on `/COMMIT_MSG` for copy-pasteable commit messages.\n\n[🔗](http://go/tj/594e9a3e-3b69-40fd-bca9-90bbce87b9e8)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e5ce9b8_1aaa8f02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7 for the code and test items: timeout_ms \u003c\u003d 0 is rejected up front, RtsLibusbBackend::open() closes an existing handle, header constants are inline constexpr, tests use InSequence with exact close() counts, named kTimeoutMs/kPollIntervalMs, a timeout_ms \u003d\u003d 0 case and exact control-transfer matchers.\n\nNot done: splitting this CL into three. The backend, the lifecycle and the download-mode request are already stacked on the following changes, and splitting further would add more churn than review value, so I kept them together. Leaving this open for you to decide.",
+      "parentUuid": "625d1c3c_ff3bb35a",
       "revId": "203d28a7ad466b185837684827c698dc303160dc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf498156_c83a2689",
+        "filename": "util/build.mk",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: rts5817_libusb_backend.o is now linked into rts5817_flash_test, so the backend sources are compiled and linked in this change. Kept in this CL rather than moved to a later one to avoid a large conflict in the stack.",
+      "parentUuid": "8d60918d_25786d97",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 9999
+      },
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40c11bec_5ca937dd",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76652950_a1a626e9",
+        "filename": "util/rts5817_libusb_backend.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: open() now closes an already-open handle before opening a new one.",
+      "parentUuid": "40c11bec_5ca937dd",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 9999
+      },
       "revId": "203d28a7ad466b185837684827c698dc303160dc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a302d1e_c179534f",
+        "filename": "util/rts5817_usb_device.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: wait_for_device() now rejects timeout_ms \u003c\u003d 0 before touching the backend.",
+      "parentUuid": "3ff2c70d_38c996b3",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 9999
+      },
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd269e6c_713eb637",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84c226b7_653ab1b8",
+        "filename": "util/rts5817_usb_device.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: header constants are now inline constexpr.",
+      "parentUuid": "fd269e6c_713eb637",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
       "revId": "203d28a7ad466b185837684827c698dc303160dc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -170,6 +308,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d349d363_51d982be",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: using declarations keep the leading ::testing::, the redundant prefixes inside tests are dropped, and the polling arguments use kTimeoutMs and kPollIntervalMs.",
+      "parentUuid": "4d8d4283_7c569963",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 9999
+      },
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad7191de_d94777ef",
@@ -195,6 +357,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e5a722f_9f6fc4de",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: the failure-path tests use InSequence with exact close() counts, ReleaseClosesBackend expects Times(2), and WaitForDeviceRejectsInvalidIntervals covers timeout_ms \u003d\u003d 0 and asserts init() is never called.",
+      "parentUuid": "ad7191de_d94777ef",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 123,
+        "endChar": 9999
+      },
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a410a20_20f541b4",
@@ -216,6 +402,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b367a32c_a9ac93c5",
+        "filename": "util/rts5817_usb_device_test.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-29T08:51:28Z",
+      "side": 1,
+      "message": "Done in ps7: the remaining EnableDownload* tests now match the exact control-transfer arguments, using _ only for the status output pointer.",
+      "parentUuid": "8a410a20_20f541b4",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 198,
+        "endChar": 9999
+      },
       "revId": "203d28a7ad466b185837684827c698dc303160dc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
