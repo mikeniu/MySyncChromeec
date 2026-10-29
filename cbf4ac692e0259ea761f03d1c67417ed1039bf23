@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b9364760_af0d9884",
+        "filename": "zephyr/program/dougie/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1551907
+      },
+      "writtenOn": "2026-10-29T17:00:58Z",
+      "side": 1,
+      "message": "I will take a look at this.",
+      "parentUuid": "ae39ac0c_1a228613",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 66
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4ee45b2_8af84aa3",
         "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
         "patchSetId": 1
