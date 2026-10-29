@@ -31,6 +31,7 @@ enum class RtsError {
   kTimeout,
   kStall,
   kProtocolError,
+  kNoDfuInterface,
 };
 
 inline std::string_view ToString(RtsError error) {
@@ -49,6 +50,8 @@ inline std::string_view ToString(RtsError error) {
       return "The device stalled the request";
     case RtsError::kProtocolError:
       return "Unexpected response from the device";
+    case RtsError::kNoDfuInterface:
+      return "No DFU interface found on the device";
   }
   return "Unknown error";
 }
@@ -76,6 +79,11 @@ inline constexpr uint16_t kRtsEnableDownloadMode = 1;
 inline constexpr uint8_t kBmReqD2hStdDev = 0x80;
 inline constexpr uint8_t kBmReqH2dStdDev = 0x00;
 inline constexpr uint8_t kBmReqD2hVendorDev = 0xC0;
+
+// DFU class-specific requests (bmRequestType = 0x21 or 0xA1).
+enum class DfuRequest : uint8_t {
+  kDetach = 0x00,
+};
 
 // DFU_GETSTATUS response: bStatus, bwPollTimeout[3], bState, iString.
 inline constexpr size_t kDfuGetStatusResponseLen = 6;
@@ -123,6 +131,13 @@ inline constexpr size_t kDfuDescTypeOff = 1;
 inline constexpr size_t kDfuDescXferSizeOff = 5;
 inline constexpr size_t kDfuDescMinLen = kDfuDescXferSizeOff + sizeof(uint16_t);
 
+// DFU class/subclass/protocol codes.
+inline constexpr uint8_t kDfuClass = 0xFE;
+inline constexpr uint8_t kDfuSubclass = 0x01;
+
+// bmRequestType: 0x21 = Host-to-device, Class, Interface.
+inline constexpr uint8_t kBmReqH2dClsIf = 0x21;
+
 // USB I/O timeouts.
 inline constexpr std::chrono::milliseconds kUsbCtrlTimeout{1000};
 
@@ -134,6 +149,12 @@ inline constexpr uint16_t kDfuDefaultTransferSize = 4096;
 // DFU interface descriptor. Returns kDfuDefaultTransferSize if there is no
 // valid DFU functional descriptor or if it reports a zero transfer size.
 uint16_t ParseDfuTransferSize(std::span<const uint8_t> extra);
+
+// The DFU interface of a device and the transfer size it advertises.
+struct DfuInterfaceInfo {
+  int number = 0;
+  uint16_t transfer_size = kDfuDefaultTransferSize;
+};
 
 class RtsUsbDevice {
  public:
@@ -169,7 +190,50 @@ class RtsUsbDevice {
   // DFU_DETACH.
   std::expected<void, RtsError> EnableDownload();
 
+  // Sends DFU_DETACH to transition the device from Runtime mode to DFU mode.
+  // After this call the device re-enumerates; close the handle, wait, and
+  // re-open before issuing DFU_DOWNLOAD. `detach_timeout` is the time the
+  // device waits before detaching.
+  // It is sent in a 16-bit field, so it must fit in 65535 ms.
+  std::expected<void, RtsError> DfuDetach(
+      std::chrono::milliseconds detach_timeout);
+
  private:
+  // Claims an interface for the lifetime of the object, so every return path
+  // releases it.
+  class InterfaceClaim {
+   public:
+    InterfaceClaim(RtsUsbBackend& backend, int interface_number)
+        : backend_(backend), interface_number_(interface_number) {}
+    InterfaceClaim(const InterfaceClaim&) = delete;
+    InterfaceClaim& operator=(const InterfaceClaim&) = delete;
+    ~InterfaceClaim() {
+      if (claimed_) {
+        backend_.ReleaseInterface(interface_number_);
+      }
+    }
+
+    // Claims the interface; fails with the libusb error code.
+    std::expected<void, int> Claim() {
+      auto res = backend_.ClaimInterface(interface_number_);
+
+      claimed_ = res.has_value();
+      return res;
+    }
+
+   private:
+    RtsUsbBackend& backend_;
+    int interface_number_;
+    bool claimed_ = false;
+  };
+
+  // Finds the DFU interface and parses the DFU functional descriptor.
+  std::expected<DfuInterfaceInfo, RtsError> FindDfuInterface();
+
+  // Sends a zero-length class request to `interface`.
+  std::expected<void, RtsError> DfuSendRequest(DfuRequest request,
+                                               uint16_t value, int interface);
+
   std::unique_ptr<RtsUsbBackend> backend_;
   SleepFn sleep_;
 };

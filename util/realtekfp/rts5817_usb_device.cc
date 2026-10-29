@@ -5,6 +5,7 @@
 
 #include "rts5817_usb_device.h"
 
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <chrono>
@@ -13,6 +14,7 @@
 #include <print>
 #include <span>
 #include <utility>
+#include <vector>
 
 namespace realtekfp {
 
@@ -170,6 +172,39 @@ std::expected<void, RtsError> RtsUsbDevice::EnableDownload() {
   return {};
 }
 
+std::expected<void, RtsError> RtsUsbDevice::DfuDetach(
+    std::chrono::milliseconds detach_timeout) {
+  // wValue is 16 bits wide.
+  if (detach_timeout < std::chrono::milliseconds::zero() ||
+      detach_timeout > std::chrono::milliseconds(UINT16_MAX)) {
+    return std::unexpected(RtsError::kInvalidParameter);
+  }
+
+  // DFU_DETACH tells the device to switch from Runtime mode to DFU mode. The
+  // device responds by re-enumerating on the USB bus.
+  auto info = FindDfuInterface();
+  if (!info) {
+    return std::unexpected(info.error());
+  }
+
+  // An interface-recipient request needs the interface claimed (which also
+  // detaches any kernel driver); otherwise usbfs warns and may return EBUSY.
+  InterfaceClaim claim(*backend_, info->number);
+  if (auto claimed = claim.Claim(); !claimed) {
+    return Fail(*backend_, "Claiming the DFU interface", claimed.error());
+  }
+
+  if (auto res = DfuSendRequest(DfuRequest::kDetach,
+                                static_cast<uint16_t>(detach_timeout.count()),
+                                info->number);
+      !res) {
+    return res;
+  }
+
+  std::println("DFU_DETACH sent.  Waiting for re-enumeration...");
+  return {};
+}
+
 uint16_t ParseDfuTransferSize(std::span<const uint8_t> extra) {
   // Walk the descriptor stream. The DFU functional descriptor has type 0x21
   // and contains wTransferSize at byte offset 5-6.
@@ -193,6 +228,38 @@ uint16_t ParseDfuTransferSize(std::span<const uint8_t> extra) {
   return kDfuDefaultTransferSize;
 }
 
+std::expected<DfuInterfaceInfo, RtsError> RtsUsbDevice::FindDfuInterface() {
+  if (!backend_->IsOpen()) {
+    return std::unexpected(RtsError::kDeviceNotFound);
+  }
+
+  auto interfaces = backend_->GetInterfaces();
+
+  if (!interfaces) {
+    return Fail(*backend_, "Reading the config descriptor", interfaces.error());
+  }
+
+  // Walk all interfaces and alternate settings.
+  const auto it =
+      std::ranges::find_if(*interfaces, [](const RtsUsbInterface& alt) {
+        return alt.usb_class == kDfuClass && alt.usb_subclass == kDfuSubclass;
+      });
+
+  if (it == interfaces->end()) {
+    std::println(stderr, "Error: no DFU interface found on device.");
+    return std::unexpected(RtsError::kNoDfuInterface);
+  }
+
+  const DfuInterfaceInfo info = {
+      .number = it->number,
+      .transfer_size = ParseDfuTransferSize(it->extra),
+  };
+
+  std::println("DFU transfer size: {} bytes", info.transfer_size);
+  std::println("DFU interface found: #{}", info.number);
+  return info;
+}
+
 DfuStatusResponse DfuStatusResponse::FromBytes(
     std::span<const uint8_t, kDfuGetStatusResponseLen> raw) {
   const uint32_t poll_timeout_ms =
@@ -205,6 +272,21 @@ DfuStatusResponse DfuStatusResponse::FromBytes(
       .poll_timeout = std::chrono::milliseconds(poll_timeout_ms),
       .state = static_cast<DfuState>(raw[kDfuStateOff]),
   };
+}
+
+std::expected<void, RtsError> RtsUsbDevice::DfuSendRequest(DfuRequest request,
+                                                           uint16_t value,
+                                                           int interface) {
+  // bmRequestType = 0x21: Host-to-Device, Class, Interface
+  // wIndex = interface number
+  auto res = backend_->ControlTransferOut(
+      kBmReqH2dClsIf, std::to_underlying(request), value,
+      static_cast<uint16_t>(interface), {}, kUsbCtrlTimeout);
+
+  if (!res) {
+    return Fail(*backend_, "A DFU request", res.error());
+  }
+  return {};
 }
 
 }  // namespace realtekfp
