@@ -3,6 +3,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f8433aae_4051cf62",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:07:10Z",
+      "side": 1,
+      "message": "`_rts5817_flash_bin` adds `--libs libusb-1.0` to `HOST_LDFLAGS` without adding `--cflags libusb-1.0` to `HOST_CXXFLAGS`:\n```makefile\n$(_rts5817_flash_bin): HOST_CXXFLAGS+\u003d$(shell $(HOST_PKG_CONFIG) \\\n\t--cflags libusb-1.0)\n```\nWhen building `ec-utils` / `ec-devutils` in Portage against a target board sysroot (`HOST_PKG_CONFIG`), omitting `--cflags libusb-1.0` breaks header resolution when `libusb-1.0` is not installed in the default host include path (compare `util/elan/build.mk`, `util/egis/build.mk`, and `util/focaltech/build.mk`).\n\nAlso consider adding `-fvisibility\u003dhidden` to `HOST_CXXFLAGS` on both `_rts5817_flash_bin` and `_rts5817_test_bin` (matching `util/egis/build.mk` and `util/focaltech/build.mk`).",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "83720b3b_71d7cb1f",
         "filename": "util/realtekfp/rts5817_flash.cc",
         "patchSetId": 5
@@ -36,6 +60,102 @@
         "startLine": 41,
         "startChar": 0,
         "endLine": 44,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5981de2b_3d82774f",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:07:10Z",
+      "side": 1,
+      "message": "Two pre-flight validation bugs before opening the USB device:\n1. **Malformed `-p` falls back to flashing `0BDA:5817` (lines 70–77)**: If the user explicitly specifies `-p` with a typo (e.g., `-p 0BDA-5817`), printing a warning and proceeding to flash default `0BDA:5817` risks flashing the wrong device. An unparseable explicit `-p` argument must fail immediately with `EXIT_FAILURE`.\n2. **Empty payload checked too late (lines 64–68)**: If the image is 0 bytes or contains only a 16-byte DFU suffix (`firmware.empty()` after `strip_dfu_suffix()`), `main()` still opens the device, enables download mode, detaches it into DFU mode (`0BDA:5800`), waits for re-enumeration, and only then fails inside `dfu_download()` — leaving the hardware in DFU mode. Please reject an empty payload right after `strip_dfu_suffix()` before touching USB.",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fabe15c_05951fb3",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:07:10Z",
+      "side": 1,
+      "message": "`rts5817_flash` currently cannot recover or flash an RTS5817 that is already in DFU mode (`0BDA:5800`, e.g., after an interrupted update):\n1. Without `-p`, it only looks for runtime PID `0x5817` and fails immediately when the chip is enumerated as `0BDA:5800`.\n2. Even with `-p 0BDA:5800`, `main()` unconditionally calls `enable_download()` — which sends `0x1A` (`GET_FW_STATUS`), a request the RTS5817 `STALL`s whenever it is already in DFU mode — followed by `dfu_detach()`, which resets a DFU-mode device *out* of DFU mode rather than entering it.\n\nPlease:\n- When `-p` is not specified and `0BDA:5817` is absent, also check for `0BDA:5800` (`kRts5817DfuPid`).\n- Whenever the opened device is already `0BDA:5800`, skip `enable_download()`, `dfu_detach()`, and `wait_for_device()`, and proceed straight to `dfu_download()`.",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d441b8bb_b3a3db17",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:07:10Z",
+      "side": 1,
+      "message": "The commit message notes *\"DFU download completes and the device boots the new image\"*, but without a post-manifest `DFU_DETACH` (see comment on `rts5817_usb_device.cc:449-452` in CL 8629987), the RTS5817 stays enumerated in DFU mode (`0BDA:5800`) after `dfu_download()` returns.\n\nPlease ensure post-manifest `DFU_DETACH` is sent (either inside `dfu_download()` or right after it here), and consider polling `wait_for_device(vid, kRts5817Pid, ...)` afterward to confirm the device re-enumerated into runtime mode (`0BDA:5817`).",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a058e59_f3a55fcf",
+        "filename": "util/realtekfp/rts5817_libusb_backend.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:07:10Z",
+      "side": 1,
+      "message": "`libusb_open_device_with_vid_pid()` returns `nullptr` for both \"device not present\" and `LIBUSB_ERROR_ACCESS` (e.g., running without root or when udev rules cover `0BDA:5817` but omit `0BDA:5800`), causing `init()` to report `\"device not found\"` and `wait_for_device()` to poll for the full 10 s timeout.\n\nWith `open()` returning `std::expected\u003cvoid, int\u003e`, please enumerate with `libusb_get_device_list()` + `libusb_open()` (like `util/elan/libusb_backend.cc`) so `LIBUSB_ERROR_ACCESS` vs. `LIBUSB_ERROR_NO_DEVICE` is preserved and surfaced immediately.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 31,
         "endChar": 9999
       },
       "isAi": true,
