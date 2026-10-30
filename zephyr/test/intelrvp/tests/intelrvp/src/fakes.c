@@ -22,8 +22,8 @@ DEFINE_FAKE_VALUE_FUNC(int, ioex_init, int);
 DEFINE_FAKE_VALUE_FUNC(int, clock_get_freq);
 DEFINE_FAKE_VOID_FUNC(keyboard_raw_drive_column, int);
 DEFINE_FAKE_VALUE_FUNC(int, keyboard_raw_read_rows);
-
-#if defined(CONFIG_AP_PWRSEQ_S0IX)
-DEFINE_FAKE_VALUE_FUNC(int, x86_non_dsx_mtl_s0ix_run, void *);
-#endif /* CONFIG_AP_PWRSEQ_S0IX */
 #endif /* CONFIG_TEST_PROJECT_PTLRVP_MCHP */
+
+#if defined(CONFIG_AP_PWRSEQ_S0IX) && !defined(CONFIG_X86_NON_DSX_PWRSEQ_MTL)
+DEFINE_FAKE_VALUE_FUNC(int, x86_non_dsx_mtl_s0ix_run, void *);
+#endif /* CONFIG_AP_PWRSEQ_S0IX && !CONFIG_X86_NON_DSX_PWRSEQ_MTL */

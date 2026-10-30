@@ -225,3 +225,66 @@ tests:
       - CONFIG_AP_EVENTS=n
       - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
       - CONFIG_EMUL_PDC_TPS6699X=n
+
+  intelrvp.ocelotrvp_ite: &ocelotrvp_ite
+    extra_dtc_overlay_files:
+      - ../../program/ocelot/ocelotrvp-ite/native_sim.overlay
+    extra_conf_files:
+      - ../../program/ocelot/program.conf
+      - ../../program/ocelot/rvp_program.conf
+      - ../../program/ocelot/dsp_comms.conf
+      - ../../program/ocelot/ocelotrvp-ite/project.conf
+      - ../../program/native_sim.conf
+      - ../../program/ocelot/native_sim.conf
+
+  intelrvp.ocelotrvp_ite.board_power:
+    <<: *ocelotrvp_ite
+    extra_configs: &ocelotrvp_board_power_configs
+      - CONFIG_TEST_PROJECT_MTL_BOARD_POWER=y
+      - CONFIG_X86_NON_DSX_PWRSEQ_MTL=n
+      - CONFIG_EMUL_AP_PWRSEQ_DRIVER=n
+      - CONFIG_AP_EVENTS=n
+
+  intelrvp.ocelotrvp_ite.dc_jack.max_power:
+    <<: *ocelotrvp_ite
+    extra_configs: &ocelotrvp_max_power_configs
+      - CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW=30000
+
+  intelrvp.ocelotrvp_ite.pd_runtime_no_pdc:
+    <<: *ocelotrvp_ite
+    extra_configs: &ocelotrvp_no_pdc_configs
+      - CONFIG_EMUL_PDC_RTS54=n
+      - CONFIG_EMUL_PDC_TPS6699X=n
+
+  intelrvp.ocelotrvp_ite.pd_runtime_no_runtime_pdc:
+    <<: *ocelotrvp_ite
+    extra_configs: &ocelotrvp_no_runtime_pdc_configs
+      - CONFIG_EMUL_PDC_RTS54=n
+      - CONFIG_EMUL_PDC_TPS6699X=y
+
+  intelrvp.ocelotrvp_npcx: &ocelotrvp_npcx
+    extra_dtc_overlay_files:
+      - ../../program/ocelot/ocelotrvp-npcx/native_sim.overlay
+    extra_conf_files:
+      - ../../program/ocelot/program.conf
+      - ../../program/ocelot/rvp_program.conf
+      - ../../program/ocelot/dsp_comms.conf
+      - ../../program/ocelot/ocelotrvp-npcx/project.conf
+      - ../../program/native_sim.conf
+      - ../../program/ocelot/native_sim.conf
+
+  intelrvp.ocelotrvp_npcx.board_power:
+    <<: *ocelotrvp_npcx
+    extra_configs: *ocelotrvp_board_power_configs
+
+  intelrvp.ocelotrvp_npcx.dc_jack.max_power:
+    <<: *ocelotrvp_npcx
+    extra_configs: *ocelotrvp_max_power_configs
+
+  intelrvp.ocelotrvp_npcx.pd_runtime_no_pdc:
+    <<: *ocelotrvp_npcx
+    extra_configs: *ocelotrvp_no_pdc_configs
+
+  intelrvp.ocelotrvp_npcx.pd_runtime_no_runtime_pdc:
+    <<: *ocelotrvp_npcx
+    extra_configs: *ocelotrvp_no_runtime_pdc_configs

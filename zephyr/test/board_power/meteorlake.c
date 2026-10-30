@@ -46,6 +46,27 @@ void board_ap_power_force_shutdown(void)
 
 int mock_power_signal_set_ap_force_shutdown(enum power_signal signal, int value)
 {
+#if CONFIG_TEST_AP_PWRSEQ_DEASSERT_PWROK
+	if (power_signal_set_fake.call_count == 1) {
+		zassert_true(signal == PWR_PCH_PWROK && value == 0,
+			     "First call signal: %d, value: %d", signal, value);
+		return 0;
+	} else if (power_signal_set_fake.call_count == 2) {
+		zassert_true(signal == PWR_EC_PCH_SYS_PWROK && value == 0,
+			     "Second call signal: %d, value: %d", signal,
+			     value);
+		return 0;
+	} else if (power_signal_set_fake.call_count == 3) {
+		zassert_true(signal == PWR_EC_PCH_RSMRST && value == 1,
+			     "Third call signal: %d, value: %d", signal, value);
+		return 0;
+	} else if (power_signal_set_fake.call_count == 4) {
+		zassert_true(signal == PWR_EN_PP3300_A && value == 0,
+			     "Fourth call signal: %d, value: %d", signal,
+			     value);
+		return 0;
+	}
+#else
 	if (power_signal_set_fake.call_count == 1) {
 		zassert_true(signal == PWR_EC_PCH_RSMRST && value == 1,
 			     "First call signal: %d, value: %d", signal, value);
@@ -64,6 +85,7 @@ int mock_power_signal_set_ap_force_shutdown(enum power_signal signal, int value)
 		return 0;
 	}
 #endif
+#endif /* CONFIG_TEST_AP_PWRSEQ_DEASSERT_PWROK */
 
 	zassert_unreachable(
 		"Wrong input received. power_signal_set_fake.call_count: %d, "
@@ -229,7 +251,9 @@ ZTEST_USER(board_power, test_board_ap_power_force_shutdown)
 	board_ap_power_force_shutdown();
 
 	k_msleep(100);
-#if CONFIG_TEST_AP_PWRSEQ_PP5500
+#if CONFIG_TEST_AP_PWRSEQ_DEASSERT_PWROK
+	zassert_equal(4, power_signal_set_fake.call_count);
+#elif CONFIG_TEST_AP_PWRSEQ_PP5500
 	zassert_equal(3, power_signal_set_fake.call_count);
 #else
 	zassert_equal(2, power_signal_set_fake.call_count);
@@ -256,7 +280,9 @@ ZTEST_USER(board_power, test_board_ap_power_force_shutdown_timeout)
 
 	zassert_true((end_ms - start_ms) >=
 		     X86_NON_DSX_MTL_FORCE_SHUTDOWN_TO_MS);
-#if CONFIG_TEST_AP_PWRSEQ_PP5500
+#if CONFIG_TEST_AP_PWRSEQ_DEASSERT_PWROK
+	zassert_equal(power_signal_set_fake.call_count, 4);
+#elif CONFIG_TEST_AP_PWRSEQ_PP5500
 	zassert_equal(power_signal_set_fake.call_count, 3);
 #else
 	zassert_equal(power_signal_set_fake.call_count, 2);
