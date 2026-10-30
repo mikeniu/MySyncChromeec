@@ -39,6 +39,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0706dd04_74f422e8",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T02:14:47Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "0dd7ad3a_3950c366",
+      "revId": "9574d1afa04f4337a57461ae971297e0a66271a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7828833_a9b4e35e",
         "filename": "zephyr/shim/src/host_command.c",
         "patchSetId": 6
@@ -50,6 +68,24 @@
       "writtenOn": "2026-10-26T22:01:00Z",
       "side": 1,
       "message": "`ec_host_cmd_user_cb()` is invoked by `ec_host_cmd_rx_notify()` from ISR context across the hardware backends (eSPI, SHI, SPI, UART) before `k_sem_give(\u0026hc-\u003erx_ready)` wakes `ec_host_cmd_thread()`. Calling `k_sleep()` here will panic on `__ASSERT(!arch_is_in_isr())`.",
+      "revId": "9574d1afa04f4337a57461ae971297e0a66271a3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31106e6a_e2a906ff",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T02:14:47Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "e7828833_a9b4e35e",
       "revId": "9574d1afa04f4337a57461ae971297e0a66271a3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
