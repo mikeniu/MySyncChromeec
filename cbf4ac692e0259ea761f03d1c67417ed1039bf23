@@ -122,6 +122,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "41ce9f57_6d5c9fb4",
+        "filename": "zephyr/program/dougie/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-30T20:23:15Z",
+      "side": 1,
+      "message": "I\u0027m fine with landing this as is, but create a bug for adding AP_POWER_EVENT support to the QCOM driver and a TODO here.",
+      "parentUuid": "ff254ff5_77d0ffde",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 66
+      },
+      "revId": "cbf4ac692e0259ea761f03d1c67417ed1039bf23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4ee45b2_8af84aa3",
         "filename": "zephyr/program/dougie/src/dp_alt_mode.c",
         "patchSetId": 1
