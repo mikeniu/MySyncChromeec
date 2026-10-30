@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd642136_d1423d0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:40:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/36340e2d-906c-4eaa-b7e0-7ac181039052)]\n\n### Review Summary\n- **Functionality:** ✅ `RtsUsbDevice::dfu_download` properly validates non-empty firmware and DFU interface availability, detaches any active kernel driver, claims and releases the DFU interface across all completion and error paths, checks for short control transfers, polls `dfu_poll_idle()` after each block and after the manifest zero-length packet, and clears error status on transfer failure.\n- **Architecture \u0026 Component Fit:** ✅ Routing DFU download operations through `RtsUsbBackend` cleanly decouples the USB DFU protocol state machine from `libusb` and integrates with the existing `RtsUsbDevice` helpers.\n- **Code Simplicity:** ✅ Control flow in `RtsUsbDevice::dfu_download` and the `RtsUsbDeviceDownloadTest` fixture is concise and free of redundant state or duplicated setup.\n- **Idiomaticity \u0026 Readability:** ✅ Constants (`kDfuDownload`, `kDfuProgressStepPct`), types, and C++ constructs follow codebase conventions.\n- **Security:** ✅ Bounds, chunk sizes, and short-transfer return values are properly validated before advancing buffer offsets.\n- **Testing:** ✅ Thorough GoogleTest coverage in `RtsUsbDeviceDownloadTest` exercising chunking boundaries (`\u003c kTransferSize`, `\u003d\u003d kTransferSize`, `kTransferSize + 1`, and exact multiples), trailing ZLP, empty firmware, closed device, missing DFU interface, kernel driver detach failure, claim failure, transfer error and short write recovery (`DFU_CLRSTATUS` + release), poll failure, and manifest non-idle handling.\n- **CL Size \u0026 Scope:** ✅ `Size: L (+372, -0)` (130 production lines across `rts5817_usb_device.h` and `rts5817_usb_device.cc`, plus 242 unit test lines in `rts5817_usb_device_test.cc`). Represents a single cohesive logical change with comprehensive unit tests.\n- **Commit Message:** ✅ Accurately and concisely summarizes the motivation and high-level change.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
