@@ -10,6 +10,9 @@ cpu:
 rtc:
     wakeupTimerFrequency: 32000
 
+nvic:
+    systickFrequency: 96000000
+
 timer2:
     frequency: 96000000
 
