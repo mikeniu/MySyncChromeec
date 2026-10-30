@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "898588bd_26e3bd58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:04:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality:** ✅ Capturing `__get_IPSR()` into `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` via `CORTEX_PANIC_SYS_REG_LIST` properly records the active fault exception number when `panic_data_write_esf()` runs in handler mode, while preserving the stacked `esf-\u003ebasic.xpsr` in `cm.frame[CORTEX_PANIC_FRAME_REGISTER_PSR]`. Updating `docs/panic_data.md` matches the updated `PANIC_REG_LIST` print order.\n* **Architecture \u0026 Component Fit:** ✅ Extending `PANIC_REG_LIST` with `PANIC_SYS_REG` / `CORTEX_PANIC_SYS_REG_LIST` and `_VAL` macro variants cleanly integrates live CMSIS system register reads alongside ESF field copies in `zephyr/shim/src/panic.c` without changing the `struct panic_data` binary layout.\n* **Code Simplicity:** ✅ The macro definitions (`PANIC_SYS_REG`, `CORTEX_PANIC_SYS_REG_LIST`, `PANIC_COPY_REGS_VAL`, and `PANIC_PRINT_REGS_VAL`) and test additions are concise and minimal.\n* **Idiomaticity \u0026 Readability:** ✅ Uses standard CMSIS intrinsics (`__get_IPSR()`), existing `CORTEX_PANIC_FRAME_REGISTER_PSR` and `CORTEX_PANIC_REGISTER_IPSR` enum constants, and appropriate `CONFIG_CPU_CORTEX_M` guards.\n* **Security:** ✅ No security concerns.\n* **Testing:** ✅ Covered by unit test assertions in `zephyr/test/drivers/panic/src/panic.c` (`test_panic_data_write_esf`, verifying that `cm.frame[CORTEX_PANIC_FRAME_REGISTER_PSR]` receives `esf.basic.xpsr` while `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` receives `__get_IPSR()`) and on-device fault test coverage in `zephyr/test/hwtest/src/panic.c` (`test_panic_data`).\n* **CL Size \u0026 Scope:** ✅ `Size: M (+46, -7)`. Single, focused logical change fixing Cortex-M `IPSR` capture in panic data along with its documentation and test updates.\n* **Commit Message:** ✅ Clear, accurate summary and rationale explaining why the stacked `xPSR` reported exception `0` for thread-mode faults and how `__get_IPSR()` resolves it. [[trajectory](https://goto.corp.google.com/traj/eca5f14d-f673-4e39-bc7c-8f29f562de73)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4abbf6a92967b5a96cedd60a3cf40254985c973d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
