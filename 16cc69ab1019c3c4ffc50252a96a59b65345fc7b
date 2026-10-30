@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "16cc69ab1019c3c4ffc50252a96a59b65345fc7b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4af39b12_1312aea3",
+        "filename": "zephyr/test/drivers/isl9241/src/isl9241.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-30T18:42:23Z",
+      "side": 1,
+      "message": "`test_restart_charge_voltage_when_full` previously mocked `charge_manager_get_active_charge_port()` so `led_pwr_get_state()` would see an active charge port. Since `led_pwr_get_state()` now calls `charge_manager_get_active_charge_port_no_lock()`, set `charge_port` directly instead.",
+      "revId": "16cc69ab1019c3c4ffc50252a96a59b65345fc7b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
