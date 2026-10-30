@@ -37,6 +37,41 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1d156e88_4e7e2bee",
+        "filename": "zephyr/program/ocelot/coolum/coolum_vif.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-10-30T05:50:05Z",
+      "side": 1,
+      "message": "We could remove this and later on partner could initiate the VIF matched their design when start running the compliance.",
+      "parentUuid": "993be175_95edfa73",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d67741c4_e892581c",
+        "filename": "zephyr/program/ocelot/coolum/project.conf",
+        "patchSetId": 14
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-10-30T05:50:05Z",
+      "side": 1,
+      "message": "coolum",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0825b4e3_be1345d3",
         "filename": "zephyr/program/ocelot/coolum/project.conf",
         "patchSetId": 14
@@ -48,6 +83,24 @@
       "writtenOn": "2026-10-30T03:49:10Z",
       "side": 1,
       "message": "Shall this be remove ?",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf1427ce_c27f9a1f",
+        "filename": "zephyr/program/ocelot/coolum/project.conf",
+        "patchSetId": 14
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-10-30T05:50:05Z",
+      "side": 1,
+      "message": "It should be removed.",
+      "parentUuid": "0825b4e3_be1345d3",
       "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
