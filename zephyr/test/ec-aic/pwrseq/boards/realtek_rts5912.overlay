@@ -51,7 +51,8 @@
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "PP5000_S5 enable output";
 		enum-name = "PWR_EN_PP5000_A";
-		gpios = <RTS5912_GPIO060 0>;
+		/* MECC Pin 55 (EC_DS3 / MECC_EN_S5_RAILS) */
+		gpios = <RTS5912_GPIO053 0>;
 		output;
 	};
 
@@ -68,7 +69,13 @@
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "PCH_PWROK output to PCH";
 		enum-name = "PWR_PCH_PWROK";
-		gpios = <RTS5912_GPIO127 0>;
+		/*
+		 * TODO(b/580052406): Canonical MECC Pin 30 (PCH_PWROK_EC,
+		 * RTS5912_GPIO127) does not propagate to Dagwood PI00 on
+		 * current hardware. Route via MECC Pin 145 (C_EN_PP5000_TYPEA,
+		 * RTS5912_GPIO123 -> Dagwood PI05) until resolved.
+		 */
+		gpios = <RTS5912_GPIO123 0>;
 		output;
 	};
 
