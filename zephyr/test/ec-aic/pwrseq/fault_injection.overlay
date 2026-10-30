@@ -1,0 +1,14 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	common-pwrseq {
+		/* Violate tPCH03 (< 10 ms): deassert RSMRST# after only 1 ms */
+		rsmrst-delay = <1>;
+		/* Violate tPLT04 (< 1 ms), tPCH08 (< 1 ms), and tPLT05 (< 10 ms) */
+		sys-pwrok-delay = <0>;
+		pch-pwrok-delay = <0>;
+	};
+};
