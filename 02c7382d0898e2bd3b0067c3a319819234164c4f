@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8829fef3_1ce1cd24",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:10:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality:** ✅ Replacing `\u003e sizeof(...)` with `\u003e\u003d ARRAY_SIZE(...)` for `adverts`, `adv_params`, and `scans` in `command_ble_hci_adv()` properly restricts `adv`, `p`, and `scan_rsp` to valid element indices (`[0, 1]`).\n* **Architecture \u0026 Component Fit:** ✅ Input bounds validation is co-located where console arguments are parsed in `command_ble_hci_adv()`, and the host unit test configuration in `common/build.mk`, `test/build.mk`, and `test/test_config.h` follows standard ChromiumOS EC conventions.\n* **Code Simplicity:** ✅ Both the bounds check fix and the unit test in `test/btle_hci_controller.c` are minimal and direct.\n* **Idiomaticity \u0026 Readability:** ✅ Uses `ARRAY_SIZE(...)` for array bounds checks and standard `TEST_EQ` / `RUN_TEST` macros in the unit test.\n* **Security:** ✅ Prevents out-of-bounds pointer and length reads from `adverts`, `adv_params`, `scans`, `adv_lengths`, and `scan_lengths` when handling `ble_hci_adv` console arguments.\n* **Testing:** ✅ `test/btle_hci_controller.c` thoroughly exercises valid boundary indices (`0` and `1`), negative values (`-1`), the exact upper boundary (`2`), above-boundary values (`3`), and non-numeric inputs across `adv`, `p`, and `scan_rsp`.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+200, -3)` (4 production lines changed, ~196 test lines). Single, cohesive logical change fixing the `command_ble_hci_adv()` bounds checks and adding its unit test.\n* **Commit Message:** ✅ Clear, concise explanation of the problem and fix with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/4e21aaff-cc0c-493c-96b0-06442c9bced4)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "02c7382d0898e2bd3b0067c3a319819234164c4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
