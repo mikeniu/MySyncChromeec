@@ -22,6 +22,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fc740b89_d152693e",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:37Z",
+      "side": 1,
+      "message": "`dfu_detach()` sends an interface-recipient control transfer (`kBmReqH2dClsIf \u003d 0x21`, `wIndex \u003d dfu_interface_`) without detaching any active kernel driver or claiming `dfu_interface_` first.\n\nOn Linux (`usbfs` `check_ctrlrecip()`), issuing an interface-targeted control transfer on an unclaimed interface logs a kernel warning (`usbfs: process ... did not claim interface ... before use`) and fails with `LIBUSB_ERROR_BUSY` (`-EBUSY`) if a kernel driver is bound to that interface.\n\nPlease call `detach_kernel_driver()` and `claim_interface()` before sending `DFU_DETACH` and `release_interface()` afterward (e.g., via a small RAII guard shared with `dfu_download()`). Note that doing so also means the backend hooks in https://crrev.com/c/8687499 should move before (or squash into) this CL.",
+      "range": {
+        "startLine": 143,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7d5cde84_9537a851",
         "filename": "util/realtekfp/rts5817_usb_device.h",
         "patchSetId": 3
