@@ -387,12 +387,25 @@ void check_battery_soc_change(struct batt_params batt)
 	}
 }
 
+#ifndef CONFIG_CHARGER
+static struct batt_params batt_cache;
+
+test_mockable const struct batt_params *charger_current_battery_params(void)
+{
+	return &batt_cache;
+}
+#endif
+
 void battery_poll_dynamic_info(void)
 {
 	const struct batt_params *batt;
 	bool ac_present;
 	bool is_charging;
 	bool charger_idle = false;
+
+#ifndef CONFIG_CHARGER
+	battery_get_params(&batt_cache);
+#endif
 
 	batt = charger_current_battery_params();
 	ac_present = extpower_is_present();
