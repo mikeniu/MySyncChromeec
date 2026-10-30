@@ -28,6 +28,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "983ddf37_20c12993",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:22:47Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "864b8874_26318153",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 9999
+      },
+      "revId": "db94295ff68a9a6dc8558f5dcfb4f2f3202ef2a9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bd8ee0da_5ad1541f",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 6
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:** ✅ The two consecutive `IT83XX_GCTRL_WNCKR` (65.536 kHz) writes in `dma_flash_fsce_high()` guarantee at least one full clock period (~15.25 us) before driving `FSCE#` high, and keeping `FSCE#` asserted (`cmd_end \u003d 0`) while polling `IT83XX_SMFI_ECINDDR` with a `WNCKR` delay between reads in `dma_flash_cmd_read_status()` matches the hardware follow-mode status polling sequence in Zephyr.\n* **Architecture \u0026 Component Fit:** ✅ The changes stay within the `.flash_direct_map` RAM-code layer in `chip/it83xx/flash.c` and align `ec-legacy` with the corresponding Zephyr IT8xxx2 flash driver (`ramcode_flash_fsce_high()` and `ramcode_flash_cmd_read_status()`).\n* **Code Simplicity:** ✅ Removing the single-element `status[1]` buffer and repeated `dma_flash_transaction()` calls in `dma_flash_cmd_read_status()` simplifies the polling loop.\n* **Idiomaticity \u0026 Readability:** ✅ Register accesses and comments follow the conventions in `chip/it83xx/flash.c`.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ✅ These changes control low-level IT83xx MMIO bus-stall timing (`IT83XX_GCTRL_WNCKR`) and physical SPI chip-select (`FSCE#`) signaling inside `.flash_direct_map` RAM code, which requires physical hardware verification.\n* **CL Size \u0026 Scope:** ❌ `Size: S (+14, -8)`. Although the line delta is small, this CL bundles two independent logical changes in `chip/it83xx/flash.c` that can each be committed and reverted on their own:\n  1. **CL 1 (`chip/it83xx/flash.c`, `dma_flash_fsce_high`, lines 203–208):** Add two consecutive `IT83XX_GCTRL_WNCKR` writes before driving `FSCE#` high so the last SPI byte is latched before chip select is deasserted.\n  2. **CL 2 (`chip/it83xx/flash.c`, `dma_flash_cmd_read_status`, lines 248–262):** Keep `FSCE#` asserted after sending `FLASH_CMD_RS`, poll `IT83XX_SMFI_ECINDDR` with a `IT83XX_GCTRL_WNCKR` delay between reads instead of toggling `FSCE#` and resending `FLASH_CMD_RS` on each iteration, and drive `FSCE#` high at the end of the transaction.\n* **Commit Message:** ❌ Please replace the `In chip/it83xx/flash.c:` prefix and numbered list (`1.`, `2.`) with concise prose paragraphs (see inline comment on `/COMMIT_MSG` for copy-pasteable replacements). [🔗](http://go/tj/48e7138f-8604-40c8-9a6f-0fe9e644f941)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "db94295ff68a9a6dc8558f5dcfb4f2f3202ef2a9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15592398_0b250d3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:22:47Z",
+      "side": 1,
+      "message": "Code updated in PS7; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "bd8ee0da_5ad1541f",
       "revId": "db94295ff68a9a6dc8558f5dcfb4f2f3202ef2a9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
