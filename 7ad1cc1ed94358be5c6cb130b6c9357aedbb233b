@@ -127,6 +127,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a4e775cf_cf1bfc78",
+        "filename": "common/fpsensor/fpsensor_led.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-30T12:08:10Z",
+      "side": 1,
+      "message": "\u003e It adds complexity\n\nTrue, but I don\u0027t think it adds that much complexity. Or I\u0027m missing something? What\u0027s your opinion on this?",
+      "parentUuid": "2f2c6099_f05d52bb",
+      "revId": "7ad1cc1ed94358be5c6cb130b6c9357aedbb233b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a3fa709_35b63116",
         "filename": "zephyr/program/fpmcu/em32f967/fp_led.dtsi",
         "patchSetId": 4
