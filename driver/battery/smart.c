@@ -505,6 +505,8 @@ void battery_get_params(struct batt_params *batt)
 	if (batt_new.is_present != BP_YES) {
 		batt->is_present = BP_NO;
 		batt->flags = BATT_FLAG_BAD_ANY;
+		batt->design_voltage = 0;
+		batt->design_capacity = 0;
 		return;
 	}
 #endif
@@ -542,8 +544,18 @@ void battery_get_params(struct batt_params *batt)
 		batt_new.flags |= BATT_FLAG_BAD_STATUS;
 
 	/* If any of those reads worked, the battery is responsive */
-	if ((batt_new.flags & BATT_FLAG_BAD_ANY) != BATT_FLAG_BAD_ANY)
+	if ((batt_new.flags & BATT_FLAG_BAD_ANY) != BATT_FLAG_BAD_ANY) {
 		batt_new.flags |= BATT_FLAG_RESPONSIVE;
+
+		if (batt_new.design_voltage == 0)
+			battery_design_voltage(&batt_new.design_voltage);
+
+		if (batt_new.design_capacity == 0)
+			battery_design_capacity(&batt_new.design_capacity);
+	} else {
+		batt_new.design_voltage = 0;
+		batt_new.design_capacity = 0;
+	}
 
 #ifdef CONFIG_BATTERY_MEASURE_IMBALANCE
 	if (battery_imbalance_mv() > CONFIG_BATTERY_MAX_IMBALANCE_MV)

@@ -117,6 +117,8 @@ struct batt_params {
 	int desired_current; /* Charging current desired by battery (mA) */
 	int remaining_capacity; /* Remaining capacity in mAh */
 	int full_capacity; /* Capacity in mAh (might change occasionally) */
+	int design_capacity; /* Design capacity in mAh */
+	int design_voltage; /* Design voltage in mV */
 	int display_charge; /* Display charge in 10ths of a % (1000=100.0%) */
 	int status; /* Battery status */
 	enum battery_present is_present; /* Is the battery physically present */

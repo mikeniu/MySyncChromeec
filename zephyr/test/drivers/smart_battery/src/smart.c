@@ -284,7 +284,7 @@ ZTEST_USER(smart_battery, test_battery_time_at_rate)
 ZTEST_USER(smart_battery, test_battery_get_params)
 {
 	struct sbat_emul_bat_data *bat;
-	struct batt_params batt;
+	struct batt_params batt = { 0 };
 	const struct emul *emul = EMUL_DT_GET(BATTERY_NODE);
 	struct i2c_common_emul_data *common_data =
 		emul_smart_battery_get_i2c_common_data(emul);
@@ -299,6 +299,8 @@ ZTEST_USER(smart_battery, test_battery_get_params)
 	batt.flags = 0;
 	battery_get_params(&batt);
 	zassert_equal(flags, batt.flags, "0x%x != 0x%x", flags, batt.flags);
+	zassert_true(batt.design_voltage > 0);
+	zassert_true(batt.design_capacity > 0);
 
 	/* Fail state of charge read; want charge cannot be set */
 	i2c_common_emul_set_read_fail_reg(common_data,
@@ -377,6 +379,16 @@ ZTEST_USER(smart_battery, test_battery_get_params)
 	batt.flags = 0;
 	battery_get_params(&batt);
 	zassert_equal(flags, batt.flags, "0x%x != 0x%x", flags, batt.flags);
+	zassert_equal(batt.design_voltage, 0);
+	zassert_equal(batt.design_capacity, 0);
+
+	/* Restore reads and verify repopulation */
+	i2c_common_emul_set_read_fail_reg(common_data,
+					  I2C_COMMON_EMUL_NO_FAIL_REG);
+	batt.flags = 0;
+	battery_get_params(&batt);
+	zassert_true(batt.design_voltage > 0);
+	zassert_true(batt.design_capacity > 0);
 
 	/* Use default handler, everything should be ok */
 	i2c_common_emul_set_read_fail_reg(common_data,
