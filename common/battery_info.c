@@ -423,6 +423,11 @@ void battery_poll_dynamic_info(void)
 #endif
 }
 
+test_mockable const struct battery_static_info *battery_get_static_info(void)
+{
+	return &battery_static[BATT_IDX_MAIN];
+}
+
 int update_static_battery_info(void)
 {
 	int batt_serial;

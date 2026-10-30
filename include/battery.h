@@ -587,6 +587,13 @@ bool battery_is_below_threshold(const struct batt_params *batt,
 void battery_poll_dynamic_info(void);
 
 /**
+ * Get cached static battery information for the main battery.
+ *
+ * @return Pointer to static battery info structure.
+ */
+const struct battery_static_info *battery_get_static_info(void);
+
+/**
  * Read static battery info from a main battery and store it in a cache.
  *
  * @return EC_SUCCESS or EC_ERROR_*.

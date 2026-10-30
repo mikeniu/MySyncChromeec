@@ -37,6 +37,9 @@ ZTEST(host_cmd_battery_info, test_get_static__v0)
 	/* Validate all of the fields */
 	struct battery_static_info *batt = &battery_static[0];
 
+	zassert_equal(battery_get_static_info(),
+		      &battery_static[BATT_IDX_MAIN]);
+
 	zassert_equal(batt->design_capacity, response.design_capacity);
 	zassert_equal(batt->design_voltage, response.design_voltage);
 	zassert_equal(batt->cycle_count, response.cycle_count);
