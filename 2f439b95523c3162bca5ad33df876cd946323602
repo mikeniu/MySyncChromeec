@@ -52,6 +52,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e1e89aa7_3a6dc631",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:01:05Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "6e31992e_aded1d6c",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ec57a0ea_4da39927",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
