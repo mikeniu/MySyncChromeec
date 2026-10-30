@@ -49,6 +49,7 @@ static void simulate_seconds(int seconds)
 /* Test environment initialization */
 static void reset_battery_state(void)
 {
+	mock_batt.is_present = BP_YES;
 	mock_batt.current = -1000;
 	mock_batt.voltage = 10000;
 	mock_batt.flags = 0;
