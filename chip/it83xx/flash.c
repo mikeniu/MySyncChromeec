@@ -200,6 +200,12 @@ void FLASH_DMA_CODE dma_flash_fsce_high(void)
 {
 	/* FSCE# high level */
 	IT83XX_SMFI_ECINDAR1 = 0xFE;
+	/*
+	 * Perform 2 consecutive writes to WNCKR (65.536 kHz) to ensure a
+	 * minimum 15 us delay before driving FSCE# high.
+	 */
+	IT83XX_GCTRL_WNCKR = 0;
+	IT83XX_GCTRL_WNCKR = 0;
 	IT83XX_SMFI_ECINDDR = 0x00;
 }
 
