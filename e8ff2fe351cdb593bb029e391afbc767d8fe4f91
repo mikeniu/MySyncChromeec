@@ -1,0 +1,70 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "997cdf07_e65443b2",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:03Z",
+      "side": 1,
+      "message": "Please return `std::expected\u003cvoid, int\u003e` for consistency with the rest of `RtsUsbBackend`.",
+      "isAi": true,
+      "revId": "e8ff2fe351cdb593bb029e391afbc767d8fe4f91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef63b650_68facbf1",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:03Z",
+      "side": 1,
+      "message": "Mixing `unsigned int` (`kUsbDfuTimeoutMs`), `int` (`timeout`, `slept`, `remaining_ms`), and `uint32_t` (`poll_timeout`) here triggers a `-Wsign-conversion` warning on `std::min\u003cuint32_t\u003e(poll_timeout, remaining_ms)` (`remaining_ms` is signed `int`).\n\nRepresenting `kUsbDfuTimeout`, `kDfuMinPollDelay` (`rts5817_usb_device.h:61, 81`), `slept`, and the decoded 24-bit `poll_timeout` as `std::chrono::milliseconds` lets you write `std::min(poll_timeout, remaining)` directly with no casts or signed/unsigned mixing.",
+      "range": {
+        "startLine": 303,
+        "startChar": 0,
+        "endLine": 311,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "e8ff2fe351cdb593bb029e391afbc767d8fe4f91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cfc386b_4ef815a0",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:03Z",
+      "side": 1,
+      "message": "Returning `std::expected\u003cuint8_t, RtsError\u003e` (or a small `DfuStatus` struct) from `dfu_poll_idle()` and `std::expected\u003cvoid, RtsError\u003e` from `dfu_clear_status()` lets callers and tests see the actual terminal DFU `bState` / `bStatus` (e.g., `errNOTDONE` vs. `errADDRESS` vs. USB transport failure) instead of collapsing all failures into `false`.",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "e8ff2fe351cdb593bb029e391afbc767d8fe4f91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
