@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c44b2972_e6677f80",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-30T15:11:25Z",
+      "side": 1,
+      "message": "Done. The pending bit is in odr_event_required, so motion_sense_stop_sensor() now clears it. It was harmless as you said, since the task skips inactive sensors and re-init queues a new bit anyway, but it\u0027s cleaner this way. Also added a check in the unit test.",
+      "parentUuid": "8b727e8e_6701c765",
+      "range": {
+        "startLine": 367,
+        "startChar": 0,
+        "endLine": 367,
+        "endChar": 0
+      },
+      "revId": "4a813af2a7276cf2db1f705b31a7aff348532b14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "031a24f6_d2b92186",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-19T21:35:41Z",
       "side": 1,
       "message": "Consider adding sensor_active \u003d SENSOR_ACTIVE_S3; here as well to ensure motion_sense_stop_inactive_sensors() uses the correct state mask. Although startup handles the S5-\u003eS3 transition, the S0-\u003eS3 transition (suspend) would benefit from this for consistency.",
+      "range": {
+        "startLine": 577,
+        "startChar": 0,
+        "endLine": 577,
+        "endChar": 0
+      },
+      "revId": "4a813af2a7276cf2db1f705b31a7aff348532b14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "710cd0f3_a171ffdd",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-30T15:11:25Z",
+      "side": 1,
+      "message": "It is already there in the line 587.",
+      "parentUuid": "031a24f6_d2b92186",
       "range": {
         "startLine": 577,
         "startChar": 0,
