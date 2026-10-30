@@ -38,6 +38,10 @@
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 
+		i2c_ec_i2c_pac: ec_i2c_pac {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_PAC";
+		};
 		i2c_ec_i2c_pd_prog: ec_i2c_pd_prog {
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_PORT_PD";
