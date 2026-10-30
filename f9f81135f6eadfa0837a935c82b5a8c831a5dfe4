@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "f9f81135f6eadfa0837a935c82b5a8c831a5dfe4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d44ca09_1d0a4706",
+        "filename": "zephyr/shim/src/watchdog.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-30T19:22:37Z",
+      "side": 1,
+      "message": "Nit: make this a helper function.",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 4
+      },
+      "revId": "f9f81135f6eadfa0837a935c82b5a8c831a5dfe4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
