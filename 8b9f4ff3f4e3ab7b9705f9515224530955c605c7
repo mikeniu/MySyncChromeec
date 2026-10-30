@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e088b3d_f8ae5052",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1444467
+      },
+      "writtenOn": "2026-10-30T02:38:24Z",
+      "side": 1,
+      "message": "We need this for Deku Toolkit to control LED on factory side.",
+      "revId": "8b9f4ff3f4e3ab7b9705f9515224530955c605c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
