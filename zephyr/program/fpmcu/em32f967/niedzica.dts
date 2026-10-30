@@ -4,6 +4,7 @@
  */
 
 #include "common.dtsi"
+#include "fp_led.dtsi"
 
 #define ELANI80SA_COMMON_IMAGE_PROPS \
 	width = <80>; \
