@@ -120,17 +120,28 @@ tests:
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
     - CONFIG_AP_PWRSEQ_DRIVER=y
-  ap_power.ocelotrvp:
+  ap_power.ocelotrvp_ite: &ocelotrvp
     extra_dtc_overlay_files:
-    - boards/native_sim.overlay
+    - ../../program/ocelot/ocelotrvp-ite/native_sim.overlay
     - boards/ocelotrvp_native_sim.overlay
+    extra_conf_files:
+    - ../../program/ocelot/program.conf
+    - ../../program/ocelot/rvp_program.conf
+    - ../../program/ocelot/dsp_comms.conf
+    - ../../program/ocelot/ocelotrvp-ite/project.conf
+    - ../../program/native_sim.conf
+    - ../../program/ocelot/native_sim.conf
     extra_configs:
-    - CONFIG_TEST_AP_POWER_OCELOTRVP=y
-    - CONFIG_EMUL_POWER_SIGNALS=y
-    - CONFIG_X86_NON_DSX_PWRSEQ_MTL=y
-    - CONFIG_AP_PWRSEQ_S0IX=y
-    - CONFIG_AP_X86_INTEL_MTL=y
-    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3=y
-    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
-    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
-    - CONFIG_AP_PWRSEQ_DRIVER=y
+    - CONFIG_PLATFORM_EC_EXTPOWER_GPIO=n
+  ap_power.ocelotrvp_npcx:
+    <<: *ocelotrvp
+    extra_dtc_overlay_files:
+    - ../../program/ocelot/ocelotrvp-npcx/native_sim.overlay
+    - boards/ocelotrvp_native_sim.overlay
+    extra_conf_files:
+    - ../../program/ocelot/program.conf
+    - ../../program/ocelot/rvp_program.conf
+    - ../../program/ocelot/dsp_comms.conf
+    - ../../program/ocelot/ocelotrvp-npcx/project.conf
+    - ../../program/native_sim.conf
+    - ../../program/ocelot/native_sim.conf

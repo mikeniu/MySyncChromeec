@@ -41,5 +41,12 @@ target_sources_ifdef(CONFIG_TEST_AP_POWER_ATRIARVP app PRIVATE
   src/boards/atriarvp.c)
 
 target_sources_ifdef(CONFIG_TEST_AP_POWER_OCELOTRVP app PRIVATE
+  ${PLATFORM_EC_PROGRAM_DIR}/intelrvp/src/dc_jack.c
+  ${PLATFORM_EC_PROGRAM_DIR}/ocelot/src/rvp_board_id.c
   ${PLATFORM_EC_PROGRAM_DIR}/ocelot/src/rvp_board_power.c
+  ${PLATFORM_EC_PROGRAM_DIR}/ocelot/src/rvp_usbc_runtime.c
   src/boards/ocelotrvp.c)
+
+zephyr_include_directories_ifdef(CONFIG_TEST_AP_POWER_OCELOTRVP
+  "${PLATFORM_EC_PROGRAM_DIR}/intelrvp/include"
+  "${PLATFORM_EC_PROGRAM_DIR}/ocelot/include")
