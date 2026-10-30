@@ -90,7 +90,9 @@ static int keyboard_input_init(void)
 
 SYS_INIT(keyboard_input_init, APPLICATION, 0);
 
-#if defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP) || defined(CONFIG_ZTEST)
+#if defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP) || \
+	(defined(CONFIG_ZTEST) &&                         \
+	 !defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042))
 
 /* Max matrix size from ec_response_get_next_data_v3 */
 #define CROS_EC_KEYBOARD_COLS_MAX 18
@@ -124,7 +126,9 @@ static void keyboard_input_cb(struct input_event *evt, void *user_data)
 
 	keyboard_state_changed(row, col, pressed);
 
-#if defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP) || defined(CONFIG_ZTEST)
+#if defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP) || \
+	(defined(CONFIG_ZTEST) &&                         \
+	 !defined(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042))
 	if (col >= CROS_EC_KEYBOARD_COLS_MAX) {
 		LOG_ERR("invalid col: %d", col);
 		return;

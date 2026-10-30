@@ -249,7 +249,7 @@ lock_imvp:
 	return rv;
 }
 
-static void rt3645_initiate_update(const struct device *dev)
+__maybe_unused static void rt3645_initiate_update(const struct device *dev)
 {
 	gpio_pin_configure_dt(&config->enable_gpio, GPIO_OUTPUT);
 	gpio_pin_set_dt(&config->enable_gpio, 1);
