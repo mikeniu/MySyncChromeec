@@ -114,6 +114,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a5fced63_799aa153",
+        "filename": "zephyr/program/ocelot/coolum/generated.dtsi",
+        "patchSetId": 14
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-30T07:41:30Z",
+      "side": 1,
+      "message": "We copied the reference code and will modify it later.",
+      "parentUuid": "bc7eeb59_5e861e44",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 169,
+        "endChar": 4
+      },
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d67741c4_e892581c",
         "filename": "zephyr/program/ocelot/coolum/project.conf",
         "patchSetId": 14
