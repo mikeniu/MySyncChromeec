@@ -18,6 +18,24 @@
       "isAi": true,
       "revId": "8f59767b77630af2247ef42e420555f1fd0811db",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d43e9c71_49b9765c",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:43:49Z",
+      "side": 1,
+      "message": "Prefer returning values over output parameters (Google C++ Style): please change this to `virtual std::expected\u003cstd::vector\u003cRtsUsbInterface\u003e, int\u003e get_interfaces() \u003d 0;`. That also simplifies the mock expectations in tests (`Return(interfaces)` instead of `DoAll(SetArgPointee\u003c0\u003e(...), Return(0))`).",
+      "isAi": true,
+      "revId": "8f59767b77630af2247ef42e420555f1fd0811db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
