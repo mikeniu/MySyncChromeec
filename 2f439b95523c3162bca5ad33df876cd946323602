@@ -481,6 +481,30 @@
       },
       "revId": "2f439b95523c3162bca5ad33df876cd946323602",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f18e9d14_ac9b1bf1",
+        "filename": "zephyr/test/drivers/rts5912_rtmr/src/rts5912_rtmr_test.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:01:35Z",
+      "side": 1,
+      "message": "Code updated in PS5; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "74ea6ce7_cf836b79",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 9999
+      },
+      "revId": "2f439b95523c3162bca5ad33df876cd946323602",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
