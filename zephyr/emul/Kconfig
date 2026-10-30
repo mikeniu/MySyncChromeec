@@ -52,7 +52,7 @@ config EMUL_BC12_DETECT_PI3USB9201
 config EMUL_CHARGER_ISL9241
 	bool "Renesas buck-boost battery charger emulator"
 	default y
-	depends on ZTEST && DT_HAS_INTERSIL_ISL9241_ENABLED
+	depends on DT_HAS_INTERSIL_ISL9241_ENABLED && EMUL
 	select EMUL_COMMON_I2C
 	help
 	  Enable the ISL9241 emulator.  This chip is a configurable buck-boost
@@ -401,7 +401,7 @@ config EMUL_TOUCHPAD_ELAN
 
 config EMUL_PPM_DRIVER
 	bool "UCSI PPM emulator"
-	default y
+	default y if !UCSI_PPM
 	depends on ZTEST && DT_HAS_UCSI_PPM_ENABLED
 	help
 	  Enable the UCSI PPM emulator.

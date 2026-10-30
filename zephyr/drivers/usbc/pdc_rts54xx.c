@@ -3387,7 +3387,7 @@ static struct pdc_data_t *const pdc_data[] = { DT_INST_FOREACH_STATUS_OKAY(
 CHECK_ONE_CCD_PORT_COUNT_FOR_DRIVER();
 #endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
 
-#ifdef CONFIG_ZTEST
+#if defined(CONFIG_ZTEST) || defined(CONFIG_EMUL_PDC_RTS54)
 
 /*
  * Wait for drivers to become idle.
