@@ -14,6 +14,7 @@
 #include "battery.h"
 #include "battery_smart.h"
 #include "charge_manager.h"
+#include "charge_state.h"
 #include "chipset.h"
 #include "drivers/ucsi_v3.h"
 #include "ec_commands.h"
@@ -2666,7 +2667,8 @@ pdc_snk_attached_send_set_rdo(struct pdc_port_t *port,
 
 	LOG_INF("C%d: Send RDO: %d (%08x), battery_is_present=%d, mismatch=%d",
 		config->connector_num, RDO_POS(snk_policy->rdo_to_send),
-		snk_policy->rdo_to_send, battery_is_present(),
+		snk_policy->rdo_to_send,
+		charger_current_battery_params()->is_present,
 		!!(flags & RDO_CAP_MISMATCH));
 	LOG_INF("C%d: Power request: %umA, %umV, %umW, "
 		"pdo_max=%umW, board_max=%umW",
@@ -2821,7 +2823,8 @@ pdc_snk_attached_evaluate_pdos(struct pdc_port_t *port)
 	/* if sink path is enabled, battery is not present, and AP is ON,
 	 * do not send RDO. Proceed to seed charge manager with current RDO.
 	 */
-	if (port->sink_path_status && battery_is_present() != BP_YES &&
+	if (port->sink_path_status &&
+	    charger_current_battery_params()->is_present != BP_YES &&
 	    !chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
 		LOG_INF("C%d: Dead battery detected. Keep current RDO.",
 			config->connector_num);
@@ -5181,13 +5184,14 @@ static void pdc_update_battery_status(struct pdc_port_t *port, bool force)
 	const struct pdc_config_t *config = port->dev->config;
 	int port_number = config->connector_num;
 	union battery_status_t bsdo = { 0 };
+	const struct batt_params *batt = charger_current_battery_params();
 
-	if (battery_is_present() == BP_YES) {
-		uint32_t v;
-		uint32_t c;
+	if (batt->is_present == BP_YES) {
+		uint32_t v = batt->design_voltage;
+		uint32_t c = batt->remaining_capacity;
 
-		if (battery_design_voltage(&v) != 0 ||
-		    battery_remaining_capacity(&c) != 0) {
+		if (v == 0 ||
+		    (batt->flags & BATT_FLAG_BAD_REMAINING_CAPACITY)) {
 			bsdo.present_capacity = BSDO_CAP_UNKNOWN;
 		} else {
 			/*
@@ -5206,14 +5210,14 @@ static void pdc_update_battery_status(struct pdc_port_t *port, bool force)
 		 * battery_status() returns EC_ERROR_UNIMPLEMENTED and
 		 * the battery is assumed to be idle.
 		 */
-		if (battery_status(&c) != 0) {
+		if (batt->flags & BATT_FLAG_BAD_STATUS) {
 			/* Assume idle if battery status is not available. */
 			bsdo.battery_state = BSDO_BATTERY_STATE_IDLE;
 		} else {
-			if (c & STATUS_FULLY_CHARGED) {
+			if (batt->status & STATUS_FULLY_CHARGED) {
 				/* Fully charged */
 				bsdo.battery_state = BSDO_BATTERY_STATE_IDLE;
-			} else if (c & STATUS_DISCHARGING) {
+			} else if (batt->status & STATUS_DISCHARGING) {
 				/* Discharging */
 				bsdo.battery_state =
 					BSDO_BATTERY_STATE_DISCHARGING;
@@ -5247,6 +5251,7 @@ static void pdc_update_battery_capability(struct pdc_port_t *port)
 	const struct pdc_config_t *config = port->dev->config;
 	int port_number = config->connector_num;
 	union battery_capability_t bcdb = { 0 };
+	const struct batt_params *batt = charger_current_battery_params();
 
 	/* TODO: Replace with proper VID:PID API */
 	/* Set VID */
@@ -5255,9 +5260,9 @@ static void pdc_update_battery_capability(struct pdc_port_t *port)
 	/* Set PID */
 	bcdb.pid = CONFIG_PLATFORM_EC_USB_PID;
 
-	if (battery_is_present() == BP_YES) {
-		uint32_t v;
-		uint32_t c;
+	if (batt->is_present == BP_YES) {
+		uint32_t v = batt->design_voltage;
+		uint32_t c = batt->design_capacity;
 
 		/*
 		 * The Battery Design Capacity field shall return the
@@ -5280,8 +5285,8 @@ static void pdc_update_battery_capability(struct pdc_port_t *port)
 		 */
 		bcdb.last_full_charge_capacity = 0xffff;
 
-		if (battery_design_voltage(&v) == 0) {
-			if (battery_design_capacity(&c) == 0) {
+		if (v != 0) {
+			if (c != 0) {
 				/*
 				 * Wh = (c * v) / 1000000
 				 * 10th of a Wh = Wh * 10
@@ -5290,7 +5295,8 @@ static void pdc_update_battery_capability(struct pdc_port_t *port)
 					DIV_ROUND_NEAREST((c * v), 100000);
 			}
 
-			if (battery_full_charge_capacity(&c) == 0) {
+			if (!(batt->flags & BATT_FLAG_BAD_FULL_CAPACITY)) {
+				c = batt->full_capacity;
 				/*
 				 * Wh = (c * v) / 1000000
 				 * 10th of a Wh = Wh * 10
