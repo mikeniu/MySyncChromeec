@@ -157,6 +157,24 @@
       "parentUuid": "0825b4e3_be1345d3",
       "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d15ac190_4ac3b4cb",
+        "filename": "zephyr/program/ocelot/coolum/project.conf",
+        "patchSetId": 14
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-10-30T06:25:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f0620d21_a38d01fb",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
