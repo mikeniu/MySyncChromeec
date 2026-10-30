@@ -16,6 +16,24 @@
       "message": "Please refine the commit message. \u0027Canim\u0027 is the QC SoC name, and the lock screen key shouldn\u0027t be related to the SoC. Thanks!",
       "revId": "4a9a3e7fd980eb9f420125b034737c433eb0caa6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99f1806d_f0b3ba13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-30T01:42:40Z",
+      "side": 1,
+      "message": "Please help check the new commit message.",
+      "parentUuid": "7b5b64c9_9ec74c64",
+      "revId": "4a9a3e7fd980eb9f420125b034737c433eb0caa6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
