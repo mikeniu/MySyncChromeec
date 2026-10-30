@@ -46,6 +46,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dc1c4fe1_9716d155",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:40Z",
+      "side": 1,
+      "message": "Consider using `std::ranges::find_if` (`\u003calgorithm\u003e`) instead of the manual search loop:\n```cpp\nconst auto it \u003d std::ranges::find_if(interfaces, [](const RtsUsbInterface\u0026 alt) {\n  return alt.usb_class \u003d\u003d kDfuClass \u0026\u0026 alt.usb_subclass \u003d\u003d kDfuSubclass;\n});\nif (it \u003d\u003d interfaces.end()) {\n  ...\n}\n```\nOnce `GetInterfaces()` returns `std::expected\u003cstd::vector\u003cRtsUsbInterface\u003e, int\u003e`, this helper is also a clean candidate for C++23 `std::expected` monadic chaining (`.transform_error(...)` / `.and_then(...)`) if you\u0027d like to avoid manual `if (!res)` plumbing.",
+      "range": {
+        "startLine": 210,
+        "startChar": 0,
+        "endLine": 220,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7d5cde84_9537a851",
         "filename": "util/realtekfp/rts5817_usb_device.h",
         "patchSetId": 3
