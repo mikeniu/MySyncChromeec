@@ -22,6 +22,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "43c41525_41469706",
+        "filename": "util/realtekfp/rts5817_mock_usb_backend.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:31Z",
+      "side": 1,
+      "message": "Nit (optional): Consider squashing this pure-interface CL into https://crrev.com/c/8656278 so `get_interfaces()` lands alongside its first caller and unit tests.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "8f59767b77630af2247ef42e420555f1fd0811db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d43e9c71_49b9765c",
         "filename": "util/realtekfp/rts5817_usb_backend.h",
         "patchSetId": 1
