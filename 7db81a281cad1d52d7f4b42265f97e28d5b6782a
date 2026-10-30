@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75d0cab3_a226833a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:44:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/8af1939c-8216-424e-a519-61b6c70166bf)]\n\n### Review Summary\n\n* **Functionality:** `RtsUsbDevice::init()`, `wait_for_device()`, and `release()` properly manage the `RtsUsbBackend` lifecycle, releasing any previously open resources before re-initializing, validating positive timeout and polling intervals (`timeout_ms \u003c\u003d 0 || poll_interval_ms \u003c\u003d 0`) up front, and cleaning up on open/timeout failures as well as in `~RtsUsbDevice()`.\n* **Architecture \u0026 Component Fit:** Placing the Realtek fingerprint host utility under `util/realtekfp/` with its own `build.mk` and decoupling `RtsUsbDevice` from hardware `libusb` calls via `RtsUsbBackend` and `MockRtsUsbBackend` cleanly matches sibling host utilities in `util/` (such as `util/elan/`).\n* **Code Simplicity:** Each method in `RtsUsbDevice` is concise and linear with early-return guard clauses and an injectable `SleepFn` seam that avoids real-time sleeps in unit tests.\n* **Idiomaticity \u0026 Readability:** The C++ headers and implementation follow modern C++ conventions, including `std::unique_ptr` ownership, deleted copy operations, `\u003cchrono\u003e`/`\u003cthread\u003e` durations, proper member declaration order, and namespace-scoped `using` declarations and named constants in tests.\n* **Security:** No memory safety, buffer handling, or untrusted input vulnerabilities are introduced.\n* **Testing:** `util/realtekfp/rts5817_usb_device_test.cc` thoroughly exercises happy paths, `backend_-\u003einit()` failures, device-not-found cleanup, re-initialization resource release, immediate vs. multi-poll re-enumeration, exact timeout boundaries (`3 * kPollIntervalMs`), and invalid interval boundaries (`0` and `-1` for both `timeout_ms` and `poll_interval_ms`) using `StrictMock\u003cMockRtsUsbBackend\u003e` and `InSequence` with exact `close()` call counts.\n* **CL Size \u0026 Scope:** `Size: L (+375, -1)` — Although the total delta is 376 lines, it consists of 171 lines of production code (`rts5817_usb_backend.h`, `rts5817_usb_device.h`, `rts5817_usb_device.cc`), 26 lines of build configuration (`util/build.mk`, `util/realtekfp/build.mk`), and 179 lines of unit test and mock code (`rts5817_mock_usb_backend.h`, `rts5817_usb_device_test.cc`), representing a single cohesive logical change well under the 250-line production threshold.\n* **Commit Message:** Concise and accurate, clearly stating both the motivation for self-contained USB device handling and a high-level summary of the changes with `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
