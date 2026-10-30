@@ -1,0 +1,70 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83720b3b_71d7cb1f",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:40Z",
+      "side": 1,
+      "message": "Nit: Update copyright year from `2025` to `2026` (matching the other new files in this stack), and apply `//` comments + `cros format` here as well.",
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af812d7e_82099935",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:40Z",
+      "side": 1,
+      "message": "Please define `kDetachTimeout`, `kReEnumTimeout`, and `kReEnumPollInterval` as `std::chrono::milliseconds` (and consider taking `std::chrono::milliseconds` in `dfu_detach()`, clamping/checking against `UINT16_MAX` when packing the 16-bit `wValue`). Right now these `unsigned int` constants undergo implicit narrowing/sign conversions to `uint16_t` (line 93) and `int` (lines 100–101).",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81c70059_c1587ccd",
+        "filename": "util/realtekfp/rts5817_libusb_backend.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:40Z",
+      "side": 1,
+      "message": "Same Google C++ style updates here (`PLATFORM_EC_UTIL_REALTEKFP_RTS5817_LIBUSB_BACKEND_H_` header guard, `namespace realtekfp`, `PascalCase` method names, and `cros format`).",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
