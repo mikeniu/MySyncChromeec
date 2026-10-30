@@ -18,6 +18,42 @@
       "isAi": true,
       "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d5cde84_9537a851",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:43:56Z",
+      "side": 1,
+      "message": "Please return `std::expected\u003cvoid, RtsError\u003e` from `dfu_detach()`.",
+      "isAi": true,
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3dd2bfc_a3a8873a",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:43:56Z",
+      "side": 1,
+      "message": "Instead of returning `bool` and mutating `dfu_interface_` / `transfer_size_` as side effects, consider having `find_dfu_interface()` return `std::expected\u003cDfuInterfaceInfo, RtsError\u003e` (containing `{interface_number, transfer_size}`) by value. That avoids having to manually reset `dfu_interface_ \u003d -1` on error/release paths.",
+      "isAi": true,
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
