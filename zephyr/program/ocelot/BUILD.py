@@ -5,6 +5,38 @@
 """Define zmake projects for ocelot."""
 
 
+def maybe_register_sim_project(
+    project_name,
+    kconfig_files,
+    modules,
+    boards,
+):
+    """Register a native_sim host variant if native_sim.overlay exists."""
+    sim_overlay = here / project_name / "native_sim.overlay"
+    if not sim_overlay.is_file():
+        return
+
+    sim_kconfig_files = [
+        *kconfig_files,
+        here.parent / "native_sim.conf",
+    ]
+    for sim_conf in (
+        here / "native_sim.conf",
+        here / project_name / "native_sim.conf",
+    ):
+        if sim_conf.is_file():
+            sim_kconfig_files.append(sim_conf)
+
+    register_host_project(
+        project_name=f"{project_name}-sim",
+        zephyr_board="native_sim",
+        dts_overlays=[sim_overlay],
+        kconfig_files=sim_kconfig_files,
+        modules=modules,
+        boards=boards,
+    )
+
+
 def register_npcx9_project(
     project_name,
     extra_kconfig_base_files=(),
@@ -15,6 +47,18 @@ def register_npcx9_project(
     if boards is None:
         boards = ["ocelot"]
 
+    kconfig_files = [
+        # Common to all projects.
+        here / "program.conf",
+        # Customization to apply before project-specific config.
+        *extra_kconfig_base_files,
+        # Project-specific KConfig customization.
+        here / project_name / "project.conf",
+        # Additional project-specific KConfig customization.
+        *extra_kconfig_proj_files,
+    ]
+    modules = ["cmsis_6", "ec", "pigweed", "nanopb"]
+
     register_npcx_project(
         project_name=project_name,
         zephyr_board="npcx9/npcx9m7f",
@@ -22,17 +66,14 @@ def register_npcx9_project(
             here / "common.overlay",
             here / project_name / "project.overlay",
         ],
-        kconfig_files=[
-            # Common to all projects.
-            here / "program.conf",
-            # Customization to apply before project-specific config.
-            *extra_kconfig_base_files,
-            # Project-specific KConfig customization.
-            here / project_name / "project.conf",
-            # Additional project-specific KConfig customization.
-            *extra_kconfig_proj_files,
-        ],
-        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
+        kconfig_files=kconfig_files,
+        modules=modules,
+        boards=boards,
+    )
+    maybe_register_sim_project(
+        project_name=project_name,
+        kconfig_files=kconfig_files,
+        modules=modules,
         boards=boards,
     )
 
@@ -48,26 +89,36 @@ def register_it8xxx2_project(
     if boards is None:
         boards = ["ocelot"]
 
-    return register_binman_project(
+    kconfig_files = [
+        # Common to all projects.
+        here / "program.conf",
+        # Customization to apply before project-specific config.
+        *extra_kconfig_base_files,
+        # Project-specific KConfig customization.
+        here / project_name / "project.conf",
+        # Additional project-specific KConfig customization.
+        *extra_kconfig_proj_files,
+    ]
+    modules = ["cmsis_6", "ec", "pigweed", "nanopb"]
+
+    ret = register_binman_project(
         project_name=project_name,
         zephyr_board=chip,
         dts_overlays=[
             here / "common.overlay",
             here / project_name / "project.overlay",
         ],
-        kconfig_files=[
-            # Common to all projects.
-            here / "program.conf",
-            # Customization to apply before project-specific config.
-            *extra_kconfig_base_files,
-            # Project-specific KConfig customization.
-            here / project_name / "project.conf",
-            # Additional project-specific KConfig customization.
-            *extra_kconfig_proj_files,
-        ],
-        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
+        kconfig_files=kconfig_files,
+        modules=modules,
         boards=boards,
     )
+    maybe_register_sim_project(
+        project_name=project_name,
+        kconfig_files=kconfig_files,
+        modules=modules,
+        boards=boards,
+    )
+    return ret
 
 
 def register_mec172x_project(

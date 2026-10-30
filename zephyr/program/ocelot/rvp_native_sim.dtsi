@@ -1,0 +1,46 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+&kbd {
+	/delete-property/ row-size;
+	/delete-property/ col-size;
+};
+
+&i2c_port_pd1 {
+	smbus_ara_emul: smbus_ara@c {
+		compatible = "zephyr,smbus-ara-emul";
+		reg = <0xc>;
+	};
+};
+
+&i2c_port_charger {
+	battery: sb@b {
+		compatible = "zephyr,smart-battery-emul";
+		reg = <0xb>;
+		cycle-count = <99>;
+		version = "BATTERY_SPEC_VER_1_1_WITH_PEC";
+		volt = <13200>;
+		desired-charg-volt = <13200>;
+		desired-charg-cur = <2400>;
+		mf-name = "LGC";
+		dev-name = "AP18C8K";
+	};
+};
+
+&pca95xx_0 {
+	compatible = "zephyr,gpio-emul";
+	/delete-property/ zephyr,deferred-init;
+};
+
+&pca95xx_1 {
+	compatible = "zephyr,gpio-emul";
+};
+
+/delete-node/ &it8801_mfd;
+/delete-node/ &seven_seg_display;
+
+usbc0: &usbc_port0 {};
+usbc1: &usbc_port1 {};
+ppm_driver_nodelabel: &{/usbc/ppm-driver} {};
