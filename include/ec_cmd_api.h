@@ -159,6 +159,14 @@ static inline int ec_cmd_fp_info_v3(CROS_EC_COMMAND_INFO *h,
 	return CROS_EC_COMMAND(h, EC_CMD_FP_INFO, 3, NULL, 0, r, resp_size);
 }
 
+static inline int
+ec_cmd_fp_load_pairing_key(CROS_EC_COMMAND_INFO *h,
+			   const ec_params_fp_load_pairing_key *p)
+{
+	return CROS_EC_COMMAND(h, EC_CMD_FP_LOAD_PAIRING_KEY, 0, p, sizeof(*p),
+			       NULL, 0);
+}
+
 /*
  * Section 2: EC interface functions that can be generated with the help
  * of template macros.
@@ -351,6 +359,12 @@ _CROS_EC_C0_F_RF(EC_CMD_FP_ENC_STATUS, fp_encryption_status);
 _CROS_EC_C0_F_RF(EC_CMD_FP_STATS, fp_stats);
 _CROS_EC_C1_F_PF(EC_CMD_FP_CONTEXT, fp_context);
 _CROS_EC_CV_F_R(EC_CMD_FP_INFO, 1, fp_info, fp_info);
+_CROS_EC_C0_F_RF(EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN,
+		 fp_establish_pairing_key_keygen);
+_CROS_EC_C0_F_PF_RF(EC_CMD_FP_ESTABLISH_PAIRING_KEY_WRAP,
+		    fp_establish_pairing_key_wrap);
+_CROS_EC_C0_F_RF(EC_CMD_FP_GENERATE_NONCE, fp_generate_nonce);
+_CROS_EC_C0_F_PF(EC_CMD_FP_ESTABLISH_SESSION, fp_establish_session);
 _CROS_EC_CV_F_R(EC_CMD_GET_BOARD_VERSION, 0, get_board_version, board_version);
 _CROS_EC_C0_F_RF(EC_CMD_GET_BOOT_TIME, get_boot_time);
 _CROS_EC_C0_F_RF(EC_CMD_GET_CHIP_INFO, get_chip_info);
