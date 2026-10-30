@@ -64,6 +64,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c77d10c6_e0fd7d1a",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:21Z",
+      "side": 1,
+      "message": "Boot ROM runtime (`R_INITVTOR \u003d\u003d 0x00000000`) and Flash Image runtime (`R_INITVTOR \u003d\u003d 0x01800000`) both enumerate as `0BDA:5817`.\n\nIn `rtsflash.py` (`RtsUsb.get_mode()` / `enable_download()`), the host first reads `0x401E2090` (`R_INITVTOR`) via vendor request `0x41` (`RTS_VREQ_XMEM_READ`, `bmRequestType \u003d 0xC0`) and only sends `0x1A` / `0x1B` when `mode \u003d\u003d \"ROM\"`. Because `0x1A` / `0x1B` use `bmRequestType \u003d 0x80` / `0x00` (Standard Device requests), a Zephyr Flash Image implementing standard USB Chapter 9 + USB DFU Runtime without the Boot ROM\u0027s custom `0x1A` request will `STALL` (`LIBUSB_ERROR_PIPE`), causing `enable_download()` to abort before `dfu_detach()` can be sent.\n\nPlease check `0x401E2090` via `0x41` like `rtsflash.py` so `0x1A` / `0x1B` are only sent in Boot ROM mode (and if a Flash Image `STALL`s `0x41` / `0x1A` with `LIBUSB_ERROR_PIPE`, allow proceeding to standard `DFU_DETACH` rather than failing).",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9c32f292_a8fa95d9",
         "filename": "util/realtekfp/rts5817_usb_device.h",
         "patchSetId": 1
