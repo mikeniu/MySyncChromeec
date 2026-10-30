@@ -6,6 +6,7 @@
 #include "ec_commands.h"
 #include "fpsensor/fpsensor_detect.h"
 
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
 #include <zephyr/ztest.h>
@@ -46,7 +47,7 @@ static const struct ec_response_get_protocol_info expected_info[] = {
 	}
 };
 
-static void *fpsensor_setup_spi(void)
+static void *fpsensor_setup(void)
 {
 	hc = (struct ec_host_cmd *)ec_host_cmd_get_hc();
 
@@ -68,15 +69,10 @@ static uint8_t cal_checksum(const uint8_t *const buffer, const uint16_t size)
 	return (uint8_t)(-checksum);
 }
 
-ZTEST_SUITE(fp_transport_spi, NULL, fpsensor_setup_spi, NULL, NULL, NULL);
-
-/* SPI is a default HC backend. Issue a EC_CMD_GET_PROTOCOL_INFO command via
- * test backend to get protocol_info for SPI.
- */
-ZTEST(fp_transport_spi, test_fp_transport_spi)
+static void check_protocol_info(enum fp_transport_type transport_type)
 {
 	const struct ec_response_get_protocol_info *expected =
-		&expected_info[FP_TRANSPORT_TYPE_SPI];
+		&expected_info[transport_type];
 	struct ec_response_get_protocol_info *info;
 	struct ec_host_cmd_request_header header = {
 		.prtcl_ver = 3,
@@ -87,6 +83,8 @@ ZTEST(fp_transport_spi, test_fp_transport_spi)
 		.data_len = 0,
 	};
 	struct ec_host_cmd_response_header *response;
+
+	zassert_equal(get_fp_transport_type(), transport_type);
 
 	/* Prepare header to send. */
 	header.checksum = cal_checksum((uint8_t *)&header, sizeof(header));
@@ -110,33 +108,72 @@ ZTEST(fp_transport_spi, test_fp_transport_spi)
 	zassert_equal(info->protocol_versions, expected->protocol_versions);
 }
 
-ZTEST_SUITE(fp_transport_uart, NULL, NULL, NULL, NULL, NULL);
-
-/* UART uses the same EC_CMD_GET_PROTOCOL_INFO HC handler as SPI. If the
- * output from the command if correct for SPI, it should be correct for UART as
- * well. It would be hard to replace already initialized HC backed (SPI).
- */
-ZTEST(fp_transport_uart, test_fp_transport_uart)
+static void check_backend_init(enum fp_transport_type transport_type,
+			       struct ec_host_cmd_backend *backend)
 {
 	const struct ec_response_get_protocol_info *expected =
-		&expected_info[FP_TRANSPORT_TYPE_UART];
-	struct ec_host_cmd_backend *backend_uart;
+		&expected_info[transport_type];
 	struct ec_host_cmd_rx_ctx rx_ctx;
 	struct ec_host_cmd_tx_buf tx;
 	uint8_t rx_buf, tx_buf;
 
-	backend_uart = ec_host_cmd_backend_get_uart(
-		DEVICE_DT_GET(DT_CHOSEN(zephyr_host_cmd_uart_backend)));
 	rx_ctx.buf = &rx_buf;
 	rx_ctx.len_max = CONFIG_EC_HOST_CMD_HANDLER_RX_BUFFER_SIZE;
 	tx.buf = &tx_buf;
 	tx.len_max = CONFIG_EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE;
 
-	/* The UART backend init adjusts max response/request size. */
-	backend_uart->api->init(backend_uart, &rx_ctx, &tx);
+	/* The backend init adjusts max response/request size. */
+	zassert_ok(backend->api->init(backend, &rx_ctx, &tx));
 
 	/* Make sure max buffers sizes have been set correctly by the backend
-	 * init. */
+	 * init.
+	 */
 	zassert_equal(expected->max_request_packet_size, rx_ctx.len_max);
 	zassert_equal(expected->max_response_packet_size, tx.len_max);
+}
+
+ZTEST_SUITE(fp_transport_spi, NULL, fpsensor_setup, NULL, NULL, NULL);
+
+/* When SPI is the active transport (selected via TRANSPORT_SEL at boot), issue
+ * EC_CMD_GET_PROTOCOL_INFO via the test backend. Otherwise, verify that the
+ * inactive SPI/SHI backend init adjusts max packet sizes.
+ */
+ZTEST(fp_transport_spi, test_fp_transport_spi)
+{
+	if (get_fp_transport_type() == FP_TRANSPORT_TYPE_SPI) {
+		check_protocol_info(FP_TRANSPORT_TYPE_SPI);
+	} else {
+		struct ec_host_cmd_backend *backend_spi;
+#if defined(CONFIG_EC_HOST_CMD_BACKEND_SPI)
+		struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(
+			DT_CHOSEN(zephyr_host_cmd_spi_backend), cs_gpios);
+
+		backend_spi = ec_host_cmd_backend_get_spi(&cs);
+#elif defined(CONFIG_EC_HOST_CMD_BACKEND_SHI)
+		backend_spi = ec_host_cmd_backend_get_shi_npcx();
+#else
+#error "SPI/SHI host command backend must be enabled"
+#endif
+
+		check_backend_init(FP_TRANSPORT_TYPE_SPI, backend_spi);
+	}
+}
+
+ZTEST_SUITE(fp_transport_uart, NULL, fpsensor_setup, NULL, NULL, NULL);
+
+/* When UART is the active transport (selected via TRANSPORT_SEL at boot),
+ * issue EC_CMD_GET_PROTOCOL_INFO via the test backend. Otherwise, verify that
+ * the inactive UART backend init adjusts max packet sizes.
+ */
+ZTEST(fp_transport_uart, test_fp_transport_uart)
+{
+	if (get_fp_transport_type() == FP_TRANSPORT_TYPE_UART) {
+		check_protocol_info(FP_TRANSPORT_TYPE_UART);
+	} else {
+		struct ec_host_cmd_backend *backend_uart =
+			ec_host_cmd_backend_get_uart(DEVICE_DT_GET(
+				DT_CHOSEN(zephyr_host_cmd_uart_backend)));
+
+		check_backend_init(FP_TRANSPORT_TYPE_UART, backend_uart);
+	}
 }
