@@ -34,6 +34,24 @@
       "parentUuid": "2d1aa786_f6b84af7",
       "revId": "015dc354214f2c5a70f8c1ec208d84571a5cbf13",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "921599e2_456c3805",
+        "filename": "common/charge_manager.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-30T21:06:29Z",
+      "side": 1,
+      "message": "Added CM_MUTEX_TRY_LOCK to cover this.",
+      "parentUuid": "7f1990af_df4b4c97",
+      "revId": "015dc354214f2c5a70f8c1ec208d84571a5cbf13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
