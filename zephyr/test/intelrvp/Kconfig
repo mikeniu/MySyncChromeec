@@ -4,6 +4,7 @@
 
 choice TEST_PROJECT_TYPE
 	prompt "Select Intel RVP board variant for tests"
+	default TEST_PROJECT_OCELOTRVP if BOARD_OCELOTRVP_ITE || BOARD_OCELOTRVP_NPCX
 	help
 	  Choose the board variant for which the tests will be compiled and run.
 
@@ -27,10 +28,18 @@ config TEST_PROJECT_PTLRVP_MCHP
 	help
 	  Enable tests specific to the ptlrvp_mchp variant.
 
+config TEST_PROJECT_OCELOTRVP
+	bool "Enable ocelotrvp-specific tests"
+	help
+	  Enable tests specific to the ocelotrvp variants.
+
 endchoice
 
 config TEST_PROJECT_MTL_BOARD_POWER
 	bool "Run tests for board_power.c"
+	select AP_POWER_EVENTS_MOCK if TEST_PROJECT_OCELOTRVP
+	select POWER_SIGNALS_MOCK if TEST_PROJECT_OCELOTRVP
+	select CHIPSET_API_MOCK if TEST_PROJECT_OCELOTRVP
 	help
 	  Include board_power.c into the binary and test its functions.
 
@@ -39,6 +48,13 @@ config TEST_AP_PWRSEQ_PP5500
         default n
         help
           Enable PP5500 rail tests for board power.
+
+config TEST_AP_PWRSEQ_DEASSERT_PWROK
+	bool "Expect PCH_PWROK and SYS_PWROK deassertion on force shutdown"
+	default y if TEST_PROJECT_OCELOTRVP
+	help
+	  Expect board_ap_power_shutdown to deassert PWR_PCH_PWROK and
+	  PWR_EC_PCH_SYS_PWROK before RSMRST and PP3300_A.
 
 config TEST_PROJECT_INTELRVP_TCPC
 	bool "Run tests for tcpc.c"
@@ -52,11 +68,13 @@ config TEST_PROJECT_INTELRVP_CHG_USB_PD_MECC
 
 config TEST_PROJECT_INTELRVP_DC_JACK
 	bool "Run tests for dc_jack.c"
+	default y if TEST_PROJECT_OCELOTRVP && PLATFORM_EC_DEDICATED_CHARGE_PORT && !TEST_PROJECT_MTL_BOARD_POWER
 	help
 	  Include dc_jack.c into the binary and test its functions.
 
 config TEST_PROJECT_INTELRVP_BOARD_ID
 	bool "Run INTELRVP board id test"
+	default y if TEST_PROJECT_OCELOTRVP && PLATFORM_EC_CBI && !TEST_PROJECT_MTL_BOARD_POWER
 	help
 	  Run board ID test for INTELRVP.
 
@@ -65,6 +83,7 @@ config TEST_PROJECT_INTELRVP_BOARD_ID_VAL
 	depends on TEST_PROJECT_INTELRVP_BOARD_ID
 	default 1051 if TEST_PROJECT_MTLRVPP_COMMON
 	default 1078 if TEST_PROJECT_PTLRVP_MCHP
+	default 33 if TEST_PROJECT_OCELOTRVP
 	help
 	  Value to be used for board ID test.
 
@@ -76,8 +95,9 @@ config TEST_PROJECT_PTL_BOARD_POWER
 
 config TEST_PROJECT_PTL_PDC_RUNTIME_PORT_CFG
 	bool "Run tests pdc runtime port config"
-	depends on TEST_PROJECT_PTLRVP_MCHP
+	depends on TEST_PROJECT_PTLRVP_MCHP || TEST_PROJECT_OCELOTRVP
+	default y if TEST_PROJECT_OCELOTRVP && PDC_RUNTIME_PORT_CONFIG && !TEST_PROJECT_MTL_BOARD_POWER
 	help
 	  Include usbc_runtime.c into the binary and test its functions.
 
-source "Kconfig.zephyr"
+rsource "../../program/ocelot/Kconfig"

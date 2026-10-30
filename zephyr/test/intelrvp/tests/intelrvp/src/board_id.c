@@ -19,6 +19,12 @@
 #include <ap_power/ap_pwrseq_sm.h>
 #endif
 
+#if !DT_HAS_COMPAT_STATUS_OKAY(intel_rvp_board_id) && \
+	defined(CONFIG_PLATFORM_EC_CBI)
+#include "cros_board_info.h"
+#endif
+
+#if DT_HAS_COMPAT_STATUS_OKAY(intel_rvp_board_id)
 #define NUM_BOM_GPIOS DT_PROP_LEN(DT_INST(0, intel_rvp_board_id), bom_gpios)
 #define NUM_FAB_GPIOS DT_PROP_LEN(DT_INST(0, intel_rvp_board_id), fab_gpios)
 #define NUM_BOARD_GPIOS DT_PROP_LEN(DT_INST(0, intel_rvp_board_id), board_gpios)
@@ -64,8 +70,26 @@ static int test_set_board_id_gpios(void)
 	return 0;
 }
 
+/* Board ID gpios need to be initialized before other applications.
+ * Use 80 to place it just ahead of the CBI driver priority */
+#define INTELRVP_BOARD_GPIO_SYS_INIT_PRIORITY 80
+BUILD_ASSERT(INTELRVP_BOARD_GPIO_SYS_INIT_PRIORITY <
+	     CONFIG_PLATFORM_EC_CBI_SYS_INIT_PRIORITY);
+
+SYS_INIT(test_set_board_id_gpios, POST_KERNEL,
+	 INTELRVP_BOARD_GPIO_SYS_INIT_PRIORITY);
+#endif /* DT_HAS_COMPAT_STATUS_OKAY(intel_rvp_board_id) */
+
 ZTEST(board_version_tests, test_board_get_version)
 {
+#if !DT_HAS_COMPAT_STATUS_OKAY(intel_rvp_board_id) && \
+	defined(CONFIG_PLATFORM_EC_CBI)
+	const uint32_t sku_id = 3;
+
+	zassert_ok(cbi_create());
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (const uint8_t *)&sku_id,
+				      sizeof(sku_id)));
+#endif
 	/* Set up fake return values for successful GPIO pin reading */
 	int expected_board_id = CONFIG_TEST_PROJECT_INTELRVP_BOARD_ID_VAL;
 
@@ -77,15 +101,6 @@ ZTEST(board_version_tests, test_board_get_version)
 		"Expected version didn't match actual version. Expected: %d, Actual: %d",
 		expected_board_id, version);
 }
-
-/* Board ID gpios need to be initialized before other applications.
- * Use 80 to place it just ahead of the CBI driver priority */
-#define INTELRVP_BOARD_GPIO_SYS_INIT_PRIORITY 80
-BUILD_ASSERT(INTELRVP_BOARD_GPIO_SYS_INIT_PRIORITY <
-	     CONFIG_PLATFORM_EC_CBI_SYS_INIT_PRIORITY);
-
-SYS_INIT(test_set_board_id_gpios, POST_KERNEL,
-	 INTELRVP_BOARD_GPIO_SYS_INIT_PRIORITY);
 
 #ifdef CONFIG_TEST_PROJECT_PTLRVP_MCHP
 static int board_ap_power_action_g3_run(void *data)

@@ -82,11 +82,14 @@ ZTEST_USER(test_dc_jack, test_board_is_dc_jack_present)
 }
 
 static void
-mock_charge_manager_update_charge(int port, int en,
+mock_charge_manager_update_charge(int supplier, int port,
 				  const struct charge_port_info *info)
 {
-	port_info.current = info->current;
-	port_info.voltage = info->voltage;
+	if (supplier == CHARGE_SUPPLIER_DEDICATED &&
+	    port == DEDICATED_CHARGE_PORT && info != NULL) {
+		port_info.current = info->current;
+		port_info.voltage = info->voltage;
+	}
 }
 
 ZTEST_USER(test_dc_jack, test_charger_jack_init_present)
