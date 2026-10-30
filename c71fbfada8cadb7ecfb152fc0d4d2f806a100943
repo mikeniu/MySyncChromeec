@@ -28,6 +28,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8bf30c32_4ec16c88",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:13:00Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "6f5d0f72_e93a93b3",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "06d28a6b_cfb4b382",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:** ✅ Saving `__get_IPSR()` into `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` instead of the stacked `esf-\u003ebasic.xpsr` properly records the active fault exception number when `panic_data_write_esf()` runs in handler mode, while keeping `esf-\u003ebasic.xpsr` in `cm.frame[CORTEX_PANIC_FRAME_REGISTER_PSR]`. Updating `docs/panic_data.md` matches the new `PANIC_REG_LIST` print order.\n* **Architecture \u0026 Component Fit:** ✅ Extending `PANIC_REG_LIST` with `PANIC_SYS_REG` / `CORTEX_PANIC_SYS_REG_LIST` and `_VAL` macro variants cleanly integrates live CMSIS register reads alongside ESF field copies in `zephyr/shim/src/panic.c`.\n* **Code Simplicity:** ✅ The macro definitions (`PANIC_SYS_REG`, `PANIC_COPY_REGS_VAL`, and `PANIC_PRINT_REGS_VAL`) are concise and minimal.\n* **Idiomaticity \u0026 Readability:** ✅ Uses standard CMSIS intrinsics (`__get_IPSR()`, `SCB-\u003eSHCSR`), existing `CORTEX_PANIC_REGISTER_IPSR` enum constants, and appropriate `#if defined(CONFIG_CPU_CORTEX_M)` / `#if defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)` guards.\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ `test_panic_data_write_esf` in `zephyr/test/drivers/panic/src/panic.c` only adds a `CONFIG_ARCH_POSIX` assertion (`esf.dummy` -\u003e `pdata-\u003eposix.esf_placeholder`), which exercises the pre-existing POSIX `PANIC_COPY_REGS` macro rather than the Cortex-M `IPSR` fix. Please add Cortex-M test assertions verifying that `pdata-\u003ecm.regs[CORTEX_PANIC_REGISTER_IPSR]` captures `__get_IPSR()` rather than `esf.basic.xpsr` (see inline comment on `zephyr/test/drivers/panic/src/panic.c`).\n* **CL Size \u0026 Scope:** ❌ While the CL is `Size: S (+39, -7)`, it bundles three independently revertible changes across `zephyr/shim/src/panic.c`, `docs/panic_data.md`, and `zephyr/test/drivers/panic/src/panic.c`. Please split this CL into self-contained changes:\n  1. **CL 1:** Save the active exception number with `__get_IPSR()` in `cm.regs[CORTEX_PANIC_REGISTER_IPSR]` via `PANIC_SYS_REG` / `CORTEX_PANIC_SYS_REG_LIST` in `zephyr/shim/src/panic.c`, update the `ipsr` line position in `docs/panic_data.md`, and add Cortex-M `IPSR` test assertions.\n  2. **CL 2:** Save and print `SCB-\u003eSHCSR` (`cm.shcsr`) via `CORTEX_PANIC_SYS_REG_SHCSR` on `CONFIG_ARMV7_M_ARMV8_M_MAINLINE` in `zephyr/shim/src/panic.c` and add the `shcsr` line to `docs/panic_data.md`.\n  3. **CL 3:** Add the `CONFIG_ARCH_POSIX` `esf.dummy` / `pdata-\u003eposix.esf_placeholder` verification in `zephyr/test/drivers/panic/src/panic.c`.\n* **Commit Message:** ❌ The subject line (`zephyr: panic: save the active exception number in IPSR`) omits the `SHCSR` addition mentioned in the body (`\"and also save SHCSR\"`), and the commit message omits the `CONFIG_ARCH_POSIX` test change in `zephyr/test/drivers/panic/src/panic.c`. Copy-pasteable commit messages are provided inline on `/COMMIT_MSG`. [🔗](http://go/tj/84adf0a1-0b27-4ff3-b51d-27eb83e9e93b)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67a2a377_96d781a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:13:00Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "06d28a6b_cfb4b382",
       "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -72,6 +114,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9bf78c86_22d7cace",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:13:00Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "7ea54711_82be39a7",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 9999
+      },
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "929f4db3_375b13d2",
         "filename": "zephyr/test/drivers/panic/src/panic.c",
         "patchSetId": 5
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f35cbc5_a6496ad3",
+        "filename": "zephyr/test/drivers/panic/src/panic.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:13:00Z",
+      "side": 1,
+      "message": "Code updated in PS6; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "929f4db3_375b13d2",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 367,
+        "endChar": 9999
+      },
       "revId": "c71fbfada8cadb7ecfb152fc0d4d2f806a100943",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
