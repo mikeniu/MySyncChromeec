@@ -87,6 +87,24 @@
       "parentUuid": "0f095194_61f9adc4",
       "revId": "319d7771c24ed1b6c2efc76b82c947a2272150d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82c326db_f6717b47",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-10-30T17:24:01Z",
+      "side": 1,
+      "message": "As noted, the motivation for the implementation was consistency with rwsig which uses futility in the same way. You could make the argument that rwsig is preparing a separate binary block which makes futility almost just a binary block signing tool.",
+      "parentUuid": "cd1b9065_c32a72b6",
+      "revId": "319d7771c24ed1b6c2efc76b82c947a2272150d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
