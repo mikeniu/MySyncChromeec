@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6db4a090_645dd95b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:02:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5dcd896f-19be-491f-b194-d8f0e3d491f9)]\n\n### Review Summary\n\n* **Functionality:** ✅ Correctly saves `SCB-\u003eSHCSR` into `pdata-\u003ecm.shcsr` during `panic_data_write_esf()` and prints `shcsr` in `panic_data_print()` when `CONFIG_ARMV7_M_ARMV8_M_MAINLINE` is enabled.\n* **Architecture \u0026 Component Fit:** ✅ Fits the existing `CORTEX_PANIC_SYS_REG_LIST` mechanism for capturing live CMSIS system registers not present in Zephyr\u0027s `struct __extra_esf_info`, and matches the `CONFIG_ARMV7_M_ARMV8_M_MAINLINE` guard used by `EXTRA_MAINLINE_PANIC_REG_LIST`.\n* **Code Simplicity:** ✅ Minimal macro definition following the established register-list pattern in `zephyr/shim/src/panic.c`.\n* **Idiomaticity \u0026 Readability:** ✅ Adheres to C and Zephyr/ChromiumOS EC conventions with no magic values.\n* **Security:** ✅ No security concerns; `SHCSR` is a standard fault status/control register already defined in `struct cortex_panic_data`.\n* **Testing:** ✅ Updates `test_panic_data_write_esf` in `zephyr/test/drivers/panic/src/panic.c` to verify `pdata-\u003ecm.shcsr` against `SCB-\u003eSHCSR` when `CONFIG_ARMV7_M_ARMV8_M_MAINLINE` is enabled.\n* **CL Size \u0026 Scope:** ✅ `Size: S (+13, -1)`. Single, self-contained logical change across implementation, unit test, and documentation.\n* **Commit Message:** ✅ Clear, accurate problem statement and solution summary with proper `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d91b259cd150f14bb81d65040c5ab9043ac918e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
