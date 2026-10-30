@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "508b4615_e41ef8a4",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T16:59:34Z",
+      "side": 1,
+      "message": "Please disregard — posted unintentionally by an un-sandboxed local eval run.",
+      "parentUuid": "89f33903_94f195e7",
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd97907f_81721e17",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "Please use #if defined(CHIP_VARIANT_STM32H7X3) instead of if (IS_ENABLED(CHIP_VARIANT_STM32H7X3)) here as well for consistency.",
       "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f271cd5_4a8fea4f",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T16:59:34Z",
+      "side": 1,
+      "message": "Please disregard — posted unintentionally by an un-sandboxed local eval run.",
+      "parentUuid": "bd97907f_81721e17",
       "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -73,6 +109,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79226002_e6096a11",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T16:59:34Z",
+      "side": 1,
+      "message": "Please disregard — posted unintentionally by an un-sandboxed local eval run.",
+      "parentUuid": "a5eb8e7d_87607c3f",
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b95a96c8_19f0991a",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T16:59:34Z",
+      "side": 1,
+      "message": "Please disregard — posted unintentionally by an un-sandboxed local eval run.",
+      "parentUuid": "d4261ead_47484dd8",
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a337c6c_0124dd40",
@@ -91,6 +163,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cbd0240_7f7e5073",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T16:59:34Z",
+      "side": 1,
+      "message": "Please disregard — posted unintentionally by an un-sandboxed local eval run.",
+      "parentUuid": "3a337c6c_0124dd40",
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "acf316b8_160589a9",
@@ -105,6 +195,24 @@
       "side": 1,
       "message": "fp_buffer_clear was added to _skip_test_chudow and _skip_test_helipilot (for Zephyr), but _skip_test_sanok was not updated. Consider adding fp_buffer_clear to _skip_test_sanok if sanok does not support this test.",
       "isAi": true,
+      "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f46f659a_373c40ff",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 590,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T16:59:34Z",
+      "side": 1,
+      "message": "Please disregard — posted unintentionally by an un-sandboxed local eval run.",
+      "parentUuid": "acf316b8_160589a9",
       "revId": "536139eaeb0b0e33b3e353915ff877709d621dbb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
