@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52023e1e_6fce3bb4",
+        "filename": "zephyr/program/dougie/i2c.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-30T18:53:05Z",
+      "side": 1,
+      "message": "The TI PDC supports fast mode, but I think we\u0027ve only used standard mode.\nThe Realtek PDC is limited to standard mode (100KHz), so I recommend using standard mode.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 38
+      },
+      "revId": "e2a7d256f370ec67a29e4f70ddf6a155437405a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48d03bcc_4c07b2d9",
+        "filename": "zephyr/program/dougie/i2c.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-30T18:53:05Z",
+      "side": 1,
+      "message": "I2C_BITRATE_STANDARD",
+      "range": {
+        "startLine": 34,
+        "startChar": 20,
+        "endLine": 34,
+        "endChar": 36
+      },
+      "revId": "e2a7d256f370ec67a29e4f70ddf6a155437405a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
