@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46ab0d34_309c347d",
+        "filename": "zephyr/program/ocelot/BUILD.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-30T07:30:00Z",
+      "side": 1,
+      "message": "The RVP specific configuration is not needed.",
+      "revId": "2a170af2dbdec72cca9619a67d8f7d1cb9911d5d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa3dee68_31883b5f",
+        "filename": "zephyr/program/ocelot/CMakeLists.txt",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-30T07:30:00Z",
+      "side": 1,
+      "message": "RVP specific source code is not needed.",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 49
+      },
+      "revId": "2a170af2dbdec72cca9619a67d8f7d1cb9911d5d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "601f6e57_f826c686",
+        "filename": "zephyr/program/ocelot/coolum/project.overlay",
+        "patchSetId": 16
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-30T07:30:00Z",
+      "side": 1,
+      "message": "Update this comment to refer to coolum instead of ocelotrvp-ite.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 0
+      },
+      "revId": "2a170af2dbdec72cca9619a67d8f7d1cb9911d5d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b269396_81b9070e",
+        "filename": "zephyr/program/ocelot/coolum/project.overlay",
+        "patchSetId": 16
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-30T07:30:00Z",
+      "side": 1,
+      "message": "Is DC jack pins needed?",
+      "revId": "2a170af2dbdec72cca9619a67d8f7d1cb9911d5d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
