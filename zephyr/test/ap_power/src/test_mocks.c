@@ -10,6 +10,7 @@
 
 /* Mocks for common/extpower_gpio.c */
 DEFINE_FAKE_VALUE_FUNC(int, extpower_is_present);
+DEFINE_FAKE_VOID_FUNC(extpower_interrupt, enum gpio_signal);
 
 /* Mocks for common/system.c */
 DEFINE_FAKE_VOID_FUNC(system_hibernate, uint32_t, uint32_t);
@@ -25,6 +26,7 @@ static void fff_reset_rule_before(const struct ztest_unit_test *test,
 	ARG_UNUSED(data);
 
 	RESET_FAKE(extpower_is_present);
+	RESET_FAKE(extpower_interrupt);
 	RESET_FAKE(system_hibernate);
 	RESET_FAKE(system_can_boot_ap);
 	system_can_boot_ap_fake.return_val = 1;
