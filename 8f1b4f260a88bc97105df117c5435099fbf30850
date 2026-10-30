@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22df08df_2f5eff99",
+        "filename": "zephyr/program/ocelot/blanc/led_policy.dtsi",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-10-30T23:00:06Z",
+      "side": 1,
+      "message": "*battery-led here and other nodes",
+      "range": {
+        "startLine": 17,
+        "startChar": 3,
+        "endLine": 17,
+        "endChar": 13
+      },
+      "revId": "8f1b4f260a88bc97105df117c5435099fbf30850",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
