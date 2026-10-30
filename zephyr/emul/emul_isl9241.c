@@ -11,7 +11,9 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/emul_stub_device.h>
 #include <zephyr/logging/log.h>
+#ifdef CONFIG_ZTEST
 #include <zephyr/ztest.h>
+#endif
 
 #define DT_DRV_COMPAT ISL9241_CHG_COMPAT
 
@@ -168,6 +170,7 @@ DT_INST_FOREACH_STATUS_OKAY(INIT_ISL9241_EMUL)
 
 DT_INST_FOREACH_STATUS_OKAY(EMUL_STUB_DEVICE);
 
+#ifdef CONFIG_ZTEST
 static void isl9241_emul_reset_rule_before(const struct ztest_unit_test *test,
 					   void *data)
 {
@@ -180,3 +183,4 @@ static void isl9241_emul_reset_rule_before(const struct ztest_unit_test *test,
 	DT_INST_FOREACH_STATUS_OKAY(ISL9241_EMUL_RESET_RULE_BEFORE);
 }
 ZTEST_RULE(isl9241_emul_reset, isl9241_emul_reset_rule_before, NULL);
+#endif /* CONFIG_ZTEST */

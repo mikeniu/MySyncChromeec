@@ -1937,7 +1937,7 @@ static int emul_realtek_rts54xx_get_sys_power_state(const struct emul *target,
 		*state = POWER_S4;
 		break;
 #ifdef CONFIG_POWER_S0IX
-	case SX_S0IX:
+	case SX_SOIX:
 		*state = POWER_S0ix;
 		break;
 #endif /* CONFIG_POWER_S0IX */
