@@ -165,6 +165,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ebe1294c_d8f726d5",
+        "filename": "util/realtekfp/rts5817_libusb_backend.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:04Z",
+      "side": 1,
+      "message": "Two C++23 cleanups here (matching `util/focaltech/libusb_transport.cc`):\n\n1. Wrap `config` in a `std::unique_ptr\u003clibusb_config_descriptor, CDeleter\u003clibusb_free_config_descriptor\u003e\u003e` populated via C++23 `std::out_ptr(config)` so `libusb_free_config_descriptor()` runs automatically on scope exit.\n2. Wrap the C descriptor arrays in `std::span` instead of nested index loops and pointer arithmetic:\n   ```cpp\n   for (const auto\u0026 iface :\n        std::span(config-\u003einterface, config-\u003ebNumInterfaces)) {\n     for (const auto\u0026 alt :\n          std::span(iface.altsetting,\n                    static_cast\u003csize_t\u003e(iface.num_altsetting))) {\n       const std::span\u003cconst uint8_t\u003e extra(\n           alt.extra,\n           alt.extra \u0026\u0026 alt.extra_length \u003e 0\n               ? static_cast\u003csize_t\u003e(alt.extra_length)\n               : 0);\n       interfaces.push_back({\n           .number \u003d alt.bInterfaceNumber,\n           .usb_class \u003d alt.bInterfaceClass,\n           .usb_subclass \u003d alt.bInterfaceSubClass,\n           .extra \u003d {extra.begin(), extra.end()},\n       });\n     }\n   }\n   ```",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "81c70059_c1587ccd",
         "filename": "util/realtekfp/rts5817_libusb_backend.h",
         "patchSetId": 5
@@ -180,6 +204,30 @@
         "startLine": 6,
         "startChar": 0,
         "endLine": 14,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7c48de1_ad8857c8",
+        "filename": "util/realtekfp/rts5817_libusb_backend.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:04Z",
+      "side": 1,
+      "message": "Consider replacing the raw `libusb_context*` and `libusb_device_handle*` pointers (and the manual `if (p) { libusb_...; p \u003d nullptr; }` cleanup in `rts5817_libusb_backend.cc:8-43`) with `std::unique_ptr` and C++20 stateless lambda deleters, matching `util/focaltech/libusb_transport.h` and `util/elan/iap_control.h`:\n```cpp\ntemplate \u003cauto Fn\u003e\nusing CDeleter \u003d decltype([](auto* p) { Fn(p); });\n\nstd::unique_ptr\u003clibusb_context, CDeleter\u003clibusb_exit\u003e\u003e ctx_;\nstd::unique_ptr\u003clibusb_device_handle, CDeleter\u003clibusb_close\u003e\u003e dev_handle_;\n```\nNote the declaration order: `ctx_` must be declared *before* `dev_handle_` so `dev_handle_` is destroyed (`libusb_close`) before `ctx_` (`libusb_exit`), allowing `~RtsLibusbBackend() override \u003d default;`.\n\nIn `Init()`, C++23 `std::out_ptr` (`\u003cmemory\u003e`) then lets you pass `ctx_` directly to C out-parameter APIs (after `Close()`):\n```cpp\nClose();\nreturn libusb_init(std::out_ptr(ctx_));\n```",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
         "endChar": 9999
       },
       "isAi": true,
