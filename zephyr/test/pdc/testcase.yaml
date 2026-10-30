@@ -36,7 +36,7 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
-  pdc.generic.runtime_config:
+  pdc.generic.runtime_config: &pdc_generic_runtime_config
     timeout: 500
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_GENERIC=y
@@ -100,7 +100,7 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/tps6699x.overlay"
 
-  pdc.generic.tps6699x.runtime_config:
+  pdc.generic.tps6699x.runtime_config: &pdc_generic_tps6699x_runtime_config
     timeout: 300
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_GENERIC=y
@@ -545,3 +545,27 @@ tests:
     - CONFIG_PDC_POWER_MGMT_SRC_THROTTLING=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
+
+  pdc.generic.ocelotrvp_ite.rts54xx:
+    <<: *pdc_generic_runtime_config
+    extra_dtc_overlay_files:
+    - "../../program/ocelot/ocelotrvp-ite/native_sim.overlay"
+    - "./boards/rvp_rts54xx.overlay"
+
+  pdc.generic.ocelotrvp_ite.tps6699x:
+    <<: *pdc_generic_tps6699x_runtime_config
+    extra_dtc_overlay_files:
+    - "../../program/ocelot/ocelotrvp-ite/native_sim.overlay"
+    - "./boards/rvp_tps6699x.overlay"
+
+  pdc.generic.ocelotrvp_npcx.rts54xx:
+    <<: *pdc_generic_runtime_config
+    extra_dtc_overlay_files:
+    - "../../program/ocelot/ocelotrvp-npcx/native_sim.overlay"
+    - "./boards/rvp_rts54xx.overlay"
+
+  pdc.generic.ocelotrvp_npcx.tps6699x:
+    <<: *pdc_generic_tps6699x_runtime_config
+    extra_dtc_overlay_files:
+    - "../../program/ocelot/ocelotrvp-npcx/native_sim.overlay"
+    - "./boards/rvp_tps6699x.overlay"

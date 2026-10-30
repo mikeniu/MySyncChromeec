@@ -1,0 +1,18 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	zephyr,user {
+		test_timeout = <1850>;
+		pd_version = <0>;
+		pd_revision = <0>;
+		project_name = "GOOG";
+	};
+};
+
+/delete-node/ &dsp_service;
+
+pdc_emul1: &pdc_ti_c0 {};
+pdc_emul2: &pdc_ti_c1 {};

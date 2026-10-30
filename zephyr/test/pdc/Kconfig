@@ -192,4 +192,19 @@ config TEST_SNIFF_POWER_MGMT_PDC_APIS
 	  This is used to allow tests to create sniffing PDC APIs in
 	  pdc_power_mgmt.c that can be mocked in tests.
 
+configdefault PLATFORM_EC_CHARGER_ISL9238
+	default y if DT_HAS_INTERSIL_ISL923X_ENABLED || DT_HAS_CROS_ISL923X_EMUL_ENABLED
+
+configdefault PLATFORM_EC_CHARGER_RAA489110
+	default y if DT_HAS_INTERSIL_ISL9241_ENABLED
+
+configdefault FLASH
+	default y if DT_HAS_CROS_EC_FLASH_EMUL_ENABLED
+
+configdefault ESPI
+	default y if DT_HAS_ZEPHYR_ESPI_EMUL_ESPI_HOST_ENABLED
+
+configdefault I2C_INIT_PRIORITY
+	default 39 if DT_HAS_INTERSIL_ISL9241_ENABLED
+
 source "Kconfig.zephyr"
