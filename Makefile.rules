@@ -7,10 +7,8 @@
 # Embedded Controller firmware build system - common targets
 #
 
-BUILD_DIR := $(firstword $(subst /, ,$(out)))
-
 # Create output directories if necessary
-_common_dir_create := $(foreach d,$(common_dirs) $(common-dirs-y),\
+_common_dir_create := $(foreach d,$(common_dirs),\
 	$(shell [ -d $(out)/$(d) ] || mkdir -p $(out)/$(d)))
 
 # V unset for normal output, V=1 for verbose output, V=0 for silent build
@@ -63,15 +61,7 @@ cmd_cxx_to_host = $(HOSTCXX) $(HOST_CXXFLAGS) \
 cmd_version = ./util/getversion.sh > $@.tmp && \
 	cmp -s $@.tmp $@ && rm -f $@.tmp || mv $@.tmp $@
 
-cmd_cp_script = cp "$<" "$@" && chmod +x "$@"
 cmd_symlink_hdr = mkdir -p $(@D) && ln -srf $< $@
-# If outputing to tty and column command exists, pipe into column.
-# Otherwise, print in newline format.
-cmd_pretty_print_cmd = @$(1) \
-				| { [ -t 1 ]                         \
-				    && which column 1>/dev/null 2>&1 \
-				    && column || cat ; }
-cmd_pretty_print_list = $(call cmd_pretty_print_cmd,echo $(1) | tr ' ' '\n')
 
 .PHONY: utils-host
 utils-host: $(host-utils) $(host-utils-cxx)
@@ -134,7 +124,7 @@ $(host-utils-cxx): $(out)/%: | $(chromeos-ec-headers) $(out)/ec_version.h
 
 .PHONY: clean
 clean:
-	-rm -rf $(out) build/Makefile.sdk
+	-rm -rf $(out)
 
 .PHONY: clobber
 clobber:
@@ -162,17 +152,16 @@ help:
 	@echo ""
 	@echo "Common Variables:"
 	@echo "  V=1                  - Show make output"
-	@echo "  STATIC_VERSION=1     - Force a constant version string for reproducable builds"
-	@echo "  BUILDCC_PREFIX=      - Set the compiler prefix for the system doing "
-	@echo "     the build (defaults to 'x86_64-pc-linux-gnu-')."
-	@echo "  CROSS_COMPILE=       - Set the compiler for the board"
-	@echo "  CROSS_COMPILE_arch=  - Set the compiler for arch"
-	@echo "     The board picks its CROSS_COMPILE_arch if CROSS_COMPILE is not set."
-	@echo "     arch may be one of 'arm', 'i386', 'nds32'."
-	@echo "  HOST_CROSS_COMPILE=  - Set the compiler for the target platform on top of"
-	@echo "     the EC. For example, this may be 32-bit x86 linux ('i686-pc-linux-gnu-'),"
-	@echo "     64-bit x86 linux ('x86_64-pc-linux-gnu-'), or maybe 64-bit ARM linux"
+	@echo "  STATIC_VERSION=1     - Force a constant version string for" \
+	      "reproducible builds"
+	@echo "  HOST_CROSS_COMPILE=  - Set the compiler for the target" \
+	      "platform on top of"
+	@echo "     the EC. For example, this may be 32-bit x86 linux" \
+	      "('i686-pc-linux-gnu-'),"
+	@echo "     64-bit x86 linux ('x86_64-pc-linux-gnu-'), or maybe" \
+	      "64-bit ARM linux"
 	@echo "     ('aarch64-cros-linux-gnu-')."
+	@echo ""
 	@echo "Example:"
 	@echo "  make utils-host"
 
@@ -180,21 +169,9 @@ out_cros_ec_commands=build/kernel/include/linux/mfd/cros_ec_commands.h
 .PHONY: build_cros_ec_commands
 build_cros_ec_commands: $(out_cros_ec_commands)
 
-
 $(out_cros_ec_commands): include/ec_commands.h util/make_linux_ec_commands_h.sh
 	util/make_linux_ec_commands_h.sh $< $@
 
 .SECONDARY:
 
 -include $(deps)
-
-.PHONY: get_sdk
-get_sdk:
-ifneq ($(BAZEL_SUPPORTED),)
-	declare -A toolchain_dict=($(shell ./util/coreboot_sdk.py)) ; \
-	rm -rf build/Makefile.sdk ; \
-	for key in "$${!toolchain_dict[@]}"; do \
-		echo "export $${key} := $${toolchain_dict[$${key}]}" >> build/Makefile.sdk ; \
-	done
-	sync
-endif
