@@ -34,6 +34,7 @@ static struct batt_params mock_batt;
 
 const struct batt_params *charger_current_battery_params(void)
 {
+	mock_batt.is_present = battery_is_present();
 	return &mock_batt;
 }
 
