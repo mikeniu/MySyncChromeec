@@ -18,6 +18,84 @@
       "isAi": true,
       "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13f2b855_4cb57de1",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:43:27Z",
+      "side": 1,
+      "message": "Prefer `std::span` over a raw `(uint8_t* data, uint16_t length)` pointer+length pair — e.g., splitting into `ControlTransferOut(..., std::span\u003cconst uint8_t\u003e data, ...)` and `ControlTransferIn(..., std::span\u003cuint8_t\u003e data, ...)` (matching `util/focaltech/usb_transport.h` and `util/egis/usb_comm.h`).\n\nThat prevents buffer/length mismatches, lets zero-length control requests pass `{}` instead of `(nullptr, 0)`, and avoids forcing callers like `dfu_download()` to `const_cast\u003cuint8_t*\u003e` read-only firmware buffers (keeping the `libusb_control_transfer()` C API cast and `UINT16_MAX` length check isolated inside `RtsLibusbBackend`).",
+      "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a2bb281_112cac3a",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:43:27Z",
+      "side": 1,
+      "message": "Following the `std::expected` pattern from the base CL, please return `std::expected\u003csize_t, int\u003e` here instead of multiplexing a non-negative byte count and a negative `libusb_error` into a single `int`. That also eliminates the signed/unsigned `static_cast\u003cint\u003e(sizeof(...))` comparisons at call sites.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c32f292_a8fa95d9",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:43:27Z",
+      "side": 1,
+      "message": "Use `std::chrono::milliseconds` here (`inline constexpr std::chrono::milliseconds kUsbCtrlTimeout{1000};`) and accept `std::chrono::milliseconds timeout` in `RtsUsbBackend::control_transfer()` (`rts5817_usb_backend.h:38`), converting via `static_cast\u003cunsigned int\u003e(timeout.count())` only once at the `libusb_control_transfer()` C API boundary in `RtsLibusbBackend`.",
+      "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0804691b_2952f5a9",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:43:27Z",
+      "side": 1,
+      "message": "Please return `std::expected\u003cvoid, RtsError\u003e` here as well so callers can distinguish a `STALL` (`LIBUSB_ERROR_PIPE`) from transport/disconnect errors.",
+      "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
