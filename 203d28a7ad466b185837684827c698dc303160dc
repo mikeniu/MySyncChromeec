@@ -87,6 +87,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df62d85_a41eb859",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:29:44Z",
+      "side": 1,
+      "message": "Done in ps8: split as suggested. This change keeps only the lifecycle (init, wait_for_device, release); download mode is 8687496 and RtsLibusbBackend is in 8629988.",
+      "parentUuid": "7e5ce9b8_1aaa8f02",
+      "revId": "203d28a7ad466b185837684827c698dc303160dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d60918d_25786d97",

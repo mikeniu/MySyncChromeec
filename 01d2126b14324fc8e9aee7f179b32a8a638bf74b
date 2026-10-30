@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6b43d8c_7921ffcf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:29:44Z",
+      "side": 1,
+      "message": "Done in ps8: the subject is now \"Add RtsUsbDevice lifecycle management\". Download mode moved to 8687496 and RtsLibusbBackend moved into the rts5817_flash CLI change (8629988).",
+      "parentUuid": "878989d3_a237abcc",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c7a0eb0_e430fed1",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n* **Functionality:**\n  * All previously identified functional defects have been resolved: `wait_for_device()` rejects `timeout_ms \u003c\u003d 0` and `poll_interval_ms \u003c\u003d 0` before touching the backend, `RtsLibusbBackend::open()` closes any existing device handle before opening a new one, `init()` and `wait_for_device()` release prior resources before re-initializing and on failure paths, and `enable_download()` guards against short reads on `GET_STATUS`.\n* **Architecture \u0026 Component Fit:**\n  * Placing the Realtek fingerprint utility sources under `util/realtekfp/` with its own `util/realtekfp/build.mk` cleanly matches sibling host utilities (`util/elan/`, `util/egis/`, `util/focaltech/`). However, `rts5817_flash_test` only exercises `RtsUsbDevice` via `MockRtsUsbBackend` and does not use `RtsLibusbBackend`; decoupling `RtsLibusbBackend` from this CL avoids linking `libusb-1.0` into the unit test runner (matching `util/elan/build.mk`).\n* **Code Simplicity:**\n  * The implementations of `RtsUsbDevice::init()`, `wait_for_device()`, `release()`, and `enable_download()` are concise, linear, and easy to follow.\n* **Idiomaticity \u0026 Readability:**\n  * Header-scope constants in `util/realtekfp/rts5817_usb_device.h` now use `inline constexpr`, class declarations follow standard C++ member ordering with in-class initializers and deleted copy operations, and test files use clean namespace-scope `using` declarations and named constants (`kTimeoutMs`, `kPollIntervalMs`).\n* **Security:**\n  * `enable_download()` verifies `ret \u003c static_cast\u003cint\u003e(sizeof(status))` before inspecting `status`, preventing uninitialized or stale buffer reads on 0-byte transfers.\n* **Testing:**\n  * `util/realtekfp/rts5817_usb_device_test.cc` thoroughly covers success, error, short-read, timeout (`3 * kPollIntervalMs`), and invalid-interval (`0` and `-1` for both `timeout_ms` and `poll_interval_ms`) boundaries using `StrictMock\u003cMockRtsUsbBackend\u003e`, `InSequence` with exact `close()` call counts, and exact control-transfer argument matchers.\n* **CL Size \u0026 Scope:**\n  * This CL is `Size: L (+638, -1)`, comprising **348 lines of production code** (`rts5817_usb_backend.h`: 44, `rts5817_libusb_backend.h`: 34, `rts5817_libusb_backend.cc`: 65, `rts5817_usb_device.h`: 75, `rts5817_usb_device.cc`: 130), **26 lines of build configuration** (`util/build.mk`: 1, `util/realtekfp/build.mk`: 25), and **264 lines of test/mock code** (`rts5817_mock_usb_backend.h`: 27, `rts5817_usb_device_test.cc`: 237). Because the non-test production diff exceeds the 250-line limit (`348 \u003e\u003d 250`) and bundles multiple independently reviewable components (`RtsUsbDevice` lifecycle management, RTS5817 vendor download-mode control, and `RtsLibusbBackend`), please split this CL into smaller commits:\n    1. **CL 1:** Add `RtsUsbBackend` (`init`, `open`, `close`, `error_name`), `MockRtsUsbBackend`, `RtsUsbDevice` lifecycle management (`init`, `wait_for_device`, `release`), lifecycle unit tests in `util/realtekfp/rts5817_usb_device_test.cc`, and `util/realtekfp/build.mk` (~185 non-test production lines).\n    2. **CL 2:** Extend `RtsUsbBackend`, `MockRtsUsbBackend`, and `RtsUsbDevice` with `is_open()`, `control_transfer()`, and `enable_download()` (along with vendor control request constants and the `EnableDownload*` unit tests, ~75 non-test production lines).\n    3. **CL 3:** Add `RtsLibusbBackend` (`util/realtekfp/rts5817_libusb_backend.h` and `util/realtekfp/rts5817_libusb_backend.cc`, 99 lines) in its own CL or in the `rts5817_flash` CLI binary CL where `RtsLibusbBackend` is instantiated.\n* **Commit Message:**\n  * The subject line (`rts5817: Add RtsUsbDevice lifecycle and download mode`) still joins two distinct responsibilities with `\" and \"`. See the inline comment on `/COMMIT_MSG` for copy-pasteable commit messages.\n\n[🔗](http://go/tj/07013c35-06fc-4bc0-beed-33379a66d8b2)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf1b4e79_4ad82d3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:29:44Z",
+      "side": 1,
+      "message": "Done in ps8: this change is now ~170 non-test lines with only the lifecycle. Download mode is 8687496; RtsLibusbBackend is added in the CLI binary change 8629988 where it is instantiated.",
+      "parentUuid": "7c7a0eb0_e430fed1",
       "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d749d374_3de51e68",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:29:44Z",
+      "side": 1,
+      "message": "Done in ps8: rts5817_flash_test no longer links rts5817_libusb_backend.o or libusb-1.0.",
+      "parentUuid": "0d891360_c5b31688",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 9999
+      },
       "revId": "01d2126b14324fc8e9aee7f179b32a8a638bf74b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
