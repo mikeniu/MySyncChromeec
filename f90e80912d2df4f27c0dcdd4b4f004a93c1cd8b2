@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc72233d_d87754a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T16:43:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/1e822285-5101-43c4-957d-bc5665bb0015)]\n\n### Review Summary\n- **Functionality**: `system_disable_jump()` now unconditionally calls `mpu_enable()` when `CONFIG_MPU` is enabled so Cortex-M fixed MPU regions protect code and data RAM even when hardware write-protect is unlocked, while `mpu_enable()` gates sticky NPCX RAM lock configuration on `system_is_locked()` and `arch_pre_system_jump()` disables fixed MPU regions (followed by `__DSB()` and `__ISB()` barriers) before jumping to a target image or RAM loader.\n- **Architecture \u0026 Component Fit**: Keeping the NPCX RAM lock check and log inside `mpu_enable()` under `CONFIG_NPCX_RAM_LOCK` keeps `common/system.c` target-agnostic, disabling fixed MPU regions in `arch_pre_system_jump()` matches the pre-jump contract in `include/system.h`, and isolating the POSIX/Ztest MPU register and barrier stubs under `CONFIG_ZTEST \u0026\u0026 CONFIG_ARCH_POSIX` enables host unit testing without shadowing CMSIS headers.\n- **Code Simplicity**: Reuses `mpu_disable_fixed_regions()` directly in `arch_pre_system_jump()` and evaluates `system_is_locked()` once before the region loop in `mpu_enable()`.\n- **Idiomaticity \u0026 Readability**: Follows ChromiumOS EC and Zephyr C conventions (`LOG_INF`, CMSIS/Zephyr barrier APIs, Kconfig, and FFF fakes), and `zephyr/shim/include/mpu.h` includes `\u003cstdint.h\u003e` directly for `uint32_t`.\n- **Security**: Strengthens defense-in-depth on unlocked Cortex-M targets by ensuring fixed MPU write and execute-never protections are enabled when jumps are disabled.\n- **Testing**: `zephyr/test/system_common` covers both `system.default` (verifying `system_disable_jump()` calls `mpu_enable()` when unlocked and locked) and `system.cortex_m_mpu` (exercising `zephyr/shim/core/cortex-m/mpu.c` on `native_sim` across unlocked `system_disable_jump()`, `arch_pre_system_jump()`, and locked `system_disable_jump()`).\n- **CL Size \u0026 Scope**: `Size: M (+159, -19)`. Focused, single logical change (~50 production lines and ~109 test/config lines) combining `system_disable_jump()` MPU enablement, NPCX RAM lock gating, `arch_pre_system_jump()` region teardown, and unit tests.\n- **Commit Message**: Concisely explains the problem and conceptual solution in two short prose paragraphs with valid `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f90e80912d2df4f27c0dcdd4b4f004a93c1cd8b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
