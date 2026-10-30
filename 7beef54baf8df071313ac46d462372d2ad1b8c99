@@ -88,6 +88,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8bc7c11_ec56aa4b",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:18Z",
+      "side": 1,
+      "message": "Two C++ simplifications that clean up this function:\n\n1. **RAII interface-claim guard**: Wrapping `claim_interface` / `release_interface` (plus resetting `dfu_interface_ \u003d -1`) in a small move-only/non-copyable scope guard eliminates the repeated manual `backend_-\u003erelease_interface(dfu_interface_); dfu_interface_ \u003d -1;` cleanup across every error and return path (lines 394–395, 405–406, and 449–450).\n2. **`std::span` slicing instead of manual offset arithmetic**: Walking a `std::span\u003cconst uint8_t\u003e remaining \u003d firmware;` via `first()` / `subspan()` (matching `util/elan/iap_control.cc`) avoids manual `offset` math and `firmware.data() + offset` pointer arithmetic:\n   ```cpp\n   std::span\u003cconst uint8_t\u003e remaining \u003d firmware;\n   for (uint16_t block_num \u003d 0; !remaining.empty(); ++block_num) {\n     const auto chunk \u003d remaining.first(\n         std::min\u003csize_t\u003e(remaining.size(), transfer_size_));\n     const size_t offset \u003d firmware.size() - remaining.size();\n     ...\n     remaining \u003d remaining.subspan(chunk.size());\n   }\n   ```\n   *(Note: C++23 `std::views::chunk` and `std::views::enumerate` are not yet implemented in CrOS\u0027s `libc++`, so `first()` / `subspan()` is the cleanest portable option here.)*",
+      "range": {
+        "startLine": 350,
+        "startChar": 0,
+        "endLine": 420,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94db683a_6ed8786f",
         "filename": "util/realtekfp/rts5817_usb_device.cc",
         "patchSetId": 5
