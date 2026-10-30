@@ -20,6 +20,10 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
 
+#if defined(CONFIG_CPU_CORTEX_M)
+#include <cmsis_core.h>
+#endif
+
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
 /*
@@ -59,16 +63,25 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 	M_GPR(extra_info.callee->v7, cm.regs[CORTEX_PANIC_REGISTER_R10], v7) \
 	M_GPR(extra_info.callee->v8, cm.regs[CORTEX_PANIC_REGISTER_R11], v8) \
 	M(extra_info.callee->psp, cm.regs[CORTEX_PANIC_REGISTER_PSP], psp)   \
-	M(basic.xpsr, cm.regs[CORTEX_PANIC_REGISTER_IPSR], ipsr)             \
 	M(extra_info.exc_return, cm.regs[CORTEX_PANIC_REGISTER_LR], exc_rtn) \
 	M(extra_info.msp, cm.regs[CORTEX_PANIC_REGISTER_MSP], msp)           \
 	EXTRA_MAINLINE_PANIC_REG_LIST(M)
-/*
- * IPSR is a subset of xPSR, which is already captured in PANIC_REG_LIST, but
- * print it anyway because it may contain panic exception.
- */
 #else
 #define EXTRA_PANIC_REG_LIST(M, M_GPR)
+#endif
+/*
+ * The stacked xPSR holds the exception number of the interrupted context (0 in
+ * thread mode), so save the active exception number with __get_IPSR() instead,
+ * as legacy cros-ec does.
+ */
+#if defined(CONFIG_CPU_CORTEX_M)
+#define PANIC_SYS_REG(M, val, pdata_field, human_name) \
+	M##_VAL(val, pdata_field, human_name)
+#define CORTEX_PANIC_SYS_REG_LIST(M)                                        \
+	PANIC_SYS_REG(M, __get_IPSR(), cm.regs[CORTEX_PANIC_REGISTER_IPSR], \
+		      ipsr)
+#else
+#define CORTEX_PANIC_SYS_REG_LIST(M)
 #endif
 #define PANIC_REG_LIST(M, M_GPR)          \
 	M_GPR(basic.r0, cm.frame[0], a1)  \
@@ -79,7 +92,8 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 	M(basic.lr, cm.frame[5], lr)      \
 	M(basic.pc, cm.frame[6], pc)      \
 	M(basic.xpsr, cm.frame[7], xpsr)  \
-	EXTRA_PANIC_REG_LIST(M, M_GPR)
+	EXTRA_PANIC_REG_LIST(M, M_GPR)    \
+	CORTEX_PANIC_SYS_REG_LIST(M)
 #define PANIC_REG_EXCEPTION(pdata) ((pdata)->cm.regs[1])
 #define PANIC_REG_REASON(pdata) ((pdata)->cm.regs[3])
 #define PANIC_REG_INFO(pdata) ((pdata)->cm.regs[4])
@@ -142,12 +156,15 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 /* Macros to be applied to PANIC_REG_LIST as M */
 #define PANIC_COPY_REGS(esf_field, pdata_field, human_name) \
 	pdata->pdata_field = esf->esf_field;
+#define PANIC_COPY_REGS_VAL(val, pdata_field, human_name) \
+	pdata->pdata_field = val;
 #define PANIC_COPY_REGS_GPR(esf_field, pdata_field, human_name)              \
 	pdata->pdata_field = COND_CODE_1(CONFIG_PLATFORM_EC_PANIC_STRIP_GPR, \
 					 (0), (esf->esf_field));
 
 #define PANIC_PRINT_REGS(esf_field, pdata_field, human_name) \
 	panic_printf("  %-8s = 0x%08X\n", #human_name, pdata->pdata_field);
+#define PANIC_PRINT_REGS_VAL PANIC_PRINT_REGS
 
 void panic_data_print(const struct panic_data *pdata)
 {

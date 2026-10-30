@@ -141,6 +141,11 @@ static void test_panic_data(void)
 				pdata->riscv.regs[expected_regs[i].index]);
 		}
 	}
+
+	if (IS_ENABLED(CONFIG_CPU_CORTEX_M)) {
+		zassert_not_equal(pdata->cm.regs[CORTEX_PANIC_REGISTER_IPSR],
+				  0);
+	}
 }
 
 static void (*test_steps[])(void) = { test_panic, test_panic_data };
