@@ -39,6 +39,25 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aa979893_ddbc2057",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T19:19:47Z",
+      "side": 1,
+      "message": "Code updated in PS13; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "46bd0ca2_233eafc5",
+      "isAi": true,
+      "revId": "e84e1af557d70228eeb16c8b82db1f18c727a231",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f8d68db0_d1b346ad",
         "filename": "zephyr/shim/include/mpu.h",
         "patchSetId": 11
@@ -50,6 +69,25 @@
       "writtenOn": "2026-10-30T17:19:25Z",
       "side": 1,
       "message": "Consider guarding this block with `#ifdef CONFIG_TEST_CORTEX_M_MPU` instead of `#ifdef CONFIG_ZTEST`. On-device Renode tests (`firmware-ec-renode-cq`, `CONFIG_HW_TEST\u003dy`) also enable `CONFIG_ZTEST\u003dy` on real Cortex-M targets (`bloonchipper`, `chudow`, `helipilot`), which causes `MPU_RASR_ENABLE_Msk` and `struct arm_mpu_region` / `struct arm_mpu_config` redefinition errors against CMSIS and Zephyr ARM MPU headers.",
+      "revId": "e84e1af557d70228eeb16c8b82db1f18c727a231",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4da3984d_01aa00ee",
+        "filename": "zephyr/shim/include/mpu.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T19:19:47Z",
+      "side": 1,
+      "message": "Code updated in PS13; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "f8d68db0_d1b346ad",
+      "isAi": true,
       "revId": "e84e1af557d70228eeb16c8b82db1f18c727a231",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
