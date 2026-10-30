@@ -11,3 +11,16 @@ tests:
     harness: pytest
     harness_config:
       pytest_dut_scope: session
+      pytest_root:
+        - pytest/test_pwrseq.py
+  aic.pwrseq.fault_injection:
+    extra_configs:
+      - CONFIG_AIC_PWRSEQ_FAULT_INJECTION=y
+    extra_dtc_overlay_files:
+      - boards/realtek_rts5912.overlay
+      - fault_injection.overlay
+    harness: pytest
+    harness_config:
+      pytest_dut_scope: session
+      pytest_root:
+        - pytest/test_pwrseq_fault.py

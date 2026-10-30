@@ -1,0 +1,13 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config AIC_PWRSEQ_FAULT_INJECTION
+	bool "Inject AP power sequencing timing violations for negative testing"
+	help
+	  Enable deliberate timing violations in the AIC power sequencing test
+	  firmware to verify that the Dagwood AP emulator and pytest harness
+	  detect spec violations (tPCH12, tPCH03, tPLT04, tPCH08, tPLT05,
+	  tPCH43, and tCPU22).
+
+source "Kconfig.zephyr"
