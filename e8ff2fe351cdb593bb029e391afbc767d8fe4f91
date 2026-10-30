@@ -21,6 +21,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef341e9c_be295748",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:33Z",
+      "side": 1,
+      "message": "Prefer `std::array\u003cuint8_t, kDfuGetStatusResponseLen\u003e response{};` over a raw C array, and consider extracting the 6-byte unpacking into a small `DfuStatusResponse` struct/helper:\n```cpp\nstruct DfuStatusResponse {\n  DfuStatus status;\n  std::chrono::milliseconds poll_timeout;\n  DfuState state;\n\n  static DfuStatusResponse FromBytes(\n      std::span\u003cconst uint8_t, kDfuGetStatusResponseLen\u003e raw);\n};\n```\nThat isolates the 24-bit little-endian `bwPollTimeout` bit shifts in one place and can be reused for the initial `DFU_GETSTATUS` state check/recovery in `DfuDownload()`.",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 263,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "e8ff2fe351cdb593bb029e391afbc767d8fe4f91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef63b650_68facbf1",
         "filename": "util/realtekfp/rts5817_usb_device.cc",
         "patchSetId": 4
@@ -36,6 +60,30 @@
         "startLine": 303,
         "startChar": 0,
         "endLine": 311,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "e8ff2fe351cdb593bb029e391afbc767d8fe4f91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "073d8b0c_8784f040",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:33Z",
+      "side": 1,
+      "message": "Consider grouping the DFU protocol constants into scoped `enum class : uint8_t` types (`DfuRequest`, `DfuStatus`, and `DfuState`, matching `util/elan/iap_control.h`) instead of loose `uint8_t` constants:\n```cpp\nenum class DfuRequest : uint8_t {\n  kDetach \u003d 0x00,\n  kDownload \u003d 0x01,\n  kGetStatus \u003d 0x03,\n  kClrStatus \u003d 0x04,\n};\n\nenum class DfuStatus : uint8_t {\n  kOk \u003d 0x00,\n};\n\nenum class DfuState : uint8_t {\n  kDfuIdle \u003d 2,\n  kDfuDnloadSync \u003d 3,\n  kDfuDnloadBusy \u003d 4,\n  kDfuDnloadIdle \u003d 5,\n  kDfuManifestSync \u003d 6,\n  kDfuManifest \u003d 7,\n  kDfuManifestWaitReset \u003d 8,\n  kDfuError \u003d 10,\n};\n```\nThat prevents accidentally mixing `bStatus`, `bState`, and `bRequest` values, lets `DfuPollIdle()` use C++20 `using enum DfuState;` inside its `switch`, and pairs cleanly with C++23 `std::to_underlying()` (`\u003cutility\u003e`, as used in `util/focaltech/updater.cc` and `util/elan/iap_control.cc`) at the `ControlTransfer` wire boundary.\n\nAlso, for the duration constants below (lines 61, 80–81), `std::chrono::milliseconds(1)` / `std::chrono::seconds(1)` / `std::chrono::seconds(60)` (or `1ms`, `1s`, `60s` via `using namespace std::chrono_literals;` inside a `.cc` file or internal namespace) reads much more clearly than raw integer millisecond counts.",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 58,
         "endChar": 9999
       },
       "isAi": true,
