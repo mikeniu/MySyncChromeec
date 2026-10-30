@@ -22,6 +22,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "064a8aab_541bbc06",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:18:25Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "9f8dc9d3_d25cc052",
+      "revId": "bb68a733c7ff7baf24b69ff116ef85784a8f0bf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d4849cb8_dfb8aaae",
         "filename": "common/btle_hci_controller.c",
         "patchSetId": 2
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "bb68a733c7ff7baf24b69ff116ef85784a8f0bf8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81415748_57a70a55",
+        "filename": "common/btle_hci_controller.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:18:25Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "d4849cb8_dfb8aaae",
+      "range": {
+        "startLine": 573,
+        "startChar": 0,
+        "endLine": 586,
+        "endChar": 9999
+      },
       "revId": "bb68a733c7ff7baf24b69ff116ef85784a8f0bf8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
