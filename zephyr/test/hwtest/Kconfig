@@ -150,6 +150,14 @@ config HW_TEST_NULL_POINTER
 	help
 	  The test verifies null pointer dereference crashes.
 
+config HW_TEST_OPENSSL_CLEANSE
+	bool "OPENSSL_cleanse test"
+	depends on ZTEST
+	depends on BORINGSSL_CRYPTO
+	help
+	  The test verifies OPENSSL_cleanse is not optimized out by the
+	  compiler.
+
 config HW_TEST_OTP_KEY
 	bool "OTP key test"
 	depends on ZTEST
