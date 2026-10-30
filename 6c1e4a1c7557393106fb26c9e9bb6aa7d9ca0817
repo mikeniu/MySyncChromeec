@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9264bad3_38377ddf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:02:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Scope \u0026 Commit Message Structure**\n\n1. **Single Logical Change (Split into Two Stacked CLs):** The subject line joins two distinct actions with `\" and \"` (`Keep FSCE# asserted` and `delay during flash status polling`), and the patch bundles two independently committable changes that can each build and be verified on their own:\n   - **CL 1:** Keep `FSCE#` asserted across flash status polling in `dma_flash_cmd_read_status()` by issuing `FLASH_CMD_RS` once, reading status directly from `IT83XX_SMFI_ECINDDR`, and driving `FSCE#` high only after the expected status is observed.\n   - **CL 2:** Add the ~15 us `IT83XX_GCTRL_WNCKR` delay inside the `dma_flash_cmd_read_status()` polling loop to throttle `IT83XX_SMFI_ECINDDR` reads (matching `crrev.com/c/8119380`).\n\n2. **Explain *Why* (Problem Impact) Rather Than Narrating the Code:**\n   - The first paragraph describes *what* the old code did mechanically (`\"repeatedly toggles FSCE# and resends FLASH_CMD_RS in a tight loop with no delay\"`), and the second paragraph narrates the replacement statements step-by-step (`\"Send FLASH_CMD_RS once while keeping FSCE# asserted, delay via IT83XX_GCTRL_WNCKR (~15 us)...\"`).\n   - Instead, state **why** the previous behavior was problematic (repeatedly toggling `FSCE#` and re-sending `FLASH_CMD_RS` adds unnecessary SPI transaction overhead on every status check, and unthrottled back-to-back reads of `IT83XX_SMFI_ECINDDR` while flash is busy can cause bus contention or premature status evaluation resulting in intermittent flash erase/write failures) and summarize the fix at a conceptual level.\n\n### Suggested Commit Messages (When Split into Two CLs)\n\n**CL 1:**\n```text\nchip/it83xx: Keep FSCE# asserted during flash status polling\n\ndma_flash_cmd_read_status() previously executed a full transaction on\nevery poll iteration, toggling FSCE# and resending FLASH_CMD_RS for\neach status byte read. Because SPI flash shifts out the latest status\nregister value continuously while FSCE# remains low after FLASH_CMD_RS,\nre-issuing the command on every poll adds unnecessary transaction\noverhead while waiting for flash operations to complete.\n\nKeep FSCE# asserted after sending FLASH_CMD_RS once, poll the status\nregister until the target mask matches, and deassert FSCE# when polling\ncompletes.\n\nBUG\u003db:574033256\nTEST\u003dmake run-flash_it83xx\nTEST\u003dmake BOARD\u003dasurada -j; verify flash write/erase status polling\n```\n\n**CL 2:**\n```text\nchip/it83xx: Delay between flash status register reads\n\nPolling IT83XX_SMFI_ECINDDR in a tight loop with no delay while flash is\nbusy can cause bus contention or premature status evaluation on fast\nsilicon and higher compiler optimization levels, leading to intermittent\nflash write and erase failures.\n\nInsert a ~15 us hardware delay between status register reads during\npolling, matching Zephyr\u0027s ramcode_flash_cmd_read_status()\n(crrev.com/c/8119380).\n\nBUG\u003db:574033256\nTEST\u003dmake run-flash_it83xx\nTEST\u003dmake BOARD\u003dasurada -j; verify flash write/erase status polling\n```\n\n### Suggested Commit Message (If Kept as a Single CL)\n```text\nchip/it83xx: Throttle continuous flash status polling\n\ndma_flash_cmd_read_status() previously toggled FSCE# and re-issued\nFLASH_CMD_RS in an unthrottled loop on every status check. Re-sending\nthe command on every poll adds unnecessary SPI transaction overhead,\nand back-to-back status reads without a delay can cause bus contention\nor premature status evaluation during flash write and erase operations.\n\nKeep FSCE# asserted across a single FLASH_CMD_RS transaction and delay\n~15 us between status reads until the target status is observed,\nmatching Zephyr\u0027s ramcode_flash_cmd_read_status() (crrev.com/c/8119380).\n\nBUG\u003db:574033256\nTEST\u003dmake run-flash_it83xx\nTEST\u003dmake BOARD\u003dasurada -j; verify flash write/erase status polling\n```\n\n[🔗](http://go/tj/637b0f37-10bc-49de-bcb0-c9bbabdc1f09)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6c1e4a1c7557393106fb26c9e9bb6aa7d9ca0817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71bdb8ec_cb76d39f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:02:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL into two focused changes, update the commit message rationale, and add unit test coverage. [[trajectory](https://goto.corp.google.com/traj/637b0f37-10bc-49de-bcb0-c9bbabdc1f09)]\n\n### Review Summary\n- **Functionality:** ✅ Sending `FLASH_CMD_RS` (`0x05`) once with `stop_ec_ind \u003d 0` keeps `FSCE#` asserted (`IT83XX_SMFI_ECINDAR1 \u003d 0xFD`) so subsequent reads from `IT83XX_SMFI_ECINDDR` clock out updated status register bytes, writing `0` to `IT83XX_GCTRL_WNCKR` delays ~15.25 us (65.536 kHz clock) safely from `.flash_direct_map` RAM code (`FLASH_DMA_CODE`), and `dma_flash_fsce_high()` properly terminates the transaction.\n- **Architecture \u0026 Component Fit:** ✅ Matches existing `chip/it83xx/flash.c` conventions (`dma_flash_fsce_high()`, `dma_flash_transaction()`, and `dma_flash_indirect_fast_read()` all use `IT83XX_SMFI_ECINDDR` and `IT83XX_GCTRL_WNCKR \u003d 0` directly).\n- **Code Simplicity:** ✅ Replaces the nested `dma_flash_transaction()` loop and temporary `uint8_t status[1]` buffer with a concise 4-statement sequence.\n- **Idiomaticity \u0026 Readability:** ✅ Follows ChromiumOS EC C conventions.\n- **Security:** ✅ No security or memory-safety concerns.\n- **Testing:** ❌ `dma_flash_cmd_read_status()` modifies polling loop, bitmask comparison, and `FSCE#` lifecycle logic, but the CL only includes manual board testing (`TEST\u003dmake BOARD\u003dasurada -j; verify flash write/erase status polling`). Please add automated host unit test coverage (`test/`) exercising immediate status match, multi-iteration busy-to-ready transitions (verifying `IT83XX_GCTRL_WNCKR` delay writes and single `FLASH_CMD_RS` / `dma_flash_fsce_high()` invocation), and `mask`/`target` bit filtering.\n- **CL Size \u0026 Scope:** ❌ `Size: S (+9, -9)`. Although small in line count, this CL bundles two independent logical changes (and joins them with `\" and \"` in the subject line):\n  1. **CL 1:** Keep `FSCE#` asserted across status polling in `dma_flash_cmd_read_status()` (`dma_flash_transaction(sizeof(cmd_rs), cmd_rs, 0, NULL, 0)`, poll `(IT83XX_SMFI_ECINDDR \u0026 mask) !\u003d target`, and call `dma_flash_fsce_high()`).\n  2. **CL 2:** Add the ~15 us `IT83XX_GCTRL_WNCKR \u003d 0` delay inside the `dma_flash_cmd_read_status()` polling loop (matching `crrev.com/c/8119380`).\n- **Commit Message:** ❌ The commit message narrates the old and new code mechanics without explaining *why* the previous behavior caused problems (unnecessary SPI transaction overhead on every poll and bus contention / premature status evaluation from unthrottled `IT83XX_SMFI_ECINDDR` reads during flash write/erase operations). See inline comment on `/COMMIT_MSG` for copy-pasteable replacements.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6c1e4a1c7557393106fb26c9e9bb6aa7d9ca0817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d8c33af_002feca0",
+        "filename": "chip/it83xx/flash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:02:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Split Logical Changes \u0026 Add Unit Test Coverage**\n\n### 1. Split into Two Focused Changes\nThis function change combines two independent improvements that should be landed as stacked CLs:\n\n- **CL 1 (Keep `FSCE#` asserted across status polling):**\n```c\nvoid FLASH_DMA_CODE dma_flash_cmd_read_status(enum flash_status_mask mask,\n\t\t\t\t\t      enum flash_status_mask target)\n{\n\tuint8_t cmd_rs[] \u003d { FLASH_CMD_RS };\n\n\t/* Send read status command */\n\tdma_flash_transaction(sizeof(cmd_rs), cmd_rs, 0, NULL, 0);\n\n\t/*\n\t * We prefer no timeout here. We can always get the status\n\t * we want, or wait for watchdog triggered to check\n\t * e-flash\u0027s status before CPU reset.\n\t * This will avoid fetching unknown instruction from e-flash\n\t * and causing exception.\n\t */\n\twhile ((IT83XX_SMFI_ECINDDR \u0026 mask) !\u003d target)\n\t\t;\n\n\t/* Transaction done, drive FSCE# high */\n\tdma_flash_fsce_high();\n}\n```\n\n- **CL 2 (Add the ~15 us `IT83XX_GCTRL_WNCKR` polling delay):**\n```c\n\twhile ((IT83XX_SMFI_ECINDDR \u0026 mask) !\u003d target)\n\t\tIT83XX_GCTRL_WNCKR \u003d 0;\n```\n\n---\n\n### 2. Add Automated Unit Test Coverage\n`dma_flash_cmd_read_status()` implements transaction framing (`FSCE#` kept low during `FLASH_CMD_RS`, then driven high via `dma_flash_fsce_high()`), bitmask filtering (`(IT83XX_SMFI_ECINDDR \u0026 mask) !\u003d target`), and delay pacing (`IT83XX_GCTRL_WNCKR \u003d 0`), but this CL only lists manual board verification (`TEST\u003dmake BOARD\u003dasurada -j; verify flash write/erase status polling`).\n\nPlease add a host unit test (e.g., `test/flash_it83xx.c`) or a small register-access seam in `chip/it83xx/flash.c` so `dma_flash_cmd_read_status()` is covered by automated tests for:\n1. **Immediate status match on first read:** `(IT83XX_SMFI_ECINDDR \u0026 mask) \u003d\u003d target` on the initial check executes 0 loop delay writes and drives `FSCE#` high.\n2. **Multi-iteration busy-to-ready transition:** Polling while `FLASH_SR_BUSY` is set for $N$ reads before clearing issues `FLASH_CMD_RS` only once (with `stop_ec_ind \u003d 0`), writes `0` to `IT83XX_GCTRL_WNCKR` on each non-matching read, and calls `dma_flash_fsce_high()` once at the end.\n3. **Bitmask isolation:** Unmasked bits in `IT83XX_SMFI_ECINDDR` (such as `FLASH_SR_WEL` when polling `mask \u003d FLASH_SR_BUSY, target \u003d FLASH_SR_NO_BUSY`) are ignored, whereas full-mask checks (`mask \u003d FLASH_SR_ALL, target \u003d FLASH_SR_WEL`) continue polling until both `WEL \u003d\u003d 1` and `BUSY \u003d\u003d 0`.\n\nExample unit test harness (if `IT83XX_SMFI_ECINDDR` / `IT83XX_GCTRL_WNCKR` reads and writes are routed through small inline helpers or overridden in a test build):\n```c\nstruct flash_poll_test_state {\n\tconst uint8_t *status_seq;\n\tsize_t status_len;\n\tsize_t status_idx;\n\tint wnckr_writes;\n\tint fsce_high_calls;\n};\n\nstatic int test_read_status_immediate_match(void)\n{\n\tconst uint8_t seq[] \u003d { FLASH_SR_NO_BUSY };\n\treset_flash_poll_state(seq, ARRAY_SIZE(seq));\n\n\tdma_flash_cmd_read_status(FLASH_SR_BUSY, FLASH_SR_NO_BUSY);\n\n\tTEST_EQ(poll_state.status_idx, 1, \"%zu\");\n\tTEST_EQ(poll_state.wnckr_writes, 0, \"%d\");\n\tTEST_EQ(poll_state.fsce_high_calls, 1, \"%d\");\n\treturn EC_SUCCESS;\n}\n\nstatic int test_read_status_busy_then_ready(void)\n{\n\tconst uint8_t seq[] \u003d {\n\t\tFLASH_SR_BUSY,\n\t\tFLASH_SR_BUSY,\n\t\tFLASH_SR_NO_BUSY,\n\t};\n\treset_flash_poll_state(seq, ARRAY_SIZE(seq));\n\n\tdma_flash_cmd_read_status(FLASH_SR_BUSY, FLASH_SR_NO_BUSY);\n\n\tTEST_EQ(poll_state.status_idx, 3, \"%zu\");\n\tTEST_EQ(poll_state.wnckr_writes, 2, \"%d\");\n\tTEST_EQ(poll_state.fsce_high_calls, 1, \"%d\");\n\treturn EC_SUCCESS;\n}\n\nstatic int test_read_status_mask_filtering(void)\n{\n\t/* WEL bit set while checking only BUSY mask should match immediately; */\n\t/* checking FLASH_SR_ALL for FLASH_SR_WEL should wait for BUSY to clear. */\n\tconst uint8_t seq[] \u003d {\n\t\tFLASH_SR_WEL | FLASH_SR_BUSY,\n\t\tFLASH_SR_WEL,\n\t};\n\treset_flash_poll_state(seq, ARRAY_SIZE(seq));\n\n\tdma_flash_cmd_read_status(FLASH_SR_ALL, FLASH_SR_WEL);\n\n\tTEST_EQ(poll_state.status_idx, 2, \"%zu\");\n\tTEST_EQ(poll_state.wnckr_writes, 1, \"%d\");\n\tTEST_EQ(poll_state.fsce_high_calls, 1, \"%d\");\n\treturn EC_SUCCESS;\n}\n```\n\n[🔗](http://go/tj/637b0f37-10bc-49de-bcb0-c9bbabdc1f09)",
+      "range": {
+        "startLine": 243,
+        "startChar": 0,
+        "endLine": 263,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6c1e4a1c7557393106fb26c9e9bb6aa7d9ca0817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
