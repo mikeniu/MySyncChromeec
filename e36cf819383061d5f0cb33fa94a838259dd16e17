@@ -22,6 +22,30 @@
       },
       "revId": "e36cf819383061d5f0cb33fa94a838259dd16e17",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb32ecab_603e6ac0",
+        "filename": "zephyr/program/ocelot/blanc/pwm.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-30T02:21:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e31b93a_77ede886",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 2
+      },
+      "revId": "e36cf819383061d5f0cb33fa94a838259dd16e17",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
