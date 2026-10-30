@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4a8a821_3da4922f",
+        "filename": "zephyr/dts/bindings/battery/utl,q25u3s1p5c.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-30T18:40:13Z",
+      "side": 1,
+      "message": "Where is the ship mode and FET information? What fuel gauge is used with this battery?",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 21
+      },
+      "revId": "1561b50ed42c6f41d0fd6638a8c9db312de3fd08",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df55a994_79f40e9e",
+        "filename": "zephyr/dts/bindings/battery/utl,q25u3s1p5c.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-30T18:40:13Z",
+      "side": 1,
+      "message": "What is the source of this value?",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 15
+      },
+      "revId": "1561b50ed42c6f41d0fd6638a8c9db312de3fd08",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
