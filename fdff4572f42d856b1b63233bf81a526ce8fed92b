@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a53b891d_12ef6aae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-30T06:00:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "101bb74c_9bc2b5f0",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "993be175_95edfa73",
@@ -70,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "518d9650_e5730ac3",
+        "filename": "zephyr/program/ocelot/coolum/project.conf",
+        "patchSetId": 14
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-30T06:00:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d67741c4_e892581c",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0825b4e3_be1345d3",
@@ -100,6 +136,24 @@
       "writtenOn": "2026-10-30T05:50:05Z",
       "side": 1,
       "message": "It should be removed.",
+      "parentUuid": "0825b4e3_be1345d3",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0620d21_a38d01fb",
+        "filename": "zephyr/program/ocelot/coolum/project.conf",
+        "patchSetId": 14
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-30T06:00:18Z",
+      "side": 1,
+      "message": "All items in this CL are copied from ocelotrvp-ite. I will remove them in a subsequent CL. Thanks.",
       "parentUuid": "0825b4e3_be1345d3",
       "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
