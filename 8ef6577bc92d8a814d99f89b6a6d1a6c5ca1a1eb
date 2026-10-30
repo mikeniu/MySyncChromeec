@@ -50,6 +50,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16d7fccd_5f9361c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:30:33Z",
+      "side": 1,
+      "message": "Done in ps3: split into the descriptor parser (8687497), get_interfaces() (8687498) and this change, which keeps DFU interface discovery and dfu_detach().",
+      "parentUuid": "696a6e9f_b8092bd9",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4c1ee81_aeb5fc3d",
@@ -83,6 +107,24 @@
       "side": 1,
       "message": "Done in ps2: release_interface() is deferred to the change that adds claim_interface(), release() always resets dfu_interface_ and transfer_size_, transfer_size() is exposed and asserted in the tests, parse_dfu_transfer_size() takes a std::span, get_interfaces() uses emplace_back with designated initializers, and the 1-byte and desc_len \u003d\u003d kDfuDescMinLen + 1 cases are added.\n\nNot done: splitting into three CLs, see the COMMIT_MSG thread.",
       "parentUuid": "f4c1ee81_aeb5fc3d",
+      "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13d8d65f_ccbf7a1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:30:33Z",
+      "side": 1,
+      "message": "Done in ps3: split into 8687497 (parser), 8687498 (get_interfaces) and this change (discovery and dfu_detach).",
+      "parentUuid": "df0082c4_38de1582",
       "revId": "8ef6577bc92d8a814d99f89b6a6d1a6c5ca1a1eb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
