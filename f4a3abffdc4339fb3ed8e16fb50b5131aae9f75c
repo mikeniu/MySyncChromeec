@@ -22,6 +22,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8b440f4a_ab888d1e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:16:26Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "5de379e4_08d2ef8f",
+      "revId": "f4a3abffdc4339fb3ed8e16fb50b5131aae9f75c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e687ee61_d61237c2",
         "filename": "driver/led/lm3509.c",
         "patchSetId": 2
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "f4a3abffdc4339fb3ed8e16fb50b5131aae9f75c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57724dcb_bee9d273",
+        "filename": "driver/led/lm3509.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T00:16:26Z",
+      "side": 1,
+      "message": "Code updated in PS3; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "e687ee61_d61237c2",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 9999
+      },
       "revId": "f4a3abffdc4339fb3ed8e16fb50b5131aae9f75c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
