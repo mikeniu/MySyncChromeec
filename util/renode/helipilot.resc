@@ -34,4 +34,7 @@ macro reset
     image_type WriteByte 0x0 0x40
 """
 
+include $ORIGIN/fpsensor.py
+RegisterFpSensor spip $name
+
 runMacro $reset

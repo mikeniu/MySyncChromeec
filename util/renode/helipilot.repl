@@ -34,8 +34,6 @@ GPIO_TRANSPORT_SEL: Miscellaneous.Button @ gpio4 3
     init:
         ReleaseOnReset false
 
-fpsensor: Sensors.GenericSPISensor @ spip
-
 // On NPCX9, battery-backed RAM occupies 0x400AF000..0x400AF07F (128 / 0x80
 // bytes) and 0x400AF100 is the Write-1-To-Clear BKUP_STS control/status
 // register. Upstream nuvoton_npcx9.repl maps battery_backed_ram at 0x400AF000
