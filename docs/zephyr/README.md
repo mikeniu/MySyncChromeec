@@ -35,6 +35,10 @@ documentation needed to configure individual EC features.
 The [Zephyr Troubleshooting](zephyr_troubleshooting.md) page lists few common
 errors and troubleshooting techniques used when working with Zephyr.
 
+The [Full-Board Zephyr EC Simulation](zephyr_native_sim.md) guide explains how
+to enable and run full-board `native_sim` targets and wire them to `twister`
+test suites.
+
 ## Source Code Organization
 
 Zephyr EC images rely on multiple Chromium repositories to build Zephyr EC images.

@@ -85,9 +85,11 @@ test_mockable const char *system_get_chip_revision(void)
 	return "";
 }
 
+#ifndef CONFIG_PLATFORM_EC_USB_PD_CONTROLLER
 test_mockable void board_reset_pd_mcu(void)
 {
 }
+#endif
 
 test_mockable void system_hibernate(uint32_t seconds, uint32_t microseconds)
 {
@@ -120,4 +122,25 @@ int __wrap_main(int argc, char **argv)
 	posix_exit(ret);
 	return ret;
 }
+#endif
+
+#if !defined(CONFIG_USBC_INTEL_ALTMODE) && defined(CONFIG_ZTEST)
+test_mockable void suspend_pd_intel_altmode_task(void)
+{
+}
+
+test_mockable void resume_pd_intel_altmode_task(void)
+{
+}
+
+test_mockable bool is_pd_intel_altmode_task_suspended(void)
+{
+	return true;
+}
+#endif
+
+#if defined(CONFIG_EMUL_ESPI_HOST) && !defined(CONFIG_ZTEST)
+#include <zephyr/drivers/emul_stub_device.h>
+#define DT_DRV_COMPAT zephyr_espi_emul_espi_host
+DT_INST_FOREACH_STATUS_OKAY(EMUL_STUB_DEVICE);
 #endif

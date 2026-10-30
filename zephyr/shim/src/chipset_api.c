@@ -56,10 +56,13 @@ bool board_ap_power_is_startup_ok(void)
 		 * TODO(b/260909787) this logic should be handled by a single
 		 * function that works in all configurations. system_can_boot_ap
 		 * is a subset of charge_prevent_power_on, but works in all
-		 * configurations.
+		 * configurations. Route ZTEST builds through system_can_boot_ap
+		 * so ap_power tests can mock startup readiness even when
+		 * CONFIG_CHARGER and CONFIG_BATTERY are enabled.
 		 */
 		bool power_ok = IS_ENABLED(CONFIG_CHARGER) &&
-						IS_ENABLED(CONFIG_BATTERY) ?
+						IS_ENABLED(CONFIG_BATTERY) &&
+						!IS_ENABLED(CONFIG_ZTEST) ?
 					!charge_prevent_power_on(false) :
 					system_can_boot_ap();
 		if (power_ok)

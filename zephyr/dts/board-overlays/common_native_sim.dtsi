@@ -1,0 +1,205 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <cros/binman.dtsi>
+#include <cros/cbi_flash.dtsi>
+#include <cros/vivaldi_kbd_default.dtsi>
+#include <dt-bindings/pwm/pwm.h>
+#include <freq.h>
+
+#define BOARD_NATIVE_SIM
+
+/*
+ * zephyr,gpio-emul does not support open-drain/open-source flags. Mask them
+ * out so board devicetree files can be included unmodified on native_sim.
+ */
+#undef GPIO_OPEN_DRAIN
+#define GPIO_OPEN_DRAIN 0
+#undef GPIO_OPEN_SOURCE
+#define GPIO_OPEN_SOURCE 0
+#undef GPIO_ODR_LOW
+#define GPIO_ODR_LOW GPIO_OUTPUT_LOW
+#undef GPIO_ODR_HIGH
+#define GPIO_ODR_HIGH GPIO_OUTPUT_HIGH
+
+/ {
+	/* Delete conflicting native_sim peripherals. */
+	/delete-node/ adc;
+	/delete-node/ i2c@100;
+
+	chosen {
+		cros-ec,espi = &espi0;
+		cros-ec,watchdog = &wdt_counter;
+		cros-ec,flash = &flash0;
+		cros-ec,flash-controller = &cros_flash;
+		cros,rtc = &cros_rtc;
+	};
+
+	wdt_counter: wdt-counter {
+		compatible = "zephyr,counter-watchdog";
+		status = "okay";
+		counter = <&counter0>;
+	};
+
+	cros_flash: cros-flash {
+		compatible = "cros-ec,flash-emul";
+	};
+
+	cros_rtc: cros-rtc {
+		compatible = "cros-ec,rtc-emul";
+	};
+
+	pwms {
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		pwm0: pwm@0 {
+			compatible = "cros,pwm-mock";
+			reg = <0 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+
+		pwm1: pwm@1 {
+			compatible = "cros,pwm-mock";
+			reg = <1 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+
+		pwm2: pwm@2 {
+			compatible = "cros,pwm-mock";
+			reg = <2 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+
+		pwm3: pwm@3 {
+			compatible = "cros,pwm-mock";
+			reg = <3 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+
+		pwm4: pwm@4 {
+			compatible = "cros,pwm-mock";
+			reg = <4 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+
+		pwm5: pwm@5 {
+			compatible = "cros,pwm-mock";
+			reg = <5 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+
+		pwm6: pwm@6 {
+			compatible = "cros,pwm-mock";
+			reg = <6 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+
+		pwm7: pwm@7 {
+			compatible = "cros,pwm-mock";
+			reg = <7 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+	};
+
+	tachs {
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		tach0: tach@0 {
+			compatible = "cros,tach-mock";
+			reg = <0 1>;
+			#tach-cells = <3>;
+			status = "okay";
+		};
+
+		tach1: tach@1 {
+			compatible = "cros,tach-mock";
+			reg = <1 1>;
+			#tach-cells = <3>;
+			status = "okay";
+		};
+	};
+
+	kbd: keyboard {
+		compatible = "gpio-kbd-matrix";
+		idle-mode = "poll";
+		row-gpios = <&gpioksi 0 GPIO_ACTIVE_LOW>,
+			    <&gpioksi 1 GPIO_ACTIVE_LOW>,
+			    <&gpioksi 2 GPIO_ACTIVE_LOW>,
+			    <&gpioksi 3 GPIO_ACTIVE_LOW>,
+			    <&gpioksi 4 GPIO_ACTIVE_LOW>,
+			    <&gpioksi 5 GPIO_ACTIVE_LOW>,
+			    <&gpioksi 6 GPIO_ACTIVE_LOW>,
+			    <&gpioksi 7 GPIO_ACTIVE_LOW>;
+		col-gpios = <&gpioksol 0 GPIO_ACTIVE_LOW>,
+			    <&gpioksol 1 GPIO_ACTIVE_LOW>,
+			    <&gpioksol 2 GPIO_ACTIVE_LOW>,
+			    <&gpioksol 3 GPIO_ACTIVE_LOW>,
+			    <&gpioksol 4 GPIO_ACTIVE_LOW>,
+			    <&gpioksol 5 GPIO_ACTIVE_LOW>,
+			    <&gpioksol 6 GPIO_ACTIVE_LOW>,
+			    <&gpioksol 7 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 0 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 1 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 2 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 3 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 4 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 5 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 6 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 7 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 8 GPIO_ACTIVE_LOW>,
+			    <&gpioksoh 9 GPIO_ACTIVE_LOW>;
+	};
+
+	/* Emulated I/O expander GPIO ports for <ite/it8801-common-cfg.dtsi> */
+	ioex_it8801_port0: ioex-it8801-port-0 {
+		compatible = "zephyr,gpio-emul";
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <8>;
+	};
+
+	ioex_it8801_port1: ioex-it8801-port-1 {
+		compatible = "zephyr,gpio-emul";
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <8>;
+	};
+
+	ioex_it8801_port2: ioex-it8801-port-2 {
+		compatible = "zephyr,gpio-emul";
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <8>;
+	};
+};
+
+&espi0 {
+	espi-host@0 {
+		status = "okay";
+		compatible = "zephyr,espi-emul-espi-host";
+		reg = <0x0>;
+	};
+};
+
+&flash0 {
+	erase-block-size = <0x1000>;
+	write-block-size = <1>;
+	reg = <0x00000000 DT_SIZE_M(1)>;
+};
+
+&cbi_flash {
+	size = <0x1000>;
+};

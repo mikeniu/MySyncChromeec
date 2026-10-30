@@ -115,6 +115,13 @@ if (DEFINED CONFIG_RISCV)
   zephyr_cc_option(-fsanitize-undefined-trap-on-error)
 endif()
 
+if (DEFINED CONFIG_ARCH_POSIX AND DEFINED CONFIG_CPP AND TARGET native_simulator)
+  get_target_property(nsi_link_opts native_simulator INTERFACE_LINK_OPTIONS)
+  list(REMOVE_ITEM nsi_link_opts "-lstdc++")
+  set_target_properties(native_simulator PROPERTIES INTERFACE_LINK_OPTIONS "${nsi_link_opts}")
+  target_link_options(native_simulator INTERFACE "-Wl,-Bstatic" "-lc++" "-lc++abi" "-Wl,-Bdynamic")
+endif()
+
 # TODO: b/323234432 - Investigate explicitly using doubles over floats
 # For now disable the "double-promotion" warning to avoid errors from
 # the sensor code and math_util.h.
