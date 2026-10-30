@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5cb8e5d_ac91805b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:39:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** `RtsUsbDevice::find_dfu_interface()` locates the USB DFU interface (`class \u003d 0xFE`, `subclass \u003d 0x01`) from the active configuration descriptor and records its `wTransferSize`, `RtsUsbDevice::dfu_detach()` issues the class-specific `DFU_DETACH` control transfer, and `RtsUsbDevice::release()` resets `dfu_interface_` and `transfer_size_` before closing the backend.\n* **Architecture \u0026 Component Fit:** Cleanly layered on top of `RtsUsbBackend::get_interfaces()` and `parse_dfu_transfer_size()`, keeping `find_dfu_interface()` `private` and exposing `transfer_size()` as a `const` accessor.\n* **Code Simplicity:** Concise, linear control flow with early-return guard clauses and minimal state.\n* **Idiomaticity \u0026 Readability:** Idiomatic C++20/C++23 with `inline constexpr` constants, explicit types, and designated initializers in unit tests.\n* **Security:** Safe descriptor handling and bounded control transfer arguments.\n* **Testing:** Comprehensive unit test suite (`RtsUsbDeviceDfuTest`) covering closed-device guard, config descriptor error, missing DFU interface, mismatched class/subclass, multi-interface discovery and `wTransferSize` recording, control transfer failure, and state reset on `release()`.\n* **CL Size \u0026 Scope:** `Size: M (+198, -0)` (+92 production lines across `rts5817_usb_device.h` and `rts5817_usb_device.cc`, +106 unit test lines in `rts5817_usb_device_test.cc`). Tightly focused on a single logical change following the split of the descriptor parser and interface enumeration into prerequisite CLs.\n* **Commit Message:** Clear subject line and concise two-paragraph rationale and summary.\n\n[🔗](http://go/tj/5cbee112-d320-4040-acc8-ab84e4823b66)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
