@@ -87,6 +87,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14dbe269_5b85a7b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:30:18Z",
+      "side": 1,
+      "message": "Done in ps5: detach_kernel_driver(), claim_interface() and release_interface() moved to the prerequisite change 8687499.",
+      "parentUuid": "014f6ec7_f07ee482",
+      "revId": "661b0d29adaf441fd2bb62e8a8216b93f8d9155b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbe73269_7347509b",

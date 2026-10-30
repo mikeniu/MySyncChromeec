@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "55582a92_1e41e9ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:30:18Z",
+      "side": 1,
+      "message": "Done in ps5: the commit message now says the download runs over RtsUsbBackend. The backend hooks moved to 8687499, so it no longer describes them.",
+      "parentUuid": "a4363528_bb149700",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce4794ee_dcd45aa2",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n**Functionality:** ✅ `RtsUsbDevice::dfu_download` properly validates non-empty firmware and DFU interface presence, detaches any active kernel driver, claims and releases the interface across all completion and error paths, checks for short control transfers, polls block status, and sends the trailing zero-length packet.\n**Architecture \u0026 Component Fit:** ✅ Routing DFU download operations through `RtsUsbBackend` cleanly decouples the protocol state machine from `libusb` and integrates with `utils-test`.\n**Code Simplicity:** ❌ In `util/realtekfp/rts5817_usb_device_test.cc`, `kTransferSize`, `kDfuIf`, and `DownloadRecorder` are defined above `RtsUsbDeviceStatusTest` rather than next to `RtsUsbDeviceDownloadTest`, and `DownloadRecorder` wraps a single `std::vector\u003cBlock\u003e blocks` field that can be a direct member of `RtsUsbDeviceDownloadTest` (see inline comment).\n**Idiomaticity \u0026 Readability:** ❌ `util/realtekfp/rts5817_usb_device_test.cc` includes 7 unrelated `::testing::` qualification cleanups inside `RtsUsbDeviceStatusTest` (lines 471, 480, 534, 548, 560, 583, 594) that belong in the parent CL where `RtsUsbDeviceStatusTest` is introduced.\n**Security:** ✅ No security vulnerabilities identified.\n**Testing:** ✅ Thorough unit test coverage in `RtsUsbDeviceDownloadTest` exercising chunking boundaries (`\u003c kTransferSize`, `\u003d\u003d kTransferSize`, `kTransferSize + 1`, and exact multiples), trailing ZLP, empty firmware, closed device, missing DFU interface, kernel driver detach failure, claim failure, transfer error and short write recovery (`DFU_CLRSTATUS` + release), poll failure, and manifest non-idle handling.\n**CL Size \u0026 Scope:** ❌ `Size: L (+425, -7)` (167 production lines across `rts5817_usb_backend.h`, `rts5817_libusb_backend.{h,cc}`, and `rts5817_usb_device.{h,cc}`, plus 258 added and 7 modified test/mock lines in `rts5817_mock_usb_backend.h` and `rts5817_usb_device_test.cc`). While the production delta is under 250 lines, this CL bundles three separable changes that should be split:\n1. **CL 1 (Fold into parent `RtsUsbBackend` CL or separate prerequisite CL):** Add `detach_kernel_driver`, `claim_interface`, and `release_interface` to `RtsUsbBackend` (`util/realtekfp/rts5817_usb_backend.h`), `RtsLibusbBackend` (`util/realtekfp/rts5817_libusb_backend.h`, `util/realtekfp/rts5817_libusb_backend.cc`), and `MockRtsUsbBackend` (`util/realtekfp/rts5817_mock_usb_backend.h`).\n2. **CL 2 (Fold into parent `RtsUsbDeviceStatusTest` CL):** Keep the `::testing::` namespace qualification cleanups in `RtsUsbDeviceStatusTest` (`util/realtekfp/rts5817_usb_device_test.cc` lines 471, 480, 534, 548, 560, 583, 594) in the parent CL that introduces `RtsUsbDeviceStatusTest`.\n3. **CL 3 (This CL):** Add `kDfuDownload`, `kDfuProgressStepPct`, and `RtsUsbDevice::dfu_download` (`util/realtekfp/rts5817_usb_device.h`, `util/realtekfp/rts5817_usb_device.cc`) along with `RtsUsbDeviceDownloadTest` (`util/realtekfp/rts5817_usb_device_test.cc`).\n**Commit Message:** ❌ The commit message in Patchset 4 was not updated and still states that `RtsUsbDevice` downloads firmware *\"directly via libusb control transfers\"* rather than over `RtsUsbBackend` (see inline comment on `/COMMIT_MSG` for copy-pasteable replacements). [🔗](http://go/tj/229ca942-b01d-4680-85b2-9a3f6134aa4b)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49e7362c_102b1d76",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:30:18Z",
+      "side": 1,
+      "message": "Done in ps5: backend hooks are in 8687499, the ::testing:: cleanups are folded into 8637072 where RtsUsbDeviceStatusTest is introduced, and this change only adds dfu_download() and its tests.",
+      "parentUuid": "ce4794ee_dcd45aa2",
       "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46425e49_4286a703",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-10-30T01:30:18Z",
+      "side": 1,
+      "message": "Done in ps5: the ::testing:: edits are now in 8637072. kTransferSize and kDfuIf sit next to RtsUsbDeviceDownloadTest, and DownloadRecorder is replaced by blocks_ on the fixture.",
+      "parentUuid": "9283dd5b_b9d59c17",
+      "range": {
+        "startLine": 459,
+        "startChar": 0,
+        "endLine": 471,
+        "endChar": 9999
+      },
       "revId": "bea7b34f31d25076a24699c5cbae3142d966bc5e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
