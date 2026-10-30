@@ -5,6 +5,9 @@ tests:
   debug_assert.default:
     extra_configs:
       - CONFIG_ASSERT_NO_FILE_INFO=n
+  debug_assert.normal:
+    extra_configs:
+      - CONFIG_ASSERT_MODULE_DEFAULT_LEVEL_NORMAL=y
   debug_assert.no_file_info:
     extra_configs:
       - CONFIG_ASSERT_NO_FILE_INFO=y

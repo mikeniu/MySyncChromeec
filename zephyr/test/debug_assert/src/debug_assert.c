@@ -9,6 +9,7 @@
 #include <setjmp.h>
 
 #include <zephyr/fff.h>
+#include <zephyr/sys/printk-hooks.h>
 #include <zephyr/ztest.h>
 
 DECLARE_FAKE_VOID_FUNC(system_reset, int);
@@ -105,10 +106,41 @@ ZTEST(debug_assert, test_assert_recursive_post_action)
 	verify_assert_panic_data(linenum);
 }
 
+static printk_hook_fn_t orig_printk_hook;
+static bool printk_hook_installed;
+
+static int recursive_printk_hook(int c)
+{
+	ARG_UNUSED(c);
+
+	/* Trigger a second assert while inside zassert_fail(). */
+	__ASSERT(false, "Second assert");
+	CODE_UNREACHABLE;
+}
+
+ZTEST(debug_assert, test_assert_recursive_print)
+{
+	int linenum;
+
+	orig_printk_hook = __printk_get_hook();
+	__printk_hook_install(recursive_printk_hook);
+	printk_hook_installed = true;
+
+	linenum = __LINE__ + 1;
+	EXPECT_NO_RETURN(__ASSERT(false, "First assert"));
+
+	zassert_equal(system_reset_fake.call_count, 1);
+	verify_assert_panic_data(linenum);
+}
+
 static void reset(void *data)
 {
 	ARG_UNUSED(data);
 	in_assert = false;
+	if (printk_hook_installed) {
+		__printk_hook_install(orig_printk_hook);
+		printk_hook_installed = false;
+	}
 	/* clear panic data */
 	memset(get_panic_data_write(), 0, sizeof(struct panic_data));
 	RESET_FAKE(system_reset);
