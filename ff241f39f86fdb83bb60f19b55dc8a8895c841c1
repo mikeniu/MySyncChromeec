@@ -1,0 +1,169 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae628468_9f00c259",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "Nit: I presume that you will have other events eventually. I think an enum would be appropriate. I\u0027d suggest using enums over macros wherever you can.",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "942da42e_53d4669c",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "Nit: Do you expect to have some other type of event in this structure? If this is the only one, maybe just `struct k_event events`.",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13d5eabe_563bd30e",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "Having the array of state be defined as the size of the array of state names feels backward to me. I\u0027d structure this so that the state enum has a count member, the count is used for array sizes, and arrays that don\u0027t have an explicit size, like `state_names`, have a `BUILD_ASSERT` that their size equals the count enumerator.",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c03f504a_51cce022",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "Within this CL, these forward declarations are unneeded. Can you save them for later?",
+      "range": {
+        "startLine": 314,
+        "startChar": 0,
+        "endLine": 327,
+        "endChar": 25
+      },
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77d7573d_58fa5a63",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "Why is it shared across driver instances?",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aa261f7_505a28f5",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "This is trivial but also unused here. I presume that there will be a later CL that actually does something with this. Can you move the getters and setters there?",
+      "range": {
+        "startLine": 340,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 1
+      },
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "968704e8_97e96a6c",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "When does this get set?",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88240fd6_bea27602",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "When does this get checked?",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa649eab_88f2bb1b",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-30T17:55:48Z",
+      "side": 1,
+      "message": "When does this get set?",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
