@@ -18,6 +18,42 @@
       "isAi": true,
       "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "211f7471_e77cc65c",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:17Z",
+      "side": 1,
+      "message": "Please accept `std::span\u003cconst uint8_t\u003e firmware` instead of `const std::vector\u003cuint8_t\u003e\u0026` (and update `rts5817_usb_device.h:150`, which also lets you drop `#include \u003cvector\u003e` on line 17 — matching `parse_dfu_transfer_size(std::span\u003cconst uint8_t\u003e)`, `util/elan/iap_control.h`, and `util/focaltech/updater.h`).\n\nUsing `std::span\u003cconst uint8_t\u003e` lets callers/tests pass stack arrays or a suffix-stripped subspan view without copying/mutating a `std::vector`, and lets the block loop slice chunks via `firmware.subspan(offset, chunk_size)` instead of pointer arithmetic + `const_cast` on line 381.",
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f0a8ab6_4bc73c38",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:44:17Z",
+      "side": 1,
+      "message": "Please return `std::expected\u003cvoid, RtsError\u003e` here so `main()` and unit tests can distinguish empty-input, interface-claim, block-transfer, and manifestation/verification (`errNOTDONE`) failures.",
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
