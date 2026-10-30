@@ -19,7 +19,11 @@
 
 #if defined(CONFIG_CROS_EC_KEYBOARD_INPUT) || \
 	defined(CONFIG_DT_HAS_VND_KEYBOARD_INPUT_DEVICE_ENABLED)
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_keyboard), gpio_kbd_matrix)
+#define KEYBOARD_COLS_MAX DT_PROP_LEN(DT_CHOSEN(cros_ec_keyboard), col_gpios)
+#else
 #define KEYBOARD_COLS_MAX DT_PROP(DT_CHOSEN(cros_ec_keyboard), col_size)
+#endif
 #else
 /* include the board layer keyboard header file */
 #include "keyboard_customization.h"

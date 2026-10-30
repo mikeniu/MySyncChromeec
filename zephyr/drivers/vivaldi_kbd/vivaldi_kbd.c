@@ -199,7 +199,8 @@ static void vivaldi_kbd_init(void)
 		col = vivaldi_keys[i].col;
 		row = vivaldi_keys[i].row;
 
-#if defined(CONFIG_PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB) || defined(CONFIG_ZTEST)
+#if defined(CONFIG_PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB) || \
+	(defined(CONFIG_ZTEST) && !defined(CONFIG_CROS_EC_KEYBOARD_INPUT))
 		keyscan_config.actual_key_mask[col] |= BIT(row);
 #endif
 
@@ -213,7 +214,8 @@ static void vivaldi_kbd_init(void)
 		if (key == TK_VOL_UP) {
 			vivaldi_kbd_vol_up.row = row;
 			vivaldi_kbd_vol_up.col = col;
-#if defined(CONFIG_PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB) || defined(CONFIG_ZTEST)
+#if defined(CONFIG_PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB) || \
+	(defined(CONFIG_ZTEST) && !defined(CONFIG_CROS_EC_KEYBOARD_INPUT))
 			set_vol_up_key(row, col);
 #endif
 		}

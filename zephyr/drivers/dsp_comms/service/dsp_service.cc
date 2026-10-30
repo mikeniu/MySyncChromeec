@@ -404,7 +404,7 @@ void dsp_service_hook_tablet_mode_change() {
 DECLARE_HOOK(HOOK_INIT, dsp_service_hook_tablet_mode_change, HOOK_PRIO_DEFAULT);
 #endif /* CONFIG_PLATFORM_EC_TABLET_MODE */
 
-#ifdef CONFIG_TEST
+#if defined(CONFIG_TEST) || defined(CONFIG_I2C_EMUL)
 /*
  * There's a bug in the i2c_emul where every node in the i2c is required to have
  * a device* associated with it. So create a stub one for now until upstream is

@@ -152,7 +152,7 @@ INPUT_CALLBACK_DEFINE(DEVICE_DT_GET(CROS_EC_KEYBOARD_NODE),
 		      runtime_keys_input_cb, NULL);
 
 #if CONFIG_TEST
-void test_reinit(void)
+__weak void test_reinit(void)
 {
 	runtime_keys_counter = 0;
 	runtime_keys_mask = 0;
