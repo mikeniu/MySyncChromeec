@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6dca195_6b58777b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:47:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/f428a4fd-78cc-4910-9339-e21a25098e4f)]\n\n### Review Summary\n- **Functionality:** ✅ `RtsUsbDevice::enable_download()` accurately queries the device status via `kRtsStdGetStatus` (`0x1A`), validates the 1-byte response length, and issues `kRtsStdSetStatus` (`0x1B`) with `kRtsEnableDownloadMode` (`1`) only when download mode is currently inactive (`status \u003d\u003d 0`).\n- **Architecture \u0026 Component Fit:** ✅ Extending `RtsUsbBackend` and `MockRtsUsbBackend` with `is_open()` and `control_transfer()` cleanly preserves the hardware transport seam used by `RtsUsbDevice`.\n- **Code Simplicity:** ✅ Control flow in `RtsUsbDevice::enable_download()` is concise and direct, with early returns on preconditions and transfer errors.\n- **Idiomaticity \u0026 Readability:** ✅ Protocol request codes, `bmRequestType` values, and timeout constants are defined as typed `inline constexpr` constants (`kRtsStdGetStatus`, `kRtsStdSetStatus`, `kRtsEnableDownloadMode`, `kBmReqD2hStdDev`, `kBmReqH2dStdDev`, `kUsbCtrlTimeoutMs`) with no magic numbers.\n- **Security:** ✅ No security concerns; the 1-byte status read is properly bounds-checked against `sizeof(status)` before inspecting `status`.\n- **Testing:** ✅ Comprehensive unit tests in `rts5817_usb_device_test.cc` cover the closed-device precondition, inactive-to-active transition, already-active fast path, negative error return codes on both `GET_STATUS` and `SET_STATUS`, and the 0-byte short-read boundary.\n- **CL Size \u0026 Scope:** ✅ `Size: M (+163, -0)` (~84 production/mock lines and ~79 test lines) representing a single, self-contained logical change.\n- **Commit Message:** ✅ Clear, accurate summary following ChromiumOS `BUG\u003d` and `TEST\u003d` conventions.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
