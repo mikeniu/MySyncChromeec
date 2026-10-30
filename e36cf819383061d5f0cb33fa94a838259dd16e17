@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e31b93a_77ede886",
+        "filename": "zephyr/program/ocelot/blanc/pwm.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-30T01:17:42Z",
+      "side": 1,
+      "message": "I think you can remove this configuration, as it has already been enabled for the keyboard.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 2
+      },
+      "revId": "e36cf819383061d5f0cb33fa94a838259dd16e17",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
