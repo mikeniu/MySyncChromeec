@@ -45,6 +45,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba3f7d4b_faa17ab6",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:43Z",
+      "side": 1,
+      "message": "`RtsUsbDevice` is not designed as a base class (non-virtual destructor), so please avoid marking internal helpers `protected:` solely for `TestableRtsUsbDevice` in `rts5817_usb_device_test.cc:451-456` (which also ends up calling them while `dfu_interface_ \u003d\u003d -1`, passing `wIndex \u003d 0xFFFF`).\n\nPrefer keeping `dfu_poll_idle()` and `dfu_clear_status()` `private:` (passing `dfu_interface` explicitly once `find_dfu_interface()` returns `DfuInterfaceInfo` by value) and exercising status polling / error clearing through the public `dfu_download()` API (or squashing this CL into https://crrev.com/c/8629987).",
+      "isAi": true,
+      "revId": "e8ff2fe351cdb593bb029e391afbc767d8fe4f91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2cfc386b_4ef815a0",
         "filename": "util/realtekfp/rts5817_usb_device.h",
         "patchSetId": 4
