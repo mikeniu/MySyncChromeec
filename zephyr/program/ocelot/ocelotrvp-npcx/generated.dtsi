@@ -182,6 +182,7 @@
 	};
 };
 
+#ifndef BOARD_NATIVE_SIM
 &adc0 {
 	status = "okay";
 	pinctrl-0 = <&adc0_chan0_gp45
@@ -313,3 +314,4 @@
 	>;
 	pinctrl-names = "default", "sleep";
 };
+#endif /* !BOARD_NATIVE_SIM */

@@ -1,0 +1,17 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/it8xxx2_native_sim.dts>
+
+#include "board.dtsi"
+#include "../rvp_native_sim.dtsi"
+
+&gpio_gsc_ec_pwr_btn_odl {
+	gpios = <&gpioe 4 (GPIO_INPUT | GPIO_PULL_UP)>;
+};
+
+&gpio_lid_open {
+	gpios = <&gpiod 3 (GPIO_INPUT | GPIO_PULL_UP)>;
+};
