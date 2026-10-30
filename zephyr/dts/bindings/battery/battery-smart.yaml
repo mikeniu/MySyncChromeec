@@ -167,6 +167,7 @@ properties:
       - "smp,l24m4pk5"
       - "smp,l25m3pg1"
       - "smp,l26m2pk1"
+      - "smp,l26m4pk3"
       - "smp,byd_pc-vp-bp162"
       - "smp,cosmx_pc-vp-bp162"
       - "smp,pc-vp-bp153"

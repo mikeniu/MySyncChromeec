@@ -9,5 +9,8 @@
 			compatible = "sunwoda,l26d4pk3", "battery-smart";
 			has_manuf_info;
 		};
+		smp_l26m4pk3 {
+			compatible = "smp,l26m4pk3", "battery-smart";
+		};
 	};
 };
