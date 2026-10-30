@@ -18,6 +18,24 @@
       "isAi": true,
       "revId": "4abbf6a92967b5a96cedd60a3cf40254985c973d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a9ae77a_e49b0632",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-30T22:51:44Z",
+      "side": 1,
+      "message": "Scott\u0027s https://crrev.com/c/8416731 introduces a `PANIC_ARCH_POST_COPY(pdata)` macro in `panic_data_write_esf()` for non-ESF fields. Setting `cm.regs[CORTEX_PANIC_REGISTER_IPSR] \u003d __get_IPSR()` in `PANIC_ARCH_POST_COPY(pdata)` and printing it in `panic_data_print()` would align cleanly with that pattern.",
+      "isAi": true,
+      "revId": "4abbf6a92967b5a96cedd60a3cf40254985c973d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
