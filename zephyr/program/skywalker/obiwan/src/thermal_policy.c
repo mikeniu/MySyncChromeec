@@ -237,7 +237,7 @@ void battery_policy(void)
 	if (battery_is_present() != BP_YES)
 		return;
 
-	struct battery_static_info *bs = &battery_static[BATT_IDX_MAIN];
+	const struct battery_static_info *bs = battery_get_static_info();
 
 	if (!bs->model_ext[0]) {
 		update_static_battery_info();

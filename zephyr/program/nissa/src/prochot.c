@@ -72,7 +72,7 @@ defferred:
 
 static void check_batt_current(void)
 {
-	struct battery_static_info *bs = &battery_static[BATT_IDX_MAIN];
+	const struct battery_static_info *bs = battery_get_static_info();
 
 	/* Just check the B140435 battery */
 	if (strcasecmp(bs->model_ext, "B140435")) {

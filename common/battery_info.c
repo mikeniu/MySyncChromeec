@@ -45,6 +45,7 @@ static int prev_charge, prev_disp_charge;
 #ifdef CONFIG_HAS_HOSTCMD
 static void battery_update(enum battery_index i)
 {
+	const struct battery_static_info *bs = battery_get_static_info();
 	char *batt_str;
 	int *memmap_dcap = (int *)host_get_memmap(EC_MEMMAP_BATT_DCAP);
 	int *memmap_dvlt = (int *)host_get_memmap(EC_MEMMAP_BATT_DVLT);
@@ -57,32 +58,31 @@ static void battery_update(enum battery_index i)
 
 	/* Smart battery serial number is 16 bits */
 	batt_str = (char *)host_get_memmap(EC_MEMMAP_BATT_SERIAL);
-	memcpy(batt_str, battery_static[i].serial_ext, EC_MEMMAP_TEXT_MAX);
+	memcpy(batt_str, bs->serial_ext, EC_MEMMAP_TEXT_MAX);
 	batt_str[EC_MEMMAP_TEXT_MAX - 1] = 0;
 
 	/* Design Capacity of Full */
-	*memmap_dcap = battery_static[i].design_capacity;
+	*memmap_dcap = bs->design_capacity;
 
 	/* Design Voltage */
-	*memmap_dvlt = battery_static[i].design_voltage;
+	*memmap_dvlt = bs->design_voltage;
 
 	/* Cycle Count */
-	*memmap_ccnt = battery_static[i].cycle_count;
+	*memmap_ccnt = bs->cycle_count;
 
 	/* Battery Manufacturer string */
 	batt_str = (char *)host_get_memmap(EC_MEMMAP_BATT_MFGR);
-	memcpy(batt_str, battery_static[i].manufacturer_ext,
-	       EC_MEMMAP_TEXT_MAX);
+	memcpy(batt_str, bs->manufacturer_ext, EC_MEMMAP_TEXT_MAX);
 	batt_str[EC_MEMMAP_TEXT_MAX - 1] = 0;
 
 	/* Battery Model string */
 	batt_str = (char *)host_get_memmap(EC_MEMMAP_BATT_MODEL);
-	memcpy(batt_str, battery_static[i].model_ext, EC_MEMMAP_TEXT_MAX);
+	memcpy(batt_str, bs->model_ext, EC_MEMMAP_TEXT_MAX);
 	batt_str[EC_MEMMAP_TEXT_MAX - 1] = 0;
 
 	/* Battery Type string */
 	batt_str = (char *)host_get_memmap(EC_MEMMAP_BATT_TYPE);
-	memcpy(batt_str, battery_static[i].type_ext, EC_MEMMAP_TEXT_MAX);
+	memcpy(batt_str, bs->type_ext, EC_MEMMAP_TEXT_MAX);
 	batt_str[EC_MEMMAP_TEXT_MAX - 1] = 0;
 
 	/*
@@ -139,7 +139,7 @@ host_command_battery_get_static(struct ec_host_cmd_handler_args *args)
 
 	if (p->index >= CONFIG_BATTERY_COUNT)
 		return EC_HOST_CMD_INVALID_PARAM;
-	bs = &battery_static[p->index];
+	bs = battery_get_static_info();
 
 	battery_update(p->index);
 	if (args->version == 0) {
@@ -421,6 +421,11 @@ void battery_poll_dynamic_info(void)
 	if (battery_misc[BATT_IDX_MAIN].dfet_status == BATTERY_DISCONNECT_ERROR)
 		battery_misc[BATT_IDX_MAIN].dfet_status = -1;
 #endif
+}
+
+test_mockable const struct battery_static_info *battery_get_static_info(void)
+{
+	return &battery_static[BATT_IDX_MAIN];
 }
 
 int update_static_battery_info(void)

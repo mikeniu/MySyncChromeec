@@ -178,7 +178,7 @@ static char read_battery_string(size_t field_offset, size_t field_size,
 	if (str_offset >= field_size) {
 		return 0;
 	}
-	return *((const char *)(&battery_static[battery_index]) + field_offset +
+	return *((const char *)battery_get_static_info() + field_offset +
 		 str_offset);
 }
 #endif
@@ -196,15 +196,16 @@ static char strings_fifo_read_work(size_t offset)
 	case EC_ACPI_MEM_STRINGS_FIFO_ID_BATTERY_MODEL:
 		return read_battery_string(
 			offsetof(struct battery_static_info, model_ext),
-			sizeof(battery_static[0].model_ext), offset);
+			sizeof(battery_get_static_info()->model_ext), offset);
 	case EC_ACPI_MEM_STRINGS_FIFO_ID_BATTERY_SERIAL:
 		return read_battery_string(
 			offsetof(struct battery_static_info, serial_ext),
-			sizeof(battery_static[0].serial_ext), offset);
+			sizeof(battery_get_static_info()->serial_ext), offset);
 	case EC_ACPI_MEM_STRINGS_FIFO_ID_BATTERY_MANUFACTURER:
 		return read_battery_string(
 			offsetof(struct battery_static_info, manufacturer_ext),
-			sizeof(battery_static[0].manufacturer_ext), offset);
+			sizeof(battery_get_static_info()->manufacturer_ext),
+			offset);
 #endif
 
 	default:

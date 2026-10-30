@@ -78,7 +78,7 @@ static int virtual_battery_operation(const uint8_t *batt_cmd_head,
 		 * TODO: To support multiple batteries, we need to translate
 		 * i2c address to a battery index.
 		 */
-		bs = &battery_static[BATT_IDX_MAIN];
+		bs = battery_get_static_info();
 		bd = &battery_dynamic[BATT_IDX_MAIN];
 	}
 

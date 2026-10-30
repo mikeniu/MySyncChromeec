@@ -35,7 +35,9 @@ ZTEST(host_cmd_battery_info, test_get_static__v0)
 	zassert_ok(rv, "Got %d", rv);
 
 	/* Validate all of the fields */
-	struct battery_static_info *batt = &battery_static[0];
+	const struct battery_static_info *batt = battery_get_static_info();
+
+	zassert_equal(batt, &battery_static[BATT_IDX_MAIN]);
 
 	zassert_equal(batt->design_capacity, response.design_capacity);
 	zassert_equal(batt->design_voltage, response.design_voltage);
@@ -72,7 +74,7 @@ ZTEST(host_cmd_battery_info, test_get_static__v1)
 	zassert_ok(rv, "Got %d", rv);
 
 	/* Validate all of the fields */
-	struct battery_static_info *batt = &battery_static[0];
+	const struct battery_static_info *batt = battery_get_static_info();
 
 	zassert_equal(batt->design_capacity, response.design_capacity);
 	zassert_equal(batt->design_voltage, response.design_voltage);
@@ -112,7 +114,7 @@ ZTEST(host_cmd_battery_info, test_get_static__v2)
 	zassert_equal(args.response_size, sizeof(response));
 
 	/* Validate all of the fields */
-	struct battery_static_info *batt = &battery_static[0];
+	const struct battery_static_info *batt = battery_get_static_info();
 
 	zassert_equal(batt->design_capacity, response.design_capacity);
 	zassert_equal(batt->design_voltage, response.design_voltage);
@@ -144,7 +146,7 @@ ZTEST(host_cmd_battery_info, test_get_static__v3)
 	zassert_equal(args.response_size, sizeof(response));
 
 	/* Validate all of the fields */
-	struct battery_static_info *batt = &battery_static[0];
+	const struct battery_static_info *batt = battery_get_static_info();
 
 	zassert_equal(batt->design_capacity, response.design_capacity);
 	zassert_equal(batt->design_voltage, response.design_voltage);
