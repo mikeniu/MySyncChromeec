@@ -5,6 +5,7 @@
 
 /* Blanc program common DTS includes */
 #include <cros/integrated_fwid.dtsi>
+#include <dt-bindings/macros.h>
 #include <zephyr/dt-bindings/led/led.h>
 
 /* Include the standard and OEM schema templates */
@@ -70,4 +71,31 @@ gpio_ec_pch_wake_odl: &gpio_ec_soc_wake_odl {};
 
 &sha0 {
 	status = "okay";
+};
+
+&uart4 {
+    status = "okay";
+	current-speed = <4166667>;
+	pinctrl-0 = <&uart4_sout_gp35>;
+	pinctrl-names = "default";
+	data-bits = <8>;
+	tx-invert;
+
+	uart4_dev0: uart4_dev0 {
+		status = "okay";
+		chain-length = <8>;
+		reset-delay = <205>;
+		bits-per-symbol = <5>;
+		one-symbol = <BINARY(1,1,1,1,0)>;
+		zero-symbol = <BINARY(1,0,0,0,0)>;
+	};
+};
+
+&pcc {
+	clock-frequency = <DT_FREQ_M(100)>;
+	core-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <4>;
+	apb3-prescaler = <4>;
+	apb4-prescaler = <1>;
 };
