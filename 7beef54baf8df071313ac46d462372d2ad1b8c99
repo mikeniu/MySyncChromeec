@@ -40,6 +40,54 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "add335de_fc4cb99a",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:58Z",
+      "side": 1,
+      "message": "Nit: Guard against `uint16_t block_num` overflow before starting the loop (e.g., if a malformed descriptor or test advertises a tiny `transfer_size_` such that `(total_size + transfer_size_ - 1) / transfer_size_ \u003e\u003d UINT16_MAX`, `block_num` wraps past `65535` before the final ZLP).",
+      "range": {
+        "startLine": 359,
+        "startChar": 0,
+        "endLine": 362,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "251fdd04_fb450bb6",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:58Z",
+      "side": 1,
+      "message": "Two DFU state-machine issues in `dfu_download()`:\n1. **Pre-download state recovery (before line 358)**: Before sending block 0, please issue `DFU_GETSTATUS` to ensure the device is in `dfuIDLE (2)` — if a prior interrupted transfer left it in `dfuERROR (10)`, send `DFU_CLRSTATUS (0x04)`; if in `dfuDNLOAD-IDLE (5)` or `dfuUPLOAD-IDLE (9)`, send `DFU_ABORT (0x06)` to return cleanly to `dfuIDLE (2)`.\n2. **Conditional `DFU_CLRSTATUS` on error paths (lines 393 \u0026 400–408)**: On RTS5817, sending `DFU_CLRSTATUS` in any state *other* than `dfuERROR (10)` `STALL`s and actively pushes the device *into* `dfuERROR`. Avoid calling `dfu_clear_status()` unconditionally on line 393 (e.g., after a host timeout or short write where `bState !\u003d 10`); instead, only send `DFU_CLRSTATUS` when `DFU_GETSTATUS` reports `bState \u003d\u003d kDfuStateDfuError` (including on the `!dfu_poll_idle()` failure path on lines 400–408).",
+      "range": {
+        "startLine": 392,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94db683a_6ed8786f",
         "filename": "util/realtekfp/rts5817_usb_device.cc",
         "patchSetId": 5
@@ -55,6 +103,54 @@
         "startLine": 428,
         "startChar": 0,
         "endLine": 452,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0d9a6c0_0e045abd",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:58Z",
+      "side": 1,
+      "message": "After manifestation reaches `dfuIDLE (2)`, the host still needs to send `DFU_DETACH` (`bmRequestType \u003d 0x21`, `bRequest \u003d 0x00`, `wIndex \u003d dfu_interface_`) so the RTS5817 exits DFU mode and boots the newly flashed image:\n- Because RTS5817 sets `bitManifestationTolerant \u003d 1` and `bitWillDetach \u003d 1` (`bmAttributes \u003d 0x0F`), `DFU_GETSTATUS` transitions `dfuMANIFEST-SYNC (6) -\u003e dfuIDLE (2)` and never enters `dfuMANIFEST-WAIT-RESET (8)` (so `backend_-\u003ereset_device()` in `dfu_poll_idle()` is never reached).\n- RTS5817 persists its DFU state across warm resets in an always-on register (`R_AL_DUMMY0`); only receiving `DFU_DETACH` while in DFU mode clears that state back to `appIDLE`, resets `R_INITVTOR`, and triggers a chip reset into the new firmware (`0BDA:5817`).\n\nPlease either send this post-manifest `DFU_DETACH` here before releasing `dfu_interface_` (with unit test coverage), or document clearly that callers must invoke `dfu_detach()` after `dfu_download()` succeeds.",
+      "range": {
+        "startLine": 449,
+        "startChar": 0,
+        "endLine": 452,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed94f3d7_90f61cb8",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:06:58Z",
+      "side": 1,
+      "message": "Both preconditions in this comment are inverted:\n1. `dfu_download()` must be called *after* the device has detached and re-enumerated in DFU mode (`0BDA:5800`), not immediately after `init()` and `enable_download()` in runtime mode (`0BDA:5817`).\n2. `firmware` must have any trailing DFU suffix *stripped beforehand* (RTS5817 rejects a trailing 16-byte DFU suffix as payload because `dwDnloadedFWLen !\u003d dwTotalFWLen`).",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 149,
         "endChar": 9999
       },
       "isAi": true,
