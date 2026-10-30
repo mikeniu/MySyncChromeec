@@ -310,6 +310,8 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #endif /* CONFIG_ZTEST_FATAL_HOOK */
 
 #ifdef CONFIG_PLATFORM_EC_DEBUG_ASSERT
+test_export_static bool in_assert;
+
 FUNC_NORETURN
 __override void zassert_post_action(const char *path, unsigned int line)
 {
@@ -320,6 +322,13 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	 * force synchronous console/log output.
 	 */
 	irq_lock();
+
+	if (in_assert) {
+		panic_puts("Recursive assert\n");
+		panic_reboot();
+		CODE_UNREACHABLE;
+	}
+	in_assert = true;
 
 	/* Save assert panic data first before logging or stack walking. */
 	panic_data_write_assert(path, line);
