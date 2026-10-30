@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "469edbfc_89913a08",
+        "filename": "zephyr/program/ocelot/coolum/coolum_vif.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-10-30T06:25:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1d156e88_4e7e2bee",
+      "revId": "fdff4572f42d856b1b63233bf81a526ce8fed92b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d67741c4_e892581c",
