@@ -18,6 +18,138 @@
       "isAi": true,
       "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e7dab64_e84757c1",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:42:43Z",
+      "side": 1,
+      "message": "Please add a `util/realtekfp/.clang-format` file containing:\n```yaml\nBasedOnStyle: Google\n```\n(matching `util/elan/.clang-format`, `util/egis/.clang-format`, and `util/focaltech/.clang-format`) and format all `.cc`/`.h` files across this stack with `cros format`.\n\nCurrently, without a subdirectory `.clang-format`, `clang-format` falls back to the repo-root C config (Linux kernel style), and all 11 C++ files in `util/realtekfp/` fail `cros format --check` (`clang-format --dry-run -Werror`).",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cfc4b7d_2be502bd",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:42:43Z",
+      "side": 1,
+      "message": "Please align the C++ files across this stack with the Google C++ Style Guide (matching the peer C++23 FPMCU utilities in `util/elan/`, `util/egis/`, and `util/focaltech/`):\n1. **Namespace**: Wrap declarations and definitions in `namespace realtekfp { ... }  // namespace realtekfp` instead of placing types and constants in the global namespace. (Inside `namespace realtekfp`, dropping the `Rts` prefix on `UsbBackend`, `UsbDevice`, `UsbInterface`, `LibusbBackend`, etc. is also optional if you want cleaner names.)\n2. **Function naming**: Use `PascalCase` for regular functions and methods (`Init()`, `Open()`, `Close()`, `ErrorName()`, `WaitForDevice()`, `Release()`, `EnableDownload()`, `ParseDfuTransferSize()`, `DfuDetach()`, `DfuDownload()`, etc.), keeping `snake_case()` only for cheap inline accessors like `transfer_size()` / `is_open()`.\n3. **Header guards**: Include the `REALTEKFP_` directory component to match the file path (`PLATFORM_EC_UTIL_REALTEKFP_RTS5817_USB_BACKEND_H_`, and likewise in `rts5817_usb_device.h` and `rts5817_mock_usb_backend.h`) and close with `#endif  // PLATFORM_EC_UTIL_REALTEKFP_...` (checked by `cros lint` / `cpplint`).\n4. **Comments**: Prefer C++ `//` comments (and prose function comments) over C `/* ... */` and kernel-doc `/** @param ... */` blocks.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04facf52_529d7aad",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:42:43Z",
+      "side": 1,
+      "message": "Since host C++ utilities in `platform/ec` build with `-std\u003dgnu++23` and `-fno-exceptions`, please use `std::expected` for fallible operations across this stack (similar to `util/elan/`, `util/egis/`, and `util/focaltech/`).\n\nAt the `RtsUsbBackend` seam, using `std::expected\u003c..., int\u003e` (where the error is the negative `libusb_error` code) avoids losing error details:\n- `open()` currently returns `bool`, which discards `LIBUSB_ERROR_ACCESS` vs. `LIBUSB_ERROR_NO_DEVICE` — returning `std::expected\u003cvoid, int\u003e` lets callers fail immediately on permission errors instead of reporting \"device not found\" or polling until timeout.\n- `init()` can similarly return `std::expected\u003cvoid, int\u003e` for consistency.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e855d03_2f2884d5",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:42:43Z",
+      "side": 1,
+      "message": "Prefer returning `std::string_view` instead of `const char*` here (`virtual std::string_view ErrorName(int error) const \u003d 0;`). Both `libusb_error_name()` and string literals in unit tests convert to `std::string_view` with zero allocation.",
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b874b085_953e904a",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:42:43Z",
+      "side": 1,
+      "message": "Please use `std::chrono::milliseconds` instead of raw `int` millisecond counts for durations across this stack (matching `util/elan/iap_control.h`, `util/egis/usb_comm.h`, and `util/focaltech/usb_device.h`):\n- `using SleepFn \u003d std::function\u003cvoid(std::chrono::milliseconds)\u003e;`\n- `wait_for_device(uint16_t vid, uint16_t pid, std::chrono::milliseconds timeout, std::chrono::milliseconds poll_interval)` (lines 40–41)\n- `default_sleep(std::chrono::milliseconds delay)` (line 47 — `rts5817_usb_device.cc` already converts `ms` right back into `std::chrono::milliseconds(ms)`).",
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33968e1a_bc27185b",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:42:43Z",
+      "side": 1,
+      "message": "Please define a domain error enum (e.g., `enum class RtsError` with a `ToString()` helper; see `util/focaltech/ft_util.h` or `util/elan/utility.h` for examples) and return `std::expected\u003cvoid, RtsError\u003e` from `init()` and `wait_for_device()` instead of `bool`.\n\nBeyond making unit tests able to assert specific failure causes (`EXPECT_EQ(res.error(), ...)` instead of just `EXPECT_FALSE`), this lets `wait_for_device()` retry only on `kDeviceNotFound` and abort immediately on non-retryable errors like `kAccessDenied`, while moving user-facing error formatting up to the CLI layer.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
