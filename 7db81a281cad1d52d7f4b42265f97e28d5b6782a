@@ -94,6 +94,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cffece57_7268ff46",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:53Z",
+      "side": 1,
+      "message": "Consider defining a small value type here (matching `util/elan/usb_backend.h`, `util/egis/usb_comm.h`, and `util/focaltech/usb_transport.h`):\n```cpp\nstruct UsbDeviceId {\n  uint16_t vid \u003d 0;\n  uint16_t pid \u003d 0;\n  bool operator\u003d\u003d(const UsbDeviceId\u0026) const \u003d default;\n};\n```\nand passing `UsbDeviceId` instead of separate `(uint16_t vid, uint16_t pid)` parameters across `RtsUsbBackend::Open()`, `RtsUsbDevice::Init()`, `RtsUsbDevice::WaitForDevice()`, and `ParseVidPid()` / `Config` (`std::optional\u003cUsbDeviceId\u003e dev_id`). That prevents accidental `(vid, pid)` swaps at call sites and simplifies target selection in `main()` to `cfg.dev_id.value_or(kRts5817RuntimeId)`.",
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2e855d03_2f2884d5",
         "filename": "util/realtekfp/rts5817_usb_backend.h",
         "patchSetId": 8
@@ -112,6 +130,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0adbfc4_6f6ed3b7",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:53Z",
+      "side": 1,
+      "message": "Since host C++ utilities build with `-std\u003dgnu++23`, consider using C++23 `\u003cprint\u003e` (`std::println(...)` / `std::println(stderr, ...)` and `std::print(...)`) instead of `\u003ccstdio\u003e` `printf` / `fprintf` across `util/realtekfp/` (`rts5817_usb_device.cc`, `rts5817_flash_cli.cc`, and `rts5817_flash.cc`), matching `util/focaltech/`, `util/egis/`, and `util/elan/`.\n\nFor example:\n```cpp\nstd::println(stderr, \"Error: device {:04x}:{:04x} not found.\", id.vid, id.pid);\n```\nIt checks format strings at compile time and formats `std::string_view` (such as `ErrorName()`) and integer widths directly without `%zu` / `%04x` / `.c_str()`.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b874b085_953e904a",
         "filename": "util/realtekfp/rts5817_usb_device.h",
         "patchSetId": 8
@@ -123,6 +165,30 @@
       "writtenOn": "2026-10-30T18:42:43Z",
       "side": 1,
       "message": "Please use `std::chrono::milliseconds` instead of raw `int` millisecond counts for durations across this stack (matching `util/elan/iap_control.h`, `util/egis/usb_comm.h`, and `util/focaltech/usb_device.h`):\n- `using SleepFn \u003d std::function\u003cvoid(std::chrono::milliseconds)\u003e;`\n- `wait_for_device(uint16_t vid, uint16_t pid, std::chrono::milliseconds timeout, std::chrono::milliseconds poll_interval)` (lines 40–41)\n- `default_sleep(std::chrono::milliseconds delay)` (line 47 — `rts5817_usb_device.cc` already converts `ms` right back into `std::chrono::milliseconds(ms)`).",
+      "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1183efb8_6e04b114",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T19:46:53Z",
+      "side": 1,
+      "message": "Nit: You can drop the private `default_sleep_ms()` static helper method (`rts5817_usb_device.h:47`, `rts5817_usb_device.cc:13-16`) by using an inline default lambda (with `\u003cthread\u003e`):\n```cpp\nexplicit RtsUsbDevice(\n    std::unique_ptr\u003cRtsUsbBackend\u003e backend,\n    SleepFn sleep \u003d [](std::chrono::milliseconds d) {\n      std::this_thread::sleep_for(d);\n    });\n```",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
