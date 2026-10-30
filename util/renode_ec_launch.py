@@ -61,6 +61,19 @@ GPIO_TRANSPORT_SEL_MAP: dict[str, str] = {
 GPIO_TRANSPORT_SEL_SPI = "Release"
 GPIO_TRANSPORT_SEL_UART = "Press"
 
+ZEPHYR_UPSTREAM_ADDR_MAP: dict[str, str] = {
+    # Upstream ft9001_eval links slot0_partition at eflash base 0x10000000 +
+    # 0x1000 (whereas EC chudow links at 0x10080000 + 0x1000), and upstream
+    # egis_et171 links slot0_partition at flash0 base 0x80000000 + 0x1000,
+    # both without the 4KB flash header prepended to ec.bin.
+    "chudow": "0x10001000",
+    "sanok": "0x80001000",
+}
+
+ZEPHYR_UPSTREAM_CONSOLE_MAP: dict[str, str] = {
+    "chudow": "sysbus.usart2",
+}
+
 
 def msg_run(cmd: List[str]) -> NoReturn:
     """Prints a command and executes it, replacing the current process.
@@ -109,7 +122,7 @@ def launch(
 
     if zephyr_bin:
         bin_file = pathlib.Path(zephyr_bin)
-        elf_ro_file = pathlib.Path(os.path.dirname(zephyr_bin)) / "zephyr.elf"
+        elf_ro_file = bin_file.parent / "zephyr.elf"
         # There is only a single ELF file in upstream Zephyr builds.
         elf_rw_file = elf_ro_file
     elif zephyr:
@@ -156,6 +169,11 @@ def launch(
     # using a derivative board, like buccaneer which is based on helipilot.
     renode_execute.append(f'$name="{board}";')
     renode_execute.append(f'$bin="{bin_file}";')
+    if zephyr_bin:
+        upstream_addr = ZEPHYR_UPSTREAM_ADDR_MAP.get(board)
+        if upstream_addr:
+            renode_execute.append(f"$bin_addr={upstream_addr};")
+            renode_execute.append(f"$vector_table_offset={upstream_addr};")
     renode_execute.append(f'$elf_ro="{elf_ro_file}";')
     renode_execute.append(f'$elf_rw="{elf_rw_file}";')
     renode_execute.append(f"include @util/renode/{board}.resc;")
@@ -181,16 +199,17 @@ def launch(
             f"{GPIO_TRANSPORT_SEL_MAP[board]} {transport_state};"
         )
 
-    if board in CONSOLE_MAP:
+    console = CONSOLE_MAP.get(board)
+    if console:
+        if zephyr_bin:
+            console = ZEPHYR_UPSTREAM_CONSOLE_MAP.get(board, console)
         # Expose the console UART as a PTY on the given path (default:
         # /tmp/renode-uart). You can connect to the PTY with minicom, screen,
         # etc.
         renode_execute.append(
             f'emulation CreateUartPtyTerminal "term" "{uart}" True;'
         )
-        renode_execute.append(
-            "connector Connect " + CONSOLE_MAP[board] + " term;"
-        )
+        renode_execute.append(f"connector Connect {console} term;")
 
     renode_execute.append("start;")
 

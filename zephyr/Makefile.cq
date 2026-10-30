@@ -75,7 +75,8 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 
 ifeq ($(filter 1/%,$(TWISTER_SUBSET)),$(TWISTER_SUBSET))
 test_host: zmake_unit_tests test_host_utils \
-	zephyr_check_compliance_unittest run_device_tests_unittest
+	zephyr_check_compliance_unittest run_device_tests_unittest \
+	renode_ec_launch_unittest
 
 test_llvm: zmake_unit_tests test_host_utils
 
@@ -116,6 +117,10 @@ zephyr_check_compliance_unittest:
 .PHONY: run_device_tests_unittest
 run_device_tests_unittest:
 	$(PLATFORM_EC)/test/run_device_tests_unittest.py
+
+.PHONY: renode_ec_launch_unittest
+renode_ec_launch_unittest:
+	$(PLATFORM_EC)/util/renode_ec_launch_unittest.py
 
 twister_host $(PLATFORM_EC)/twister-out-host/coverage.info: TOOLCHAIN=host/gnu
 twister_host $(PLATFORM_EC)/twister-out-host/coverage.info: TOOLCHAIN_PATH=host

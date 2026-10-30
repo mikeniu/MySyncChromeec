@@ -28,3 +28,5 @@ pytest check_zephyr_project_config_unittest.py
 # NOTE: these use vpython so they do not run correctly through pytest.
 ./zephyr_check_compliance_unittest.py
 ./kconfig_check_unittest.py
+
+./renode_ec_launch_unittest.py
