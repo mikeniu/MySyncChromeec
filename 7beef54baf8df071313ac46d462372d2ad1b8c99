@@ -40,6 +40,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94db683a_6ed8786f",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:46:09Z",
+      "side": 1,
+      "message": "Both ZLP `DFU_DOWNLOAD` failure (`ret \u003c 0`, lines 428–433) and manifestation poll failure (`!dfu_poll_idle()`, lines 443–447) must fail the download rather than printing a warning and returning success:\n- RTS5817 performs partition-length validation (e.g., rejecting an unpadded binary whose size does not match `dwTotalFWLen`) and whole-image SHA-256 verification inside the final zero-length `DFU_DNLOAD(wLength \u003d 0)` handler. When verification fails, the device `STALL`s the ZLP (`LIBUSB_ERROR_PIPE`), transitions to `bStatus \u003d errNOTDONE (9)` / `bState \u003d dfuERROR (10)`, and omits writing the firmware-valid flag — leaving the SPI flash partition unbootable.\n- Because RTS5817 sets `bitManifestationTolerant \u003d 1` (`bmAttributes \u003d 0x0F`), a valid flash on RTS5817 always ACKs the ZLP and reaches `bState \u003d dfuIDLE (2)` on `DFU_GETSTATUS` without disconnecting mid-manifestation.\n\nSwallowing these errors causes `rts5817_flash` to print `\"Flash completed successfully.\"` and exit `0` even when flash verification failed and the device cannot boot. Please return an error on both paths (releasing `dfu_interface_`, and if the ZLP `STALL`s, optionally querying `DFU_GETSTATUS` / `DFU_CLRSTATUS` first so the device\u0027s `bStatus` code is surfaced in the error). Also verify that post-ZLP polling specifically reaches `dfuIDLE (2)` rather than `dfuDNLOAD-IDLE (5)`.",
+      "range": {
+        "startLine": 428,
+        "startChar": 0,
+        "endLine": 452,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0f0a8ab6_4bc73c38",
         "filename": "util/realtekfp/rts5817_usb_device.h",
         "patchSetId": 5
@@ -51,6 +75,30 @@
       "writtenOn": "2026-10-30T18:44:17Z",
       "side": 1,
       "message": "Please return `std::expected\u003cvoid, RtsError\u003e` here so `main()` and unit tests can distinguish empty-input, interface-claim, block-transfer, and manifestation/verification (`errNOTDONE`) failures.",
+      "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0ca133b_dac332b0",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 888,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T18:46:09Z",
+      "side": 1,
+      "message": "Following the comment on `rts5817_usb_device.cc:428-452`, please invert `FinalZlpFailureIsOnlyAWarning` and `ManifestNotIdleStillSucceeds` to assert that `dfu_download()` fails when the final ZLP or manifestation status poll fails.",
+      "range": {
+        "startLine": 859,
+        "startChar": 0,
+        "endLine": 888,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
