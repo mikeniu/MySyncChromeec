@@ -6,7 +6,9 @@
 #include "common.h"
 #include "ec_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
+#ifdef CONFIG_MOCK_OTP
 #include "mock/otpi_mock.h"
+#endif
 #include "openssl/bn.h"
 #include "openssl/ec.h"
 #include "openssl/obj_mac.h"
@@ -37,10 +39,12 @@ static_assert(kFakeUserId.size() == FP_CONTEXT_USERID_BYTES);
 
 void *setup_suite(void)
 {
+#ifdef CONFIG_MOCK_OTP
 	if (IS_ENABLED(CONFIG_OTP_KEY)) {
 		std::ranges::copy(default_fake_otp_key,
 				  mock_otp.otp_key_buffer);
 	}
+#endif
 
 	return NULL;
 }

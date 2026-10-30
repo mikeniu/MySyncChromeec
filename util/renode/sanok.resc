@@ -34,6 +34,11 @@ showAnalyzer uart0
 # Mock of bootrom, reads entry point from flash header and jumps there
 cpu0 AssembleBlock 0x70000000 "li t0, 0x80000000; lw t1, 24(t0); jalr zero, t1, 0"
 
+# Set OTPC_INTR_FLAG (bit 0) at ET171_OTPC->INTR (0xf1000004) and populate
+# non-trivial EGIS_KEY3 (8 words at ET171_OTPC->OTP[0x74], 0xf10011d0).
+sysbus Tag <0xf1000004 0x4> "OTPC_INTR" 0x1
+sysbus Tag <0xf10011d0 0x20> "OTPC_EGIS_KEY3" 0x2d327146
+
 macro reset
 """
     sysbus LoadBinary $bin 0x80000000
