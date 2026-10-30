@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2087995_0b17a844",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T01:29:03Z",
+      "side": 1,
+      "message": "Code updated in PS9; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "63ba4347_24ac922b",
+      "revId": "61a76c8f674f17db280b96716f0ee07994096e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f35a1b45_98b16dd6",
         "filename": "core/cortex-m/mpu.c",
         "patchSetId": 8
@@ -73,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fed05f10_6e3afec9",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T01:29:03Z",
+      "side": 1,
+      "message": "Code updated in PS9; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "f35a1b45_98b16dd6",
+      "revId": "61a76c8f674f17db280b96716f0ee07994096e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b7ecc0e3_d02a8b5c",
         "filename": "test/system.c",
         "patchSetId": 8
@@ -84,6 +120,24 @@
       "writtenOn": "2026-10-26T20:43:13Z",
       "side": 1,
       "message": "Will this ever be untrue?",
+      "revId": "61a76c8f674f17db280b96716f0ee07994096e36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f1d5e50_b14d805e",
+        "filename": "test/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-30T01:29:03Z",
+      "side": 1,
+      "message": "Code updated in PS9; waiting for human review.\n\n(Drafted with AI assistant on behalf of Jon Murphy)",
+      "parentUuid": "b7ecc0e3_d02a8b5c",
       "revId": "61a76c8f674f17db280b96716f0ee07994096e36",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
