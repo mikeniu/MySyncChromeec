@@ -16,6 +16,24 @@
       "message": "This should probably partake of the mutex history logging, maybe with its own lock macro. Should this method of locking be the definition of `CM_MUTEX_LOCK`? I\u0027ll defer to Al.",
       "revId": "015dc354214f2c5a70f8c1ec208d84571a5cbf13",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f1990af_df4b4c97",
+        "filename": "common/charge_manager.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-30T02:32:06Z",
+      "side": 1,
+      "message": "Yes, this should be updated in `CM_MUTEX_LOCK` call.",
+      "parentUuid": "2d1aa786_f6b84af7",
+      "revId": "015dc354214f2c5a70f8c1ec208d84571a5cbf13",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
