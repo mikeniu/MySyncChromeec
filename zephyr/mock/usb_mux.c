@@ -11,3 +11,10 @@ __weak mux_state_t usb_mux_get(int port)
 {
 	return 0;
 }
+
+#if defined(CONFIG_USBC_SS_MUX) || defined(CONFIG_ZTEST)
+__weak void usb_mux_set(int port, mux_state_t mux_mode,
+			enum usb_switch usb_config, int polarity)
+{
+}
+#endif

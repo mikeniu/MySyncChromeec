@@ -1,0 +1,86 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <npcx_emul.dts>
+
+/ {
+	gpio2: gpio@201 {
+		status = "okay";
+		compatible = "zephyr,gpio-emul";
+		reg = <0x201 0x4>;
+		rising-edge;
+		falling-edge;
+		high-level;
+		low-level;
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <8>;
+	};
+
+	gpioksi: gpio@f01d08 {
+		status = "okay";
+		compatible = "zephyr,gpio-emul";
+		reg = <0xf01d08 0x4>;
+		rising-edge;
+		falling-edge;
+		high-level;
+		low-level;
+		gpio-controller;
+		keyboard-controller;
+		#gpio-cells = <2>;
+		ngpios = <8>;
+	};
+
+	gpioksoh: gpio@f01d01 {
+		status = "okay";
+		compatible = "zephyr,gpio-emul";
+		reg = <0xf01d01 0x4>;
+		rising-edge;
+		falling-edge;
+		high-level;
+		low-level;
+		gpio-controller;
+		keyboard-controller;
+		#gpio-cells = <2>;
+		ngpios = <10>;
+	};
+
+	gpioksol: gpio@f01d00 {
+		status = "okay";
+		compatible = "zephyr,gpio-emul";
+		reg = <0xf01d00 0x4>;
+		rising-edge;
+		falling-edge;
+		high-level;
+		low-level;
+		gpio-controller;
+		keyboard-controller;
+		#gpio-cells = <2>;
+		ngpios = <8>;
+	};
+
+	adc0: adc@400d1000 {
+		compatible = "zephyr,adc-emul";
+		reg = <0x400d1000 0x1000>;
+		nchannels = <12>;
+		ref-internal-mv = <3300>;
+		#io-channel-cells = <1>;
+	};
+};
+
+i2c0: &i2c_ctrl0 {};
+i2c0_0: &i2c_ctrl0 {};
+i2c1_0: &i2c_ctrl1 {};
+i2c2_0: &i2c_ctrl2 {};
+i2c3_0: &i2c_ctrl3 {};
+i2c4_0: &i2c_ctrl4 {};
+i2c4_1: &i2c_ctrl4 {};
+i2c5_0: &i2c_ctrl5 {};
+i2c5_1: &i2c_ctrl5 {};
+i2c6_0: &i2c_ctrl6 {};
+i2c6_1: &i2c_ctrl6 {};
+i2c7_0: &i2c_ctrl7 {};
+
+#include <board-overlays/common_native_sim.dtsi>
