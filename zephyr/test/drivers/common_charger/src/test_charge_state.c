@@ -46,17 +46,6 @@ static enum ec_error_list mock_discharge_on_ac(int chgnum, int enable)
 	return EC_SUCCESS;
 }
 
-/*
- * Strong override: common/battery.c provides a weak definition that queries
- * battery_get_params(), and common/charge_state.c defines it as test_mockable
- * (weak in test builds). Override it here so charge_get_display_charge()
- * reads directly from curr.batt set in the test fixture.
- */
-const struct batt_params *charger_current_battery_params(void)
-{
-	return &charge_get_status()->batt;
-}
-
 static struct charger_drv mock_chg_drv;
 
 struct charge_state_fixture {

@@ -328,4 +328,33 @@ ZTEST_USER(adsp_comms, test_adsp_comms_shutdown_reset)
 	zassert_equal(status, 0);
 }
 
+/* Test charger_current_battery_params returns cached parameters from
+ * battery_poll_dynamic_info */
+ZTEST_USER(adsp_comms, test_charger_current_battery_params_cached)
+{
+	const struct batt_params *batt;
+	unsigned int sb_reads;
+
+	battery_is_present_fake.return_val = BP_YES;
+	extpower_is_present_fake.return_val = 1;
+
+	/* Trigger polling to populate the cache */
+	battery_poll_dynamic_info();
+	sb_reads = sb_read_fake.call_count;
+	zassert_true(sb_reads > 0);
+
+	/* Reading cached params performs zero SMBus reads */
+	batt = charger_current_battery_params();
+	zassert_not_null(batt);
+	zassert_equal(sb_read_fake.call_count, sb_reads);
+	zassert_equal(charger_current_battery_params(), batt);
+	zassert_equal(sb_read_fake.call_count, sb_reads);
+
+	/* Next poll refreshes the cached params from SMBus */
+	extpower_is_present_fake.return_val = 0;
+	battery_poll_dynamic_info();
+	zassert_true(sb_read_fake.call_count > sb_reads);
+	zassert_equal(charger_current_battery_params(), batt);
+}
+
 ZTEST_SUITE(adsp_comms, NULL, NULL, test_before, NULL, NULL);
