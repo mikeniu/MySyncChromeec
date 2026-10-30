@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c21c137_8272c9d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:14:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ Replacing `sizeof(lm3509_brightness)` (64 bytes) with `ARRAY_SIZE(lm3509_brightness)` (32 elements) fixes the out-of-bounds loop bound in `brightness_to_bmain` when `percent \u003e 100` and ensures the fallback `return i - 1` returns the maximum valid register value (`31` / `LM3509_BMAIN_MASK`).\n* **Architecture \u0026 Component Fit:** ✅ Uses `ARRAY_SIZE` from `compile_time_macros.h` and integrates the host unit test via `DECLARE_TEST_I2C_XFER`, `test/lm3509.tasklist`, `test/test_config.h`, and `test/build.mk` following standard ChromiumOS EC test conventions.\n* **Code Simplicity:** ✅ Minimal 1-line fix in `driver/led/lm3509.c` and linear, control-flow-free assertions in `test/lm3509.c`.\n* **Idiomaticity \u0026 Readability:** ✅ Idiomatic use of `ARRAY_SIZE` for array element count and descriptive named constants for boundary test inputs in `test/lm3509.c`.\n* **Security:** ✅ Prevents reading up to 32 `uint16_t` elements (64 bytes) past the end of `lm3509_brightness` in `.rodata` when `percent \u003e 100`.\n* **Testing:** ✅ `test/lm3509.c` thoroughly covers `kblight_lm3509.set` / `brightness_to_bmain` across below-minimum (`-1`), minimum (`0`), `1%`, equidistant midpoint tie-breaking (`4%`), final-interval rounding down/up (`93%` / `94%`), exact maximum (`100%`), and out-of-range (`101%`) inputs.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+94, -1)` — Single, cohesive logical change (`+1, -1` production fix in `driver/led/lm3509.c` and `+93, -0` host unit test coverage).\n* **Commit Message:** ✅ Concise prose clearly stating why `sizeof(lm3509_brightness)` failed and what changed, with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/097c5e2e-2546-4aa4-a97b-5afe5de0f781)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bce74698cb49052fee8781f1965e81c07a4f6bed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
