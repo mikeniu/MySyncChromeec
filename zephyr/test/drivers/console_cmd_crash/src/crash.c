@@ -8,11 +8,37 @@
 #include "test/drivers/test_mocks.h"
 #include "test/drivers/test_state.h"
 
+#include <setjmp.h>
+
 #include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
 
 FAKE_VOID_FUNC(command_crash_nested_enable, int, const char **);
 FAKE_VOID_FUNC(command_crash_nested_disable);
+
+/*
+ * Simulate a non-returning EC reset using setjmp/longjmp. EXPECT_NO_RETURN()
+ * saves the calling context before running the shell command, and the custom
+ * system_reset() fake clears the shell command-context flag, unlocks
+ * interrupts, and unwinds back to EXPECT_NO_RETURN() via longjmp().
+ */
+static jmp_buf reset_jmp;
+
+static void system_reset_longjmp(int flags)
+{
+	ARG_UNUSED(flags);
+	get_ec_shell()->ctx->ctx.flags.cmd_ctx = 0;
+	irq_unlock(0);
+	longjmp(reset_jmp, 1);
+}
+
+#define EXPECT_NO_RETURN(stmt)                                     \
+	do {                                                       \
+		if (setjmp(reset_jmp) == 0) {                      \
+			stmt;                                      \
+			zassert_unreachable("Expected no return"); \
+		}                                                  \
+	} while (0)
 
 ZTEST_USER(console_cmd_crash, test_no_args)
 {
@@ -37,25 +63,22 @@ ZTEST_USER(console_cmd_crash, test_bad_arg)
 
 ZTEST_USER(console_cmd_crash, test_assert)
 {
-	int rv;
+	EXPECT_NO_RETURN(shell_execute_cmd(get_ec_shell(), "crash assert"));
 
-	rv = shell_execute_cmd(get_ec_shell(), "crash assert");
-
-	zassert_equal(EC_ERROR_UNKNOWN, rv, NULL);
+	zassert_equal(1, system_reset_fake.call_count);
 	zassert_equal(0, command_crash_nested_enable_fake.call_count);
-	zassert_equal(1, command_crash_nested_disable_fake.call_count);
+	zassert_equal(0, command_crash_nested_disable_fake.call_count);
 }
 
 ZTEST_USER(console_cmd_crash, test_assert_assert)
 {
-	int rv;
+	EXPECT_NO_RETURN(
+		shell_execute_cmd(get_ec_shell(), "crash assert asset"));
 
-	rv = shell_execute_cmd(get_ec_shell(), "crash assert asset");
-
-	zassert_equal(EC_ERROR_UNKNOWN, rv, NULL);
+	zassert_equal(1, system_reset_fake.call_count);
 	zassert_equal(1, command_crash_nested_enable_fake.call_count);
 	zassert_equal(3, command_crash_nested_enable_fake.arg0_val);
-	zassert_equal(1, command_crash_nested_disable_fake.call_count);
+	zassert_equal(0, command_crash_nested_disable_fake.call_count);
 }
 
 static void reset(void *data)
@@ -64,6 +87,7 @@ static void reset(void *data)
 
 	RESET_FAKE(command_crash_nested_enable);
 	RESET_FAKE(command_crash_nested_disable);
+	system_reset_fake.custom_fake = system_reset_longjmp;
 }
 
 ZTEST_SUITE(console_cmd_crash, drivers_predicate_post_main, NULL, reset, NULL,

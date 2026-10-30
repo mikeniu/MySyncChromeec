@@ -6,24 +6,46 @@
 #include "panic.h"
 #include "task.h"
 
+#include <setjmp.h>
+
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
 
 DECLARE_FAKE_VOID_FUNC(system_reset, int);
 DEFINE_FAKE_VOID_FUNC(system_reset, int);
 
-ZTEST(debug_assert, test_assert_false)
+/*
+ * On real hardware, assertion handlers are FUNC_NORETURN: they lock interrupts
+ * and call panic_reboot() -> system_reset(), which resets the EC and never
+ * returns.
+ *
+ * To test assertion handling without returning into panic_reboot() and hitting
+ * CODE_UNREACHABLE, EXPECT_NO_RETURN() saves the calling environment with
+ * setjmp(reset_jmp) and the custom system_reset() fake unlocks interrupts and
+ * unwinds the stack back to the test via longjmp(reset_jmp, 1).
+ */
+static jmp_buf reset_jmp;
+
+static void system_reset_longjmp(int flags)
 {
-	struct panic_data *pdata;
-	int linenum;
-	const char *filename;
+	ARG_UNUSED(flags);
+	irq_unlock(0);
+	longjmp(reset_jmp, 1);
+}
 
-	filename = strrchr(__FILE__, '/') + 1;
-	linenum = __LINE__ + 1;
-	__ASSERT(false, "Test false assert");
+#define EXPECT_NO_RETURN(stmt)                                     \
+	do {                                                       \
+		if (setjmp(reset_jmp) == 0) {                      \
+			stmt;                                      \
+			zassert_unreachable("Expected no return"); \
+		}                                                  \
+	} while (0)
 
-	zassert_equal(system_reset_fake.call_count, 1);
-	pdata = panic_get_data();
+static void verify_assert_panic_data(int linenum)
+{
+	const char *filename = strrchr(__FILE__, '/') + 1;
+	struct panic_data *pdata = panic_get_data();
+
 	zassert_not_null(pdata);
 	zassert_equal(PANIC_SW_ASSERT, panic_get_reason_reg(pdata));
 	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO)) {
@@ -37,6 +59,17 @@ ZTEST(debug_assert, test_assert_false)
 	}
 	zassert_equal((uint8_t)(uintptr_t)k_current_get(),
 		      panic_get_exception_reg(pdata));
+}
+
+ZTEST(debug_assert, test_assert_false)
+{
+	int linenum;
+
+	linenum = __LINE__ + 1;
+	EXPECT_NO_RETURN(__ASSERT(false, "Test false assert"));
+
+	zassert_equal(system_reset_fake.call_count, 1);
+	verify_assert_panic_data(linenum);
 }
 
 ZTEST(debug_assert, test_assert_true)
@@ -53,6 +86,7 @@ static void reset(void *data)
 	/* clear panic data */
 	memset(get_panic_data_write(), 0, sizeof(struct panic_data));
 	RESET_FAKE(system_reset);
+	system_reset_fake.custom_fake = system_reset_longjmp;
 }
 
 ZTEST_SUITE(debug_assert, NULL, NULL, reset, reset, NULL);

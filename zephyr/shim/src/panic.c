@@ -310,9 +310,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #endif /* CONFIG_ZTEST_FATAL_HOOK */
 
 #ifdef CONFIG_PLATFORM_EC_DEBUG_ASSERT
-#ifndef CONFIG_ASSERT_TEST
 FUNC_NORETURN
-#endif
 __override void zassert_post_action(const char *path, unsigned int line)
 {
 	/*
@@ -321,7 +319,7 @@ __override void zassert_post_action(const char *path, unsigned int line)
 	 * are fatal, so lock interrupts immediately to prevent preemption and
 	 * force synchronous console/log output.
 	 */
-	unsigned int key = irq_lock();
+	irq_lock();
 
 	/* Save assert panic data first before logging or stack walking. */
 	panic_data_write_assert(path, line);
@@ -342,12 +340,7 @@ __override void zassert_post_action(const char *path, unsigned int line)
 
 	panic_reboot();
 
-	if (IS_ENABLED(CONFIG_ZTEST))
-		irq_unlock(key);
-
-#ifndef CONFIG_ASSERT_TEST
 	CODE_UNREACHABLE;
-#endif
 }
 #endif /* CONFIG_PLATFORM_EC_DEBUG_ASSERT */
 
