@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff14d666_4dc6876e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-30T01:11:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/0a0ab4f8-5f2f-464a-9725-e6b9a6b03104)]\n\n### Review Summary\n\n* **Functionality:** ✅ Performing two consecutive volatile writes to `IT83XX_GCTRL_WNCKR` (65.536 kHz) in `dma_flash_fsce_high()` guarantees waiting at least one full clock period (~15.26 us) before writing `0x00` to `IT83XX_SMFI_ECINDDR` to drive `FSCE#` high, ensuring internal e-flash latches the final SPI byte.\n* **Architecture \u0026 Component Fit:** ✅ Placing the bus-stall delay in `dma_flash_fsce_high()` within the `.flash_direct_map` RAM-code section covers all `FSCE#` deassertions (`dma_flash_transaction()` and `dma_flash_cmd_write()`) and aligns with the Zephyr IT8xxx2 flash driver (`ramcode_flash_fsce_high()`).\n* **Code Simplicity:** ✅ Minimal two-line register write addition with no unnecessary branching or state.\n* **Idiomaticity \u0026 Readability:** ✅ Reuses `IT83XX_GCTRL_WNCKR` from `chip/it83xx/registers.h` with a clear explanatory comment matching local conventions.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ✅ This change only adds two unconditional hardware bus-stall MMIO writes (`IT83XX_GCTRL_WNCKR`) in `.flash_direct_map` RAM code to enforce physical SPI `FSCE#` hold timing, with no branching or state logic that can be unit-tested on the host.\n* **CL Size \u0026 Scope:** ✅ `Size: XS (+6, -0)`. Focused, single-purpose fix.\n* **Commit Message:** ✅ Concise prose clearly explaining the problem and fix with proper `BUG\u003d` and `TEST\u003d` tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3e16cf7404351fc84df295392987ad9c6630da4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
