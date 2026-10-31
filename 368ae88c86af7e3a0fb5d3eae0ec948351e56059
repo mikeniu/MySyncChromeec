@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28b9f6a1_e4c89c1c",
+        "filename": "zephyr/program/ocelot/blanc/keyboard.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T09:30:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b06107b_e60c1ccd",
+      "range": {
+        "startLine": 150,
+        "startChar": 1,
+        "endLine": 150,
+        "endChar": 9
+      },
+      "revId": "368ae88c86af7e3a0fb5d3eae0ec948351e56059",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8eabe8f_6ce8aae3",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-31T08:33:46Z",
       "side": 1,
       "message": "should drop one",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 49
+      },
+      "revId": "368ae88c86af7e3a0fb5d3eae0ec948351e56059",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "727737ed_661d2e3f",
+        "filename": "zephyr/program/ocelot/blanc/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T09:30:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8eabe8f_6ce8aae3",
       "range": {
         "startLine": 84,
         "startChar": 0,
