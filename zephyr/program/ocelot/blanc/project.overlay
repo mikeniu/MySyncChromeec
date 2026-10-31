@@ -5,6 +5,7 @@
 
 /* Blanc program common DTS includes */
 #include <cros/integrated_fwid.dtsi>
+#include <zephyr/dt-bindings/led/led.h>
 
 /* Include the standard and OEM schema templates */
 #include <cros/cbi_ufsc_std_schema.dtsi>
@@ -21,6 +22,8 @@
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
 #include "power_signals.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
 #include "usb_typec.dtsi"
 #include "usba.dtsi"
 #include "adc.dtsi"
