@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee1dd434_41d182ef",
+        "filename": "zephyr/program/ocelot/blanc/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T07:46:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "057ed21d_e7868002",
+      "range": {
+        "startLine": 35,
+        "startChar": 2,
+        "endLine": 40,
+        "endChar": 4
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ebadb79_4458fe09",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-31T01:20:38Z",
       "side": 1,
       "message": "Power sequencing signals (all pins in the canonical power_signals.dtsi) should be removed from named-gpios. Remove the PDC IRQs as well.\n\n`named-gpios` is for legacy, non-Zephyr driver pin configs.",
+      "range": {
+        "startLine": 74,
+        "startChar": 2,
+        "endLine": 88,
+        "endChar": 4
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0755665_aaab55d6",
+        "filename": "zephyr/program/ocelot/blanc/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T07:46:05Z",
+      "side": 1,
+      "message": "Done - only two had to stay, both are phandle targets:\n\n  gpio_all_sys_pwrgd       -\u003e fan_0 pgood-gpio            (cros-ec,fans)\n  gpio_pg_pp1250_soc_s5_od -\u003e power-good-pin x4           (cros-ec,temp-sensors)\n\ntemp_sensors.c reads it via DT_GPIO_CTLR(\u003cnode\u003e, gpios), so the node must keep its\n`gpios` property and cannot be dropped. The other 8 power-signal named-gpios and the 2 PDC IRQ named-gpios are removed.",
+      "parentUuid": "2ebadb79_4458fe09",
       "range": {
         "startLine": 74,
         "startChar": 2,
