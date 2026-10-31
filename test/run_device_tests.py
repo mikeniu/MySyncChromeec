@@ -586,6 +586,7 @@ class Renode(Platform):
             "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
             "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
             "fpsensor_crypto",  # TODO(b/556233130)
+            "fpsensor_crypto_stack",  # TODO(b/485316342)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
@@ -657,6 +658,7 @@ class Renode(Platform):
             "system_is_locked",  # TODO(b/483118063)
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
+            "fpsensor_crypto_stack",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
@@ -914,6 +916,10 @@ class AllTests:
             TestConfig(test_name="fpsensor_auth_crypto_stateful"),
             TestConfig(test_name="fpsensor_auth_crypto_stateless"),
             TestConfig(test_name="fpsensor_crypto"),
+            TestConfig(
+                test_name="fpsensor_crypto_stack",
+                skip_for_ec_legacy=True,
+            ),
             TestConfig(test_name="fpsensor_debug"),
             TestConfig(
                 test_name="fpsensor_hw",
