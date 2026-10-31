@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa6b481d_51cd4c5c",
+        "filename": "zephyr/program/ocelot/blanc/led_pins.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T09:32:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2fa0b01_6cee6a51",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 3
+      },
+      "revId": "19b64bcd1e91367785d0c40ebac2f3f0eca59c81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66ea4b18_b158f5fe",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30786b00_e0c8905f",
+        "filename": "zephyr/program/ocelot/blanc/led_pins.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T09:32:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66ea4b18_b158f5fe",
+      "range": {
+        "startLine": 67,
+        "startChar": 3,
+        "endLine": 67,
+        "endChar": 14
+      },
+      "revId": "19b64bcd1e91367785d0c40ebac2f3f0eca59c81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3da54b8f_559bed27",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-31T08:42:20Z",
       "side": 1,
       "message": "drop this, it\u0027s `default y` \u0026\u0026 `depends on DT_HAS_CROS_EC_LED_POLICY_ENABLED`",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 27
+      },
+      "revId": "19b64bcd1e91367785d0c40ebac2f3f0eca59c81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a027449_2ea73d94",
+        "filename": "zephyr/program/ocelot/blanc/project.conf",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T09:32:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3da54b8f_559bed27",
       "range": {
         "startLine": 104,
         "startChar": 0,
