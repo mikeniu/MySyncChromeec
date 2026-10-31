@@ -28,12 +28,20 @@
 #include "usba.dtsi"
 #include "adc.dtsi"
 #include "temp_sensors.dtsi"
+#include "npcx_psl.dtsi"
 #include <cros/cbi_flash.dtsi>
 
 /*
  * Aliases to common names
  */
 gpio_ec_pch_wake_odl: &gpio_ec_soc_wake_odl {};
+
+/ {
+	cse_early_recovery: cse-early-recovery {
+		compatible = "cros-ec,cse-early-rec";
+		cse-early-rec-gpios = <&gpio9 4 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
+	};
+};
 
 &binman {
 	wp-ro {
