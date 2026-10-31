@@ -70,6 +70,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a1b2c63_e2600277",
+        "filename": "zephyr/program/ocelot/blanc/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T04:07:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a2f58c1_252d8fde",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c545ad2_f8babf19",
@@ -83,6 +107,30 @@
       "writtenOn": "2026-10-31T01:20:38Z",
       "side": 1,
       "message": "Please confirm (1) that that this board is two separate single-port PDC chips and (2) the separate IRQ GPIOs is intentional.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 41
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33c705c6_31cab940",
+        "filename": "zephyr/program/ocelot/blanc/usb_typec.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3471801
+      },
+      "writtenOn": "2026-10-31T04:07:21Z",
+      "side": 1,
+      "message": "Confirmed: two separate single-port RTS54xx PDC chips (I2C 0x66 / 0x67), each with its own IRQ line (GPIO C6 / GPIO E4).",
+      "parentUuid": "2c545ad2_f8babf19",
       "range": {
         "startLine": 52,
         "startChar": 0,
