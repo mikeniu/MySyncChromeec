@@ -1,0 +1,39 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/*
+ * Board LEDs.
+ *
+ * The LEDs share one prescaler reference, all clocks must be configured for
+ * 324 Hz or lower so the LEDs work in low power mode.
+ *
+ * TODO(chromeos): verify the pin assignment against the coolum schematic:
+ *   pwm2 -> CHG_LED#_EC (battery amber)
+ *   pwm3 -> AC_LED#_EC  (battery white)
+ *   pwm5 -> PWR_LED_L   (power/standby LED)
+ */
+/* CHG_LED#_EC */
+&pwm2 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C4>;
+	pinctrl-0 = <&pwm2_gpa2_default>;
+	pinctrl-names = "default";
+};
+
+/* AC_LED#_EC */
+&pwm3 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C4>;
+	pinctrl-0 = <&pwm3_gpa3_default>;
+	pinctrl-names = "default";
+};
+
+/* PWR_LED_L */
+&pwm5 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C4>;
+	pinctrl-0 = <&pwm5_gpa5_default>;
+	pinctrl-names = "default";
+};

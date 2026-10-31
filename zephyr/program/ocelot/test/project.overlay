@@ -1,0 +1,58 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "coolum_ec_ufsc.dtsi"
+
+/* ocelot program common DTS includes */
+#include <cros/integrated_fwid.dtsi>
+#include "../ite_hibernate.dtsi"
+#include "../rvp_usba.dtsi"
+
+/* coolum project DTS includes */
+#include "battery.dtsi"
+#include "binman.dtsi"
+#include "gpio.dtsi"
+#include "i2c.dtsi"
+#include "interrupt.dtsi"
+#include "imvp.dtsi"
+#include "keyboard.dtsi"
+#include "power_signals.dtsi"
+#include "thermal.dtsi"
+#include "usbc.dtsi"
+#include "pwm.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
+
+/*
+ * Map GPIOs used for interrupts to common names
+ */
+gpio_ec_pch_wake_odl: &gpio_ec_soc_wake_odl {};
+
+/* coolum overrides follow... */
+/ {
+	cse_early_recovery: cse-early-recovery {
+		compatible = "cros-ec,cse-early-rec";
+		cse-early-rec-gpios = <&gpioj 3 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
+	};
+
+	ap-power-events {
+		compatible = "cros-ec,ap-power-events";
+		/* GPIO H0: Power down signal(C_EC_PDB_CTRL_R) for codec amplifier */
+		event-gpios = <&gpioh 0 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&espi0 {
+	status = "okay";
+};
+
+&sha0 {
+	status = "okay";
+};
