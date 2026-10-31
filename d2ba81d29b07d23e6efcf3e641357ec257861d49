@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19b3e5d8_68c203d1",
+        "filename": "zephyr/program/ocelot/blanc/npcx_psl.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-10-31T08:44:52Z",
+      "side": 1,
+      "message": "add a blank line",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 15
+      },
+      "revId": "d2ba81d29b07d23e6efcf3e641357ec257861d49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
