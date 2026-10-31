@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "057ed21d_e7868002",
+        "filename": "zephyr/program/ocelot/blanc/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-10-31T01:20:38Z",
+      "side": 1,
+      "message": "Remove this. Special functions like UART or I2C assignments are handled through pinmux settings elsewhere. GPIO flags don\u0027t apply to them.",
+      "range": {
+        "startLine": 35,
+        "startChar": 2,
+        "endLine": 40,
+        "endChar": 4
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ebadb79_4458fe09",
+        "filename": "zephyr/program/ocelot/blanc/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-10-31T01:20:38Z",
+      "side": 1,
+      "message": "Power sequencing signals (all pins in the canonical power_signals.dtsi) should be removed from named-gpios. Remove the PDC IRQs as well.\n\n`named-gpios` is for legacy, non-Zephyr driver pin configs.",
+      "range": {
+        "startLine": 74,
+        "startChar": 2,
+        "endLine": 88,
+        "endChar": 4
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a2f58c1_252d8fde",
+        "filename": "zephyr/program/ocelot/blanc/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-10-31T01:20:38Z",
+      "side": 1,
+      "message": "Add `CONFIG_USBC_PDC_RTS54XX_CONSOLE_FW_UPDATER\u003dy` for bringup",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c545ad2_f8babf19",
+        "filename": "zephyr/program/ocelot/blanc/usb_typec.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-10-31T01:20:38Z",
+      "side": 1,
+      "message": "Please confirm (1) that that this board is two separate single-port PDC chips and (2) the separate IRQ GPIOs is intentional.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 41
+      },
+      "revId": "7454f7b8349d846ec326ea4e1c1eb2a94716aa99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
