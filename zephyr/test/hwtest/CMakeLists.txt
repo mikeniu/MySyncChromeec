@@ -6,6 +6,7 @@ zephyr_include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 zephyr_library_sources("src/main.c")
 zephyr_library_sources(${PLATFORM_EC}/zephyr/test/test_utils/fff.c)
+zephyr_library_sources_ifdef(CONFIG_EC_HOST_CMD ${PLATFORM_EC}/zephyr/test/test_utils/host_command.c)
 # go/keep-sorted start
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_ABORT src/abort.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_AES src/aes.cc)
@@ -23,6 +24,7 @@ zephyr_library_sources_ifdef(CONFIG_HW_TEST_FLASH_WRITE_PROTECT src/flash_write_
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_FPSENSOR_AUTH_CRYPTO_STATEFUL src/fpsensor_auth_crypto_stateful.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_FPSENSOR_AUTH_CRYPTO_STATELESS src/fpsensor_auth_crypto_stateless.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_FPSENSOR_CRYPTO src/fpsensor_crypto.cc)
+zephyr_library_sources_ifdef(CONFIG_HW_TEST_FPSENSOR_CRYPTO_STACK src/fpsensor_crypto_stack.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_FPSENSOR_DEBUG ${PLATFORM_EC}/zephyr/test/fingerprint/task/src/fpsensor_debug.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_FPSENSOR_HW src/fpsensor_hw.cc)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_FPSENSOR_UTILS ${PLATFORM_EC}/zephyr/test/fingerprint/task/src/fpsensor_utils.cc)
