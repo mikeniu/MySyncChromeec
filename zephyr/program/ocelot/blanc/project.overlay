@@ -15,6 +15,7 @@
 
 /* blanc project DTS includes */
 #include "battery.dtsi"
+#include "fan.dtsi"
 #include "gpios.dtsi"
 #include "i2c.dtsi"
 #include "interrupts.dtsi"
@@ -23,6 +24,7 @@
 #include "usb_typec.dtsi"
 #include "usba.dtsi"
 #include "adc.dtsi"
+#include "temp_sensors.dtsi"
 #include <cros/cbi_flash.dtsi>
 
 /*
