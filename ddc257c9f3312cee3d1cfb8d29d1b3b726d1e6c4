@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80cb97bc_57dd4c3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-31T02:05:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n- **Functionality**: Moving `hook_notify(HOOK_SYSJUMP)` before `interrupt_disable_all()` in `jump_to_image()` restores the expected execution context for `HOOK_SYSJUMP` handlers (allowing mutex locking, sleeping, and console flushing), while keeping `chip_pre_system_jump()` and `arch_pre_system_jump()` after `interrupt_disable_all()` for low-level hardware teardown.\n- **Architecture \u0026 Component Fit**: The separation between high-level `HOOK_SYSJUMP` callbacks (interrupts and scheduler enabled) and low-level `chip_pre_system_jump()` / `arch_pre_system_jump()` callbacks (interrupts disabled) aligns cleanly with the ChromeOS EC sysjump lifecycle and documentation in `include/hooks.h`.\n- **Code Simplicity**: The changes cleanly restore `k_mutex_lock()` / `k_mutex_unlock()` in `preserve_enable_5v_state()` and `k_msleep(10)` in `flash_shared_enable_ec_access()` without unnecessary complexity.\n- **Idiomaticity \u0026 Readability**: Code and comments adhere to ChromeOS EC and Zephyr C conventions.\n- **Security**: Restoring `pwr_5v_ctl_mtx` locking in `preserve_enable_5v_state()` prevents concurrent access races on `pwr_5v_en_req` while `HOOK_SYSJUMP` runs with interrupts enabled.\n- **Testing**: `zephyr/test/jump_tags/src/jump_tags.c` verifies that interrupts are enabled during `HOOK_SYSJUMP` and disabled during `chip_pre_system_jump()` and `arch_pre_system_jump()`, and `zephyr/test/qcom_power/src/main.c` exercises `HOOK_SYSJUMP` with `power_5v_enable()`.\n- **CL Size \u0026 Scope**: The CL is `Size: M (+29, -33)` across 6 files and is well-scoped to a single logical change.\n- **Commit Message**: Clearly explains the what and why, references the relevant bugs (`BUG\u003db:519694070, b:575868788`), and includes `TEST\u003d` instructions.\n\n[[trajectory](https://goto.corp.google.com/traj/fff40b97-797f-4aac-9865-10769a126fa2)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ddc257c9f3312cee3d1cfb8d29d1b3b726d1e6c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
