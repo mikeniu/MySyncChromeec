@@ -644,5 +644,77 @@ ZTEST_F(usb_tc, test_tc_error_recovery_and_suspend)
 	zassert_true(pd_is_port_enabled(TEST_PORT));
 }
 
+ZTEST_F(usb_tc, test_tc_low_power_mode_drp_toggle_bounce)
+{
+	uint16_t cc_status;
+
+	/*
+	 * Allow the port to transition through DRPAutoToggle into LowPowerMode.
+	 * In DRPAutoToggle, tcpm_enable_drp_toggle() writes LOOK4CONNECTION,
+	 * setting TCPC_REG_CC_STATUS_LOOK4CONNECTION_MASK (0x20) in the TCPC.
+	 */
+	k_sleep(K_MSEC(50));
+	zassert_equal(0,
+		      strcmp(tc_get_current_state(TEST_PORT), "LowPowerMode"));
+
+	/* Verify LOOK4CONNECTION is active initially */
+	zassert_ok(tcpci_emul_get_reg(fixture->tcpci_emul, TCPC_REG_CC_STATUS,
+				      &cc_status));
+	zassert_true(TCPC_REG_CC_STATUS_LOOK4CONNECTION(cc_status));
+
+	/*
+	 * Simulate a transient CC bounce occurring during the 10 ms
+	 * PD_LPM_DEBOUNCE_US window before LowPowerMode commits to I2CIDLE.
+	 * The bounce aborts DRP auto-toggle in the TCPC (clearing
+	 * LOOK4CONNECTION) and returns CC lines to OPEN, raising a CC alert.
+	 */
+	zassert_ok(
+		tcpci_emul_set_reg(fixture->tcpci_emul, TCPC_REG_CC_STATUS, 0));
+	zassert_ok(tcpci_emul_set_reg(fixture->tcpci_emul, TCPC_REG_ALERT,
+				      TCPC_REG_ALERT_CC_STATUS));
+	tcpci_tcpc_alert(TEST_PORT);
+
+	/*
+	 * Wait for the 10 ms TC_TIMER_LOW_POWER_TIME debounce to expire and
+	 * tc_low_power_mode_run() to commit to LowPowerMode.
+	 *
+	 * With the fix in tc_low_power_mode_run(), tcpm_enable_drp_toggle()
+	 * re-arms LOOK4CONNECTION before entering low power mode.
+	 * Without the fix, the TCPC is left in LowPowerMode with
+	 * LOOK4CONNECTION == 0.
+	 */
+	k_sleep(K_MSEC(50));
+	zassert_equal(0,
+		      strcmp(tc_get_current_state(TEST_PORT), "LowPowerMode"));
+
+	zassert_ok(tcpci_emul_get_reg(fixture->tcpci_emul, TCPC_REG_CC_STATUS,
+				      &cc_status));
+	zassert_true(TCPC_REG_CC_STATUS_LOOK4CONNECTION(cc_status));
+
+	/*
+	 * Connect a Source partner with Rp and VBUS=0 (as in unattached
+	 * connect). If LOOK4CONNECTION is active, the TCPC emulator detects Rp
+	 * as a sink (applying Rd) and asserts ALERT_CC_STATUS, causing the
+	 * state machine to wake from LowPowerMode into AttachWait.SNK. If
+	 * LOOK4CONNECTION was 0, Rp + Rp appears as OPEN, wedging the port in
+	 * LowPowerMode forever.
+	 */
+	tcpci_partner_init(&fixture->partner_emul, PD_REV20);
+	fixture->partner_emul.extensions = tcpci_src_emul_init(
+		&fixture->src_ext, &fixture->partner_emul, NULL);
+	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
+
+	zassert_ok(tcpci_partner_connect_to_tcpci(&fixture->partner_emul,
+						  fixture->tcpci_emul));
+	zassert_ok(tcpci_emul_set_vbus_level(fixture->tcpci_emul, VBUS_SAFE0V));
+
+	k_sleep(K_MSEC(100));
+
+	zassert_equal(0, strcmp(tc_get_current_state(TEST_PORT),
+				"AttachWait.SNK"));
+
+	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
+}
+
 ZTEST_SUITE(usb_tc, drivers_predicate_post_main, usb_tc_setup, usb_tc_before,
 	    usb_tc_after, NULL);
