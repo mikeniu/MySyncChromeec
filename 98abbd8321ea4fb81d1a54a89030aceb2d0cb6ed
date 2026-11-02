@@ -16,6 +16,25 @@
       "message": "This change effectively stops reporting of any WD warnings. Let\u0027s discuss it a bit before we proceed.",
       "revId": "98abbd8321ea4fb81d1a54a89030aceb2d0cb6ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d39941e8_ca95c7d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T19:19:41Z",
+      "side": 1,
+      "message": "Opened b/580948219 to track runtime reporting/telemetry for recovered watchdog warnings.\n\nToday, the OS only reads `EC_CMD_GET_PANIC_INFO` at AP boot, so recovered warnings are only reported if the AP happens to warm-reboot later while EC RAM stays powered. That attaches unrelated logs from the later reboot, loses warnings across EC power-off/hibernate, and causes any subsequent hard watchdog reset to be misreported with the old warning\u0027s PC and task.",
+      "parentUuid": "bf71612c_be0a0f7b",
+      "isAi": true,
+      "revId": "98abbd8321ea4fb81d1a54a89030aceb2d0cb6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
