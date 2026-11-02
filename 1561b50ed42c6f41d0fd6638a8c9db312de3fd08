@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1ab6003e_dae9c03d",
+        "filename": "zephyr/dts/bindings/battery/utl,q25u3s1p5c.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-11-02T14:19:11Z",
+      "side": 1,
+      "message": "The datasheet of battery lists IC BQ40Z50 component. FET registers comes from [TI reference manual](https://www.ti.com/lit/ug/sluubc1d/sluubc1d.pdf?ts\u003d1793617018155\u0026ref_url\u003dhttps%253A%252F%252Fwww.ti.com%252Fproduct%252FBQ40Z50-R1). Ship mode is described in section `5.4.2 ManufacturerAccess() MAC Shutdown`",
+      "parentUuid": "a4a8a821_3da4922f",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 21
+      },
+      "revId": "1561b50ed42c6f41d0fd6638a8c9db312de3fd08",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df55a994_79f40e9e",
         "filename": "zephyr/dts/bindings/battery/utl,q25u3s1p5c.yaml",
         "patchSetId": 2
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-30T18:40:13Z",
       "side": 1,
       "message": "What is the source of this value?",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 15
+      },
+      "revId": "1561b50ed42c6f41d0fd6638a8c9db312de3fd08",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51318743_e8a54329",
+        "filename": "zephyr/dts/bindings/battery/utl,q25u3s1p5c.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-11-02T14:19:11Z",
+      "side": 1,
+      "message": "The battery datasheet (linked in b/579439469) in section 2. Product specification (page 6) there are temperatures listed. Full voltage charging is available only below 45 degrees Celsius. Other batteries seems to use lower `start_charging_max_c` values than `charging_max_c` too (`utl,hq24u3s1p3i`, `getac,ca31a53`).",
+      "parentUuid": "df55a994_79f40e9e",
       "range": {
         "startLine": 49,
         "startChar": 0,
