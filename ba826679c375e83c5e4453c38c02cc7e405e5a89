@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54cb4428_f561cb18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T23:21:49Z",
+      "side": 1,
+      "message": "Validated the 12-test `faft-pd` + `EcStress` suite (including `ECPDPowerSwap.normal`, `ECPDConnect.normal`, `ECPDTrysrc.normal`, `PDConnectAsDFP.normal`, `PDResetHard.normal`, and `EcStress.pd`) on `hideo` (RAA489000 TCPC with Servo v4p1 in DTS mode). Let me know if there are additional DTS transition scenarios you\u0027d like checked on hardware.",
+      "parentUuid": "fc90f509_6e149f83",
+      "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5902d790_6e3df2f0",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ab5ec02_3c9ba09f",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 2208,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T23:21:49Z",
+      "side": 1,
+      "message": "Extracted `tc_debug_detach(port)` to encapsulate the conditions across `Unattached.{SNK,SRC}` entry and `Attached.{SNK,SRC}` exit.\n\nOn why the `Unattached` entry calls were added (https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/2786068 and https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/2792690) and why `TC_FLAGS_TS_DTS_PARTNER` isn\u0027t set there:\n1. `TC_FLAGS_TS_DTS_PARTNER` is only set when transitioning from `AttachWait.{SNK,SRC}` into `Attached.{SNK,SRC}` after `tCCDebounce`. However, the RAA489000 hardware detects DTS on the CC pins as soon as both CC lines see terminations. If a dual-role power state change forces a role switch (`Unattached.SRC \u003c-\u003e Unattached.SNK`) while an incomplete debug connection is in `AttachWait` or `Unattached`, `tc_attached_{snk,src}_exit()` never runs and `TC_FLAGS_TS_DTS_PARTNER` is not set.\n2. On initial `Unattached` entry after an EC reset or sysjump (`last_state \u003d\u003d TC_STATE_COUNT`) while the TCPC remained powered, `tc[port].flags` in EC RAM is cleared even if the TCPC hardware is still in DTS state.",
+      "parentUuid": "5902d790_6e3df2f0",
+      "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8671627_3d583105",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-11-02T20:06:16Z",
       "side": 1,
       "message": "If you use FFF to fake `tcpm_debug_detach`, do you need this machinery? (See `tcpm_header.c`.)",
+      "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cea3daea_fe0a7516",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_tc.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T23:21:49Z",
+      "side": 1,
+      "message": "Switched `mock_debug_detach` to `FAKE_VALUE_FUNC` and moved `saved_tcpm_drv` / `mock_tcpm_drv` into `usb_tc_fixture` (matching `tcpm_header.c`). Because `tcpm_debug_detach()` is `static inline` in `tcpm.h` and `tcpc_config[TEST_PORT].drv` points to `const struct tcpm_drv tcpci_tcpm_drv`, we still swap `tcpc_config[TEST_PORT].drv` to hook `.debug_detach`, as `tcpm_header.c` does in `tcpm_header_before` / `tcpm_header_after`.",
+      "parentUuid": "b8671627_3d583105",
       "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
