@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8908265b_9f98b80f",
+        "filename": "zephyr/test/debug_assert/src/debug_assert.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-11-02T22:38:26Z",
+      "side": 1,
+      "message": "Is this needed so that other tests don\u0027t accidentally trip a nest assert check in the firmware?\n\nIf you moved this into it\u0027s own test binary, can you avoid having to make `in_assert` public?",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 22
+      },
+      "revId": "44c51d7f6c17fb7497ff748c25e9ed6a325410a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
