@@ -42,6 +42,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id);
 __maybe_unused static void
 wdt_warning_handler_with_enable(const struct device *wdt_dev, int channel_id);
+static void reset_watchdog_stats(void);
 
 const struct watchdog_info wdt_info[] = {
 #if DT_NODE_HAS_STATUS(DT_CHOSEN(cros_ec_watchdog), okay)
@@ -154,6 +155,7 @@ int watchdog_init(void)
 
 	watchdog_initialized = true;
 	watchdog_reload();
+	reset_watchdog_stats();
 
 	return err;
 }
@@ -294,14 +296,17 @@ wdt_warning_handler_with_enable(const struct device *wdt_dev, int channel_id)
 	watchdog_enable(wdt_dev);
 }
 
-__maybe_unused static void reset_watchdog_stats(void)
+static void reset_watchdog_stats(void)
 {
-	K_SPINLOCK(&watchdog_stats_lock)
-	{
-		watchdog_stats_reset_ts_ms = watchdog_reload_last_ts_ms;
-		watchdog_reload_period_max_ts_ms = 0;
-		watchdog_reload_period_max_ms = 0;
-		watchdog_reload_count = 0;
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD_WATCHDOG_INFO) ||
+	    IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO)) {
+		K_SPINLOCK(&watchdog_stats_lock)
+		{
+			watchdog_stats_reset_ts_ms = watchdog_reload_last_ts_ms;
+			watchdog_reload_period_max_ts_ms = 0;
+			watchdog_reload_period_max_ms = 0;
+			watchdog_reload_count = 0;
+		}
 	}
 }
 
