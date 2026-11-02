@@ -16,6 +16,24 @@
       "message": "@robbarnes@google.com\nLooks good overall and very low risk! Mind giving me until Monday to run this CL chain on a few fingerprint boards just to be 100% sure everything works as expected?",
       "revId": "dca31d9e7a69bd4964d1e4b39d16ff9430083426",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3c575ba_156aa769",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T15:54:05Z",
+      "side": 1,
+      "message": "@fsammoura@google.com Have you had a chance to test this on the FP boards, or are we good to land the remaining two CLs?",
+      "parentUuid": "ab89e588_c35a2d86",
+      "revId": "dca31d9e7a69bd4964d1e4b39d16ff9430083426",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
