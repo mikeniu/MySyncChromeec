@@ -94,6 +94,18 @@ config HW_TEST_FPSENSOR_CRYPTO
 	bool "FP sensor crypto test"
 	depends on ZTEST
 
+config HW_TEST_FPSENSOR_CRYPTO_STACK
+	bool "FP sensor crypto stack watermark test"
+	depends on ZTEST
+	depends on EC_HOST_CMD
+	select INIT_STACKS
+	select MOCK_OTP if NPCX_OTP_KEY
+	select MOCK_ROLLBACK
+	select THREAD_STACK_INFO
+	help
+	  Verifies that HOSTCMD and FPSENSOR task stacks have sufficient
+	  headroom after executing fingerprint cryptographic operations.
+
 config HW_TEST_FPSENSOR_DEBUG
 	bool "FP sensor debug test"
 	depends on ZTEST
