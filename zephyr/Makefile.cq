@@ -37,6 +37,7 @@ GENERATED_AND_SYSTEM_PATTERNS='**/.cache/**' \
 	'**/usr/include/**' \
 	'**/usr/lib/**' \
 	'$(PLATFORM_EC)/build/**' \
+	'$(PLATFORM_EC)/common/mock/**' \
 	'$(PLATFORM_EC)/twister-out*/**' \
 	'$(PLATFORM_EC)/zephyr/mock/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/arch/x86/**'
@@ -47,6 +48,8 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'**/*_test.c' \
 	'**/*_test.cc' \
 	'**/*_test.h' \
+	'$(PLATFORM_EC)/common/mock/**' \
+	'$(PLATFORM_EC)/include/mock/**' \
 	'$(PLATFORM_EC)/include/test_util.h' \
 	'$(PLATFORM_EC)/include/tests/**' \
 	'$(PLATFORM_EC)/test/**' \
