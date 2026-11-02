@@ -6,6 +6,7 @@ zephyr_include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 zephyr_library_sources("src/main.c")
 zephyr_library_sources(${PLATFORM_EC}/zephyr/test/test_utils/fff.c)
+zephyr_library_sources_ifdef(CONFIG_EC_HOST_CMD ${PLATFORM_EC}/zephyr/test/test_utils/host_command.c)
 # go/keep-sorted start
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_ABORT src/abort.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_AES src/aes.cc)
