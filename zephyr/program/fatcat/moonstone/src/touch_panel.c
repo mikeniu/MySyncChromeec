@@ -20,21 +20,23 @@ LOG_MODULE_REGISTER(moonstone_touch, LOG_LEVEL_INF);
 
 #define TOUCH_ENABLE_DELAY_MS 10
 
-static void touch_disable_deferred(struct k_work *work)
-{
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_touch_en), 0);
-}
-
-static K_WORK_DELAYABLE_DEFINE(touch_disable_deferred_data,
-			       touch_disable_deferred);
-
 static void touch_enable_deferred(struct k_work *work)
 {
+	if (!lid_is_open() ||
+	    !gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_soc_edp_bl_en)))
+		return;
+
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_touch_en), 1);
 }
 
 static K_WORK_DELAYABLE_DEFINE(touch_enable_deferred_data,
 			       touch_enable_deferred);
+
+static void touch_disable(void)
+{
+	k_work_cancel_delayable(&touch_enable_deferred_data);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_touch_en), 0);
+}
 
 /* Called on AP S3 -> S5 transition */
 static void touch_enable_event_handler(struct ap_power_ev_callback *cb,
@@ -43,10 +45,7 @@ static void touch_enable_event_handler(struct ap_power_ev_callback *cb,
 	ARG_UNUSED(cb);
 	switch (data.event) {
 	case AP_POWER_SHUTDOWN:
-		/* Cancel touch_enable touch_disable k_work. */
-		k_work_cancel_delayable(&touch_enable_deferred_data);
-		k_work_cancel_delayable(&touch_disable_deferred_data);
-		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_touch_en), 0);
+		touch_disable();
 		break;
 	default:
 		return;
@@ -61,22 +60,28 @@ void soc_edp_bl_interrupt(const struct device *device,
 
 	state = gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_soc_edp_bl_en));
 
-	LOG_INF("%s: %d", __func__, state);
-
 	if (state) {
-		k_work_schedule(&touch_enable_deferred_data,
-				K_MSEC(TOUCH_ENABLE_DELAY_MS));
+		if (lid_is_open()) {
+			k_work_schedule(&touch_enable_deferred_data,
+					K_MSEC(TOUCH_ENABLE_DELAY_MS));
+		}
 	} else {
-		k_work_schedule(&touch_disable_deferred_data, K_NO_WAIT);
+		touch_disable();
 	}
+
+	LOG_INF("%s: %d", __func__, state);
 }
 
 static void touch_lid_change(void)
 {
-	if (lid_is_open()) {
-		k_work_schedule(&touch_enable_deferred_data, K_NO_WAIT);
-	} else {
-		k_work_schedule(&touch_disable_deferred_data, K_NO_WAIT);
+	if (!lid_is_open()) {
+		touch_disable();
+		return;
+	}
+
+	if (gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_soc_edp_bl_en))) {
+		k_work_schedule(&touch_enable_deferred_data,
+				K_MSEC(TOUCH_ENABLE_DELAY_MS));
 	}
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, touch_lid_change, HOOK_PRIO_DEFAULT);
