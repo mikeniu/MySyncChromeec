@@ -22,6 +22,54 @@
       },
       "revId": "44c51d7f6c17fb7497ff748c25e9ed6a325410a6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0399240_ff846fe0",
+        "filename": "zephyr/test/debug_assert/src/debug_assert.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T23:57:36Z",
+      "side": 1,
+      "message": "Yes, since `system_reset_longjmp()` unwinds with `longjmp()` instead of rebooting, `in_assert` stays latched across tests in the same binary unless reset.\n\nSince `test_export_static` still compiles as `static` in production firmware, I\u0027d prefer to keep the assert tests together in one test binary rather than splitting each failing-assert test into its own binary.",
+      "parentUuid": "8908265b_9f98b80f",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 22
+      },
+      "revId": "44c51d7f6c17fb7497ff748c25e9ed6a325410a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bf3951b_81590571",
+        "filename": "zephyr/test/debug_assert/src/debug_assert.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T23:57:36Z",
+      "side": 1,
+      "message": "Yes,",
+      "parentUuid": "8908265b_9f98b80f",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 22
+      },
+      "revId": "44c51d7f6c17fb7497ff748c25e9ed6a325410a6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
