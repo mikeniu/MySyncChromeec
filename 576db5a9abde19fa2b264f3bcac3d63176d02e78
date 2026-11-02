@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "049066ec_b31408d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T22:35:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please add unit test coverage in `test/fpsensor_crypto_with_mock.cc` for the new `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL` mock control branch. [[trajectory](https://goto.corp.google.com/traj/5c6f0d61-fa83-4b3e-acae-7ed55e49cc1e)]\n\n### Review Summary\n- **Functionality:** ✅ `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL` causes the mocked `hkdf_sha256()` to return `false` as intended.\n- **Architecture \u0026 Component Fit:** ✅ Aligns with the existing `mock_ctrl_fpsensor_crypto_sha256_type` enum and `mock_ctrl_fpsensor_crypto` dispatch in `common/mock/fpsensor_crypto_mock.cc`.\n- **Code Simplicity:** ✅ Minimal 3-line addition with no redundant state or control flow.\n- **Idiomaticity \u0026 Readability:** ✅ Follows existing naming and style conventions with no magic values.\n- **Security:** ✅ Test-only mock (`#ifndef TEST_BUILD` guarded); no security issues.\n- **Testing:** ❌ `test/fpsensor_crypto_with_mock.cc` exercises `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_ZEROS` and `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FF`, but does not yet exercise the newly added `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL` branch. See the inline comment on `common/mock/fpsensor_crypto_mock.cc` for a ready-to-use test case.\n- **CL Size \u0026 Scope:** ✅ `Size: XS (+3, -0)`. Focused single logical change.\n- **Commit Message:** ✅ Clear subject line, concise rationale explaining why the hunk was missed by Copybot, and valid `BUG\u003d` / `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "576db5a9abde19fa2b264f3bcac3d63176d02e78",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5da0a2d2_a01e5228",
+        "filename": "common/mock/fpsensor_crypto_mock.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T22:35:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please add a unit test in `test/fpsensor_crypto_with_mock.cc` exercising `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL` (alongside the existing tests for `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_ZEROS` and `MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FF`) so that this new failure branch and its `EC_ERROR_UNKNOWN` propagation in `derive_key()` are covered by `make run-fpsensor_crypto_with_mock`.\n\nFor example, in `test/fpsensor_crypto_with_mock.cc`:\n\n```cpp\ntest_static int test_derive_encryption_key_failure_hkdf_fail()\n{\n\tFpEncryptionKey unused_key{};\n\tconstexpr std::array\u003cuint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES\u003e\n\t\tunused_salt{};\n\tconstexpr std::array\u003cuint8_t, FP_CONTEXT_USERID_BYTES\u003e userid{};\n\n\t/* GIVEN that HKDF-SHA256 will fail. */\n\tmock_ctrl_fpsensor_crypto.output_type \u003d\n\t\tMOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL;\n\n\t/* THEN the derivation will fail with EC_ERROR_UNKNOWN. */\n\tTEST_EQ(derive_encryption_key(unused_key, unused_salt, userid,\n\t\t\t\t      default_fake_tpm_seed),\n\t\tEC_ERROR_UNKNOWN, \"%d\");\n\n\t/* GIVEN that HKDF-SHA256 will succeed after resetting the mock. */\n\tmock_ctrl_fpsensor_crypto \u003d MOCK_CTRL_DEFAULT_FPSENSOR_CRYPTO;\n\n\t/* THEN the derivation will succeed. */\n\tTEST_EQ(derive_encryption_key(unused_key, unused_salt, userid,\n\t\t\t\t      default_fake_tpm_seed),\n\t\tEC_SUCCESS, \"%d\");\n\n\treturn EC_SUCCESS;\n}\n```\n\nAnd register `RUN_TEST(test_derive_encryption_key_failure_hkdf_fail);` in `run_test()`.\n\n[🔗](http://go/tj/5c6f0d61-fa83-4b3e-acae-7ed55e49cc1e)",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "576db5a9abde19fa2b264f3bcac3d63176d02e78",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
