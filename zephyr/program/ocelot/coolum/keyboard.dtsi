@@ -1,0 +1,257 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <zephyr/dt-bindings/input/keymap.h>
+
+/ {
+	chosen {
+		cros-ec,keyboard = &kbd;
+	};
+	kblight: kblight {
+		compatible = "cros-ec,kblight-pwm";
+		pwms = <&pwm1 PWM_CHANNEL_1 PWM_HZ(324) PWM_POLARITY_NORMAL>;
+	};
+};
+
+&vivaldi_kbd {
+	vivaldi-keys = <
+		KBD_RC(0, 2)     /* T1 */
+		KBD_RC(3, 2)     /* T2 */
+		KBD_RC(7, 15)    /* T3 */
+		KBD_RC(1, 13)    /* T4 */
+		KBD_RC(0, 9)     /* T5 */
+		KBD_RC(2, 3)     /* T6 */
+		KBD_RC(0, 7)     /* T7 */
+		KBD_RC(3, 12)    /* T8 */
+		KBD_RC(0, 8)     /* T9 */
+		KBD_RC(4, 15)    /* T10 */
+		KBD_RC(0, 11)    /* T11 */
+		KBD_RC(0, 12)    /* T12 */
+		KBD_RC(6, 7)     /* T13 */
+	>;
+
+	kbd_config_0: kbd-config-0 {
+		vivaldi-codes = <
+			VIVALDI_TK_BACK               /* T1 */
+			VIVALDI_TK_HOME               /* T2 */
+			VIVALDI_TK_OVERVIEW           /* T3 */
+			VIVALDI_TK_FULLSCREEN         /* T4 */
+			VIVALDI_TK_SNAPSHOT           /* T5 */
+			VIVALDI_TK_BRIGHTNESS_DOWN    /* T6 */
+			VIVALDI_TK_BRIGHTNESS_UP      /* T7 */
+			VIVALDI_TK_KBD_BKLIGHT_TOGGLE /* T8 */
+			VIVALDI_TK_MICMUTE            /* T9 */
+			VIVALDI_TK_DICTATE            /* T10 */
+			VIVALDI_TK_VOL_MUTE           /* T11 */
+			VIVALDI_TK_VOL_DOWN           /* T12 */
+			VIVALDI_TK_VOL_UP             /* T13 */
+		>;
+		capabilities = <(VIVALDI_KEYBD_CAP_FUNCTION_KEYS |
+				VIVALDI_KEYBD_CAP_ASSISTANT_KEY)
+		>;
+	};
+};
+
+&kbd {
+	status = "okay";
+	pinctrl-0 = <
+		&ksi0_default
+		&ksi1_default
+		&ksi2_default
+		&ksi3_default
+		&ksi4_default
+		&ksi5_default
+		&ksi6_default
+		&ksi7_default
+		&kso0_default
+		&kso1_default
+		&kso3_default
+		&kso4_default
+		&kso5_default
+		&kso6_default
+		&kso7_default
+		&kso8_default
+		&kso9_default
+		&kso10_default
+		&kso11_default
+		&kso12_default
+		&kso13_default
+		&kso14_default
+		&kso15_default
+        /* &kso16_default: Removed to free up the SMOSI pin */
+        /* &kso17_default: Removed to prevent SPI function conflict */
+	>;
+        pinctrl-1 = <
+		&ksi0_sleep
+		&ksi1_sleep
+		&ksi2_sleep
+		&ksi4_sleep
+		&ksi5_sleep
+		&ksi6_sleep
+		&ksi7_sleep
+		&kso0_sleep
+		&kso10_sleep
+		&kso11_sleep
+		&kso12_sleep
+		&kso13_sleep
+		&kso14_sleep
+		&kso15_sleep
+        /* &kso16_sleep: Removed to free up the SMOSI pin */
+        /* &kso17_sleep: Removed to prevent SPI function conflict */
+        &kso1_sleep
+		&kso2_sleep
+		&kso3_sleep
+		&kso4_sleep
+		&kso5_sleep
+		&kso6_sleep
+		&kso7_sleep
+		&kso8_sleep
+		&kso9_sleep
+	>;
+
+	pinctrl-names = "default", "sleep";
+	row-size = <8>;
+	col-size = <18>;
+	/* Tell the keyboard driver to ignore KSO16, KSO17, and KSO2 (already GPIO) */
+	kso-ignore-mask = <0x30004>;
+	debounce-down-ms = <15>;
+	debounce-up-ms = <15>;
+	actual-key-mask = <
+		0x53  /* C0 */
+		0x6f  /* C1 */
+		0x7d  /* C2 */
+		0x2d  /* C3 */
+		0xff  /* C4 */
+		0xef  /* C5 */
+		0xaf  /* C6 */
+		0xfd  /* C7 */
+		0xef  /* C8 */
+		0xfd  /* C9 */
+		0xe5  /* C10 */
+		0xfd  /* C11 */
+		0xef  /* C12 */
+		0xef  /* C13 */
+		0xcf  /* C14 */
+		0xb9  /* C15 */
+		0xfd  /* C16 */
+		0xc2  /* C17 */
+	>;
+
+	kso-gpio {
+		compatible = "cros-ec,col-gpio";
+		col-num = <2>;
+		col-gpios = <&gpioksol 2 GPIO_ACTIVE_LOW>;
+	};
+
+	/* KSO16: Reassign function to GPB2 */
+	kso16-gpio {
+		compatible = "cros-ec,col-gpio";
+		col-num = <16>;
+		col-gpios = <&gpiob 2 (GPIO_OPEN_DRAIN | GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		settle-time-us = <0>;
+	};
+
+	/* KSO17: Control the original pin GPC5 */
+	kso17-gpio {
+		compatible = "cros-ec,col-gpio";
+		col-num = <17>;
+		col-gpios = <&gpioc 5 (GPIO_OPEN_DRAIN | GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		settle-time-us = <0>;
+	};
+
+	boot-keys {
+		compatible = "cros-ec,boot-keys";
+		down-arrow-rc = <KBD_RC(5, 16)>;
+		esc-rc = <KBD_RC(1, 1)>;
+		left-shift-rc = <KBD_RC(1, 0)>;
+		refresh-rc = <KBD_RC(3, 2)>;
+	};
+
+	runtime-keys {
+		compatible = "cros-ec,runtime-keys";
+		left-alt-rc = <KBD_RC(6, 2)>;
+		right-alt-rc = <KBD_RC(0, 10)>;
+		h-rc = <KBD_RC(5, 11)>;
+		r-rc = <KBD_RC(7, 6)>;
+	};
+
+	fn-keys {
+		compatible = "cros-ec,fn-keys";
+
+		fn-rc = <KBD_RC(4, 16)>;
+		keymap = <
+			MATRIX_KEY(0, 2,  KBD_SCANCODE_F1)
+			MATRIX_KEY(3, 2,  KBD_SCANCODE_F2)
+			MATRIX_KEY(7, 15, KBD_SCANCODE_F3)
+			MATRIX_KEY(1, 13, KBD_SCANCODE_F4)
+			MATRIX_KEY(0, 9,  KBD_SCANCODE_F5)
+			MATRIX_KEY(2, 3,  KBD_SCANCODE_F6)
+			MATRIX_KEY(0, 7,  KBD_SCANCODE_F7)
+			MATRIX_KEY(3, 12, KBD_SCANCODE_F8)
+			MATRIX_KEY(0, 8,  KBD_SCANCODE_F9)
+			MATRIX_KEY(4, 15, KBD_SCANCODE_F10)
+			MATRIX_KEY(0, 11, KBD_SCANCODE_F11)
+			MATRIX_KEY(0, 12, KBD_SCANCODE_F12)
+			MATRIX_KEY(6, 7,  KBD_SCANCODE_F13)
+
+			MATRIX_KEY(4, 2, KBD_SCANCODE_CAPSLOCK)
+			MATRIX_KEY(0, 5, KBD_SCANCODE_DELETE)
+			MATRIX_KEY(2, 11, KBD_SCANCODE_PAGEUP)
+			MATRIX_KEY(5, 16, KBD_SCANCODE_PAGEDOWN)
+			MATRIX_KEY(0, 15, KBD_SCANCODE_HOME)
+			MATRIX_KEY(1, 17, KBD_SCANCODE_END)
+		>;
+	};
+
+	scancode-set2 {
+		compatible = "cros-ec,scancode-set2";
+		default {
+			/* KSO0: 24, 44, Empty, Empty, 64, Empty, 63, Empty */
+			col0-codes  = <0x0043 0x0012 0x0000 0x0000 0xe014 0x0000 0x0067 0x0000>;
+			/* KSO1: 28, 110, 58, 96(0), Empty, 29, T14, Empty */
+			col1-codes  = <0x005b 0x0076 0x0014 0x0000 0x0000 0x005d 0x0017 0x0000>;
+			/* KSO2: T1, Empty, 105(0), T2, 128, 85, 60, Empty */
+			col2-codes  = <0x0005 0x0000 0x0000 0x0006 0x0027 0xe07d 0x0011 0x0000>;
+			/* KSO3: 45(0), Empty, T6, 55, Empty, 61, Empty, Empty */
+			col3-codes  = <0x0000 0x0000 0x000b 0x004a 0x0000 0x0029 0x0000 0x0000>;
+			/* KSO4: 51, 26, 95, 39, 42(0), 8, 5, 18 */
+			col4-codes  = <0x0031 0x004d 0x0037 0x004b 0x0000 0x003d 0x0025 0x001d>;
+			/* KSO5: 15, 97(0), 4, 65, Empty, 47, 108, 7 */
+			col5-codes  = <0x0066 0x0000 0x0026 0x0064 0x0000 0x0022 0x0061 0x0036>;
+			/* KSO6: T15, 93, 9, 80, Empty, 32, Empty, 20 */
+			col6-codes  = <0x001f 0x005d 0x003e 0xe06c 0x0000 0x001b 0x0000 0x002d>;
+			/* KSO7: T7, Empty, 100(0), 21, 31, 23, T13, 54 */
+			col7-codes  = <0x0083 0x0000 0x0000 0x002c 0x001c 0x003c 0x000f 0x0049>;
+			/* KSO8: T9, 101, 35, 12, Empty, 19, 14(0), 11 */
+			col8-codes  = <0x0001 0x006a 0x0034 0x004e 0x0000 0x0024 0x0000 0x0045>;
+			/* KSO9: T5, Empty, 3, Lock, 37, 66(0), 53, 46 */
+			col9-codes  = <0x0003 0x0000 0x001e 0x002f 0x003b 0x0000 0x0041 0x001a>;
+			/* KSO10: 62, Empty, 10, Empty, 76, 34, 40, 49 */
+			col10-codes = <0xe011 0x0000 0x0046 0x0000 0xe071 0x002b 0x004c 0x002a>;
+			/* KSO11: T11, Empty, 83, 98(0), Empty, 36, 1, 13 */
+			col11-codes = <0x0078 0x0000 0xe075 0x0000 0x0000 0x0033 0x000e 0x0055>;
+			/* KSO12: T12, 25, 81, T8, Empty, 91(0), 17, 102(0) */
+			col12-codes = <0x0007 0x0044 0xe069 0x000a 0x0000 0x0000 0x0015 0x0000>;
+			/* KSO13: 22, T4, 103(0), 92(0), Empty, 52, 41, 48 */
+			col13-codes = <0x0035 0x000c 0x0000 0x0000 0x0000 0x003a 0x0052 0x0021>;
+			/* KSO14: 33, 99(0), 50, 2, Empty, Empty, 106(0), 56 */
+			col14-codes = <0x0023 0x0000 0x0032 0x0016 0x0000 0x0000 0x0000 0x0051>;
+			/* KSO15: 79, Empty, Empty, 30, T10, 16, Empty, T3 */
+			col15-codes = <0xe06b 0x0000 0x0000 0xe01f 0x0009 0x000d 0x0000 0x0004>;
+			/* KSO16: 86, Empty, 27, 6, 127(0), 84, 104(0), 38 */
+			col16-codes = <0xe07a 0x0000 0x0054 0x002e 0x0000 0xe072 0x0000 0x0042>;
+			/* KSO17: Empty, 89, Empty, Empty, Empty, Empty, 57, 43 */
+			col17-codes = <0x0000 0xe074 0x0000 0x0000 0x0000 0x0000 0x0059 0x005a>;
+		};
+	};
+};
+
+/* kb back light */
+&pwm1 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C6>;
+	pinctrl-0 = <&pwm1_gpa1_default>;
+	pinctrl-names = "default";
+};

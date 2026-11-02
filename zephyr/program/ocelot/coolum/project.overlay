@@ -16,6 +16,7 @@
 #include "i2c.dtsi"
 #include "interrupt.dtsi"
 #include "imvp.dtsi"
+#include "keyboard.dtsi"
 #include "power_signals.dtsi"
 #include "usbc.dtsi"
 
