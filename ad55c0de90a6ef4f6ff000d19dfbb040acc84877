@@ -16,6 +16,50 @@
       "message": "The previous build (https://cr-buildbucket.appspot.com/build/8667824122760425729) is being automatically retried for the following reasons:\n- Some tests are now retryable:hatch-cq.helios.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
       "revId": "ad55c0de90a6ef4f6ff000d19dfbb040acc84877",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e0b4992_2c33c9cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:17:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please encapsulate the `USE_LEGACY_GPIO_API` guard inside `warn_gpio()` and add unit test coverage in `util/flash_fp_mcu_test.sh`. [[trajectory](https://goto.corp.google.com/traj/a44da871-b2dc-4da4-9de8-82a48e1be1b1)]\n\n### Review Summary\n* **Functionality:** ✅ Restricting the pre-flash `warn_gpio` check to `USE_LEGACY_GPIO_API\u003d1` prevents `gpioget` from reconfiguring `BOOT0` and `NRST` as inputs when using the character-device GPIO API without background hold processes (`GPIOSET_SUPPORTS_HOLD\u003d0`).\n* **Architecture \u0026 Component Fit:** ❌ Other GPIO helpers (`gpio()` and `gpio_chip_exists()`) encapsulate the `USE_LEGACY_GPIO_API` check inside the helper layer, and `_gpio_new()` treats legacy-only operations (`export`, `unexport`, `in`, `out`) as no-ops so `flash_fp_mcu_board()` can call GPIO primitives unconditionally. Moving the `USE_LEGACY_GPIO_API` check into `warn_gpio()` keeps this abstraction consistent and makes `warn_gpio()` directly unit-testable.\n* **Code Simplicity:** ✅ The condition itself is minimal and clear.\n* **Idiomaticity \u0026 Readability:** ✅ Matches existing Bash conventions in `util/flash_fp_mcu`.\n* **Security:** ✅ No security concerns.\n* **Testing:** ❌ Although `TEST\u003d` cites `flash_fp_mcu_test.sh`, no unit test was added to `util/flash_fp_mcu_test.sh` to verify that `warn_gpio` skips `gpio get` when `USE_LEGACY_GPIO_API\u003d0` and checks the pin state when `USE_LEGACY_GPIO_API\u003d1`. See the inline comment for a ready-to-use test snippet.\n* **CL Size \u0026 Scope:** ✅ `Size: XS (+4, -3)`. Single, focused logical change.\n* **Commit Message:** ✅ Clear, concise subject and body explaining why `warn_gpio` must be restricted to the legacy sysfs GPIO API.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ad55c0de90a6ef4f6ff000d19dfbb040acc84877",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a58aef10_e3e51223",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:17:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Other GPIO helpers in this script (`gpio()` on line 436 and `gpio_chip_exists()` on line 444) encapsulate the `USE_LEGACY_GPIO_API` check inside the helper layer, and `_gpio_new()` treats legacy-only operations (`export`, `unexport`, `in`, `out`) as no-ops so `flash_fp_mcu_board()` can invoke GPIO helpers unconditionally.\n\nPlease move the `USE_LEGACY_GPIO_API` guard into `warn_gpio()` (lines 454–469) so that:\n1. `USE_LEGACY_GPIO_API` remains encapsulated in the GPIO helper layer and any caller of `warn_gpio()` is protected from invoking `gpioget` under the character-device API.\n2. The behavior can be directly unit-tested in `util/flash_fp_mcu_test.sh` (which is cited in `TEST\u003d` but currently has no test case covering `warn_gpio` with `USE_LEGACY_GPIO_API\u003d0` vs. `USE_LEGACY_GPIO_API\u003d1`).\n\nIn `util/flash_fp_mcu`:\n```bash\n# Usage: warn_gpio \u003csignal\u003e \u003cexpected_value\u003e \u003cmsg\u003e\nwarn_gpio() {\n  # Only check GPIO state via sysfs legacy API. With the character-device GPIO\n  # API, gpioset either holds the line open (blocking gpioget) or gpioget\n  # reconfigures the line as input (clobbering the output driven on BOOT0/NRST).\n  if [[ \"${USE_LEGACY_GPIO_API}\" -ne 1 ]]; then\n    return 0\n  fi\n\n  local signal\u003d$1\n  local expected_value\u003d$2\n  local msg\u003d$3\n\n  local value\n  if ! value\u003d\"$(gpio get \"${signal}\")\"; then\n    echo \"Error fetching gpio value ${signal}\" \u003e\u00262\n    exit \"${EXIT_RUNTIME}\"\n  fi\n\n  if [[ \"${value}\" !\u003d \"${expected_value}\" ]]; then\n    echo \"${msg}\" \u003e\u00262\n    return 1\n  fi\n}\n```\n\nAnd at the call site in `flash_fp_mcu_board()`:\n```bash\n  # We do not expect the drivers to change the pin state when binding.\n  # If you receive this warning, the driver needs to be fixed on this board\n  # and this flash attempt will probably fail.\n  warn_gpio \"${gpio_boot0}\" 1 \\\n    \"WARNING: One of the drivers changed BOOT0 pin state on bind attempt.\"\n  warn_gpio \"${gpio_nrst}\" 0 \\\n    \"WARNING: One of the drivers changed NRST pin state on bind attempt.\"\n```\n\nThen add unit tests in `util/flash_fp_mcu_test.sh` covering both `USE_LEGACY_GPIO_API\u003d0` and `USE_LEGACY_GPIO_API\u003d1`:\n```bash\n# 7. warn_gpio only queries GPIO state when USE_LEGACY_GPIO_API\u003d1\n(\n  USE_LEGACY_GPIO_API\u003d0\n  gpio_called\u003d0\n  gpio() { gpio_called\u003d1; }\n  warn_gpio \"gpiochip0:46\" 1 \"unexpected warning\"\n  assert_eq \"0\" \"${gpio_called}\" \"warn_gpio skipped when USE_LEGACY_GPIO_API\u003d0\"\n)\n(\n  USE_LEGACY_GPIO_API\u003d1\n  gpio() { echo \"1\"; }\n  warn_gpio \"46\" 1 \"unexpected warning\"\n)\n(\n  USE_LEGACY_GPIO_API\u003d1\n  gpio() { echo \"0\"; }\n  ret\u003d0\n  err\u003d\"$(warn_gpio \"46\" 1 \"pin state changed\" 2\u003e\u00261)\" || ret\u003d$?\n  assert_eq \"1\" \"${ret}\" \"warn_gpio returns 1 on mismatch\"\n  assert_eq \"pin state changed\" \"${err}\" \"warn_gpio prints warning on mismatch\"\n)\n```\n\n[🔗](http://go/tj/a44da871-b2dc-4da4-9de8-82a48e1be1b1)",
+      "range": {
+        "startLine": 989,
+        "startChar": 0,
+        "endLine": 997,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ad55c0de90a6ef4f6ff000d19dfbb040acc84877",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
