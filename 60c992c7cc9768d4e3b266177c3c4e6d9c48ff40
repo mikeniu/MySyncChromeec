@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a4d0b18_693f7716",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T18:35:19Z",
+      "side": 1,
+      "message": "Some mechanical notes. If possible, I\u0027d prefer to address this at a more fundamental level. See bug comments.",
+      "revId": "60c992c7cc9768d4e3b266177c3c4e6d9c48ff40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a313982_05bb8ab0",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T18:35:19Z",
+      "side": 1,
+      "message": "Nit: Would it work to have these be `__maybe_unused` but unconditionally compiled? Whether there\u0027s a space penalty may depend on how smart the LTO is. See the no-op definition of `pm_notifier_register`. FWIW, I think we have this enabled in essentially every production context, at least for this chip.",
+      "revId": "60c992c7cc9768d4e3b266177c3c4e6d9c48ff40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c74dde2e_947df11d",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T18:35:19Z",
+      "side": 1,
+      "message": "Nit: These could be the same function. If that function was called something like `cros_system_rtk_pm_watchdog_reload`, that might be usefully clearer and terser.",
+      "revId": "60c992c7cc9768d4e3b266177c3c4e6d9c48ff40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c8e6d3c_6557ac3c",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtk.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T18:35:19Z",
+      "side": 1,
+      "message": "The definition of `pm_notifier_register` is a no-op if this config is undefined. The call site shouldn\u0027t need a config check if the callback structures are also defined.",
+      "revId": "60c992c7cc9768d4e3b266177c3c4e6d9c48ff40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
