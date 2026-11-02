@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b49da11c_f69ad20f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T22:37:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/537a3fe7-213e-457e-8663-b6dcd4b12cbf)]\n\n### Review Summary\n- **Functionality**: Relocates `fpsensor_crypto_mock.cc` and `rollback_mock.c` from `zephyr/mock/` back to `common/mock/`, and their headers `fpsensor_crypto_mock.h` and `rollback_mock.h` from `zephyr/mock/include/mock/` back to `include/mock/`. Updates `zephyr/mock/CMakeLists.txt`, `zephyr/test/fingerprint/task/CMakeLists.txt`, and `zephyr/Makefile.cq` (`GENERATED_AND_SYSTEM_PATTERNS` and `TEST_PATTERNS`) accordingly. Both `include/` and `zephyr/mock/include` are on the global Zephyr include path (`zephyr/CMakeLists.txt`), so existing `#include \"mock/...\"` directives continue to resolve seamlessly.\n- **Architecture \u0026 Component Fit**: Restoring these shared mocks to `common/mock/` and `include/mock/` aligns with the `ec-legacy` directory layout and allows the fingerprint Copybot job (`git apply --include`) to synchronize changes across both repositories.\n- **Code Simplicity**: Pure file relocation with build/CQ path updates; left optional follow-up suggestions on the moved files to avoid introducing unrelated churn into this move CL.\n- **Idiomaticity \u0026 Readability**: Added non-blocking follow-up suggestions regarding pre-existing unused headers, local `extern` forward declarations, C99 compound literals in C++-included headers, and leading double-underscore header guards (`__MOCK_*_H`).\n- **Security**: Test-only mocks guarded by `#ifndef TEST_BUILD`; no production firmware impact or security issues.\n- **Testing**: `zephyr/test/fingerprint/task/CMakeLists.txt` and `zephyr/mock/CMakeLists.txt` are updated to reference `${PLATFORM_EC}/common/mock/...`, and `zephyr/Makefile.cq` patterns cover `common/mock/**` and `include/mock/**`.\n- **CL Size \u0026 Scope**: Focused, atomic file move (`Size: S (+13, -9)`).\n- **Commit Message**: Clear and well-structured; explains both the what and the why (Copybot `git apply --include` matching `common/mock/fpsensor*` and `common/mock/rollback*`) and includes `BUG\u003d` and `TEST\u003d` tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "09454531a6e4796a76f8667b3c471a8d4071d46a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ed9eab5_90861612",
+        "filename": "common/mock/fpsensor_crypto_mock.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T22:37:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):** Remove unused header includes and use C++ standard library headers in this `.cc` translation unit.\n\n`\"compile_time_macros.h\"`, `\"console.h\"`, `\"ec_commands.h\"`, `\"fpsensor/fpsensor_utils.h\"`, `\"sha256.h\"`, `\u003cstdio.h\u003e`, and `\u003cstring.h\u003e` are not referenced in this file, and `\u003ccassert\u003e` / `\u003ccstdint\u003e` are preferred over `\"assert.h\"` / `\u003cstdint.h\u003e` in C++20 translation units:\n\n```cpp\n#include \"mock/fpsensor_crypto_mock.h\"\n\n#include \u003calgorithm\u003e\n#include \u003ccassert\u003e\n#include \u003ccstdint\u003e\n#include \u003cspan\u003e\n```\n\n[🔗](http://go/tj/537a3fe7-213e-457e-8663-b6dcd4b12cbf)",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "09454531a6e4796a76f8667b3c471a8d4071d46a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46c52724_96e62eff",
+        "filename": "common/mock/fpsensor_crypto_mock.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T22:37:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):** Declare `hkdf_sha256_impl` in `include/fpsensor/fpsensor_crypto.h` and `#include \"fpsensor/fpsensor_crypto.h\"` here instead of maintaining a local `extern` forward declaration in the `.cc` file.\n\nHaving both `common/fpsensor/fpsensor_crypto.cc` and `common/mock/fpsensor_crypto_mock.cc` include a shared header declaration ensures the compiler checks for signature drift if `hkdf_sha256` / `hkdf_sha256_impl` is modified.\n\n[🔗](http://go/tj/537a3fe7-213e-457e-8663-b6dcd4b12cbf)",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "09454531a6e4796a76f8667b3c471a8d4071d46a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f96f4aa_df852421",
+        "filename": "include/mock/fpsensor_crypto_mock.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T22:37:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):** Avoid leading double underscores in header guard macros.\n\nIdentifiers starting with `__` (such as `__MOCK_FPSENSOR_CRYPTO_MOCK_H` and `__MOCK_ROLLBACK_MOCK_H`) are reserved for the compiler and standard library implementation by the C and C++ standards, and headers under `include/` in this repository use `PLATFORM_EC_INCLUDE_\u003cPATH\u003e_H_` guards. Once Copybot synchronization with `ec-legacy` is settled, consider updating both repositories to use standard-compliant guards:\n\n```c\n#ifndef PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_CRYPTO_MOCK_H_\n#define PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_CRYPTO_MOCK_H_\n```\n\nOther locations:\n- `include/mock/fpsensor_crypto_mock.h`, **line 32**\n- `include/mock/rollback_mock.h`, **lines 11–12** and **line 36**\n\n[🔗](http://go/tj/537a3fe7-213e-457e-8663-b6dcd4b12cbf)",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "09454531a6e4796a76f8667b3c471a8d4071d46a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41d5a63b_78fe7105",
+        "filename": "include/mock/fpsensor_crypto_mock.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T22:37:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):** Avoid C99 compound literals in headers included by C++20 translation units.\n\n`((struct mock_ctrl_fpsensor_crypto){ ... })` is a C99 compound literal, which is a non-standard compiler extension when compiled as C++ (this header is included by `common/mock/fpsensor_crypto_mock.cc` and `zephyr/test/fingerprint/task/src/fpsensor_template.cc`, and `include/mock/rollback_mock.h` is included by `zephyr/test/hwtest/src/fpsensor_auth_crypto_stateful.cc`). Using a braced designated initializer (or omitting the type cast in C++) is valid in both C99 and C++20 for initialization and assignment:\n\n```c\n#define MOCK_CTRL_DEFAULT_FPSENSOR_CRYPTO \\\n\t{ .output_type \u003d MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_REAL }\n```\n\nOther locations:\n- `include/mock/rollback_mock.h`, **lines 24–28**\n\n[🔗](http://go/tj/537a3fe7-213e-457e-8663-b6dcd4b12cbf)",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "09454531a6e4796a76f8667b3c471a8d4071d46a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
