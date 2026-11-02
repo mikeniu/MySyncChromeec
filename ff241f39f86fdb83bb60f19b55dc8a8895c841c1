@@ -188,6 +188,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a04ec2d_dd90099e",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T23:16:08Z",
+      "side": 1,
+      "message": "Ack. If there is a version of this where multiple drivers will need to share the same state, e.g. 2 PDCs in 1 I2C device, we may need to think about the appropriate interface or rules here. If not, per-driver seems like the simplest way to go.",
+      "parentUuid": "713a4593_17e15709",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0aa261f7_505a28f5",
@@ -336,6 +354,24 @@
       "side": 1,
       "message": "The initialization-state handling is introduced in CL:8336670: `st_init_entry()` clears it, and `INIT_PDC_COMPLETE` sets it. The disabled-state handler in CL:8336673 also sets it when initialization terminates with the port disabled. It indicates that initialization is no longer in progress.",
       "parentUuid": "fa649eab_88f2bb1b",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6ce2797_cf317265",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T23:16:08Z",
+      "side": 1,
+      "message": "Ack. I presume you are leaving it here because this function wouldn\u0027t make sense without checking it?",
+      "parentUuid": "28d8f8c4_36004ebb",
       "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
