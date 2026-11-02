@@ -32,7 +32,7 @@ static void drive_one_col_gpio(const struct device *col_dev,
 {
 	const struct col_gpio_config *cfg = col_dev->config;
 	struct col_gpio_data *data = col_dev->data;
-	bool state;
+	bool state = false;
 
 	if (kbd_dev != cfg->kbd_dev) {
 		return;
@@ -41,7 +41,7 @@ static void drive_one_col_gpio(const struct device *col_dev,
 	if (col == INPUT_KBD_MATRIX_COLUMN_DRIVE_ALL || col == cfg->col) {
 		gpio_pin_set_dt(&cfg->gpio, 1);
 		state = true;
-	} else {
+	} else if (col == INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE || data->state) {
 		gpio_pin_set_dt(&cfg->gpio, 0);
 		state = false;
 	}
