@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc90f509_6e149f83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T20:06:16Z",
+      "side": 1,
+      "message": "\"Debug detach\" is a concept specific to certain TCPCs (maybe just the RAA489000?), outside of the relevant specs. I don\u0027t think it\u0027s formally documented anywhere. It has instead developed organically as a set of workarounds for weird things that happen on transition from DTS mode. I think some of those things are nondeterministic.\n\nTo validate a change like this, you\u0027d want to observe some number of transitions involving DTS of different types on real hardware. The scenarios to test should probably be informed by the history of bugs that motivated changes to the debug detach process or when it was called.",
+      "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5902d790_6e3df2f0",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 2208,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T20:06:16Z",
+      "side": 1,
+      "message": "This should be OK. I haven\u0027t worked this out in my head yet, but I\u0027m suspicious that with some refactoring, `tcpm_debug_detach` could be called less conditionally, either by moving to a different place or by checking the last state itself. This would make the module boundaries a little different than they are now, but debug detach is a workaround specific to a single TCPC, not a well defined spec concept.\n\nRight now, this is called during entry to an Unattached state and during exit from Attached.{SNK,SRC} outside of a PR Swap, if the DTS flag is set. That flag is then cleared on detach. I think if the exit calls worked, the calls entering Unattached should be redundant (see other comment about testing).\n\nSo do we need the Unattached entry calls at all? If we do, would it be sufficient to check the DTS flag? If the DTS flag is set here, how did that happen?\n\nIs the set of conditions under which we need to debug detach sufficiently regular that we could have something like `tc_debug _detach` that we call unconditionally, and that encapsulates the conditions, which we can apply at any necessary point in the state machine?",
+      "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8671627_3d583105",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_tc.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T20:06:16Z",
+      "side": 1,
+      "message": "If you use FFF to fake `tcpm_debug_detach`, do you need this machinery? (See `tcpm_header.c`.)",
+      "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
