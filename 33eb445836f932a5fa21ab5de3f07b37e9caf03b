@@ -16,6 +16,125 @@
       "message": "The previous build (https://cr-buildbucket.appspot.com/build/8667824122760425729) is being automatically retried for the following reasons:\n- Some tests are now retryable:hatch-cq.helios.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
       "revId": "33eb445836f932a5fa21ab5de3f07b37e9caf03b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53c54955_0b82d27e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:25:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments before approval. [[trajectory](https://goto.corp.google.com/traj/dce243a9-748e-41dd-ac66-ccb9c05317f1)]\n\n### Review Summary\n* **Functionality:** ❌ `_gpio_new` routes `\u003cchip\u003e:\u003cline\u003e` tuples to `_gpioset_hold \"${gpio_chip}\" \"${gpio_line}\" \"${cmd}\"`, but `_gpioset_hold` keys `GPIO_ACTIVE_PIDS` only by line number (`${signal}`) in an indexed array, causing PID collisions when two GPIO chips use the same per-chip line offset.\n* **Architecture \u0026 Component Fit:** ⚠️ `power_cycle_fpmcu` and `flash_fp_mcu_board` duplicate the `${gpio_pwren#*:} -gt 0` precondition check, and `get_gpiochip_by_dev` hardcodes `/sys/bus/gpio/devices` without a seam for host unit tests.\n* **Code Simplicity:** ❌ `get_gpiochip_by_dev` spawns `grep` and `basename` subprocesses in a loop where Bash parameter expansion and pattern matching suffice, and `-n \"${gpio_pwren}\"` is redundant with `\"${gpio_pwren#*:}\" -gt 0`.\n* **Idiomaticity \u0026 Readability:** ❌ `chip` in `get_gpiochip_by_dev` is not declared `local`, leaking the loop variable into global scope.\n* **Security:** ✅ No security issues identified.\n* **Testing:** ❌ `util/flash_fp_mcu_test.sh` only tests `_gpio_new` with `GPIOSET_SUPPORTS_HOLD\u003d0`; tests are missing for `_gpioset_hold`, `gpioget`, missing `GPIO_CHIP` error handling, `get_gpiochip_by_dev`, `config_ocelot`, and `power_cycle_fpmcu` boundary values.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+58, -16)` — Single cohesive change adding `\u003cchip\u003e:\u003cline\u003e` GPIO tuple support for Ocelot\u0027s dual GPIO controllers.\n* **Commit Message:** ✅ Clear summary and motivation with `BUG\u003d` and `TEST\u003d` tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "33eb445836f932a5fa21ab5de3f07b37e9caf03b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b250cf13_962ffdc3",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:25:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] In `get_gpiochip_by_dev`, there are a few issues with variable scoping, subprocess usage, and testability:\n\n1. **Global variable leak:** `chip` in `for chip in ...` is not declared `local`, leaking `chip` into the global shell namespace.\n2. **Unnecessary subprocesses \u0026 regex matching:** Piping `readlink \"${chip}\" | grep -q \"${match}\"` spawns a pipeline and `grep` process on every iteration and treats `match` as a regular expression rather than a literal substring; `[[ \"$(readlink \"${chip}\")\" \u003d\u003d *\"${match}\"* ]]` and `echo \"${chip##*/}\"` perform the check and basename extraction directly in Bash.\n3. **Testability seam:** Hardcoding `/sys/bus/gpio/devices` prevents unit-testing `get_gpiochip_by_dev` and `config_ocelot` in environments where `/sys/bus/gpio/devices/gpiochip*` is absent (where the unmatched glob stays a literal string). Allowing the directory to be overridden via `${SYSFS_GPIO_DEVICES_DIR:-/sys/bus/gpio/devices}` (similar to `lsbval` on line 477) enables hermetic unit testing with temporary symlinks.\n\n```bash\nget_gpiochip_by_dev() {\n  local match\u003d\"$1\"\n  local gpio_dev_dir\u003d\"${SYSFS_GPIO_DEVICES_DIR:-/sys/bus/gpio/devices}\"\n  local chip\n\n  for chip in \"${gpio_dev_dir}\"/gpiochip*; do\n    if [[ \"$(readlink \"${chip}\")\" \u003d\u003d *\"${match}\"* ]]; then\n      echo \"${chip##*/}\"\n      return 0\n    fi\n  done\n\n  return 1\n}\n```\n\n[🔗](http://go/tj/dce243a9-748e-41dd-ac66-ccb9c05317f1)",
+      "range": {
+        "startLine": 261,
+        "startChar": 0,
+        "endLine": 272,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "33eb445836f932a5fa21ab5de3f07b37e9caf03b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7cca74cb_4382877a",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:25:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] When `GPIOSET_SUPPORTS_HOLD` is `1` (the default on ChromeOS), `_gpio_new` passes `${gpio_chip}` and `${gpio_line}` separately to `_gpioset_hold`. However, `_gpioset_hold` (lines 365–381) indexes `GPIO_ACTIVE_PIDS[${signal}]` solely by the line offset (`$2`), and `GPIO_ACTIVE_PIDS` is an undeclared indexed array.\n\nWith `\u003cchip\u003e:\u003cline\u003e` tuples across multiple GPIO controllers, two signals on different chips that share the same per-chip line number (e.g., `gpiochip0:15` and `gpiochip1:15`) will collide in `GPIO_ACTIVE_PIDS[${signal}]`, causing `_gpioset_hold` to kill the `gpioset` background process holding the first chip\u0027s pin when setting the second.\n\nPlease declare `GPIO_ACTIVE_PIDS` as an associative array at the top level (`declare -A GPIO_ACTIVE_PIDS\u003d()`) and key it by `\"${gpio_chip}:${signal}\"` in `_gpioset_hold` (existing uses of `${#GPIO_ACTIVE_PIDS[@]}` on line 988 and `\"${GPIO_ACTIVE_PIDS[@]}\"` in the `EXIT` trap on line 1668 work unchanged with an associative array):\n\n```bash\ndeclare -A GPIO_ACTIVE_PIDS\u003d()\n\n# Usage: _gpioset_hold \u003cgpio_chip\u003e \u003csignal\u003e \u003cvalue\u003e\n_gpioset_hold() {\n  local gpio_chip\u003d\"$1\"\n  local signal\u003d\"$2\"\n  local value\u003d\"$3\"\n  local key\u003d\"${gpio_chip}:${signal}\"\n\n  # Kill any gpioset processes for this GPIO before spawning a new one.\n  if [[ -n \"${GPIO_ACTIVE_PIDS[${key}]}\" ]]; then\n    kill \"${GPIO_ACTIVE_PIDS[${key}]}\"\n    unset \"GPIO_ACTIVE_PIDS[${key}]\"\n  fi\n\n  # We need to run gpioset as a background process in order to hold the\n  # gpio at a specific value.\n  gpioset --mode\u003dsignal \"${gpio_chip}\" \"${signal}\u003d${value}\" \u0026\n  GPIO_ACTIVE_PIDS[${key}]\u003d$!\n  klog \"Set and hold GPIO ${gpio_chip}/${signal} to ${value} (PID: ${GPIO_ACTIVE_PIDS[${key}]})\"\n}\n```\n\n[🔗](http://go/tj/dce243a9-748e-41dd-ac66-ccb9c05317f1)",
+      "range": {
+        "startLine": 414,
+        "startChar": 0,
+        "endLine": 418,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "33eb445836f932a5fa21ab5de3f07b37e9caf03b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebc49601_1ce12dba",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:25:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `if [[ -n \"${gpio_pwren}\" \u0026\u0026 \"${gpio_pwren#*:}\" -gt 0 ]]; then` is duplicated in both `power_cycle_fpmcu` and its sole caller `flash_fp_mcu_board` (line 1037), and the `-n \"${gpio_pwren}\"` check is redundant in Bash because an empty operand `\"\"` in `[[ \"${gpio_pwren#*:}\" -gt 0 ]]` already evaluates to `0` (`0 -gt 0` is false).\n\nCo-locating the precondition inside `power_cycle_fpmcu` as an early-return guard clause returning `1` when `gpio_pwren` is not positive removes the duplicate check in `flash_fp_mcu_board`:\n\n```bash\npower_cycle_fpmcu() {\n  local gpio_pwren\u003d\"${1}\"\n\n  if [[ ! \"${gpio_pwren#*:}\" -gt 0 ]]; then\n    return 1\n  fi\n\n  echo \"Power cycling the FPMCU.\"\n  gpio export \"${gpio_pwren}\"\n  gpio out    \"${gpio_pwren}\"\n  gpio 0      \"${gpio_pwren}\"\n  # Must outlast hardware soft start, which is typically ~3ms.\n  sleep 0.5\n  gpio 1      \"${gpio_pwren}\"\n  # Power enable line is externally pulled down, so leave as output-high.\n  gpio unexport \"${gpio_pwren}\"\n}\n```\n\nAnd at line 1037 in `flash_fp_mcu_board`:\n\n```bash\n  if ! power_cycle_fpmcu \"${gpio_pwren}\"; then\n    echo \"Reset the FPMCU.\"\n    gpio out\t\"${gpio_nrst}\"\n    gpio 0\t\"${gpio_nrst}\"\n    # Make sure that we keep nRST line low long enough.\n    sleep 0.01\n    gpio 1\t\"${gpio_nrst}\"\n  fi\n```\n\nOther locations with this issue:\n* **Line 1037**\n\n[🔗](http://go/tj/dce243a9-748e-41dd-ac66-ccb9c05317f1)",
+      "range": {
+        "startLine": 566,
+        "startChar": 0,
+        "endLine": 580,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "33eb445836f932a5fa21ab5de3f07b37e9caf03b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3b32d95_7c6ba4b2",
+        "filename": "util/flash_fp_mcu_test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:25:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This test only exercises `_gpio_new` for `cmd\u003d1` with `GPIOSET_SUPPORTS_HOLD\u003d0`. Please expand the unit tests to cover the remaining branches, error paths, and boundary conditions added or modified in this CL:\n\n1. **`_gpio_new` branches \u0026 error handling:**\n   * `GPIOSET_SUPPORTS_HOLD\u003d1` (`_gpioset_hold`), including holding the same line number on two different chips (`gpiochip0:39` and `gpiochip1:39`) to verify `GPIO_ACTIVE_PIDS` does not collide across chips.\n   * `cmd\u003dget` (`gpioget` routing with `\u003cchip\u003e:\u003cline\u003e` and default `GPIO_CHIP`).\n   * Unset `GPIO_CHIP\u003d\"\"`: succeeding when a `\u003cchip\u003e:\u003cline\u003e` tuple is provided, and exiting with `EXIT_CONFIG` when a bare line (`\"39\"`) or empty chip prefix (`\":39\"`) is passed.\n2. **`get_gpiochip_by_dev` and `config_ocelot`:**\n   * Resolving `INTC10EC:00` and `INTC10EC:01` symlinks and verifying `GPIO_CHIP`, `GPIO_NRST`, `GPIO_BOOT0`, and `GPIO_PWREN`.\n   * Returning `1` when either `INTC10EC:00` or `INTC10EC:01` is missing.\n3. **`power_cycle_fpmcu` boundary values around `0` (`-gt 0`):**\n   * Off-by-one above boundary (`\"gpiochip1:1\"` triggers power cycle) vs. exact boundary (`\"gpiochip1:0\"`), negative (`\"-1\"`), and empty (`\"\"`) inputs.\n\n```bash\n# 6. \u003cchip\u003e:\u003cline\u003e GPIO tuple routing in _gpio_new\n(\n  GPIO_CHIP\u003d\"gpiochip0\"\n  GPIOSET_SUPPORTS_HOLD\u003d0\n  calls\u003d\"\"\n  _gpioset() { calls\u003d\"${calls}$1:$2\u003d$3;\"; }\n  _gpio_new 1 \"gpiochip1:46\" \"39\"\n  assert_eq \"gpiochip1:46\u003d1;gpiochip0:39\u003d1;\" \"${calls}\" \\\n    \"_gpio_new \u003cchip\u003e:\u003cline\u003e routing\"\n\n  GPIOSET_SUPPORTS_HOLD\u003d1\n  hold_calls\u003d\"\"\n  _gpioset_hold() { hold_calls\u003d\"${hold_calls}$1:$2\u003d$3;\"; }\n  _gpio_new 0 \"gpiochip1:46\" \"39\"\n  assert_eq \"gpiochip1:46\u003d0;gpiochip0:39\u003d0;\" \"${hold_calls}\" \\\n    \"_gpio_new \u003cchip\u003e:\u003cline\u003e hold routing\"\n\n  get_calls\u003d\"\"\n  klog() { :; }\n  gpioget() { get_calls\u003d\"${get_calls}$1:$2;\"; }\n  _gpio_new get \"gpiochip1:46\" \"39\"\n  assert_eq \"gpiochip1:46;gpiochip0:39;\" \"${get_calls}\" \\\n    \"_gpio_new \u003cchip\u003e:\u003cline\u003e get routing\"\n\n  GPIO_CHIP\u003d\"\"\n  GPIOSET_SUPPORTS_HOLD\u003d0\n  calls\u003d\"\"\n  _gpio_new 1 \"gpiochip1:46\"\n  assert_eq \"gpiochip1:46\u003d1;\" \"${calls}\" \\\n    \"_gpio_new \u003cchip\u003e:\u003cline\u003e without default GPIO_CHIP\"\n\n  ret\u003d0\n  ( _gpio_new 1 \"39\" 2\u003e/dev/null ) || ret\u003d$?\n  assert_eq \"${EXIT_CONFIG}\" \"${ret}\" \\\n    \"expected bare signal without GPIO_CHIP to exit with EXIT_CONFIG\"\n\n  ret\u003d0\n  ( _gpio_new 1 \":39\" 2\u003e/dev/null ) || ret\u003d$?\n  assert_eq \"${EXIT_CONFIG}\" \"${ret}\" \\\n    \"expected empty chip in tuple to exit with EXIT_CONFIG\"\n)\n\n# 7. get_gpiochip_by_dev and config_ocelot\n(\n  tmp_dir\u003d\"$(mktemp -d)\"\n  trap \u0027rm -rf \"${tmp_dir}\"\u0027 EXIT\n  ln -s \"../../../devices/platform/INTC10EC:00/gpiochip0\" \\\n    \"${tmp_dir}/gpiochip0\"\n  ln -s \"../../../devices/platform/INTC10EC:01/gpiochip1\" \\\n    \"${tmp_dir}/gpiochip1\"\n  SYSFS_GPIO_DEVICES_DIR\u003d\"${tmp_dir}\"\n\n  assert_eq \"gpiochip0\" \"$(get_gpiochip_by_dev \"INTC10EC:00\")\" \\\n    \"get_gpiochip_by_dev matches INTC10EC:00\"\n  assert_eq \"gpiochip1\" \"$(get_gpiochip_by_dev \"INTC10EC:01\")\" \\\n    \"get_gpiochip_by_dev matches INTC10EC:01\"\n\n  ret\u003d0\n  get_gpiochip_by_dev \"INTC10EC:99\" || ret\u003d$?\n  assert_eq \"1\" \"${ret}\" \"get_gpiochip_by_dev returns 1 when not found\"\n\n  get_spidev() { echo \"/dev/spidev0.0\"; }\n  (\n    config_ocelot\n    assert_eq \"gpiochip0\" \"${GPIO_CHIP}\" \"config_ocelot GPIO_CHIP\"\n    assert_eq \"gpiochip0:39\" \"${GPIO_NRST}\" \"config_ocelot GPIO_NRST\"\n    assert_eq \"gpiochip1:46\" \"${GPIO_BOOT0}\" \"config_ocelot GPIO_BOOT0\"\n    assert_eq \"gpiochip1:31\" \"${GPIO_PWREN}\" \"config_ocelot GPIO_PWREN\"\n  )\n\n  rm \"${tmp_dir}/gpiochip1\"\n  ret\u003d0\n  ( config_ocelot ) || ret\u003d$?\n  assert_eq \"1\" \"${ret}\" \"config_ocelot fails when INTC10EC:01 is missing\"\n\n  rm \"${tmp_dir}/gpiochip0\"\n  ret\u003d0\n  ( config_ocelot ) || ret\u003d$?\n  assert_eq \"1\" \"${ret}\" \"config_ocelot fails when INTC10EC:00 is missing\"\n)\n\n# 8. power_cycle_fpmcu boundary checks\n(\n  sleep() { :; }\n  calls\u003d\"\"\n  gpio() { calls\u003d\"${calls}$1:$2;\"; }\n\n  power_cycle_fpmcu \"gpiochip1:1\" \u003e/dev/null\n  assert_eq \\\n    \"export:gpiochip1:1;out:gpiochip1:1;0:gpiochip1:1;1:gpiochip1:1;unexport:gpiochip1:1;\" \\\n    \"${calls}\" \"power_cycle_fpmcu runs for line 1\"\n\n  ret\u003d0\n  power_cycle_fpmcu \"gpiochip1:0\" \u003e/dev/null || ret\u003d$?\n  assert_eq \"1\" \"${ret}\" \"power_cycle_fpmcu rejects line 0 on boundary\"\n\n  ret\u003d0\n  power_cycle_fpmcu \"-1\" \u003e/dev/null || ret\u003d$?\n  assert_eq \"1\" \"${ret}\" \"power_cycle_fpmcu rejects -1\"\n\n  ret\u003d0\n  power_cycle_fpmcu \"\" \u003e/dev/null || ret\u003d$?\n  assert_eq \"1\" \"${ret}\" \"power_cycle_fpmcu rejects empty string\"\n)\n```\n\n[🔗](http://go/tj/dce243a9-748e-41dd-ac66-ccb9c05317f1)",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "33eb445836f932a5fa21ab5de3f07b37e9caf03b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
