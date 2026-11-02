@@ -16,6 +16,125 @@
       "message": "The previous build (https://cr-buildbucket.appspot.com/build/8667824122760425729) is being automatically retried for the following reasons:\n- Some tests are now retryable:hatch-cq.helios.hw.fingerprint-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
       "revId": "cb83da3639ca80177300f502facd03887610984c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "273b8dc2_78873310",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:17:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding positional argument ordering, integer flag validation, loop simplification, and unit test coverage. [[trajectory](https://goto.corp.google.com/traj/4b4ad1f9-6eeb-43cb-865c-fe356bc6155e)]\n\n### Review Summary\n* **Functionality:** ❌ Changes requested — In `parse_args()`, the `*)` branch appends all remaining arguments (`POSITIONAL_ARGS+\u003d(\"$@\")`) and `break`s out of the loop, so any flags passed after the positional `[ec.bin]` filename (such as `flash_fp_mcu dump.bin -r` or `flash_fp_mcu ec.bin -H`) are silently ignored by `main()`, causing `flash_fp_mcu` to write/flash the MCU instead of reading or pinging. Additionally, `-R`/`--retries` and `-B`/`--baudrate` no longer validate that their arguments are integers, allowing empty strings (`--retries\u003d`), non-numeric values (`--retries\u003dabc`), or subsequent flags (`-R -r`) to be silently accepted.\n* **Architecture \u0026 Component Fit:** ✅ Replacing `shflags` with built-in argument parsing and guarding top-level execution in `util/flash_fp_mcu` so `util/flash_fp_mcu_test.sh` can source and unit-test `parse_args()` fits the standalone fingerprint APEX deployment cleanly.\n* **Code Simplicity:** ❌ Changes requested — Moving `shift` and integer validation (`^[0-9]+$`) to the bottom of the `while` loop in `parse_args()` removes 14 repeated `shift` statements and duplicated missing-argument blocks, and a small `assert_parse_err` helper in `util/flash_fp_mcu_test.sh` eliminates repeated error-checking boilerplate.\n* **Idiomaticity \u0026 Readability:** ❌ Changes requested — `util/flash_fp_mcu_test.sh` hardcodes magic default values `\"4\"` and `\"115200\"` instead of referencing `${DEFAULT_RETRIES}` and `${STM32MON_SERIAL_BAUDRATE}`.\n* **Security:** ✅ No security vulnerabilities identified.\n* **Testing:** ❌ Changes requested — `util/flash_fp_mcu_test.sh` passes `--read --noread` and `--hello --nohello` in a single `parse_args` call where both flags already default to `${FLAGS_FALSE}`, masking whether `--read` and `--hello` actually set `${FLAGS_TRUE}`. Several flag branches (`-U`, `--remove_flash_read_protect`, `-u`, `--remove_flash_write_protect`, `-s`, `--services`, space-separated `--retries` / `--baudrate`, `-h`/`--help`, dash-prefixed positional args after `--`, and invalid/empty integer flag arguments) also need test coverage.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+202, -35)` (~127 production lines and 75 unit test lines) is a single, cohesive logical change.\n* **Commit Message:** ✅ Clearly explains the motivation and scope of the change with proper `BUG\u003d` and `TEST\u003d` tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb83da3639ca80177300f502facd03887610984c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09e6aae8_314aa70f",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:17:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `parse_args()` has two argument-parsing bugs and repeated per-branch boilerplate in the `while` loop:\n\n1. **Flags after the positional filename are silently ignored (`*)` branch, lines 135–138):** Because `*)` runs `POSITIONAL_ARGS+\u003d(\"$@\")` and `break`s out of the loop, passing any flag after the positional `[ec.bin]` argument (e.g. `flash_fp_mcu dump.bin -r`, `flash_fp_mcu ec.bin -H`, or `flash_fp_mcu ec.bin --noservices`) stops option parsing on the filename and appends the trailing flags to `POSITIONAL_ARGS`, where `main()` silently ignores `$2`+. As a result, `flash_fp_mcu dump.bin -r` leaves `FLAGS_read` as `FLAGS_FALSE` and **writes/flashes** `dump.bin` to the MCU instead of reading from it, `flash_fp_mcu ec.bin -H` flashes the MCU instead of only pinging the bootloader, and `flash_fp_mcu ec.bin --unknown-flag` silently succeeds. `*)` should only record the current positional token (`POSITIONAL_ARGS+\u003d(\"$1\")`) and continue the loop, leaving `--)` as the explicit end-of-options delimiter.\n2. **Missing integer validation on `-R`/`--retries` and `-B`/`--baudrate` (lines 81–104):** Unlike `DEFINE_integer` in `shflags`, `parse_args()` accepts empty values (`--retries\u003d`, `--baudrate\u003d`), non-numeric strings (`--retries\u003dabc`, `-R ec.bin`), and missing values followed by another flag (`-R -r` or `-B -H`, where `$# -lt 2` is false and the next flag is silently consumed as the retry count or baudrate). Validating that `FLAGS_retries` and `FLAGS_baudrate` match `^[0-9]+$` catches empty values, missing values before another flag, and non-integer arguments.\n3. **Loop simplification:** Moving `shift` to the end of the `while` loop body (with one extra `shift` in the two-argument `-R|--retries` and `-B|--baudrate` arms) and checking `FLAGS_retries` and `FLAGS_baudrate` against `^[0-9]+$` at the end of the loop body eliminates 14 repeated `shift` statements and the duplicated `if [[ $# -lt 2 ]]` blocks:\n\n```bash\n  while [[ $# -gt 0 ]]; do\n    case \"$1\" in\n      -r|--read)\n        FLAGS_read\u003d\"${FLAGS_TRUE}\"\n        ;;\n      --noread)\n        FLAGS_read\u003d\"${FLAGS_FALSE}\"\n        ;;\n      -U|--remove_flash_read_protect)\n        FLAGS_remove_flash_read_protect\u003d\"${FLAGS_TRUE}\"\n        ;;\n      --noremove_flash_read_protect)\n        FLAGS_remove_flash_read_protect\u003d\"${FLAGS_FALSE}\"\n        ;;\n      -u|--remove_flash_write_protect)\n        FLAGS_remove_flash_write_protect\u003d\"${FLAGS_TRUE}\"\n        ;;\n      --noremove_flash_write_protect)\n        FLAGS_remove_flash_write_protect\u003d\"${FLAGS_FALSE}\"\n        ;;\n      -R|--retries)\n        FLAGS_retries\u003d\"${2:-}\"\n        shift\n        ;;\n      --retries\u003d*)\n        FLAGS_retries\u003d\"${1#*\u003d}\"\n        ;;\n      -B|--baudrate)\n        FLAGS_baudrate\u003d\"${2:-}\"\n        shift\n        ;;\n      --baudrate\u003d*)\n        FLAGS_baudrate\u003d\"${1#*\u003d}\"\n        ;;\n      -H|--hello)\n        FLAGS_hello\u003d\"${FLAGS_TRUE}\"\n        ;;\n      --nohello)\n        FLAGS_hello\u003d\"${FLAGS_FALSE}\"\n        ;;\n      -s|--services)\n        FLAGS_services\u003d\"${FLAGS_TRUE}\"\n        ;;\n      --noservices)\n        FLAGS_services\u003d\"${FLAGS_FALSE}\"\n        ;;\n      -h|--help)\n        usage\n        exit 0\n        ;;\n      --)\n        shift\n        POSITIONAL_ARGS+\u003d(\"$@\")\n        break\n        ;;\n      -*)\n        echo \"Unknown flag: $1\" \u003e\u00262\n        usage \u003e\u00262\n        return \"${EXIT_ARGUMENT}\"\n        ;;\n      *)\n        POSITIONAL_ARGS+\u003d(\"$1\")\n        ;;\n    esac\n    if [[ ! \"${FLAGS_retries}\" \u003d~ ^[0-9]+$ || \\\n          ! \"${FLAGS_baudrate}\" \u003d~ ^[0-9]+$ ]]; then\n      usage \u003e\u00262\n      return \"${EXIT_ARGUMENT}\"\n    fi\n    shift\n  done\n```\n\n[🔗](http://go/tj/4b4ad1f9-6eeb-43cb-865c-fe356bc6155e)",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 140,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb83da3639ca80177300f502facd03887610984c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f25f30ff_55938737",
+        "filename": "util/flash_fp_mcu_test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:17:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Reference the named constants `${DEFAULT_RETRIES}` and `${STM32MON_SERIAL_BAUDRATE}` (which are already in scope from sourcing `flash_fp_mcu` on line 9) rather than hardcoding the magic numbers `\"4\"` and `\"115200\"`, matching how the surrounding assertions reference `${FLAGS_FALSE}` and `${FLAGS_TRUE}`:\n\n```bash\nassert_eq \"${DEFAULT_RETRIES}\" \"${FLAGS_retries}\" \"default FLAGS_retries\"\nassert_eq \"${STM32MON_SERIAL_BAUDRATE}\" \"${FLAGS_baudrate}\" \"default FLAGS_baudrate\"\n```\n\n[🔗](http://go/tj/4b4ad1f9-6eeb-43cb-865c-fe356bc6155e)",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb83da3639ca80177300f502facd03887610984c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3843006_0f7b8c3f",
+        "filename": "util/flash_fp_mcu_test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:17:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Several flag branches in `parse_args()` are either masked or untested here:\n\n1. **Masked state transitions for `--read` and `--hello`:** Because `parse_args()` resets `FLAGS_read` and `FLAGS_hello` to `${FLAGS_FALSE}` at the start of every call, passing `--read --noread` and `--hello --nohello` in the same `parse_args` invocation and asserting `${FLAGS_FALSE}` would still pass even if `--read`, `--noread`, `--hello`, and `--nohello` were all no-ops. Assert the positive long-flag state (`${FLAGS_TRUE}`) before testing the negated flags.\n2. **Missing coverage for positive protection/service flags, space-separated `--retries` / `--baudrate`, `--` with dash-prefixed filenames, and flags after positional arguments:**\n   * `-U`, `--remove_flash_read_protect`, `-u`, `--remove_flash_write_protect`, `-s`, and `--services` are never exercised (because their default is already `${FLAGS_TRUE}`, test them after their `--no*` counterparts so the state transition back to `${FLAGS_TRUE}` is verified).\n   * Space-separated `--retries \u003cN\u003e` and `--baudrate \u003cN\u003e` are not tested.\n   * In `-- custom_fw.bin`, `custom_fw.bin` does not start with `-`, so it would match `*)` even if `--)` were removed; pass a dash-prefixed filename after `--` (e.g. `-- -custom_fw.bin`) to verify that `--` stops option parsing.\n   * Test a flag following a positional argument (e.g. `parse_args ec.bin -r`) and `-h`/`--help`.\n\n```bash\n# 3. Positive long flags and space-separated --retries / --baudrate\nparse_args --read --noremove_flash_read_protect --remove_flash_read_protect \\\n  --noremove_flash_write_protect --remove_flash_write_protect \\\n  --retries 8 --baudrate 57600 --hello --noservices --services ec.bin\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_read}\" \"--read sets FLAGS_read\"\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_remove_flash_read_protect}\" \\\n  \"--remove_flash_read_protect\"\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_remove_flash_write_protect}\" \\\n  \"--remove_flash_write_protect\"\nassert_eq \"8\" \"${FLAGS_retries}\" \"--retries 8\"\nassert_eq \"57600\" \"${FLAGS_baudrate}\" \"--baudrate 57600\"\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_hello}\" \"--hello\"\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_services}\" \"--services\"\nassert_eq \"ec.bin\" \"${POSITIONAL_ARGS[0]}\" \"positional arg with long flags\"\n\n# 4. Negated boolean flags, short protection/service flags, --key\u003dvalue, and --\nparse_args --read --noread --noremove_flash_read_protect \\\n  --noremove_flash_write_protect --retries\u003d8 --baudrate\u003d57600 \\\n  --hello --nohello --noservices -- -custom_fw.bin\nassert_eq \"${FLAGS_FALSE}\" \"${FLAGS_read}\" \"--noread sets FLAGS_read\"\nassert_eq \"${FLAGS_FALSE}\" \"${FLAGS_remove_flash_read_protect}\" \\\n  \"--noremove_flash_read_protect\"\nassert_eq \"${FLAGS_FALSE}\" \"${FLAGS_remove_flash_write_protect}\" \\\n  \"--noremove_flash_write_protect\"\nassert_eq \"8\" \"${FLAGS_retries}\" \"--retries\u003d8\"\nassert_eq \"57600\" \"${FLAGS_baudrate}\" \"--baudrate\u003d57600\"\nassert_eq \"${FLAGS_FALSE}\" \"${FLAGS_hello}\" \"--nohello\"\nassert_eq \"${FLAGS_FALSE}\" \"${FLAGS_services}\" \"--noservices\"\nassert_eq \"-custom_fw.bin\" \"${POSITIONAL_ARGS[0]}\" \"dash-prefixed positional arg after --\"\n\nparse_args --noremove_flash_read_protect -U --noremove_flash_write_protect -u \\\n  --noservices -s ec.bin -r\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_remove_flash_read_protect}\" \"-U sets flag\"\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_remove_flash_write_protect}\" \"-u sets flag\"\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_services}\" \"-s sets flag\"\nassert_eq \"${FLAGS_TRUE}\" \"${FLAGS_read}\" \"flag after positional arg\"\nassert_eq \"1\" \"${#POSITIONAL_ARGS[@]}\" \"positional arg count before flag\"\nassert_eq \"ec.bin\" \"${POSITIONAL_ARGS[0]}\" \"positional arg before flag\"\n\nhelp_out\u003d\"$(parse_args -h)\"\nassert_eq \"$(usage)\" \"${help_out}\" \"-h outputs usage and exits 0\"\n```\n\n[🔗](http://go/tj/4b4ad1f9-6eeb-43cb-865c-fe356bc6155e)",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb83da3639ca80177300f502facd03887610984c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5774b9d_e8d1a09c",
+        "filename": "util/flash_fp_mcu_test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-02T21:17:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Extract a small helper function with a `local` return-code variable to eliminate the repeated 4-line `ret\u003d0; parse_args ... || ret\u003d$?; assert_eq ...` boilerplate, and add test cases for `--retries`, `--baudrate`, empty `--retries\u003d` / `--baudrate\u003d`, non-integer arguments, and missing values followed by another flag:\n\n```bash\n# Error handling: unknown flag, missing values, and non-integer values\nassert_parse_err() {\n  local ret\u003d0\n  parse_args \"$@\" 2\u003e/dev/null || ret\u003d$?\n  assert_eq \"${EXIT_ARGUMENT}\" \"${ret}\" \"expected EXIT_ARGUMENT for: $*\"\n}\n\nassert_parse_err --unknown-flag\nassert_parse_err -R\nassert_parse_err --retries\nassert_parse_err --retries\u003d\nassert_parse_err --retries\u003dabc\nassert_parse_err -R abc\nassert_parse_err -R -r\nassert_parse_err -B\nassert_parse_err --baudrate\nassert_parse_err --baudrate\u003d\nassert_parse_err --baudrate\u003dabc\nassert_parse_err -B abc\nassert_parse_err -B -H\n```\n\n[🔗](http://go/tj/4b4ad1f9-6eeb-43cb-865c-fe356bc6155e)",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cb83da3639ca80177300f502facd03887610984c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
