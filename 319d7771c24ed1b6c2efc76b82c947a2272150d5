@@ -105,6 +105,24 @@
       "parentUuid": "cd1b9065_c32a72b6",
       "revId": "319d7771c24ed1b6c2efc76b82c947a2272150d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f8d5eaf_51f5e32a",
+        "filename": "zephyr/zmake/zmake/signers.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-11-02T08:11:20Z",
+      "side": 1,
+      "message": "\u003e As noted, the motivation for the implementation was consistency with rwsig which uses futility in the same way. \n\nThat\u0027s clear.\n\n\u003e You could make the argument that rwsig is preparing a separate binary block which makes futility almost just a binary block signing tool.\n\nThat\u0027s exactly my argument. I think the actions that are performed in zmake could be done on futility side e.g. you could pass an area name that has to be \"signed\" (checksumed), an area name where the checksum should be written to and maybe even hashing function type.",
+      "parentUuid": "82c326db_f6717b47",
+      "revId": "319d7771c24ed1b6c2efc76b82c947a2272150d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
