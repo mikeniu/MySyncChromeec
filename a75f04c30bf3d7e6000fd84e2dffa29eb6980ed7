@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f296e488_031c5781",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 684,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T23:42:36Z",
+      "side": 1,
+      "message": "I don\u0027t think you\u0027re covering the software-controlled toggle case (Unattached.SRC \u003c-\u003e Unattached.SNK) here. Of the ones we\u0027ve discussed, I would expect that to be the most burdensome in terms of unnecessary I2C transactions.",
+      "revId": "a75f04c30bf3d7e6000fd84e2dffa29eb6980ed7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41cc1bec_2421e93f",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 696,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T23:42:36Z",
+      "side": 1,
+      "message": "Nit: \"only debug detach.\" If we\u0027re not in a PRS, we\u0027re definitely detaching.",
+      "revId": "a75f04c30bf3d7e6000fd84e2dffa29eb6980ed7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

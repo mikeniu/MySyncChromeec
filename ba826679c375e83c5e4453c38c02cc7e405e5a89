@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4621886c_21d14b3f",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 2208,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-11-02T23:42:36Z",
+      "side": 1,
+      "message": "\u003e TC_FLAGS_TS_DTS_PARTNER is only set when transitioning from AttachWait.{SNK,SRC} into Attached.{SNK,SRC} after tCCDebounce. However, the RAA489000 hardware detects DTS on the CC pins as soon as both CC lines see terminations. If a dual-role power state change forces a role switch (Unattached.SRC \u003c-\u003e Unattached.SNK) while an incomplete debug connection is in AttachWait or Unattached, tc_attached_{snk,src}_exit() never runs and TC_FLAGS_TS_DTS_PARTNER is not set.\n\nIf this is true, it calls into question the logic of this CL. If the TCPC could have already entered some kind of DTS-attached state while the TCPM is still in an AttachWait state, then maybe the only transitions in which we can skip this step are between Unattached states and between LPM and Unattached.\n\n\u003e On initial Unattached entry after an EC reset or sysjump (last_state \u003d\u003d TC_STATE_COUNT) while the TCPC remained powered, tc[port].flags in EC RAM is cleared even if the TCPC hardware is still in DTS state.\n\nIn one of your recent CLs, I recall looking at code that specifically runs in this scenario to start the TC. Perhaps running debug detach explicitly there would reduce the need for other existing calls?",
+      "parentUuid": "7ab5ec02_3c9ba09f",
+      "revId": "ba826679c375e83c5e4453c38c02cc7e405e5a89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b8671627_3d583105",
         "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_tc.c",
         "patchSetId": 5
