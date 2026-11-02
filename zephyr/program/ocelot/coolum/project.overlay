@@ -18,6 +18,7 @@
 #include "imvp.dtsi"
 #include "keyboard.dtsi"
 #include "power_signals.dtsi"
+#include "thermal.dtsi"
 #include "usbc.dtsi"
 
 

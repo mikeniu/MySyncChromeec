@@ -1,0 +1,132 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/thermistor/thermistor.dtsi>
+
+/ {
+	named-adc-channels {
+		compatible = "named-adc-channels";
+
+		adc_charger_amon_bmon: charger_amon_bmon {
+			enum-name = "ADC_AMON_BMON";
+			io-channels = <&adc0 1>;
+		};
+		adc_temp_charger: temp_charger {
+			enum-name = "ADC_TEMP_SENSOR_2_AMBIENT";
+			io-channels = <&adc0 2>;
+		};
+		adc_temp_pd: temp_pd {
+			enum-name = "ADC_TEMP_SENSOR_4";
+			io-channels = <&adc0 5>;
+		};
+		adc_temp_vr: temp_vr {
+			enum-name = "ADC_TEMP_SENSOR_PP3300_REGULATOR";
+			io-channels = <&adc0 4>;
+		};
+		adc_temp_cpu: temp_cpu {
+			enum-name = "ADC_TEMP_SENSOR_1_DDR_SOC";
+			io-channels = <&adc0 3>;
+		};
+		adc_temp_dboard: temp_dboard {
+			enum-name = "ADC_TEMP_SENSOR_5";
+			io-channels = <&adc0 6>;
+		};
+	};
+
+	temp_charger_thermistor: ddr-soc-thermistor {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_temp_charger>;
+	};
+	temp_pd_thermistor: pd-thermistor {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_temp_pd>;
+	};
+	temp_vr_thermistor: vr-thermistor {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_temp_vr>;
+	};
+	temp_cpu_thermistor: cpu-thermistor {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_temp_cpu>;
+	};
+	temp_dboard_thermistor: dboard-thermistor {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_47K_NCP15WB473>;
+		adc = <&adc_temp_dboard>;
+	};
+
+	fans {
+		compatible = "cros-ec,fans";
+
+		fan0: fan_0 {
+			pwms = <&pwm6 PWM_CHANNEL_6 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <2500>;
+			rpm-start = <2500>;
+			rpm-max = <6000>;
+			tach = <&tach0>;
+			rpm-deviation = <1>;
+			pgood-gpio = <&gpio_all_sys_pwrgd_r>;
+		};
+
+		fan1: fan_1 {
+			pwms = <&pwm6 PWM_CHANNEL_7 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <2500>;
+			rpm-start = <2500>;
+			rpm-max = <6000>;
+			tach = <&tach1>;
+			rpm-deviation = <1>;
+			pgood-gpio = <&gpio_all_sys_pwrgd_r>;
+		};
+	};
+};
+
+&adc0 {
+	status = "okay";
+	pinctrl-0 = <&adc0_ch1_gpi1_default
+		&adc0_ch2_gpi2_default
+		&adc0_ch3_gpi3_default
+		&adc0_ch4_gpi4_default
+		&adc0_ch5_gpi5_default
+		&adc0_ch6_gpi6_default>;
+	pinctrl-names = "default";
+};
+
+&thermistor_3V3_100K_47K_NCP15WB473 {
+	status = "okay";
+};
+
+&pwm6 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C6>;
+	pinctrl-0 = <&pwm6_gpa6_default>;
+	pinctrl-names = "default";
+};
+
+&pwm7 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C6>;
+	pinctrl-0 = <&pwm7_gpa7_default>;
+	pinctrl-names = "default";
+};
+
+&tach0 {
+	status = "okay";
+	pinctrl-0 = <&tach0a_gpd6_default>;
+	pinctrl-names = "default";
+	channel = <IT8XXX2_TACH_CHANNEL_A>;
+	pulses-per-round = <2>;
+};
+
+&tach1 {
+	status = "okay";
+	pinctrl-0 = <&tach1a_gpd7_default>;
+	pinctrl-names = "default";
+	channel = <IT8XXX2_TACH_CHANNEL_A>;
+	pulses-per-round = <2>;
+};
