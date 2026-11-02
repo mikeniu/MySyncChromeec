@@ -192,6 +192,11 @@ choice TEST_TARGET
 	  select TEST_DISABLE_INLINE_CHIPSET_IN_STATE
 	  help
 		The test target that exercises nissa/xivu/*.c
+
+	config TEST_NISSA_TOUCH_PANEL
+	  bool "Tests for touch_panel.c"
+	  help
+	    The test target that exercises nissa/src/touch_panel.c.
 endchoice
 
 config TEST_DISABLE_INLINE_CHIPSET_IN_STATE

@@ -524,3 +524,30 @@ tests:
       - CONFIG_PLATFORM_EC_HOSTCMD=y
       - CONFIG_PLATFORM_EC_VBOOT_HASH=n
       - CONFIG_ADC=y
+  nissa.touch_panel:
+    extra_dtc_overlay_files:
+      - "boards/touch_panel.dts"
+    extra_configs:
+      - CONFIG_TEST_NISSA_TOUCH_PANEL=y
+      - CONFIG_STUB_EXTPOWER_IS_PRESENT=y
+  nissa.touch_panel.tchscr_report_en:
+    extra_dtc_overlay_files:
+      - "boards/touch_panel.dts"
+      - "boards/touch_panel_tchscr.dts"
+    extra_configs:
+      - CONFIG_TEST_NISSA_TOUCH_PANEL=y
+      - CONFIG_STUB_EXTPOWER_IS_PRESENT=y
+  nissa.touch_panel.ec_touch_en:
+    extra_dtc_overlay_files:
+      - "boards/touch_panel_ec_touch_en.dts"
+      - "boards/touch_panel_fw_config.dts"
+    extra_configs:
+      - CONFIG_TEST_NISSA_TOUCH_PANEL=y
+      - CONFIG_STUB_EXTPOWER_IS_PRESENT=y
+  nissa.touch_panel.ec_touch_en_no_fw_config:
+    extra_dtc_overlay_files:
+      - "boards/touch_panel_ec_touch_en.dts"
+    extra_configs:
+      - CONFIG_TEST_NISSA_TOUCH_PANEL=y
+      - CONFIG_STUB_EXTPOWER_IS_PRESENT=y
+

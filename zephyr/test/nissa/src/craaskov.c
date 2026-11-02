@@ -346,31 +346,3 @@ ZTEST(craaskov, test_kb_layout_init)
 	kb_layout_init();
 	zassert_equal(set_scancode_set2_fake.call_count, 2);
 }
-
-#define TEST_DELAY_MS 1
-#define TOUCH_ENABLE_DELAY_MS (500 + TEST_DELAY_MS)
-#define TOUCH_DISABLE_DELAY_MS (0 + TEST_DELAY_MS)
-
-ZTEST(craaskov, test_touch_enable_init)
-{
-	const struct gpio_dt_spec *bl_en =
-		GPIO_DT_FROM_NODELABEL(gpio_soc_edp_bl_en);
-	const struct gpio_dt_spec *touch_en =
-		GPIO_DT_FROM_NODELABEL(gpio_ec_touch_en);
-
-	cros_cbi_get_fw_config_fake.custom_fake = cros_cbi_get_fw_config_mock;
-
-	hook_notify(HOOK_INIT);
-
-	/* touch_en become high after TOUCH_ENABLE_DELAY_MS delay */
-	zassert_ok(gpio_emul_input_set(bl_en->port, bl_en->pin, 1), NULL);
-	zassert_equal(gpio_emul_output_get(touch_en->port, touch_en->pin), 0);
-
-	k_sleep(K_MSEC(TOUCH_ENABLE_DELAY_MS));
-	zassert_equal(gpio_emul_output_get(touch_en->port, touch_en->pin), 1);
-
-	/* touch_en become low after TOUCH_DISABLE_DELAY_MS delay */
-	zassert_ok(gpio_emul_input_set(bl_en->port, bl_en->pin, 0), NULL);
-	k_sleep(K_MSEC(TOUCH_DISABLE_DELAY_MS));
-	zassert_equal(gpio_emul_output_get(touch_en->port, touch_en->pin), 0);
-}

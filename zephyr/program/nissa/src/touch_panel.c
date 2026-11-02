@@ -122,18 +122,15 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 	case AP_POWER_RESUME:
 		/* Called on AP S3 -> S0 transition */
 		value = 1;
-		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tp_vcc_od), value);
 		break;
 
 	case AP_POWER_SUSPEND:
 		/* Called on AP S0 -> S3 transition */
-		value = 0;
-		break;
 	case AP_POWER_SHUTDOWN:
 		value = 0;
-		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tp_vcc_od), value);
 		break;
 	}
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tp_vcc_od), value);
 }
 AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_RESUME,
 			       AP_POWER_SUSPEND, AP_POWER_SHUTDOWN);

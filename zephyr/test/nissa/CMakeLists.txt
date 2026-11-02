@@ -174,7 +174,6 @@ if(CONFIG_TEST_NISSA_CRAASK)
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/keyboard.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/led.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/thermal.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/touch_panel.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craask/src/usbc.c
     )
 endif()
@@ -187,7 +186,6 @@ if(CONFIG_TEST_NISSA_CRAASKOV)
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craaskov/src/charger.c
             ${PLATFORM_EC_PROGRAM_DIR}/nissa/craaskov/src/hdmi.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craaskov/src/keyboard.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/touch_panel.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/craaskov/src/usbc.c
     )
 endif()
@@ -323,7 +321,6 @@ if(CONFIG_TEST_NISSA_RIVEN)
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/keyboard.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/keyboard_customization.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/led.c
-            ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/touch_panel.c
 	    ${PLATFORM_EC_PROGRAM_DIR}/nissa/riven/src/usbc.c
     )
 endif()
@@ -437,3 +434,10 @@ target_sources_ifdef(
         app PRIVATE
         src/xivu.c
         ${PLATFORM_EC_PROGRAM_DIR}/nissa/xivu/src/usbc.c)
+
+target_sources_ifdef(
+        CONFIG_TEST_NISSA_TOUCH_PANEL
+        app PRIVATE
+        src/touch_panel.c
+        src/log_module.c
+        ${PLATFORM_EC_PROGRAM_DIR}/nissa/src/touch_panel.c)

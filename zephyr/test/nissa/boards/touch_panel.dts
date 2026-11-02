@@ -1,0 +1,31 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "generic_npcx.dts"
+
+/ {
+	gpio-interrupts {
+		int_ap_bl_en: int_ap_bl_en {
+			irq-pin = <&gpio_ap_bl_en_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "ap_bl_en_interrupt";
+		};
+	};
+
+	named-gpios {
+		gpio_ap_bl_en_odl: gpio_ap_bl_en_odl {
+			gpios = <&gpioa 3 GPIO_INPUT>;
+		};
+		gpio_tp_vcc_od: gpio_tp_vcc_od {
+			gpios = <&gpioc 0 GPIO_OUTPUT_LOW>;
+		};
+		gpio_tp_en_od: gpio_tp_en_od {
+			gpios = <&gpioa 4 GPIO_OUTPUT_LOW>;
+		};
+		gpio_ec_edp_bl_en_od: ec_edp_bl_en_od {
+			gpios = <&gpiob 2 GPIO_OUTPUT_LOW>;
+		};
+	};
+};
