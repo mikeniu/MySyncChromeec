@@ -16,6 +16,24 @@
       "message": "`DT_NODE_EXISTS` takes a node identifier (`DT_ALIAS(gpio_en_rails_odl)`), whereas `GPIO_DT_FROM_ALIAS(...)` expands to a C pointer expression (`\u0026...`), causing this `#if` to evaluate to `0` on `gothrax` too:\n```c\n#if DT_NODE_EXISTS(DT_ALIAS(gpio_en_rails_odl))\n```",
       "revId": "b6fdc4a88bde3907fa0f97adeb6c12d7335b465e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81e628f8_69fa3fd9",
+        "filename": "zephyr/program/nissa/src/gothrax_sub_board.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-11-02T18:09:32Z",
+      "side": 1,
+      "message": "Fixed on CL:8704037",
+      "parentUuid": "07a275f5_1737fb66",
+      "revId": "b6fdc4a88bde3907fa0f97adeb6c12d7335b465e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
