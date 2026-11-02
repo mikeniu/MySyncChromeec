@@ -8,6 +8,7 @@
 #define TRUNKS_TPM_GENERATED_H_
 
 #include <string>
+#include <vector>
 
 #include "callback.h"
 #include "hex.h"
