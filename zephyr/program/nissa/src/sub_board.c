@@ -167,7 +167,7 @@ static void hdmi_hpd_interrupt(const struct device *device,
 
 void nissa_configure_hdmi_rails(void)
 {
-#if DT_NODE_EXISTS(GPIO_DT_FROM_ALIAS(gpio_en_rails_odl))
+#if DT_NODE_EXISTS(DT_ALIAS(gpio_en_rails_odl))
 	gpio_pin_configure_dt(GPIO_DT_FROM_ALIAS(gpio_en_rails_odl),
 			      GPIO_OUTPUT_INACTIVE | GPIO_OPEN_DRAIN |
 				      GPIO_PULL_UP | GPIO_ACTIVE_LOW);
