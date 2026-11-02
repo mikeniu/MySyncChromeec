@@ -206,7 +206,7 @@ int cros_system_soc_reset(void)
 	struct pcr_regs *const pcr = HAL_PCR_INST();
 
 	/* Disable interrupts to avoid task swaps during reboot */
-	interrupt_disable_all();
+	irq_lock();
 	/* Stop the watchdog */
 	system_xec_watchdog_stop();
 
@@ -596,7 +596,7 @@ static void system_xec_hibernate_by_dsleep(uint32_t seconds,
 int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 {
 	/* Disable interrupt first */
-	interrupt_disable_all();
+	irq_lock();
 	/* Stop the watchdog */
 	system_xec_watchdog_stop();
 

@@ -7,7 +7,6 @@
 #include "system_fake.h"
 
 #include <setjmp.h>
-#include <stdbool.h>
 
 #include <zephyr/irq.h>
 
@@ -15,16 +14,6 @@ static enum ec_image shrspi_image_copy = EC_IMAGE_RO;
 
 /* setjmp environment to use for reboot (NULL if none) */
 static jmp_buf *jump_env;
-static unsigned int irq_lock_key;
-static bool irq_locked;
-
-void ztest_interrupt_disable_all(void)
-{
-	if (!irq_locked) {
-		irq_lock_key = irq_lock();
-		irq_locked = true;
-	}
-}
 
 void system_fake_setenv(jmp_buf *env)
 {
@@ -33,10 +22,7 @@ void system_fake_setenv(jmp_buf *env)
 
 void system_jump_to_booter(void)
 {
-	if (irq_locked) {
-		irq_locked = false;
-		irq_unlock(irq_lock_key);
-	}
+	irq_unlock(0);
 	if (jump_env)
 		longjmp(*jump_env, 1);
 }

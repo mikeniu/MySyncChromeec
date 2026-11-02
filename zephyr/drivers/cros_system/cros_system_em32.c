@@ -4,12 +4,12 @@
  */
 
 #include "drivers/cros_system.h"
-#include "system.h"
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/hwinfo.h>
 #include <zephyr/drivers/watchdog.h>
 #include <zephyr/init.h>
+#include <zephyr/irq.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/reboot.h>
 
@@ -185,7 +185,7 @@ int cros_system_soc_reset(void)
 #endif
 
 	/* Disable interrupts to avoid task swaps during reboot */
-	interrupt_disable_all();
+	irq_lock();
 
 	/* Stop watchdog */
 	system_em32_watchdog_stop();
