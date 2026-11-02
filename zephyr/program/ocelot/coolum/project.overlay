@@ -3,6 +3,13 @@
  * found in the LICENSE file.
  */
 
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "coolum_ec_ufsc.dtsi"
+
 /* ocelot program common DTS includes */
 
 #include <cros/integrated_fwid.dtsi>
