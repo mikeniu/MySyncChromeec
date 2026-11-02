@@ -812,8 +812,7 @@ class AllTests:
                 # TODO(b/485954886): Runs slowly on helipilot Renode.
                 timeout_secs=150,
             ),
-            # Cryptoc is not supported with Zephyr.
-            # TODO(b/333039464) A new test for OPENSSL_cleanse has to be implemented.
+            # Cryptoc is not supported with Zephyr; covered by openssl_cleanse.
             TestConfig(test_name="always_memset", skip_for_zephyr=True),
             TestConfig(
                 test_name="assert_builtin",
@@ -964,6 +963,11 @@ class AllTests:
             TestConfig(test_name="mutex_trylock", skip_for_zephyr=True),
             TestConfig(test_name="mutex_recursive", skip_for_zephyr=True),
             TestConfig(test_name="null_pointer"),
+            # Zephyr equivalent of always_memset (ec-legacy uses cryptoc).
+            TestConfig(
+                test_name="openssl_cleanse",
+                skip_for_ec_legacy=True,
+            ),
             TestConfig(
                 test_name="otp_key",
                 exclude_boards=[BLOONCHIPPER, DARTMONKEY],
