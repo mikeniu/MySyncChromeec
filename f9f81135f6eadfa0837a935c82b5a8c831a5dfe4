@@ -39,6 +39,30 @@
       },
       "revId": "f9f81135f6eadfa0837a935c82b5a8c831a5dfe4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b2c43d8_f2f2d45d",
+        "filename": "zephyr/shim/src/watchdog.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T23:12:37Z",
+      "side": 1,
+      "message": "Switched to just call reset_watchdog_stats() in watchdog_init() after the initial watchdog_reload().\n\nNote, there\u0027s an upstream issue on ITE that is causing the initial bad watchdog stats value:  https://github.com/zephyrproject-rtos/zephyr/pull/124363",
+      "parentUuid": "2d44ca09_1d0a4706",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 4
+      },
+      "revId": "f9f81135f6eadfa0837a935c82b5a8c831a5dfe4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
