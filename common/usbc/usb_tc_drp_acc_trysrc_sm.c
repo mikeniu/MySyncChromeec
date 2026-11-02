@@ -3651,6 +3651,10 @@ __maybe_unused static void tc_low_power_mode_run(const int port)
 
 	if (pd_timer_is_expired(port, TC_TIMER_LOW_POWER_TIME)) {
 		CPRINTS("C%d: TCPC Enter Low Power Mode", port);
+		if (IS_ENABLED(CONFIG_USB_PD_DUAL_ROLE_AUTO_TOGGLE) &&
+		    get_last_state_tc(port) == TC_DRP_AUTO_TOGGLE) {
+			tcpm_enable_drp_toggle(port);
+		}
 		TC_SET_FLAG(port, TC_FLAGS_LPM_ENGAGED);
 		TC_SET_FLAG(port, TC_FLAGS_LPM_TRANSITION);
 		tcpm_enter_low_power_mode(port);
