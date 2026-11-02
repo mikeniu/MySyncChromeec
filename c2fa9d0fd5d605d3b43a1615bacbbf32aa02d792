@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef99ed2e_f28e7466",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T16:44:12Z",
+      "side": 1,
+      "message": "nit: Should this be BUG\u003db:439591195 to match the rest of the stack?",
+      "revId": "c2fa9d0fd5d605d3b43a1615bacbbf32aa02d792",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ac6cdb8_c28cfc53",
+        "filename": "common/panic_output.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T16:44:12Z",
+      "side": 1,
+      "message": "Consider extracting a common helper that switches on enum ec_crash_type directly instead of converting the enum to a string and calling command_crash(). command_crash() can parse argv into enum ec_crash_type using crash_type_names[] and call the shared helper.",
+      "revId": "c2fa9d0fd5d605d3b43a1615bacbbf32aa02d792",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4094e135_f5af7fc5",
+        "filename": "common/panic_output.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T16:44:12Z",
+      "side": 1,
+      "message": "nit: EC_HOST_CMD_HANDLER_REQ_ONLY already enforces min_rqt_size \u003d sizeof(struct ec_params_crash) before invoking the handler, so this check can be dropped.",
+      "revId": "c2fa9d0fd5d605d3b43a1615bacbbf32aa02d792",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46c044c7_eb21318d",
+        "filename": "common/panic_output.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T16:44:12Z",
+      "side": 1,
+      "message": "Consider adding unit tests for EC_CMD_CRASH in zephyr/test/drivers/console_cmd_crash/src/crash.c or zephyr/test/drivers/panic_output/src/panic_output_crash_cmd.c.",
+      "revId": "c2fa9d0fd5d605d3b43a1615bacbbf32aa02d792",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdca54f8_65a57004",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 8563,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-11-02T16:44:12Z",
+      "side": 1,
+      "message": "Consider supporting nested crashes here too by replacing command_crash_nested_argv with a static queue of enum ec_crash_type and accepting multiple crash types in ec_params_crash and ectool.",
+      "revId": "c2fa9d0fd5d605d3b43a1615bacbbf32aa02d792",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
