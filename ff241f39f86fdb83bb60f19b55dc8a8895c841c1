@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "125ad28d_fa59dbca",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae628468_9f00c259",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "942da42e_53d4669c",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fdc5df2_ea1af521",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "942da42e_53d4669c",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13d5eabe_563bd30e",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-30T17:55:48Z",
       "side": 1,
       "message": "Having the array of state be defined as the size of the array of state names feels backward to me. I\u0027d structure this so that the state enum has a count member, the count is used for array sizes, and arrays that don\u0027t have an explicit size, like `state_names`, have a `BUILD_ASSERT` that their size equals the count enumerator.",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0e2aed0_7f5a798a",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13d5eabe_563bd30e",
       "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -75,6 +129,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5321cb3_90c48c92",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c03f504a_51cce022",
+      "range": {
+        "startLine": 314,
+        "startChar": 0,
+        "endLine": 327,
+        "endChar": 25
+      },
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77d7573d_58fa5a63",
@@ -88,6 +166,24 @@
       "writtenOn": "2026-10-30T17:55:48Z",
       "side": 1,
       "message": "Why is it shared across driver instances?",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "713a4593_17e15709",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "I move the flag into each IT52XX device\u0027s runtime data. For IT5271, each device instance represents a separate chip; all-port coordination remain in the management layer.",
+      "parentUuid": "77d7573d_58fa5a63",
       "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -115,6 +211,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9c20a09_45a0a7de",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0aa261f7_505a28f5",
+      "range": {
+        "startLine": 340,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 1
+      },
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "968704e8_97e96a6c",
@@ -128,6 +248,24 @@
       "writtenOn": "2026-10-30T17:55:48Z",
       "side": 1,
       "message": "When does this get set?",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a5ddef5_2fbca8f9",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "The callback is stored by `it52xx_post_command_with_callback()` in CL:8336674 and supplied by the raw UCSI API in CL:8336680. I\u0027ll move the one-shot callback member and dispatch branch into CL:8336674 so that registration and consumption are introduced together.",
+      "parentUuid": "968704e8_97e96a6c",
       "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -149,6 +287,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69c2a73c_f5f3bfd8",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "It is checked by cached `get_info()` reads in CL:8336676 (it52xx: implement info and error APIs).\n\nI move the `info_valid` member and reinitialization-time invalidation into that CL, alongside the complete cache update and read-side checks, so the cache lifecycle can be reviewed together.",
+      "parentUuid": "88240fd6_bea27602",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa649eab_88f2bb1b",
@@ -162,6 +318,24 @@
       "writtenOn": "2026-10-30T17:55:48Z",
       "side": 1,
       "message": "When does this get set?",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28d8f8c4_36004ebb",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-02T09:59:09Z",
+      "side": 1,
+      "message": "The initialization-state handling is introduced in CL:8336670: `st_init_entry()` clears it, and `INIT_PDC_COMPLETE` sets it. The disabled-state handler in CL:8336673 also sets it when initialization terminates with the port disabled. It indicates that initialization is no longer in progress.",
+      "parentUuid": "fa649eab_88f2bb1b",
       "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
