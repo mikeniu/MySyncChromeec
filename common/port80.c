@@ -60,6 +60,13 @@ test_mockable void port_80_write(int data)
 {
 	char ts_str[PRINTF_TIMESTAMP_BUF_SIZE];
 
+	/* Skip if the last entry is a resume marker (e.g. S0ix churn). */
+	if (data == PORT_80_EVENT_RESUME && writes > 0 &&
+	    history[(writes - 1) % ARRAY_SIZE(history)] ==
+		    PORT_80_EVENT_RESUME) {
+		return;
+	}
+
 	/*
 	 * By default print_in_int is disabled if:
 	 * 1. CONFIG_BRINGUP is not defined
@@ -264,12 +271,6 @@ EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_PORT80_READ, port80_command_read,
 
 static void port80_log_resume(void)
 {
-	/* Skip if the last entry is a resume marker (e.g. S0ix churn). */
-	if ((writes > 0) && history[(writes - 1) % ARRAY_SIZE(history)] ==
-				    PORT_80_EVENT_RESUME) {
-		return;
-	}
-
 	/* Store port 80 event so we know where resume happened */
 	port_80_write(PORT_80_EVENT_RESUME);
 }

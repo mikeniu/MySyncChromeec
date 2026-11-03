@@ -258,6 +258,7 @@ ZTEST(port80, test_port80_resume_dedup)
 	for (int i = 0; i < 5; i++) {
 		hook_notify(HOOK_CHIPSET_RESUME);
 	}
+	port_80_write(PORT_80_EVENT_RESUME);
 
 	shell_backend_dummy_clear_output(get_ec_shell());
 	zassert_ok(shell_execute_cmd(get_ec_shell(), "port80"), NULL);
@@ -280,6 +281,7 @@ ZTEST(port80, test_port80_resume_dedup)
 	port_80_write(0x42);
 	hook_notify(HOOK_CHIPSET_RESUME);
 	hook_notify(HOOK_CHIPSET_RESUME);
+	port_80_write(PORT_80_EVENT_RESUME);
 
 	shell_backend_dummy_clear_output(get_ec_shell());
 	zassert_ok(shell_execute_cmd(get_ec_shell(), "port80"), NULL);
