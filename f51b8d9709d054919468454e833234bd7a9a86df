@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51dbae8a_0cd95499",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please update the commit message body so it accurately reflects the current implementation and avoids narrating routine test additions:\n\n1. `RtsUsbDevice::EnableDownload()` now first reads `R_INITVTOR` (`0x401E2090`) via vendor control request `0x41` (`kRtsVreqXmemRead`) to check whether the device is running from the Boot ROM (`0x00000000`), leaving Flash Image runtime devices (or devices that stall the mode query) untouched so the caller can proceed directly to `DFU_DETACH`, and only sends `GET_STATUS` (`0x1A`) / `SET_STATUS` (`0x1B`) in Boot ROM mode.\n2. Omit the trailing `\"Add unit tests covering...\"` sentence, as routine unit test additions are already covered by the `TEST\u003d` footer and diff.\n\nSuggested replacement commit message:\n\n```text\nrts5817: Support enabling download mode on RtsUsbDevice\n\nExtend RtsUsbDevice and RtsUsbBackend with USB control transfer support\nto enable DFU download mode when the RTS5817 is running from the Boot\nROM. RtsUsbDevice::EnableDownload() reads R_INITVTOR via a vendor\ncontrol request to identify the active image, leaves Flash Image runtime\ndevices untouched so callers can proceed directly to DFU_DETACH, and\nqueries/enables Boot ROM download mode when inactive.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n\nChange-Id: Icb5a6f32b861bf24437e18a0ce357e56de9ce199\n```\n\n[🔗](http://go/tj/558ca79b-e890-47e4-9f95-d2446b6b1fe0)",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f51b8d9709d054919468454e833234bd7a9a86df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a5a7eaf_8857f1f7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comments for a few test and commit message improvements. [[trajectory](https://goto.corp.google.com/traj/558ca79b-e890-47e4-9f95-d2446b6b1fe0)]\n\n### Review Summary\n- **Functionality:** ✅ `RtsUsbDevice::EnableDownload()` properly checks `backend_-\u003eIsOpen()`, reads `R_INITVTOR` (`0x401E2090`) via `kRtsVreqXmemRead` (`0x41`), leaves download mode untouched when running from a Flash Image or when the mode query stalls (`kUsbErrorPipe`), and issues `kRtsStdGetStatus` (`0x1A`) / `kRtsStdSetStatus` (`0x1B`) only when running from the Boot ROM.\n- **Architecture \u0026 Component Fit:** ✅ Extending `RtsUsbBackend` and `MockRtsUsbBackend` with `IsOpen()`, `ControlTransferIn()`, and `ControlTransferOut()` cleanly preserves the hardware transport abstraction.\n- **Code Simplicity:** ⚠️ `InitVtorIs` in `rts5817_usb_device_test.cc` can be simplified using `std::ranges::copy` + `std::bit_cast` instead of a manual byte-shifting `for` loop, and `Invoke(...)` wrappers around lambda actions can be dropped.\n- **Idiomaticity \u0026 Readability:** ⚠️ Replace magic byte counts `4` and `2` in `rts5817_usb_device_test.cc` with `sizeof(uint32_t)` and `sizeof(uint32_t) - 1`.\n- **Security:** ✅ Fixed-size `std::array` buffers are passed via `std::span` and validated against `.size()` before use.\n- **Testing:** ⚠️ `FailsOnModeQueryShortRead` in `rts5817_usb_device_test.cc:327` tests a 2-byte read rather than the off-by-one boundary (`sizeof(uint32_t) - 1` \u003d `3` bytes) for `if (*mode \u003c init_vector.size())`.\n- **CL Size \u0026 Scope:** ✅ `Size: L (+318, -1)` (~126 lines of production code across `rts5817_usb_backend.h`, `rts5817_usb_device.h`, and `rts5817_usb_device.cc`, 14 mock lines, and ~178 lines of unit tests) representing a single cohesive logical change.\n- **Commit Message:** ⚠️ The commit message body in `/COMMIT_MSG` has not been updated to describe the `R_INITVTOR` Boot ROM check / Flash Image handling and includes routine `\"Add unit tests...\"` narration.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f51b8d9709d054919468454e833234bd7a9a86df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "362494a9_0f7fb383",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Replace the manual byte-shifting `for` loop in `InitVtorIs` with `std::ranges::copy` and `std::bit_cast` (matching `rts5817_usb_device.cc:133`, with `#include \u003calgorithm\u003e`, `#include \u003carray\u003e`, and `#include \u003cbit\u003e`). Also, because GoogleMock\u0027s `testing::Action` implicitly converts from callables, you can pass `InitVtorIs(...)` and `StatusIs(...)` directly to `ExpectInitVtorQuery(...)` and `ExpectGetStatus(...)` without wrapping every call site in `Invoke(...)` (and drop `using ::testing::Invoke;` on line 28):\n\n```cpp\nauto InitVtorIs(uint32_t value) {\n  return [value](uint8_t, uint8_t, uint16_t, uint16_t, std::span\u003cuint8_t\u003e data,\n                 milliseconds) {\n    std::ranges::copy(\n        std::bit_cast\u003cstd::array\u003cuint8_t, sizeof(value)\u003e\u003e(value),\n        data.begin());\n    return std::expected\u003csize_t, int\u003e(data.size());\n  };\n}\n```\n\n[🔗](http://go/tj/558ca79b-e890-47e4-9f95-d2446b6b1fe0)",
+      "range": {
+        "startLine": 211,
+        "startChar": 0,
+        "endLine": 219,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f51b8d9709d054919468454e833234bd7a9a86df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e819f6e1_47cad41b",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Test the exact off-by-one short-read boundary (`sizeof(uint32_t) - 1`, i.e., `3` bytes) rather than the magic number `2`, and use `SizeIs(sizeof(uint32_t))` instead of `SizeIs(4)` in `ExpectInitVtorQuery` on line 245.\n\nIn `RtsUsbDevice::EnableDownload()` (`rts5817_usb_device.cc:128`), the check is `if (*mode \u003c init_vector.size())` where `init_vector.size() \u003d\u003d sizeof(uint32_t)` (`4`). Testing only `2` leaves a 3-byte short read untested and would allow a wrong threshold (such as `\u003c 3` or `\u003c\u003d 2`) to pass:\n\n```cpp\nTEST_F(RtsUsbDeviceEnableDownloadTest, FailsOnModeQueryShortRead) {\n  ExpectInitVtorQuery(\n      Return(std::expected\u003csize_t, int\u003e(sizeof(uint32_t) - 1)));\n\n  auto res \u003d device_-\u003eEnableDownload();\n\n  ASSERT_FALSE(res);\n  EXPECT_EQ(res.error(), RtsError::kProtocolError);\n}\n```\n\n[🔗](http://go/tj/558ca79b-e890-47e4-9f95-d2446b6b1fe0)",
+      "range": {
+        "startLine": 327,
+        "startChar": 0,
+        "endLine": 334,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f51b8d9709d054919468454e833234bd7a9a86df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
