@@ -10,14 +10,16 @@ rts5817_flash_test-objs := $(addprefix $(_cur_dir)/, \
 	rts5817_usb_device_test.o \
 	rts5817_flash_cli.o \
 	rts5817_flash_cli_test.o \
+	rts5817_libusb_backend.o \
+	rts5817_libusb_backend_test.o \
 )
 
 _rts5817_test_bin := $(out)/util/rts5817_flash_test
 $(_rts5817_test_bin): HOST_CXXFLAGS+=-Iutil/realtekfp
 $(_rts5817_test_bin): HOST_CXXFLAGS+=$(shell $(HOST_PKG_CONFIG) \
-	--cflags gtest gmock)
+	--cflags libusb-1.0 gtest gmock)
 $(_rts5817_test_bin): HOST_LDFLAGS+=$(shell $(HOST_PKG_CONFIG) \
-	--libs gtest gtest_main gmock)
+	--libs libusb-1.0 gtest gtest_main gmock)
 
 .PHONY: rts5817-utils-test
 rts5817-utils-test: $(_rts5817_test_bin)
