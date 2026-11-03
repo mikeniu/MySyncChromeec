@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f54bf40_0a1e68d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T11:23:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/059f67ef-40c6-427b-9733-692084915afa)]\n\n### Review Summary\n- **Functionality:** ✅ `RtsUsbDevice::EnableDownload()` verifies that `backend_-\u003eIsOpen()` is true, reads `R_INITVTOR` (`0x401E2090`) via vendor control request `0x41` (`kRtsVreqXmemRead`), leaves download mode untouched when running from a Flash Image or when the mode query stalls (`kUsbErrorPipe`), and issues `kRtsStdGetStatus` (`0x1A`) / `kRtsStdSetStatus` (`0x1B`) only when running from the Boot ROM (`0x00000000`) and download mode is inactive.\n- **Architecture \u0026 Component Fit:** ✅ Extending `RtsUsbBackend` and `MockRtsUsbBackend` with `IsOpen()`, `ControlTransferIn()`, and `ControlTransferOut()` cleanly preserves the hardware transport abstraction used by `RtsUsbDevice`.\n- **Code Simplicity:** ✅ Control flow in `RtsUsbDevice::EnableDownload()` and the test helpers (`InitVtorIs`, `StatusIs`) is concise and direct, using early-return guard clauses and `std::ranges::copy` with `std::bit_cast`.\n- **Idiomaticity \u0026 Readability:** ✅ Protocol request codes, `bmRequestType` constants, register addresses, and timeouts are defined as typed `inline constexpr` constants (`std::chrono::milliseconds`, `uint8_t`, `uint16_t`, `uint32_t`), and buffer transfers use `std::span` and `std::expected`.\n- **Security:** ✅ Fixed-size `std::array` buffers are passed via `std::span` and validated against `.size()` before unpacking.\n- **Testing:** ✅ Unit tests in `rts5817_usb_device_test.cc` cover the closed-device precondition, Boot ROM inactive-to-active transition, already-active fast path, Flash Image and unknown image handling, stalled mode queries, transport errors, and exact off-by-one short-read boundaries (`sizeof(uint32_t) - 1` and `0`).\n- **CL Size \u0026 Scope:** ✅ `Size: L (+319, -1)` (~130 lines of production code across `rts5817_usb_backend.h`, `rts5817_usb_device.h`, and `rts5817_usb_device.cc`, 14 mock lines, and ~175 lines of unit tests) representing a single cohesive logical change.\n- **Commit Message:** ✅ Concise, accurate prose summary of the *Why* and *What* following ChromiumOS `BUG\u003d` and `TEST\u003d` conventions.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c9aa9283bec575d177a815d58e7b3e7244c711b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
