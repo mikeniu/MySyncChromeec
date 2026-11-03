@@ -102,7 +102,7 @@ static void port80_dump_buffer(void)
 	int printed = 0;
 	int i;
 	int head, tail;
-	int last_e = 0;
+	int last_e = -1;
 	char buffer[PORT80_LINE_LENGTH];
 	int buf_offset = 0;
 
@@ -160,7 +160,7 @@ static void port80_dump_buffer(void)
 	}
 
 	/* Displaying last port80 msg on 7-segment if it is enabled */
-	if (IS_ENABLED(CONFIG_SEVEN_SEG_DISPLAY) && buf_offset)
+	if (IS_ENABLED(CONFIG_SEVEN_SEG_DISPLAY) && last_e >= 0)
 		display_7seg_write(SEVEN_SEG_PORT80_DISPLAY, last_e);
 }
 
