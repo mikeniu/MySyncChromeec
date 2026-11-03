@@ -9,6 +9,7 @@ def register_npcx9_project(
     project_name,
     extra_kconfig_base_files=(),
     extra_kconfig_proj_files=(),
+    extra_modules=(),
     boards=None,
 ):
     """Register an npcx9 based variant of ocelot."""
@@ -32,7 +33,7 @@ def register_npcx9_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
+        modules=["cmsis_6", "ec", "pigweed", "nanopb", *extra_modules],
         boards=boards,
     )
 
@@ -142,6 +143,7 @@ register_npcx9_project(
 
 register_npcx9_project(
     project_name="blanc",
+    extra_modules=["google-private"],
 )
 
 # For use on RVP SKU3
