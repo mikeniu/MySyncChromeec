@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "600ce7d3_75b96138",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T11:08:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:** All checks pass. `main()` in `rts5817_flash.cc` parses command-line options via `ParseArgs()`, reads the firmware image via `ReadFile()`, constructs `RtsUsbDevice` with `RtsLibusbBackend`, and delegates the DFU update sequence to `Flash()`, reporting errors clearly to `stderr`.\n\n**Architecture \u0026 Component Fit:** Splitting `RtsLibusbBackend` and `Flash()` into prerequisite CLs leaves `rts5817_flash.cc` as a clean, minimal CLI entry point and wires the `rts5817_flash` host binary target into `util/realtekfp/build.mk` consistently with sibling utilities.\n\n**Code Simplicity:** `main()` uses flat early-return guard clauses with minimal variable scope and no redundant helpers or includes.\n\n**Idiomaticity \u0026 Readability:** Clean modern C++ usage (`std::println`, `std::make_unique`, `std::expected`, and RAII resource management) with no magic values.\n\n**Testing:** All underlying CLI parsing, file reading, USB backend, USB device, and flashing orchestration logic is covered by unit tests in `rts5817_flash_test`.\n\n**Security:** N/A\n\n**CL Size \u0026 Scope:** `Size: M (+78, -1)`. The CL is a single, self-contained logical change adding the `rts5817_flash` entry point (`util/realtekfp/rts5817_flash.cc`, 61 lines) and its build rule (`util/realtekfp/build.mk`, 17 lines).\n\n**Commit Message:** Concise summary explaining what the entry point wires together, with proper `BUG\u003d` and `TEST\u003d` tags. [[trajectory](https://goto.corp.google.com/traj/1294c248-252b-43a9-9b27-7e3f6deefd94)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f81b3cb091e4449d48f5f80a83ba79ab4eab55f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
