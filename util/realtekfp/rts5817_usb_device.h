@@ -9,6 +9,7 @@
 #ifndef PLATFORM_EC_UTIL_REALTEKFP_RTS5817_USB_DEVICE_H_
 #define PLATFORM_EC_UTIL_REALTEKFP_RTS5817_USB_DEVICE_H_
 
+#include <array>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -167,6 +168,20 @@ inline constexpr uint16_t kDfuDefaultTransferSize = 4096;
 // DFU interface descriptor. Returns kDfuDefaultTransferSize if there is no
 // valid DFU functional descriptor or if it reports a zero transfer size.
 uint16_t ParseDfuTransferSize(std::span<const uint8_t> extra);
+
+// DFU suffix (USB DFU 1.1, 16 bytes), appended to a firmware file: bcdDevice,
+// idProduct, idVendor, bcdDFU, ucDfuSignature ("UFD" in file order), bLength,
+// dwCRC. bLength may exceed kDfuSuffixLen if the suffix is longer.
+inline constexpr size_t kDfuSuffixLen = 16;
+inline constexpr size_t kDfuSuffixSigOff = 8;
+inline constexpr size_t kDfuSuffixLenOff = 11;
+inline constexpr std::array<uint8_t, 3> kDfuSuffixSig = {'U', 'F', 'D'};
+
+// Returns `firmware` without a trailing DFU suffix. The suffix is only removed
+// if it ends in the "UFD" signature and a plausible bLength; otherwise the
+// whole image is returned. The device rejects the suffix as download payload,
+// so strip it before DfuDownload().
+std::span<const uint8_t> StripDfuSuffix(std::span<const uint8_t> firmware);
 
 // The DFU interface of a device and the transfer size it advertises.
 struct DfuInterfaceInfo {

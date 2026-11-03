@@ -28,6 +28,7 @@ namespace {
 using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::Contains;
+using ::testing::ElementsAreArray;
 using ::testing::InSequence;
 using ::testing::Invoke;
 using ::testing::IsEmpty;
@@ -1118,6 +1119,95 @@ TEST(DfuStatusResponseTest, ZeroPollTimeout) {
   const std::array<uint8_t, kDfuGetStatusResponseLen> raw = {};
 
   EXPECT_EQ(DfuStatusResponse::FromBytes(raw).poll_timeout, milliseconds(0));
+}
+
+// A valid DFU suffix with the given bLength.
+std::vector<uint8_t> DfuSuffix(uint8_t length = kDfuSuffixLen) {
+  return {0x00, 0x00, 0x17, 0x58,   0xDA, 0x0B, 0x00, 0x01,
+          'U',  'F',  'D',  length, 0x11, 0x22, 0x33, 0x44};
+}
+
+std::vector<uint8_t> WithSuffix(std::vector<uint8_t> payload,
+                                const std::vector<uint8_t>& suffix) {
+  payload.insert(payload.end(), suffix.begin(), suffix.end());
+  return payload;
+}
+
+TEST(StripDfuSuffixTest, RemovesValidSuffix) {
+  const std::vector<uint8_t> payload = {1, 2, 3, 4, 5};
+  const std::vector<uint8_t> fw = WithSuffix(payload, DfuSuffix());
+
+  EXPECT_THAT(StripDfuSuffix(fw), ElementsAreArray(payload));
+}
+
+TEST(StripDfuSuffixTest, SuffixOnlyLeavesEmptyImage) {
+  const std::vector<uint8_t> fw = DfuSuffix();
+
+  EXPECT_TRUE(StripDfuSuffix(fw).empty());
+}
+
+TEST(StripDfuSuffixTest, HonorsLongerBLength) {
+  constexpr size_t kExtraSuffixBytes = 4;
+  const std::vector<uint8_t> payload = {1, 2, 3, 4, 5};
+  const std::vector<uint8_t> extra(kExtraSuffixBytes, 0xEE);
+  const std::vector<uint8_t> fw = WithSuffix(
+      WithSuffix(payload, extra), DfuSuffix(kDfuSuffixLen + kExtraSuffixBytes));
+
+  EXPECT_THAT(StripDfuSuffix(fw), ElementsAreArray(payload));
+}
+
+TEST(StripDfuSuffixTest, KeepsImageWithoutSignature) {
+  std::vector<uint8_t> suffix = DfuSuffix();
+  suffix[kDfuSuffixSigOff] = 'X';
+  const std::vector<uint8_t> fw = WithSuffix({1, 2, 3}, suffix);
+
+  EXPECT_THAT(StripDfuSuffix(fw), ElementsAreArray(fw));
+}
+
+TEST(StripDfuSuffixTest, KeepsImageWhenBLengthSmallerThanSuffix) {
+  const std::vector<uint8_t> fw =
+      WithSuffix({1, 2, 3}, DfuSuffix(kDfuSuffixLen - 1));
+
+  EXPECT_THAT(StripDfuSuffix(fw), ElementsAreArray(fw));
+}
+
+TEST(StripDfuSuffixTest, KeepsImageWhenBLengthIsZero) {
+  const std::vector<uint8_t> fw = WithSuffix({1, 2, 3}, DfuSuffix(0));
+
+  EXPECT_THAT(StripDfuSuffix(fw), ElementsAreArray(fw));
+}
+
+TEST(StripDfuSuffixTest, BLengthMayCoverTheWholeImage) {
+  // The largest bLength that is still accepted is the image size, which
+  // leaves nothing but the suffix and so an empty payload.
+  const std::vector<uint8_t> payload = {1, 2, 3, 4};
+  const std::vector<uint8_t> fw = WithSuffix(
+      payload, DfuSuffix(static_cast<uint8_t>(kDfuSuffixLen + payload.size())));
+
+  ASSERT_EQ(fw.size(), kDfuSuffixLen + payload.size());
+  EXPECT_TRUE(StripDfuSuffix(fw).empty());
+}
+
+TEST(StripDfuSuffixTest, KeepsImageWhenBLengthExceedsImageSize) {
+  // One more byte than the image has.
+  const std::vector<uint8_t> payload = {1, 2, 3};
+  const std::vector<uint8_t> fw = WithSuffix(
+      payload,
+      DfuSuffix(static_cast<uint8_t>(kDfuSuffixLen + payload.size() + 1)));
+
+  EXPECT_THAT(StripDfuSuffix(fw), ElementsAreArray(fw));
+}
+
+TEST(StripDfuSuffixTest, KeepsImageOneByteShorterThanSuffix) {
+  std::vector<uint8_t> fw = DfuSuffix();
+  fw.pop_back();
+
+  ASSERT_EQ(fw.size(), kDfuSuffixLen - 1);
+  EXPECT_THAT(StripDfuSuffix(fw), ElementsAreArray(fw));
+}
+
+TEST(StripDfuSuffixTest, KeepsEmptyImage) {
+  EXPECT_TRUE(StripDfuSuffix({}).empty());
 }
 
 }  // namespace
