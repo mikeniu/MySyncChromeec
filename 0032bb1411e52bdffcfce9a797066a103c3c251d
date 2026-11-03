@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9506055_a27a4be5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:33:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ `RtsUsbDevice::Init`, `RtsUsbDevice::WaitForDevice`, and `RtsUsbDevice::Release` properly manage the USB backend lifecycle, release prior resources before re-initialization and on error/timeout paths, validate positive timeout and polling intervals, and distinguish retriable device-absence errors from fatal USB errors.\n* **Architecture \u0026 Component Fit:** ✅ `RtsUsbBackend` provides a clean transport seam decoupling `RtsUsbDevice` from direct `libusb` calls, matching the component structure and `build.mk` test integration used by sibling fingerprint utilities under `util/`.\n* **Code Simplicity:** ✅ Control flow in `Init`, `WaitForDevice`, `ToRtsError`, and `Fail` is concise and linear with no redundant state or duplicated cleanup.\n* **Idiomaticity \u0026 Readability:** ✅ Uses modern C++23/C++20 constructs (`std::expected`, `std::chrono::milliseconds`, `std::string_view`, `std::println`, `enum class`, `inline constexpr` constants, and RAII ownership via `std::unique_ptr`) and follows the Google C++ Style Guide.\n* **Security:** ✅ No security vulnerabilities or unsafe memory operations.\n* **Testing:** ✅ Comprehensive unit tests in `rts5817_usb_device_test.cc` cover initialization, resource cleanup ordering, polling retries across both `kUsbErrorNotFound` and `kUsbErrorNoDevice`, timeout boundaries, early abort on access-denied and generic USB errors, invalid interval boundary values (`0` and `-1`), and `ToString` coverage.\n* **CL Size \u0026 Scope:** ✅ `Size: L (+508, -0)` — Acceptable: ~236 lines of cohesive production code implementing `RtsUsbDevice` lifecycle management and `RtsUsbBackend`, paired with ~272 lines of unit tests, mock backend, and test build configuration.\n* **Commit Message:** ✅ Concisely states the motivation and summary of changes with proper `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/4ee1a6f7-5e65-4c70-9114-472e0da63000)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0032bb1411e52bdffcfce9a797066a103c3c251d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
