@@ -146,7 +146,6 @@ static void port80_dump_buffer(void)
 					       " %02x", e);
 			if (++printed >= PORT80_CODES_PER_LINE) {
 				ccprintf("%s\n", buffer);
-				cflush();
 				printed = 0;
 				buf_offset = 0;
 			}
