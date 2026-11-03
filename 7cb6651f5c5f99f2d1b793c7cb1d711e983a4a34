@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e1748f0_a0c9b9da",
+        "filename": "zephyr/dts/bindings/battery/battery-smart.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-11-03T06:32:23Z",
+      "side": 0,
+      "message": "Why is the one remmoved?",
+      "revId": "7cb6651f5c5f99f2d1b793c7cb1d711e983a4a34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
