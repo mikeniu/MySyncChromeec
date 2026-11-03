@@ -77,6 +77,15 @@ if(DEFINED CONFIG_BOARD_OCELOTRVP_RTK)
 	zephyr_library_sources("src/rvp_usbc_runtime.c")
 endif()
 
+if(DEFINED CONFIG_BOARD_LIBRA)
+	project(libra)
+	zephyr_library_sources("libra/src/board.c")
+	zephyr_library_sources("libra/src/board_power.c")
+	zephyr_library_sources("libra/src/fan.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
+					"libra/src/keyboard_customization.c")
+endif()
+
 zephyr_include_directories("include/")
 
 zephyr_include_directories_ifdef(CONFIG_PLATFORM_EC_DEDICATED_CHARGE_PORT

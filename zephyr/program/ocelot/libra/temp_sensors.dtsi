@@ -1,0 +1,58 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/thermistor/thermistor.dtsi>
+
+/ {
+	temp_buck_ntc: buck-ntc {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&NTC_3V3_24K_100K_4250B>;
+		adc = <&adc_buck_ntc>;
+	};
+	temp_ddr_ntc: ddr-ntc {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&NTC_3V3_24K_100K_4250B>;
+		adc = <&adc_ddr_ntc>;
+	};
+	temp_charger_ntc: charger-ntc {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&NTC_3V3_24K_100K_4250B>;
+		adc = <&adc_charge_ntc>;
+	};
+	temp_ambient_ntc: ambient-ntc {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&NTC_3V3_24K_100K_4250B>;
+		adc = <&adc_ambient_ntc>;
+	};
+	temp_cpu_ntc: cpu-ntc {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&NTC_3V3_24K_100K_4250B>;
+		adc = <&adc_cpu_ntc>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+
+		temp_buck: buck {
+			sensor = <&temp_buck_ntc>;
+		};
+		temp_ddr: ddr {
+			sensor = <&temp_ddr_ntc>;
+		};
+		temp_charger: charger{
+			sensor = <&temp_charger_ntc>;
+		};
+		temp_ambient: ambient{
+			sensor = <&temp_ambient_ntc>;
+		};
+		temp_cpu: cpu {
+			sensor = <&temp_cpu_ntc>;
+		};
+	};
+};
+
+&NTC_3V3_24K_100K_4250B {
+	status = "okay";
+};
