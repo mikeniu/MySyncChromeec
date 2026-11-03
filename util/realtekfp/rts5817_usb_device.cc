@@ -228,6 +228,23 @@ uint16_t ParseDfuTransferSize(std::span<const uint8_t> extra) {
   return kDfuDefaultTransferSize;
 }
 
+std::span<const uint8_t> StripDfuSuffix(std::span<const uint8_t> firmware) {
+  if (firmware.size() < kDfuSuffixLen) {
+    return firmware;
+  }
+
+  const auto suffix = firmware.last(kDfuSuffixLen);
+  const size_t len = suffix[kDfuSuffixLenOff];
+
+  if (!std::ranges::equal(
+          suffix.subspan(kDfuSuffixSigOff, kDfuSuffixSig.size()),
+          kDfuSuffixSig) ||
+      len < kDfuSuffixLen || len > firmware.size()) {
+    return firmware;
+  }
+  return firmware.first(firmware.size() - len);
+}
+
 std::expected<DfuInterfaceInfo, RtsError> RtsUsbDevice::FindDfuInterface() {
   if (!backend_->IsOpen()) {
     return std::unexpected(RtsError::kDeviceNotFound);
