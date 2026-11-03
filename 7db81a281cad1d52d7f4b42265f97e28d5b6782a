@@ -44,6 +44,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a628667_9a3cd3bc",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 8
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: added util/realtekfp/.clang-format (BasedOnStyle: Google) and formatted the stack with the same clang-format that cros format uses; cros format --check is clean.",
+      "parentUuid": "5e7dab64_e84757c1",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 9999
+      },
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0cfc4b7d_2be502bd",
@@ -64,6 +88,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "929d8f84_5ca90154",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: everything is in namespace realtekfp, methods are PascalCase (accessors such as transfer_size() stay snake_case), header guards carry the REALTEKFP_ component, and comments use //. I kept the Rts prefix on the type names for now.",
+      "parentUuid": "0cfc4b7d_2be502bd",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
       "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -110,6 +158,48 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fa95109_15d9f0bb",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: added UsbDeviceId and used it for Open(), Init() and WaitForDevice().",
+      "parentUuid": "cffece57_7268ff46",
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13269589_190b6772",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: RtsUsbBackend::Init() and Open() return std::expected\u003cvoid, int\u003e, so a permission error is no longer reported as \"device not found\".",
+      "parentUuid": "04facf52_529d7aad",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 9999
+      },
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e855d03_2f2884d5",
@@ -124,6 +214,24 @@
       "side": 1,
       "message": "Prefer returning `std::string_view` instead of `const char*` here (`virtual std::string_view ErrorName(int error) const \u003d 0;`). Both `libusb_error_name()` and string literals in unit tests convert to `std::string_view` with zero allocation.",
       "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7c78160_5155ea70",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: ErrorName() returns std::string_view.",
+      "parentUuid": "2e855d03_2f2884d5",
       "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -152,6 +260,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3d33231_91d6ce38",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9 for rts5817_usb_device.cc, which now uses std::println. rts5817_flash.cc and rts5817_flash_cli.cc also use \u003cprint\u003e in their own changes.",
+      "parentUuid": "c0adbfc4_6f6ed3b7",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 9999
+      },
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b874b085_953e904a",
@@ -166,6 +298,24 @@
       "side": 1,
       "message": "Please use `std::chrono::milliseconds` instead of raw `int` millisecond counts for durations across this stack (matching `util/elan/iap_control.h`, `util/egis/usb_comm.h`, and `util/focaltech/usb_device.h`):\n- `using SleepFn \u003d std::function\u003cvoid(std::chrono::milliseconds)\u003e;`\n- `wait_for_device(uint16_t vid, uint16_t pid, std::chrono::milliseconds timeout, std::chrono::milliseconds poll_interval)` (lines 40–41)\n- `default_sleep(std::chrono::milliseconds delay)` (line 47 — `rts5817_usb_device.cc` already converts `ms` right back into `std::chrono::milliseconds(ms)`).",
       "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2594f36_2e67c6c3",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: SleepFn, WaitForDevice() and the timeouts use std::chrono::milliseconds; the later changes follow.",
+      "parentUuid": "b874b085_953e904a",
       "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -194,6 +344,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1ab2c45_9a0dc3b0",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: dropped default_sleep_ms() in favour of a default lambda argument.",
+      "parentUuid": "1183efb8_6e04b114",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 9999
+      },
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33968e1a_bc27185b",
@@ -214,6 +388,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "863f5a1d_2a98ea69",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:04:37Z",
+      "side": 1,
+      "message": "Done in ps9: added RtsError with a ToString() helper. Init() and WaitForDevice() return std::expected\u003cvoid, RtsError\u003e, and WaitForDevice() only retries while the device is absent, so an access error aborts immediately. The tests assert the specific errors.",
+      "parentUuid": "33968e1a_bc27185b",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 9999
+      },
       "revId": "7db81a281cad1d52d7f4b42265f97e28d5b6782a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
