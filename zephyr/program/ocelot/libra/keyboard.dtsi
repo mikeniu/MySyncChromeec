@@ -1,0 +1,201 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <zephyr/dt-bindings/input/keymap.h>
+
+/ {
+	chosen {
+		cros-ec,keyboard = &kbd;
+	};
+
+	kblight: kblight {
+		compatible = "cros-ec,kblight-pwm";
+		pwms = <&pwm1 PWM_CHANNEL_1 PWM_HZ(324) PWM_POLARITY_NORMAL>;
+	};
+
+};
+
+&vivaldi_kbd {
+	vivaldi-keys = <VIVALDI_KEYS_STRAUSS_T14>;
+
+	kbd_config_0: kbd-config-0 {
+		vivaldi-codes = <
+			VIVALDI_TK_BACK               /* T1 */
+			VIVALDI_TK_REFRESH            /* T2 */
+			VIVALDI_TK_FULLSCREEN         /* T3 */
+			VIVALDI_TK_OVERVIEW           /* T4 */
+			VIVALDI_TK_SNAPSHOT           /* T5 */
+			VIVALDI_TK_BRIGHTNESS_DOWN    /* T6 */
+			VIVALDI_TK_BRIGHTNESS_UP      /* T7 */
+			VIVALDI_TK_KBD_BKLIGHT_TOGGLE /* T8 */
+			VIVALDI_TK_DICTATE            /* T9 */
+			VIVALDI_TK_ACCESSIBILITY      /* T10 */
+			VIVALDI_TK_MICMUTE            /* T11 */
+			VIVALDI_TK_VOL_MUTE           /* T12 */
+			VIVALDI_TK_VOL_DOWN           /* T13 */
+			VIVALDI_TK_VOL_UP             /* T14 */
+		>;
+		capabilities = <(VIVALDI_KEYBD_CAP_FUNCTION_KEYS |
+				VIVALDI_KEYBD_CAP_SCRNLOCK_KEY |
+				VIVALDI_KEYBD_CAP_ASSISTANT_KEY)
+		>;
+	};
+};
+
+&kbd {
+	status = "okay";
+
+	pinctrl-0 = <
+		&ksi0_default
+		&ksi1_default
+		&ksi2_default
+		&ksi3_default
+		&ksi4_default
+		&ksi5_default
+		&ksi6_default
+		&ksi7_default
+		&kso0_default
+		&kso1_default
+		&kso3_default
+		&kso4_default
+		&kso5_default
+		&kso6_default
+		&kso7_default
+		&kso8_default
+		&kso9_default
+		&kso10_default
+		&kso11_default
+		&kso12_default
+		&kso13_default
+		&kso14_default
+		&kso15_default
+		&kso16_default
+		&kso17_default
+	>;
+        pinctrl-1 = <
+		&ksi0_sleep
+		&ksi1_sleep
+		&ksi2_sleep
+		&ksi4_sleep
+		&ksi5_sleep
+		&ksi6_sleep
+		&ksi7_sleep
+		&kso0_sleep
+		&kso1_sleep
+		&kso2_sleep
+		&kso3_sleep
+		&kso4_sleep
+		&kso5_sleep
+		&kso6_sleep
+		&kso7_sleep
+		&kso8_sleep
+		&kso9_sleep
+		&kso10_sleep
+		&kso11_sleep
+		&kso12_sleep
+		&kso13_sleep
+		&kso14_sleep
+		&kso15_sleep
+		&kso16_sleep
+		&kso17_sleep
+	>;
+	pinctrl-names = "default", "sleep";
+	row-size = <8>;
+	col-size = <18>;
+	kso-ignore-mask = <04>;
+	debounce-down-ms = <15>;
+	debounce-up-ms = <15>;
+	actual-key-mask = <
+		0x13  /* C0 */
+		0x47  /* C1 */
+		0x59  /* C2 */
+		0x3d  /* C3 */
+		0xfb  /* C4 */
+		0xa1  /* C5 */
+		0xa4  /* C6 */
+		0xf9  /* C7 */
+		0xad  /* C8 */
+		0xdd  /* C9 */
+		0xe5  /* C10 */
+		0x65  /* C11 */
+		0x4b  /* C12 */
+		0xe3  /* C13 */
+		0x0d  /* C14 */
+		0xb9  /* C15 */
+		0xbc  /* C16 */
+		0xc2  /* C17 */
+	>;
+
+	kso-gpio {
+		compatible = "cros-ec,col-gpio";
+		col-num = <2>;
+		col-gpios = <&gpioksol 2 GPIO_ACTIVE_LOW>;
+	};
+
+	boot-keys {
+		compatible = "cros-ec,boot-keys";
+		down-arrow-rc = <KBD_RC(5, 16)>;
+		esc-rc = <KBD_RC(1, 1)>;
+		left-shift-rc = <KBD_RC(1, 0)>;
+		refresh-rc = <KBD_RC(3, 2)>;
+	};
+
+	runtime-keys {
+		compatible = "cros-ec,runtime-keys";
+		left-alt-rc = <KBD_RC(6, 2)>;
+		right-alt-rc = <KBD_RC(0, 10)>;
+		h-rc = <KBD_RC(5, 11)>;
+		r-rc = <KBD_RC(7, 6)>;
+	};
+
+	fn-keys {
+		compatible = "cros-ec,fn-keys";
+
+		fn-rc = <KBD_RC(5, 16)>;
+		keymap = <
+			MATRIX_KEY(0, 2, KBD_SCANCODE_F1)
+			MATRIX_KEY(3, 2, KBD_SCANCODE_F2)
+			MATRIX_KEY(7, 15, KBD_SCANCODE_F3)
+			MATRIX_KEY(1, 13, KBD_SCANCODE_F4)
+			MATRIX_KEY(0, 9, KBD_SCANCODE_F5)
+			MATRIX_KEY(2, 3, KBD_SCANCODE_F6)
+			MATRIX_KEY(0, 7, KBD_SCANCODE_F7)
+			MATRIX_KEY(3, 12, KBD_SCANCODE_F8) 
+			MATRIX_KEY(0, 8, KBD_SCANCODE_F9)
+			MATRIX_KEY(4, 15, KBD_SCANCODE_F10)
+			MATRIX_KEY(0, 11, KBD_SCANCODE_F11)
+			MATRIX_KEY(0, 12, KBD_SCANCODE_F12)
+			MATRIX_KEY(6, 7, KBD_SCANCODE_F13)
+			MATRIX_KEY(6, 1, KBD_SCANCODE_F14) 
+
+			MATRIX_KEY(4, 2, KBD_SCANCODE_CAPSLOCK)
+		>;
+	};
+
+	scancode-set2 {
+		compatible = "cros-ec,scancode-set2";
+
+		default {
+			col0-codes  = <0x0043 0x0012 0x0000 0x0000 0xe014 0x0000 0x0000 0x0000>;
+			col1-codes  = <0x005b 0x0076 0x0014 0x0000 0x0000 0x0000 0x0037 0x0000>;
+			col2-codes  = <0x0005 0x0000 0x0000 0x0006 0x0058 0x0000 0x0011 0x0000>;
+			col3-codes  = <0x005d 0x0000 0x000b 0x004a 0x0026 0x0029 0x0000 0x0000>;
+			col4-codes  = <0x0031 0x004d 0x0000 0x004b 0x0061 0x003d 0x0025 0x001d>;
+			col5-codes  = <0x0066 0x0000 0x0000 0x0000 0x0000 0x0022 0x0000 0x0036>;
+			col6-codes  = <0x0000 0x0000 0x003e 0x0000 0x0000 0x001b 0x0000 0x002d>;
+			col7-codes  = <0x0083 0x0000 0x0000 0x002c 0x001c 0x003c 0x002f 0x0049>;
+			col8-codes  = <0x0001 0x0000 0x0034 0x004e 0x0000 0x0024 0x0000 0x0045>;
+			col9-codes  = <0x0003 0x0000 0x001e 0x0055 0x003b 0x0000 0x0041 0x001a>;
+			col10-codes = <0xe011 0x0000 0x0046 0x0000 0x0000 0x002b 0x004c 0x002a>;
+			col11-codes = <0x0078 0x0000 0xe075 0x0000 0x0000 0x0033 0x000e 0x0000>;
+			col12-codes = <0x0007 0x0044 0x0000 0x000a 0x0000 0x0000 0x0015 0x0000>;
+			col13-codes = <0x0035 0x000c 0x0000 0x0000 0x0000 0x003a 0x0052 0x0021>;
+			col14-codes = <0x0023 0x0000 0x0032 0x0016 0x0000 0x0000 0x0000 0x0000>;
+			col15-codes = <0xe06b 0x0000 0x0000 0xe01f 0x0009 0x000d 0x0000 0x0004>;
+			col16-codes = <0x0000 0x0000 0x0054 0x002e 0x0000 0xe072 0x0000 0x0042>;
+			col17-codes = <0x0000 0xe074 0x0000 0x0000 0x0000 0x0000 0x0059 0x005a>;
+		};
+	};
+};
