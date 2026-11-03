@@ -27,6 +27,7 @@
 #include "power_signals.dtsi"
 #include "thermal.dtsi"
 #include "usbc.dtsi"
+#include <coolum/overlay.dtsi>
 
 /*
  * Map GPIOs used for interrupts to common names
@@ -54,4 +55,20 @@ tach_fan0: &tach0 {};
 
 &sha0 {
 	status = "okay";
+};
+
+&spi0 {
+	status = "okay";
+	pinctrl-0 = <&spi_ssce0_default &spi_smosi_default>;
+	pinctrl-names = "default";
+
+	spi0_dev0: spi0_dev@0 {
+		reg = <0>;
+		chain-length = <4>;
+		reset-delay = <205>;
+		spi-max-frequency = <6000000>;
+		bits-per-symbol = <8>;
+		spi-one-frame = <0xF8>;
+		spi-zero-frame = <0xC0>;
+	};
 };

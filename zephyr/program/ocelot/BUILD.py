@@ -43,6 +43,7 @@ def register_it8xxx2_project(
     extra_kconfig_proj_files=(),
     boards=None,
     chip="it8xxx2/it82002aw",
+    extra_modules=()
 ):
     """Register an it8xxx2 based variant of ocelot."""
     if boards is None:
@@ -65,7 +66,7 @@ def register_it8xxx2_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis_6", "ec", "pigweed", "nanopb"],
+        modules=["cmsis_6", "ec", "pigweed", "nanopb"，*extra_modules],
         boards=boards,
     )
 
@@ -251,6 +252,7 @@ register_rtk59_project(
 register_it8xxx2_project(
     project_name="coolum",
     chip="it8xxx2/it82002bw",
+    extra_modules=["google-private", "pigweed", "nanopb"],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
