@@ -1,0 +1,176 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16fa531f_f00e84fb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "no tracking bug?",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 8
+      },
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f222dfb_44ef392a",
+        "filename": "common/panic_output.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "Did you remove `static` because of tests? Mark it `test_export_static` in panic_output.c and guard the declaration in panic.h with #ifdef TEST_BUILD so production firmware keeps static linkage and inlining.",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 34
+      },
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b549dfe4_5a866047",
+        "filename": "common/panic_output.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "nit: worth adding a comment why the SIZE has to be aligned (for future readers..)",
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34219c7c_da88c3f4",
+        "filename": "common/panic_output.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "(feel free to disregard) for extra safety I would add a compile-time check that CONFIG_PANIC_DATA_SIZE is bigger than PANIC_DATA_MIN_SIZE and is a multiple of 4",
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e54e5045_ec9c5fd2",
+        "filename": "include/panic.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "a tracking bug would help here",
+      "range": {
+        "startLine": 37,
+        "startChar": 3,
+        "endLine": 37,
+        "endChar": 7
+      },
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0906413_b8ae221e",
+        "filename": "zephyr/test/drivers/panic/src/panic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "nit: conventions for multi-line comments require a new line here",
+      "range": {
+        "startLine": 156,
+        "startChar": 1,
+        "endLine": 156,
+        "endChar": 6
+      },
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "098e164d_781a9068",
+        "filename": "zephyr/test/drivers/panic_output/src/panic_output_get_panic_data_write.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "nit: conventions for multi-line comments require a new line here",
+      "range": {
+        "startLine": 250,
+        "startChar": 1,
+        "endLine": 250,
+        "endChar": 6
+      },
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2633dbbe_b506dcb4",
+        "filename": "zephyr/test/jump_data/src/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T00:32:25Z",
+      "side": 1,
+      "message": "nit: conventions for multi-line comments require a new line here",
+      "range": {
+        "startLine": 462,
+        "startChar": 1,
+        "endLine": 462,
+        "endChar": 5
+      },
+      "revId": "a7148cb63331ff8359d6d50422e570b321a348aa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
