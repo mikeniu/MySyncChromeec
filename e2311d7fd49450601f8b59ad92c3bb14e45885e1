@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "e2311d7fd49450601f8b59ad92c3bb14e45885e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f72fc846_d53f5a27",
+        "filename": "zephyr/drivers/keyboard_input/col_gpio_drive.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-11-03T12:40:05Z",
+      "side": 1,
+      "message": "not sure why I follow the new logic, it\u0027s odd to initialize this at every call to false but then have a case that falls back unconditionally and compare with the actual saved state, really can\u0027t wrap my head aroud it but anyway - wouldn\u0027t it be simpler to move the `gpio_pin_set_dt` function inside this block as `gpio_pin_set_dt(\u0026cfg-\u003egpio, state);`? then it just gets called when the state changes and that\u0027s it.\n\nThen you could even change the condition above as `state \u003d\u003d col \u003d\u003d INPUT_KBD_MATRIX_COLUMN_DRIVE_ALL || col \u003d\u003d cfg-\u003ecol` if you really fancy and this becomes super compact",
+      "revId": "e2311d7fd49450601f8b59ad92c3bb14e45885e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
