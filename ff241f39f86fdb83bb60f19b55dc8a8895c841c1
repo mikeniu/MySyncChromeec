@@ -206,6 +206,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "baa6eab4_f1d5e621",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-03T08:46:45Z",
+      "side": 1,
+      "message": "Yes, IT5272 is such a case: two port instances share one chip. It will need interface for per-port coordination. This series targets IT5271, where each instance represents a separate chip, so suspension remains per-instance here.",
+      "parentUuid": "2a04ec2d_dd90099e",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0aa261f7_505a28f5",
@@ -372,6 +390,24 @@
       "side": 1,
       "message": "Ack. I presume you are leaving it here because this function wouldn\u0027t make sense without checking it?",
       "parentUuid": "28d8f8c4_36004ebb",
+      "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6aa331f9_7afcbbff",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-11-03T08:46:45Z",
+      "side": 1,
+      "message": "The `init_done` check is necessary for this helper. I\u0027ve now moved the entire `transition_to_init_or_idle_state()` helper to CL:8336672, where it is first called, so its definition and usage can be reviewed together.",
+      "parentUuid": "a6ce2797_cf317265",
       "revId": "ff241f39f86fdb83bb60f19b55dc8a8895c841c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
