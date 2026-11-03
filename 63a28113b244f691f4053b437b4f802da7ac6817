@@ -25,6 +25,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ef3ba4d_fc9959cb",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: added --cflags libusb-1.0 for rts5817_flash, and -fvisibility\u003dhidden for both rts5817_flash and the test binary.",
+      "parentUuid": "f8433aae_4051cf62",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9999
+      },
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83720b3b_71d7cb1f",
@@ -39,6 +63,24 @@
       "side": 1,
       "message": "Nit: Update copyright year from `2025` to `2026` (matching the other new files in this stack), and apply `//` comments + `cros format` here as well.",
       "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "575a456f_e51a4c45",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: copyright year is 2026, comments use //, and the files are formatted with cros format.",
+      "parentUuid": "83720b3b_71d7cb1f",
       "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -67,6 +109,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d4ff918_b6ef5c5d",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: the detach, re-enumeration and poll durations are std::chrono::milliseconds, and DfuDetach() takes a std::chrono::milliseconds and rejects values that do not fit the 16-bit wValue.",
+      "parentUuid": "af812d7e_82099935",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 9999
+      },
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5981de2b_3d82774f",
@@ -87,6 +153,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53ab71ed_2e730002",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: ParseArgs() fails on a malformed -p, so the tool no longer falls back to the default device, and an empty payload (including a file that is only a DFU suffix) is rejected right after the suffix is stripped, before the USB is touched.",
+      "parentUuid": "5981de2b_3d82774f",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 9999
+      },
       "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -115,6 +205,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3226db59_b17ad9a6",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: without -p the tool tries 0BDA:5817 and then 0BDA:5800. A device that is already in DFU mode skips EnableDownload(), DfuDetach() and the first WaitForDevice() and goes straight to DfuDownload(). A device that exists but cannot be opened is reported as access denied rather than falling back. The sequence is in rts5817_flasher.cc and covered by FlasherTest against a simulated device.",
+      "parentUuid": "0fabe15c_05951fb3",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 9999
+      },
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d441b8bb_b3a3db17",
@@ -135,6 +249,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87e891a5_7197a1fa",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: DfuDownload() sends DFU_DETACH after manifest (see 8629987), and the tool then waits for the device to re-enumerate as 0BDA:5817 before reporting success.",
+      "parentUuid": "d441b8bb_b3a3db17",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 9999
+      },
       "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -163,6 +301,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc547ee3_e6896f45",
+        "filename": "util/realtekfp/rts5817_libusb_backend.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: Open() enumerates with libusb_get_device_list() and libusb_open(), so LIBUSB_ERROR_ACCESS is returned straight away instead of the tool polling for the full timeout.",
+      "parentUuid": "8a058e59_f3a55fcf",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 9999
+      },
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ebe1294c_d8f726d5",
@@ -183,6 +345,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f99093e5_d5792a40",
+        "filename": "util/realtekfp/rts5817_libusb_backend.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: the config descriptor is held in a std::unique_ptr filled through std::out_ptr, and the interface and altsetting arrays are walked with std::span.",
+      "parentUuid": "ebe1294c_d8f726d5",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 9999
+      },
       "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -211,6 +397,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "691d4773_820e9524",
+        "filename": "util/realtekfp/rts5817_libusb_backend.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6: PLATFORM_EC_UTIL_REALTEKFP_RTS5817_LIBUSB_BACKEND_H_ guard, namespace realtekfp, PascalCase methods, and cros format.",
+      "parentUuid": "81c70059_c1587ccd",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7c48de1_ad8857c8",
@@ -231,6 +441,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d41524c0_d42fd6d5",
+        "filename": "util/realtekfp/rts5817_libusb_backend.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:09:54Z",
+      "side": 1,
+      "message": "Done in ps6, with one difference: the context and handle are held in std::unique_ptr with a deleter, with ctx_ declared first so the handle closes before libusb_exit, and the destructor is defaulted. CDeleter is a named struct template with operator() rather than a decltype lambda: a lambda type has internal linkage, so a class in a header holding it triggers -Wsubobject-linkage with g++. std::out_ptr is used as suggested.",
+      "parentUuid": "f7c48de1_ad8857c8",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
       "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
