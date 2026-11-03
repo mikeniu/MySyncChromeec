@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c832ca4d_5c74f642",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-11-03T08:12:52Z",
+      "side": 1,
+      "message": "Please add functions like power sequence, charging, usbc,..., individually.",
+      "revId": "d0054606dd09f7879b69de1a3fd1ed1727c675bf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
