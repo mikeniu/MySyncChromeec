@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0367645b_a70fb74b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T01:19:17Z",
+      "side": 1,
+      "message": "please add a tracking bug",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 8
+      },
+      "revId": "7bc0de49da6b8b624cf36aa2cfe90a5ae1214acd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf231af3_eb1b354a",
+        "filename": "common/panic_output.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 576,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T01:19:17Z",
+      "side": 1,
+      "message": "this check is redundant, after the check on line 553 we know for sure that `flags` is not NULL",
+      "range": {
+        "startLine": 576,
+        "startChar": 3,
+        "endLine": 576,
+        "endChar": 14
+      },
+      "revId": "7bc0de49da6b8b624cf36aa2cfe90a5ae1214acd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f77dd94_6e3a4d3e",
+        "filename": "common/panic_output.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-11-03T01:19:17Z",
+      "side": 1,
+      "message": "same here, right?",
+      "range": {
+        "startLine": 584,
+        "startChar": 5,
+        "endLine": 584,
+        "endChar": 10
+      },
+      "revId": "7bc0de49da6b8b624cf36aa2cfe90a5ae1214acd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
