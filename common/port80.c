@@ -39,10 +39,17 @@ static int scroll;
 /* Required buffer size for port80 output.
  *   number nibbles per code (2 * port80_code_t size)
  *   1 space
- *   1 trailing NUL
+ *   trailing " <--new\n" and NUL
  */
-#define PORT80_LINE_LENGTH \
-	((PORT80_CODES_PER_LINE * ((2 * sizeof(port80_code_t)) + 1)) + 1)
+#define PORT80_LINE_LENGTH                                             \
+	((PORT80_CODES_PER_LINE * ((2 * sizeof(port80_code_t)) + 1)) + \
+	 sizeof(" <--new\n"))
+
+/*
+ * Maximum bytes appended in a single loop iteration ("\n(S3->S0)\n" or
+ * " %08x\n" = 10 chars) plus the trailing " <--new\n" (8 chars) and NUL.
+ */
+#define PORT80_MAX_STEP_LEN (10 + sizeof(" <--new\n"))
 
 static int print_in_int = CONFIG_PORT80_PRINT_IN_INT;
 
@@ -120,44 +127,45 @@ static void port80_dump_buffer(void)
 	else
 		tail = 0;
 
-	ccputs("Port 80 writes:\n");
+	buf_offset = snprintf(buffer, sizeof(buffer), "Port 80 writes:\n");
 	for (i = tail; i < head; i++) {
 		int e = history[i % ARRAY_SIZE(history)];
+
+		if (sizeof(buffer) - buf_offset < PORT80_MAX_STEP_LEN) {
+			ccprintf("%s", buffer);
+			buf_offset = 0;
+		}
+
 		switch (e) {
 		case PORT_80_EVENT_RESUME:
-			if (buf_offset != 0) {
-				ccprintf("%s\n", buffer);
-				printed = 0;
-				buf_offset = 0;
-			}
-			ccputs("(S3->S0)\n");
+			buf_offset += snprintf(&buffer[buf_offset],
+					       sizeof(buffer) - buf_offset,
+					       "%s(S3->S0)\n",
+					       printed ? "\n" : "");
+			printed = 0;
 			break;
 		case PORT_80_EVENT_RESET:
-			if (buf_offset != 0) {
-				ccprintf("%s\n", buffer);
-				printed = 0;
-				buf_offset = 0;
-			}
-			ccputs("(RESET)\n");
+			buf_offset += snprintf(&buffer[buf_offset],
+					       sizeof(buffer) - buf_offset,
+					       "%s(RESET)\n",
+					       printed ? "\n" : "");
+			printed = 0;
 			break;
 		default:
 			buf_offset += snprintf(&buffer[buf_offset],
 					       sizeof(buffer) - buf_offset,
 					       " %02x", e);
 			if (++printed >= PORT80_CODES_PER_LINE) {
-				ccprintf("%s\n", buffer);
+				buffer[buf_offset++] = '\n';
+				buffer[buf_offset] = '\0';
 				printed = 0;
-				buf_offset = 0;
 			}
 			last_e = e;
 		}
 	}
 
-	if (buf_offset != 0) {
-		ccprintf("%s <--new\n", buffer);
-	} else {
-		ccputs(" <--new\n");
-	}
+	snprintf(&buffer[buf_offset], sizeof(buffer) - buf_offset, " <--new\n");
+	ccprintf("%s", buffer);
 
 	/* Displaying last port80 msg on 7-segment if it is enabled */
 	if (IS_ENABLED(CONFIG_SEVEN_SEG_DISPLAY) && last_e >= 0)
