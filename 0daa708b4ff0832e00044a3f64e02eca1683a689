@@ -28,6 +28,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7606eaca_5f8afaf1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Not split as suggested. Instead the change was reduced: DfuRequest and DfuSendRequest() moved into the DFU_DETACH change (8656278), the DFU_GETSTATUS decoder moved into the parser change (8687497), and the recovery of an interrupted transfer is now its own change (8713342). The production diff here is about 240 lines. The status helpers stay here because DfuDownload() is their only caller and they are private.",
+      "parentUuid": "c9f412bd_4e8416f7",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e6b383c8_64356b99",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 7
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n- **Functionality:** ❌ A couple of DFU state-machine edge cases need attention in `util/realtekfp/rts5817_usb_device.cc`:\n  - In `DfuRecoverToIdle()` (lines 397–422), when the device starts in a busy download state (`kDfuDnloadSync` or `kDfuDnloadBusy`), calling `DfuPollIdle()` in `default:` immediately issues a second `DFU_GETSTATUS` without sleeping the initial `poll_timeout`, and when the in-flight block finishes in `kDfuDnloadIdle`, `DfuRecoverToIdle()` returns `{}` without sending `DFU_ABORT`—leaving the device in `dfuDNLOAD-IDLE` instead of `dfuIDLE`.\n  - In `DfuDownload()` (lines 487–492), verify `*idle \u003d\u003d DfuState::kDfuDnloadIdle` after each data block.\n- **Architecture \u0026 Component Fit:** ❌ `RtsUsbBackend::ResetDevice()` (`rts5817_usb_backend.h:86`, `rts5817_mock_usb_backend.h:43`) modifies the transport interface in the `RtsUsbDevice` CL and is only called in `DfuPollIdle()` on `kDfuManifestWaitReset`—a state that manifestation-tolerant RTS5817 (`bmAttributes \u003d 0x0F`) never enters and that `DfuDownload()` immediately rejects as `RtsError::kProtocolError` anyway (after `ResetDevice()` has already invalidated the handle still held by `InterfaceClaim`). Dropping `case kDfuManifestWaitReset:` from `DfuPollIdle()` eliminates `ResetDevice()` from `RtsUsbBackend` and `MockRtsUsbBackend`.\n- **Code Simplicity:** ❌\n  - Remove the unused `#include \u003cvector\u003e` added to `rts5817_usb_device.h` (line 21) and unused `#include \u003cinitializer_list\u003e` added to `rts5817_usb_device_test.cc` (line 17).\n  - Use typed `DfuStatus` and `DfuState` fields on `DfuStatusResponse` to avoid repeated `static_cast\u003cDfuState\u003e` and `std::to_underlying(...)` conversions across callers.\n  - Fold `DfuReportStatus()` into `DfuClearIfInError()` so a stalled final ZLP does not issue two back-to-back `DFU_GETSTATUS` requests, delete the single-line `DfuClearStatus()` / `DfuAbort()` wrappers in favor of `DfuSendRequest()`, and simplify the `delay` clamping in `DfuPollIdle()` with `std::max`.\n- **Idiomaticity \u0026 Readability:** ❌ In `util/realtekfp/rts5817_usb_device_test.cc`, prefer `std::ranges::fill(data, 0)` over `std::fill(data.begin(), data.end(), 0)` (line 704) and assert the exact `fake_.requests` vector in `DetachesAfterManifestSoDeviceBoots` instead of `std::count(fake_.requests.begin(), fake_.requests.end(), ...)` (lines 1002–1004).\n- **Security:** ✅ Bounds, block counts (`UINT16_MAX`), and short-transfer return values are properly validated.\n- **Testing:** ❌\n  - Replace the `for` loop and weak `EXPECT_LE` assertion in `TimesOutWhenDeviceStaysBusy` (lines 1090–1103) with a larger `poll_timeout` and an exact `EXPECT_EQ` on `slept_` that verifies both normal polling and `kUsbDfuTimeout - slept` clamping.\n  - Replace wildcard `_` matchers on contract arguments in `FakeDfuDevice::Attach`, `ShortWriteIsAnError`, `DetachFailureIsReported`, `FailsWhenRecoveryStatusReadFails`, and `ReportsShortStatusRead`.\n  - Add coverage for `ToString(RtsError::kDeviceRejected)`, `poll_timeout \u003d\u003d 0` (`kDfuMinPollDelay`), `status \u003d\u003d kOk \u0026\u0026 state \u003d\u003d kDfuError` in `DfuPollIdle()`, and `DfuRecoverToIdle()` when recovering from a busy download state.\n- **CL Size \u0026 Scope:** ❌ `Size: L (+874, -41)` (`+393, -25` \u003d 418 production lines across `rts5817_usb_backend.h`, `rts5817_usb_device.h`, and `rts5817_usb_device.cc`, plus `+481, -16` \u003d 497 test/mock lines in `rts5817_mock_usb_backend.h` and `rts5817_usb_device_test.cc`). Because the production diff exceeds the 250-line limit and bundles the DFU status/recovery helpers and `DfuDetach`/`Release` refactoring back into the `DfuDownload` CL, please split this CL (or move the status/recovery helpers back into the parent CL in the series):\n  1. **CL 1 (DFU status polling, recovery helpers, \u0026 `DfuDetach` cleanup — or fold into parent CL 8637072):** Add `DfuRequest`, `DfuStatus`, `DfuState`, `DfuStatusResponse::FromBytes`, `RtsError::kDeviceRejected`, `DfuSendRequest`, `DfuGetStatus`, `DfuPollIdle`, `DfuRecoverToIdle`, and `DfuClearIfInError`, update `DfuDetach` and `Release` to drop cached `dfu_interface_`/`transfer_size_`, and include the status/recovery unit tests.\n  2. **CL 2 (This CL — `RtsUsbDevice::DfuDownload`):** Add `kDfuProgressStepPct` and `RtsUsbDevice::DfuDownload` in `rts5817_usb_device.{h,cc}` along with `RtsUsbDeviceDownloadTest` in `rts5817_usb_device_test.cc`.\n- **Commit Message:** ❌ The commit message describes `DfuDownload` only, whereas Patchset 7 also bundles the DFU status/recovery helpers and `DfuDetach`/`Release` refactoring. See inline comment on `/COMMIT_MSG` for copy-pasteable commit messages for the split CLs.",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c49b4d64_4517dc25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Addressed in ps8 with a different split, see the reply on the COMMIT_MSG thread. ResetDevice() is removed, DfuStatusResponse has typed fields, the thin wrappers are gone, per-block polling requires dfuDNLOAD-IDLE, and the DfuRecoverToIdle() fixes are in 8713342. Tests added or tightened as listed in the inline replies.",
+      "parentUuid": "e6b383c8_64356b99",
       "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96f8864d_ff232c9a",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Done in ps8: ResetDevice() is removed from RtsUsbBackend and the mock, dfuMANIFEST-WAIT-RESET falls into the default arm (kProtocolError), and ResetsDeviceWhenItRequestsOneAfterManifest is replaced by RejectsManifestWaitResetState.",
+      "parentUuid": "45e242e8_31da1117",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 9999
+      },
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc714793_01a5bd63",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64e1b584_247c6428",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Done in ps8: DfuPollIdle() uses the typed status and state, std::max for the minimum poll delay, and no duration_cast.",
+      "parentUuid": "fc714793_01a5bd63",
+      "range": {
+        "startLine": 311,
+        "startChar": 0,
+        "endLine": 372,
+        "endChar": 9999
+      },
       "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -122,6 +212,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d6eac6a6_eb9ba373",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Done in ps8 for the single DFU_GETSTATUS in DfuClearIfInError() (DfuReportStatus, DfuClearStatus and DfuAbort are removed) and for the per-block check that polling settles in dfuDNLOAD-IDLE. The DfuRecoverToIdle() busy-state fixes (sleep the poll interval, ABORT after settling in dfuDNLOAD-IDLE) are in 8713342, where that function now lives.",
+      "parentUuid": "d80c527e_72157946",
+      "range": {
+        "startLine": 374,
+        "startChar": 0,
+        "endLine": 422,
+        "endChar": 9999
+      },
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6f6279c7_ff3b7624",
         "filename": "util/realtekfp/rts5817_usb_device.h",
         "patchSetId": 7
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e487e39_f4a1cee8",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Done in ps8: both unused includes are removed.",
+      "parentUuid": "6f6279c7_ff3b7624",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 9999
+      },
       "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -170,6 +308,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba5c46c3_23568765",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Done in ps8: DfuStatusResponse holds DfuStatus and DfuState (decoded in 8687497), the wrappers are removed, and RtsError::kDeviceRejected is covered in ToStringCoversAllValues.",
+      "parentUuid": "71c60db7_29391118",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 9999
+      },
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a493576_c756baf8",
@@ -195,6 +357,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8819f051_5df207f8",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Done in ps8: std::ranges::fill, exact contract arguments in FakeDfuDevice::Attach(), and poll_timeout and error_on_fail fields.",
+      "parentUuid": "5a493576_c756baf8",
+      "range": {
+        "startLine": 656,
+        "startChar": 0,
+        "endLine": 755,
+        "endChar": 9999
+      },
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75334c86_9e697d1e",
@@ -216,6 +402,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b7161f9_afcb4919",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 1103,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:24Z",
+      "side": 1,
+      "message": "Done in ps8: TimesOutWhenDeviceStaysBusy asserts the exact sleeps without a loop, DetachesAfterManifestSoDeviceBoots compares the exact request sequence, the wildcard matchers are replaced with exact arguments, error_on_fail is used, and UsesMinPollDelayWhenPollTimeoutIsZero and FailsWhenDeviceEntersErrorStateWithOkStatus are added. The busy-recovery test (AbortsAfterBusyRecoverySettlesInDnloadIdle) is in 8713342.",
+      "parentUuid": "75334c86_9e697d1e",
+      "range": {
+        "startLine": 909,
+        "startChar": 0,
+        "endLine": 1103,
+        "endChar": 9999
+      },
       "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
