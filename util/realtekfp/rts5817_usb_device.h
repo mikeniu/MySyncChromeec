@@ -89,6 +89,7 @@ enum class DfuRequest : uint8_t {
   kDownload = 0x01,
   kGetStatus = 0x03,
   kClrStatus = 0x04,
+  kAbort = 0x06,
 };
 
 // DFU_GETSTATUS response: bStatus, bwPollTimeout[3], bState, iString.
@@ -266,6 +267,10 @@ class RtsUsbDevice {
   // Polls DFU_GETSTATUS until the device is no longer busy and returns the
   // state it settled in: dfuIDLE or dfuDNLOAD-IDLE.
   std::expected<DfuState, RtsError> DfuPollIdle(int interface);
+
+  // Brings a device left in a non-idle state by an earlier, interrupted
+  // transfer back to dfuIDLE.
+  std::expected<void, RtsError> DfuRecoverToIdle(int interface);
 
   // Clears the error state after a failed transfer, but only if the device is
   // in dfuERROR: CLRSTATUS anywhere else makes the RTS5817 stall and enter it.

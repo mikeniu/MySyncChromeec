@@ -371,6 +371,38 @@ void RtsUsbDevice::DfuClearIfInError(int interface) {
   }
 }
 
+std::expected<void, RtsError> RtsUsbDevice::DfuRecoverToIdle(int interface) {
+  auto status = DfuGetStatus(interface);
+  if (!status) {
+    return std::unexpected(status.error());
+  }
+
+  if (status->state == DfuState::kDfuError) {
+    // CLRSTATUS is only valid here.
+    return DfuSendRequest(DfuRequest::kClrStatus, 0, interface);
+  }
+  if (status->state == DfuState::kDfuUploadIdle) {
+    return DfuSendRequest(DfuRequest::kAbort, 0, interface);
+  }
+
+  // Busy or otherwise unexpected: honour the reported poll interval, then let
+  // the device settle.
+  DfuState settled = status->state;
+  if (settled != DfuState::kDfuIdle && settled != DfuState::kDfuDnloadIdle) {
+    sleep_(std::min(std::max(status->poll_timeout, kDfuMinPollDelay),
+                    std::chrono::milliseconds(kUsbDfuTimeout)));
+    auto idle = DfuPollIdle(interface);
+    if (!idle) {
+      return std::unexpected(idle.error());
+    }
+    settled = *idle;
+  }
+  if (settled == DfuState::kDfuDnloadIdle) {
+    return DfuSendRequest(DfuRequest::kAbort, 0, interface);
+  }
+  return {};
+}
+
 std::expected<void, RtsError> RtsUsbDevice::DfuDownload(
     std::span<const uint8_t> firmware) {
   if (firmware.empty()) {
@@ -399,6 +431,11 @@ std::expected<void, RtsError> RtsUsbDevice::DfuDownload(
   InterfaceClaim claim(*backend_, interface);
   if (auto claimed = claim.Claim(); !claimed) {
     return Fail(*backend_, "Claiming the DFU interface", claimed.error());
+  }
+
+  // An earlier interrupted transfer may have left the device mid-download.
+  if (auto recovered = DfuRecoverToIdle(interface); !recovered) {
+    return recovered;
   }
 
   std::println("Flashing {} bytes ({}-byte blocks)...", firmware.size(),

@@ -784,6 +784,9 @@ class FakeDfuDevice {
         state = DfuState::kDfuIdle;
         status = 0;
         return size_t{0};
+      case DfuRequest::kAbort:
+        state = DfuState::kDfuIdle;
+        return size_t{0};
       default:
         return size_t{0};
     }
@@ -927,6 +930,7 @@ TEST_F(RtsUsbDeviceDownloadTest, WaitsThroughBusyStatesWithPollTimeout) {
   fake_.busy_polls = 2;
 
   EXPECT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  // Once while recovering before the download, once while polling.
   EXPECT_EQ(slept_,
             (std::vector<milliseconds>{milliseconds(5), milliseconds(5)}));
 }
@@ -1044,6 +1048,56 @@ TEST_F(RtsUsbDeviceDownloadTest, DetachFailureIsReported) {
   EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
 }
 
+// The states a previous, interrupted transfer can leave the device in.
+TEST_F(RtsUsbDeviceDownloadTest, RecoversFromErrorStateBeforeDownloading) {
+  fake_.state = DfuState::kDfuError;
+  fake_.status = std::to_underlying(DfuStatus::kNotDone);
+
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  ASSERT_FALSE(fake_.requests.empty());
+  EXPECT_EQ(fake_.requests.front(), DfuRequest::kClrStatus);
+  EXPECT_EQ(fake_.state_when_cleared,
+            (std::vector<DfuState>{DfuState::kDfuError}));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, AbortsLeftoverDownloadBeforeDownloading) {
+  fake_.state = DfuState::kDfuDnloadIdle;
+
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  ASSERT_FALSE(fake_.requests.empty());
+  EXPECT_EQ(fake_.requests.front(), DfuRequest::kAbort);
+  EXPECT_TRUE(fake_.state_when_cleared.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, AbortsLeftoverUploadBeforeDownloading) {
+  fake_.state = DfuState::kDfuUploadIdle;
+
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  ASSERT_FALSE(fake_.requests.empty());
+  EXPECT_EQ(fake_.requests.front(), DfuRequest::kAbort);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, LeavesIdleDeviceAloneBeforeDownloading) {
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  ASSERT_FALSE(fake_.requests.empty());
+  EXPECT_EQ(fake_.requests.front(), DfuRequest::kDownload);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWhenRecoveryStatusReadFails) {
+  EXPECT_CALL(*backend_,
+              ControlTransferIn(kBmReqD2hClsIf,
+                                std::to_underlying(DfuRequest::kGetStatus), 0,
+                                kDfuIf, SizeIs(kDfuGetStatusResponseLen),
+                                milliseconds(kUsbDfuTimeout)))
+      .WillOnce(Return(std::unexpected(kUsbErrorNoDevice)));
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
+  EXPECT_TRUE(fake_.blocks.empty());
+}
+
 TEST_F(RtsUsbDeviceDownloadTest, ReportsShortStatusRead) {
   EXPECT_CALL(*backend_,
               ControlTransferIn(kBmReqD2hClsIf,
@@ -1070,8 +1124,10 @@ TEST_F(RtsUsbDeviceDownloadTest, RejectsManifestWaitResetState) {
 }
 
 TEST_F(RtsUsbDeviceDownloadTest, TimesOutWhenDeviceStaysBusy) {
+  // The first busy reply is consumed by the recovery check before the
+  // download; the other three are polled until the overall timeout.
   fake_.poll_timeout = milliseconds(25000);
-  fake_.busy_polls = 3;
+  fake_.busy_polls = 4;
 
   auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
 
@@ -1079,6 +1135,7 @@ TEST_F(RtsUsbDeviceDownloadTest, TimesOutWhenDeviceStaysBusy) {
   EXPECT_EQ(res.error(), RtsError::kTimeout);
   // The last sleep is clamped so the total is exactly kUsbDfuTimeout.
   EXPECT_EQ(slept_, (std::vector<milliseconds>{
+                        milliseconds(25000),
                         milliseconds(25000),
                         milliseconds(25000),
                         milliseconds(10000),
@@ -1100,6 +1157,15 @@ TEST_F(RtsUsbDeviceDownloadTest, FailsWhenDeviceEntersErrorStateWithOkStatus) {
 
   ASSERT_FALSE(res);
   EXPECT_EQ(res.error(), RtsError::kDeviceRejected);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, AbortsAfterBusyRecoverySettlesInDnloadIdle) {
+  fake_.busy_polls = 1;
+  fake_.state = DfuState::kDfuDnloadIdle;
+
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  ASSERT_FALSE(fake_.requests.empty());
+  EXPECT_EQ(fake_.requests.front(), DfuRequest::kAbort);
 }
 
 TEST(DfuStatusResponseTest, Decodes24BitLittleEndianPollTimeout) {
