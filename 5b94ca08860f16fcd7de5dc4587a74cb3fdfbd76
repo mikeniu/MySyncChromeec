@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "548ec5b5_9f51cdbf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in ps8 as suggested: the libusb backend (8713343), the flashing sequence (8713344) and this change (the CLI) are now three changes. Each inline comment is answered below.",
+      "parentUuid": "820fc53b_115c6290",
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7050fd9_956a7e8e",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71c31740_3b2178d6",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in 8713343: rts5817_libusb_backend.o is linked into rts5817_flash_test with libusb-1.0 flags, and rts5817_libusb_backend_test.cc covers the unopened and uninitialized guard paths and ErrorName().",
+      "parentUuid": "f7050fd9_956a7e8e",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
       "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "716e588a_574ad97a",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in ps8: Report() and its namespace are inlined, and suffix stripping and the empty check moved into Flash() (8713344), so the extra includes are gone.",
+      "parentUuid": "c0a8337a_21c26730",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b2e89259_5067e0ee",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8491f67b_2828e060",
+        "filename": "util/realtekfp/rts5817_flasher.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in 8713344: Flash() strips the DFU suffix and rejects an empty payload before opening the device, and dfu_id is declared inside the branch that uses it.",
+      "parentUuid": "b2e89259_5067e0ee",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 9999
+      },
       "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -120,6 +210,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "945bf228_9767e5a7",
+        "filename": "util/realtekfp/rts5817_flasher.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in 8713344: kDetachTimeout, kReEnumTimeout and kReEnumPollInterval are inline constexpr in rts5817_flasher.h.",
+      "parentUuid": "03affd5a_5851ce2c",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db9b4450_01688dc1",
@@ -141,6 +255,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "337ae2b6_c5cfd7f9",
+        "filename": "util/realtekfp/rts5817_flasher_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in 8713344: unused include, using declaration and FakeBus counters are removed, and std::ranges::fill and std::ranges::contains are used.",
+      "parentUuid": "db9b4450_01688dc1",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
       "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -170,6 +308,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "597ca8d0_12173a19",
+        "filename": "util/realtekfp/rts5817_flasher_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in 8713344: exact sleep assertions, both sides of the re-enumeration timeout boundary derived from kReEnumTimeout / kReEnumPollInterval, and tests for EnableDownload() failure, DfuDetach() failure, suffix stripping and empty or suffix-only images.",
+      "parentUuid": "8ffd3f6a_afb813f7",
+      "range": {
+        "startLine": 294,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 9999
+      },
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0978158_36651814",
@@ -191,6 +353,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4aafef64_8692ae9f",
+        "filename": "util/realtekfp/rts5817_libusb_backend.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in 8713343: std::out_ptr in Open(), a single unnamed namespace, FreeDeviceList() without the null check, and static_asserts tying the kUsbError constants to LIBUSB_ERROR_*.",
+      "parentUuid": "a0978158_36651814",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 9999
+      },
       "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

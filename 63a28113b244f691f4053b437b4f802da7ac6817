@@ -467,6 +467,30 @@
       },
       "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ce2ceed_426fa8f7",
+        "filename": "util/realtekfp/rts5817_libusb_backend.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:39:06Z",
+      "side": 1,
+      "message": "Done in ps6, now in 8713343. CDeleter is a named struct template rather than a lambda because a lambda type has internal linkage and triggers -Wsubobject-linkage with g++ when held by a class in a header.",
+      "parentUuid": "d41524c0_d42fd6d5",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 9999
+      },
+      "revId": "63a28113b244f691f4053b437b4f802da7ac6817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
