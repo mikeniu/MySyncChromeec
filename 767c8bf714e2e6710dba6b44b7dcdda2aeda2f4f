@@ -111,6 +111,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5e2b8cb_38909415",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "The empty firmware, zero transfer size and claim-failure cases were done earlier. The std::span signature change is now done as well in ps6, as requested in the other threads.",
+      "parentUuid": "240b292a_1f1766d1",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 503,
+        "endChar": 9999
+      },
+      "revId": "767c8bf714e2e6710dba6b44b7dcdda2aeda2f4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4629de58_600cf201",

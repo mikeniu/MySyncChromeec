@@ -38,6 +38,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a8f25fd_319be141",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: DfuDownload() takes std::span\u003cconst uint8_t\u003e and slices blocks with first()/subspan(). The \u003cvector\u003e include is gone from the header.",
+      "parentUuid": "211f7471_e77cc65c",
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "add335de_fc4cb99a",
@@ -58,6 +76,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f69a498_c2aab194",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: images that need 65535 blocks or more are rejected before anything is sent (the ZLP is numbered after the last data block). Tests cover 65534 blocks (accepted) and 65535 (rejected).",
+      "parentUuid": "add335de_fc4cb99a",
+      "range": {
+        "startLine": 359,
+        "startChar": 0,
+        "endLine": 362,
+        "endChar": 9999
+      },
       "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -86,6 +128,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18fc2b5c_cb0dc26b",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: before block 0 DfuDownload() reads DFU_GETSTATUS and recovers: dfuERROR -\u003e DFU_CLRSTATUS, dfuDNLOAD-IDLE/dfuUPLOAD-IDLE -\u003e DFU_ABORT. On the error paths DFU_CLRSTATUS is only sent when GETSTATUS reports dfuERROR. The fake device in the tests stalls CLRSTATUS outside dfuERROR, so a regression would show.",
+      "parentUuid": "251fdd04_fb450bb6",
+      "range": {
+        "startLine": 392,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 9999
+      },
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8bc7c11_ec56aa4b",
@@ -106,6 +172,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46fb3b15_a21b8121",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: an RAII InterfaceClaim replaces the manual release/reset on each return path, and blocks are walked with first()/subspan().",
+      "parentUuid": "d8bc7c11_ec56aa4b",
+      "range": {
+        "startLine": 350,
+        "startChar": 0,
+        "endLine": 420,
+        "endChar": 9999
+      },
       "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -158,6 +248,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b824d71_362960bc",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: after the manifest reaches dfuIDLE, DfuDownload() sends DFU_DETACH so the device resets into the new image. The tests check it is sent exactly once, last, and not after a failure.",
+      "parentUuid": "e0d9a6c0_0e045abd",
+      "range": {
+        "startLine": 449,
+        "startChar": 0,
+        "endLine": 452,
+        "endChar": 9999
+      },
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "199b422f_281a22fa",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: a stalled final ZLP, or a manifest poll that fails or does not settle in dfuIDLE (dfuDNLOAD-IDLE is not accepted), now fails the download. On a ZLP stall the device bStatus/bState is read and printed, then cleared if in dfuERROR. The two tests that expected success are inverted.",
+      "parentUuid": "94db683a_6ed8786f",
+      "range": {
+        "startLine": 428,
+        "startChar": 0,
+        "endLine": 452,
+        "endChar": 9999
+      },
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ed94f3d7_90f61cb8",
@@ -182,6 +320,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdcfe035_28118f41",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: the header comment is corrected. It says DfuDownload() runs on the device in DFU mode (0BDA:5800), after DfuDetach() and WaitForDevice(), and that the DFU suffix must already be stripped.",
+      "parentUuid": "ed94f3d7_90f61cb8",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 9999
+      },
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f0a8ab6_4bc73c38",
@@ -196,6 +358,24 @@
       "side": 1,
       "message": "Please return `std::expected\u003cvoid, RtsError\u003e` here so `main()` and unit tests can distinguish empty-input, interface-claim, block-transfer, and manifestation/verification (`errNOTDONE`) failures.",
       "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46b72dc8_8266ffc9",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: DfuDownload() returns std::expected\u003cvoid, RtsError\u003e, so callers and tests can tell invalid input, claim failure, a transfer error and a rejected image apart.",
+      "parentUuid": "0f0a8ab6_4bc73c38",
       "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -220,6 +400,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d155227a_bd2a6fce",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 888,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:08:29Z",
+      "side": 1,
+      "message": "Done in ps6: FinalZlpFailureIsOnlyAWarning and ManifestNotIdleStillSucceeds are replaced by tests that assert DfuDownload() fails.",
+      "parentUuid": "e0ca133b_dac332b0",
+      "range": {
+        "startLine": 859,
+        "startChar": 0,
+        "endLine": 888,
+        "endChar": 9999
+      },
       "revId": "7beef54baf8df071313ac46d462372d2ad1b8c99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
