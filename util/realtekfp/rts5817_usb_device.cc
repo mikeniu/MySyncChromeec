@@ -289,4 +289,203 @@ std::expected<void, RtsError> RtsUsbDevice::DfuSendRequest(DfuRequest request,
   return {};
 }
 
+std::expected<DfuStatusResponse, RtsError> RtsUsbDevice::DfuGetStatus(
+    int interface) {
+  // bmRequestType = 0xA1: Device-to-Host, Class, Interface
+  // Data (6 bytes): bStatus, bwPollTimeout[3], bState, iString
+  std::array<uint8_t, kDfuGetStatusResponseLen> response{};
+  auto got = backend_->ControlTransferIn(
+      kBmReqD2hClsIf, std::to_underlying(DfuRequest::kGetStatus), 0,
+      static_cast<uint16_t>(interface), response, kUsbDfuTimeout);
+
+  if (!got) {
+    return Fail(*backend_, "DFU_GETSTATUS", got.error());
+  }
+  if (*got < response.size()) {
+    std::println(stderr, "Error: DFU_GETSTATUS failed: short read");
+    return std::unexpected(RtsError::kProtocolError);
+  }
+  return DfuStatusResponse::FromBytes(response);
+}
+
+std::expected<DfuState, RtsError> RtsUsbDevice::DfuPollIdle(int interface) {
+  using enum DfuState;
+
+  // Bound the whole wait: the manifest phase (flash programming and image
+  // verification) can take tens of seconds.
+  std::chrono::milliseconds slept{0};
+
+  while (slept < kUsbDfuTimeout) {
+    auto status = DfuGetStatus(interface);
+    if (!status) {
+      return std::unexpected(status.error());
+    }
+
+    if (status->status != DfuStatus::kOk || status->state == kDfuError) {
+      std::println(stderr, "DFU error: bStatus={}, bState={}",
+                   std::to_underlying(status->status),
+                   std::to_underlying(status->state));
+      return std::unexpected(RtsError::kDeviceRejected);
+    }
+
+    switch (status->state) {
+      case kDfuIdle:
+      case kDfuDnloadIdle:
+        // Terminal success states.
+        return status->state;
+
+      case kDfuDnloadSync:
+      case kDfuDnloadBusy:
+      case kDfuManifestSync:
+      case kDfuManifest:
+        // Transient / busy states: wait for the suggested poll interval.
+        break;
+
+      default:
+        std::println(stderr, "Unexpected DFU state: bState={}",
+                     std::to_underlying(status->state));
+        return std::unexpected(RtsError::kProtocolError);
+    }
+
+    // Never sleep past the overall timeout.
+    const auto delay =
+        std::min(std::max(status->poll_timeout, kDfuMinPollDelay),
+                 kUsbDfuTimeout - slept);
+
+    sleep_(delay);
+    slept += delay;
+  }
+
+  std::println(stderr, "Timed out waiting for DFU idle state.");
+  return std::unexpected(RtsError::kTimeout);
+}
+
+void RtsUsbDevice::DfuClearIfInError(int interface) {
+  auto status = DfuGetStatus(interface);
+
+  if (status && status->state == DfuState::kDfuError) {
+    std::println(stderr, "Device DFU status: bStatus={:#04x}, bState={}",
+                 std::to_underlying(status->status),
+                 std::to_underlying(status->state));
+    DfuSendRequest(DfuRequest::kClrStatus, 0, interface);
+  }
+}
+
+std::expected<void, RtsError> RtsUsbDevice::DfuDownload(
+    std::span<const uint8_t> firmware) {
+  if (firmware.empty()) {
+    return std::unexpected(RtsError::kInvalidParameter);
+  }
+
+  auto info = FindDfuInterface();
+  if (!info) {
+    return std::unexpected(info.error());
+  }
+  const int interface = info->number;
+  const size_t transfer_size = info->transfer_size;
+
+  // A zero-length packet ends the transfer, and wValue is a 16-bit block
+  // number: refuse images that cannot be numbered.
+  const size_t block_count =
+      (firmware.size() + transfer_size - 1) / transfer_size;
+  if (block_count >= UINT16_MAX) {
+    std::println(stderr, "Error: image needs {} blocks, more than {}",
+                 block_count, UINT16_MAX - 1);
+    return std::unexpected(RtsError::kInvalidParameter);
+  }
+
+  // Claim the interface (detaching any kernel driver); it is released on
+  // every return path below.
+  InterfaceClaim claim(*backend_, interface);
+  if (auto claimed = claim.Claim(); !claimed) {
+    return Fail(*backend_, "Claiming the DFU interface", claimed.error());
+  }
+
+  std::println("Flashing {} bytes ({}-byte blocks)...", firmware.size(),
+               transfer_size);
+
+  std::span<const uint8_t> remaining = firmware;
+  size_t printed_pct = 0;
+
+  for (uint16_t block_num = 0; !remaining.empty(); ++block_num) {
+    const auto chunk =
+        remaining.first(std::min(remaining.size(), transfer_size));
+    const size_t offset = firmware.size() - remaining.size();
+
+    // bmRequestType = 0x21: Host-to-Device, Class, Interface
+    // wValue = block_num, wIndex = interface number
+    auto sent = backend_->ControlTransferOut(
+        kBmReqH2dClsIf, std::to_underlying(DfuRequest::kDownload), block_num,
+        static_cast<uint16_t>(interface), chunk, kUsbDfuTimeout);
+
+    if (!sent || *sent != chunk.size()) {
+      std::println(stderr,
+                   "\nDFU_DOWNLOAD failed at block {} (offset {:#x}): {}",
+                   block_num, offset,
+                   !sent ? backend_->ErrorName(sent.error()) : "short write");
+      DfuClearIfInError(interface);
+      return !sent ? Fail(*backend_, "DFU_DOWNLOAD", sent.error())
+                   : std::unexpected(RtsError::kProtocolError);
+    }
+
+    // Poll status to wait for the block to be processed.
+    if (auto idle = DfuPollIdle(interface);
+        !idle || *idle != DfuState::kDfuDnloadIdle) {
+      std::println(stderr, "DFU status error after block {} (offset {:#x}).",
+                   block_num, offset);
+      DfuClearIfInError(interface);
+      return std::unexpected(idle ? RtsError::kProtocolError : idle.error());
+    }
+
+    remaining = remaining.subspan(chunk.size());
+
+    // Print progress every 10%.
+    const size_t pct =
+        (firmware.size() - remaining.size()) * 100 / firmware.size();
+    if (pct >= printed_pct + kDfuProgressStepPct) {
+      std::print("\r  Progress: {}%", pct);
+      fflush(stdout);
+      printed_pct = pct;
+    }
+  }
+
+  // The device validates the image length and a SHA-256 of the whole image in
+  // the final zero-length DFU_DNLOAD, and stalls it if they do not match.
+  const uint16_t last_block = static_cast<uint16_t>(block_count);
+  std::println("\r  Progress: 100%");
+  auto zlp = backend_->ControlTransferOut(
+      kBmReqH2dClsIf, std::to_underlying(DfuRequest::kDownload), last_block,
+      static_cast<uint16_t>(interface), {}, kUsbDfuTimeout);
+
+  if (!zlp) {
+    std::println(stderr, "Error: the device rejected the image: {}",
+                 backend_->ErrorName(zlp.error()));
+    DfuClearIfInError(interface);
+    return Fail(*backend_, "The final DFU_DOWNLOAD", zlp.error());
+  }
+
+  // After the final ZLP the device goes through manifest. The RTS5817 is
+  // manifestation tolerant, so a good image settles in dfuIDLE.
+  std::println("Waiting for device to complete...");
+  auto settled = DfuPollIdle(interface);
+  if (!settled) {
+    DfuClearIfInError(interface);
+    return std::unexpected(settled.error());
+  }
+  if (*settled != DfuState::kDfuIdle) {
+    std::println(stderr, "Error: device settled in state {}, not dfuIDLE",
+                 std::to_underlying(*settled));
+    return std::unexpected(RtsError::kProtocolError);
+  }
+
+  // The device stays in DFU mode until it is told to detach; only DFU_DETACH
+  // makes it reset into the new image.
+  if (auto detached = DfuSendRequest(DfuRequest::kDetach, 0, interface);
+      !detached) {
+    return detached;
+  }
+  std::println("DFU download complete; the device is restarting.");
+  return {};
+}
+
 }  // namespace realtekfp

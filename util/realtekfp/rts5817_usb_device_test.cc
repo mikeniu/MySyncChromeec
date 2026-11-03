@@ -27,8 +27,10 @@ namespace {
 
 using ::testing::_;
 using ::testing::AnyNumber;
+using ::testing::Contains;
 using ::testing::InSequence;
 using ::testing::IsEmpty;
+using ::testing::Not;
 using ::testing::Return;
 using ::testing::SizeIs;
 using ::testing::StrictMock;
@@ -384,7 +386,8 @@ TEST(RtsErrorTest, ToStringCoversAllValues) {
   for (RtsError error :
        {RtsError::kDeviceNotFound, RtsError::kAccessDenied, RtsError::kUsbError,
         RtsError::kInvalidParameter, RtsError::kTimeout, RtsError::kStall,
-        RtsError::kProtocolError, RtsError::kNoDfuInterface}) {
+        RtsError::kProtocolError, RtsError::kNoDfuInterface,
+        RtsError::kDeviceRejected}) {
     EXPECT_NE(ToString(error), "Unknown error");
   }
 }
@@ -671,6 +674,432 @@ TEST_F(RtsUsbDeviceDfuTest, DetachReleasesInterfaceOnTransferError) {
 
   ASSERT_FALSE(res);
   EXPECT_EQ(res.error(), RtsError::kStall);
+}
+
+// A scripted RTS5817 in DFU mode, behind the mocked control channel. It models
+// just enough of the DFU state machine for DfuDownload() to drive it, and
+// records what the host sends.
+class FakeDfuDevice {
+ public:
+  struct Block {
+    uint16_t number;
+    std::vector<uint8_t> data;
+  };
+
+  // The state returned by GETSTATUS until a request changes it.
+  DfuState state = DfuState::kDfuIdle;
+  uint8_t status = 0;
+  // State to report after the final zero-length DNLOAD.
+  DfuState manifest_result = DfuState::kDfuIdle;
+  // Reject block `fail_block` / the final ZLP with a stall.
+  int fail_block = -1;
+  bool stall_zlp = false;
+  // Extra GETSTATUS replies with `poll_timeout`, before settling.
+  int busy_polls = 0;
+  milliseconds poll_timeout{5};
+  // Enter dfuERROR when `fail_block` fails.
+  bool error_on_fail = false;
+  // Fail every GETSTATUS once the final ZLP was accepted.
+  bool fail_status_after_zlp = false;
+
+  std::vector<Block> blocks;
+  std::vector<DfuRequest> requests;
+  std::vector<DfuState> state_when_cleared;
+
+  void Attach(MockRtsUsbBackend& backend, int interface) {
+    EXPECT_CALL(backend,
+                ControlTransferIn(kBmReqD2hClsIf,
+                                  std::to_underlying(DfuRequest::kGetStatus), 0,
+                                  interface, SizeIs(kDfuGetStatusResponseLen),
+                                  milliseconds(kUsbDfuTimeout)))
+        .WillRepeatedly([this](uint8_t, uint8_t, uint16_t, uint16_t,
+                               std::span<uint8_t> data, milliseconds) {
+          if (zlp_done_ && fail_status_after_zlp) {
+            return std::expected<size_t, int>(
+                std::unexpected(kUsbErrorNoDevice));
+          }
+          return GetStatus(data);
+        });
+    EXPECT_CALL(backend,
+                ControlTransferOut(kBmReqH2dClsIf, _, _, interface, _, _))
+        .WillRepeatedly([this](uint8_t, uint8_t request, uint16_t value,
+                               uint16_t, std::span<const uint8_t> data,
+                               milliseconds) {
+          return Out(static_cast<DfuRequest>(request), value, data);
+        });
+  }
+
+ private:
+  bool zlp_done_ = false;
+
+  std::expected<size_t, int> GetStatus(std::span<uint8_t> data) {
+    std::ranges::fill(data, 0);
+    data[kDfuStatusOff] = status;
+    data[kDfuStateOff] = std::to_underlying(state);
+    if (busy_polls > 0) {
+      --busy_polls;
+      const auto ms = static_cast<uint32_t>(poll_timeout.count());
+      data[kDfuPollTimeoutOff] = static_cast<uint8_t>(ms);
+      data[kDfuPollTimeoutOff + 1] = static_cast<uint8_t>(ms >> 8);
+      data[kDfuPollTimeoutOff + 2] = static_cast<uint8_t>(ms >> 16);
+      data[kDfuStateOff] = std::to_underlying(DfuState::kDfuDnloadBusy);
+    }
+    return data.size();
+  }
+
+  std::expected<size_t, int> Out(DfuRequest request, uint16_t value,
+                                 std::span<const uint8_t> data) {
+    requests.push_back(request);
+    switch (request) {
+      case DfuRequest::kDownload:
+        if (data.empty()) {
+          if (stall_zlp) {
+            state = DfuState::kDfuError;
+            status = std::to_underlying(DfuStatus::kNotDone);
+            return std::unexpected(kUsbErrorPipe);
+          }
+          blocks.push_back({value, {}});
+          state = manifest_result;
+          zlp_done_ = true;
+          return size_t{0};
+        }
+        if (static_cast<int>(value) == fail_block) {
+          if (error_on_fail) {
+            state = DfuState::kDfuError;
+            status = std::to_underlying(DfuStatus::kNotDone);
+          }
+          return std::unexpected(kUsbErrorPipe);
+        }
+        blocks.push_back(
+            {value, std::vector<uint8_t>(data.begin(), data.end())});
+        state = DfuState::kDfuDnloadIdle;
+        return data.size();
+      case DfuRequest::kClrStatus:
+        state_when_cleared.push_back(state);
+        if (state != DfuState::kDfuError) {
+          // The RTS5817 stalls CLRSTATUS outside dfuERROR and enters it.
+          state = DfuState::kDfuError;
+          return std::unexpected(kUsbErrorPipe);
+        }
+        state = DfuState::kDfuIdle;
+        status = 0;
+        return size_t{0};
+      default:
+        return size_t{0};
+    }
+  }
+};
+
+constexpr uint16_t kTransferSize = 4;
+constexpr int kDfuIf = 1;
+
+// An opened device in DFU mode, advertising kTransferSize.
+class RtsUsbDeviceDownloadTest : public RtsUsbDeviceDfuTest {
+ protected:
+  void SetUp() override {
+    RtsUsbDeviceDfuTest::SetUp();
+    EXPECT_CALL(*backend_, IsOpen()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*backend_, GetInterfaces())
+        .WillRepeatedly(Return(
+            std::vector<RtsUsbInterface>{DfuInterface(kDfuIf, kTransferSize)}));
+    EXPECT_CALL(*backend_, ClaimInterface(kDfuIf))
+        .WillRepeatedly(Return(std::expected<void, int>{}));
+    EXPECT_CALL(*backend_, ReleaseInterface(kDfuIf)).Times(AnyNumber());
+    fake_.Attach(*backend_, kDfuIf);
+  }
+
+  FakeDfuDevice fake_;
+};
+
+TEST_F(RtsUsbDeviceDownloadTest, ChunksAcrossTransferSizeBoundaries) {
+  // kTransferSize + 1 bytes: one full block, a 1-byte tail, and a ZLP.
+  const std::vector<uint8_t> fw = {0x10, 0x20, 0x30, 0x40, 0x50};
+
+  ASSERT_TRUE(device_->DfuDownload(fw));
+  ASSERT_EQ(fake_.blocks.size(), 3u);
+  EXPECT_EQ(fake_.blocks[0].number, 0);
+  EXPECT_EQ(fake_.blocks[0].data,
+            (std::vector<uint8_t>{0x10, 0x20, 0x30, 0x40}));
+  EXPECT_EQ(fake_.blocks[1].number, 1);
+  EXPECT_EQ(fake_.blocks[1].data, (std::vector<uint8_t>{0x50}));
+  EXPECT_EQ(fake_.blocks[2].number, 2);
+  EXPECT_TRUE(fake_.blocks[2].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ImageSmallerThanOneBlock) {
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{0x01, 0x02}));
+  ASSERT_EQ(fake_.blocks.size(), 2u);
+  EXPECT_EQ(fake_.blocks[0].data, (std::vector<uint8_t>{0x01, 0x02}));
+  EXPECT_TRUE(fake_.blocks[1].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ImageExactlyOneBlock) {
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2, 3, 4}));
+  ASSERT_EQ(fake_.blocks.size(), 2u);
+  EXPECT_EQ(fake_.blocks[0].data, (std::vector<uint8_t>{1, 2, 3, 4}));
+  EXPECT_TRUE(fake_.blocks[1].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ImageOfExactMultipleOfBlockSize) {
+  ASSERT_TRUE(
+      device_->DfuDownload(std::vector<uint8_t>{1, 2, 3, 4, 5, 6, 7, 8}));
+  ASSERT_EQ(fake_.blocks.size(), 3u);
+  EXPECT_EQ(fake_.blocks[0].data, (std::vector<uint8_t>{1, 2, 3, 4}));
+  EXPECT_EQ(fake_.blocks[1].data, (std::vector<uint8_t>{5, 6, 7, 8}));
+  EXPECT_EQ(fake_.blocks[2].number, 2);
+  EXPECT_TRUE(fake_.blocks[2].data.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, RejectsEmptyFirmware) {
+  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);
+
+  auto res = device_->DfuDownload({});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kInvalidParameter);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, RejectsImageNeedingTooManyBlocks) {
+  // wValue is 16 bits, so a block count that does not fit must be refused
+  // before anything is sent.
+  const std::vector<uint8_t> fw(static_cast<size_t>(kTransferSize) * 65535);
+
+  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);
+
+  auto res = device_->DfuDownload(fw);
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kInvalidParameter);
+  EXPECT_TRUE(fake_.blocks.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, AcceptsLargestNumberableImage) {
+  // The ZLP is numbered after the last data block, so the block count itself
+  // must still fit in 16 bits.
+  const std::vector<uint8_t> fw(static_cast<size_t>(kTransferSize) * 65534);
+
+  ASSERT_TRUE(device_->DfuDownload(fw));
+  EXPECT_EQ(fake_.blocks.back().number, 65534);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWithoutOpenDevice) {
+  EXPECT_CALL(*backend_, IsOpen()).WillOnce(Return(false));
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWhenNoDfuInterface) {
+  EXPECT_CALL(*backend_, GetInterfaces())
+      .WillOnce(Return(std::vector<RtsUsbInterface>{}));
+  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kNoDfuInterface);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ClaimFailureLeavesNothingToRelease) {
+  EXPECT_CALL(*backend_, ClaimInterface(kDfuIf))
+      .WillOnce(Return(std::unexpected(kUsbErrorAccess)));
+  EXPECT_CALL(*backend_, ReleaseInterface(_)).Times(0);
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kAccessDenied);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ReleasesInterfaceOnSuccess) {
+  InSequence seq;
+
+  EXPECT_CALL(*backend_, ClaimInterface(kDfuIf))
+      .WillOnce(Return(std::expected<void, int>{}));
+  EXPECT_CALL(*backend_, ReleaseInterface(kDfuIf)).Times(1);
+
+  EXPECT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, WaitsThroughBusyStatesWithPollTimeout) {
+  fake_.busy_polls = 2;
+
+  EXPECT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  EXPECT_EQ(slept_,
+            (std::vector<milliseconds>{milliseconds(5), milliseconds(5)}));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, TransferFailureReleasesInterface) {
+  fake_.fail_block = 1;
+  EXPECT_CALL(*backend_, ReleaseInterface(kDfuIf)).Times(1);
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2, 3, 4, 5, 6});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kStall);
+  ASSERT_EQ(fake_.blocks.size(), 1u);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ShortWriteIsAnError) {
+  EXPECT_CALL(*backend_,
+              ControlTransferOut(
+                  kBmReqH2dClsIf, std::to_underlying(DfuRequest::kDownload), 0,
+                  kDfuIf, SizeIs(kTransferSize), milliseconds(kUsbDfuTimeout)))
+      .WillOnce(Return(std::expected<size_t, int>(kTransferSize - 1)));
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2, 3, 4, 5, 6});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kProtocolError);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ClearStatusIsOnlySentInErrorState) {
+  // After a failed block the device is not in dfuERROR, so CLRSTATUS (which
+  // the RTS5817 would stall, and enter dfuERROR) must not be sent.
+  fake_.fail_block = 0;
+
+  EXPECT_FALSE(device_->DfuDownload(std::vector<uint8_t>{1, 2, 3, 4}));
+  EXPECT_TRUE(fake_.state_when_cleared.empty());
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ClearsStatusWhenDeviceIsInErrorState) {
+  fake_.fail_block = 0;
+  fake_.error_on_fail = true;
+
+  EXPECT_FALSE(device_->DfuDownload(std::vector<uint8_t>{1, 2, 3, 4}));
+  EXPECT_EQ(fake_.state_when_cleared,
+            (std::vector<DfuState>{DfuState::kDfuError}));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, PollFailureReleasesInterface) {
+  EXPECT_CALL(*backend_, ReleaseInterface(kDfuIf)).Times(1);
+  fake_.status = std::to_underlying(DfuStatus::kNotDone);
+  fake_.state = DfuState::kDfuIdle;
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2, 3, 4, 5, 6});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceRejected);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWhenFinalZlpIsStalled) {
+  // The RTS5817 validates the image in the final ZLP. Rejecting it must fail
+  // the download instead of only warning.
+  fake_.stall_zlp = true;
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kStall);
+  // The device is in dfuERROR after the stall, so it is cleared.
+  EXPECT_EQ(fake_.state_when_cleared,
+            (std::vector<DfuState>{DfuState::kDfuError}));
+  // The device is not told to boot an image it rejected.
+  EXPECT_THAT(fake_.requests, Not(Contains(DfuRequest::kDetach)));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWhenManifestDoesNotReachIdle) {
+  // dfuDNLOAD-IDLE after the ZLP means the image was not accepted.
+  fake_.manifest_result = DfuState::kDfuDnloadIdle;
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kProtocolError);
+  EXPECT_THAT(fake_.requests, Not(Contains(DfuRequest::kDetach)));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWhenManifestStatusPollFails) {
+  // The device goes away while it is verifying the image.
+  fake_.fail_status_after_zlp = true;
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
+  EXPECT_THAT(fake_.requests, Not(Contains(DfuRequest::kDetach)));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, DetachesAfterManifestSoDeviceBoots) {
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+
+  // Download block 0 and the ZLP, and only then DFU_DETACH.
+  EXPECT_EQ(fake_.requests, (std::vector<DfuRequest>{DfuRequest::kDownload,
+                                                     DfuRequest::kDownload,
+                                                     DfuRequest::kDetach}));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, DetachFailureIsReported) {
+  EXPECT_CALL(*backend_,
+              ControlTransferOut(kBmReqH2dClsIf,
+                                 std::to_underlying(DfuRequest::kDetach), 0,
+                                 kDfuIf, IsEmpty(), kUsbCtrlTimeout))
+      .WillOnce(Return(std::unexpected(kUsbErrorNoDevice)));
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, ReportsShortStatusRead) {
+  EXPECT_CALL(*backend_,
+              ControlTransferIn(kBmReqD2hClsIf,
+                                std::to_underlying(DfuRequest::kGetStatus), 0,
+                                kDfuIf, SizeIs(kDfuGetStatusResponseLen),
+                                milliseconds(kUsbDfuTimeout)))
+      .WillOnce(
+          Return(std::expected<size_t, int>(kDfuGetStatusResponseLen - 1)));
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kProtocolError);
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, RejectsManifestWaitResetState) {
+  fake_.manifest_result = DfuState::kDfuManifestWaitReset;
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kProtocolError);
+  EXPECT_THAT(fake_.requests, Not(Contains(DfuRequest::kDetach)));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, TimesOutWhenDeviceStaysBusy) {
+  fake_.poll_timeout = milliseconds(25000);
+  fake_.busy_polls = 3;
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kTimeout);
+  // The last sleep is clamped so the total is exactly kUsbDfuTimeout.
+  EXPECT_EQ(slept_, (std::vector<milliseconds>{
+                        milliseconds(25000),
+                        milliseconds(25000),
+                        milliseconds(10000),
+                    }));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, UsesMinPollDelayWhenPollTimeoutIsZero) {
+  fake_.busy_polls = 1;
+  fake_.poll_timeout = milliseconds(0);
+
+  ASSERT_TRUE(device_->DfuDownload(std::vector<uint8_t>{1, 2}));
+  EXPECT_EQ(slept_, (std::vector<milliseconds>{kDfuMinPollDelay}));
+}
+
+TEST_F(RtsUsbDeviceDownloadTest, FailsWhenDeviceEntersErrorStateWithOkStatus) {
+  fake_.manifest_result = DfuState::kDfuError;
+
+  auto res = device_->DfuDownload(std::vector<uint8_t>{1, 2});
+
+  ASSERT_FALSE(res);
+  EXPECT_EQ(res.error(), RtsError::kDeviceRejected);
 }
 
 TEST(DfuStatusResponseTest, Decodes24BitLittleEndianPollTimeout) {
