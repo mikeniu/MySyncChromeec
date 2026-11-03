@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "acd29676_610891b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:35:14Z",
+      "side": 1,
+      "message": "Done in ps4: the body refers to GetInterfaces().",
+      "parentUuid": "97da279f_a93ed0bf",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "revId": "26162e463d22e5cb632188439820d1d750a12450",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10af7042_177d7f87",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please update the stale method name in the commit message. [[trajectory](https://goto.corp.google.com/traj/5990b0c4-fa4f-46f0-9751-f84a74176ad5)]\n\n### Review Summary\n- **Functionality:** ✅ Defines `RtsUsbInterface` (capturing interface number, class, subclass, and class-specific extra descriptor bytes) and adds the pure virtual `GetInterfaces()` method to `RtsUsbBackend` along with its `MOCK_METHOD` in `MockRtsUsbBackend`.\n- **Architecture \u0026 Component Fit:** ✅ Fits cleanly into the `RtsUsbBackend` transport seam by returning `std::expected\u003cstd::vector\u003cRtsUsbInterface\u003e, int\u003e` by value (where `RtsUsbInterface::extra` owns the descriptor bytes and converts directly to `std::span\u003cconst uint8_t\u003e` for `ParseDfuTransferSize`), keeping libusb descriptor lifetimes encapsulated behind the backend interface.\n- **Code Simplicity:** ✅ Minimal and declarative interface extension with no redundant state or unnecessary indirection.\n- **Idiomaticity \u0026 Readability:** ✅ Uses `\u003ccstdint\u003e` and `\u003cvector\u003e`, default member initializers on scalar fields, `CamelCase` method naming (`GetInterfaces()`) consistent with the rest of `RtsUsbBackend`, and `override` on the mock method.\n- **Security:** ✅ No security concerns; descriptor bytes are owned safely via `std::vector\u003cuint8_t\u003e`.\n- **Testing:** ✅ Pure interface and mock declaration prerequisite CL with no new executable production branches; existing `StrictMock\u003cMockRtsUsbBackend\u003e` tests in `rts5817_usb_device_test.cc` continue to exercise mock instantiation.\n- **CL Size \u0026 Scope:** ✅ `Size: S (+16, -0)`. Cleanly scoped as a single atomic prerequisite CL introducing the backend interface contract and mock before caller integration.\n- **Commit Message:** ❌ The commit message body still refers to `get_interfaces()` after patchset 3 renamed the method to `GetInterfaces()`. Please update `/COMMIT_MSG` to match the code.",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "26162e463d22e5cb632188439820d1d750a12450",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e416bb28_62fc5eb8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:35:14Z",
+      "side": 1,
+      "message": "Done in ps4.",
+      "parentUuid": "10af7042_177d7f87",
       "revId": "26162e463d22e5cb632188439820d1d750a12450",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
