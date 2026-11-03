@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0eb81d5_0ac12e30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T10:41:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/42ef9fcc-0812-4108-bfbb-97d213a4de25)]\n\n### Review Summary\n- **Functionality:** ✅ `DfuDownload()`, `DfuGetStatus()`, `DfuPollIdle()`, and `DfuClearIfInError()` properly implement the USB DFU download state machine, per-block `dfuDNLOAD-IDLE` verification, manifestation polling to `dfuIDLE`, error clearing when in `dfuERROR`, and final `DFU_DETACH`.\n- **Architecture \u0026 Component Fit:** ✅ Fits cleanly within `RtsUsbDevice` over `RtsUsbBackend`, using `InterfaceClaim` RAII for interface lifetime management and keeping the status polling helpers private to `RtsUsbDevice`.\n- **Code Simplicity:** ✅ Control flow is linear with early-return guard clauses, bounded polling delays via `std::min`/`std::max`, and concise helper methods.\n- **Idiomaticity \u0026 Readability:** ✅ Uses modern C++20/23 constructs (`std::expected`, `std::span`, `std::chrono` durations, `std::to_underlying`, `std::ranges::fill`, `using enum`) and named constants throughout.\n- **Security:** ✅ Properly validates empty payloads, 16-bit block count limits (`UINT16_MAX`), and short control transfer reads/writes.\n- **Testing:** ✅ Comprehensive unit test coverage in `RtsUsbDeviceDownloadTest` exercising chunking boundaries (`\u003c 1` block, `1` block, `1` block + 1 byte, exact multiple, `65534` max blocks, `65535` rejected), busy polling, `bwPollTimeout \u003d\u003d 0` minimum delay fallback, timeout clamping, error recovery, manifest states, and exact control transfer contracts.\n- **CL Size \u0026 Scope:** ✅ `Size: L (+671, -1)` (`+235, -0` production lines in `rts5817_usb_device.h` and `rts5817_usb_device.cc`, plus `+436, -1` unit test lines in `rts5817_usb_device_test.cc`), representing a single cohesive logical change with thorough unit tests.\n- **Commit Message:** ✅ Clear, accurate subject line and concise high-level summary with `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4bce6f501b9356d6d9e5943adf9499213cb4f08f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
