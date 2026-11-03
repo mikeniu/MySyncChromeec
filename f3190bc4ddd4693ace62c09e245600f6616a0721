@@ -38,6 +38,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e5770de_c9eaf8ef",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:05:04Z",
+      "side": 1,
+      "message": "Done in ps2: split into ControlTransferIn(std::span\u003cuint8_t\u003e) and ControlTransferOut(std::span\u003cconst uint8_t\u003e). The libusb length check stays in RtsLibusbBackend, and the const_cast is gone from DfuDownload().",
+      "parentUuid": "13f2b855_4cb57de1",
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a2bb281_112cac3a",
@@ -58,6 +76,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "006a5ff5_7f7c890c",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:05:04Z",
+      "side": 1,
+      "message": "Done in ps2: both return std::expected\u003csize_t, int\u003e.",
+      "parentUuid": "2a2bb281_112cac3a",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
       "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -86,6 +128,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "977df2ff_78e2d057",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:05:04Z",
+      "side": 1,
+      "message": "Done in ps2: EnableDownload() reads R_INITVTOR (0x401E2090) with the vendor request 0x41 first (wValue \u003d low 16 bits, wIndex \u003d high 16 bits, 4 bytes little endian, as in rtsflash.py) and only sends 0x1A/0x1B when it is 0 (Boot ROM). A Flash Image, an unknown value, or a mode query that stalls with LIBUSB_ERROR_PIPE leaves download mode alone so the caller can go on to DFU_DETACH. Covered by tests for each of these.",
+      "parentUuid": "c77d10c6_e0fd7d1a",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 9999
+      },
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c32f292_a8fa95d9",
@@ -104,6 +170,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9fc8050_b3eac9b8",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:05:04Z",
+      "side": 1,
+      "message": "Done in ps2: kUsbCtrlTimeout is a std::chrono::milliseconds and the backend converts it once at the libusb call.",
+      "parentUuid": "9c32f292_a8fa95d9",
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0804691b_2952f5a9",
@@ -118,6 +202,24 @@
       "side": 1,
       "message": "Please return `std::expected\u003cvoid, RtsError\u003e` here as well so callers can distinguish a `STALL` (`LIBUSB_ERROR_PIPE`) from transport/disconnect errors.",
       "isAi": true,
+      "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2be8540e_17f907a9",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:05:04Z",
+      "side": 1,
+      "message": "Done in ps2: EnableDownload() returns std::expected\u003cvoid, RtsError\u003e. A STALL maps to RtsError::kStall and a short read to kProtocolError.",
+      "parentUuid": "0804691b_2952f5a9",
       "revId": "f3190bc4ddd4693ace62c09e245600f6616a0721",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
