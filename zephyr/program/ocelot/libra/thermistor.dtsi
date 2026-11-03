@@ -1,0 +1,92 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	NTC_3V3_24K_100K_4250B: NTC-3V3-24K-100K-4250B {
+		status = "okay";
+		compatible = "cros-ec,thermistor";
+		scaling-factor = <13>;
+		num-pairs = <14>;
+		steinhart-reference-mv = <3300>;
+		steinhart-reference-res = <24000>;
+
+		/*
+		* Thermistor: 100K ohm @ 25C, B(25/100) = 4250
+		* Divider: Vdd = 3300mV, series (pull-up) resistor R = 24K ohm,
+		*          NTC to GND, ADC measures the NTC node.
+		* Source : "EC NTC Porting Guide.xlsx" (T / NTC R / V curve, -10C~105C)
+		*/
+		sample-datum-0 {
+			milivolt = <(3098 / 13)>;
+			temp = <0>;
+			sample-index = <0>;
+		};
+		sample-datum-1 {
+			milivolt = <(3038 / 13)>;
+			temp = <5>;
+			sample-index = <1>;
+		};
+		sample-datum-2 {
+			milivolt = <(2966 / 13)>;
+			temp = <10>;
+			sample-index = <2>;
+		};
+		sample-datum-3 {
+			milivolt = <(2777 / 13)>;
+			temp = <20>;
+			sample-index = <3>;
+		};
+		sample-datum-4 {
+			milivolt = <(2531 / 13)>;
+			temp = <30>;
+			sample-index = <4>;
+		};
+		sample-datum-5 {
+			milivolt = <(2237 / 13)>;
+			temp = <40>;
+			sample-index = <5>;
+		};
+		sample-datum-6 {
+			milivolt = <(1915 / 13)>;
+			temp = <50>;
+			sample-index = <6>;
+		};
+		sample-datum-7 {
+			milivolt = <(1592 / 13)>;
+			temp = <60>;
+			sample-index = <7>;
+		};
+		sample-datum-8 {
+			milivolt = <(1291 / 13)>;
+			temp = <70>;
+			sample-index = <8>;
+		};
+		sample-datum-9 {
+			milivolt = <(1028 / 13)>;
+			temp = <80>;
+			sample-index = <9>;
+		};
+		sample-datum-10 {
+			milivolt = <(913 / 13)>;
+			temp = <85>;
+			sample-index = <10>;
+		};
+		sample-datum-11 {
+			milivolt = <(809 / 13)>;
+			temp = <90>;
+			sample-index = <11>;
+		};
+		sample-datum-12 {
+			milivolt = <(716 / 13)>;
+			temp = <95>;
+			sample-index = <12>;
+		};
+		sample-datum-13 {
+			milivolt = <(633 / 13)>;
+			temp = <100>;
+			sample-index = <13>;
+		};
+	};
+};

@@ -1,0 +1,207 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	aliases {
+		gpio-wp = &gpio_ec_wp_od;
+		gpio-btn-ign-in = &gpio_fp_btn_ign;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		/* The legacy system code requires GPIO_ENTERING_RW symbol */
+		ec-entering-rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+		
+		/* Port A */
+		gpio_ec_kb_bl_en: ec_kb_bl_en {
+			gpios = <&gpioa 1 (GPIO_OUTPUT)>;
+			enum-name = "GPIO_EN_KEYBOARD_BACKLIGHT";
+		};
+		/* Port B */
+		gpio_en_pac_pp3300_z1_od: en_pac_pp3300_z1_od {
+			gpios = <&gpiob 3 GPIO_OUTPUT>;
+		};
+		gpio_ec_wp_od: ec_wp_od {
+			gpios = <&gpiob 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_soc_wake_odl: ec_soc_wake_odl {
+			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		/* Port C */
+		gpio_acok_od: acok_od {
+			gpios = <&gpioc 0 (GPIO_INPUT)>;
+			enum-name = "GPIO_AC_PRESENT";
+		};
+		gpio_ec_en_edp_bl: ec_en_edp_bl {
+			gpios = <&gpioc 6 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+			enum-name = "GPIO_ENABLE_BACKLIGHT";
+		};
+		/* Port D */
+		gpio_espi_lpc_rst_n: espi_lpc_rst_n {
+			gpios = <&gpiod 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_lid_open: lid_open {
+			gpios = <&gpiod 3 (GPIO_INPUT)>;
+			enum-name = "GPIO_LID_OPEN";
+		};
+		gpio_en_slp_z: en_slp_z {
+			gpios = <&gpiod 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH)>;
+		};
+		gpio_all_sys_pwrgd_r: all_sys_pwrgd_r {
+			gpios = <&gpiod 5 (GPIO_INPUT)>;
+		};
+		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
+			gpios = <&gpiod 7 GPIO_OUTPUT>;
+			enum-name = "GPIO_PACKET_MODE_EN";
+		};
+		/* Port E */
+		gpio_ec_soc_pwr_btn_odl: ec_soc_pwr_btn_odl {
+			gpios = <&gpioe 3 (GPIO_ODR_HIGH)>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
+		gpio_gsc_ec_pwr_btn_odl: gsc_ec_pwr_btn_odl {
+			gpios = <&gpioe 4 (GPIO_INPUT)>;
+			enum-name = "GPIO_POWER_BUTTON_L";
+		};
+		gpio_ec_me_unlock: ec_me_unlock {
+			/* TODO Intel ME UNLOCK */
+			gpios = <&gpioe 6 (GPIO_INPUT)>;
+		};
+		/* Port F */
+		gpio_pg_pp1250_soc_s5_od: pg_pp1250_soc_s5_od {
+			gpios = <&gpiof 0 (GPIO_INPUT)>;
+		};
+		gpio_ec_soc_sys_pwrok: ec_soc_sys_pwrok {
+			gpios = <&gpiof 1 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_ec_tpad_en: ec_tpad_en {
+			gpios = <&gpiof 3 (GPIO_OUTPUT)>;
+		};
+		gpio_usb_pd1_int_odl: usb_pd_int_odl {
+			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_accel_mb_int_l: ec_accel_mb_int_l {
+			gpios = <&gpiof 7 (GPIO_INPUT)>;
+		};
+		/* Port G */
+		gpio_ec_nmi: ec_nmi {
+			gpios = <&gpiog 1 (GPIO_INPUT)>;
+		};
+		/* Port H */
+		gpio_ec_codec_mute_odl: ec_codec_mute_odl {
+			gpios = <&gpioh 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_slp_s3: ec_slp_s3_l {
+			gpios = <&gpioh 3 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_slp_s4: ec_slp_s4_l {
+			gpios = <&gpioh 4 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
+			gpios = <&gpioh 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_ec_ish_int_odl: ec_ish_int_odl {
+			gpios = <&gpioh 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		/* Port I */
+		gpio_ec_forcepr_odl: ec_forcepr_odl {
+			gpios = <&gpioi 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		/* Power sequencing signal needed by temp sensor driver */
+		gpio_en_s5_rails: en_s5_rails {
+			gpios = <&gpioi 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>; 
+		};
+		/* Port J */
+		gpio_ec_rsmrst_l: ec_rsmrst_l {
+			gpios = <&gpioj 0 (GPIO_OUTPUT | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_PCH_RSMRST_L";
+		};
+		gpio_ec_plt_pwrok: plt_pwrok_ec_r {
+			gpios = <&gpioj 1 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_ec_soc_rec_switch_od: ec_soc_rec_switch_od {
+			gpios = <&gpioj 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
+		};
+		gpio_pm_caterr_n: pm_caterr_n {
+			gpios = <&gpioj 4 (GPIO_INPUT)>;
+		};
+		gpio_sys_slp_s0ix_l: sys_slp_s0ix_l {
+			gpios = <&gpioj 5 (GPIO_INPUT)>;
+		};
+		gpio_fp_btn_ign: fp_btn_ign {
+			gpios = <&gpioj 6 (GPIO_INPUT)>;
+		};
+		gpio_sys_rst_odl: sys_rst_odl {
+			gpios = <&gpioj 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		/* Port M */
+		gpio_ec_soc_int_odl: ec_soc_int_odl {
+			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+			enum-name = "GPIO_EC_INT_L";
+		};
+	};
+
+	unused-pins {
+		compatible = "unused-gpios";
+
+		unused-gpios =
+			<&gpioa 0 0>, /* VBL_FLT */
+			<&gpioa 2 0>, /* EC_VRON */
+			<&gpioa 3 0>, /* ALW_PWRGD */
+			<&gpioa 4 0>, /* VDD2_PWRGD */
+			<&gpioa 5 0>, /* LED_4_R_L */
+			<&gpioa 7 0>, /* EC_ACIN */
+			<&gpiob 4 0>, /* RSTN_SYS */
+			<&gpioc 4 0>, /* EDP_BIST */
+			<&gpiod 1 0>, /* PM_THERMTRIP_N */
+			<&gpioe 5 0>, /* VR_READY */
+			<&gpiof 2 0>, /* EDP_BKLT_EN */
+			<&gpiof 4 0>, /* TPAN_RST#_LS */
+			<&gpiof 6 0>, /* EDP_VDD_EN */
+			<&gpiog 3 0>, /* EN_PP5000_LED_X */
+			<&gpioi 5 0>, /* P_CHG_IBAT */
+			<&gpioi 6 0>; /* PLN */
+	};
+};
+
+&gpio_en_s5_rails {
+	no-auto-init;
+};
+&gpio_pg_pp1250_soc_s5_od {
+	no-auto-init;
+};
+&gpio_ec_rsmrst_l {
+	no-auto-init;
+};
+&gpio_slp_s4 {
+	no-auto-init;
+};
+&gpio_slp_s3 {
+	no-auto-init;
+};
+&gpio_sys_slp_s0ix_l {
+	no-auto-init;
+};
+&gpio_all_sys_pwrgd_r {
+	no-auto-init;
+};
+&gpio_ec_plt_pwrok {
+	no-auto-init;
+};
+&gpio_ec_soc_sys_pwrok {
+	no-auto-init;
+};
+&gpio_sys_rst_odl {
+	no-auto-init;
+};
+
+gpio_ec_pch_wake_odl: &gpio_ec_soc_wake_odl {};
+gpio_acok: &gpio_acok_od {};
+gpio_lid: &gpio_lid_open {};
+gpio_pwrbtn: &gpio_gsc_ec_pwr_btn_odl {};
+gpio_all_sys_pwr_good: &gpio_all_sys_pwrgd_r {};

@@ -1,0 +1,42 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* ocelot program common DTS includes */
+#include <cros/integrated_fwid.dtsi>
+
+/* libra project DTS includes */
+#include "adc.dtsi"
+#include "battery.dtsi"
+#include "binman.dtsi"
+#include "console.dtsi"
+#include "fan.dtsi"
+#include "gpios.dtsi"
+#include "i2c.dtsi"
+#include "interrupts.dtsi"
+#include "keyboard.dtsi"
+#include "power_signals.dtsi"
+#include "pwm.dtsi"
+#include "thermistor.dtsi"
+#include "temp_sensors.dtsi"
+#include "usb_typec.dtsi"
+
+#include "../ite_hibernate.dtsi"
+
+/ {
+	cse_early_recovery: cse-early-recovery {
+		compatible = "cros-ec,cse-early-rec";
+		cse-early-rec-gpios = <&gpioj 3 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
+	};
+};
+
+/* libra overrides follow... */
+
+&espi0 {
+	status = "okay";
+};
+
+&sha0 {
+	status = "okay";
+};
