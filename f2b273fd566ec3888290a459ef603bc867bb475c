@@ -186,6 +186,24 @@
       "parentUuid": "d3dd2bfc_a3a8873a",
       "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07a90cf4_fb5369de",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:00Z",
+      "side": 1,
+      "message": "Done: FindDfuInterface() returns std::expected\u003cDfuInterfaceInfo, RtsError\u003e, and as suggested in the other thread this change no longer keeps the interface or transfer size as members at all.",
+      "parentUuid": "14681d7b_4bb0f1e4",
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

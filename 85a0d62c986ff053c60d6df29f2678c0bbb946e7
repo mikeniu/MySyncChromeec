@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee95c026_2340ccec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:00Z",
+      "side": 1,
+      "message": "Done in ps6: the body uses DfuDetach(), says it claims the DFU interface, and mentions the DfuRequest enum and DfuSendRequest() that now arrive in this change.",
+      "parentUuid": "14631cce_eb32344c",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3084e438_ff4ec998",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding redundant member state across stacked CLs, boundary test coverage for `0 ms` detach timeout, and the commit message.\n\n### Review Summary\n* **Functionality:** `RtsUsbDevice::FindDfuInterface()` locates the USB DFU interface (`class \u003d 0xFE`, `subclass \u003d 0x01`) and parses its `wTransferSize`, and `RtsUsbDevice::DfuDetach()` validates the 16-bit timeout, claims the interface via `InterfaceClaim`, and sends the `DFU_DETACH` control transfer.\n* **Architecture \u0026 Component Fit:** Now that `FindDfuInterface()` returns `std::expected\u003cDfuInterfaceInfo, RtsError\u003e` by value, keeping `dfu_interface_`, `transfer_size_`, and `transfer_size()` on `RtsUsbDevice` (and resetting them in `Release()`) introduces temporary member state in this CL that is immediately deleted in the child CL (`https://crrev.com/c/8629987`). Please omit `dfu_interface_`, `transfer_size_`, and `transfer_size()` in this CL and pass `info-\u003enumber` directly in `DfuDetach()`.\n* **Code Simplicity:** Removing `dfu_interface_` and `transfer_size_` from `RtsUsbDevice` eliminates the state assignments in `DfuDetach()` and keeps `RtsUsbDevice::Release()` as a single `backend_-\u003eClose()` call.\n* **Idiomaticity \u0026 Readability:** Clean use of C++23 `std::expected`, `std::ranges::find_if`, `std::chrono::milliseconds`, and RAII interface claiming. In `RtsUsbDeviceDfuTest`, prefer deriving the 16-bit timeout boundary values from `UINT16_MAX` rather than raw `65535` / `65536` literals.\n* **Security:** Proper bounds checking on the 16-bit `wValue` timeout and safe descriptor handling.\n* **Testing:** Good unit test coverage of error and claim/release paths in `RtsUsbDeviceDfuTest`, but the lower valid boundary `detach_timeout \u003d\u003d 0 ms` (`std::chrono::milliseconds::zero()`) is not tested (so mutating `\u003c` to `\u003c\u003d` on line 182 of `rts5817_usb_device.cc` would not be caught).\n* **CL Size \u0026 Scope:** `Size: L (+298, -2)` (+144, -1 production lines across `rts5817_usb_device.h` and `rts5817_usb_device.cc`; +154, -1 unit test lines in `rts5817_usb_device_test.cc`). The production diff is well under 250 lines and implements a single cohesive logical change pushed into `Size: L` by its unit tests.\n* **Commit Message:** The second paragraph of `/COMMIT_MSG` still references the pre-rename `dfu_detach()` identifier and describes recording `transfer_size` on `RtsUsbDevice`.\n\n[[trajectory](https://goto.corp.google.com/traj/e0d899bb-ac40-40a8-a839-93b60aee117f)]",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03596290_209fa190",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:00Z",
+      "side": 1,
+      "message": "Done in ps6, see the replies on each inline comment.",
+      "parentUuid": "3084e438_ff4ec998",
       "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ab9b24c_3161982c",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:00Z",
+      "side": 1,
+      "message": "Done in ps6: dfu_interface_, transfer_size_ and transfer_size() are gone, Release() is a single backend_-\u003eClose(), and DfuDetach() passes info-\u003enumber directly. The tests that used them are removed.",
+      "parentUuid": "b18a892d_6fdee7a3",
+      "range": {
+        "startLine": 191,
+        "startChar": 0,
+        "endLine": 212,
+        "endChar": 9999
+      },
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "105af9d9_77d3b962",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c8d44d0_b871c888",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T10:36:00Z",
+      "side": 1,
+      "message": "Done in ps6: added DetachAcceptsZeroTimeout, and the boundary values are derived from UINT16_MAX.",
+      "parentUuid": "105af9d9_77d3b962",
+      "range": {
+        "startLine": 525,
+        "startChar": 0,
+        "endLine": 547,
+        "endChar": 9999
+      },
       "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
