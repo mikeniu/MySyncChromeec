@@ -1,0 +1,223 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9f412bd_4e8416f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **CL Scope \u0026 Commit Messages for Split CLs:**\n\nIn Patchset 7, the DFU status/recovery helpers (`DfuStatusResponse`, `DfuGetStatus`, `DfuPollIdle`, `DfuRecoverToIdle`, `DfuClearIfInError`, `DfuSendRequest`) and the `DfuDetach`/`Release` refactoring were folded into this CL, pushing the production (non-test) diff to 418 lines (`+393, -25`).\n\nOnce those helpers are moved into the prerequisite CL (e.g., https://crrev.com/c/8637072), the current commit message on this CL is ready to use as-is for **CL 2**. Below are copy-pasteable commit messages for both CLs in the stack:\n\n*CL 1 (Prerequisite — DFU status polling \u0026 state recovery helpers):*\n```text\nrts5817: Add DFU status polling and state recovery to RtsUsbDevice\n\nAdd USB DFU status decoding, polling (DfuGetStatus, DfuPollIdle), and\nstate recovery (DfuRecoverToIdle, DfuClearIfInError, DfuSendRequest)\nover RtsUsbBackend so RtsUsbDevice can bring the device to dfuIDLE and\nwait for flash operations to complete.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n*CL 2 (This CL — `RtsUsbDevice::DfuDownload`):*\n```text\nrts5817: Implement DFU download in RtsUsbDevice\n\nAdd firmware flashing support to RtsUsbDevice by implementing the USB\nDFU Specification (Interface Class 0xFE) download sequence over\nRtsUsbBackend, handling interface claiming, block chunking, status\npolling, and manifest completion without external tools like dfu-util.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6b383c8_64356b99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n- **Functionality:** ❌ A couple of DFU state-machine edge cases need attention in `util/realtekfp/rts5817_usb_device.cc`:\n  - In `DfuRecoverToIdle()` (lines 397–422), when the device starts in a busy download state (`kDfuDnloadSync` or `kDfuDnloadBusy`), calling `DfuPollIdle()` in `default:` immediately issues a second `DFU_GETSTATUS` without sleeping the initial `poll_timeout`, and when the in-flight block finishes in `kDfuDnloadIdle`, `DfuRecoverToIdle()` returns `{}` without sending `DFU_ABORT`—leaving the device in `dfuDNLOAD-IDLE` instead of `dfuIDLE`.\n  - In `DfuDownload()` (lines 487–492), verify `*idle \u003d\u003d DfuState::kDfuDnloadIdle` after each data block.\n- **Architecture \u0026 Component Fit:** ❌ `RtsUsbBackend::ResetDevice()` (`rts5817_usb_backend.h:86`, `rts5817_mock_usb_backend.h:43`) modifies the transport interface in the `RtsUsbDevice` CL and is only called in `DfuPollIdle()` on `kDfuManifestWaitReset`—a state that manifestation-tolerant RTS5817 (`bmAttributes \u003d 0x0F`) never enters and that `DfuDownload()` immediately rejects as `RtsError::kProtocolError` anyway (after `ResetDevice()` has already invalidated the handle still held by `InterfaceClaim`). Dropping `case kDfuManifestWaitReset:` from `DfuPollIdle()` eliminates `ResetDevice()` from `RtsUsbBackend` and `MockRtsUsbBackend`.\n- **Code Simplicity:** ❌\n  - Remove the unused `#include \u003cvector\u003e` added to `rts5817_usb_device.h` (line 21) and unused `#include \u003cinitializer_list\u003e` added to `rts5817_usb_device_test.cc` (line 17).\n  - Use typed `DfuStatus` and `DfuState` fields on `DfuStatusResponse` to avoid repeated `static_cast\u003cDfuState\u003e` and `std::to_underlying(...)` conversions across callers.\n  - Fold `DfuReportStatus()` into `DfuClearIfInError()` so a stalled final ZLP does not issue two back-to-back `DFU_GETSTATUS` requests, delete the single-line `DfuClearStatus()` / `DfuAbort()` wrappers in favor of `DfuSendRequest()`, and simplify the `delay` clamping in `DfuPollIdle()` with `std::max`.\n- **Idiomaticity \u0026 Readability:** ❌ In `util/realtekfp/rts5817_usb_device_test.cc`, prefer `std::ranges::fill(data, 0)` over `std::fill(data.begin(), data.end(), 0)` (line 704) and assert the exact `fake_.requests` vector in `DetachesAfterManifestSoDeviceBoots` instead of `std::count(fake_.requests.begin(), fake_.requests.end(), ...)` (lines 1002–1004).\n- **Security:** ✅ Bounds, block counts (`UINT16_MAX`), and short-transfer return values are properly validated.\n- **Testing:** ❌\n  - Replace the `for` loop and weak `EXPECT_LE` assertion in `TimesOutWhenDeviceStaysBusy` (lines 1090–1103) with a larger `poll_timeout` and an exact `EXPECT_EQ` on `slept_` that verifies both normal polling and `kUsbDfuTimeout - slept` clamping.\n  - Replace wildcard `_` matchers on contract arguments in `FakeDfuDevice::Attach`, `ShortWriteIsAnError`, `DetachFailureIsReported`, `FailsWhenRecoveryStatusReadFails`, and `ReportsShortStatusRead`.\n  - Add coverage for `ToString(RtsError::kDeviceRejected)`, `poll_timeout \u003d\u003d 0` (`kDfuMinPollDelay`), `status \u003d\u003d kOk \u0026\u0026 state \u003d\u003d kDfuError` in `DfuPollIdle()`, and `DfuRecoverToIdle()` when recovering from a busy download state.\n- **CL Size \u0026 Scope:** ❌ `Size: L (+874, -41)` (`+393, -25` \u003d 418 production lines across `rts5817_usb_backend.h`, `rts5817_usb_device.h`, and `rts5817_usb_device.cc`, plus `+481, -16` \u003d 497 test/mock lines in `rts5817_mock_usb_backend.h` and `rts5817_usb_device_test.cc`). Because the production diff exceeds the 250-line limit and bundles the DFU status/recovery helpers and `DfuDetach`/`Release` refactoring back into the `DfuDownload` CL, please split this CL (or move the status/recovery helpers back into the parent CL in the series):\n  1. **CL 1 (DFU status polling, recovery helpers, \u0026 `DfuDetach` cleanup — or fold into parent CL 8637072):** Add `DfuRequest`, `DfuStatus`, `DfuState`, `DfuStatusResponse::FromBytes`, `RtsError::kDeviceRejected`, `DfuSendRequest`, `DfuGetStatus`, `DfuPollIdle`, `DfuRecoverToIdle`, and `DfuClearIfInError`, update `DfuDetach` and `Release` to drop cached `dfu_interface_`/`transfer_size_`, and include the status/recovery unit tests.\n  2. **CL 2 (This CL — `RtsUsbDevice::DfuDownload`):** Add `kDfuProgressStepPct` and `RtsUsbDevice::DfuDownload` in `rts5817_usb_device.{h,cc}` along with `RtsUsbDeviceDownloadTest` in `rts5817_usb_device_test.cc`.\n- **Commit Message:** ❌ The commit message describes `DfuDownload` only, whereas Patchset 7 also bundles the DFU status/recovery helpers and `DfuDetach`/`Release` refactoring. See inline comment on `/COMMIT_MSG` for copy-pasteable commit messages for the split CLs.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45e242e8_31da1117",
+        "filename": "util/realtekfp/rts5817_usb_backend.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Architecture, YAGNI \u0026 CL Scope (`ResetDevice`):**\n\n1. **Unnecessary for RTS5817 (`bitManifestationTolerant \u003d 1`):** RTS5817 advertises `bmAttributes \u003d 0x0F` (`bitManifestationTolerant \u003d 1`, `bitWillDetach \u003d 1`), so after manifestation it transitions `dfuMANIFEST-SYNC -\u003e dfuIDLE` and never enters `dfuMANIFEST-WAIT-RESET (8)`. Even if a device reported `kDfuManifestWaitReset`, `DfuDownload()` immediately rejects any post-manifest state other than `kDfuIdle` with `RtsError::kProtocolError` (`rts5817_usb_device.cc:530–534`), and calling `backend_-\u003eResetDevice()` inside `DfuPollIdle()` invalidates the USB handle before `InterfaceClaim::~InterfaceClaim()` runs `backend_.ReleaseInterface()`.\n2. **CL Scope:** Modifying `RtsUsbBackend` and `MockRtsUsbBackend` in the same CL as `RtsUsbDevice` mixes transport interface changes with device state-machine logic.\n\nPlease drop `ResetDevice()` from `rts5817_usb_backend.h` and `rts5817_mock_usb_backend.h`, and let `kDfuManifestWaitReset` fall into the `default:` (`RtsError::kProtocolError`) arm in `RtsUsbDevice::DfuPollIdle()`.\n\nOther locations:\n- `util/realtekfp/rts5817_mock_usb_backend.h` **Line 43**\n- `util/realtekfp/rts5817_usb_device.cc` **Lines 338–345** (`RtsUsbDevice::DfuPollIdle`)\n- `util/realtekfp/rts5817_usb_device_test.cc` **Lines 1077–1088** (`ResetsDeviceWhenItRequestsOneAfterManifest`)\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc714793_01a5bd63",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity (`DfuPollIdle`):**\n\n1. With `DfuStatusResponse` storing `DfuStatus` and `DfuState` and `kDfuManifestWaitReset` handled by `default:` (returning `RtsError::kProtocolError`), the loop body avoids manual enum casts and matches the header contract (`dfuIDLE` or `dfuDNLOAD-IDLE`).\n2. In the sleep calculation (lines 359–364), `std::max(status-\u003epoll_timeout, kDfuMinPollDelay)` replaces the ternary, and `kUsbDfuTimeout - slept` already has common type `std::chrono::milliseconds` without `std::chrono::duration_cast`:\n\n```cpp\nstd::expected\u003cDfuState, RtsError\u003e RtsUsbDevice::DfuPollIdle(int interface) {\n  using enum DfuState;\n\n  // Bound the whole wait: the manifest phase (flash programming and image\n  // verification) can take tens of seconds.\n  std::chrono::milliseconds slept{0};\n\n  while (slept \u003c kUsbDfuTimeout) {\n    auto status \u003d DfuGetStatus(interface);\n    if (!status) {\n      return std::unexpected(status.error());\n    }\n\n    if (status-\u003estatus !\u003d DfuStatus::kOk || status-\u003estate \u003d\u003d kDfuError) {\n      std::println(stderr, \"DFU error: bStatus\u003d{}, bState\u003d{}\",\n                   std::to_underlying(status-\u003estatus),\n                   std::to_underlying(status-\u003estate));\n      return std::unexpected(RtsError::kDeviceRejected);\n    }\n\n    switch (status-\u003estate) {\n      case kDfuIdle:\n      case kDfuDnloadIdle:\n        // Terminal success states.\n        return status-\u003estate;\n\n      case kDfuDnloadSync:\n      case kDfuDnloadBusy:\n      case kDfuManifestSync:\n      case kDfuManifest:\n        // Transient / busy states: wait for the suggested poll interval.\n        break;\n\n      default:\n        std::println(stderr, \"Unexpected DFU state: bState\u003d{}\",\n                     std::to_underlying(status-\u003estate));\n        return std::unexpected(RtsError::kProtocolError);\n    }\n\n    // Never sleep past the overall timeout.\n    const auto delay \u003d std::min(\n        std::max(status-\u003epoll_timeout, kDfuMinPollDelay),\n        kUsbDfuTimeout - slept);\n\n    sleep_(delay);\n    slept +\u003d delay;\n  }\n\n  std::println(stderr, \"Timed out waiting for DFU idle state.\");\n  return std::unexpected(RtsError::kTimeout);\n}\n```\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 311,
+        "startChar": 0,
+        "endLine": 372,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d80c527e_72157946",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Functionality \u0026 Code Simplicity (`DfuRecoverToIdle` \u0026 `DfuClearIfInError`):**\n\n1. **Recovering from busy download states (`lines 397–422`):** When an earlier transfer was interrupted while a block was still being programmed (`kDfuDnloadSync` or `kDfuDnloadBusy`):\n   - Calling `DfuGetStatus(interface)` at line 398 and then immediately calling `DfuPollIdle(interface)` at line 417 issues a second `DFU_GETSTATUS` without sleeping the first response\u0027s `poll_timeout` (which violates the USB DFU `dfuDNBUSY` polling interval).\n   - When that in-flight block finishes, `DfuPollIdle(interface)` settles in `kDfuDnloadIdle` (not `kDfuIdle`), and returning `{}` at line 420 without sending `DFU_ABORT` leaves the device in `dfuDNLOAD-IDLE`.\n2. **Single `DFU_GETSTATUS` in `DfuClearIfInError` (`lines 374–395` \u0026 `517–518`):** Logging `bStatus`/`bState` inside `DfuClearIfInError` before sending `DfuRequest::kClrStatus` avoids calling `DfuGetStatus` twice in a row on line 517–518 and lets you drop `DfuReportStatus`, `DfuClearStatus`, and `DfuAbort`:\n\n```cpp\nvoid RtsUsbDevice::DfuClearIfInError(int interface) {\n  auto status \u003d DfuGetStatus(interface);\n\n  if (status \u0026\u0026 status-\u003estate \u003d\u003d DfuState::kDfuError) {\n    std::println(stderr, \"Device DFU status: bStatus\u003d{:#04x}, bState\u003d{}\",\n                 std::to_underlying(status-\u003estatus),\n                 std::to_underlying(status-\u003estate));\n    DfuSendRequest(DfuRequest::kClrStatus, 0, interface);\n  }\n}\n\nstd::expected\u003cvoid, RtsError\u003e RtsUsbDevice::DfuRecoverToIdle(int interface) {\n  auto status \u003d DfuGetStatus(interface);\n  if (!status) {\n    return std::unexpected(status.error());\n  }\n\n  if (status-\u003estate \u003d\u003d DfuState::kDfuError) {\n    // CLRSTATUS is only valid here.\n    return DfuSendRequest(DfuRequest::kClrStatus, 0, interface);\n  }\n  if (status-\u003estate \u003d\u003d DfuState::kDfuUploadIdle) {\n    return DfuSendRequest(DfuRequest::kAbort, 0, interface);\n  }\n\n  DfuState settled \u003d status-\u003estate;\n  if (settled !\u003d DfuState::kDfuIdle \u0026\u0026 settled !\u003d DfuState::kDfuDnloadIdle) {\n    sleep_(std::min(std::max(status-\u003epoll_timeout, kDfuMinPollDelay),\n                    std::chrono::milliseconds(kUsbDfuTimeout)));\n    auto idle \u003d DfuPollIdle(interface);\n    if (!idle) {\n      return std::unexpected(idle.error());\n    }\n    settled \u003d *idle;\n  }\n  if (settled \u003d\u003d DfuState::kDfuDnloadIdle) {\n    return DfuSendRequest(DfuRequest::kAbort, 0, interface);\n  }\n  return {};\n}\n```\n\nAlso in `DfuDownload()` at **lines 487–492**, please verify that per-block polling settles in `kDfuDnloadIdle`:\n```cpp\n    // Poll status to wait for the block to be processed.\n    if (auto idle \u003d DfuPollIdle(interface);\n        !idle || *idle !\u003d DfuState::kDfuDnloadIdle) {\n      std::println(stderr, \"DFU status error after block {} (offset {:#x}).\",\n                   block_num, offset);\n      DfuClearIfInError(interface);\n      return std::unexpected(idle ? RtsError::kProtocolError : idle.error());\n    }\n```\n\nOther locations in this file:\n- **Lines 487–492** (`DfuDownload` per-block poll check)\n- **Lines 517–518** (`DfuDownload` ZLP error handling—remove `DfuReportStatus(interface);`)\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 374,
+        "startChar": 0,
+        "endLine": 422,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f6279c7_ff3b7624",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity (Unused `#include`s):** `std::vector` is not used in `rts5817_usb_device.h` now that `DfuDownload` takes `std::span\u003cconst uint8_t\u003e`. Please remove `#include \u003cvector\u003e` here (as well as the unused `#include \u003cinitializer_list\u003e` added at `util/realtekfp/rts5817_usb_device_test.cc:17`).\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71c60db7_29391118",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity \u0026 Type Safety (`DfuStatusResponse` \u0026 Single-Use Private Wrappers):**\n\n1. **Typed `status` and `state` on `DfuStatusResponse`:** Storing `DfuStatus status` and `DfuState state` directly on `DfuStatusResponse` (converting once in `FromBytes`) eliminates the repeated `static_cast\u003cDfuState\u003e(status-\u003estate)` and `std::to_underlying(DfuStatus::kOk)` / `std::to_underlying(DfuState::kDfuError)` casts across `DfuPollIdle()`, `DfuClearIfInError()`, and `DfuRecoverToIdle()`:\n```cpp\n// The six-byte DFU_GETSTATUS response.\nstruct DfuStatusResponse {\n  DfuStatus status \u003d DfuStatus::kOk;\n  std::chrono::milliseconds poll_timeout{0};\n  DfuState state \u003d DfuState::kDfuIdle;\n\n  // Decodes the response; bwPollTimeout is a 24-bit little-endian value.\n  static DfuStatusResponse FromBytes(\n      std::span\u003cconst uint8_t, kDfuGetStatusResponseLen\u003e raw);\n};\n```\n2. **Remove thin pass-through wrappers (`lines 272–288`):** `DfuClearStatus()` and `DfuAbort()` are single-line wrappers around `DfuSendRequest(DfuRequest::kClrStatus, 0, interface)` and `DfuSendRequest(DfuRequest::kAbort, 0, interface)`, and `DfuReportStatus()` can be folded into `DfuClearIfInError()` so `DfuDownload()` does not issue two back-to-back `DFU_GETSTATUS` requests when the final ZLP stalls.\n3. **Test coverage for `RtsError::kDeviceRejected` (`lines 36, 57–58`):** Please include `RtsError::kDeviceRejected` in `RtsErrorTest.ToStringCoversAllValues` (`rts5817_usb_device_test.cc:388–394`).\n\nOther locations in this file:\n- **Lines 36, 57–58** (`RtsError::kDeviceRejected`)\n- **Lines 272–288** (`DfuClearStatus`, `DfuAbort`, `DfuReportStatus`)\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a493576_c756baf8",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Test Oracle Specificity (`FakeDfuDevice`):**\n\n1. Use `std::ranges::fill(data, 0);` instead of `std::fill(data.begin(), data.end(), 0);` at line 704.\n2. In `FakeDfuDevice::Attach()` (lines 680–698), specify the exact contract arguments on `ControlTransferIn` (`kBmReqD2hClsIf`, `std::to_underlying(DfuRequest::kGetStatus)`, `0`, `interface`, `SizeIs(kDfuGetStatusResponseLen)`, `milliseconds(kUsbDfuTimeout)`) and `ControlTransferOut` (`kBmReqH2dClsIf`, `interface`) rather than wildcard `_` matchers.\n3. Making `poll_timeout` a field (`milliseconds poll_timeout{5};`) and adding `bool error_on_fail \u003d false;` lets tests exercise the `poll_timeout \u003d\u003d 0` fallback (`kDfuMinPollDelay`), fast exact-boundary timeouts, and error-state clearing without custom `EXPECT_CALL` lambdas:\n\n```cpp\n  // Extra GETSTATUS replies with `poll_timeout`, before settling.\n  int busy_polls \u003d 0;\n  milliseconds poll_timeout{5};\n  // Enter dfuERROR when `fail_block` fails.\n  bool error_on_fail \u003d false;\n  // Fail every GETSTATUS once the final ZLP was accepted.\n  bool fail_status_after_zlp \u003d false;\n\n  std::vector\u003cBlock\u003e blocks;\n  std::vector\u003cDfuRequest\u003e requests;\n  std::vector\u003cDfuState\u003e state_when_cleared;\n\n  void Attach(MockRtsUsbBackend\u0026 backend, int interface) {\n    EXPECT_CALL(\n        backend,\n        ControlTransferIn(kBmReqD2hClsIf,\n                          std::to_underlying(DfuRequest::kGetStatus), 0,\n                          interface, SizeIs(kDfuGetStatusResponseLen),\n                          milliseconds(kUsbDfuTimeout)))\n        .WillRepeatedly([this](uint8_t, uint8_t, uint16_t, uint16_t,\n                               std::span\u003cuint8_t\u003e data, milliseconds) {\n          if (zlp_done_ \u0026\u0026 fail_status_after_zlp) {\n            return std::expected\u003csize_t, int\u003e(\n                std::unexpected(kUsbErrorNoDevice));\n          }\n          return GetStatus(data);\n        });\n    EXPECT_CALL(backend,\n                ControlTransferOut(kBmReqH2dClsIf, _, _, interface, _, _))\n        .WillRepeatedly([this](uint8_t, uint8_t request, uint16_t value,\n                               uint16_t, std::span\u003cconst uint8_t\u003e data,\n                               milliseconds) {\n          return Out(static_cast\u003cDfuRequest\u003e(request), value, data);\n        });\n  }\n\n private:\n  bool zlp_done_ \u003d false;\n\n  std::expected\u003csize_t, int\u003e GetStatus(std::span\u003cuint8_t\u003e data) {\n    std::ranges::fill(data, 0);\n    data[kDfuStatusOff] \u003d status;\n    data[kDfuStateOff] \u003d std::to_underlying(state);\n    if (busy_polls \u003e 0) {\n      --busy_polls;\n      const auto ms \u003d static_cast\u003cuint32_t\u003e(poll_timeout.count());\n      data[kDfuPollTimeoutOff] \u003d static_cast\u003cuint8_t\u003e(ms);\n      data[kDfuPollTimeoutOff + 1] \u003d static_cast\u003cuint8_t\u003e(ms \u003e\u003e 8);\n      data[kDfuPollTimeoutOff + 2] \u003d static_cast\u003cuint8_t\u003e(ms \u003e\u003e 16);\n      data[kDfuStateOff] \u003d std::to_underlying(DfuState::kDfuDnloadBusy);\n    }\n    return data.size();\n  }\n```\n(And in `Out()` when `static_cast\u003cint\u003e(value) \u003d\u003d fail_block`, set `if (error_on_fail) { state \u003d DfuState::kDfuError; status \u003d std::to_underlying(DfuStatus::kNotDone); }`.)\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 656,
+        "startChar": 0,
+        "endLine": 755,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75334c86_9e697d1e",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 1103,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:27:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing, Idiomaticity \u0026 Boundary Coverage:**\n\n1. **Eliminate loop \u0026 weak `EXPECT_LE` oracle in `TimesOutWhenDeviceStaysBusy` (`lines 1090–1103`):** `EXPECT_LE(total, milliseconds(kUsbDfuTimeout))` would pass even if `DfuPollIdle()` never slept (`total \u003d\u003d 0`). Setting `fake_.poll_timeout \u003d milliseconds(25000); fake_.busy_polls \u003d 3;` tests both normal `poll_timeout` sleeps and the `kUsbDfuTimeout - slept` clamping boundary in 3 iterations without a `for` loop:\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, TimesOutWhenDeviceStaysBusy) {\n  fake_.poll_timeout \u003d milliseconds(25000);\n  fake_.busy_polls \u003d 3;\n\n  auto res \u003d device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2});\n\n  ASSERT_FALSE(res);\n  EXPECT_EQ(res.error(), RtsError::kTimeout);\n  EXPECT_EQ(slept_, (std::vector\u003cmilliseconds\u003e{\n                        milliseconds(25000),\n                        milliseconds(25000),\n                        milliseconds(10000),\n                    }));\n}\n```\n2. **Assert exact request sequence in `DetachesAfterManifestSoDeviceBoots` (`lines 996–1005`):** Replace `ASSERT_FALSE` + `back()` + `std::count(fake_.requests.begin(), fake_.requests.end(), ...)` with a single exact vector comparison:\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, DetachesAfterManifestSoDeviceBoots) {\n  ASSERT_TRUE(device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2}));\n\n  // Download block 0 and the ZLP, and only then DFU_DETACH.\n  EXPECT_EQ(fake_.requests,\n            (std::vector\u003cDfuRequest\u003e{DfuRequest::kDownload,\n                                     DfuRequest::kDownload,\n                                     DfuRequest::kDetach}));\n}\n```\n3. **Specify exact contract arguments instead of `_` matchers** in `ShortWriteIsAnError` (`lines 910–911`), `DetachFailureIsReported` (`lines 1008–1012`), `FailsWhenRecoveryStatusReadFails` (`line 1056`), and `ReportsShortStatusRead` (`line 1067`), and use `fake_.error_on_fail \u003d true;` in `ClearsStatusWhenDeviceIsInErrorState` (`lines 929–945`):\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, ShortWriteIsAnError) {\n  EXPECT_CALL(*backend_,\n              ControlTransferOut(kBmReqH2dClsIf,\n                                 std::to_underlying(DfuRequest::kDownload), 0,\n                                 kDfuIf, SizeIs(kTransferSize),\n                                 milliseconds(kUsbDfuTimeout)))\n      .WillOnce(Return(std::expected\u003csize_t, int\u003e(kTransferSize - 1)));\n\n  auto res \u003d device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2, 3, 4, 5, 6});\n\n  ASSERT_FALSE(res);\n  EXPECT_EQ(res.error(), RtsError::kProtocolError);\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, ClearsStatusWhenDeviceIsInErrorState) {\n  fake_.fail_block \u003d 0;\n  fake_.error_on_fail \u003d true;\n\n  EXPECT_FALSE(device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2, 3, 4}));\n  EXPECT_EQ(fake_.state_when_cleared,\n            (std::vector\u003cDfuState\u003e{DfuState::kDfuError}));\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, DetachFailureIsReported) {\n  EXPECT_CALL(*backend_,\n              ControlTransferOut(kBmReqH2dClsIf,\n                                 std::to_underlying(DfuRequest::kDetach), 0,\n                                 kDfuIf, IsEmpty(), kUsbCtrlTimeout))\n      .WillOnce(Return(std::unexpected(kUsbErrorNoDevice)));\n\n  auto res \u003d device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2});\n\n  ASSERT_FALSE(res);\n  EXPECT_EQ(res.error(), RtsError::kDeviceNotFound);\n}\n```\n4. **Add missing branch and boundary tests** for:\n   - `poll_timeout \u003d\u003d 0` fallback to `kDfuMinPollDelay` (`1ms`)\n   - `status \u003d\u003d kOk \u0026\u0026 state \u003d\u003d kDfuError` in `DfuPollIdle()`\n   - Pre-download recovery when the device starts in `kDfuDnloadBusy` and settles into `kDfuDnloadIdle` (verifying `DfuRequest::kAbort` is sent before block 0):\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, UsesMinPollDelayWhenPollTimeoutIsZero) {\n  fake_.busy_polls \u003d 1;\n  fake_.poll_timeout \u003d milliseconds(0);\n\n  ASSERT_TRUE(device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2}));\n  EXPECT_EQ(slept_, (std::vector\u003cmilliseconds\u003e{kDfuMinPollDelay}));\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, FailsWhenDeviceEntersErrorStateWithOkStatus) {\n  fake_.manifest_result \u003d DfuState::kDfuError;\n\n  auto res \u003d device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2});\n\n  ASSERT_FALSE(res);\n  EXPECT_EQ(res.error(), RtsError::kDeviceRejected);\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, AbortsAfterBusyRecoverySettlesInDnloadIdle) {\n  fake_.busy_polls \u003d 1;\n  fake_.state \u003d DfuState::kDfuDnloadIdle;\n\n  ASSERT_TRUE(device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2}));\n  ASSERT_FALSE(fake_.requests.empty());\n  EXPECT_EQ(fake_.requests.front(), DfuRequest::kAbort);\n}\n```\n\nOther locations in this file:\n- **Lines 910–912** (`ShortWriteIsAnError`)\n- **Lines 929–945** (`ClearsStatusWhenDeviceIsInErrorState`)\n- **Lines 996–1005** (`DetachesAfterManifestSoDeviceBoots`)\n- **Lines 1007–1018** (`DetachFailureIsReported`)\n- **Lines 1055–1075** (`FailsWhenRecoveryStatusReadFails`, `ReportsShortStatusRead`)\n- **Lines 1090–1103** (`TimesOutWhenDeviceStaysBusy`)\n\n[🔗](http://go/tj/b2c5d976-5204-4274-85f0-ebbdd5e79b54)",
+      "range": {
+        "startLine": 909,
+        "startChar": 0,
+        "endLine": 1103,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0daa708b4ff0832e00044a3f64e02eca1683a689",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
