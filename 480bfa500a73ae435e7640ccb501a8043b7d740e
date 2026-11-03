@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee9ac743_998d73ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T11:14:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5e72cc91-4e7f-4892-8380-d9d11560a799)]\n\n### Review Summary\n- **Functionality:** ✅ `Flash()` accurately orchestrates the RTS5817 DFU update sequence—stripping any trailing DFU suffix, rejecting empty payloads before touching the USB bus, opening either an explicit target or falling back from runtime (`0BDA:5817`) to DFU (`0BDA:5800`) only on `kDeviceNotFound`, transitioning runtime devices into DFU mode via `EnableDownload()` and `DfuDetach()`, downloading the firmware payload, and waiting for runtime re-enumeration.\n- **Architecture \u0026 Component Fit:** ✅ Isolating the flashing sequence in `rts5817_flasher.{h,cc}` cleanly decouples the DFU state-machine orchestration from CLI parsing (`rts5817_flash_cli`) and low-level USB device/transport layers (`rts5817_usb_device`, `rts5817_usb_backend`), enabling deterministic in-process testing against a simulated USB bus. `OpenTarget()` is appropriately scoped to the anonymous namespace in `rts5817_flasher.cc`.\n- **Code Simplicity:** ✅ Both `OpenTarget()` and `Flash()` use flat guard clauses and early error propagation with minimal state and no redundant branching.\n- **Idiomaticity \u0026 Readability:** ✅ Idiomatic modern C++ (`std::expected`, `std::span`, `std::optional`, `std::chrono::milliseconds`, `std::println`, `std::ranges`, `std::bit_cast`, `std::to_underlying`, and designated initializers) with named `inline constexpr` device ID and timeout constants.\n- **Security:** ✅ Firmware buffers are handled via bounds-checked `std::span\u003cconst uint8_t\u003e` slices and validated for non-empty payloads after DFU suffix stripping before any USB operations occur.\n- **Testing:** ✅ Thorough unit test suite in `rts5817_flasher_test.cc` covering the end-to-end Boot ROM and Flash Image runtime flows, stalled mode queries, direct DFU-mode flashing, device discovery fallbacks and `kAccessDenied` handling, explicit target selection, download/detach/image-rejection errors, DFU suffix stripping, empty/suffix-only image rejection, and exact boundary (`kMaxReEnumPolls`) and off-by-one (`kMaxReEnumPolls - 1`) re-enumeration polling.\n- **CL Size \u0026 Scope:** ✅ `Size: L (+672, -0)` — The production diff is 153 lines (`rts5817_flasher.h`: +46, `rts5817_flasher.cc`: +105, `build.mk`: +2) implementing a single cohesive logical change, with the remaining 519 lines in `rts5817_flasher_test.cc` providing unit and boundary tests.\n- **Commit Message:** ✅ Concise, accurate subject line and prose body clearly explaining both the motivation and behavior of `Flash()`, with proper `BUG\u003d` and `TEST\u003d` tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "480bfa500a73ae435e7640ccb501a8043b7d740e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
