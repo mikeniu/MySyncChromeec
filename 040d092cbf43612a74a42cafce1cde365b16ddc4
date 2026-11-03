@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e651e64_3b6332cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T10:40:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/84ce3e8b-d33e-42f6-85f8-621c7a52c2ad)]\n\n### Review Summary\n* **Functionality:** `RtsUsbDevice::FindDfuInterface()` locates the USB DFU interface (`class \u003d 0xFE`, `subclass \u003d 0x01`) from the active configuration descriptor and parses its `wTransferSize`, `RtsUsbDevice::DfuDetach()` validates that `detach_timeout` fits in the 16-bit `wValue` field and claims the interface via `InterfaceClaim` before issuing `DFU_DETACH` through `DfuSendRequest()`, and `InterfaceClaim` guarantees the interface is released on all return paths.\n* **Architecture \u0026 Component Fit:** Cleanly layered on top of `RtsUsbBackend::GetInterfaces()`, `ClaimInterface()`, `ReleaseInterface()`, and `ParseDfuTransferSize()`, keeping `InterfaceClaim`, `FindDfuInterface()`, and `DfuSendRequest()` `private` to `RtsUsbDevice` without introducing unused member state.\n* **Code Simplicity:** Concise, linear control flow using early-return guard clauses and RAII interface management.\n* **Idiomaticity \u0026 Readability:** Idiomatic C++23 (`std::expected`, `std::ranges::find_if`, `std::to_underlying`, `std::chrono::milliseconds`, `inline constexpr` header constants, and designated initializers) with named constants and `UINT16_MAX`-derived boundary values.\n* **Security:** Proper bounds validation on the 16-bit `wValue` timeout before narrowing to `uint16_t` and safe descriptor parsing.\n* **Testing:** Comprehensive unit test coverage in `RtsUsbDeviceDfuTest` and `RtsErrorTest` exercising negative and `\u003e UINT16_MAX` timeouts, exact `0 ms` and `UINT16_MAX ms` timeout boundaries, closed-device and config-descriptor failure paths, missing or mismatched class/subclass interfaces, interface claiming/releasing around `DFU_DETACH`, claim failure, and transfer failure release cleanup.\n* **CL Size \u0026 Scope:** `Size: L (+304, -1)` (+146 production lines across `rts5817_usb_device.h` and `rts5817_usb_device.cc`, and +158, -1 unit test lines in `rts5817_usb_device_test.cc`). The production diff is well under 250 lines and implements a single cohesive logical change pushed into `Size: L` by its unit test suite.\n* **Commit Message:** Clear subject line and concise two-paragraph rationale and summary.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "040d092cbf43612a74a42cafce1cde365b16ddc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
