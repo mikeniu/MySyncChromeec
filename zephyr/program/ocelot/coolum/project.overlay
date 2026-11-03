@@ -14,10 +14,10 @@
 
 #include <cros/integrated_fwid.dtsi>
 #include "../ite_hibernate.dtsi"
-#include "../rvp_battery.dtsi"
 #include "../rvp_usba.dtsi"
 
 /* coolum project DTS includes */
+#include "battery.dtsi"
 #include "binman.dtsi"
 #include "gpio.dtsi"
 #include "i2c.dtsi"
