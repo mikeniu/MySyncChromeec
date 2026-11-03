@@ -44,6 +44,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7c33241_4ec89e7e",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:07:00Z",
+      "side": 1,
+      "message": "Done in ps4: DfuDetach() claims the interface before sending DFU_DETACH and releases it afterwards, through a small RAII InterfaceClaim shared with DfuDownload(). This needed 8687499 to come first, so the stack order changed. Kernel driver detach is automatic (see the reply on 8687499). Tests check the claim happens around the request, and that a failed claim or a failed transfer still releases correctly.",
+      "parentUuid": "fc740b89_d152693e",
+      "range": {
+        "startLine": 143,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 9999
+      },
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc1c4fe1_9716d155",
@@ -68,6 +92,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1bca00b_e7d2f694",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:07:00Z",
+      "side": 1,
+      "message": "Done in ps4: FindDfuInterface() uses std::ranges::find_if, and GetInterfaces() returns a std::expected.",
+      "parentUuid": "dc1c4fe1_9716d155",
+      "range": {
+        "startLine": 210,
+        "startChar": 0,
+        "endLine": 220,
+        "endChar": 9999
+      },
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d5cde84_9537a851",
@@ -86,6 +134,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f738139b_093bf348",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:07:00Z",
+      "side": 1,
+      "message": "Done in ps4: DfuDetach() returns std::expected\u003cvoid, RtsError\u003e, and takes a std::chrono::milliseconds that must fit the 16-bit wValue.",
+      "parentUuid": "7d5cde84_9537a851",
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3dd2bfc_a3a8873a",
@@ -100,6 +166,24 @@
       "side": 1,
       "message": "Instead of returning `bool` and mutating `dfu_interface_` / `transfer_size_` as side effects, consider having `find_dfu_interface()` return `std::expected\u003cDfuInterfaceInfo, RtsError\u003e` (containing `{interface_number, transfer_size}`) by value. That avoids having to manually reset `dfu_interface_ \u003d -1` on error/release paths.",
       "isAi": true,
+      "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14681d7b_4bb0f1e4",
+        "filename": "util/realtekfp/rts5817_usb_device.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-11-03T06:07:00Z",
+      "side": 1,
+      "message": "Done: FindDfuInterface() returns std::expected\u003cDfuInterfaceInfo, RtsError\u003e by value, with a new kNoDfuInterface error. The dfu_interface_ and transfer_size_ members are removed in 8629987 (where the status helpers take the interface explicitly), because the status helpers that need them only arrive there.",
+      "parentUuid": "d3dd2bfc_a3a8873a",
       "revId": "f2b273fd566ec3888290a459ef603bc867bb475c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
