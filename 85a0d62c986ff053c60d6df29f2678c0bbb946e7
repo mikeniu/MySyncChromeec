@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14631cce_eb32344c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:29:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please update the second paragraph to use the current `DfuDetach()` method name (renamed from `dfu_detach()` in patchset 4) and reflect that `DfuDetach()` claims the discovered DFU interface before issuing `DFU_DETACH` (without storing `dfu_interface_` / `transfer_size_` on `RtsUsbDevice`):\n\n```text\nrts5817: Support transitioning to DFU mode via DFU_DETACH\n\nTransitioning the RTS5817 from runtime mode into DFU mode for firmware\nupdates requires locating the device\u0027s USB DFU interface (class 0xFE,\nsubclass 0x01), claiming it, and issuing a class-specific DFU_DETACH\ncontrol request.\n\nExtend RtsUsbDevice with DFU interface discovery and DfuDetach() to\nlocate and claim the DFU interface and send DFU_DETACH to trigger USB\nre-enumeration.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n\nChange-Id: I653afa87a5b89071ab2f0dcdce2d52b7e8372354\n```\n\n[🔗](http://go/tj/e0d899bb-ac40-40a8-a839-93b60aee117f)",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3084e438_ff4ec998",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:29:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding redundant member state across stacked CLs, boundary test coverage for `0 ms` detach timeout, and the commit message.\n\n### Review Summary\n* **Functionality:** `RtsUsbDevice::FindDfuInterface()` locates the USB DFU interface (`class \u003d 0xFE`, `subclass \u003d 0x01`) and parses its `wTransferSize`, and `RtsUsbDevice::DfuDetach()` validates the 16-bit timeout, claims the interface via `InterfaceClaim`, and sends the `DFU_DETACH` control transfer.\n* **Architecture \u0026 Component Fit:** Now that `FindDfuInterface()` returns `std::expected\u003cDfuInterfaceInfo, RtsError\u003e` by value, keeping `dfu_interface_`, `transfer_size_`, and `transfer_size()` on `RtsUsbDevice` (and resetting them in `Release()`) introduces temporary member state in this CL that is immediately deleted in the child CL (`https://crrev.com/c/8629987`). Please omit `dfu_interface_`, `transfer_size_`, and `transfer_size()` in this CL and pass `info-\u003enumber` directly in `DfuDetach()`.\n* **Code Simplicity:** Removing `dfu_interface_` and `transfer_size_` from `RtsUsbDevice` eliminates the state assignments in `DfuDetach()` and keeps `RtsUsbDevice::Release()` as a single `backend_-\u003eClose()` call.\n* **Idiomaticity \u0026 Readability:** Clean use of C++23 `std::expected`, `std::ranges::find_if`, `std::chrono::milliseconds`, and RAII interface claiming. In `RtsUsbDeviceDfuTest`, prefer deriving the 16-bit timeout boundary values from `UINT16_MAX` rather than raw `65535` / `65536` literals.\n* **Security:** Proper bounds checking on the 16-bit `wValue` timeout and safe descriptor handling.\n* **Testing:** Good unit test coverage of error and claim/release paths in `RtsUsbDeviceDfuTest`, but the lower valid boundary `detach_timeout \u003d\u003d 0 ms` (`std::chrono::milliseconds::zero()`) is not tested (so mutating `\u003c` to `\u003c\u003d` on line 182 of `rts5817_usb_device.cc` would not be caught).\n* **CL Size \u0026 Scope:** `Size: L (+298, -2)` (+144, -1 production lines across `rts5817_usb_device.h` and `rts5817_usb_device.cc`; +154, -1 unit test lines in `rts5817_usb_device_test.cc`). The production diff is well under 250 lines and implements a single cohesive logical change pushed into `Size: L` by its unit tests.\n* **Commit Message:** The second paragraph of `/COMMIT_MSG` still references the pre-rename `dfu_detach()` identifier and describes recording `transfer_size` on `RtsUsbDevice`.\n\n[[trajectory](https://goto.corp.google.com/traj/e0d899bb-ac40-40a8-a839-93b60aee117f)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b18a892d_6fdee7a3",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:29:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Now that `FindDfuInterface()` returns `std::expected\u003cDfuInterfaceInfo, RtsError\u003e` by value, storing `dfu_interface_` and `transfer_size_` as data members on `RtsUsbDevice` (and resetting them in `Release()`) is redundant in this CL and causes unnecessary churn when the child CL (`https://crrev.com/c/8629987`) immediately removes `dfu_interface_`, `transfer_size_`, `transfer_size()`, the `Release()` resets, and `ReleaseForgetsFoundInterface`.\n\nIn this CL, `dfu_interface_` is never read outside `DfuDetach()` (which already has `info-\u003enumber` locally), and `DfuDetach()` triggers USB re-enumeration so the device handle must be closed and re-opened before any download occurs. Please omit `dfu_interface_`, `transfer_size_`, and `transfer_size()` from `RtsUsbDevice` in this CL, pass `info-\u003enumber` directly in `DfuDetach()`, and leave `RtsUsbDevice::Release()` unchanged:\n\n```cpp\n  // Find the DFU interface first.\n  auto info \u003d FindDfuInterface();\n  if (!info) {\n    return std::unexpected(info.error());\n  }\n\n  // An interface-recipient request needs the interface claimed (which also\n  // detaches any kernel driver); otherwise usbfs warns and may return EBUSY.\n  InterfaceClaim claim(*backend_, info-\u003enumber);\n  if (auto claimed \u003d claim.Claim(); !claimed) {\n    return Fail(*backend_, \"Claiming the DFU interface\", claimed.error());\n  }\n\n  // bmRequestType \u003d 0x21: Host-to-Device, Class, Interface\n  // bRequest \u003d kDfuDetach (0x00)\n  // wValue \u003d detach_timeout in ms\n  // wIndex \u003d interface number\n  auto res \u003d backend_-\u003eControlTransferOut(\n      kBmReqH2dClsIf, kDfuDetach, static_cast\u003cuint16_t\u003e(detach_timeout.count()),\n      static_cast\u003cuint16_t\u003e(info-\u003enumber), {}, kUsbCtrlTimeout);\n```\n\nOther locations to update:\n* `util/realtekfp/rts5817_usb_device.cc` **lines 107–111**: Keep `void RtsUsbDevice::Release() { backend_-\u003eClose(); }` unchanged.\n* `util/realtekfp/rts5817_usb_device.h` **lines 162–163** and **lines 199–200**: Remove `transfer_size()`, `dfu_interface_`, and `transfer_size_`.\n* `util/realtekfp/rts5817_usb_device_test.cc` **line 613** and **lines 645–657**: Remove `EXPECT_EQ(device_-\u003etransfer_size(), 2048);` and `ReleaseForgetsFoundInterface`.\n\n[🔗](http://go/tj/e0d899bb-ac40-40a8-a839-93b60aee117f)",
+      "range": {
+        "startLine": 191,
+        "startChar": 0,
+        "endLine": 212,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "105af9d9_77d3b962",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:29:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two boundary-testing improvements for `detach_timeout`:\n\n1. **Test the lower valid boundary (`0 ms`):** `DfuDetach()` checks `detach_timeout \u003c std::chrono::milliseconds::zero() || detach_timeout \u003e std::chrono::milliseconds(UINT16_MAX)`. While `milliseconds(-1)`, `milliseconds(65535)`, and `milliseconds(65536)` are tested, `milliseconds(0)` is never exercised—so if `\u003c` were accidentally written as `\u003c\u003d`, all tests would still pass.\n2. **Derive boundary inputs from `UINT16_MAX`:** Prefer `milliseconds(UINT16_MAX)` and `milliseconds(UINT16_MAX + 1)` over raw `65535` / `65536` literals so the test inputs directly express the 16-bit `wValue` limit.\n\n```cpp\nTEST_F(RtsUsbDeviceDfuTest, DetachRejectsTimeoutThatDoesNotFitInWValue) {\n  EXPECT_CALL(*backend_, GetInterfaces()).Times(0);\n  EXPECT_CALL(*backend_, ClaimInterface(_)).Times(0);\n\n  for (milliseconds timeout :\n       {milliseconds(-1), milliseconds(UINT16_MAX + 1)}) {\n    auto res \u003d device_-\u003eDfuDetach(timeout);\n\n    ASSERT_FALSE(res);\n    EXPECT_EQ(res.error(), RtsError::kInvalidParameter);\n  }\n}\n\nTEST_F(RtsUsbDeviceDfuTest, DetachAcceptsZeroTimeout) {\n  ExpectInterfaces({DfuInterface(2, 2048)});\n  EXPECT_CALL(*backend_, ClaimInterface(2))\n      .WillOnce(Return(std::expected\u003cvoid, int\u003e{}));\n  EXPECT_CALL(*backend_, ControlTransferOut(kBmReqH2dClsIf, kDfuDetach, 0, 2,\n                                            IsEmpty(), kUsbCtrlTimeout))\n      .WillOnce(Return(std::expected\u003csize_t, int\u003e(0)));\n  EXPECT_CALL(*backend_, ReleaseInterface(2));\n\n  EXPECT_TRUE(device_-\u003eDfuDetach(milliseconds::zero()));\n}\n\nTEST_F(RtsUsbDeviceDfuTest, DetachAcceptsTheLargestTimeout) {\n  ExpectInterfaces({DfuInterface(2, 2048)});\n  EXPECT_CALL(*backend_, ClaimInterface(2))\n      .WillOnce(Return(std::expected\u003cvoid, int\u003e{}));\n  EXPECT_CALL(*backend_, ControlTransferOut(kBmReqH2dClsIf, kDfuDetach,\n                                            UINT16_MAX, 2, IsEmpty(),\n                                            kUsbCtrlTimeout))\n      .WillOnce(Return(std::expected\u003csize_t, int\u003e(0)));\n  EXPECT_CALL(*backend_, ReleaseInterface(2));\n\n  EXPECT_TRUE(device_-\u003eDfuDetach(milliseconds(UINT16_MAX)));\n}\n```\n\n[🔗](http://go/tj/e0d899bb-ac40-40a8-a839-93b60aee117f)",
+      "range": {
+        "startLine": 525,
+        "startChar": 0,
+        "endLine": 547,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "85a0d62c986ff053c60d6df29f2678c0bbb946e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
