@@ -8,5 +8,8 @@
 		default_battery: sunwoda-l26d4pk3 {
 			compatible = "sunwoda,l26d4pk3", "battery-smart";
 		};
+		smp-l26m4pk3 {
+			compatible = "smp,l26m4pk3", "battery-smart";
+		};
 	};
 };
