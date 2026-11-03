@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebab53ea_4bf0ce1c",
+        "filename": "zephyr/test/bluey/tests/pic/src/test_fan.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-11-03T06:25:25Z",
+      "side": 1,
+      "message": "This assertion failed when running **twister -s bluey.pic** command. Have you run the same command?",
+      "revId": "af2bb92f9fe4abb6391874d5c14356692c936934",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
