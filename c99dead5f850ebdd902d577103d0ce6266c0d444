@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89dce445_39aebd30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T10:49:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please address the inline comments regarding the recovery polling timeout budget and test coverage.\n\n### Review Summary\n* **Functionality:** ❌ `DfuRecoverToIdle()` performs an initial `DfuGetStatus()` and `sleep_()` before calling `DfuPollIdle()`, which does not count that initial sleep toward `kUsbDfuTimeout` (allowing a stuck busy device to sleep up to `2 * kUsbDfuTimeout`, or 85s instead of 60s in `TimesOutWhenDeviceStaysBusy`), sleeps before rejecting non-busy unexpected states (such as `kDfuManifestWaitReset`), ignores non-OK `bStatus` when `bState` is idle, and fails instead of clearing `dfuERROR` if a busy state settles into `kDfuError`.\n* **Architecture \u0026 Component Fit:** ✅ Adding pre-download recovery in `RtsUsbDevice` fits the existing DFU state management layer cleanly.\n* **Code Simplicity:** ❌ Polling while the device is in a transient busy state can be shared between `DfuPollIdle()` and `DfuRecoverToIdle()`, removing the duplicated timeout-clamping `sleep_()` call, the mutable `settled` state variable, and the split `DfuRequest::kAbort` branches.\n* **Idiomaticity \u0026 Readability:** ✅ Uses modern C++20/23 (`std::expected`, `std::chrono`, `std::to_underlying`, `enum class`) and named constants consistently.\n* **Security:** ✅ No security concerns identified.\n* **Testing:** ❌ `TimesOutWhenDeviceStaysBusy` was adjusted to expect 85,000 ms of total sleep across 4 polls (contradicting its comment that the total is clamped to `kUsbDfuTimeout` \u003d 60,000 ms), and unit tests are missing for recovery request (`kClrStatus` / `kAbort`) failure propagation and busy recovery settling into `kDfuError`.\n* **CL Size \u0026 Scope:** ✅ `Size: M (+109, -1)` (~36 production lines, ~74 test lines). Represents a single, cohesive logical change with its associated unit tests.\n* **Commit Message:** ✅ Clear, concise subject and prose body explaining the motivation and recovery behavior with `BUG\u003d` and `TEST\u003d` tags.\n\n[[trajectory](https://goto.corp.google.com/traj/299f4ff5-df51-438e-9ffa-b26782cf1cb6)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c99dead5f850ebdd902d577103d0ce6266c0d444",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1856b7ff_9ab3d6c3",
+        "filename": "util/realtekfp/rts5817_usb_device.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T10:49:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Performing a separate `DfuGetStatus()` and `sleep_()` here before calling `DfuPollIdle()` introduces a few issues:\n\n1. **Exceeds `kUsbDfuTimeout` and duplicates sleep clamping:** The initial `sleep_()` at lines 392–393 is not counted toward `DfuPollIdle()`\u0027s `slept \u003c kUsbDfuTimeout` loop. If a device stays busy, recovery can sleep for `first_poll_timeout + kUsbDfuTimeout` (up to `2 * kUsbDfuTimeout` \u003d 120s, or 85s in `TimesOutWhenDeviceStaysBusy` instead of clamping the total wait to 60s).\n2. **Sleeps on unexpected non-busy states and ignores `bStatus`:** Checking `settled !\u003d DfuState::kDfuIdle \u0026\u0026 settled !\u003d DfuState::kDfuDnloadIdle` treats unexpected non-busy states (such as `kDfuManifestWaitReset`) as busy—sleeping for `poll_timeout` and issuing a second `DfuGetStatus()` before `DfuPollIdle()` rejects them—while ignoring `status-\u003estatus !\u003d DfuStatus::kOk` when `state` is `kDfuIdle`, `kDfuDnloadIdle`, or `kDfuUploadIdle`.\n3. **Does not recover if a busy state settles into `dfuERROR`, and splits the `kAbort` branch:** If an interrupted busy operation finishes in `kDfuError`, `DfuPollIdle()` fails with `RtsError::kDeviceRejected` instead of clearing it with `DFU_CLRSTATUS`. Polling while busy first also lets `kDfuDnloadIdle` and `kDfuUploadIdle` share a single `DfuRequest::kAbort` branch.\n\nConsider extracting a `DfuPollSettled(int interface)` helper (declared in `rts5817_usb_device.h`) that polls `DfuGetStatus()` while the device reports a transient busy state (`kDfuDnloadSync`, `kDfuDnloadBusy`, `kDfuManifestSync`, `kDfuManifest` with `DfuStatus::kOk`), and calling it from both `DfuPollIdle()` and `DfuRecoverToIdle()`:\n\n```cpp\nstd::expected\u003cDfuStatusResponse, RtsError\u003e RtsUsbDevice::DfuPollSettled(\n    int interface) {\n  using enum DfuState;\n\n  // Bound the whole wait: the manifest phase (flash programming and image\n  // verification) can take tens of seconds.\n  std::chrono::milliseconds slept{0};\n\n  while (slept \u003c kUsbDfuTimeout) {\n    auto status \u003d DfuGetStatus(interface);\n    if (!status) {\n      return std::unexpected(status.error());\n    }\n\n    if (status-\u003estatus !\u003d DfuStatus::kOk ||\n        (status-\u003estate !\u003d kDfuDnloadSync \u0026\u0026 status-\u003estate !\u003d kDfuDnloadBusy \u0026\u0026\n         status-\u003estate !\u003d kDfuManifestSync \u0026\u0026 status-\u003estate !\u003d kDfuManifest)) {\n      return *status;\n    }\n\n    // Never sleep past the overall timeout.\n    const auto delay \u003d\n        std::min(std::max(status-\u003epoll_timeout, kDfuMinPollDelay),\n                 kUsbDfuTimeout - slept);\n\n    sleep_(delay);\n    slept +\u003d delay;\n  }\n\n  std::println(stderr, \"Timed out waiting for DFU idle state.\");\n  return std::unexpected(RtsError::kTimeout);\n}\n\nstd::expected\u003cDfuState, RtsError\u003e RtsUsbDevice::DfuPollIdle(int interface) {\n  auto status \u003d DfuPollSettled(interface);\n  if (!status) {\n    return std::unexpected(status.error());\n  }\n\n  if (status-\u003estatus !\u003d DfuStatus::kOk ||\n      status-\u003estate \u003d\u003d DfuState::kDfuError) {\n    std::println(stderr, \"DFU error: bStatus\u003d{}, bState\u003d{}\",\n                 std::to_underlying(status-\u003estatus),\n                 std::to_underlying(status-\u003estate));\n    return std::unexpected(RtsError::kDeviceRejected);\n  }\n\n  if (status-\u003estate \u003d\u003d DfuState::kDfuIdle ||\n      status-\u003estate \u003d\u003d DfuState::kDfuDnloadIdle) {\n    return status-\u003estate;\n  }\n\n  std::println(stderr, \"Unexpected DFU state: bState\u003d{}\",\n               std::to_underlying(status-\u003estate));\n  return std::unexpected(RtsError::kProtocolError);\n}\n\nstd::expected\u003cvoid, RtsError\u003e RtsUsbDevice::DfuRecoverToIdle(int interface) {\n  auto status \u003d DfuPollSettled(interface);\n  if (!status) {\n    return std::unexpected(status.error());\n  }\n\n  if (status-\u003estate \u003d\u003d DfuState::kDfuError) {\n    // CLRSTATUS is only valid here.\n    return DfuSendRequest(DfuRequest::kClrStatus, 0, interface);\n  }\n  if (status-\u003estatus !\u003d DfuStatus::kOk) {\n    std::println(stderr, \"DFU error: bStatus\u003d{}, bState\u003d{}\",\n                 std::to_underlying(status-\u003estatus),\n                 std::to_underlying(status-\u003estate));\n    return std::unexpected(RtsError::kDeviceRejected);\n  }\n\n  switch (status-\u003estate) {\n    case DfuState::kDfuIdle:\n      return {};\n    case DfuState::kDfuDnloadIdle:\n    case DfuState::kDfuUploadIdle:\n      return DfuSendRequest(DfuRequest::kAbort, 0, interface);\n    default:\n      std::println(stderr, \"Unexpected DFU state: bState\u003d{}\",\n                   std::to_underlying(status-\u003estate));\n      return std::unexpected(RtsError::kProtocolError);\n  }\n}\n```\n\n[🔗](http://go/tj/299f4ff5-df51-438e-9ffa-b26782cf1cb6)",
+      "range": {
+        "startLine": 374,
+        "startChar": 0,
+        "endLine": 404,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c99dead5f850ebdd902d577103d0ce6266c0d444",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8f4e518_6ebb6a4b",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T10:49:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Note that `kUsbDfuTimeout` is 60,000 ms (60s), whereas this updated expectation sums to 85,000 ms (`25000 * 3 + 10000`), contradicting the comment on line 1136 (`// The last sleep is clamped so the total is exactly kUsbDfuTimeout.`).\n\nOnce `DfuRecoverToIdle()` shares the `kUsbDfuTimeout`-bounded poll loop with `DfuPollIdle()` instead of sleeping an extra `poll_timeout` beforehand, this test can remain unchanged at `fake_.busy_polls \u003d 3` with a total sleep of 60,000 ms:\n\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, TimesOutWhenDeviceStaysBusy) {\n  fake_.poll_timeout \u003d milliseconds(25000);\n  fake_.busy_polls \u003d 3;\n\n  auto res \u003d device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2});\n\n  ASSERT_FALSE(res);\n  EXPECT_EQ(res.error(), RtsError::kTimeout);\n  // The last sleep is clamped so the total is exactly kUsbDfuTimeout.\n  EXPECT_EQ(slept_, (std::vector\u003cmilliseconds\u003e{\n                        milliseconds(25000),\n                        milliseconds(25000),\n                        milliseconds(10000),\n                    }));\n}\n```\n\n[🔗](http://go/tj/299f4ff5-df51-438e-9ffa-b26782cf1cb6)",
+      "range": {
+        "startLine": 1126,
+        "startChar": 0,
+        "endLine": 1143,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c99dead5f850ebdd902d577103d0ce6266c0d444",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6273c76c_7b1ca929",
+        "filename": "util/realtekfp/rts5817_usb_device_test.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T10:49:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please also add unit tests covering:\n1. A busy recovery settling in `DfuState::kDfuError` (verifying `DfuRequest::kClrStatus` is sent after the busy poll).\n2. Failure propagation when the recovery request (`kClrStatus` or `kAbort`) itself fails (verifying `DfuDownload()` returns the error without sending any firmware blocks).\n\nFor example:\n\n```cpp\nTEST_F(RtsUsbDeviceDownloadTest, ClearsErrorAfterBusyRecoverySettlesInError) {\n  fake_.busy_polls \u003d 1;\n  fake_.state \u003d DfuState::kDfuError;\n  fake_.status \u003d std::to_underlying(DfuStatus::kNotDone);\n\n  ASSERT_TRUE(device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2}));\n  ASSERT_FALSE(fake_.requests.empty());\n  EXPECT_EQ(fake_.requests.front(), DfuRequest::kClrStatus);\n  EXPECT_EQ(fake_.state_when_cleared,\n            (std::vector\u003cDfuState\u003e{DfuState::kDfuError}));\n}\n\nTEST_F(RtsUsbDeviceDownloadTest, FailsWhenRecoveryAbortFails) {\n  fake_.state \u003d DfuState::kDfuDnloadIdle;\n  EXPECT_CALL(*backend_,\n              ControlTransferOut(kBmReqH2dClsIf,\n                                 std::to_underlying(DfuRequest::kAbort), 0,\n                                 kDfuIf, IsEmpty(), kUsbCtrlTimeout))\n      .WillOnce(Return(std::unexpected(kUsbErrorPipe)));\n\n  auto res \u003d device_-\u003eDfuDownload(std::vector\u003cuint8_t\u003e{1, 2});\n\n  ASSERT_FALSE(res);\n  EXPECT_EQ(res.error(), RtsError::kStall);\n  EXPECT_TRUE(fake_.blocks.empty());\n}\n```\n\n[🔗](http://go/tj/299f4ff5-df51-438e-9ffa-b26782cf1cb6)",
+      "range": {
+        "startLine": 1162,
+        "startChar": 0,
+        "endLine": 1169,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c99dead5f850ebdd902d577103d0ce6266c0d444",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
