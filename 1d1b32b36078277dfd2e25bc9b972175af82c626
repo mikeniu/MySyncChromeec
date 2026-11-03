@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c9d1c07_0f96b6e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T10:06:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/8b1e49f5-f20c-4d75-a622-698ba0d13b8e)]\n\n### Review Summary\n- **Functionality:** ✅ Registers `\u0026i2c0` (`ec_i2c_pac`, `I2C_PORT_PAC`) under `named-i2c-ports` in `zephyr/program/fatcat/moonstone/gpios.dtsi` so port 0 (enabled in `i2c_pac.dtsi` for `pac1`–`pac12`) is included in `i2c_ports[]` and discoverable via `get_i2c_port(0)` for I2C host commands.\n- **Architecture \u0026 Component Fit:** ✅ Places the `named-i2c-ports` entry in `moonstone/gpios.dtsi` alongside the existing I2C port declarations (`\u0026i2c1`, `\u0026i2c4`, `\u0026i2c5`), ordered by bus index and matching the `i2c_ec_i2c_\u003cname\u003e: ec_i2c_\u003cname\u003e` naming convention and `named-i2c-ports.yaml` binding.\n- **Code Simplicity:** ✅ Minimal 4-line declarative Devicetree node.\n- **Idiomaticity \u0026 Readability:** ✅ Follows Zephyr Devicetree conventions, phandle syntax, and upper-snake-case `enum-names` without magic values.\n- **Security:** ✅ No security concerns introduced.\n- **Testing:** ✅ Static Devicetree port mapping configuration with no procedural branching or state logic; validated at build time via `zmake build moonstone` and verified with `libectool_test` (`test_cmd_i2cxfer`).\n- **CL Size \u0026 Scope:** ✅ `Size: XS (+4, -0)` — Single, self-contained logical change.\n- **Commit Message:** ✅ Clear imperative subject line (`moonstone: Add i2c0 to named-i2c-ports`), concise prose rationale explaining why the entry is needed (`so port 0 is registered in i2c_ports[]`), and standard `BUG\u003db:579214108` / `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1d1b32b36078277dfd2e25bc9b972175af82c626",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
