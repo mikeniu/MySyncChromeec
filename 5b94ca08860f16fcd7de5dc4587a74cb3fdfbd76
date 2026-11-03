@@ -1,0 +1,198 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "820fc53b_115c6290",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** and address the inline comments.\n\n### Review Summary\n\n**Functionality:** `Flash()` in `rts5817_flasher.cc` currently relies on the caller (`main()` in `rts5817_flash.cc`) to strip the DFU suffix and reject an empty payload before calling `Flash()`. If `Flash()` is called directly with an empty buffer or a 16-byte suffix-only image, it opens the device, enables download mode, detaches the hardware into DFU mode (`0BDA:5800`), waits for re-enumeration, and only then fails inside `DfuDownload()` with `RtsError::kInvalidParameter` — leaving the device in DFU mode.\n\n**Architecture \u0026 Component Fit:** Co-locating `StripDfuSuffix()` and the empty-payload check at the start of `Flash()` in `rts5817_flasher.cc` (before `OpenTarget()`) makes `Flash()` self-validating, keeps `rts5817_flash.cc` as thin CLI glue, and makes the pre-flight suffix stripping and empty-payload rejection directly testable in `rts5817_flasher_test.cc`. Exposing `kDetachTimeout`, `kReEnumTimeout`, and `kReEnumPollInterval` in `rts5817_flasher.h` (matching `rts5817_usb_device.h`) also allows tests to reference those constants directly.\n\n**Code Simplicity:**\n- In `rts5817_flash.cc`, the single-use `Report()` helper and its unnamed namespace can be replaced with a direct `std::println(stderr, ...)` call.\n- In `rts5817_flasher.cc`, `dfu_id` is hoisted outside the `if (!in_dfu_mode)` branch where it is used.\n- In `rts5817_libusb_backend.cc`, `Open()` uses raw pointer temporaries (`raw_list` and `handle`) where `std::out_ptr(list)` and `std::out_ptr(dev_handle_)` can be used directly (matching `Init()` and `GetInterfaces()` in the same file), and the two `namespace { ... }` blocks can be merged.\n- In `rts5817_flasher_test.cc`, `#include \u003cstring\u003e`, `using ::testing::Not;`, `FakeBus::get_status_calls`, and `FakeBus::init_count` are unused.\n\n**Idiomaticity \u0026 Readability:** In `rts5817_flasher_test.cc`, prefer `std::ranges::fill(data, 0)` over `std::fill(data.begin(), data.end(), 0)` and C++23 `std::ranges::contains(bus_-\u003eevents, event)` in `Saw()`, and replace the hardcoded `milliseconds(100)` and `1 \u003c\u003c 20` literals with expressions derived from `kReEnumTimeout` and `kReEnumPollInterval`.\n\n**Testing:**\n- `rts5817_flasher_test.cc` is missing tests for the early-return error paths when `EnableDownload()` or `DfuDetach()` fails in `Flash()`, for DFU suffix stripping and empty/suffix-only payload rejection, and for the exact re-enumeration poll timeout boundary (`kReEnumTimeout / kReEnumPollInterval - 1` vs. `kReEnumTimeout / kReEnumPollInterval`).\n- `PollsUntilTheDfuDeviceAppears` uses `EXPECT_GE` instead of asserting the exact sleep duration (`EXPECT_EQ(slept_, 2 * kPolls * kReEnumPollInterval)`).\n- `RtsLibusbBackend` (`rts5817_libusb_backend.cc`) is not linked into `rts5817_flash_test` and has no unit tests for its uninitialized/unopened guard paths.\n\n**Security:** N/A\n\n**CL Size \u0026 Scope:** `Size: L (+950, -1)`. The non-test production delta is 512 lines (`rts5817_libusb_backend.{h,cc}`: 266 lines, `rts5817_flasher.{h,cc}`: 141 lines, `rts5817_flash.cc`: 86 lines, `build.mk`: 19 lines) alongside 438 lines of unit tests (`rts5817_flasher_test.cc`), exceeding the 250-line production limit and bundling three independently reviewable and testable components. Please split this CL into smaller stacked CLs (continuing the pattern of the parent CLs in this stack):\n1. **CL 1 (`RtsLibusbBackend`):** Add `util/realtekfp/rts5817_libusb_backend.{h,cc}` and `util/realtekfp/rts5817_libusb_backend_test.cc`, wired into `rts5817_flash_test` in `util/realtekfp/build.mk`.\n2. **CL 2 (`rts5817_flasher`):** Add `util/realtekfp/rts5817_flasher.{h,cc}` and `util/realtekfp/rts5817_flasher_test.cc`, wired into `rts5817_flash_test` in `util/realtekfp/build.mk`.\n3. **CL 3 (`rts5817_flash` CLI binary):** Add `util/realtekfp/rts5817_flash.cc` and the `rts5817_flash` host binary target in `util/realtekfp/build.mk`.\n\n**Commit Message:** Well-written prose with proper `BUG\u003d` and `TEST\u003d` tags; when splitting the CL, scope each commit message to its corresponding layer:\n\n*CL 1 commit message:*\n```text\nrts5817: Add libusb backend for RtsUsbBackend\n\nAdd RtsLibusbBackend, the libusb-1.0 implementation of RtsUsbBackend\nfor the RTS5817 host flashing tool.\n\nThe backend enumerates devices with libusb_get_device_list() rather\nthan using libusb_open_device_with_vid_pid(), so a device that exists\nbut cannot be opened is reported as access denied instead of missing.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n*CL 2 commit message:*\n```text\nrts5817: Add firmware flashing sequence\n\nAdd Flash() in rts5817_flasher.{h,cc} to orchestrate the RTS5817 DFU\nupdate flow independently of the command line so that it can be unit\ntested against a simulated USB bus.\n\nFlash() strips any trailing DFU suffix, rejects empty payloads before\ntouching USB, enables download mode and detaches runtime devices into\nDFU mode, flashes devices already in DFU mode directly without\ndetaching again, and waits for the device to re-enumerate in runtime\nmode after the download completes.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\n```\n\n*CL 3 commit message:*\n```text\nrts5817: Add rts5817_flash command line tool\n\nAdd the rts5817_flash host utility entry point wiring command-line\nparsing, firmware file reading, RtsLibusbBackend, and Flash() into a\nself-contained flashing binary.\n\nBUG\u003db:494586772\nTEST\u003dmake BOARD\u003dhost utils-test\nTEST\u003dRun ./rts5817_flash -i ec_rts5817.bin against an RTS5817 device;\nDFU download completes and the device boots the new image.\n```\n\n[[trajectory](https://goto.corp.google.com/traj/101a2012-b605-4679-9305-0c22661e65c3)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7050fd9_956a7e8e",
+        "filename": "util/realtekfp/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please link `rts5817_libusb_backend.o` (along with `--cflags libusb-1.0` and `--libs libusb-1.0`, matching `util/egis/build.mk` and `util/focaltech/build.mk`) into `rts5817_flash_test` and add a `rts5817_libusb_backend_test.cc` suite covering `RtsLibusbBackend`\u0027s uninitialized/unopened state and guard paths:\n- `IsOpen()` is `false` initially, and `Close()` / `ReleaseInterface()` are safe no-ops when closed.\n- `Open()` before `Init()` fails with `LIBUSB_ERROR_NO_DEVICE`.\n- `ControlTransferIn()`, `ControlTransferOut()`, `GetInterfaces()`, `ClaimInterface()`, and `ResetDevice()` fail with `LIBUSB_ERROR_NO_DEVICE` when no device handle is open.\n- `ErrorName()` returns the `libusb_error_name()` string for `LIBUSB_ERROR_*` codes.\n\nLinking and testing `rts5817_libusb_backend.o` in `rts5817_flash_test` also allows `RtsLibusbBackend` to be landed as a self-contained prerequisite CL that compiles and passes `make BOARD\u003dhost utils-test` on its own.\n\n[🔗](http://go/tj/101a2012-b605-4679-9305-0c22661e65c3)",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0a8337a_21c26730",
+        "filename": "util/realtekfp/rts5817_flash.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `Report()` is only called once (line 80). Inline `std::println(stderr, \"Flash failed: {}\", realtekfp::ToString(res.error()));` at the call site and delete this unnamed namespace and `#include \u003cstring_view\u003e`.\n\nAlso, once `StripDfuSuffix()` and the empty-payload check are moved into `Flash()` (see comment on `rts5817_flasher.cc`), lines 63–75 as well as `#include \u003ccstdint\u003e` and `#include \u003cspan\u003e` can be removed from `rts5817_flash.cc`:\n```cpp\n  auto image \u003d realtekfp::ReadFile(cfg-\u003eimg);\n  if (!image) {\n    std::println(stderr, \"Failed to read firmware.\");\n    return EXIT_FAILURE;\n  }\n  std::println(\"Firmware size: {} bytes.\", image-\u003esize());\n\n  realtekfp::RtsUsbDevice device(\n      std::make_unique\u003crealtekfp::RtsLibusbBackend\u003e());\n\n  if (auto res \u003d realtekfp::Flash(device, cfg-\u003edev_id, *image); !res) {\n    std::println(stderr, \"Flash failed: {}\", realtekfp::ToString(res.error()));\n    return EXIT_FAILURE;\n  }\n```\n\n[🔗](http://go/tj/101a2012-b605-4679-9305-0c22661e65c3)",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2e89259_5067e0ee",
+        "filename": "util/realtekfp/rts5817_flasher.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two improvements in `Flash()`:\n\n1. **Co-locate `StripDfuSuffix()` and the empty-payload check at the start of `Flash()`:** Currently `rts5817_flash.cc` strips the DFU suffix and checks `firmware.empty()` in `main()`, while `Flash()` itself opens the target device, enables download mode, sends `DfuDetach()`, and waits for DFU re-enumeration before `DfuDownload()` checks `firmware.empty()`. Calling `Flash()` with an empty span or a 16-byte suffix-only image therefore detaches the device into DFU mode (`0BDA:5800`) before failing with `RtsError::kInvalidParameter`, and keeping the pre-flight check in `main()` leaves it untested by `FlasherTest`. Moving `StripDfuSuffix()` and `if (firmware.empty())` to the top of `Flash()` makes `Flash()` self-validating before touching the USB bus.\n2. **Narrow variable scope:** `dfu_id` (line 70) is only used inside the `if (!in_dfu_mode)` branch, and `in_dfu_mode` (line 69) is only used once as the branch condition.\n\n```cpp\nstd::expected\u003cvoid, RtsError\u003e Flash(RtsUsbDevice\u0026 device,\n                                    const std::optional\u003cUsbDeviceId\u003e\u0026 requested,\n                                    std::span\u003cconst uint8_t\u003e image) {\n  // The device does not accept the DFU suffix as download payload.\n  const std::span\u003cconst uint8_t\u003e firmware \u003d StripDfuSuffix(image);\n  if (firmware.size() !\u003d image.size()) {\n    std::println(\"Stripped {}-byte DFU suffix, payload is {} bytes.\",\n                 image.size() - firmware.size(), firmware.size());\n  }\n  if (firmware.empty()) {\n    std::println(stderr, \"Error: the firmware image is empty.\");\n    return std::unexpected(RtsError::kInvalidParameter);\n  }\n\n  auto target \u003d OpenTarget(device, requested);\n  if (!target) {\n    return std::unexpected(target.error());\n  }\n\n  // A device that is already in DFU mode must not be asked to enter it again:\n  // GET_STATUS stalls there and DFU_DETACH would leave DFU mode instead.\n  if (target-\u003epid !\u003d kRts5817DfuId.pid) {\n    if (auto res \u003d device.EnableDownload(); !res) {\n      return res;\n    }\n\n    // Switch from Runtime mode to DFU mode; the device re-enumerates.\n    if (auto res \u003d device.DfuDetach(kDetachTimeout); !res) {\n      return res;\n    }\n\n    // Poll for the re-enumeration instead of sleeping a fixed time.\n    const UsbDeviceId dfu_id \u003d {.vid \u003d target-\u003evid, .pid \u003d kRts5817DfuId.pid};\n    if (auto res \u003d\n            device.WaitForDevice(dfu_id, kReEnumTimeout, kReEnumPollInterval);\n        !res) {\n      return res;\n    }\n  }\n```\n\n[🔗](http://go/tj/101a2012-b605-4679-9305-0c22661e65c3)",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03affd5a_5851ce2c",
+        "filename": "util/realtekfp/rts5817_flasher.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider exposing `kDetachTimeout`, `kReEnumTimeout`, and `kReEnumPollInterval` here as `inline constexpr` constants (matching `kUsbCtrlTimeout` and `kUsbDfuTimeout` in `rts5817_usb_device.h`) so `rts5817_flasher_test.cc` can derive its sleep assertions and poll-timeout boundary counts directly from the named constants instead of hardcoding `milliseconds(100)` and `1 \u003c\u003c 20`:\n\n```cpp\n// USB IDs of the RTS5817: the runtime mode, and the DFU mode it detaches into.\ninline constexpr UsbDeviceId kRts5817RuntimeId \u003d {.vid \u003d 0x0BDA, .pid \u003d 0x5817};\ninline constexpr UsbDeviceId kRts5817DfuId \u003d {.vid \u003d 0x0BDA, .pid \u003d 0x5800};\n\n// DFU_DETACH wValue timeout.\ninline constexpr std::chrono::milliseconds kDetachTimeout{1000};\n// Max wait for the device to re-enumerate, and the poll period.\ninline constexpr std::chrono::milliseconds kReEnumTimeout{10000};\ninline constexpr std::chrono::milliseconds kReEnumPollInterval{100};\n```\n\n[🔗](http://go/tj/101a2012-b605-4679-9305-0c22661e65c3)",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db9b4450_01688dc1",
+        "filename": "util/realtekfp/rts5817_flasher_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please clean up the unused declarations and use `std::ranges` helpers consistently in this test file:\n- **Line 20**: Remove unused `#include \u003cstring\u003e`.\n- **Line 32**: Remove unused `using ::testing::Not;`.\n- **Lines 74–75, 81, 135**: Remove `get_status_calls` and `init_count` from `FakeBus`, which are incremented but never read or asserted on.\n- **Line 136**: Prefer `std::ranges::fill(data, 0);` over `std::fill(data.begin(), data.end(), 0);`.\n- **Line 268**: In `Saw()`, prefer `std::ranges::contains(bus_-\u003eevents, event);` over `std::ranges::find(bus_-\u003eevents, event) !\u003d bus_-\u003eevents.end();`.\n\n[🔗](http://go/tj/101a2012-b605-4679-9305-0c22661e65c3)",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ffd3f6a_afb813f7",
+        "filename": "util/realtekfp/rts5817_flasher_test.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please tighten the sleep and timeout boundary assertions and add tests for the remaining branches in `Flash()`:\n\n1. **Assert exact sleep duration in `PollsUntilTheDfuDeviceAppears` (lines 294–302):** `polls_before_reenumeration \u003d 3` applies to both detach transitions (Runtime -\u003e DFU and DFU -\u003e Runtime), and `FakeBus` does not sleep during `DfuPollIdle`. Use `EXPECT_EQ` with `kReEnumPollInterval` instead of `EXPECT_GE` with a hardcoded `milliseconds(100)`:\n```cpp\nTEST_F(FlasherTest, PollsUntilTheDfuDeviceAppears) {\n  constexpr int kPollsBeforeReenum \u003d 3;\n  Start(FakeBus::Mode::kBootRom);\n  bus_-\u003epolls_before_reenumeration \u003d kPollsBeforeReenum;\n\n  ASSERT_TRUE(Run({1, 2}));\n\n  // Each of the two re-enumerations (to DFU and back to runtime) sleeps once\n  // per failed poll.\n  EXPECT_EQ(slept_, 2 * kPollsBeforeReenum * kReEnumPollInterval);\n}\n```\n2. **Test the exact re-enumeration poll timeout boundary (lines 414–435):** Instead of `1 \u003c\u003c 20`, derive the poll limit from `kMaxReEnumPolls \u003d static_cast\u003cint\u003e(kReEnumTimeout / kReEnumPollInterval)` (`100`) and verify both sides of the boundary (`kMaxReEnumPolls - 1` succeeds on the final poll; `kMaxReEnumPolls` fails with `RtsError::kTimeout` after sleeping `kReEnumTimeout`).\n3. **Cover the remaining error and pre-flight branches in `Flash()` (`rts5817_flasher.cc` lines 73–80):**\n   - `EnableDownload()` failure (e.g., when `GET_STATUS` in Boot ROM mode fails, `Flash()` returns the error without sending `DFU_DETACH`).\n   - `DfuDetach()` failure (when the initial `DFU_DETACH` fails, `Flash()` returns the error without polling for DFU re-enumeration or downloading).\n   - DFU suffix stripping (an image ending with a valid 16-byte `\"UFD\"` suffix flashes only the payload bytes) and empty / suffix-only image rejection (`Run({})` and `Run(kOnlyDfuSuffix)` fail with `RtsError::kInvalidParameter` and `EXPECT_TRUE(bus_-\u003eevents.empty())`).\n\n[🔗](http://go/tj/101a2012-b605-4679-9305-0c22661e65c3)",
+      "range": {
+        "startLine": 294,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0978158_36651814",
+        "filename": "util/realtekfp/rts5817_libusb_backend.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-11-03T06:25:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Two cleanups in `rts5817_libusb_backend.cc`:\n\n1. **Use `std::out_ptr` in `Open()` (lines 46–68):** `Init()` (line 30) and `GetInterfaces()` (line 141) populate their `std::unique_ptr`s directly via `std::out_ptr`, whereas `Open()` uses raw pointer temporaries `raw_list` and `handle`. Using `std::out_ptr(list)` and `std::out_ptr(dev_handle_)` eliminates both raw pointers.\n2. **Merge the two unnamed namespaces \u0026 add compile-time error-code checks (lines 14–25 and 90–114):** Move `DoControlTransfer()` into the single `namespace { ... }` block at the top of the file, remove the redundant `if (list)` check in `FreeDeviceList()` (`std::unique_ptr` never invokes its deleter on `nullptr`), and add `static_assert`s verifying that the `kUsbError*` constants in `rts5817_usb_backend.h` match `LIBUSB_ERROR_*`:\n\n```cpp\nstatic_assert(kUsbErrorAccess \u003d\u003d LIBUSB_ERROR_ACCESS);\nstatic_assert(kUsbErrorNoDevice \u003d\u003d LIBUSB_ERROR_NO_DEVICE);\nstatic_assert(kUsbErrorNotFound \u003d\u003d LIBUSB_ERROR_NOT_FOUND);\nstatic_assert(kUsbErrorPipe \u003d\u003d LIBUSB_ERROR_PIPE);\n\nnamespace {\n\n// Frees a device list and drops the references libusb took on its devices.\nvoid FreeDeviceList(libusb_device** list) {\n  libusb_free_device_list(list, /*unref_devices\u003d*/1);\n}\n\nusing DeviceList \u003d std::unique_ptr\u003clibusb_device*, CDeleter\u003cFreeDeviceList\u003e\u003e;\n```\nand in `Open()`:\n```cpp\n  DeviceList list;\n  const ssize_t count \u003d\n      libusb_get_device_list(ctx_.get(), std::out_ptr(list));\n  if (count \u003c 0) {\n    return std::unexpected(static_cast\u003cint\u003e(count));\n  }\n\n  for (libusb_device* device :\n       std::span(list.get(), static_cast\u003csize_t\u003e(count))) {\n    libusb_device_descriptor desc;\n\n    if (libusb_get_device_descriptor(device, \u0026desc) \u003c 0 ||\n        desc.idVendor !\u003d id.vid || desc.idProduct !\u003d id.pid) {\n      continue;\n    }\n\n    int ret \u003d libusb_open(device, std::out_ptr(dev_handle_));\n    if (ret \u003c 0) {\n      return std::unexpected(ret);\n    }\n```\n\n[🔗](http://go/tj/101a2012-b605-4679-9305-0c22661e65c3)",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5b94ca08860f16fcd7de5dc4587a74cb3fdfbd76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
